@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "start:api": "turbo run start --filter=api",
+    "start:app": "turbo run start --filter=web",
     "clean": "turbo run clean",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

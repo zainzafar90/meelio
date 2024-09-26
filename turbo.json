@@ -7,6 +7,12 @@
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_API_HOST"]
     },
+    "start": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_API_HOST"]
+    },
     "test": {
       "outputs": ["coverage/**"],
       "dependsOn": []
