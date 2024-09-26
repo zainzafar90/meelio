@@ -51,6 +51,8 @@ const { value: envVars, error } = envVarsSchema
   .prefs({ errors: { label: "key" } })
   .validate(process.env);
 
+console.log({ NODE___ENVIRONMENT: process.env.NODE_ENV });
+
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
