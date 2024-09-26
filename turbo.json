@@ -1,6 +1,26 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [".env*"],
+  "globalEnv": [
+    "NODE_ENV",
+    "PORT",
+    "MONGODB_URL",
+    "JWT_SECRET",
+    "JWT_ACCESS_EXPIRATION_MINUTES",
+    "JWT_REFRESH_EXPIRATION_DAYS",
+    "JWT_RESET_PASSWORD_EXPIRATION_MINUTES",
+    "JWT_VERIFY_EMAIL_EXPIRATION_MINUTES",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USERNAME",
+    "SMTP_PASSWORD",
+    "EMAIL_FROM",
+    "CLIENT_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "LEMON_SQUEEZY_SIGNING_SECRET",
+    "LEMON_SQUEEZY_API_KEY",
+    "LEMON_SQUEEZY_STORE_ID"
+  ],
   "tasks": {
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
