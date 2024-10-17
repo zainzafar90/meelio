@@ -32,5 +32,5 @@
     "prettier.config.js",
     "postcss.config.js"
   ],
-  "exclude": ["node_modules", "./public/sounds"]
+  "exclude": ["node_modules", "**/public/sounds/**"]
 }
