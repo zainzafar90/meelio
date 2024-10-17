@@ -1,0 +1,33 @@
+import { BrowserRouter } from "react-router-dom";
+
+import { Analytics } from "@vercel/analytics/react";
+
+import { ConnectionWarning } from "@/components/connection-warning";
+import SoundPlayer from "@/components/soundscape/sound-player/sound-player";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toast/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+import { AuthProvider } from "./auth-provider";
+
+type AppProviderProps = {
+  children: React.ReactNode;
+};
+
+export const AppProvider = ({ children }: AppProviderProps) => {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <TooltipProvider>
+            {children}
+            <SoundPlayer />
+            <Toaster />
+            <Analytics />
+            <ConnectionWarning />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+};

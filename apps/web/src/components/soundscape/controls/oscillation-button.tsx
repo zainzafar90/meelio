@@ -1,0 +1,72 @@
+import gsap from "gsap";
+
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useInterval } from "@/hooks/use-interval";
+import { useMeelioStore } from "@/store/meelio.store";
+import {
+  generateNextVolumeForOscillation,
+  OSCILLATION_INTERVAL_MS,
+} from "@/utils/sound.utils";
+
+export const OscillationButton = () => {
+  const { sounds, isOscillating, toggleOscillation, setVolumeForSound } =
+    useMeelioStore();
+
+  useInterval(() => {
+    if (!isOscillating) return;
+
+    // Get all playing sounds
+    const playingSounds = sounds.filter((sound) => sound.playing);
+
+    // Pick a random sound from the playing sounds
+    const soundToOscillate =
+      playingSounds[Math.floor(Math.random() * playingSounds.length)];
+
+    if (soundToOscillate) {
+      const nextVolume = generateNextVolumeForOscillation(soundToOscillate);
+
+      gsap.to(soundToOscillate, {
+        volume: nextVolume,
+        duration: 5,
+        ease: "sine.inOut",
+        onUpdate: () => {
+          // update the sound's volume in your app state on each animation frame
+          setVolumeForSound(soundToOscillate.id, soundToOscillate.volume);
+        },
+      });
+    }
+  }, OSCILLATION_INTERVAL_MS);
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "group flex items-center justify-center w-10 h-10 relative rounded-md bg-muted-background text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-muted-background focus:ring-offset-1",
+            {
+              "bg-background/10 text-foreground": isOscillating,
+            }
+          )}
+          onClick={() => toggleOscillation()}
+          aria-label={isOscillating ? "Shuffle Enabled" : "Shuffle Disabled"}
+        >
+          <div className="absolute -inset-4 md:hidden" />
+          <Icons.oscillation className="h-8 w-8" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>
+          Dynamically adjusting the volume of each sound to create a more
+          natural and organic soundscape
+        </p>
+      </TooltipContent>
+    </Tooltip>
+  );
+};
