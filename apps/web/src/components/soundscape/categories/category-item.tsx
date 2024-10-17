@@ -45,7 +45,7 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
         isActiveCategory(category.name as Category)
           ? "border-accent ring-1 ring-accent"
           : "border-foreground/20 hover:border-foreground/50 transition",
-        "relative flex min-w-48 max-w-48 flex-shrink-0 cursor-pointer rounded-lg border bg-background/50 p-4 shadow-sm select-none focus:outline-none"
+        "relative flex min-w-48 flex-shrink-0 cursor-pointer rounded-lg border bg-background/50 p-4 shadow-sm select-none focus:outline-none"
       )}
     >
       <div className="flex gap-4 flex-1">
