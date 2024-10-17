@@ -19,13 +19,11 @@
 export type PomodoroTimer = {
   running: boolean;
   remaining: number;
-  paused: boolean;
   sessionCount: number;
-  stageSeconds: [number, number, number];
+  stageSeconds: Record<PomodoroStage, number>;
   activeStage: PomodoroStage;
   autoStartBreaks: boolean;
   longBreakInterval: number;
-  completed: boolean;
   enableSound: boolean;
 };
 

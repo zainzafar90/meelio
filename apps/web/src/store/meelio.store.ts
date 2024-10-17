@@ -312,18 +312,16 @@ export const useMeelioStore = create<State>((set) => ({
   timer: {
     activeStage: PomodoroStage.WorkTime,
     running: false,
-    paused: false,
-    autoStartBreaks: false,
-    remaining: 1 * MINUTE_IN_SECONDS, // Initial timer duration in seconds
+    remaining: 25 * MINUTE_IN_SECONDS,
     sessionCount: 0,
-    stageSeconds: [
-      1 * MINUTE_IN_SECONDS, // work time
-      2 * MINUTE_IN_SECONDS, // short break
-      5 * MINUTE_IN_SECONDS, // long break
-    ],
+    stageSeconds: {
+      [PomodoroStage.WorkTime]: 25 * MINUTE_IN_SECONDS,
+      [PomodoroStage.ShortBreak]: 5 * MINUTE_IN_SECONDS,
+      [PomodoroStage.LongBreak]: 15 * MINUTE_IN_SECONDS,
+    },
     longBreakInterval: 4,
-    completed: false,
-    enableSound: false,
+    autoStartBreaks: true,
+    enableSound: true,
   },
 
   /*
@@ -707,21 +705,7 @@ export const useMeelioStore = create<State>((set) => ({
   |
   */
   startTimer: () =>
-    set((state) => {
-      // Check if the timer is already running or completed
-      if (state.timer.running) {
-        return state;
-      }
-
-      return {
-        ...state,
-        timer: {
-          ...state.timer,
-          running: true,
-          remaining: state.timer.stageSeconds[state.timer.activeStage],
-        },
-      };
-    }),
+    set((state) => ({ timer: { ...state.timer, running: true } })),
 
   /*
   |--------------------------------------------------------------------------
@@ -733,19 +717,7 @@ export const useMeelioStore = create<State>((set) => ({
   |
   */
   pauseTimer: () =>
-    set((state) => {
-      // Check if the timer is running
-      if (state.timer.running) {
-        return {
-          timer: {
-            ...state.timer,
-            running: false,
-            paused: true,
-          },
-        };
-      }
-      return state;
-    }),
+    set((state) => ({ timer: { ...state.timer, running: false } })),
 
   /*
   |--------------------------------------------------------------------------
@@ -756,19 +728,7 @@ export const useMeelioStore = create<State>((set) => ({
   |
   */
   resumeTimer: () =>
-    set((state) => {
-      // Check if the timer is paused
-      if (state.timer.paused) {
-        return {
-          timer: {
-            ...state.timer,
-            running: true,
-            paused: false,
-          },
-        };
-      }
-      return state;
-    }),
+    set((state) => ({ timer: { ...state.timer, running: true } })),
 
   /*
   |--------------------------------------------------------------------------
@@ -827,20 +787,14 @@ export const useMeelioStore = create<State>((set) => ({
   |
   */
   changeStage: (stage: PomodoroStage) =>
-    set((state) => {
-      const { stageSeconds } = state.timer;
-      const nextStageSeconds = stageSeconds[stage];
-
-      return {
-        timer: {
-          ...state.timer,
-          activeStage: stage,
-          remaining: nextStageSeconds,
-          running: false,
-          paused: true,
-        },
-      };
-    }),
+    set((state) => ({
+      timer: {
+        ...state.timer,
+        activeStage: stage,
+        remaining: state.timer.stageSeconds[stage],
+        running: false,
+      },
+    })),
 
   /*
   |--------------------------------------------------------------------------
@@ -903,29 +857,26 @@ export const useMeelioStore = create<State>((set) => ({
         longBreakInterval,
         autoStartBreaks,
       } = state.timer;
+      let nextStage: PomodoroStage;
+      let newSessionCount = sessionCount;
 
-      const newSessionCount = getSessionCount(activeStage, sessionCount);
-
-      const nextStage = getNextStage(
-        activeStage,
-        newSessionCount,
-        longBreakInterval
-      );
-
-      const nextStageSeconds = stageSeconds[nextStage];
-
-      // Automatically start the next stage
-      const shouldAutoStart = autoStartBreaks && !state.timer.completed;
+      if (activeStage === PomodoroStage.WorkTime) {
+        newSessionCount++;
+        nextStage =
+          newSessionCount % longBreakInterval === 0
+            ? PomodoroStage.LongBreak
+            : PomodoroStage.ShortBreak;
+      } else {
+        nextStage = PomodoroStage.WorkTime;
+      }
 
       return {
         timer: {
           ...state.timer,
-          running: shouldAutoStart,
-          paused: false,
           activeStage: nextStage,
-          remaining: nextStageSeconds,
+          remaining: stageSeconds[nextStage],
+          running: autoStartBreaks || nextStage === PomodoroStage.WorkTime,
           sessionCount: newSessionCount,
-          autoStartBreaks: shouldAutoStart,
         },
       };
     }),
@@ -977,9 +928,9 @@ export const useMeelioStore = create<State>((set) => ({
       timer: {
         ...state.timer,
         running: false,
-        paused: false,
         activeStage: PomodoroStage.WorkTime,
         remaining: state.timer.stageSeconds[PomodoroStage.WorkTime],
+        sessionCount: 0,
       },
     })),
 

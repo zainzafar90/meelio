@@ -1,61 +1,46 @@
 // worker.js
-let interval: NodeJS.Timeout;
-let elapsed = 0;
-let duration: number;
-let running = false;
+let interval: ReturnType<typeof setInterval> | null = null;
+let remaining = 0;
 
-function startTimer() {
-  if (!running) {
-    running = true;
-    interval = setInterval(() => {
-      elapsed += 1;
-      postMessage({ type: "tick", elapsed });
-      if (elapsed >= duration) {
-        postMessage({ type: "stage-completed" });
-        clearInterval(interval);
-        running = false;
-      }
-    }, 1000);
-  }
+function startTimer(duration: number) {
+  remaining = duration;
+  if (interval) clearInterval(interval);
+  interval = setInterval(() => {
+    remaining -= 1;
+    self.postMessage({ type: "tick", remaining });
+    if (remaining <= 0) {
+      clearInterval(interval!);
+      interval = null;
+      self.postMessage({ type: "complete" });
+    }
+  }, 1000);
 }
 
 function pauseTimer() {
-  if (running) {
+  if (interval) {
     clearInterval(interval);
-    running = false;
+    interval = null;
   }
 }
 
 function resumeTimer() {
-  if (!running) {
-    running = true;
-    interval = setInterval(() => {
-      elapsed += 1;
-      postMessage({ type: "tick", elapsed });
-      if (elapsed >= duration) {
-        postMessage({ type: "stage-completed" });
-        clearInterval(interval);
-        running = false;
-      }
-    }, 1000);
+  if (!interval) {
+    startTimer(remaining);
   }
 }
 
-self.addEventListener("message", (e) => {
-  const { command, newDuration } = e.data;
-  switch (command) {
+self.addEventListener("message", (e: MessageEvent) => {
+  switch (e.data.command) {
     case "start":
-      duration = newDuration;
-      elapsed = 0;
-      startTimer();
+      startTimer(e.data.duration);
       break;
     case "pause":
-      console.log("paused");
       pauseTimer();
       break;
     case "resume":
-      console.log("paused");
       resumeTimer();
       break;
   }
 });
+
+export {};
