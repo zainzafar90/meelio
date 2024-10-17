@@ -7,7 +7,6 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "turbo run build",
     "build:api": "turbo run build --filter=api",
     "build:app": "turbo run build --filter=web",
     "start:api": "turbo run start --filter=api",
