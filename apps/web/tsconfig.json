@@ -25,8 +25,12 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "vite.config.ts",
-  "prettier.config.js",
-  "postcss.config.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "vite.config.ts",
+    "prettier.config.js",
+    "postcss.config.js"
+  ],
+  "exclude": ["node_modules", "./public/sounds"]
 }
