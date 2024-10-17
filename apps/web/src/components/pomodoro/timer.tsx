@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Worker from "@/workers/timer.worker?worker";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
-import { useMeelioStore } from "@/store/meelio.store";
+import { usePomodoroStore } from "@/store/pomodoro.store";
 import { playPomodoroSound } from "@/utils/sound.utils";
 import { getTime } from "@/utils/timer.utils";
 
@@ -23,7 +23,7 @@ export const Timer: React.FC = () => {
     updateTimer,
     advanceTimer,
     changeStage,
-  } = useMeelioStore();
+  } = usePomodoroStore();
 
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
 

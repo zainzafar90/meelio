@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useMeelioStore } from "@/store/meelio.store";
+import { usePomodoroStore } from "@/store/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
 
 import { Button } from "../ui/button";
@@ -27,7 +27,7 @@ export const PomodoroSettingsDialog = ({
     toggleAutoStartBreaks,
     toggleTimerSound,
     changeTimerSettings,
-  } = useMeelioStore((state) => state);
+  } = usePomodoroStore();
 
   const { stageSeconds } = timer;
 
