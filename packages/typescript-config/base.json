@@ -17,5 +17,5 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "exclude": ["node_modules", "./apps/web/public/sounds"]
+  "exclude": ["node_modules", "apps/web/public/sounds"]
 }
