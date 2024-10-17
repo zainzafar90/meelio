@@ -143,7 +143,7 @@ html {
   .card__bottom,
   .card__back::before,
   .card__back::after {
-    backface-visiblity: hidden;
+    backface-visibility: hidden;
     transform-style: preserve-3d;
     transform: translateZ(0);
   }
@@ -189,7 +189,7 @@ html {
   height: var(--half-height);
   width: 100%;
   transition: all 0.3s ease-in;
-  backface-visiblity: hidden;
+  backface-visibility: hidden;
   transform-style: preserve-3d;
   transform: translateZ(0);
 }
