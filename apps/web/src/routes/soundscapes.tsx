@@ -5,8 +5,10 @@ import { AppLayout } from "@/layouts/app-layout";
 const Soundscapes = () => {
   return (
     <AppLayout>
-      <CategoryList />
-      <SoundList />
+      <div className="p-6">
+        <CategoryList />
+        <SoundList />
+      </div>
     </AppLayout>
   );
 };

@@ -14,6 +14,7 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { FlipClockPiece } from "./flip-clock-piece";
 import { PomodoroSettingsDialog } from "./pomodoro-settings.dialog";
+import { ResetTimerDialog } from "./reset-timer.dialog";
 
 const worker = new Worker();
 
@@ -168,20 +169,20 @@ const TimerControls: React.FC<{
   onStartPause: () => void;
   onReset: () => void;
   onOpenSettings: () => void;
-}> = ({ isRunning, onStartPause, onReset, onOpenSettings }) => (
-  <div className="mx-auto max-w-2xl p-1 py-4 flex items-center space-x-2">
-    <Button size="lg" onClick={onStartPause}>
-      {isRunning ? (
-        <Icons.pause className="size-5" />
-      ) : (
-        <Icons.play className="size-5" />
-      )}
-    </Button>
-    <Button size="lg" variant="secondary" onClick={onReset}>
-      <Icons.history className="size-5" />
-    </Button>
-    <Button size="lg" variant="secondary" onClick={onOpenSettings}>
-      <Icons.settings className="size-5" />
-    </Button>
-  </div>
-);
+}> = ({ isRunning, onStartPause, onReset, onOpenSettings }) => {
+  return (
+    <div className="mx-auto max-w-2xl p-1 pt-4 flex items-center justify-center space-x-2">
+      <Button size="lg" onClick={onStartPause}>
+        {isRunning ? (
+          <Icons.pause className="size-5" />
+        ) : (
+          <Icons.play className="size-5" />
+        )}
+      </Button>
+      <ResetTimerDialog onReset={onReset} />
+      <Button size="lg" variant="secondary" onClick={onOpenSettings}>
+        <Icons.settings className="size-5" />
+      </Button>
+    </div>
+  );
+};
