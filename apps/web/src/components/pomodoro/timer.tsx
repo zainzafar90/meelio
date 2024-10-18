@@ -177,38 +177,34 @@ const SessionProgress: React.FC<{
   sessionCount: number;
   longBreakInterval: number;
 }> = ({ sessionCount, longBreakInterval }) => {
-  const renderSessionIndicators = () => {
-    const indicators = [];
-    for (let i = 0; i < longBreakInterval; i++) {
-      if (i < sessionCount) {
-        indicators.push(<CheckCircle2 key={i} className="text-green-500" />);
-      } else {
-        indicators.push(
-          <div
-            key={i}
-            className="w-4 h-4 rounded-full border-2 border-gray-300"
-          ></div>
-        );
-      }
-    }
-    return indicators;
-  };
+  const completedIntervals = Math.floor(sessionCount / longBreakInterval);
+  const currentIntervalSessions = sessionCount % longBreakInterval;
 
-  const renderFireIcons = () => {
-    const fireCount = Math.floor(sessionCount / longBreakInterval);
-    return Array(fireCount)
+  const renderSessionIndicators = () => {
+    return Array(longBreakInterval)
       .fill(0)
-      .map((_, index) => <Flame key={index} className="text-orange-500" />);
+      .map((_, index) => (
+        <div key={index} className="w-5 h-5 flex items-center justify-center">
+          {index < currentIntervalSessions || index === 4 ? (
+            <CheckCircle2 className="text-green-600 w-5 h-5" />
+          ) : (
+            <div className="w-4 h-4 rounded-full border-2 border-gray-300" />
+          )}
+        </div>
+      ));
   };
 
   return (
-    <div className="text-center mt-4">
-      <div className="flex justify-center items-center space-x-2 mb-2">
+    <div className="flex justify-center mt-4 max-w-xs mx-auto gap-2">
+      <div className="flex justify-center items-center space-x-3 mb-2 border dark:border-zinc-800 dark:bg-zinc-900 border-zinc-100 bg-zinc-50 p-2 rounded-md">
         {renderSessionIndicators()}
       </div>
-      <div className="flex justify-center items-center space-x-1">
-        {renderFireIcons()}
-      </div>
+      {completedIntervals > 0 && (
+        <div className="flex justify-center items-center space-x-1 mb-2 border dark:border-zinc-800 dark:bg-zinc-900 border-zinc-100 bg-zinc-50 p-2 rounded-md">
+          🔥
+          <span className="text-sm font-medium ml-1">{completedIntervals}</span>
+        </div>
+      )}
     </div>
   );
 };
