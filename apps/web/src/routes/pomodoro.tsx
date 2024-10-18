@@ -50,7 +50,7 @@ const SessionProgress: React.FC<{
   };
 
   return (
-    <div className="absolute right-12 bottom-2">
+    <div className="absolute right-12 bottom-2 text-white">
       <div className="flex justify-center mt-4 max-w-xs mx-auto gap-2">
         <div className="flex justify-center items-center space-x-3 mb-2 bg-zinc-900 p-2 rounded-md backdrop-blur-lg bg-opacity-50">
           {renderSessionIndicators()}
