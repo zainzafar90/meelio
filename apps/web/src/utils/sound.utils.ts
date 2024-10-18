@@ -94,7 +94,9 @@ export const playTypewriterSound = (key: string) => {
 
 export const playPomodoroSound = (sound: "timeout" | "ticking") => {
   if (sound === "timeout") {
-    const audio = new Audio("./sounds/pomodoro/timeout-1-back-chime.mp3");
+    const audio = new Audio(
+      "./sounds/pomodoro/timeout-3-forward-single-chime.mp3"
+    );
     audio.play();
   }
 
