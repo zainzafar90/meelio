@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import Worker from "@/workers/timer.worker?worker";
+import { CheckCircle2, Flame } from "lucide-react";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { usePomodoroStore } from "@/store/pomodoro.store";
@@ -78,63 +79,136 @@ export const Timer: React.FC = () => {
 
   return (
     <div>
-      <RadioGroup
-        value={timer.activeStage.toString()}
-        onValueChange={(value) => changeStage(parseInt(value) as PomodoroStage)}
-        className="grid grid-cols-3 gap-4 mb-4"
-      >
-        {Object.values(PomodoroStage)
-          .filter((v) => !isNaN(Number(v)))
-          .map((stage) => (
-            <div key={stage}>
-              <RadioGroupItem
-                value={stage.toString()}
-                id={stage.toString()}
-                className="peer sr-only"
-              />
-              <Label
-                htmlFor={stage.toString()}
-                className="flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-secondary hover:text-secondary-foreground peer-data-[state=checked]:border-primary cursor-pointer select-none"
-              >
-                {PomodoroStageMap[stage as PomodoroStage]}
-              </Label>
-            </div>
-          ))}
-      </RadioGroup>
+      <StageSelector
+        activeStage={timer.activeStage}
+        onChangeStage={changeStage}
+      />
 
-      <div className="flex justify-center gap-x-4 mb-4">
-        <FlipClockPiece interval={minutesTens} />
-        <FlipClockPiece interval={minutesUnit} />
-        <FlipClockPiece interval={secondsTens} />
-        <FlipClockPiece interval={secondsUnit} />
-      </div>
+      <TimerDisplay
+        minutesTens={minutesTens || "0"}
+        minutesUnit={minutesUnit || "0"}
+        secondsTens={secondsTens}
+        secondsUnit={secondsUnit}
+      />
 
-      <div className="mx-auto max-w-xl p-1 py-4 flex items-center space-x-2">
-        <Button className="px-8" size="lg" fullWidth onClick={handleStartPause}>
-          {timer.running ? "Pause" : "Start"}
-        </Button>
-        <Button size="lg" variant="secondary" onClick={resetTimer}>
-          Reset
-        </Button>
-        <Button
-          size="lg"
-          variant="secondary"
-          onClick={() => setShowSettingsDialog(true)}
-        >
-          Settings
-        </Button>
-      </div>
+      <TimerControls
+        isRunning={timer.running}
+        onStartPause={handleStartPause}
+        onReset={resetTimer}
+        onOpenSettings={() => setShowSettingsDialog(true)}
+      />
 
-      <div className="text-center">
-        <p>
-          Session: {timer.sessionCount + 1} / {timer.longBreakInterval}
-        </p>
-      </div>
+      <SessionProgress
+        sessionCount={timer.sessionCount}
+        longBreakInterval={timer.longBreakInterval}
+      />
 
       <PomodoroSettingsDialog
         isOpen={showSettingsDialog}
         onClose={() => setShowSettingsDialog(false)}
       />
+    </div>
+  );
+};
+
+const StageSelector: React.FC<{
+  activeStage: PomodoroStage;
+  onChangeStage: (stage: PomodoroStage) => void;
+}> = ({ activeStage, onChangeStage }) => (
+  <RadioGroup
+    value={activeStage.toString()}
+    onValueChange={(value) => onChangeStage(parseInt(value) as PomodoroStage)}
+    className="grid grid-cols-3 gap-4 mb-4"
+  >
+    {Object.values(PomodoroStage)
+      .filter((v) => !isNaN(Number(v)))
+      .map((stage) => (
+        <div key={stage}>
+          <RadioGroupItem
+            value={stage.toString()}
+            id={stage.toString()}
+            className="peer sr-only"
+          />
+          <Label
+            htmlFor={stage.toString()}
+            className="flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 hover:bg-secondary hover:text-secondary-foreground peer-data-[state=checked]:border-primary cursor-pointer select-none"
+          >
+            {PomodoroStageMap[stage as PomodoroStage]}
+          </Label>
+        </div>
+      ))}
+  </RadioGroup>
+);
+
+const TimerDisplay: React.FC<{
+  minutesTens: string;
+  minutesUnit: string;
+  secondsTens: string;
+  secondsUnit: string;
+}> = ({ minutesTens, minutesUnit, secondsTens, secondsUnit }) => (
+  <div className="flex justify-center gap-x-4 mb-4">
+    <FlipClockPiece interval={minutesTens} />
+    <FlipClockPiece interval={minutesUnit} />
+    <FlipClockPiece interval={secondsTens} />
+    <FlipClockPiece interval={secondsUnit} />
+  </div>
+);
+
+const TimerControls: React.FC<{
+  isRunning: boolean;
+  onStartPause: () => void;
+  onReset: () => void;
+  onOpenSettings: () => void;
+}> = ({ isRunning, onStartPause, onReset, onOpenSettings }) => (
+  <div className="mx-auto max-w-xl p-1 py-4 flex items-center space-x-2">
+    <Button className="px-8" size="lg" fullWidth onClick={onStartPause}>
+      {isRunning ? "Pause" : "Start"}
+    </Button>
+    <Button size="lg" variant="secondary" onClick={onReset}>
+      Reset
+    </Button>
+    <Button size="lg" variant="secondary" onClick={onOpenSettings}>
+      Settings
+    </Button>
+  </div>
+);
+
+const SessionProgress: React.FC<{
+  sessionCount: number;
+  longBreakInterval: number;
+}> = ({ sessionCount, longBreakInterval }) => {
+  const renderSessionIndicators = () => {
+    const indicators = [];
+    for (let i = 0; i < longBreakInterval; i++) {
+      if (i < sessionCount) {
+        indicators.push(<CheckCircle2 key={i} className="text-green-500" />);
+      } else {
+        indicators.push(
+          <div
+            key={i}
+            className="w-4 h-4 rounded-full border-2 border-gray-300"
+          ></div>
+        );
+      }
+    }
+    return indicators;
+  };
+
+  const renderFireIcons = () => {
+    const fireCount = Math.floor(sessionCount / longBreakInterval);
+    return Array(fireCount)
+      .fill(0)
+      .map((_, index) => <Flame key={index} className="text-orange-500" />);
+  };
+
+  return (
+    <div className="text-center mt-4">
+      <div className="flex justify-center items-center space-x-2 mb-2">
+        {renderSessionIndicators()}
+      </div>
+      <div className="flex justify-center items-center space-x-1">
+        {renderFireIcons()}
+      </div>
     </div>
   );
 };

@@ -20,7 +20,7 @@ export const ConnectionWarning = () => {
       if (navigator.connection) {
         const effectiveType = navigator.connection.effectiveType;
 
-        if (["2g", "slow-2g", "3g", "slow-3g"].includes(effectiveType)) {
+        if (["2g", "slow-2g", "slow-3g"].includes(effectiveType)) {
           setIsSlow(true);
         } else {
           setIsSlow(false);
