@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import Worker from "@/workers/timer.worker?worker";
-import { CheckCircle2, Flame } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { usePomodoroStore } from "@/store/pomodoro.store";
