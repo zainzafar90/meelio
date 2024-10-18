@@ -1,5 +1,4 @@
-import { LucideProps } from "lucide-react";
-
+import { PomodoroStage } from "@/types/pomodoro";
 import { Icons } from "@/components/icons/icons";
 import { Timer } from "@/components/pomodoro/timer";
 import { AppLayout } from "@/layouts/app-layout";
@@ -7,6 +6,7 @@ import { usePomodoroStore } from "@/store/pomodoro.store";
 
 const Pomodoro = () => {
   const timer = usePomodoroStore((state) => state.timer);
+  timer.activeStage;
 
   return (
     <AppLayout>
@@ -21,6 +21,7 @@ const Pomodoro = () => {
         </div>
 
         <SessionProgress
+          activeStage={timer.activeStage}
           sessionCount={timer.sessionCount}
           longBreakInterval={timer.longBreakInterval}
         />
@@ -32,7 +33,8 @@ const Pomodoro = () => {
 const SessionProgress: React.FC<{
   sessionCount: number;
   longBreakInterval: number;
-}> = ({ sessionCount, longBreakInterval }) => {
+  activeStage: PomodoroStage;
+}> = ({ sessionCount, longBreakInterval, activeStage }) => {
   const completedIntervals = Math.floor(sessionCount / longBreakInterval);
   const currentIntervalSessions = sessionCount % longBreakInterval;
 
@@ -41,7 +43,8 @@ const SessionProgress: React.FC<{
       .fill(0)
       .map((_, index) => (
         <div key={index} className="size-5 flex items-center justify-center">
-          {index < currentIntervalSessions || index === 4 ? (
+          {index < currentIntervalSessions ||
+          activeStage === PomodoroStage.LongBreak ? (
             <Icons.checkFilled className="text-green-500 size-5" />
           ) : (
             <div className="size-4 rounded-full bg-zinc-300" />
