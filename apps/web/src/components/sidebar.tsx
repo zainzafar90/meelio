@@ -6,6 +6,36 @@ import { Icons } from "./icons/icons";
 import { Logomark } from "./logo";
 import { UserProfileDropdown } from "./user-profile-dropdown";
 
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="200"
+  height="200"
+  viewBox="0 0 24 24"
+>
+  <path
+    fill="currentColor"
+    d="M12,1A11,11,0,1,0,23,12,11,11,0,0,0,12,1Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,12,21Z"
+  />
+  <rect width="2" height="7" x="11" y="6" fill="currentColor" rx="1">
+    <animateTransform
+      attributeName="transform"
+      dur="9s"
+      repeatCount="indefinite"
+      type="rotate"
+      values="0 12 12;360 12 12"
+    />
+  </rect>
+  <rect width="2" height="9" x="11" y="11" fill="currentColor" rx="1">
+    <animateTransform
+      attributeName="transform"
+      dur="0.75s"
+      repeatCount="indefinite"
+      type="rotate"
+      values="0 12 12;360 12 12"
+    />
+  </rect>
+</svg>;
+
 const navigation = [
   {
     name: "Soundscapes",
@@ -33,13 +63,13 @@ const accountNavigation = [
     name: "Billing",
     href: "/account/billing",
     icon: Icons.billing,
-    activeIcon: Icons.billing,
+    activeIcon: Icons.billingActive,
   },
   {
     name: "Settings",
     href: "/account/settings",
     icon: Icons.settings,
-    activeIcon: Icons.settings,
+    activeIcon: Icons.settingsActive,
   },
 ];
 
@@ -76,12 +106,12 @@ export const Sidebar = () => {
                     >
                       {isCurrentView(item.href) ? (
                         <item.activeIcon
-                          className="h-4 w-4 shrink-0"
+                          className="size-5 shrink-0"
                           aria-hidden="true"
                         />
                       ) : (
                         <item.icon
-                          className="h-4 w-4 shrink-0"
+                          className="size-5 hrink-0"
                           aria-hidden="true"
                         />
                       )}
@@ -107,12 +137,12 @@ export const Sidebar = () => {
                   >
                     {isCurrentView(item.href) ? (
                       <item.activeIcon
-                        className="h-4 w-4 shrink-0"
+                        className="size-5 shrink-0"
                         aria-hidden="true"
                       />
                     ) : (
                       <item.icon
-                        className="h-4 w-4 shrink-0"
+                        className="size-5 shrink-0"
                         aria-hidden="true"
                       />
                     )}

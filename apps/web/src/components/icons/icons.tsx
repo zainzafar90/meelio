@@ -12,7 +12,6 @@ import {
   CloudRainWind,
   Coffee,
   Command,
-  CreditCard,
   File,
   FileText,
   Flower,
@@ -32,7 +31,6 @@ import {
   PenTool,
   Pizza,
   Plus,
-  Settings,
   Shuffle,
   Sparkle,
   Star,
@@ -67,8 +65,6 @@ export const Icons = {
   post: FileText,
   page: File,
   media: Image,
-  settings: Settings,
-  billing: CreditCard,
   ellipsis: MoreVertical,
   add: Plus,
   warning: AlertTriangle,
@@ -105,35 +101,92 @@ export const Icons = {
   logout: LogOut,
   chat: MessageCircleIcon,
   history: History,
-  soundscapes: ({ ...props }: LucideProps) => (
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
+  billing: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path opacity=".5" fill="currentColor" d="M2 9h20v2H2z" />
       <path
         fill="currentColor"
-        d="M6 1H1v14h5V1zm9 0h-5v5h5V1zm0 9v5h-5v-5h5zM0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm1 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1h-5z"
+        d="M19 5H5a3.009 3.009 0 0 0-3 3v1h20V8a3.009 3.009 0 0 0-3-3zM2 17a3.009 3.009 0 0 0 3 3h14a3.009 3.009 0 0 0 3-3v-6H2v6z"
+      />
+      <path fill="currentColor" d="M10 15H7a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2z" />
+    </svg>
+  ),
+  billingActive: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M19 5H5a3.009 3.009 0 0 0-3 3v1h20V8a3.009 3.009 0 0 0-3-3zM2 17a3.009 3.009 0 0 0 3 3h14a3.009 3.009 0 0 0 3-3v-6H2v6z"
+      />
+      <path fill="currentColor" d="M10 15H7a1 1 0 1 1 0-2h3a1 1 0 1 1 0 2z" />
+    </svg>
+  ),
+
+  settings: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        opacity=".5"
+        fill="currentColor"
+        d="m21.316 9.552-1.886-.63.89-1.777a1 1 0 0 0-.188-1.155L18.01 3.868a1 1 0 0 0-1.154-.187l-1.778.89-.63-1.887A1 1 0 0 0 13.5 2h-3a1 1 0 0 0-.949.684L8.922 4.57l-1.778-.89a.996.996 0 0 0-1.154.188L3.868 5.99a1 1 0 0 0-.187 1.155l.89 1.778-1.887.629A.999.999 0 0 0 2 10.5v3a.999.999 0 0 0 .684.948l1.886.63-.89 1.777a1 1 0 0 0 .188 1.155l2.122 2.122a.998.998 0 0 0 1.154.187l1.778-.89.63 1.887A1 1 0 0 0 10.5 22h3a1 1 0 0 0 .949-.684l.629-1.886 1.778.89a1 1 0 0 0 1.154-.188l2.122-2.122a1 1 0 0 0 .187-1.155l-.889-1.778 1.886-.629A.999.999 0 0 0 22 13.5v-3a.999.999 0 0 0-.684-.948ZM12 15a3 3 0 1 1 3-3 3.003 3.003 0 0 1-3 3Z"
+      />
+      <path
+        fill="currentColor"
+        d="M12 16a4 4 0 1 1 4-4 4.004 4.004 0 0 1-4 4Zm0-6a2 2 0 1 0 2 2 2.002 2.002 0 0 0-2-2Z"
+      />
+    </svg>
+  ),
+  settingsActive: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        opacity=".8"
+        fill="currentColor"
+        d="m21.316 9.552-1.886-.63.89-1.777a1 1 0 0 0-.188-1.155L18.01 3.868a1 1 0 0 0-1.154-.187l-1.778.89-.63-1.887A1 1 0 0 0 13.5 2h-3a1 1 0 0 0-.949.684L8.922 4.57l-1.778-.89a.996.996 0 0 0-1.154.188L3.868 5.99a1 1 0 0 0-.187 1.155l.89 1.778-1.887.629A.999.999 0 0 0 2 10.5v3a.999.999 0 0 0 .684.948l1.886.63-.89 1.777a1 1 0 0 0 .188 1.155l2.122 2.122a.998.998 0 0 0 1.154.187l1.778-.89.63 1.887A1 1 0 0 0 10.5 22h3a1 1 0 0 0 .949-.684l.629-1.886 1.778.89a1 1 0 0 0 1.154-.188l2.122-2.122a1 1 0 0 0 .187-1.155l-.889-1.778 1.886-.629A.999.999 0 0 0 22 13.5v-3a.999.999 0 0 0-.684-.948ZM12 15a3 3 0 1 1 3-3 3.003 3.003 0 0 1-3 3Z"
+      />
+      <path
+        fill="currentColor"
+        d="M12 16a4 4 0 1 1 4-4 4.004 4.004 0 0 1-4 4Zm0-6a2 2 0 1 0 2 2 2.002 2.002 0 0 0-2-2Z"
+      />
+    </svg>
+  ),
+  soundscapes: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path fill="currentColor" d="M22 11H10V2H8v20h2v-9h12z" opacity=".25" />
+      <path
+        fill="currentColor"
+        d="M3 2h5v20H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"
+      />
+      <path
+        fill="currentColor"
+        d="M10 2h11a1 1 0 0 1 1 1v8H10V2zm0 11h12v8a1 1 0 0 1-1 1H10v-9z"
+        opacity=".5"
       />
     </svg>
   ),
   soundscapesActive: ({ ...props }: LucideProps) => (
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path
         fill="currentColor"
-        d="M0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm0 9a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5z"
+        d="M2 3v18c0 .6.4 1 1 1h5V2H3c-.6 0-1 .4-1 1zm19-1H10v9h12V3c0-.6-.4-1-1-1zM10 22h11c.6 0 1-.4 1-1v-8H10v9z"
       />
     </svg>
   ),
   pomodoro: ({ ...props }: LucideProps) => (
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <g fill="currentColor">
-        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
-      </g>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M12 6a1 1 0 0 1 1 1v4.422l2.098 1.212a1 1 0 0 1-1 1.732l-2.598-1.5A1.005 1.005 0 0 1 11 12V7a1 1 0 0 1 1-1Z"
+      />
+      <path
+        fill="currentColor"
+        d="M2 12A10 10 0 1 0 12 2A10 10 0 0 0 2 12Zm9-5a1 1 0 0 1 2 0v4.422l2.098 1.212a1 1 0 0 1-1 1.732l-2.598-1.5A1.005 1.005 0 0 1 11 12Z"
+        opacity=".5"
+      />
     </svg>
   ),
   pomodoroActive: ({ ...props }: LucideProps) => (
-    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path
         fill="currentColor"
-        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
+        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2zm3.5 12c-.3.5-.9.6-1.4.4l-2.6-1.5c-.3-.2-.5-.5-.5-.9V7c0-.6.4-1 1-1s1 .4 1 1v4.4l2.1 1.2c.5.3.6.9.4 1.4z"
       />
     </svg>
   ),
