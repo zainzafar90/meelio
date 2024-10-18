@@ -24,7 +24,6 @@ export const Timer: React.FC = () => {
     startTimer,
     pauseTimer,
     resumeTimer,
-    resetTimer,
     updateTimer,
     advanceTimer,
     changeStage,
@@ -107,7 +106,6 @@ export const Timer: React.FC = () => {
       <TimerControls
         isRunning={timer.running}
         onStartPause={handleStartPause}
-        onReset={resetTimer}
         onOpenSettings={() => setShowSettingsDialog(true)}
       />
 
@@ -172,9 +170,8 @@ const TimerDisplay: React.FC<{
 const TimerControls: React.FC<{
   isRunning: boolean;
   onStartPause: () => void;
-  onReset: () => void;
   onOpenSettings: () => void;
-}> = ({ isRunning, onStartPause, onReset, onOpenSettings }) => {
+}> = ({ isRunning, onStartPause, onOpenSettings }) => {
   return (
     <div className="mx-auto max-w-2xl p-1 pt-4 flex items-center justify-center space-x-2">
       <Button

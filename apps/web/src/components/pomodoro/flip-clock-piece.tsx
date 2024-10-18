@@ -25,7 +25,7 @@ export const FlipClockPiece: React.FC<FlipClockPieceProps> = ({ interval }) => {
         <b
           className={cn(
             "card relative text-6xl sm:text-9xl",
-            "dark:text-[var(--flip-gradient-bottom)]text-[var(--flip-gradient-top)]",
+            "text-black dark:text-white",
             {
               "opacity-50": interval === null,
             }

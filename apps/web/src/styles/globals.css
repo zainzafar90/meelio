@@ -176,10 +176,11 @@ html {
   border-radius: var(--border-radius) var(--border-radius) 0 0;
   height: var(--half-height);
   width: 100%;
-  transition: all 0.3s ease-in;
+  transition: transform 0.3s ease-in;
   backface-visibility: hidden;
   transform-style: preserve-3d;
   transform: translateZ(0);
+  will-change: transform;
 }
 
 .card__top {
@@ -248,12 +249,14 @@ html {
   animation: flipTop 450ms cubic-bezier(0.37, 0.01, 0.94, 0.35);
   animation-fill-mode: both;
   transform-origin: center bottom;
+  animation-delay: 50ms;
 }
 
 .flip .card__back .card__bottom {
   transform-origin: center top;
   animation-fill-mode: both;
   animation: flipBottom 900ms cubic-bezier(0.15, 0.45, 0.28, 1);
+  animation-delay: 0ms;
 }
 
 @keyframes flipTop {
