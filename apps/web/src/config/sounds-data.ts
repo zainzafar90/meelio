@@ -137,7 +137,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Water",
-    url: `${SOUND_FILES_BASE_URL}/river-stream/water${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_URL}/river-stream/river-stream${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.water,
   },
   {
