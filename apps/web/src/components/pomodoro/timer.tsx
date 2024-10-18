@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Worker from "@/workers/timer.worker?worker";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
+import { cn } from "@/lib/utils";
 import { usePomodoroStore } from "@/store/pomodoro.store";
 import { changeFavicon } from "@/utils/favicon.utils";
 import { playPomodoroSound } from "@/utils/sound.utils";
@@ -126,7 +127,7 @@ const StageSelector: React.FC<{
   <RadioGroup
     value={activeStage.toString()}
     onValueChange={(value) => onChangeStage(parseInt(value) as PomodoroStage)}
-    className="grid grid-cols-3 gap-4 mb-4"
+    className="flex justify-center gap-x-4 mb-4"
   >
     {Object.values(PomodoroStage)
       .filter((v) => !isNaN(Number(v)))
@@ -139,7 +140,12 @@ const StageSelector: React.FC<{
           />
           <Label
             htmlFor={stage.toString()}
-            className="flex flex-col items-center justify-between rounded-md border-2 border-muted p-4 bg-primary-foreground hover:bg-secondary hover:text-secondary-foreground peer-data-[state=checked]:border-primary cursor-pointer select-none"
+            className={cn(
+              "flex flex-col items-center justify-between text-xs rounded-md p-3 bg-secondary/25 hover:bg-secondary/75 hover:text-secondary-foreground peer-data-[state=checked]:border-primary/50 cursor-pointer select-none",
+              {
+                "bg-secondary/50": activeStage === stage,
+              }
+            )}
           >
             {PomodoroStageMap[stage as PomodoroStage]}
           </Label>
