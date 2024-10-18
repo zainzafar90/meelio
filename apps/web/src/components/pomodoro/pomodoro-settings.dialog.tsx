@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
+import { ResetTimerDialog } from "./reset-timer.dialog";
 
 export const PomodoroSettingsDialog = ({
   isOpen,
@@ -180,9 +181,7 @@ export const PomodoroSettingsDialog = ({
                 timer to the default settings.
               </span>
             </Label>
-            <Button variant="destructive" onClick={() => resetTimer()}>
-              Reset
-            </Button>
+            <ResetTimerDialog onReset={resetTimer} />
           </div>
         </div>
 

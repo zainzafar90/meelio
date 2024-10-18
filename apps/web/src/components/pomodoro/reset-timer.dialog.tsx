@@ -11,14 +11,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-import { Icons } from "../icons/icons";
-
 export const ResetTimerDialog = (props: { onReset: () => void }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button size="lg" variant="secondary">
-          <Icons.history className="size-5" />
+        <Button size="lg" variant="destructive">
+          Reset
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

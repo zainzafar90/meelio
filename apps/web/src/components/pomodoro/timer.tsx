@@ -15,7 +15,6 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { FlipClockPiece } from "./flip-clock-piece";
 import { PomodoroSettingsDialog } from "./pomodoro-settings.dialog";
-import { ResetTimerDialog } from "./reset-timer.dialog";
 
 const worker = new Worker();
 
@@ -189,7 +188,7 @@ const TimerControls: React.FC<{
           <Icons.play className="size-5" />
         )}
       </Button>
-      <ResetTimerDialog onReset={onReset} />
+
       <Button size="lg" variant="secondary" onClick={onOpenSettings}>
         <Icons.settings className="size-5" />
       </Button>
