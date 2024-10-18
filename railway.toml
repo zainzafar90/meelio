@@ -1,2 +1,2 @@
-[build]
-watch_dirs = ["apps/api", "packages", ".env", ".gitignore", "package.json", "README.md", "turbo.json", "yarn.lock"]
+[phases.build]
+cmds = ['npm run build:api']
