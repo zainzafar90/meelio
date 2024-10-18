@@ -64,6 +64,16 @@ export const Timer: React.FC = () => {
     changeFavicon(faviconPath);
   }, [timer.activeStage]);
 
+  useEffect(() => {
+    const formatTime = (seconds: number) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+    };
+
+    document.title = `${formatTime(timer.remaining)} - Timer`;
+  }, [timer.remaining]);
+
   const handleStartPause = () => {
     if (timer.running) {
       pauseTimer();
