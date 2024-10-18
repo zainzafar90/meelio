@@ -1,11 +1,17 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
+
 import { PomodoroStage } from "@/types/pomodoro";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/toast/use-toast";
 import { usePomodoroStore } from "@/store/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
 
@@ -14,6 +20,14 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { ResetTimerDialog } from "./reset-timer.dialog";
+
+const pomodoroSettingsSchema = z.object({
+  workTime: z.number().min(0).max(POMODORO_MAX_MINUTES),
+  shortBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
+  longBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
+});
+
+type PomodoroSettingsValues = z.infer<typeof pomodoroSettingsSchema>;
 
 export const PomodoroSettingsDialog = ({
   isOpen,
@@ -32,6 +46,26 @@ export const PomodoroSettingsDialog = ({
 
   const { stageSeconds } = timer;
 
+  const form = useForm<PomodoroSettingsValues>({
+    resolver: zodResolver(pomodoroSettingsSchema),
+    defaultValues: {
+      workTime: stageSeconds[PomodoroStage.WorkTime] / MINUTE_IN_SECONDS,
+      shortBreak: stageSeconds[PomodoroStage.ShortBreak] / MINUTE_IN_SECONDS,
+      longBreak: stageSeconds[PomodoroStage.LongBreak] / MINUTE_IN_SECONDS,
+    },
+  });
+
+  const handleSave = (data: PomodoroSettingsValues) => {
+    changeTimerSettings(PomodoroStage.WorkTime, data.workTime);
+    changeTimerSettings(PomodoroStage.ShortBreak, data.shortBreak);
+    changeTimerSettings(PomodoroStage.LongBreak, data.longBreak);
+    toast({
+      title: "Settings saved",
+      description: "Your settings have been saved.",
+    });
+    onClose();
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -44,9 +78,13 @@ export const PomodoroSettingsDialog = ({
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
+          <DialogDescription>Configure the timer settings</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col space-y-8">
+        <form
+          onSubmit={form.handleSubmit(handleSave)}
+          className="flex flex-col space-y-8"
+        >
           <div className="border-t border-foreground/5 pt-4">
             <h3 className="text-base font-semibold leading-6 text-foreground">
               Timer
@@ -60,86 +98,85 @@ export const PomodoroSettingsDialog = ({
           <div className="flex items-center justify-between space-x-4">
             <div className="flex-1">
               <label
-                htmlFor="street-address"
+                htmlFor="pomodoro"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
                 Pomodoro
               </label>
               <div className="mt-2">
-                <Input
-                  min={0}
-                  max={POMODORO_MAX_MINUTES}
-                  type="number"
-                  id="pomodoro"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  autoComplete="pomodoro"
-                  value={
-                    stageSeconds[PomodoroStage.WorkTime] / MINUTE_IN_SECONDS
-                  }
-                  onChange={(e) => {
-                    const value = +e.target.value;
-                    if (value >= 0 && value <= POMODORO_MAX_MINUTES) {
-                      changeTimerSettings(PomodoroStage.WorkTime, value);
-                    }
-                  }}
+                <Controller
+                  name="workTime"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      min={0}
+                      max={POMODORO_MAX_MINUTES}
+                      type="number"
+                      id="pomodoro"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      autoComplete="pomodoro"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  )}
                 />
               </div>
             </div>
             <div className="flex-1">
               <label
-                htmlFor="street-address"
+                htmlFor="short-break"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
                 Short Break
               </label>
               <div className="mt-2">
-                <Input
-                  min={0}
-                  max={POMODORO_MAX_MINUTES}
-                  type="number"
-                  id="short-break"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  autoComplete="short-break"
-                  value={
-                    stageSeconds[PomodoroStage.ShortBreak] / MINUTE_IN_SECONDS
-                  }
-                  onChange={(e) => {
-                    const value = +e.target.value;
-                    if (value >= 0 && value <= POMODORO_MAX_MINUTES) {
-                      changeTimerSettings(PomodoroStage.ShortBreak, value);
-                    }
-                  }}
+                <Controller
+                  name="shortBreak"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      min={0}
+                      max={POMODORO_MAX_MINUTES}
+                      type="number"
+                      id="short-break"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      autoComplete="short-break"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  )}
                 />
               </div>
             </div>
             <div className="flex-1">
               <label
-                htmlFor="street-address"
+                htmlFor="long-break"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
                 Long Break
               </label>
               <div className="mt-2">
-                <Input
-                  min={0}
-                  max={POMODORO_MAX_MINUTES}
-                  type="number"
-                  id="long-break"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  autoComplete="long-break"
-                  value={
-                    stageSeconds[PomodoroStage.LongBreak] / MINUTE_IN_SECONDS
-                  }
-                  onChange={(e) => {
-                    const value = +e.target.value;
-
-                    if (value >= 0 && value <= POMODORO_MAX_MINUTES) {
-                      changeTimerSettings(PomodoroStage.LongBreak, value);
-                    }
-                  }}
+                <Controller
+                  name="longBreak"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      min={0}
+                      max={POMODORO_MAX_MINUTES}
+                      type="number"
+                      id="long-break"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      autoComplete="long-break"
+                      value={field.value}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    />
+                  )}
                 />
               </div>
             </div>
@@ -183,11 +220,13 @@ export const PomodoroSettingsDialog = ({
             </Label>
             <ResetTimerDialog onReset={resetTimer} />
           </div>
-        </div>
-
-        <DialogFooter>
-          <Button onClick={() => onClose()}>Close</Button>
-        </DialogFooter>
+          <DialogFooter className="flex gap-2 sm:gap-1 mt-4 border-t border-t-zinc-100 dark:border-t-zinc-900 pt-4">
+            <Button type="button" variant="secondary" onClick={() => onClose()}>
+              Close
+            </Button>
+            <Button type="submit">Save</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
