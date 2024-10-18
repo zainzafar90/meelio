@@ -18,7 +18,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider storageKey="ui-theme" defaultTheme="system">
           <TooltipProvider>
             {children}
             <SoundPlayer />
