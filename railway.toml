@@ -1,2 +1,0 @@
-[phases.build]
-cmds = ['npm run build:api']
