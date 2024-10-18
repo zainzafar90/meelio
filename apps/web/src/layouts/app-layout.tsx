@@ -98,9 +98,7 @@ export const AppLayout = memo(({ children }: AuthLayoutProps) => {
         <UserProfileDropdown mobileView={true} />
       </div>
 
-      <main className="py-8 lg:pl-72">
-        <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-      </main>
+      <main className="lg:pl-72">{children}</main>
       <SoundControlsBar />
     </div>
   );

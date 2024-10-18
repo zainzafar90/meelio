@@ -6,8 +6,10 @@
   :root {
     --half-height: 0.72em;
     --border-radius: 0.05em;
-    --flip: #101010;
-    --flip-bottom: #121212;
+    --flip: #f0f0f0;
+    --flip-bottom: #e0e0e0;
+    --flip-gradient-top: #ffffff;
+    --flip-gradient-bottom: #e0e0e0;
 
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
@@ -39,6 +41,8 @@
     --border-radius: 0.05em;
     --flip: #101010;
     --flip-bottom: #121212;
+    --flip-gradient-top: #222222;
+    --flip-gradient-bottom: #111111;
 
     --background: 20 14.3% 4.1%;
     --foreground: 60 9.1% 97.8%;
@@ -181,8 +185,12 @@ html {
 .card__top {
   overflow: hidden;
   border: 1px solid hsl(var(--background));
-  background-color: hsl(var(--background));
-  background-image: linear-gradient(to bottom, #222222, #333333);
+  background-color: var(--flip);
+  background-image: linear-gradient(
+    to bottom,
+    var(--flip-gradient-top),
+    var(--flip)
+  );
 }
 
 .card__bottom {
@@ -191,8 +199,11 @@ html {
   left: 0;
   border-top: solid 1px hsl(var(--background));
   background: var(--flip-bottom);
-  background-color: #111;
-  background-image: linear-gradient(to bottom, #222222, #111111);
+  background-image: linear-gradient(
+    to bottom,
+    var(--flip),
+    var(--flip-gradient-bottom)
+  );
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   pointer-events: none;
   overflow: hidden;
@@ -223,8 +234,12 @@ html {
   position: relative;
   z-index: -1;
   overflow: hidden;
-  background-color: #111;
-  background-image: linear-gradient(to bottom, #222222, #111111);
+  background-color: var(--flip-bottom);
+  background-image: linear-gradient(
+    to bottom,
+    var(--flip),
+    var(--flip-gradient-bottom)
+  );
   overflow: hidden;
   border: 1px solid transparent;
 }

@@ -13,24 +13,23 @@ export const FlipClockPiece: React.FC<FlipClockPieceProps> = ({ interval }) => {
 
   useEffect(() => {
     if (flipRef.current) {
-      // removes class from clock piece
       flipRef.current.classList.remove("flip");
-
-      // accessing a readonly property (making insignificantly smaller call) - adds delay when flip is finished and retriggered
       void flipRef.current.offsetWidth;
-
-      // adds class from clock piece
       flipRef.current.classList.add("flip");
     }
   }, [interval]);
 
   return (
-    <span className="my-0 mx-0 inline-block p-1 font-mono shadow-sm shadow-gray-800/90 rounded-lg">
+    <span className="my-0 mx-0 inline-block p-1 font-mono rounded-lg">
       <span ref={flipRef}>
         <b
-          className={cn("card relative text-6xl text-white sm:text-9xl", {
-            "text-gray-500": interval === null,
-          })}
+          className={cn(
+            "card relative text-6xl sm:text-9xl",
+            "dark:text-[var(--flip-gradient-bottom)]text-[var(--flip-gradient-top)]",
+            {
+              "opacity-50": interval === null,
+            }
+          )}
         >
           <b className="card__top">{interval || "0"}</b>
           <b className="card__bottom" data-value={prevCount?.toString()} />
