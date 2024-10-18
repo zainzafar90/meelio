@@ -1,5 +1,6 @@
 import { LucideProps } from "lucide-react";
 
+import { Icons } from "@/components/icons/icons";
 import { Timer } from "@/components/pomodoro/timer";
 import { AppLayout } from "@/layouts/app-layout";
 import { usePomodoroStore } from "@/store/pomodoro.store";
@@ -41,7 +42,7 @@ const SessionProgress: React.FC<{
       .map((_, index) => (
         <div key={index} className="size-5 flex items-center justify-center">
           {index < currentIntervalSessions || index === 4 ? (
-            <CheckFill className="text-green-500 size-5" />
+            <Icons.checkFilled className="text-green-500 size-5" />
           ) : (
             <div className="size-4 rounded-full bg-zinc-300" />
           )}
@@ -63,22 +64,5 @@ const SessionProgress: React.FC<{
     </div>
   );
 };
-
-export const CheckFill = (props: LucideProps) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
-    viewBox="0 0 16 16"
-    {...props}
-  >
-    <path
-      fill="currentColor"
-      fillRule="evenodd"
-      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14m3.844-8.791a.75.75 0 0 0-1.187-.918l-3.7 4.79l-1.65-1.833a.75.75 0 1 0-1.114 1.004l2.25 2.5a.75.75 0 0 0 1.15-.043z"
-      clipRule="evenodd"
-    ></path>
-  </svg>
-);
 
 export default Pomodoro;
