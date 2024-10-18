@@ -18,6 +18,7 @@ import {
   Flower,
   Headphones,
   HelpCircle,
+  History,
   Image,
   Laptop,
   Layers,
@@ -103,6 +104,7 @@ export const Icons = {
   tropical: Palmtree,
   logout: LogOut,
   chat: MessageCircleIcon,
+  history: History,
   soundscapes: ({ ...props }: LucideProps) => (
     <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path
@@ -234,7 +236,6 @@ export const Icons = {
       />
     </svg>
   ),
-
   oscillation: ({ ...props }: LucideProps) => (
     <svg
       viewBox="0 0 64 64"

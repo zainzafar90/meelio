@@ -8,6 +8,7 @@ import { changeFavicon } from "@/utils/favicon.utils";
 import { playPomodoroSound } from "@/utils/sound.utils";
 import { getTime } from "@/utils/timer.utils";
 
+import { Icons } from "../icons/icons";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
@@ -168,15 +169,19 @@ const TimerControls: React.FC<{
   onReset: () => void;
   onOpenSettings: () => void;
 }> = ({ isRunning, onStartPause, onReset, onOpenSettings }) => (
-  <div className="mx-auto max-w-xl p-1 py-4 flex items-center space-x-2">
-    <Button className="px-8" size="lg" fullWidth onClick={onStartPause}>
-      {isRunning ? "Pause" : "Start"}
+  <div className="mx-auto max-w-2xl p-1 py-4 flex items-center space-x-2">
+    <Button size="lg" onClick={onStartPause}>
+      {isRunning ? (
+        <Icons.pause className="size-5" />
+      ) : (
+        <Icons.play className="size-5" />
+      )}
     </Button>
     <Button size="lg" variant="secondary" onClick={onReset}>
-      Reset
+      <Icons.history className="size-5" />
     </Button>
     <Button size="lg" variant="secondary" onClick={onOpenSettings}>
-      Settings
+      <Icons.settings className="size-5" />
     </Button>
   </div>
 );
