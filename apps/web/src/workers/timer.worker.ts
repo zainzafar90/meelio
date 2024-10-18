@@ -1,4 +1,3 @@
-// worker.js
 let interval: ReturnType<typeof setInterval> | null = null;
 let remaining = 0;
 
