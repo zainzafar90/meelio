@@ -25,6 +25,7 @@ export const Timer: React.FC = () => {
     updateTimer,
     advanceTimer,
     changeStage,
+    updateFavicon,
   } = usePomodoroStore();
 
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
@@ -54,6 +55,13 @@ export const Timer: React.FC = () => {
       worker.postMessage({ command: "pause" });
     }
   }, [timer.running, timer.remaining]);
+
+  useEffect(() => {
+    const isBreak =
+      timer.activeStage === PomodoroStage.ShortBreak ||
+      timer.activeStage === PomodoroStage.LongBreak;
+    updateFavicon(isBreak);
+  }, [timer.activeStage, updateFavicon]);
 
   const handleStartPause = () => {
     if (timer.running) {

@@ -25,6 +25,7 @@ export type PomodoroTimer = {
   autoStartBreaks: boolean;
   longBreakInterval: number;
   enableSound: boolean;
+  faviconPath: string;
 };
 
 export enum PomodoroStage {
