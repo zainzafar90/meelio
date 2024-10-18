@@ -72,7 +72,9 @@ export const Timer: React.FC = () => {
       return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
     };
 
-    document.title = `${formatTime(timer.remaining)} - Timer`;
+    const isFocus = timer.activeStage === PomodoroStage.WorkTime;
+
+    document.title = `${formatTime(timer.remaining)} ${isFocus ? "\u00A0💡\u00B7\u00A0Focus" : "\u00A0✨\u00B7\u00A0Break"}`;
   }, [timer.remaining]);
 
   const handleStartPause = () => {
