@@ -2,7 +2,6 @@ import { create } from "zustand";
 
 import { PomodoroStage, PomodoroTimer } from "@/types/pomodoro";
 import { MINUTE_IN_SECONDS } from "@/utils/common.utils";
-import { changeFavicon } from "@/utils/favicon.utils";
 
 type PomodoroStore = {
   timer: PomodoroTimer;
@@ -18,7 +17,6 @@ type PomodoroStore = {
   toggleAutoStartBreaks: () => void;
   setTimerDuration: (duration: number) => void;
   toggleTimerSound: () => void;
-  updateFavicon: (isBreak: boolean) => void;
 };
 
 export const usePomodoroStore = create<PomodoroStore>((set) => ({
@@ -35,7 +33,6 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
     longBreakInterval: 4,
     autoStartBreaks: true,
     enableSound: true,
-    faviconPath: "/favicon.ico",
   },
 
   startTimer: () =>
@@ -85,12 +82,6 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
         nextStage = PomodoroStage.WorkTime;
       }
 
-      const isBreak =
-        nextStage === PomodoroStage.ShortBreak ||
-        nextStage === PomodoroStage.LongBreak;
-      const newFaviconPath = isBreak ? "/favicon-break.ico" : "/favicon.ico";
-      changeFavicon(newFaviconPath);
-
       return {
         timer: {
           ...state.timer,
@@ -98,27 +89,19 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
           remaining: stageSeconds[nextStage],
           running: autoStartBreaks || nextStage === PomodoroStage.WorkTime,
           sessionCount: newSessionCount,
-          faviconPath: newFaviconPath,
         },
       };
     }),
 
   changeStage: (stage: PomodoroStage) =>
-    set((state) => {
-      const isBreak =
-        stage === PomodoroStage.ShortBreak || stage === PomodoroStage.LongBreak;
-      const newFaviconPath = isBreak ? "/favicon-break.ico" : "/favicon.ico";
-      changeFavicon(newFaviconPath);
-      return {
-        timer: {
-          ...state.timer,
-          activeStage: stage,
-          remaining: state.timer.stageSeconds[stage],
-          running: false,
-          faviconPath: newFaviconPath,
-        },
-      };
-    }),
+    set((state) => ({
+      timer: {
+        ...state.timer,
+        activeStage: stage,
+        remaining: state.timer.stageSeconds[stage],
+        running: false,
+      },
+    })),
 
   changeTimerSettings: (stage: PomodoroStage, minutes: number) =>
     set((state) => ({
@@ -163,16 +146,4 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
         enableSound: !state.timer.enableSound,
       },
     })),
-
-  updateFavicon: (isBreak: boolean) =>
-    set((state) => {
-      const newFaviconPath = isBreak ? "/favicon-break.ico" : "/favicon.ico";
-      changeFavicon(newFaviconPath);
-      return {
-        timer: {
-          ...state.timer,
-          faviconPath: newFaviconPath,
-        },
-      };
-    }),
 }));

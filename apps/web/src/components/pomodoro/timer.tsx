@@ -4,6 +4,7 @@ import Worker from "@/workers/timer.worker?worker";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { usePomodoroStore } from "@/store/pomodoro.store";
+import { changeFavicon } from "@/utils/favicon.utils";
 import { playPomodoroSound } from "@/utils/sound.utils";
 import { getTime } from "@/utils/timer.utils";
 
@@ -25,7 +26,6 @@ export const Timer: React.FC = () => {
     updateTimer,
     advanceTimer,
     changeStage,
-    updateFavicon,
   } = usePomodoroStore();
 
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
@@ -60,8 +60,9 @@ export const Timer: React.FC = () => {
     const isBreak =
       timer.activeStage === PomodoroStage.ShortBreak ||
       timer.activeStage === PomodoroStage.LongBreak;
-    updateFavicon(isBreak);
-  }, [timer.activeStage, updateFavicon]);
+    const faviconPath = isBreak ? "/favicon-break.ico" : "/favicon.ico";
+    changeFavicon(faviconPath);
+  }, [timer.activeStage]);
 
   const handleStartPause = () => {
     if (timer.running) {
