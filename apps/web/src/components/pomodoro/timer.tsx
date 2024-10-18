@@ -136,6 +136,8 @@ const TimerDisplay: React.FC<{
   <div className="flex justify-center gap-x-4 mb-4">
     <FlipClockPiece interval={minutesTens} />
     <FlipClockPiece interval={minutesUnit} />
+    <div />
+    <div />
     <FlipClockPiece interval={secondsTens} />
     <FlipClockPiece interval={secondsUnit} />
   </div>

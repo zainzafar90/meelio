@@ -34,7 +34,7 @@ export enum PomodoroStage {
 }
 
 export const PomodoroStageMap = {
-  [PomodoroStage.WorkTime]: "Pomodoro",
+  [PomodoroStage.WorkTime]: "Focus",
   [PomodoroStage.ShortBreak]: "Short Break",
   [PomodoroStage.LongBreak]: "Long Break",
 };
