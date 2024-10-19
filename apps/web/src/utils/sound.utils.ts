@@ -92,12 +92,13 @@ export const playTypewriterSound = (key: string) => {
   }
 };
 
+const pomodorAudioDing = new Audio(
+  "./sounds/pomodoro/timeout-3-forward-single-chime.mp3"
+);
+
 export const playPomodoroSound = (sound: "timeout" | "ticking") => {
   if (sound === "timeout") {
-    const audio = new Audio(
-      "./sounds/pomodoro/timeout-3-forward-single-chime.mp3"
-    );
-    audio.play();
+    pomodorAudioDing.play();
   }
 
   return;
