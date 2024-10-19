@@ -2,7 +2,7 @@ import path from "path";
 
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, splitVendorChunkPlugin, UserConfig } from "vite";
-import { VitePWA } from 'vite-plugin-pwa'
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   resolve: {
@@ -11,34 +11,48 @@ export default defineConfig({
     },
   },
   plugins: [
-    react(), splitVendorChunkPlugin(),
+    react(),
+    splitVendorChunkPlugin(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: "autoUpdate",
       includeAssets: [
-        'favicon.ico',
-        'favicon-break.ico',
-        'robots.txt',
-        'img/*.webp',
-        'sounds/*.mp3',
-        'fonts/*.woff2'
+        "favicon.ico",
+        "favicon-break.ico",
+        "robots.txt",
+        "img/*.webp",
+        "sounds/*.mp3",
+        "fonts/*.woff2",
       ],
       manifest: {
-        theme_color: '#BD34FE',
+        name: "Meelio",
+        short_name: "Meelio",
+        start_url: "https://app.meelio.io",
+        theme_color: "#f3742d",
+        background_color: "#202020",
         icons: [
           {
-            src: '/android-chrome-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
+            src: "/android-chrome-64x64.png",
+            sizes: "64x64",
+            type: "image/png",
           },
           {
-            src: '/android-chrome-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      }
-    })
+            src: "/android-chrome-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "maskable-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+          {
+            src: "/android-chrome-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
   ] as UserConfig["plugins"],
- 
 });
