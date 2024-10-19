@@ -185,7 +185,6 @@ html {
 
 .card__top {
   overflow: hidden;
-  border: 1px solid hsl(var(--background));
   background-color: var(--flip);
   background-image: linear-gradient(
     to bottom,
