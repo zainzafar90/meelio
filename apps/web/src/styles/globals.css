@@ -197,7 +197,7 @@ html {
   position: absolute;
   top: 50%;
   left: 0;
-  border-top: solid 1px hsl(var(--background));
+  border-top: 2px solid hsl(var(--background));
   background: var(--flip-bottom);
   background-image: linear-gradient(
     to bottom,
@@ -241,7 +241,6 @@ html {
     var(--flip-gradient-bottom)
   );
   overflow: hidden;
-  border: 1px solid transparent;
 }
 
 .flip .card__back::before {
