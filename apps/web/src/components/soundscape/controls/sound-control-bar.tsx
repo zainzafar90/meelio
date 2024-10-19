@@ -6,7 +6,7 @@ import { useMeelioStore } from "@/store/meelio.store";
 import { GlobalVolumeControl } from "./global-volume-control";
 import { OscillationButton } from "./oscillation-button";
 import { PlayButton } from "./play-button";
-import { ResetGlobalSoundSettingsButton } from "./reset-global-sound-settings";
+import { ResetGlobalSoundSettingsDialog } from "./reset-global-sound-settings.dialog";
 // import { SaveComboButton } from "./save-combo-button";
 // import { ShareButton } from "./share-button";
 import { ShuffleButton } from "./shuffle-button";
@@ -41,7 +41,7 @@ export const SoundControlsBar = () => {
             {/* <SaveComboButton />
           <ShareButton /> */}
             <span className="block md:hidden">
-              <ResetGlobalSoundSettingsButton />
+              <ResetGlobalSoundSettingsDialog />
             </span>
           </div>
           <div className="flex flex-1 flex-shrink-0 items-center justify-center gap-4">
@@ -53,7 +53,7 @@ export const SoundControlsBar = () => {
             <GlobalVolumeControl />
 
             <span className="ml-4 hidden md:block">
-              <ResetGlobalSoundSettingsButton />
+              <ResetGlobalSoundSettingsDialog />
             </span>
           </div>
         </div>

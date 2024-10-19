@@ -23,7 +23,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    /* Type checking */
+    "types": ["vite-plugin-pwa/info.d.ts", "vite-plugin-pwa/client.d.ts"]
   },
   "include": [
     "**/*.ts",

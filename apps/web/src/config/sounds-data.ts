@@ -1,7 +1,8 @@
 import { Sound, SoundType } from "@/types/sound";
 import { SoundIcons } from "@/components/icons/sound-icons";
 
-import { SOUND_FILES_BASE_URL, SOUND_FILES_EXTENSION } from "./common";
+const SOUND_FILES_EXTENSION = ".mp3";
+const SOUND_FILES_BASE_URL = "/sounds/yT3sxTz";
 
 export const allSounds: Sound[] = [
   {

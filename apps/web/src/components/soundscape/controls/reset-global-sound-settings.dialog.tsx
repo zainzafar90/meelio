@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useMeelioStore } from "@/store/meelio.store";
 
-export const ResetGlobalSoundSettingsButton = () => {
+export const ResetGlobalSoundSettingsDialog = () => {
   const { reset } = useMeelioStore();
   const [showResetSettingsDialog, setShowResetSettingsDialog] = useState(false);
 
