@@ -22,7 +22,6 @@ import {
   Laptop,
   Layers,
   Loader2,
-  LogOut,
   Menu,
   MessageCircleIcon,
   Moon,
