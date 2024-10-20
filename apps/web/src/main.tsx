@@ -10,7 +10,7 @@ import "@/styles/globals.css";
 
 import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
-const INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+const INTERVAL_MS = 10 * 1000; // 10 seconds
 
 const updateSW = registerSW({
   onRegisteredSW(swUrl, r) {
@@ -28,7 +28,9 @@ const updateSW = registerSW({
           },
         });
 
-        if (resp?.status === 200) await r.update();
+        if (resp?.status === 200) {
+          useUpdateAlertStore.getState().setShowUpdateAlert(true);
+        }
       }, INTERVAL_MS);
   },
   onNeedRefresh() {
@@ -43,7 +45,14 @@ const AppContainer = () => {
   const showUpdateAlert = useUpdateAlertStore((state) => state.showUpdateAlert);
 
   const handleRefresh = () => {
-    window.location.reload();
+    // Update the service worker and reload the page
+    navigator.serviceWorker.getRegistration().then((registration) => {
+      if (registration) {
+        registration.update().then(() => {
+          window.location.reload();
+        });
+      }
+    });
   };
 
   return (
