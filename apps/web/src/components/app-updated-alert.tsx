@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import { Icons } from "./icons/icons";
-
 export function AppUpdatedAlert({ onRefresh }: { onRefresh: () => void }) {
   const [show, setShow] = useState(true);
 
