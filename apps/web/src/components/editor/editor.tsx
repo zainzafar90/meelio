@@ -3,11 +3,11 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import TextareaAutosize from "react-textarea-autosize";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { postPatchSchema } from "@/lib/validations/post";
 import { Icons } from "@/components/icons/icons";
-import { toast } from "@/components/ui/toast/use-toast";
 import {
   getCharCount,
   getReadingTime,
@@ -55,16 +55,12 @@ export function Editor({ post }: EditorProps) {
     setIsSaving(false);
 
     if (!response?.ok) {
-      return toast({
-        title: "Something went wrong.",
+      return toast.error("Something went wrong.", {
         description: "Your post was not saved. Please try again.",
-        variant: "destructive",
       });
     }
 
-    return toast({
-      description: "Your post has been saved.",
-    });
+    return toast.success("Your post has been saved.");
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

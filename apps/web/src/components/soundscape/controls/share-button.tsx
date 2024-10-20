@@ -1,7 +1,8 @@
+import { toast } from "sonner";
+
 import { SoundState } from "@/types/sound";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { useToast } from "@/components/ui/toast/use-toast";
 import {
   Tooltip,
   TooltipContent,
@@ -13,7 +14,6 @@ import { encodeSoundState } from "@/utils/router.utils";
 
 export const ShareButton = () => {
   const { sounds } = useMeelioStore((state) => state);
-  const { toast } = useToast();
 
   // Encode the sound state and generate the shareable link
   const generateShareableLink = () => {
@@ -28,9 +28,7 @@ export const ShareButton = () => {
 
     copyToClipboard(shareableLink);
 
-    toast({
-      variant: "success",
-      title: "Copied to clipboard!",
+    toast("Copied to clipboard!", {
       description: "Share the link with your friends!",
     });
   };

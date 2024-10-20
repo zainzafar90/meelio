@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { api } from "@/api";
+import { toast } from "sonner";
 
 import { AuthUser } from "@/types/auth";
 import { PlanInterval, Subscription } from "@/types/subscription";
@@ -15,7 +16,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/toast/use-toast";
 import { env } from "@/utils/common.utils";
 
 import { Icons } from "../../icons/icons";
@@ -62,10 +62,8 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         }
       }
     } catch (error) {
-      return toast({
-        title: "Something went wrong.",
+      return toast.error("Something went wrong.", {
         description: "Subscription portal can't be accessed. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoadingPortal(false);
@@ -96,13 +94,11 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         // window.LemonSqueezy.Url.Open(checkout.url);
       }
     } catch (error) {
-      return toast({
-        title: "Something went wrong.",
+      return toast.error("Something went wrong.", {
         description:
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (error as any)?.message ||
           "Checkout portal not working. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoadingPortal(false);
@@ -251,11 +247,9 @@ function FreePlanCard({
             disabled={isLoadingPortal}
             onClick={() => {
               if (!IS_PAYMENTS_ENABLED) {
-                return toast({
-                  title: "Payments are disabled for now.",
+                return toast("Payments are disabled for now.", {
                   description:
                     "Please contact the administrator to enable payments.",
-                  variant: "destructive",
                 });
               }
               if (!selectedPlan) {

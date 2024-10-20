@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "@/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { cn } from "@/lib/utils";
@@ -11,7 +12,6 @@ import { Icons } from "@/components/icons/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "@/components/ui/toast/use-toast";
 import { env } from "@/utils/common.utils";
 
 type FormData = z.infer<typeof userAuthSchema>;
@@ -39,18 +39,14 @@ export const UserAuthForm = () => {
       await api.auth.sendMagicLink({
         email: data.email,
       });
-      toast({
-        title: "We sent you a magic link.",
+      toast("We sent you a magic link.", {
         description:
           "Click the secure link, and check your spam folder if you don't see it in your inbox.",
-        variant: "success",
       });
     } catch (error) {
-      toast({
-        title: "Something went wrong.",
+      toast.error("Something went wrong.", {
         description:
           "We are unable to send you a magic link. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

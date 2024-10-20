@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "@/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { AuthUser } from "@/types/auth";
@@ -17,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast/use-toast";
 import { useAuthStore } from "@/store/auth.store";
 
 import { Icons } from "../icons/icons";
@@ -59,18 +59,14 @@ export const AccountForm = ({ user }: { user: AuthUser }) => {
       const user = response as AuthUser;
       authenticate(user);
     } catch (error) {
-      return toast({
-        title: "Something went wrong.",
+      return toast.error("Something went wrong.", {
         description: "Your name was not updated. Please try again.",
-        variant: "destructive",
       });
     } finally {
       setIsSaving(false);
     }
 
-    toast({
-      description: "Your name has been updated.",
-    });
+    toast.success("Your name has been updated.");
   }
 
   return (

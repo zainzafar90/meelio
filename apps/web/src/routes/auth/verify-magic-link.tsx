@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 import { api } from "@/api";
+import { toast } from "sonner";
 
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
-import { toast } from "@/components/ui/toast/use-toast";
 import { useMounted } from "@/hooks/use-mounted";
 
 const VerifyMagicLink = () => {
@@ -24,11 +24,9 @@ const VerifyMagicLink = () => {
           });
           setVerificationStatus("success");
         } catch (e) {
-          toast({
-            title: "Verification failed",
+          toast.error("Verification failed", {
             description:
               "Your link should be valid for 10 minutes. Please try again.",
-            variant: "destructive",
           });
           setVerificationStatus("error");
         }
