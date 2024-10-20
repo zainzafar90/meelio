@@ -28,6 +28,17 @@ const updateSW = registerSW({
         if (resp?.status === 200) await r.update();
       }, INTERVAL_MS);
   },
+  onNeedRefresh() {
+    const userConfirmed = window.confirm(
+      "New content is available. Would you like to refresh?"
+    );
+    if (userConfirmed) {
+      window.location.reload();
+    }
+  },
+  onOfflineReady() {
+    console.log("The app is ready to work offline.");
+  },
 });
 
 updateSW();
