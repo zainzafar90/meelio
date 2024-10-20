@@ -10,7 +10,7 @@ import "@/styles/globals.css";
 
 import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
-const INTERVAL_MS = 60 * 60 * 1000; // 1 hour
+const INTERVAL_MS = 10 * 1000; // 1 hour
 
 const updateSW = registerSW({
   onRegisteredSW(swUrl, r) {
