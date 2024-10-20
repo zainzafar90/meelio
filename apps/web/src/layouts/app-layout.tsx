@@ -5,7 +5,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { MenuIcon, X } from "lucide-react";
 
 import { Logomark } from "@/components/logo";
-import { Sidebar } from "@/components/sidebar";
+import { SidebarOld } from "@/components/sidebar";
 import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
@@ -68,7 +68,7 @@ export const AppLayout = memo(({ children }: AuthLayoutProps) => {
                   </div>
                 </Transition.Child>
                 {/* Sidebar component, swap this element with another sidebar if you like */}
-                <Sidebar />
+                <SidebarOld />
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -78,7 +78,7 @@ export const AppLayout = memo(({ children }: AuthLayoutProps) => {
       {/* Static sidebar for desktop */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         {/* Sidebar component, swap this element with another sidebar if you like */}
-        <Sidebar />
+        <SidebarOld />
       </div>
 
       <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-background px-4 py-4 shadow-sm sm:px-6 lg:hidden">

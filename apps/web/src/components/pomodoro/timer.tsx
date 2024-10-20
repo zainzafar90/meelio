@@ -177,7 +177,7 @@ const TimerControls: React.FC<{
   return (
     <div className="mx-auto max-w-2xl p-1 pt-4 flex items-center justify-center space-x-2">
       <Button
-        size="lg"
+        size="icon"
         variant={isRunning ? "default" : "secondary"}
         onClick={onStartPause}
       >
@@ -188,7 +188,7 @@ const TimerControls: React.FC<{
         )}
       </Button>
 
-      <Button size="lg" variant="secondary" onClick={onOpenSettings}>
+      <Button size="icon" variant="secondary" onClick={onOpenSettings}>
         <Icons.settings className="size-5" />
       </Button>
     </div>
