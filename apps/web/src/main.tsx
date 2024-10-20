@@ -4,8 +4,11 @@ import ReactDOM from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 
 import { App } from "./app";
+import { AppUpdatedAlert } from "./components/app-updated-alert";
 
 import "@/styles/globals.css";
+
+import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
 const INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -29,22 +32,32 @@ const updateSW = registerSW({
       }, INTERVAL_MS);
   },
   onNeedRefresh() {
-    const userConfirmed = window.confirm(
-      "New content is available. Would you like to refresh?"
-    );
-    if (userConfirmed) {
-      window.location.reload();
-    }
+    useUpdateAlertStore.getState().setShowUpdateAlert(true);
   },
   onOfflineReady() {
     console.log("The app is ready to work offline.");
   },
 });
 
+const AppContainer = () => {
+  const showUpdateAlert = useUpdateAlertStore((state) => state.showUpdateAlert);
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  return (
+    <>
+      {showUpdateAlert && <AppUpdatedAlert onRefresh={handleRefresh} />}
+      <App />
+    </>
+  );
+};
+
 updateSW();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <AppContainer />
   </React.StrictMode>
 );
