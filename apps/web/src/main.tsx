@@ -8,18 +8,19 @@ import { AppUpdatedAlert } from "./components/app-updated-alert";
 
 import "@/styles/globals.css";
 
+import { usePomodoroStore } from "./store/pomodoro.store";
 import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
 const INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
+let updateSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
+
 const initializeSW = () => {
-  registerSW({
-    onRegistered(r) {
-      console.log("Service Worker registered");
+  updateSW = registerSW({
+    onRegisteredSW(r) {
       r && setInterval(checkForUpdates, INTERVAL_MS);
     },
     onNeedRefresh() {
-      console.log("New content available, please refresh.");
       useUpdateAlertStore.getState().setShowUpdateAlert(true);
     },
     onOfflineReady() {
@@ -34,6 +35,14 @@ const checkForUpdates = async () => {
   try {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
+      const isTimerActive = usePomodoroStore.getState().isTimerRunning();
+      if (isTimerActive) {
+        console.log("Timer is running, skipping update check", updateSW);
+        return;
+      }
+
+      updateSW && updateSW();
+
       await registration.update();
     }
   } catch (error) {
@@ -53,8 +62,6 @@ const AppContainer = () => {
     </>
   );
 };
-
-// updateSW();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

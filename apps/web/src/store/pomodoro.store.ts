@@ -17,9 +17,10 @@ type PomodoroStore = {
   toggleAutoStartBreaks: () => void;
   setTimerDuration: (duration: number) => void;
   toggleTimerSound: () => void;
+  isTimerRunning: () => boolean;
 };
 
-export const usePomodoroStore = create<PomodoroStore>((set) => ({
+export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   timer: {
     activeStage: PomodoroStage.WorkTime,
     running: false,
@@ -146,4 +147,6 @@ export const usePomodoroStore = create<PomodoroStore>((set) => ({
         enableSound: !state.timer.enableSound,
       },
     })),
+
+  isTimerRunning: () => get().timer.running,
 }));
