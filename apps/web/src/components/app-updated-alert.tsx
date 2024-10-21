@@ -1,4 +1,5 @@
 import { useUpdateAlertStore } from "@/stores/useUpdateAlertStore";
+import { VERSION } from "@/version";
 import { useRegisterSW } from "virtual:pwa-register/react";
 
 export function AppUpdatedAlert() {
@@ -31,7 +32,7 @@ export function AppUpdatedAlert() {
               </div>
               <div className="ml-3 w-0 flex-1">
                 <p className="text-sm font-medium text-gray-900">
-                  Update Available (v0.1)
+                  Update Available (v{VERSION})
                 </p>
                 <p className="mt-1 text-sm text-gray-500">
                   A new version of Meelio is available. Please refresh.
