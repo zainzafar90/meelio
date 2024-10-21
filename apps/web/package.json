@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=4000",
-    "build": "npm run release && vite build",
+    "build": "vite build",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview",
     "release": "standard-version"
