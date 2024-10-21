@@ -10,55 +10,51 @@ import "@/styles/globals.css";
 
 import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
-const INTERVAL_MS = 10 * 1000; // 1 hour
+const INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
-const updateSW = registerSW({
-  onRegisteredSW(swUrl, r) {
-    r &&
-      setInterval(async () => {
-        if (r.installing || !navigator) return;
+const initializeSW = () => {
+  registerSW({
+    onRegistered(r) {
+      console.log("Service Worker registered");
+      r && setInterval(checkForUpdates, INTERVAL_MS);
+    },
+    onNeedRefresh() {
+      console.log("New content available, please refresh.");
+      useUpdateAlertStore.getState().setShowUpdateAlert(true);
+    },
+    onOfflineReady() {
+      console.log("The app is ready to work offline.");
+    },
+  });
+};
 
-        if ("connection" in navigator && !navigator.onLine) return;
+const checkForUpdates = async () => {
+  if (!navigator.onLine) return;
 
-        await fetch(swUrl, {
-          cache: "no-store",
-          headers: {
-            cache: "no-store",
-            "cache-control": "no-cache",
-          },
-        });
-      }, INTERVAL_MS);
-  },
-  onNeedRefresh() {
-    useUpdateAlertStore.getState().setShowUpdateAlert(true);
-  },
-  onOfflineReady() {
-    console.log("The app is ready to work offline.");
-  },
-});
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (registration) {
+      await registration.update();
+    }
+  } catch (error) {
+    console.error("Error checking for updates: ", error);
+  }
+};
+
+initializeSW();
 
 const AppContainer = () => {
   const showUpdateAlert = useUpdateAlertStore((state) => state.showUpdateAlert);
 
-  const handleRefresh = () => {
-    navigator.serviceWorker.getRegistration().then((registration) => {
-      if (registration) {
-        registration.update().then(() => {
-          window.location.reload();
-        });
-      }
-    });
-  };
-
   return (
     <>
-      {showUpdateAlert && <AppUpdatedAlert onRefresh={handleRefresh} />}
+      {showUpdateAlert && <AppUpdatedAlert />}
       <App />
     </>
   );
 };
 
-updateSW();
+// updateSW();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

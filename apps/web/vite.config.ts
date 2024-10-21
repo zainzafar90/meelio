@@ -18,7 +18,7 @@ export default defineConfig({
       env.NODE_ENV === "development"
         ? {}
         : {
-            registerType: "autoUpdate",
+            registerType: "prompt",
             includeAssets: [
               "favicon.ico",
               "favicon-break.ico",
@@ -30,7 +30,7 @@ export default defineConfig({
             manifest: {
               name: "Meelio",
               short_name: "Meelio",
-              start_url: "https://app.meelio.io",
+              start_url: "/",
               theme_color: "#f3742d",
               background_color: "#202020",
               icons: [
