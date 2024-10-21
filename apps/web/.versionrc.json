@@ -9,8 +9,8 @@
     { "type": "perf", "hidden": true },
     { "type": "test", "hidden": true }
   ],
-  "commitUrlFormat": "https://github.com/your-username/your-repo/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/your-username/your-repo/compare/{{previousTag}}...{{currentTag}}",
+  "commitUrlFormat": "https://github.com/zainzafar90/meelio/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/zainzafar90/meelio/compare/{{previousTag}}...{{currentTag}}",
   "bumpFiles": [
     {
       "filename": "package.json",
@@ -19,7 +19,7 @@
     {
       "filename": "src/version.ts",
       "type": "code",
-      "updater": "version-updater.cjs"
+      "updater": "scripts/version-updater.cjs"
     }
   ]
 }
