@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { differenceInCalendarDays, differenceInHours, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { MoonIcon, SunIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -116,10 +117,26 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
           >
             <div className={cn("w-1 h-1 rounded-full", clockFaceClass)} />
           </div>
+
+          {/* Center dot */}
+          <div
+            className={cn(
+              "absolute top-1/2 left-1/2 -translate-x-1.5 -translate-y-20 w-3 h-3 rounded-full flex items-center justify-center"
+            )}
+          ></div>
         </div>
       </div>
       <div className="relative -top-8 max-w-64 w-full flex flex-col items-center justify-center space-y-2 py-6 rounded-b-2xl bg-black/75 backdrop-blur-lg shadow-lg">
-        <h2 className="text-md font-medium text-white">{timezone}</h2>
+        <h2 className="flex items-center gap-2 text-md font-medium text-white">
+          {timezone}{" "}
+          <span>
+            {isDaytime ? (
+              <MoonIcon className="size-4 text-white/70" />
+            ) : (
+              <SunIcon className="size-4 text-white/70" />
+            )}
+          </span>
+        </h2>
         {!isLocalTimezone ? (
           <div className="text-center space-y-2">
             <p className="text-xs text-white/70 uppercase font-medium">
