@@ -72,6 +72,7 @@ export default {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         heading: ["var(--font-heading)", ...fontFamily.sans],
         serif: ["var(--font-serif)", ...fontFamily.serif],
+        alumini: ["Alumni Sans Pinstripe", ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
@@ -160,7 +161,7 @@ export default {
         "circle-ripple": "ripple 20s linear infinite",
         levitate: "levitate 8s cubic-bezier(0.25, 0.1, 0.25, 1) infinite",
         "concentric-ripple":
-          "concentric-waves 3s ease infinite normal backwards running calc(500ms + var(--delay,0s))",
+          "concentric-waves var(--waves-duration) ease-out infinite normal backwards running calc(500ms + var(--delay,0s))",
         "pulse-in": "pulse-in 750ms ease-in-out 125ms 1 normal both running",
         "appear-in":
           "appear-in 500ms ease-out 1 normal both running calc(300ms + (var(--stagger,0) * 225ms))",

@@ -59,6 +59,12 @@ const navigation = [
     activeIcon: Icons.writerActive,
     hidden: true,
   },
+  {
+    name: "Breathing",
+    href: "/breathing",
+    icon: Icons.breathing,
+    activeIcon: Icons.breathingActive,
+  },
 ];
 
 const accountNavigation = [

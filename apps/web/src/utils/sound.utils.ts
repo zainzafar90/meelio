@@ -92,6 +92,16 @@ export const playTypewriterSound = (key: string) => {
   }
 };
 
+export const playBreathingSound = (mode: string) => {
+  if (mode === "inhale" || mode === "exhale") {
+    const audio = new Audio("./sounds/breathing/inhale-exhale.mp3");
+    audio.play();
+  } else if (mode === "hold") {
+    const audio = new Audio("./sounds/breathing/hold.mp3");
+    audio.play();
+  }
+};
+
 const pomodorAudioDing = new Audio(
   "./sounds/pomodoro/timeout-3-forward-single-chime.mp3"
 );

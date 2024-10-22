@@ -16,6 +16,7 @@ const Settings = React.lazy(() => import("@/routes/account/settings"));
 const VerifyMagicLink = React.lazy(
   () => import("@/routes/auth/verify-magic-link")
 );
+const Breathing = React.lazy(() => import("@/routes/breathing"));
 
 export const Router = () => {
   return (
@@ -90,6 +91,15 @@ export const Router = () => {
             errorElement={<ErrorPage />}
           />
         </Route>
+        <Route
+          path="breathing"
+          element={
+            <React.Suspense fallback={<PageSkeleton />}>
+              <Breathing />
+            </React.Suspense>
+          }
+          errorElement={<ErrorPage />}
+        />
 
         <Route path="" element={<Navigate to="/soundscapes" />} />
       </Route>
