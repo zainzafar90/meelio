@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { differenceInCalendarDays, differenceInHours, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
+import { cn } from "@/lib/utils";
+
 interface ClockProps {
   timezone: string;
   isLocalTimezone?: boolean;
@@ -43,9 +45,12 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
 
   return (
     <div className="w-full aspect-square flex flex-col items-center justify-center space-y-4">
-      <div className="relative z-10 w-full max-w-xs aspect-square p-4 flex items-center justify-center bg-black rounded-3xl shadow-lg shadow-zinc-900">
+      <div className="relative z-10 w-full max-w-xs aspect-square p-6 flex items-center justify-center bg-black rounded-[4rem] shadow-lg shadow-zinc-900">
         <div
-          className={`relative w-full ${clockFaceClass} aspect-square rounded-full flex items-center justify-center p-2`}
+          className={cn(
+            "relative w-full aspect-square rounded-full flex items-center justify-center p-2",
+            clockFaceClass
+          )}
         >
           {/* Clock numbers */}
           {[...Array(12)].map((_, i) => (
@@ -62,23 +67,35 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
 
           {/* Hour hand */}
           <div
-            className={`absolute w-1 h-[32%] ${handClass} rounded-full origin-bottom`}
+            className={cn(
+              "absolute w-1 h-[32%] rounded-full origin-bottom",
+              handClass
+            )}
             style={{ transform: `translateY(-50%) rotate(${hourDegrees}deg)` }}
           >
             <div
-              className={`absolute w-2 h-[75%] -left-0.5 ${handClass} rounded-full`}
+              className={cn(
+                "absolute w-2 h-[75%] -left-0.5 rounded-full",
+                handClass
+              )}
             />
           </div>
 
           {/* Minute hand */}
           <div
-            className={`absolute w-1 h-[44%] ${handClass} rounded-full origin-bottom`}
+            className={cn(
+              "absolute w-1 h-[44%] rounded-full origin-bottom",
+              handClass
+            )}
             style={{
               transform: `translateY(-50%) rotate(${minuteDegrees}deg)`,
             }}
           >
             <div
-              className={`absolute w-2 h-[75%] -left-0.5 ${handClass} rounded-full`}
+              className={cn(
+                "absolute w-2 h-[75%] -left-0.5 rounded-full",
+                handClass
+              )}
             />
           </div>
 
@@ -92,14 +109,17 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
 
           {/* Center dot */}
           <div
-            className={`absolute w-3 h-3 ${handClass} rounded-full flex items-center justify-center`}
+            className={cn(
+              "absolute w-3 h-3 rounded-full flex items-center justify-center",
+              handClass
+            )}
           >
-            <div className={`w-1 h-1 ${clockFaceClass} rounded-full`} />
+            <div className={cn("w-1 h-1 rounded-full", clockFaceClass)} />
           </div>
         </div>
       </div>
-      <div className="relative -top-5 max-w-64 w-full flex flex-col items-center justify-center space-y-2 py-6 rounded-b-2xl bg-black/75 backdrop-blur-lg shadow-lg">
-        <h2 className="text-md font-medium">{timezone}</h2>
+      <div className="relative -top-8 max-w-64 w-full flex flex-col items-center justify-center space-y-2 py-6 rounded-b-2xl bg-black/75 backdrop-blur-lg shadow-lg">
+        <h2 className="text-md font-medium text-white">{timezone}</h2>
         {!isLocalTimezone ? (
           <div className="text-center space-y-2">
             <p className="text-xs text-white/70 uppercase font-medium">
