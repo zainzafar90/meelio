@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
+import { cn } from "@/lib/utils";
 import { AppLayout } from "@/layouts/app-layout";
 import { playBreathingSound } from "@/utils/sound.utils";
 
@@ -36,19 +37,34 @@ const BreathingCircle: React.FC<{
       className="relative inset-0 flex items-center justify-center size-48 bg-transparent border-none cursor-pointer focus:outline-none"
     >
       <div
-        className="absolute inset-0 size-56 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 animate-concentric-ripple rounded-full bg-foreground/80 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20"
+        className={cn(
+          "absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 rounded-full bg-foreground/80 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20",
+          {
+            "size-56 animate-concentric-ripple": isActive,
+          }
+        )}
         style={
           { "--delay": "0.1s", "--waves-duration": "6s" } as React.CSSProperties
         }
       />
       <div
-        className="absolute inset-0 size-64 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 animate-concentric-ripple rounded-full bg-foreground/60 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20"
+        className={cn(
+          "absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 rounded-full bg-foreground/60 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20",
+          {
+            "size-64 animate-concentric-ripple": isActive,
+          }
+        )}
         style={
           { "--delay": "0.4s", "--waves-duration": "6s" } as React.CSSProperties
         }
       />
       <div
-        className="absolute inset-0 size-72 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 animate-concentric-ripple rounded-full bg-foreground/40 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20"
+        className={cn(
+          "absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 rounded-full bg-foreground/40 border border-[#86AFFF]/20 dark:border-[#86AFFF]/20",
+          {
+            "size-72 animate-concentric-ripple": isActive,
+          }
+        )}
         style={
           { "--delay": "0.8s", "--waves-duration": "6s" } as React.CSSProperties
         }
@@ -60,7 +76,7 @@ const BreathingCircle: React.FC<{
 
 const Breathing: React.FC = () => {
   const [phase, setPhase] = useState<BreathPhase>("inhale");
-  const [count, setCount] = useState(0);
+  const [, setCount] = useState(0);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
