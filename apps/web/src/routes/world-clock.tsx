@@ -52,7 +52,7 @@ const WorldClock: React.FC = () => {
           backgroundImage: "url('./img/bg-01.webp')",
         }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           {clocks.map((timezone, index) => (
             <Clock
               key={index}
