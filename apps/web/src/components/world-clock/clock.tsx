@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { differenceInHours, format, formatDistanceToNow } from "date-fns";
+import { differenceInHours } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 interface ClockProps {
