@@ -17,6 +17,7 @@ const VerifyMagicLink = React.lazy(
   () => import("@/routes/auth/verify-magic-link")
 );
 const Breathing = React.lazy(() => import("@/routes/breathing"));
+const WorldClock = React.lazy(() => import("@/routes/world-clock"));
 
 export const Router = () => {
   return (
@@ -96,6 +97,16 @@ export const Router = () => {
           element={
             <React.Suspense fallback={<PageSkeleton />}>
               <Breathing />
+            </React.Suspense>
+          }
+          errorElement={<ErrorPage />}
+        />
+
+        <Route
+          path="world-clock"
+          element={
+            <React.Suspense fallback={<PageSkeleton />}>
+              <WorldClock />
             </React.Suspense>
           }
           errorElement={<ErrorPage />}
