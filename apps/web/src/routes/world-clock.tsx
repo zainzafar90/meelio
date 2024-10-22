@@ -22,7 +22,10 @@ const WorldClock: React.FC = () => {
   const localTimezone = useMemo(() => {
     return getLocalTimezone();
   }, []);
-  const [clocks, setClocks] = useState<string[]>([localTimezone]);
+  const [clocks, setClocks] = useState<string[]>([
+    localTimezone,
+    "America/Toronto",
+  ]);
   const [selectedTimezone, setSelectedTimezone] =
     useState<string>(localTimezone);
 
