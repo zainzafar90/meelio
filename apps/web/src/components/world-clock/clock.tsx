@@ -139,20 +139,18 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
         </h2>
         {!isLocalTimezone ? (
           <div className="text-center space-y-2">
-            <p className="text-xs text-white/70 uppercase font-medium">
+            <p className="text-xs text-white/70 font-medium">
               {getDayStatus()}
             </p>
-            <p className="text-xs text-white/70 uppercase font-medium">
+            <p className="text-xs text-white/60 uppercase font-medium">
               {timeDifference > 0 ? `+${timeDifference}` : timeDifference} hrs
             </p>
           </div>
         ) : (
           <div className="text-center space-y-2">
-            <p className="text-xs text-white/70 uppercase font-medium">
-              Current
-            </p>
-            <p className="text-xs text-white/70 uppercase font-medium">
-              Local Time
+            <p className="text-xs text-white/70 font-medium">Current</p>
+            <p className="text-xs text-white/50 uppercase font-medium">
+              &mdash;
             </p>
           </div>
         )}
