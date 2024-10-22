@@ -116,8 +116,9 @@ export const Icons = {
   ),
   billing: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <path opacity=".5" fill="currentColor" d="M2 9h20v2H2z" />
+      <path fill="currentColor" d="M2 9h20v2H2z" />
       <path
+        opacity=".5"
         fill="currentColor"
         d="M19 5H5a3.009 3.009 0 0 0-3 3v1h20V8a3.009 3.009 0 0 0-3-3zM2 17a3.009 3.009 0 0 0 3 3h14a3.009 3.009 0 0 0 3-3v-6H2v6z"
       />
@@ -197,13 +198,10 @@ export const Icons = {
   ),
   breathing: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <circle cx={12} cy={12} r={6} fill="currentColor" opacity=".5" />
       <path
-        fill="none"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10zm0-6v.01M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8z"
+        fill="currentColor"
+        d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 16a6 6 0 1 1 6-6 6.007 6.007 0 0 1-6 6Z"
       />
     </svg>
   ),
@@ -211,7 +209,7 @@ export const Icons = {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path
         fill="currentColor"
-        d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10zm0-6v.01M12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8z"
+        d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 16a6 6 0 1 1 6-6 6.007 6.007 0 0 1-6 6Z"
       />
     </svg>
   ),
