@@ -47,6 +47,9 @@
     },
     "clean": {
       "cache": false
+    },
+    "release": {
+      "dependsOn": ["^build"]
     }
   }
 }

@@ -12,6 +12,7 @@
     "start:api": "turbo run start --filter=api",
     "start:web": "turbo run start --filter=web",
     "clean": "turbo run clean",
+    "release": "turbo run release",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
