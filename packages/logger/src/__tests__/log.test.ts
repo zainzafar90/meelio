@@ -10,11 +10,11 @@ describe("@repo/logger", () => {
 
   it("prints a warning", () => {
     logger.warn("warning");
-    expect(console.log).toHaveBeenCalled();
+    expect(console.warn).toHaveBeenCalled();
   });
 
   it("prints an error", () => {
     logger.error("error");
-    expect(console.log).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalled();
   });
 });

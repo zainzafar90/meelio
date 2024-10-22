@@ -89,7 +89,6 @@ const Breathing: React.FC = () => {
             setPhase((currentPhase) => {
               switch (currentPhase) {
                 case "inhale":
-                  console.log("inhale");
                   playBreathingSound("hold");
                   return "hold1";
                 case "hold1":
