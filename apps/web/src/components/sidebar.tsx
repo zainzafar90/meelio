@@ -65,6 +65,12 @@ const navigation = [
     icon: Icons.breathing,
     activeIcon: Icons.breathingActive,
   },
+  {
+    name: "World Clock",
+    href: "/world-clock",
+    icon: Icons.worldClock,
+    activeIcon: Icons.worldClockActive,
+  },
 ];
 
 const accountNavigation = [
