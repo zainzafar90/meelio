@@ -11,7 +11,7 @@ import "@/styles/globals.css";
 import { usePomodoroStore } from "./store/pomodoro.store";
 import { useUpdateAlertStore } from "./stores/useUpdateAlertStore";
 
-const INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
+const INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
 
 let updateSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
 

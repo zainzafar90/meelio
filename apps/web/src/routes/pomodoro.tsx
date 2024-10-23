@@ -6,7 +6,6 @@ import { usePomodoroStore } from "@/store/pomodoro.store";
 
 const Pomodoro = () => {
   const timer = usePomodoroStore((state) => state.timer);
-  timer.activeStage;
 
   return (
     <AppLayout>
