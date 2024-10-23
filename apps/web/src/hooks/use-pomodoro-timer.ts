@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import Worker from "@/workers/timer.worker?worker";
 
+import { AuthUser } from "@/types/auth";
 import { PomodoroStage } from "@/types/pomodoro";
 import { usePomodoroStore } from "@/store/pomodoro.store";
 import { changeFavicon } from "@/utils/favicon.utils";
@@ -9,8 +10,12 @@ import { playPomodoroSound } from "@/utils/sound.utils";
 
 const worker = new Worker();
 
-export const usePomodoroTimer = () => {
+export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
   const { timer, updateTimer, advanceTimer } = usePomodoroStore();
+
+  const resetAppTitle = () => {
+    document.title = "Meelio - focus, calm, & productivity";
+  };
 
   useEffect(() => {
     if (!worker) return;
@@ -60,7 +65,14 @@ export const usePomodoroTimer = () => {
 
   useEffect(() => {
     if (!timer.running) {
-      document.title = "Meelio - focus, calm, & productivity";
+      resetAppTitle();
     }
   }, [timer.running]);
+
+  useEffect(() => {
+    if (!user) {
+      worker.postMessage({ command: "pause" });
+      resetAppTitle();
+    }
+  }, [user]);
 };

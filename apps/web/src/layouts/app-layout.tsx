@@ -8,7 +8,6 @@ import { Logomark } from "@/components/logo";
 import { SidebarOld } from "@/components/sidebar";
 import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
-import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -16,7 +15,6 @@ interface AuthLayoutProps {
 
 export const AppLayout = memo(({ children }: AuthLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  usePomodoroTimer();
 
   return (
     <div>
