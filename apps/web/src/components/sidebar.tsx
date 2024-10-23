@@ -60,7 +60,7 @@ const navigation = [
     hidden: true,
   },
   {
-    name: "Breathing",
+    name: "Breathepod",
     href: "/breathing",
     icon: Icons.breathing,
     activeIcon: Icons.breathingActive,

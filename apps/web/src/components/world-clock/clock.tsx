@@ -131,9 +131,9 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
           {timezone}{" "}
           <span>
             {isDaytime ? (
-              <MoonIcon className="size-4 text-white/70" />
-            ) : (
               <SunIcon className="size-4 text-white/70" />
+            ) : (
+              <MoonIcon className="size-4 text-white/70" />
             )}
           </span>
         </h2>
