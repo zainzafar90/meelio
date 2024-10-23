@@ -181,7 +181,7 @@ export const SidebarOld = () => {
                     "group flex items-center gap-x-3 rounded-md p-2 text-sm leading-6 font-medium"
                   )}
                 >
-                  <Icons.logout className="mr-2 size-5" />
+                  <Icons.logout className="size-5" />
                   <span>Logout</span>
                 </button>
               </li>

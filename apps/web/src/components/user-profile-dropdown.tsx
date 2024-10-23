@@ -1,3 +1,4 @@
+import { VERSION } from "@/version";
 import Avatar from "boring-avatars";
 
 import { AuthUser } from "@/types/auth";
@@ -53,9 +54,13 @@ export function UserProfileDropdown(props: Props) {
         {!props.mobileView && (
           <>
             <span className="sr-only">Your profile</span>
-            <span aria-hidden="true" className="truncate">
-              {email}
-            </span>
+            <div className="flex flex-col w-full text-left truncate">
+              <div aria-hidden="true">{email}</div>
+
+              <div className="font-light text-xs text-muted-foreground">
+                Meelio Version: v{VERSION}
+              </div>
+            </div>
           </>
         )}
       </button>
