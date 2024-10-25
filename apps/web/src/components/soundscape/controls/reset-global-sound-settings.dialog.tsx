@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useMeelioStore } from "@/stores/meelio.store";
+
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
@@ -16,7 +18,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useMeelioStore } from "@/store/meelio.store";
 
 export const ResetGlobalSoundSettingsDialog = () => {
   const { reset } = useMeelioStore();

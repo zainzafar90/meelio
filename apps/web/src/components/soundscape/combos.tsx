@@ -1,5 +1,6 @@
+import { useMeelioStore } from "@/stores/meelio.store";
+
 import { SoundState } from "@/types/sound";
-import { useMeelioStore } from "@/store/meelio.store";
 
 import { Button } from "../ui/button";
 

@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 
+import { useMeelioStore } from "@/stores/meelio.store";
+
 import { cn } from "@/lib/utils";
-import { useMeelioStore } from "@/store/meelio.store";
 
 import { GlobalVolumeControl } from "./global-volume-control";
 import { OscillationButton } from "./oscillation-button";

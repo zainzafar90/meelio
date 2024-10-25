@@ -1,6 +1,7 @@
+import { useMeelioStore } from "@/stores/meelio.store";
+
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { useMeelioStore } from "@/store/meelio.store";
 
 interface Props {
   isPlayButtonActive?: boolean;

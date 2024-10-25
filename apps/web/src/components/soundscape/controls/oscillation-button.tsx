@@ -1,3 +1,4 @@
+import { useMeelioStore } from "@/stores/meelio.store";
 import gsap from "gsap";
 
 import { cn } from "@/lib/utils";
@@ -8,7 +9,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInterval } from "@/hooks/use-interval";
-import { useMeelioStore } from "@/store/meelio.store";
 import {
   generateNextVolumeForOscillation,
   OSCILLATION_INTERVAL_MS,

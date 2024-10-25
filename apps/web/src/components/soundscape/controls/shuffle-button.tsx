@@ -1,3 +1,4 @@
+import { useMeelioStore } from "@/stores/meelio.store";
 import gsap from "gsap";
 
 import { Sound } from "@/types/sound";
@@ -9,7 +10,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInterval } from "@/hooks/use-interval";
-import { useMeelioStore } from "@/store/meelio.store";
 import {
   generateNextVolumeForShuffle,
   SHUFFLE_SOUNDS_INTERVAL_MS,

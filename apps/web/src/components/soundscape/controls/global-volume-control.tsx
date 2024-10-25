@@ -1,6 +1,7 @@
+import { useMeelioStore } from "@/stores/meelio.store";
+
 import { Icons } from "@/components/icons/icons";
 import { VolumeSlider } from "@/components/ui/volume-slider";
-import { useMeelioStore } from "@/store/meelio.store";
 
 export const GlobalVolumeControl = () => {
   const { globalVolume, setGlobalVolume } = useMeelioStore();

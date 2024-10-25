@@ -1,4 +1,4 @@
-import { useMeelioStore } from "@/store/meelio.store";
+import { useMeelioStore } from "@/stores/meelio.store";
 
 import { SoundTileIcon } from "./sound-tile-icon";
 

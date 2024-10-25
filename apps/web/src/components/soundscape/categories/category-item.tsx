@@ -1,10 +1,10 @@
+import { useMeelioStore } from "@/stores/meelio.store";
 import { Switch } from "@headlessui/react";
 
 import { Category, CategoryType } from "@/types/category";
 import { Telemetry } from "@/lib/telemetry/telemetry";
 import { cn } from "@/lib/utils";
 import { CategoryIcons } from "@/components/icons/category-icons";
-import { useMeelioStore } from "@/store/meelio.store";
 
 import { Icons } from "../../icons/icons";
 
