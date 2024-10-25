@@ -1,10 +1,10 @@
+import { useAuthStore } from "@/stores/auth.store";
 import { VERSION } from "@/version";
 import Avatar from "boring-avatars";
 
 import { AuthUser } from "@/types/auth";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { useAuthStore } from "@/store/auth.store";
 
 import { SettingsDialog } from "./sidebar-new";
 

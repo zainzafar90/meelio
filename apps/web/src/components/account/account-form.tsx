@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { api } from "@/api";
+import { useAuthStore } from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,7 +19,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/store/auth.store";
 
 import { Icons } from "../icons/icons";
 import { Theme, useTheme } from "../theme-provider";

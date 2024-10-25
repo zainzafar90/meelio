@@ -1,8 +1,9 @@
+import { useAuthStore } from "@/stores/auth.store";
+
 import { AuthUser } from "@/types/auth";
 import { BillingForm } from "@/components/account/billing/billing-form";
 import { Separator } from "@/components/ui/separator";
 import { AppLayout } from "@/layouts/app-layout";
-import { useAuthStore } from "@/store/auth.store";
 
 export const Billing = () => {
   const user = useAuthStore((state) => state.user) || ({} as AuthUser);

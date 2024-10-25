@@ -1,6 +1,6 @@
 import React from "react";
 
-import { AuthState } from "@/store/auth.store";
+import { AuthState } from "@/stores/auth.store";
 
 export const AuthContext = React.createContext<AuthState>({
   loading: false,

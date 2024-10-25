@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
 
 import { api } from "@/api";
+import { useAuthStore } from "@/stores/auth.store";
 
 import { cn } from "@/lib/utils";
-import { useAuthStore } from "@/store/auth.store";
 
 import { Icons } from "./icons/icons";
 import { Logomark } from "./logo";

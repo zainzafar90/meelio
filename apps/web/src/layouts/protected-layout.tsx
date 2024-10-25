@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 import { api } from "@/api";
+import { useAuthStore } from "@/stores/auth.store";
 
 import { AuthUser } from "@/types/auth";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
-import { useAuthStore } from "@/store/auth.store";
 
 export function ProtectedLayout() {
   const navigate = useNavigate();
