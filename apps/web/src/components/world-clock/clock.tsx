@@ -6,6 +6,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+const CLOCK_UPDATE_INTERVAL = 1000;
 interface ClockProps {
   timezone: string;
   isLocalTimezone?: boolean;
@@ -15,7 +16,10 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(
+      () => setCurrentTime(new Date()),
+      CLOCK_UPDATE_INTERVAL
+    );
     return () => clearInterval(timer);
   }, []);
 
