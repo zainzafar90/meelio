@@ -21,7 +21,7 @@ export default {
     "^@/components/ui/(.*)$",
     "^@/layouts/(.*)$",
     "^@/hooks/(.*)$",
-    "^@/store/(.*)$",
+    "^@/stores/(.*)$",
     "^@/utils/(.*)$",
     "^@/assets/(.*)$",
     "^@/styles/(.*)$",

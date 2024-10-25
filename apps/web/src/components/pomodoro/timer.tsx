@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
+import { usePomodoroStore } from "@/stores/pomodoro.store";
+
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
-import { usePomodoroStore } from "@/store/pomodoro.store";
 import { getTime } from "@/utils/timer.utils";
 
 import { Icons } from "../icons/icons";

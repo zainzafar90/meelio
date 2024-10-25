@@ -1,3 +1,4 @@
+import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { usePomodoroStore } from "@/store/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
 
 import { Button } from "../ui/button";

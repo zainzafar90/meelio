@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 
+import { usePomodoroStore } from "@/stores/pomodoro.store";
 import Worker from "@/workers/timer.worker?worker";
 
 import { AuthUser } from "@/types/auth";
 import { PomodoroStage } from "@/types/pomodoro";
-import { usePomodoroStore } from "@/store/pomodoro.store";
 import { changeFavicon } from "@/utils/favicon.utils";
 import { playPomodoroSound } from "@/utils/sound.utils";
 

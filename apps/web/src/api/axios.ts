@@ -1,6 +1,6 @@
+import { useNotificationStore } from "@/stores/notification.store";
 import Axios from "axios";
 
-import { useNotificationStore } from "@/store/notification.store";
 import { env } from "@/utils/common.utils";
 
 /*

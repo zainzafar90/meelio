@@ -8,7 +8,7 @@ import { AppUpdatedAlert } from "./components/app-updated-alert";
 
 import "@/styles/globals.css";
 
-import { usePomodoroStore } from "./store/pomodoro.store";
+import { usePomodoroStore } from "./stores/pomodoro.store";
 import { useUpdateAlertStore } from "./stores/update-alert-store";
 
 const INTERVAL_MS = 10 * 60 * 1000; // 10 minutes

@@ -1,8 +1,9 @@
+import { usePomodoroStore } from "@/stores/pomodoro.store";
+
 import { PomodoroStage } from "@/types/pomodoro";
 import { Icons } from "@/components/icons/icons";
 import { Timer } from "@/components/pomodoro/timer";
 import { AppLayout } from "@/layouts/app-layout";
-import { usePomodoroStore } from "@/store/pomodoro.store";
 
 export const Pomodoro = () => {
   const timer = usePomodoroStore((state) => state.timer);
