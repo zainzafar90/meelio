@@ -1,4 +1,4 @@
-import { useUpdateAlertStore } from "@/stores/useUpdateAlertStore";
+import { useUpdateAlertStore } from "@/stores/update-alert-store";
 import { VERSION } from "@/version";
 import { useRegisterSW } from "virtual:pwa-register/react";
 
