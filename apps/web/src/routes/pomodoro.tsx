@@ -4,7 +4,7 @@ import { Timer } from "@/components/pomodoro/timer";
 import { AppLayout } from "@/layouts/app-layout";
 import { usePomodoroStore } from "@/store/pomodoro.store";
 
-const Pomodoro = () => {
+export const Pomodoro = () => {
   const timer = usePomodoroStore((state) => state.timer);
 
   return (
@@ -66,5 +66,3 @@ const SessionProgress: React.FC<{
     </div>
   );
 };
-
-export default Pomodoro;

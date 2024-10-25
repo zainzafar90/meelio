@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
 import { ConnectionWarning } from "@/components/connection-warning";
-import SoundPlayer from "@/components/soundscape/sound-player/sound-player";
+import { SoundPlayer } from "@/components/soundscape/sound-player/sound-player";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";

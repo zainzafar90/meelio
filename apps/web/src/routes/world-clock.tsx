@@ -18,7 +18,7 @@ const getLocalTimezone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-const WorldClock: React.FC = () => {
+export const WorldClock: React.FC = () => {
   const localTimezone = useMemo(() => {
     return getLocalTimezone();
   }, []);
@@ -89,5 +89,3 @@ const WorldClock: React.FC = () => {
     </AppLayout>
   );
 };
-
-export default WorldClock;

@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { AppLayout } from "@/layouts/app-layout";
 import { useAuthStore } from "@/store/auth.store";
 
-const Billing = () => {
+export const Billing = () => {
   const user = useAuthStore((state) => state.user) || ({} as AuthUser);
 
   return (
@@ -22,5 +22,3 @@ const Billing = () => {
     </AppLayout>
   );
 };
-
-export default Billing;

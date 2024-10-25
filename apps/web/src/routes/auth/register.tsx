@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 
 import { UserAuthForm } from "@/components/auth/user-auth-form";
 import { Logo } from "@/components/logo";
-import AuthLayout from "@/layouts/auth-layout";
+import { AuthLayout } from "@/layouts/auth-layout";
 
-const Register = () => {
+export const Register = () => {
   return (
     <AuthLayout>
       <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
@@ -49,5 +49,3 @@ const Register = () => {
     </AuthLayout>
   );
 };
-
-export default Register;

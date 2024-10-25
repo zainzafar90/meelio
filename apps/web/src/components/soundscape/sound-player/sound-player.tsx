@@ -2,7 +2,7 @@ import ReactPlayer from "react-player";
 
 import { useMeelioStore } from "@/store/meelio.store";
 
-const SoundPlayer = () => {
+export const SoundPlayer = () => {
   const { sounds, globalVolume, setSoundLoading } = useMeelioStore(
     (state) => state
   );
@@ -31,5 +31,3 @@ const SoundPlayer = () => {
     </div>
   );
 };
-
-export default SoundPlayer;

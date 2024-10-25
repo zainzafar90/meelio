@@ -1,23 +1,23 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
+import { Settings } from "lucide-react";
+
 import { NotFoundPage } from "@/routes/errors/404";
 import { ErrorPage } from "@/routes/errors/error";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
 import { ProtectedLayout } from "@/layouts/protected-layout";
 import { PublicLayout } from "@/layouts/public-layout";
 
-const Register = React.lazy(() => import("@/routes/auth/register"));
-const Login = React.lazy(() => import("@/routes/auth/login"));
-const Soundscapes = React.lazy(() => import("@/routes/soundscapes"));
-const Pomodoro = React.lazy(() => import("@/routes/pomodoro"));
-const Billing = React.lazy(() => import("@/routes/account/billing"));
-const Settings = React.lazy(() => import("@/routes/account/settings"));
-const VerifyMagicLink = React.lazy(
-  () => import("@/routes/auth/verify-magic-link")
-);
+import { Billing } from "./account/billing";
+import { Login } from "./auth/login";
+import { Register } from "./auth/register";
+import { VerifyMagicLink } from "./auth/verify-magic-link";
+import { Pomodoro } from "./pomodoro";
+import { WorldClock } from "./world-clock";
+
 const Breathing = React.lazy(() => import("@/routes/breathing"));
-const WorldClock = React.lazy(() => import("@/routes/world-clock"));
+const Soundscapes = React.lazy(() => import("@/routes/soundscapes"));
 
 export const Router = () => {
   return (
