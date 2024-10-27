@@ -13,6 +13,7 @@ import { Billing } from "./account/billing";
 import { Login } from "./auth/login";
 import { Register } from "./auth/register";
 import { VerifyMagicLink } from "./auth/verify-magic-link";
+import { Home } from "./home";
 import { Pomodoro } from "./pomodoro";
 import { WorldClock } from "./world-clock";
 
@@ -22,6 +23,16 @@ const Soundscapes = React.lazy(() => import("@/routes/soundscapes"));
 export const Router = () => {
   return (
     <Routes>
+      <Route
+        path="/"
+        element={
+          <React.Suspense fallback={<PageSkeleton />}>
+            <Home />
+          </React.Suspense>
+        }
+        errorElement={<ErrorPage />}
+      />
+
       <Route element={<PublicLayout />}>
         <Route
           path="/register"
@@ -53,7 +64,7 @@ export const Router = () => {
         />
       </Route>
 
-      <Route path="/" element={<ProtectedLayout />}>
+      <Route element={<ProtectedLayout />}>
         <Route
           path="soundscapes"
           element={
@@ -111,8 +122,6 @@ export const Router = () => {
           }
           errorElement={<ErrorPage />}
         />
-
-        <Route path="" element={<Navigate to="/soundscapes" />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

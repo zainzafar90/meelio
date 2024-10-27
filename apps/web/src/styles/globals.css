@@ -11,6 +11,14 @@
     --flip-gradient-top: #ffffff;
     --flip-gradient-bottom: #e0e0e0;
 
+    --home-p-t: 1rem;
+    --home-p-b: 1rem;
+    --home-p-r: 1rem;
+    --home-p-l: 1rem;
+
+    --home-grid-block-col-size: 10px;
+    --home-grid-block-row-size: 10px;
+
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
@@ -288,6 +296,12 @@ html {
   animation: flipBottom 900ms cubic-bezier(0.15, 0.45, 0.28, 1);
 }
 
+/* Glass effect */
+.glass {
+  @apply border border-white/10 bg-white/5 backdrop-blur-lg;
+}
+
+/* Clock animations */
 @keyframes flipTop {
   0% {
     transform: rotateX(0deg);

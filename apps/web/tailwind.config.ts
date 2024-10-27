@@ -62,7 +62,9 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       }),
-
+      padding: {
+        home: "var(--home-p-t) var(--home-p-r) var(--home-p-b) var(--home-p-l)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
