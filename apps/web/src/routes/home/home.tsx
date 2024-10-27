@@ -32,6 +32,7 @@ export const Home = () => {
     <div id="home" className="w-screen max-w-full h-screen max-h-screen">
       <Background />
       <BackgroundOverlay />
+
       <AppLayout>
         {/* Top Row */}
         <div className="flex justify-between col-span-3">
@@ -59,7 +60,7 @@ export const Home = () => {
             })}
           </h1>
           <h2 className="text-xl sm:text-2xl md:text-4xl font-medium mt-2 mb-4 md:mb-8 lg:mb-16 text-shadow-lg">
-            {greeting}, User
+            {greeting}, Zain
           </h2>
           <div className="glass px-4 py-3 lg:px-8 lg:py-6 rounded-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto">
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 leading-relaxed">

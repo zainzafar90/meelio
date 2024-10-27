@@ -22,7 +22,7 @@ export const BackgroundOverlay = () => {
   return (
     <div
       className={cn(
-        "fixed inset-0 z-10",
+        "fixed inset-0",
         "transition-transform duration-300 ease-out"
       )}
       style={{

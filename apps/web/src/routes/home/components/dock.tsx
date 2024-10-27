@@ -1,5 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Home, Bell, Lightbulb, Camera, Moon, Sun, Volume2, MoreHorizontal } from 'lucide-react';
+import React, { useEffect, useRef, useState } from "react";
+
+import {
+  Bell,
+  Camera,
+  Home,
+  Lightbulb,
+  Moon,
+  MoreHorizontal,
+  Sun,
+  Volume2,
+} from "lucide-react";
 
 interface DockItem {
   icon: React.ElementType;
@@ -14,13 +24,13 @@ export default function Dock() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const allItems: DockItem[] = [
-    { icon: Home, label: 'Home' },
-    { icon: Bell, label: 'Notifications' },
-    { icon: Lightbulb, label: 'Ideas' },
-    { icon: Camera, label: 'Camera' },
-    { icon: Moon, label: 'Dark Mode' },
-    { icon: Sun, label: 'Brightness' },
-    { icon: Volume2, label: 'Volume' },
+    { icon: Home, label: "Home" },
+    { icon: Bell, label: "Notifications" },
+    { icon: Lightbulb, label: "Ideas" },
+    { icon: Camera, label: "Camera" },
+    { icon: Moon, label: "Dark Mode" },
+    { icon: Sun, label: "Brightness" },
+    { icon: Volume2, label: "Volume" },
   ];
 
   const getVisibleItemCount = (width: number) => {
@@ -40,28 +50,37 @@ export default function Dock() {
     };
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const DockButton = ({ Icon, label }: { Icon: React.ElementType; label: string }) => (
-    <button 
-      className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
+  const DockButton = ({
+    Icon,
+    label,
+  }: {
+    Icon: React.ElementType;
+    label: string;
+  }) => (
+    <button
+      className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
       title={label}
     >
-      <Icon  className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5"  />
-      <span className="absolute -top-8 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+      <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
+      <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
         {label}
       </span>
     </button>
@@ -69,23 +88,24 @@ export default function Dock() {
 
   return (
     <div className="relative" ref={dockRef}>
-      <div className="bg-black/80 backdrop-blur-lg rounded-full px-4 py-3 flex items-center gap-3">
+      <div className="bg-black/80 backdrop-blur-lg rounded-full px-3 py-2 flex items-center gap-2">
         {visibleItems.map((item, index) => (
           <React.Fragment key={index}>
             <DockButton Icon={item.icon} label={item.label} />
-            {(index === 3 || index === 6) && visibleItems.length > index + 1 && (
-              <div className="w-px h-6 bg-white/20" />
-            )}
+            {(index === 3 || index === 6) &&
+              visibleItems.length > index + 1 && (
+                <div className="w-px h-5 bg-white/20" />
+              )}
           </React.Fragment>
         ))}
-        
+
         {dropdownItems.length > 0 && (
-          <button 
-            className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white relative group"
+          <button
+            className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white relative group"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <MoreHorizontal  className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5"  />
-            <span className="absolute -top-8 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            <MoreHorizontal className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
+            <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
               More Options
             </span>
           </button>
@@ -94,17 +114,17 @@ export default function Dock() {
 
       {/* Dropdown Menu */}
       {isDropdownOpen && dropdownItems.length > 0 && (
-        <div 
+        <div
           ref={dropdownRef}
-          className="bg-black/80 backdrop-blur-lg absolute bottom-full mb-2 right-0 rounded-full overflow-hidden py-2 min-w-[200px]"
+          className="bg-black/80 backdrop-blur-lg absolute bottom-full mb-2 right-0 rounded-lg overflow-hidden py-1.5 min-w-[180px]"
         >
           {dropdownItems.map((item, index) => (
             <button
               key={index}
-              className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-black/10 transition-colors text-white/80 hover:text-white"
+              className="w-full px-3 py-2 flex items-center gap-2.5 hover:bg-black/10 transition-colors text-white/80 hover:text-white"
             >
-              <item.icon className="w-5 h-5" />
-              <span className="text-sm">{item.label}</span>
+              <item.icon className="w-4 h-4" />
+              <span className="text-xs">{item.label}</span>
             </button>
           ))}
         </div>
