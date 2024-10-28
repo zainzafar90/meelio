@@ -41,11 +41,8 @@ const MainContent = () => (
 
 const TopBar = () => (
   <div className="flex justify-between col-span-3">
-    <div className="flex items-center">
-      <Button variant="glass" size="icon">
-        <Timer className="w-4 h-4 md:w-5 md:h-5" />
-      </Button>
-    </div>
+    <SidebarTrigger />
+
     <div />
     <div className="glass py-2 px-3 rounded-full flex items-center gap-3 justify-end text-white/90 hover:text-white ">
       <span className="text-sm font-medium">0m</span>
@@ -57,7 +54,7 @@ const TopBar = () => (
 
 const BottomBar = () => (
   <div className="flex justify-between col-span-3">
-    <SidebarTrigger />
+    <div />
     <div className="flex justify-center items-center">
       <Dock />
     </div>
