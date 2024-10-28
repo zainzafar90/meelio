@@ -3,13 +3,14 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Bell,
   Camera,
-  Home,
   Lightbulb,
   Moon,
   MoreHorizontal,
   Sun,
   Volume2,
 } from "lucide-react";
+
+import { Logo } from "@/components/logo";
 
 interface DockItem {
   icon: React.ElementType;
@@ -24,7 +25,7 @@ export default function Dock() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const allItems: DockItem[] = [
-    { icon: Home, label: "Home" },
+    { icon: Logo, label: "Home" },
     { icon: Bell, label: "Notifications" },
     { icon: Lightbulb, label: "Ideas" },
     { icon: Camera, label: "Camera" },
@@ -34,11 +35,11 @@ export default function Dock() {
   ];
 
   const getVisibleItemCount = (width: number) => {
-    if (width >= 1280) return allItems.length; // xl - all items
-    if (width >= 1024) return 6; // lg - 6 items
-    if (width >= 768) return 4; // md - 4 items
-    if (width >= 640) return 3; // sm - 3 items
-    return 2; // xs - 2 items
+    if (width >= 1280) return allItems.length;
+    if (width >= 1024) return 6;
+    if (width >= 768) return 4;
+    if (width >= 640) return 3;
+    return 2;
   };
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function Dock() {
       className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
       title={label}
     >
-      <Icon className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
+      <Icon className="size-3 md:size-4 lg:size-5" />
       <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
         {label}
       </span>

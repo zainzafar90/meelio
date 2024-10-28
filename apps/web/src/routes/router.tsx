@@ -23,16 +23,6 @@ const Soundscapes = React.lazy(() => import("@/routes/soundscapes"));
 export const Router = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <React.Suspense fallback={<PageSkeleton />}>
-            <Home />
-          </React.Suspense>
-        }
-        errorElement={<ErrorPage />}
-      />
-
       <Route element={<PublicLayout />}>
         <Route
           path="/register"
@@ -65,6 +55,16 @@ export const Router = () => {
       </Route>
 
       <Route element={<ProtectedLayout />}>
+        <Route
+          path="/"
+          element={
+            <React.Suspense fallback={<PageSkeleton />}>
+              <Home />
+            </React.Suspense>
+          }
+          errorElement={<ErrorPage />}
+        />
+
         <Route
           path="soundscapes"
           element={
