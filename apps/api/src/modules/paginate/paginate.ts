@@ -17,7 +17,7 @@ export interface IOptions {
   page?: number;
 }
 
-const paginate = <T extends Document, U extends Model<U>>(schema: Schema<T>): void => {
+const paginate = <T extends Document, U extends Model<T>>(schema: Schema<T>): void => {
   /**
    * @typedef {Object} QueryResult
    * @property {Document[]} results - Results found
