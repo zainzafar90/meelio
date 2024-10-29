@@ -8,6 +8,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
@@ -81,6 +82,7 @@ const Clock = () => {
 const Greeting = () => {
   const [greeting, setGreeting] = useState("");
   const [time] = useState(new Date());
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const updateGreeting = () => {
@@ -97,9 +99,15 @@ const Greeting = () => {
     updateGreeting();
   }, [time]);
 
+  const getFirstName = () => {
+    if (!user || !user.name) return "";
+    return ` — ${user.name.split(" ")[0]}`;
+  };
+
   return (
     <h2 className="text-xl sm:text-2xl md:text-4xl font-medium mt-2 mb-4 md:mb-8 lg:mb-16 text-shadow-lg">
-      {greeting}, Zain
+      {greeting}
+      {getFirstName()}
     </h2>
   );
 };
