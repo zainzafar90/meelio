@@ -1,10 +1,17 @@
 import { create } from "zustand";
 
 import { PomodoroStage, PomodoroTimer } from "@/types/pomodoro";
+import { db, getTodaysSummary } from "@/lib/db/pomodoro-db";
 import { MINUTE_IN_SECONDS } from "@/utils/common.utils";
 
 type PomodoroStore = {
   timer: PomodoroTimer;
+  stats: {
+    todaysFocusSessions: number;
+    todaysShortBreaks: number;
+    todaysLongBreaks: number;
+    todaysFocusTime: number;
+  };
   startTimer: () => void;
   pauseTimer: () => void;
   resumeTimer: () => void;
@@ -18,6 +25,8 @@ type PomodoroStore = {
   setTimerDuration: (duration: number) => void;
   toggleTimerSound: () => void;
   isTimerRunning: () => boolean;
+  completeSession: () => Promise<void>;
+  loadTodayStats: () => Promise<void>;
 };
 
 export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
@@ -35,7 +44,12 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     autoStartBreaks: true,
     enableSound: true,
   },
-
+  stats: {
+    todaysFocusSessions: 0,
+    todaysShortBreaks: 0,
+    todaysLongBreaks: 0,
+    todaysFocusTime: 0,
+  },
   startTimer: () =>
     set((state) => ({ timer: { ...state.timer, running: true } })),
 
@@ -149,4 +163,50 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     })),
 
   isTimerRunning: () => get().timer.running,
+
+  completeSession: async () => {
+    const { timer } = get();
+    const session = {
+      timestamp: Date.now(),
+      stage: timer.activeStage,
+      duration: timer.stageSeconds[timer.activeStage],
+      completed: true,
+    };
+
+    await db.sessions.add(session);
+
+    // Update daily summary
+    // const today = new Date().toISOString().split("T")[0];
+    const summary = await getTodaysSummary();
+
+    if (timer.activeStage === PomodoroStage.WorkTime) {
+      summary.focusSessions++;
+      summary.totalFocusTime += timer.stageSeconds[timer.activeStage];
+    } else if (timer.activeStage === PomodoroStage.ShortBreak) {
+      summary.shortBreaks++;
+    } else {
+      summary.longBreaks++;
+    }
+
+    await db.dailySummaries.put(summary);
+
+    // Update local stats
+    await get().loadTodayStats();
+  },
+
+  loadTodayStats: async () => {
+    const summary = await getTodaysSummary();
+    set({
+      timer: {
+        ...get().timer,
+        sessionCount: summary.focusSessions,
+      },
+      stats: {
+        todaysFocusSessions: summary.focusSessions,
+        todaysShortBreaks: summary.shortBreaks,
+        todaysLongBreaks: summary.longBreaks,
+        todaysFocusTime: summary.totalFocusTime,
+      },
+    });
+  },
 }));

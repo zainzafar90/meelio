@@ -73,10 +73,5 @@ export const getTime = (
   const secondTens = Math.floor(remainingSeconds / 10).toString();
   const secondUnits = (remainingSeconds % 10).toString();
 
-  return [
-    minuteTens === "0" ? null : minuteTens,
-    minuteUnits === "0" && minuteTens === "0" ? null : minuteUnits,
-    secondTens,
-    secondUnits,
-  ];
+  return [minuteTens, minuteUnits, secondTens, secondUnits];
 };

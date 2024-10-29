@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-
-import { usePomodoroStore } from "@/stores/pomodoro.store";
+import React, { useEffect, useState } from "react";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
+import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { getTime } from "@/utils/timer.utils";
 
 import { Icons } from "../icons/icons";
@@ -14,9 +13,26 @@ import { FlipClockPiece } from "./flip-clock-piece";
 import { PomodoroSettingsDialog } from "./pomodoro-settings.dialog";
 
 export const Timer: React.FC = () => {
-  const { timer, startTimer, pauseTimer, resumeTimer, changeStage } =
-    usePomodoroStore();
+  const {
+    timer,
+    startTimer,
+    pauseTimer,
+    resumeTimer,
+    changeStage,
+    completeSession,
+    loadTodayStats,
+  } = usePomodoroStore();
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+
+  useEffect(() => {
+    loadTodayStats();
+  }, [loadTodayStats]);
+
+  useEffect(() => {
+    if (timer.remaining === 0) {
+      completeSession();
+    }
+  }, [timer.remaining, completeSession]);
 
   const handleStartPause = () => {
     if (timer.running) {

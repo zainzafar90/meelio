@@ -13,6 +13,7 @@ import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { Dock } from "./components/dock";
 import { AppLayout } from "./components/layout";
+import { TimerDynamicIsland } from "./components/timer-dynamic-island";
 
 export const Home = () => {
   return (
@@ -40,9 +41,10 @@ const MainContent = () => (
 );
 
 const TopBar = () => (
-  <div className="flex justify-between col-span-3">
+  <div className="relative flex justify-between col-span-3">
     <SidebarTrigger />
-    <div />
+    <TimerDynamicIsland />
+
     <div className="flex items-center justify-end">
       <Button variant="glass" size="icon">
         <ListTodo className="w-4 h-4 md:w-5 md:h-5" />
