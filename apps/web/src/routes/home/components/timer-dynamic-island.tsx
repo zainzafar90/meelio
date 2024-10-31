@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -150,6 +150,7 @@ export const TimerDynamicIsland = () => {
   const { user } = useAuthStore();
   usePomodoroTimer({ user });
   const [isExpanded, setIsExpanded] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const {
     timer,
     startTimer,
@@ -198,25 +199,39 @@ export const TimerDynamicIsland = () => {
     return (timer.remaining / totalTime) * 100;
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <motion.div className="absolute left-1/2 -translate-x-1/2 w-full max-w-sm z-10">
+    <motion.div className="absolute left-1/2 -translate-x-1/2 top-1 w-full max-w-sm z-10">
       <AnimatePresence mode="wait">
         <motion.div
+          ref={containerRef}
           className="bg-black/80 backdrop-blur-xl overflow-hidden rounded-3xl min-w-60"
           layout
           initial={{
-            borderRadius: !isExpanded ? "24px" : "40px",
-            scale: 0.95,
+            borderRadius: isExpanded ? "40px" : "24px",
             width: "100%",
           }}
           animate={{
-            borderRadius: !isExpanded ? "40px" : "24px",
-            scale: 1.0125,
+            borderRadius: isExpanded ? "24px" : "40px",
             width: "95%",
           }}
           exit={{
-            borderRadius: !isExpanded ? "24px" : "40px",
-            scale: 0.95,
+            borderRadius: isExpanded ? "40px" : "24px",
             width: "100%",
           }}
           transition={{
