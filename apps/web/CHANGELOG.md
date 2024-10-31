@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.25](https://github.com/zainzafar90/meelio/compare/v0.0.24...v0.0.25) (2024-10-31)
+
+
+### Bug Fixes
+
+* rerenders ([1d44a2a](https://github.com/zainzafar90/meelio/commit/1d44a2a94684d3a571603c7ec15b44fbd3cfb10c))
+
 ### [0.0.24](https://github.com/zainzafar90/meelio/compare/v0.0.23...v0.0.24) (2024-10-29)
 
 ### [0.0.23](https://github.com/zainzafar90/meelio/compare/v0.0.22...v0.0.23) (2024-10-29)
