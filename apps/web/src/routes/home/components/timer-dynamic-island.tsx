@@ -7,6 +7,7 @@ import { Icons } from "@/components/icons/icons";
 import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";
 import { useAuthStore } from "@/stores/auth.store";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { getTime } from "@/utils/timer.utils";
 
 import { TimerStats } from "./timer/timer-stats";
@@ -160,6 +161,7 @@ export const TimerDynamicIsland = () => {
     completeSession,
     loadTodayStats,
   } = usePomodoroStore();
+  const { playRandom, pausePlayingSounds } = useSoundscapesStore();
 
   useEffect(() => {
     loadTodayStats();
@@ -174,10 +176,13 @@ export const TimerDynamicIsland = () => {
   const handleToggle = () => {
     if (timer.running) {
       pauseTimer();
+      pausePlayingSounds();
     } else if (timer.remaining === timer.stageSeconds[timer.activeStage]) {
       startTimer();
+      playRandom();
     } else {
       resumeTimer();
+      playRandom();
     }
   };
 
@@ -214,6 +219,12 @@ export const TimerDynamicIsland = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (timer.remaining === 0) {
+      pausePlayingSounds();
+    }
+  }, [timer.remaining, pausePlayingSounds]);
 
   return (
     <motion.div className="absolute left-1/2 -translate-x-1/2 top-1 w-full max-w-sm z-10">

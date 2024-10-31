@@ -1,10 +1,10 @@
-import { useMeelioStore } from "@/stores/meelio.store";
 import { Switch } from "@headlessui/react";
 
 import { Category, CategoryType } from "@/types/category";
 import { Telemetry } from "@/lib/telemetry/telemetry";
 import { cn } from "@/lib/utils";
 import { CategoryIcons } from "@/components/icons/category-icons";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { Icons } from "../../icons/icons";
 
@@ -12,7 +12,7 @@ interface CategoryItemProps {
   category: CategoryType;
 }
 export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
-  const { playCategory, playRandom, activeCategoryId } = useMeelioStore();
+  const { playCategory, playRandom, activeCategoryId } = useSoundscapesStore();
 
   const isActiveCategory = (category: Category) => {
     return activeCategoryId === category;

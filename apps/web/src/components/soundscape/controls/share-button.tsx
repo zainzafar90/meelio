@@ -1,4 +1,3 @@
-import { useMeelioStore } from "@/stores/meelio.store";
 import { toast } from "sonner";
 
 import { SoundState } from "@/types/sound";
@@ -9,11 +8,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { copyToClipboard } from "@/utils/common.utils";
 import { encodeSoundState } from "@/utils/router.utils";
 
 export const ShareButton = () => {
-  const { sounds } = useMeelioStore((state) => state);
+  const { sounds } = useSoundscapesStore((state) => state);
 
   // Encode the sound state and generate the shareable link
   const generateShareableLink = () => {

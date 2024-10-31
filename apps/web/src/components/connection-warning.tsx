@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useMeelioStore } from "@/stores/meelio.store";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { Icons } from "./icons/icons";
 
@@ -11,7 +11,7 @@ const navigator = (
 export const ConnectionWarning = () => {
   const [isSlow, setIsSlow] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
-  const isAnySoundPlaying = useMeelioStore((state) =>
+  const isAnySoundPlaying = useSoundscapesStore((state) =>
     state.sounds.some((sound) => sound.playing)
   );
 

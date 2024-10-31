@@ -1,8 +1,9 @@
-import { useMeelioStore } from "@/stores/meelio.store";
 import ReactPlayer from "react-player";
 
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
+
 export const SoundPlayer = () => {
-  const { sounds, globalVolume, setSoundLoading } = useMeelioStore(
+  const { sounds, globalVolume, setSoundLoading } = useSoundscapesStore(
     (state) => state
   );
 

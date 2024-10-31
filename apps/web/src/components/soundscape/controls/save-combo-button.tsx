@@ -1,5 +1,3 @@
-import { useMeelioStore } from "@/stores/meelio.store";
-
 import { SoundState } from "@/types/sound";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
@@ -8,10 +6,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 export const SaveComboButton = () => {
-  const { addCombo } = useMeelioStore((state) => state);
-  const currentlyPlayingSounds = useMeelioStore((state) =>
+  const { addCombo } = useSoundscapesStore((state) => state);
+  const currentlyPlayingSounds = useSoundscapesStore((state) =>
     state.sounds.filter((sound) => sound.playing)
   );
 

@@ -1,6 +1,5 @@
 import { memo } from "react";
 
-import { useMeelioStore } from "@/stores/meelio.store";
 import { Switch } from "@headlessui/react";
 
 import { Sound } from "@/types/sound";
@@ -9,13 +8,14 @@ import { cn } from "@/lib/utils";
 import { RipplesEffect } from "@/components/ripple-effects";
 import { Spinner } from "@/components/ui/spinner";
 import { VolumeSlider } from "@/components/ui/volume-slider";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 type Props = {
   sound: Sound;
 };
 
 export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
-  const { setVolumeForSound, toggleSoundState } = useMeelioStore(
+  const { setVolumeForSound, toggleSoundState } = useSoundscapesStore(
     (state) => state
   );
 

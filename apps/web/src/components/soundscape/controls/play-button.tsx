@@ -1,16 +1,15 @@
-import { useMeelioStore } from "@/stores/meelio.store";
-
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 interface Props {
   isPlayButtonActive?: boolean;
 }
 
 export const PlayButton = (props: Props) => {
-  const { pausePlayingSounds, resumePausedSounds } = useMeelioStore();
+  const { pausePlayingSounds, resumePausedSounds } = useSoundscapesStore();
 
-  const isAnySoundPlaying = useMeelioStore((state) =>
+  const isAnySoundPlaying = useSoundscapesStore((state) =>
     state.sounds.some((sound) => sound.playing)
   );
 

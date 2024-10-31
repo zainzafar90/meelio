@@ -183,7 +183,7 @@ type State = {
   reset: () => void;
 };
 
-export const useMeelioStore = create<State>((set) => ({
+export const useSoundscapesStore = create<State>((set) => ({
   sounds: allSounds,
   globalVolume: 1,
   pausedSounds: [],

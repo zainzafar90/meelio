@@ -1,15 +1,14 @@
-import { useMeelioStore } from "@/stores/meelio.store";
-
 import { SoundState } from "@/types/sound";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { Button } from "../ui/button";
 
 export const Combos: React.FC = () => {
-  const addCombo = useMeelioStore((state) => state.addCombo);
-  const deleteCombo = useMeelioStore((state) => state.deleteCombo);
-  const playCombo = useMeelioStore((state) => state.playCombo);
-  const combos = useMeelioStore((state) => state.combos);
-  const currentlyPlayingSounds = useMeelioStore((state) =>
+  const addCombo = useSoundscapesStore((state) => state.addCombo);
+  const deleteCombo = useSoundscapesStore((state) => state.deleteCombo);
+  const playCombo = useSoundscapesStore((state) => state.playCombo);
+  const combos = useSoundscapesStore((state) => state.combos);
+  const currentlyPlayingSounds = useSoundscapesStore((state) =>
     state.sounds.filter((sound) => sound.playing)
   );
 

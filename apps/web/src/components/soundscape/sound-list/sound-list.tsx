@@ -1,9 +1,9 @@
-import { useMeelioStore } from "@/stores/meelio.store";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { SoundTileIcon } from "./sound-tile-icon";
 
 export const SoundList = () => {
-  const { sounds } = useMeelioStore();
+  const { sounds } = useSoundscapesStore();
 
   return (
     <ul

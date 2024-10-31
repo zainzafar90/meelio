@@ -1,4 +1,3 @@
-import { useMeelioStore } from "@/stores/meelio.store";
 import gsap from "gsap";
 
 import { cn } from "@/lib/utils";
@@ -9,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useInterval } from "@/hooks/use-interval";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import {
   generateNextVolumeForOscillation,
   OSCILLATION_INTERVAL_MS,
@@ -16,7 +16,7 @@ import {
 
 export const OscillationButton = () => {
   const { sounds, isOscillating, toggleOscillation, setVolumeForSound } =
-    useMeelioStore();
+    useSoundscapesStore();
 
   useInterval(() => {
     if (!isOscillating) return;

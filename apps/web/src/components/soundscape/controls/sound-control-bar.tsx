@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 
-import { useMeelioStore } from "@/stores/meelio.store";
-
 import { cn } from "@/lib/utils";
+import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { GlobalVolumeControl } from "./global-volume-control";
 import { OscillationButton } from "./oscillation-button";
@@ -13,9 +12,9 @@ import { ResetGlobalSoundSettingsDialog } from "./reset-global-sound-settings.di
 import { ShuffleButton } from "./shuffle-button";
 
 export const SoundControlsBar = () => {
-  const { pausedSounds } = useMeelioStore();
+  const { pausedSounds } = useSoundscapesStore();
 
-  const isAnySoundPlaying = useMeelioStore((state) =>
+  const isAnySoundPlaying = useSoundscapesStore((state) =>
     state.sounds.some((sound) => sound.playing)
   );
 
