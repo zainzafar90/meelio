@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -145,6 +145,79 @@ const SessionIndicators = ({
     </div>
   );
 };
+
+const TimerExpandedContent = memo(() => {
+  console.log("TimerExpandedContent");
+  const { timer } = usePomodoroStore((state) => ({
+    timer: state.timer,
+  }));
+
+  return (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
+      <div className="p-3 pt-0">
+        <motion.div
+          className="border-t border-gray-700 pt-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <SessionIndicators
+            sessionCount={timer.sessionCount}
+            longBreakInterval={timer.longBreakInterval}
+            activeStage={timer.activeStage}
+          />
+
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            <motion.div
+              className="bg-gray-800/50 rounded-xl p-3"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h3 className="text-white text-sm font-medium mb-1">Focus</h3>
+              <p className="text-[#FF453A] text-base font-bold">
+                {Math.floor(timer.stageSeconds[PomodoroStage.WorkTime] / 60)}m
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-gray-800/50 rounded-xl p-3"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <h3 className="text-white text-sm font-medium mb-1">Break</h3>
+              <p className="text-[#4CD964] text-base font-bold">
+                {Math.floor(timer.stageSeconds[PomodoroStage.ShortBreak] / 60)}m
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="bg-gray-800/50 rounded-xl p-3"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h3 className="text-white text-sm font-medium mb-1">
+                Long Break
+              </h3>
+              <p className="text-[#4CD964] text-base font-bold">
+                {Math.floor(timer.stageSeconds[PomodoroStage.LongBreak] / 60)}m
+              </p>
+            </motion.div>
+          </div>
+
+          <TimerStats />
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+});
 
 export const TimerDynamicIsland = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -325,84 +398,7 @@ export const TimerDynamicIsland = () => {
 
           {/* Expanded Content */}
           <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              >
-                <div className="p-3 pt-0">
-                  <motion.div
-                    className="border-t border-gray-700 pt-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <SessionIndicators
-                      sessionCount={timer.sessionCount}
-                      longBreakInterval={timer.longBreakInterval}
-                      activeStage={timer.activeStage}
-                    />
-
-                    <div className="mt-3 grid grid-cols-3 gap-3">
-                      <motion.div
-                        className="bg-gray-800/50 rounded-xl p-3"
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                      >
-                        <h3 className="text-white text-sm font-medium mb-1">
-                          Focus
-                        </h3>
-                        <p className="text-[#FF453A] text-base font-bold">
-                          {Math.floor(
-                            timer.stageSeconds[PomodoroStage.WorkTime] / 60
-                          )}
-                          m
-                        </p>
-                      </motion.div>
-
-                      <motion.div
-                        className="bg-gray-800/50 rounded-xl p-3"
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        <h3 className="text-white text-sm font-medium mb-1">
-                          Break
-                        </h3>
-                        <p className="text-[#4CD964] text-base font-bold">
-                          {Math.floor(
-                            timer.stageSeconds[PomodoroStage.ShortBreak] / 60
-                          )}
-                          m
-                        </p>
-                      </motion.div>
-
-                      <motion.div
-                        className="bg-gray-800/50 rounded-xl p-3"
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        <h3 className="text-white text-sm font-medium mb-1">
-                          Long Break
-                        </h3>
-                        <p className="text-[#4CD964] text-base font-bold">
-                          {Math.floor(
-                            timer.stageSeconds[PomodoroStage.LongBreak] / 60
-                          )}
-                          m
-                        </p>
-                      </motion.div>
-                    </div>
-
-                    <TimerStats />
-                  </motion.div>
-                </div>
-              </motion.div>
-            )}
+            {isExpanded && <TimerExpandedContent />}
           </AnimatePresence>
         </motion.div>
       </AnimatePresence>

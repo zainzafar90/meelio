@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import { Bar, BarChart, XAxis } from "recharts";
 
@@ -31,7 +31,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const TimerStats = () => {
+export const TimerStats = memo(() => {
   const [chartData, setChartData] = useState<
     Array<{ date: string; focus: number; breaks: number }>
   >([]);
@@ -89,10 +89,10 @@ export const TimerStats = () => {
                 <ChartTooltipContent
                   hideLabel
                   className="w-[180px]"
-                  formatter={(value, name, item, index) => (
+                  formatter={(value, name) => (
                     <>
                       <div
-                        className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-[--color-bg]"
+                        className="h-2.5 w-1 shrink-0 rounded-[2px] bg-[--color-bg]"
                         style={
                           {
                             "--color-bg": `var(--color-${name})`,
@@ -107,18 +107,6 @@ export const TimerStats = () => {
                           mins
                         </span>
                       </div>
-                      {/* Add this after the last item */}
-                      {index === 1 && (
-                        <div className="mt-1.5 flex basis-full items-center border-t pt-1.5 text-xs font-medium text-foreground">
-                          Total
-                          <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
-                            {item.payload.focus + item.payload.breaks}
-                            <span className="font-normal text-muted-foreground">
-                              mins
-                            </span>
-                          </div>
-                        </div>
-                      )}
                     </>
                   )}
                 />
@@ -131,4 +119,4 @@ export const TimerStats = () => {
       </CardContent>
     </Card>
   );
-};
+});
