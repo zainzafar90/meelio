@@ -147,7 +147,6 @@ const SessionIndicators = ({
 };
 
 const TimerExpandedContent = memo(() => {
-  console.log("TimerExpandedContent");
   const { timer } = usePomodoroStore((state) => ({
     timer: state.timer,
   }));
