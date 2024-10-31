@@ -43,20 +43,19 @@ const MainContent = () => (
 
 const TopBar = () => (
   <div className="relative flex justify-between col-span-3">
-    <SidebarTrigger />
     <TimerDynamicIsland />
+  </div>
+);
 
+const BottomBar = () => (
+  <div className="relative flex justify-between items-center col-span-3">
+    <SidebarTrigger />
+    <Dock />
     <div className="flex items-center justify-end">
       <Button variant="glass" size="icon">
         <ListTodo className="w-4 h-4 md:w-5 md:h-5" />
       </Button>
     </div>
-  </div>
-);
-
-const BottomBar = () => (
-  <div className="flex justify-center col-span-3">
-    <Dock />
   </div>
 );
 

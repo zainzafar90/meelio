@@ -112,7 +112,7 @@ export const Dock = () => {
 
     return (
       <button
-        className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
+        className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
         title={name}
       >
         <IconComponent className="size-3 md:size-4 lg:size-5" />
@@ -143,10 +143,10 @@ export const Dock = () => {
 
         {dropdownItems.length > 0 && (
           <button
-            className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white relative group"
+            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white relative group"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <MoreHorizontal className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4" />
+            <MoreHorizontal className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
             <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
               More Options
             </span>
