@@ -185,7 +185,7 @@ type State = {
 
 export const useSoundscapesStore = create<State>((set) => ({
   sounds: allSounds,
-  globalVolume: 1,
+  globalVolume: 0.5,
   pausedSounds: [],
   isOscillating: false,
   combos: [],
