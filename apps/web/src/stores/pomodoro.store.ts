@@ -175,8 +175,6 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
 
     await db.sessions.add(session);
 
-    // Update daily summary
-    // const today = new Date().toISOString().split("T")[0];
     const summary = await getTodaysSummary();
 
     if (timer.activeStage === PomodoroStage.WorkTime) {
@@ -190,7 +188,6 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
 
     await db.dailySummaries.put(summary);
 
-    // Update local stats
     await get().loadTodayStats();
   },
 
