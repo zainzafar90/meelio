@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom"; // Add this import
+import { useLocation } from "react-router-dom";
 
 import { MoreHorizontal } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
+import { useDockStore } from "@/stores/dock.store";
 
 interface DockItem {
   name: string;
@@ -12,7 +14,47 @@ interface DockItem {
   icon: React.ElementType;
   activeIcon: React.ElementType;
   hidden?: boolean;
+  isActive?: boolean;
 }
+
+const DockButton = ({
+  icon: Icon,
+  activeIcon: ActiveIcon,
+  name,
+  isActive,
+}: {
+  icon: React.ElementType;
+  activeIcon: React.ElementType;
+  name: string;
+  isActive?: boolean;
+}) => {
+  const { toggleTimer } = useDockStore((state) => ({
+    toggleTimer: state.toggleTimer,
+  }));
+  const IconComponent = isActive ? ActiveIcon : Icon;
+
+  const handleClick = () => {
+    if (name === "Pomodoro") {
+      toggleTimer();
+    }
+  };
+
+  return (
+    <button
+      className={cn(
+        "bg-white/10 hover:bg-white/20 w-9 h-9 rounded-full transition-colors flex items-center justify-center group relative",
+        isActive ? "text-white" : ""
+      )}
+      title={name}
+      onClick={handleClick}
+    >
+      <IconComponent className="size-3 md:size-4 lg:size-5" />
+      <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+        {name}
+      </span>
+    </button>
+  );
+};
 
 export const Dock = () => {
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
@@ -21,6 +63,9 @@ export const Dock = () => {
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const { isTimerVisible } = useDockStore((state) => ({
+    isTimerVisible: state.isTimerVisible,
+  }));
 
   const allItems: DockItem[] = [
     {
@@ -35,6 +80,7 @@ export const Dock = () => {
       href: "/pomodoro",
       icon: Icons.pomodoro,
       activeIcon: Icons.pomodoroActive,
+      isActive: isTimerVisible,
     },
     {
       name: "Breathepod",
@@ -96,43 +142,16 @@ export const Dock = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const DockButton = ({
-    href,
-    icon: Icon,
-    activeIcon: ActiveIcon,
-    name,
-  }: {
-    href: string;
-    icon: React.ElementType;
-    activeIcon: React.ElementType;
-    name: string;
-  }) => {
-    const isActive = location.pathname === href;
-    const IconComponent = isActive ? ActiveIcon : Icon;
-
-    return (
-      <button
-        className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-white/80 hover:text-white group relative"
-        title={name}
-      >
-        <IconComponent className="size-3 md:size-4 lg:size-5" />
-        <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-          {name}
-        </span>
-      </button>
-    );
-  };
-
   return (
     <div className="relative" ref={dockRef}>
       <div className="bg-black/80 backdrop-blur-lg rounded-full px-3 py-2 flex items-center gap-2">
         {visibleItems.map((item, index) => (
           <React.Fragment key={index}>
             <DockButton
-              href={item.href}
               icon={item.icon}
               activeIcon={item.activeIcon}
               name={item.name}
+              isActive={item.isActive}
             />
             {(index === 3 || index === 6) &&
               visibleItems.length > index + 1 && (

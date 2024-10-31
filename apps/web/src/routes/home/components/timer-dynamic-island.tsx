@@ -2,10 +2,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 
+import { Category } from "@/types/category";
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { Icons } from "@/components/icons/icons";
-import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";
-import { useAuthStore } from "@/stores/auth.store";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { getTime } from "@/utils/timer.utils";
@@ -148,8 +147,6 @@ const SessionIndicators = ({
 };
 
 export const TimerDynamicIsland = () => {
-  const { user } = useAuthStore();
-  usePomodoroTimer({ user });
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const {
@@ -161,7 +158,10 @@ export const TimerDynamicIsland = () => {
     completeSession,
     loadTodayStats,
   } = usePomodoroStore();
-  const { playRandom, pausePlayingSounds } = useSoundscapesStore();
+  const { playCategory, pausePlayingSounds } = useSoundscapesStore((state) => ({
+    playCategory: state.playCategory,
+    pausePlayingSounds: state.pausePlayingSounds,
+  }));
 
   useEffect(() => {
     loadTodayStats();
@@ -179,10 +179,10 @@ export const TimerDynamicIsland = () => {
       pausePlayingSounds();
     } else if (timer.remaining === timer.stageSeconds[timer.activeStage]) {
       startTimer();
-      playRandom();
+      playCategory(Category.BeautifulAmbients);
     } else {
       resumeTimer();
-      playRandom();
+      playCategory(Category.BeautifulAmbients);
     }
   };
 

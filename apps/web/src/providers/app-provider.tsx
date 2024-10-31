@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
 import { ConnectionWarning } from "@/components/connection-warning";
+import { PomodoroProvider } from "@/components/providers/pomodoro-provider";
 import { SoundPlayer } from "@/components/soundscape/sound-player/sound-player";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,11 +21,13 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       <AuthProvider>
         <ThemeProvider storageKey="ui-theme" defaultTheme="system">
           <TooltipProvider>
-            {children}
-            <SoundPlayer />
-            <Toaster richColors />
-            <Analytics />
-            <ConnectionWarning />
+            <PomodoroProvider>
+              {children}
+              <SoundPlayer />
+              <Toaster richColors />
+              <Analytics />
+              <ConnectionWarning />
+            </PomodoroProvider>
           </TooltipProvider>
         </ThemeProvider>
       </AuthProvider>

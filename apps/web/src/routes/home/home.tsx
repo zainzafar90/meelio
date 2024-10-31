@@ -9,6 +9,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth.store";
+import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
@@ -41,11 +42,19 @@ const MainContent = () => (
   </div>
 );
 
-const TopBar = () => (
-  <div className="relative flex justify-between col-span-3">
-    <TimerDynamicIsland />
-  </div>
-);
+const TopBar = () => {
+  const { isTimerVisible } = useDockStore();
+
+  if (!isTimerVisible) {
+    return <div className="relative flex justify-between col-span-3" />;
+  }
+
+  return (
+    <div className="relative flex justify-between col-span-3">
+      <TimerDynamicIsland />
+    </div>
+  );
+};
 
 const BottomBar = () => (
   <div className="relative flex justify-between items-center col-span-3">
