@@ -53,11 +53,9 @@ const checkForUpdates = async () => {
 initializeSW();
 
 const AppContainer = () => {
-  const showUpdateAlert = useUpdateAlertStore((state) => state.showUpdateAlert);
-
   return (
     <>
-      {showUpdateAlert && <AppUpdatedAlert />}
+      <AppUpdatedAlert />
       <App />
     </>
   );

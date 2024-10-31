@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
-import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { getTime } from "@/utils/timer.utils";
@@ -89,7 +88,7 @@ const PomodoroControls = ({
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute inset-0 flex items-center justify-center p-1 rounded-full"
+          className="absolute inset-0 flex items-center justify-center p-1 rounded-full text-white"
           onClick={(e) => {
             e.stopPropagation();
             onToggle();
