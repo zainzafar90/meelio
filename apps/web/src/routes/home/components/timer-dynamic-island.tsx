@@ -4,6 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { Icons } from "@/components/icons/icons";
+import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";
+import { useAuthStore } from "@/stores/auth.store";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { getTime } from "@/utils/timer.utils";
 
@@ -145,6 +147,8 @@ const SessionIndicators = ({
 };
 
 export const TimerDynamicIsland = () => {
+  const { user } = useAuthStore();
+  usePomodoroTimer({ user });
   const [isExpanded, setIsExpanded] = useState(false);
   const {
     timer,
@@ -198,19 +202,22 @@ export const TimerDynamicIsland = () => {
     <motion.div className="absolute left-1/2 -translate-x-1/2 w-full max-w-sm z-10">
       <AnimatePresence mode="wait">
         <motion.div
-          className="bg-black/80 backdrop-blur-xl overflow-hidden rounded-3xl min-w-60 shadow-xl"
+          className="bg-black/80 backdrop-blur-xl overflow-hidden rounded-3xl min-w-60"
           layout
           initial={{
-            borderRadius: !isExpanded ? "24px" : "80px",
-            scale: 1,
+            borderRadius: !isExpanded ? "24px" : "40px",
+            scale: 0.95,
+            width: "100%",
           }}
           animate={{
-            borderRadius: !isExpanded ? "80px" : "24px",
-            scale: 1,
+            borderRadius: !isExpanded ? "40px" : "24px",
+            scale: 1.0125,
+            width: "95%",
           }}
           exit={{
-            borderRadius: !isExpanded ? "24px" : "80px",
-            scale: 1,
+            borderRadius: !isExpanded ? "24px" : "40px",
+            scale: 0.95,
+            width: "100%",
           }}
           transition={{
             type: "spring",
@@ -260,7 +267,6 @@ export const TimerDynamicIsland = () => {
                     duration: 0.25,
                   }}
                 >
-                  {/* {isBreak ? "Break Time" : "Focus Time"} */}
                   {PomodoroStageMap[timer.activeStage]}
                 </motion.p>
               </AnimatePresence>

@@ -81,8 +81,13 @@ const Clock = () => {
 
 const Greeting = () => {
   const [greeting, setGreeting] = useState("");
-  const [time] = useState(new Date());
+  const [time, setTime] = useState(new Date());
   const { user } = useAuthStore();
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 10 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const updateGreeting = () => {

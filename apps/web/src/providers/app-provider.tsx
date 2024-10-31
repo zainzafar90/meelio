@@ -1,6 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
 
-import { useAuthStore } from "@/stores/auth.store";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
@@ -8,7 +7,6 @@ import { ConnectionWarning } from "@/components/connection-warning";
 import { SoundPlayer } from "@/components/soundscape/sound-player/sound-player";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { usePomodoroTimer } from "@/hooks/use-pomodoro-timer";
 
 import { AuthProvider } from "./auth-provider";
 
@@ -17,9 +15,6 @@ type AppProviderProps = {
 };
 
 export const AppProvider = ({ children }: AppProviderProps) => {
-  const { user } = useAuthStore();
-  usePomodoroTimer({ user });
-
   return (
     <BrowserRouter>
       <AuthProvider>
