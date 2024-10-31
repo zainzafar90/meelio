@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Bar, BarChart, XAxis } from "recharts";
 
+import { getWeeklySummary } from "@/lib/db/pomodoro-db";
 import {
   Card,
   CardContent,
@@ -15,17 +18,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-export const description = "A stacked bar chart with a legend";
-
-const chartData = [
-  { date: "2024-07-15", focus: 450, breaks: 300 },
-  { date: "2024-07-16", focus: 380, breaks: 420 },
-  { date: "2024-07-17", focus: 520, breaks: 120 },
-  { date: "2024-07-18", focus: 140, breaks: 550 },
-  { date: "2024-07-19", focus: 600, breaks: 350 },
-  { date: "2024-07-20", focus: 480, breaks: 400 },
-];
+import { MINUTE_IN_SECONDS } from "@/utils/common.utils";
 
 const chartConfig = {
   focus: {
@@ -39,6 +32,24 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export const TimerStats = () => {
+  const [chartData, setChartData] = useState<
+    Array<{ date: string; focus: number; breaks: number }>
+  >([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const weeklySummary = await getWeeklySummary();
+      const formattedData = weeklySummary.map((day) => ({
+        date: day.date,
+        focus: Math.round(day.totalFocusTime / MINUTE_IN_SECONDS),
+        breaks: Math.round(day.shortBreaks * 5 + day.longBreaks * 15),
+      }));
+      setChartData(formattedData);
+    };
+
+    loadData();
+  }, []);
+
   return (
     <Card className="mt-4">
       <CardHeader>

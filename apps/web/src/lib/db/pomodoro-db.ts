@@ -48,3 +48,32 @@ export const getTodaysSummary = async (): Promise<DailySummary> => {
 
   return summary;
 };
+
+export const getWeeklySummary = async (): Promise<DailySummary[]> => {
+  const today = new Date();
+  const dates = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    return date.toISOString().split("T")[0];
+  }).reverse();
+
+  const summaries = await Promise.all(
+    dates.map(async (date) => {
+      const summary = await db.dailySummaries
+        .where("date")
+        .equals(date)
+        .first();
+      return (
+        summary || {
+          date,
+          focusSessions: 0,
+          shortBreaks: 0,
+          longBreaks: 0,
+          totalFocusTime: 0,
+        }
+      );
+    })
+  );
+
+  return summaries;
+};
