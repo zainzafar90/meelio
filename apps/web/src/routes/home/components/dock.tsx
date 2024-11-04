@@ -17,45 +17,6 @@ interface DockItem {
   isActive?: boolean;
 }
 
-const DockButton = ({
-  icon: Icon,
-  activeIcon: ActiveIcon,
-  name,
-  isActive,
-}: {
-  icon: React.ElementType;
-  activeIcon: React.ElementType;
-  name: string;
-  isActive?: boolean;
-}) => {
-  const { toggleTimer } = useDockStore((state) => ({
-    toggleTimer: state.toggleTimer,
-  }));
-  const IconComponent = isActive ? ActiveIcon : Icon;
-
-  const handleClick = () => {
-    if (name === "Pomodoro") {
-      toggleTimer();
-    }
-  };
-
-  return (
-    <button
-      className={cn(
-        "bg-white/10 hover:bg-white/20 w-9 h-9 rounded-full transition-colors flex items-center justify-center group relative",
-        isActive ? "text-white" : ""
-      )}
-      title={name}
-      onClick={handleClick}
-    >
-      <IconComponent className="size-3 md:size-4 lg:size-5" />
-      <span className="absolute -top-7 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-        {name}
-      </span>
-    </button>
-  );
-};
-
 export const Dock = () => {
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
   const [dropdownItems, setDropdownItems] = useState<DockItem[]>([]);
@@ -144,7 +105,7 @@ export const Dock = () => {
 
   return (
     <div className="relative" ref={dockRef}>
-      <div className="bg-black/80 backdrop-blur-lg rounded-full px-3 py-2 flex items-center gap-2">
+      <div className="[color-scheme:dark] bg-black/80 backdrop-blur-lg rounded-full px-3 py-2 flex items-center gap-2">
         {visibleItems.map((item, index) => (
           <React.Fragment key={index}>
             <DockButton
@@ -177,7 +138,7 @@ export const Dock = () => {
       {isDropdownOpen && dropdownItems.length > 0 && (
         <div
           ref={dropdownRef}
-          className="bg-black/80 backdrop-blur-lg absolute bottom-full mb-2 right-0 rounded-lg overflow-hidden py-1.5 min-w-[180px]"
+          className="[color-scheme:dark] bg-black/80 backdrop-blur-lg absolute bottom-full mb-2 right-0 rounded-lg overflow-hidden py-1.5 min-w-[180px]"
         >
           {dropdownItems.map((item, index) => {
             const isActive = location.pathname === item.href;
@@ -196,5 +157,44 @@ export const Dock = () => {
         </div>
       )}
     </div>
+  );
+};
+
+const DockButton = ({
+  icon: Icon,
+  activeIcon: ActiveIcon,
+  name,
+  isActive,
+}: {
+  icon: React.ElementType;
+  activeIcon: React.ElementType;
+  name: string;
+  isActive?: boolean;
+}) => {
+  const { toggleTimer } = useDockStore((state) => ({
+    toggleTimer: state.toggleTimer,
+  }));
+  const IconComponent = isActive ? ActiveIcon : Icon;
+
+  const handleClick = () => {
+    if (name === "Pomodoro") {
+      toggleTimer();
+    }
+  };
+
+  return (
+    <button
+      className={cn(
+        "[color-scheme:dark] bg-white/10 hover:bg-white/20 w-9 h-9 rounded-full transition-colors flex items-center justify-center group relative",
+        isActive ? "text-white" : "text-white/80"
+      )}
+      title={name}
+      onClick={handleClick}
+    >
+      <IconComponent className="size-3 md:size-4 lg:size-5" />
+      <span className="absolute -top-7 [color-scheme:dark] bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+        {name}
+      </span>
+    </button>
   );
 };
