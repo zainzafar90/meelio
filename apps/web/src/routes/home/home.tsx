@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import NumberFlow from "@number-flow/react";
 import { ListTodo } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ export const Home = () => {
 };
 
 const MainContent = () => (
-  <div className="col-span-3 row-span-3 flex flex-col items-center justify-center text-center text-white/90 hover:text-white transition-all">
+  <div className="col-span-3 row-span-3 flex flex-col items-center justify-center text-center text-white hover:text-white transition-all">
     <Clock />
     <Greeting />
     <Quote />
@@ -77,12 +78,18 @@ const Clock = () => {
   }, []);
 
   return (
-    <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-semibold leading-none tracking-tight text-shadow-lg mb-2">
-      {time.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: false,
-      })}
+    <h1 className="text-5xl sm:text-7xl md:text-9xl lg:text-[10rem] font-semibold leading-none tracking-tight text-shadow-lg mb-2 font-mono text-white">
+      <NumberFlow
+        value={time.getHours()}
+        format={{ notation: "standard", minimumIntegerDigits: 2 }}
+        locales="en-US"
+      />
+      <span className="text-white">:</span>
+      <NumberFlow
+        value={time.getMinutes()}
+        format={{ notation: "standard", minimumIntegerDigits: 2 }}
+        locales="en-US"
+      />
     </h1>
   );
 };

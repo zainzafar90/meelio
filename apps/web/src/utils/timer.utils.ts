@@ -58,20 +58,18 @@ export const getSessionCount = (
 | @returns [minuteTens, minuteUnits, secondTens, secondUnits]
 |
 */
-export const getTime = (
-  seconds: number
-): [string | null, string | null, string, string] => {
+export const getTime = (seconds: number): [number, number, number, number] => {
   // Calculate the number of whole minutes and remaining seconds
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
 
   // Decompose minutes into tens and units
-  const minuteTens = Math.floor(minutes / 10).toString();
-  const minuteUnits = (minutes % 10).toString();
+  const minuteTens = Math.floor(minutes / 10);
+  const minuteUnits = minutes % 10;
 
   // Decompose seconds into tens and units
-  const secondTens = Math.floor(remainingSeconds / 10).toString();
-  const secondUnits = (remainingSeconds % 10).toString();
+  const secondTens = Math.floor(remainingSeconds / 10);
+  const secondUnits = remainingSeconds % 10;
 
   return [minuteTens, minuteUnits, secondTens, secondUnits];
 };

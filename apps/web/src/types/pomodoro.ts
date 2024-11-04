@@ -4,13 +4,11 @@
 |
 | - running: a boolean value determining whether the timer is running or not
 | - remaining: the remaining time of the timer in seconds
-| - paused: a boolean value determining whether the timer is paused or not
 | - sessionCount: the number of sessions completed
 | - stageSeconds: an array of the number of seconds for each stage
 | - activeStage: the current stage of the timer
 | - autoStartBreaks: a boolean value determining whether breaks should be auto-started
 | - longBreakInterval: the number of sessions before a long break
-| - completed: a boolean value determining whether all sessions for the pomodoro timer has completed or not
 | - enableSound: a boolean value determining whether the sound should be enabled or not
 |
 |-----------------------------------------------------------------------------------|
