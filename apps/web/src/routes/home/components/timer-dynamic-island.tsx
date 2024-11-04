@@ -97,18 +97,18 @@ export const TimerDynamicIsland = () => {
       <AnimatePresence mode="wait">
         <motion.div
           ref={containerRef}
-          className="bg-black/80 backdrop-blur-xl overflow-hidden rounded-3xl min-w-60"
+          className="bg-white dark:bg-black backdrop-blur-xl overflow-hidden rounded-3xl min-w-60"
           layout
           initial={{
-            borderRadius: isExpanded ? "40px" : "24px",
+            borderRadius: isExpanded ? "28px" : "24px",
             width: "100%",
           }}
           animate={{
-            borderRadius: isExpanded ? "24px" : "40px",
+            borderRadius: isExpanded ? "24px" : "28px",
             width: "95%",
           }}
           exit={{
-            borderRadius: isExpanded ? "40px" : "24px",
+            borderRadius: isExpanded ? "28px" : "24px",
             width: "100%",
           }}
           transition={{
@@ -147,7 +147,7 @@ export const TimerDynamicIsland = () => {
               <AnimatePresence mode="wait">
                 <motion.p
                   key={isBreak ? "break" : "focus"}
-                  className="text-white text-lg sm:text-2xl font-semibold"
+                  className="text-black dark:text-white text-lg sm:text-2xl font-bold"
                   initial={{ y: 5, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 5, opacity: 0 }}
@@ -191,7 +191,6 @@ export const TimerDynamicIsland = () => {
               onToggle={handleToggle}
               onReset={handleReset}
               percentage={getPercentage()}
-              color={isBreak ? "#4CD964" : "#2196f3"}
             />
           </motion.div>
 
@@ -224,8 +223,9 @@ const BatteryCircle = (props: {
           cx="24"
           cy="24"
           r="20"
-          stroke="#404040"
-          strokeWidth="4"
+          stroke="#555"
+          strokeOpacity="0.5"
+          strokeWidth="5"
           fill="transparent"
           className="text-gray-700"
         />
@@ -257,7 +257,6 @@ const PomodoroControls = ({
   onReset,
 }: {
   percentage: number;
-  color: string;
   isRunning: boolean;
   onToggle: () => void;
   onReset: () => void;
@@ -275,7 +274,7 @@ const PomodoroControls = ({
       <AnimatePresence mode="wait">
         <motion.p
           key={isBreak ? "break" : "focus"}
-          className="text-gray-400 text-[10px] tracking-tight uppercase"
+          className="text-black/90 dark:text-white/90 text-xs uppercase"
           initial={{ y: 5, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 5, opacity: 0 }}
@@ -294,36 +293,36 @@ const PomodoroControls = ({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center p-2 rounded-full bg-gray-700 text-gray-200"
+          className="flex items-center justify-center p-2 rounded-full bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
           onClick={(e) => {
             e.stopPropagation();
             onReset();
           }}
         >
-          <Icons.close className="w-4 h-4 stroke-orange-100" />
+          <Icons.close className="w-4 h-4" />
         </motion.button>
       </div>
 
       <div
         className={cn("flex items-center justify-center", {
-          "text-green-400": isBreak,
-          "text-blue-400": !isBreak,
+          "text-green-500 dark:text-green-500": isBreak,
+          "text-blue-500 dark:text-blue-500": !isBreak,
         })}
       >
         <BatteryCircle percentage={percentage}>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="absolute inset-0 flex items-center justify-center p-1 rounded-full text-white"
+            className="absolute inset-0 flex items-center justify-center p-1 rounded-full text-black dark:text-white"
             onClick={(e) => {
               e.stopPropagation();
               onToggle();
             }}
           >
             {isRunning ? (
-              <Icons.pause className="w-3 h-3" />
+              <Icons.pause className="size-4" />
             ) : (
-              <Icons.play className="w-3 h-3" />
+              <Icons.play className="size-4 ml-0.5" />
             )}
           </motion.button>
         </BatteryCircle>
@@ -345,7 +344,7 @@ const SessionIndicators = ({
   const currentIntervalSessions = sessionCount % longBreakInterval;
 
   return (
-    <div className="flex items-center gap-4 bg-gray-800/50 rounded-xl p-3">
+    <div className="flex items-center gap-4 bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3">
       <div className="flex gap-2">
         {Array(longBreakInterval)
           .fill(0)
@@ -358,7 +357,7 @@ const SessionIndicators = ({
               activeStage === PomodoroStage.LongBreak ? (
                 <Icons.checkFilled className="text-green-500 size-5" />
               ) : (
-                <div className="size-4 rounded-full bg-zinc-300" />
+                <div className="size-4 rounded-full bg-zinc-300 dark:bg-zinc-700" />
               )}
             </div>
           ))}
@@ -398,39 +397,43 @@ const TimerExpandedContent = memo(() => {
 
           <div className="mt-3 grid grid-cols-3 gap-3">
             <motion.div
-              className="bg-gray-800/50 rounded-xl p-3"
+              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <h3 className="text-white text-sm font-medium mb-1">Focus</h3>
-              <p className="text-[#FF453A] text-base font-bold">
+              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
+                Focus
+              </h3>
+              <p className="text-blue-500 text-base font-bold">
                 {Math.floor(timer.stageSeconds[PomodoroStage.WorkTime] / 60)}m
               </p>
             </motion.div>
 
             <motion.div
-              className="bg-gray-800/50 rounded-xl p-3"
+              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <h3 className="text-white text-sm font-medium mb-1">Break</h3>
-              <p className="text-[#4CD964] text-base font-bold">
+              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
+                Break
+              </h3>
+              <p className="text-green-500 dark:text-green-400 text-base font-bold">
                 {Math.floor(timer.stageSeconds[PomodoroStage.ShortBreak] / 60)}m
               </p>
             </motion.div>
 
             <motion.div
-              className="bg-gray-800/50 rounded-xl p-3"
+              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <h3 className="text-white text-sm font-medium mb-1">
+              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
                 Long Break
               </h3>
-              <p className="text-[#4CD964] text-base font-bold">
+              <p className="text-green-500 dark:text-green-400 text-base font-bold">
                 {Math.floor(timer.stageSeconds[PomodoroStage.LongBreak] / 60)}m
               </p>
             </motion.div>
