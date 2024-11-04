@@ -11,6 +11,7 @@ import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { getTime } from "@/utils/timer.utils";
 
+import { TimerStageButton } from "./timer/timer-stage-button";
 import { TimerStats } from "./timer/timer-stats";
 
 export const TimerDynamicIsland = () => {
@@ -371,8 +372,9 @@ const SessionIndicators = ({
 };
 
 const TimerExpandedContent = memo(() => {
-  const { timer } = usePomodoroStore((state) => ({
+  const { timer, changeStage } = usePomodoroStore((state) => ({
     timer: state.timer,
+    changeStage: state.changeStage,
   }));
 
   return (
@@ -396,47 +398,20 @@ const TimerExpandedContent = memo(() => {
           />
 
           <div className="mt-3 grid grid-cols-3 gap-3">
-            <motion.div
-              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
-                Focus
-              </h3>
-              <p className="text-blue-500 text-base font-bold">
-                {Math.floor(timer.stageSeconds[PomodoroStage.WorkTime] / 60)}m
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
-                Break
-              </h3>
-              <p className="text-green-500 dark:text-green-400 text-base font-bold">
-                {Math.floor(timer.stageSeconds[PomodoroStage.ShortBreak] / 60)}m
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="bg-gray-200/50 dark:bg-gray-800/50 rounded-xl p-3"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <h3 className="text-black dark:text-white text-sm font-medium mb-1">
-                Long Break
-              </h3>
-              <p className="text-green-500 dark:text-green-400 text-base font-bold">
-                {Math.floor(timer.stageSeconds[PomodoroStage.LongBreak] / 60)}m
-              </p>
-            </motion.div>
+            {[
+              PomodoroStage.WorkTime,
+              PomodoroStage.ShortBreak,
+              PomodoroStage.LongBreak,
+            ].map((stage, index) => (
+              <TimerStageButton
+                key={stage}
+                stage={stage}
+                activeStage={timer.activeStage}
+                stageSeconds={timer.stageSeconds[stage]}
+                onClick={changeStage}
+                delay={0.1 * (index + 1)}
+              />
+            ))}
           </div>
 
           <TimerStats />
