@@ -386,7 +386,7 @@ const TimerExpandedContent = memo(() => {
     >
       <div className="p-3 pt-0">
         <motion.div
-          className="border-t border-gray-700 pt-3"
+          className="border-t border-gray-200 dark:border-gray-700 pt-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
