@@ -54,7 +54,9 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     set((state) => ({ timer: { ...state.timer, running: true } })),
 
   pauseTimer: () =>
-    set((state) => ({ timer: { ...state.timer, running: false } })),
+    set((state) => ({
+      timer: { ...state.timer, running: false },
+    })),
 
   resumeTimer: () =>
     set((state) => ({ timer: { ...state.timer, running: true } })),

@@ -31,33 +31,6 @@ export const TimerDynamicIsland = () => {
     pausePlayingSounds: state.pausePlayingSounds,
   }));
 
-  useEffect(() => {
-    loadTodayStats();
-  }, []);
-
-  useEffect(() => {
-    if (timer.remaining === 0) {
-      completeSession();
-    }
-  }, [timer.remaining, completeSession]);
-
-  const handleToggle = () => {
-    if (timer.running) {
-      pauseTimer();
-      pausePlayingSounds();
-    } else if (timer.remaining === timer.stageSeconds[timer.activeStage]) {
-      startTimer();
-      playCategory(Category.BeautifulAmbients);
-    } else {
-      resumeTimer();
-      playCategory(Category.BeautifulAmbients);
-    }
-  };
-
-  const handleReset = () => {
-    changeStage(PomodoroStage.WorkTime);
-  };
-
   const isBreak =
     timer.activeStage === PomodoroStage.ShortBreak ||
     timer.activeStage === PomodoroStage.LongBreak;
@@ -70,6 +43,45 @@ export const TimerDynamicIsland = () => {
     const totalTime = timer.stageSeconds[timer.activeStage];
     return (timer.remaining / totalTime) * 100;
   };
+
+  const handleToggle = () => {
+    if (timer.running) {
+      pauseTimer();
+      pausePlayingSounds();
+    } else if (timer.remaining === timer.stageSeconds[timer.activeStage]) {
+      startTimer();
+      if (timer.activeStage === PomodoroStage.WorkTime) {
+        playCategory(Category.BeautifulAmbients);
+      }
+    } else {
+      resumeTimer();
+      if (timer.activeStage === PomodoroStage.WorkTime) {
+        playCategory(Category.BeautifulAmbients);
+      }
+    }
+  };
+
+  const handleReset = () => {
+    changeStage(PomodoroStage.WorkTime);
+  };
+
+  useEffect(() => {
+    loadTodayStats();
+  }, []);
+
+  useEffect(() => {
+    if (timer.remaining === 0) {
+      completeSession();
+    }
+  }, [timer.remaining, completeSession]);
+
+  useEffect(() => {
+    pausePlayingSounds();
+
+    if (timer.running && timer.activeStage === PomodoroStage.WorkTime) {
+      playCategory(Category.BeautifulAmbients);
+    }
+  }, [timer.activeStage, timer.running, pausePlayingSounds, playCategory]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,12 +98,6 @@ export const TimerDynamicIsland = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  useEffect(() => {
-    if (timer.remaining === 0) {
-      pausePlayingSounds();
-    }
-  }, [timer.remaining, pausePlayingSounds]);
 
   return (
     <motion.div className="absolute left-1/2 -translate-x-1/2 top-1 w-full max-w-sm z-10">

@@ -15,13 +15,15 @@
 */
 
 export type PomodoroTimer = {
+  activeStage: PomodoroStage;
   running: boolean;
   remaining: number;
   sessionCount: number;
-  stageSeconds: Record<PomodoroStage, number>;
-  activeStage: PomodoroStage;
-  autoStartBreaks: boolean;
+  stageSeconds: {
+    [key in PomodoroStage]: number;
+  };
   longBreakInterval: number;
+  autoStartBreaks: boolean;
   enableSound: boolean;
 };
 
