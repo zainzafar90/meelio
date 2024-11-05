@@ -7,6 +7,11 @@ import { Category } from "@/types/category";
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { getTime } from "@/utils/timer.utils";
@@ -104,7 +109,7 @@ export const TimerDynamicIsland = () => {
       <AnimatePresence mode="wait">
         <motion.div
           ref={containerRef}
-          className="bg-white dark:bg-black backdrop-blur-xl overflow-hidden rounded-3xl min-w-60"
+          className="bg-white dark:bg-black backdrop-blur-xl rounded-3xl min-w-60"
           layout
           initial={{
             borderRadius: isExpanded ? "28px" : "24px",
@@ -297,17 +302,24 @@ const PomodoroControls = ({
       </AnimatePresence>
 
       <div className="flex items-center justify-center">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center p-2 rounded-full bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
-          onClick={(e) => {
-            e.stopPropagation();
-            onReset();
-          }}
-        >
-          <Icons.close className="w-4 h-4" />
-        </motion.button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center justify-center p-2 rounded-full bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReset();
+              }}
+            >
+              <Icons.timerOff className="w-4 h-4" />
+            </motion.button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>Reset Current Session</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div
@@ -317,21 +329,28 @@ const PomodoroControls = ({
         })}
       >
         <BatteryCircle percentage={percentage}>
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="absolute inset-0 flex items-center justify-center p-1 rounded-full text-black dark:text-white"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-          >
-            {isRunning ? (
-              <Icons.pause className="size-4" />
-            ) : (
-              <Icons.play className="size-4 ml-0.5" />
-            )}
-          </motion.button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute inset-0 flex items-center justify-center p-1 rounded-full text-black dark:text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle();
+                }}
+              >
+                {isRunning ? (
+                  <Icons.pause className="size-4" />
+                ) : (
+                  <Icons.play className="size-4 ml-0.5" />
+                )}
+              </motion.button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p> {isRunning ? "Pause" : "Start"}</p>
+            </TooltipContent>
+          </Tooltip>
         </BatteryCircle>
       </div>
     </div>

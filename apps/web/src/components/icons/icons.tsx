@@ -37,9 +37,9 @@ import {
   Sticker,
   SunMedium,
   Target,
+  TimerOff,
   Train,
   Trash,
-  Twitter,
   User,
   Volume2,
   Waves,
@@ -75,7 +75,6 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
-  twitter: Twitter,
   check: Check,
   diverseSounds: Volume2,
   oscillations: Waves,
@@ -101,6 +100,7 @@ export const Icons = {
   chat: MessageCircleIcon,
   history: History,
   panelleft: PanelLeft,
+  timerOff: TimerOff,
   logout: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path
