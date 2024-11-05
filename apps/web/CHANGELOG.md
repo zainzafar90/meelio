@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.29](https://github.com/zainzafar90/meelio/compare/v0.0.28...v0.0.29) (2024-11-05)
+
+
+### Bug Fixes
+
+* sound playing bug ([f96e598](https://github.com/zainzafar90/meelio/commit/f96e59814e083f45b04c9ebad5a93e42c9406ff7))
+
 ### [0.0.28](https://github.com/zainzafar90/meelio/compare/v0.0.27...v0.0.28) (2024-11-04)
 
 ### [0.0.27](https://github.com/zainzafar90/meelio/compare/v0.0.26...v0.0.27) (2024-10-31)
