@@ -65,6 +65,11 @@ export default {
       padding: {
         home: "var(--home-p-t) var(--home-p-r) var(--home-p-b) var(--home-p-l)",
       },
+      fontSize: {
+        xs: "0.625rem",
+        xxs: "0.5525rem",
+        "2xxs": "0.5rem",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

@@ -122,6 +122,8 @@ export const Dock = () => {
                 isActive={isTimerVisible && item.name === "Pomodoro"}
               />
             ))}
+
+            <CalendarIcon />
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
@@ -194,6 +196,12 @@ const DockButton = ({
   }));
   const IconComponent = isActive ? ActiveIcon : Icon;
 
+  const handleClick = () => {
+    if (name === "Pomodoro") {
+      toggleTimer();
+    }
+  };
+
   if (name === "Soundscapes") {
     return (
       <Dialog>
@@ -233,23 +241,43 @@ const DockButton = ({
     );
   }
 
-  const handleClick = () => {
-    if (name === "Pomodoro") {
-      toggleTimer();
-    }
-  };
+  return (
+    <div
+      className={cn(
+        "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+        "bg-gradient-to-b from-zinc-800 to-zinc-900"
+      )}
+      onClick={handleClick}
+      title={name}
+    >
+      <IconComponent className="size-6 text-white" />
+    </div>
+  );
+};
+
+const CalendarIcon = () => {
+  const [date, setDate] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setDate(new Date()), 1000 * 60);
+    return () => clearInterval(timer);
+  }, []);
+
+  const month = date.toLocaleString("default", { month: "short" });
+  const day = date.getDate();
 
   return (
-    <div className="group relative flex cursor-pointer items-center justify-center">
-      <div
-        className={cn(
-          "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-          "bg-gradient-to-b from-zinc-800 to-zinc-900"
-        )}
-        onClick={handleClick}
-        title={name}
-      >
-        <IconComponent className="size-6 text-white" />
+    <div
+      className={cn(
+        "bg-gradient-to-b from-zinc-800 to-zinc-900",
+        "flex size-12 flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
+      )}
+    >
+      <div className="text-xxs bg-red-600 pt-0.5 text-center font-bold uppercase text-white">
+        {month}
+      </div>
+      <div className="flex flex-grow items-center justify-center">
+        <span className="text-2xl font-light text-white">{day}</span>
       </div>
     </div>
   );

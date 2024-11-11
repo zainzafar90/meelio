@@ -84,19 +84,21 @@ const Clock = () => {
   }, []);
 
   return (
-    <h1 className="text-shadow-lg mb-2 font-mono text-5xl font-semibold leading-none tracking-tight text-white sm:text-7xl md:text-9xl lg:text-[10rem]">
-      <NumberFlow
-        value={time.getHours()}
-        format={{ notation: "standard", minimumIntegerDigits: 2 }}
-        locales="en-US"
-      />
-      <span className="text-white">:</span>
-      <NumberFlow
-        value={time.getMinutes()}
-        format={{ notation: "standard", minimumIntegerDigits: 2 }}
-        locales="en-US"
-      />
-    </h1>
+    <div className="flex flex-col">
+      <h1 className="text-shadow-lg font-mono text-5xl font-semibold leading-none tracking-tight text-white sm:text-7xl md:text-9xl lg:text-[10rem]">
+        <NumberFlow
+          value={time.getHours()}
+          format={{ notation: "standard", minimumIntegerDigits: 2 }}
+          locales="en-US"
+        />
+        <span className="text-white">:</span>
+        <NumberFlow
+          value={time.getMinutes()}
+          format={{ notation: "standard", minimumIntegerDigits: 2 }}
+          locales="en-US"
+        />
+      </h1>
+    </div>
   );
 };
 
