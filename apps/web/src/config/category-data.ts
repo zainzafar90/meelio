@@ -38,6 +38,30 @@ export const allCategories: CategoryType[] = [
     title: "Mindfulness & Meditation",
     description: "Tranquility and well-being through calming ambients.",
   },
+  {
+    id: 11,
+    name: Category.Motivation,
+    title: "Motivation & Focus",
+    description: "Boost motivation and focus with tailored sounds.",
+  },
+  {
+    id: 12,
+    name: Category.Sleep,
+    title: "Sleep & Relaxation",
+    description: "Promote relaxation and sleep with soothing sounds.",
+  },
+  {
+    id: 13,
+    name: Category.Studying,
+    title: "Studying & Focus",
+    description: "Enhance focus and study with targeted sounds.",
+  },
+  {
+    id: 14,
+    name: Category.Writing,
+    title: "Writing & Focus",
+    description: "Enhance focus and writing with targeted sounds.",
+  },
 ];
 
 export const soundCategories: Record<Category, SoundType[][]> = {
@@ -105,32 +129,8 @@ export const soundCategories: Record<Category, SoundType[][]> = {
     // [SoundType.Wind, SoundType.Forest, SoundType.Leaves],
     // [SoundType.Forest, SoundType.Leaves, SoundType.WaterStream],
   ],
-  // Motivation: [
-  //   [SoundType.CoffeeShop, SoundType.Train],
-  //   [SoundType.Cityscape, SoundType.Waves, SoundType.Forest],
-  //   [SoundType.Forest, SoundType.WaterStream],
-  //   [SoundType.RainOnTent, SoundType.ThunderStorm, SoundType.Wind],
-  //   [SoundType.CosmicSounds, SoundType.SpaceEngine],
-  // ],
-  // Sleep: [
-  //   [SoundType.Rain, SoundType.OceanWaves],
-  //   [SoundType.WhiteNoise, SoundType.PinkNoise, SoundType.BrownNoise],
-  //   [SoundType.Waterfall, SoundType.Forest],
-  //   [SoundType.Underwater, SoundType.Bubbles, SoundType.Leaves],
-  //   [SoundType.SummerNight, SoundType.Waves, SoundType.RainOnTent],
-  // ],
-  // Studying: [
-  //   [SoundType.CoffeeShop, SoundType.Cityscape],
-  //   [SoundType.Rain, SoundType.WaterStream],
-  //   [SoundType.CoffeeShop, SoundType.Cityscape, SoundType.Rain],
-  //   [SoundType.Cityscape, SoundType.Rain, SoundType.WaterStream],
-  // ],
-  // Writing: [
-  //   [SoundType.CoffeeShop, SoundType.Rain],
-  //   [SoundType.Wind, SoundType.Forest],
-  //   [SoundType.Leaves, SoundType.Bubbles],
-  //   [SoundType.TropicalForest, SoundType.CosmicSounds],
-  //   [SoundType.CoffeeShop, SoundType.Rain, SoundType.Wind],
-  //   [SoundType.Rain, SoundType.Wind, SoundType.Forest],
-  // ],
+  Motivation: [[SoundType.CosmicSounds, SoundType.SpaceEngine]],
+  Sleep: [[SoundType.WhiteNoise, SoundType.PinkNoise, SoundType.BrownNoise]],
+  Studying: [[SoundType.Cityscape, SoundType.Rain, SoundType.WaterStream]],
+  Writing: [[SoundType.TropicalForest, SoundType.CosmicSounds]],
 };

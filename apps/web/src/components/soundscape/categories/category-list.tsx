@@ -4,13 +4,13 @@ import { CategoryItem } from "./category-item";
 
 export const CategoryList = () => {
   return (
-    <div className="relative flex flex-wrap gap-4 mb-8 scroll-smooth">
-      <div className="overflow-x-scroll no-scrollbar flex gap-y-6 gap-x-4 pr-24">
+    <div className="relative mb-8 flex max-w-md flex-wrap gap-4 scroll-smooth">
+      <div className="no-scrollbar flex gap-x-4 gap-y-6 overflow-x-scroll pr-24">
         {allCategories.map((category) => (
           <CategoryItem key={category.id} category={category} />
         ))}
       </div>
-      <div className="absolute top-0 right-0 w-24 h-full bg-gradient-to-r from-background/10 to-background" />
+      <div className="absolute right-0 top-0 h-full w-24 bg-gradient-to-r from-background/10 to-background" />
     </div>
   );
 };

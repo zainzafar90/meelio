@@ -11,10 +11,10 @@ export enum Category {
   CreativeThinking = "CreativeThinking",
   BeautifulAmbients = "BeautifulAmbients",
   Random = "Random",
-  // Motivation = "Motivation",
-  // Sleep = "Sleep",
-  // Studying = "Studying",
-  // Writing = "Writing",
+  Motivation = "Motivation",
+  Sleep = "Sleep",
+  Studying = "Studying",
+  Writing = "Writing",
 }
 
 export type CategoryKeys = keyof typeof Category;

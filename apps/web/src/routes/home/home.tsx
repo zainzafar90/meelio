@@ -113,13 +113,10 @@ const Greeting = () => {
   useEffect(() => {
     const updateGreeting = () => {
       const hour = time.getHours();
-      if (hour >= 4 && hour < 12)
-        setGreeting("☕ Good morning"); // 04:00 AM  - 11:59 AM
-      else if (hour >= 12 && hour < 17)
-        setGreeting("🌤️ Good afternoon"); // 12:00 PM  - 04:59 PM
-      else if (hour >= 17 && hour < 21)
-        setGreeting("🌿 Good evening"); // 05:00 PM  - 08:59 PM
-      else setGreeting("🌙 Good night"); // 09:00 PM  - 03:59 AM
+      if (hour >= 4 && hour < 12) setGreeting("☕ Good morning");
+      else if (hour >= 12 && hour < 17) setGreeting("🌤️ Good afternoon");
+      else if (hour >= 17 && hour < 21) setGreeting("🌿 Good evening");
+      else setGreeting("🌙 Good night");
     };
 
     updateGreeting();

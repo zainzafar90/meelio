@@ -44,11 +44,11 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
       className={cn(
         isActiveCategory(category.name as Category)
           ? "border-accent ring-1 ring-accent"
-          : "border-foreground/20 hover:border-foreground/50 transition",
-        "relative flex min-w-48 flex-shrink-0 cursor-pointer rounded-lg border bg-background/50 p-4 shadow-sm select-none focus:outline-none"
+          : "border-foreground/20 transition hover:border-foreground/50",
+        "relative m-1 flex min-w-48 flex-shrink-0 cursor-pointer select-none rounded-lg border bg-background/50 p-4 shadow-sm focus:outline-none"
       )}
     >
-      <div className="flex gap-4 flex-1">
+      <div className="flex flex-1 gap-4">
         <div className="flex">
           <div className="flex-shrink-0 text-lg">
             {getCategoryIcon(category.name)}
@@ -58,9 +58,9 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
           <span className="block text-sm font-medium text-foreground/90">
             {category.title}
           </span>
-          <span className="mt-1 flex max-w-[12rem] items-center text-sm text-foreground/50">
+          {/* <span className="mt-1 flex max-w-[12rem] items-center text-sm text-foreground/50">
             {category.description}
-          </span>
+          </span> */}
         </div>
       </div>
       <div className="pl-5">
@@ -91,14 +91,14 @@ const getCategoryIcon = (category: Category) => {
       return <CategoryIcons.creativeThinking className={className} />;
     case Category.BeautifulAmbients:
       return <CategoryIcons.beautifulAmbients className={className} />;
-    // case Category.Motivation:
-    //   return <CategoryIcons.motivation className={className} />;
-    // case Category.Sleep:
-    //   return <CategoryIcons.sleep className={className} />;
-    // case Category.Studying:
-    //   return <CategoryIcons.studying className={className} />;
-    // case Category.Writing:
-    //   return <CategoryIcons.writing className={className} />;
+    case Category.Motivation:
+      return <CategoryIcons.motivation className={className} />;
+    case Category.Sleep:
+      return <CategoryIcons.sleep className={className} />;
+    case Category.Studying:
+      return <CategoryIcons.studying className={className} />;
+    case Category.Writing:
+      return <CategoryIcons.writing className={className} />;
 
     default:
       return null;

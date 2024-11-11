@@ -6,6 +6,9 @@ import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
+import { CategoryList } from "@/components/soundscape/categories/category-list";
+import { SoundList } from "@/components/soundscape/sound-list/sound-list";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useDockStore } from "@/stores/dock.store";
 
 interface DockItem {
@@ -180,6 +183,34 @@ const DockButton = ({
     toggleTimer: state.toggleTimer,
   }));
   const IconComponent = isActive ? ActiveIcon : Icon;
+
+  if (name === "Soundscapes") {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="group relative flex cursor-pointer items-center justify-center">
+            <div
+              className={cn(
+                "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+                "bg-gradient-to-b from-zinc-800 to-zinc-900"
+              )}
+              title={name}
+            >
+              <IconComponent className="size-6 text-white" />
+            </div>
+          </div>
+        </DialogTrigger>
+        <DialogContent className="h-[80vh] max-w-lg p-0">
+          <div className="flex h-full flex-col overflow-hidden p-6">
+            <CategoryList />
+            <div className="flex-1 overflow-y-auto">
+              <SoundList />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const handleClick = () => {
     if (name === "Pomodoro") {
