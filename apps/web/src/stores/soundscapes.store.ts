@@ -1,7 +1,7 @@
+import { soundCategories } from "@/data/category-data";
+import { allSounds } from "@/data/sounds-data";
 import { create } from "zustand";
 
-import { soundCategories } from "@/config/category-data";
-import { allSounds } from "@/config/sounds-data";
 import { Category } from "@/types/category";
 import { Combo } from "@/types/combo";
 import { Sound, SoundState } from "@/types/sound";

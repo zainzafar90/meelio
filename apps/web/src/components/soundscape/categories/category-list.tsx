@@ -1,4 +1,4 @@
-import { allCategories } from "@/config/category-data";
+import { allCategories } from "@/data/category-data";
 
 import { CategoryItem } from "./category-item";
 
