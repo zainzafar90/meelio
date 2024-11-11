@@ -42,12 +42,6 @@ export const Dock = () => {
 
   const allItems: DockItem[] = [
     {
-      name: "Home",
-      href: "/",
-      icon: Logo,
-      activeIcon: Logo,
-    },
-    {
       name: "Pomodoro",
       href: "/pomodoro",
       icon: Icons.worldClock,
@@ -65,20 +59,20 @@ export const Dock = () => {
       icon: Icons.breathing,
       activeIcon: Icons.breathingActive,
     },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Icons.settings,
-      activeIcon: Icons.settingsActive,
-    },
+    // {
+    //   name: "Settings",
+    //   href: "/settings",
+    //   icon: Icons.settings,
+    //   activeIcon: Icons.settingsActive,
+    // },
   ];
 
   const getVisibleItemCount = (width: number) => {
     if (width >= 1280) return Math.min(allItems.length, 10);
     if (width >= 1024) return 6;
-    if (width >= 768) return 4;
-    if (width >= 640) return 3;
-    return 2;
+    if (width >= 768) return 3;
+    if (width >= 640) return 1;
+    return 1;
   };
 
   useEffect(() => {
@@ -113,7 +107,14 @@ export const Dock = () => {
       <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pr-1">
-            {visibleItems.slice(0, -1).map((item, index) => (
+            <DockButton
+              icon={Logo}
+              activeIcon={Logo}
+              name="Home"
+              className="hidden sm:flex"
+            />
+
+            {visibleItems.map((item, index) => (
               <DockButton
                 key={index}
                 icon={item.icon}
@@ -122,20 +123,10 @@ export const Dock = () => {
                 isActive={isTimerVisible && item.name === "Pomodoro"}
               />
             ))}
-
-            <CalendarIcon />
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-            {visibleItems.slice(-1).map((item, index) => (
-              <DockButton
-                key={index}
-                icon={item.icon}
-                activeIcon={item.activeIcon}
-                name={item.name}
-                isActive={isTimerVisible && item.name === "Pomodoro"}
-              />
-            ))}
+            <CalendarIcon />
 
             {dropdownItems.length > 0 && (
               <div className="group relative flex items-center justify-center">
@@ -185,11 +176,13 @@ const DockButton = ({
   activeIcon: ActiveIcon,
   name,
   isActive,
+  className,
 }: {
   icon: React.ElementType;
   activeIcon: React.ElementType;
   name: string;
   isActive?: boolean;
+  className?: string;
 }) => {
   const { toggleTimer } = useDockStore((state) => ({
     toggleTimer: state.toggleTimer,
@@ -206,7 +199,12 @@ const DockButton = ({
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <div className="group relative flex cursor-pointer items-center justify-center">
+          <div
+            className={cn(
+              "group relative flex cursor-pointer items-center justify-center",
+              className
+            )}
+          >
             <div
               className={cn(
                 "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
@@ -245,7 +243,8 @@ const DockButton = ({
     <div
       className={cn(
         "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-        "bg-gradient-to-b from-zinc-800 to-zinc-900"
+        "bg-gradient-to-b from-zinc-800 to-zinc-900",
+        className
       )}
       onClick={handleClick}
       title={name}
