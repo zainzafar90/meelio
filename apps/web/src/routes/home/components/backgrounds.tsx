@@ -4,14 +4,14 @@ export const Background = () => {
   return (
     <div
       className={cn(
-        "absolute inset-0 bg-transparent bg-center bg-no-repeat bg-cover",
+        "absolute inset-0 bg-transparent bg-cover bg-center bg-no-repeat",
         "m-0 p-0 transition-transform duration-300 ease-out"
       )}
     >
       <div
-        className="absolute inset-0 bg-transparent bg-center bg-no-repeat bg-cover"
+        className="absolute inset-0 bg-transparent bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('./img/bg-03.webp')",
+          backgroundImage: "url('./img/bg-07.webp')",
         }}
       />
     </div>

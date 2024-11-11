@@ -163,23 +163,65 @@ export const Icons = {
   ),
   soundscapes: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <path fill="currentColor" d="M22 11H10V2H8v20h2v-9h12z" opacity=".25" />
-      <path
+      <rect width={9} height={9} x={2} y={2} fill="currentColor" rx={1} />
+      <rect
+        width={9}
+        height={9}
+        x={2}
+        y={13}
         fill="currentColor"
-        d="M3 2h5v20H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"
+        rx={1}
+        opacity=".5"
       />
-      <path
+      <rect
+        width={9}
+        height={9}
+        x={13}
+        y={2}
         fill="currentColor"
-        d="M10 2h11a1 1 0 0 1 1 1v8H10V2zm0 11h12v8a1 1 0 0 1-1 1H10v-9z"
+        rx={1}
+        opacity=".5"
+      />
+      <rect
+        width={9}
+        height={9}
+        x={13}
+        y={13}
+        fill="currentColor"
+        rx={1}
         opacity=".5"
       />
     </svg>
   ),
   soundscapesActive: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <path
+      <rect width={9} height={9} x={2} y={2} fill="currentColor" rx={1} />
+      <rect
+        width={9}
+        height={9}
+        x={2}
+        y={13}
         fill="currentColor"
-        d="M2 3v18c0 .6.4 1 1 1h5V2H3c-.6 0-1 .4-1 1zm19-1H10v9h12V3c0-.6-.4-1-1-1zM10 22h11c.6 0 1-.4 1-1v-8H10v9z"
+        rx={1}
+        opacity=".5"
+      />
+      <rect
+        width={9}
+        height={9}
+        x={13}
+        y={2}
+        fill="currentColor"
+        rx={1}
+        opacity=".5"
+      />
+      <rect
+        width={9}
+        height={9}
+        x={13}
+        y={13}
+        fill="currentColor"
+        rx={1}
+        opacity=".5"
       />
     </svg>
   ),
