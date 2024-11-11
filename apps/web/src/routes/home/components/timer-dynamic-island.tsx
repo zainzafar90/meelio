@@ -7,6 +7,7 @@ import { Category } from "@/types/category";
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
+import { PomodoroSettingsDialog } from "@/components/pomodoro/pomodoro-settings.dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -37,6 +38,7 @@ export const TimerDynamicIsland = () => {
     playCategory: state.playCategory,
     pausePlayingSounds: state.pausePlayingSounds,
   }));
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
 
   const isBreak =
     timer.activeStage === PomodoroStage.ShortBreak ||
@@ -237,15 +239,34 @@ export const TimerDynamicIsland = () => {
       </AnimatePresence>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent showClose={false} className="sm:max-w-sm">
+        <DialogContent
+          showClose={false}
+          className="sm:max-w-sm"
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            setIsDialogOpen(true);
+          }}
+        >
           <TimerExpandedContent />
-          <DialogFooter>
+          <DialogFooter className="sm:justify-between">
+            <Button
+              variant="secondary"
+              onClick={() => setShowSettingsDialog(true)}
+            >
+              <Icons.settings className="size-4" />
+            </Button>
+
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
               Close
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <PomodoroSettingsDialog
+        isOpen={showSettingsDialog}
+        onClose={() => setShowSettingsDialog(false)}
+      />
     </motion.div>
   );
 };
