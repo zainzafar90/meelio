@@ -204,6 +204,7 @@ const DockButton = ({
               "group relative flex cursor-pointer items-center justify-center",
               className
             )}
+            title={name}
           >
             <div
               className={cn(
@@ -243,11 +244,12 @@ const DockButton = ({
     <div
       className={cn(
         "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-        "bg-gradient-to-b from-zinc-800 to-zinc-900",
+        "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
         className
       )}
       onClick={handleClick}
       title={name}
+      role="button"
     >
       <IconComponent className="size-6 text-white" />
     </div>
@@ -269,10 +271,11 @@ const CalendarIcon = () => {
     <div
       className={cn(
         "bg-gradient-to-b from-zinc-800 to-zinc-900",
-        "flex size-12 flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
+        "flex size-12 cursor-pointer flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
       )}
+      title={`${month} ${day}`}
     >
-      <div className="text-xxs bg-red-600 pt-0.5 text-center font-bold uppercase text-white">
+      <div className="bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
         {month}
       </div>
       <div className="flex flex-grow items-center justify-center">
