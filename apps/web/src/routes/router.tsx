@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { Settings } from "lucide-react";
 
@@ -14,8 +14,6 @@ import { Login } from "./auth/login";
 import { Register } from "./auth/register";
 import { VerifyMagicLink } from "./auth/verify-magic-link";
 import { Home } from "./home";
-import { Pomodoro } from "./pomodoro";
-import { WorldClock } from "./world-clock";
 
 const Breathing = React.lazy(() => import("@/routes/breathing"));
 const Soundscapes = React.lazy(() => import("@/routes/soundscapes"));
@@ -74,15 +72,7 @@ export const Router = () => {
           }
           errorElement={<ErrorPage />}
         />
-        <Route
-          path="pomodoro"
-          element={
-            <React.Suspense fallback={<PageSkeleton />}>
-              <Pomodoro />
-            </React.Suspense>
-          }
-          errorElement={<ErrorPage />}
-        />
+
         <Route path="account">
           <Route
             path="billing"
@@ -108,16 +98,6 @@ export const Router = () => {
           element={
             <React.Suspense fallback={<PageSkeleton />}>
               <Breathing />
-            </React.Suspense>
-          }
-          errorElement={<ErrorPage />}
-        />
-
-        <Route
-          path="world-clock"
-          element={
-            <React.Suspense fallback={<PageSkeleton />}>
-              <WorldClock />
             </React.Suspense>
           }
           errorElement={<ErrorPage />}

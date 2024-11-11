@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { differenceInCalendarDays, differenceInHours, format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { MoonIcon, SunIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const CLOCK_UPDATE_INTERVAL = 1000;
-interface ClockProps {
-  timezone: string;
-  isLocalTimezone?: boolean;
-}
 
-export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
+const getLocalTimezone = () => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+export const Clock = () => {
+  const timezone = useMemo(() => {
+    return getLocalTimezone();
+  }, []);
+
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -24,89 +27,57 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
   }, []);
 
   const zonedTime = toZonedTime(currentTime, timezone);
-  const timeDifference = differenceInHours(zonedTime, currentTime);
-  const dayDifference = differenceInCalendarDays(zonedTime, currentTime);
-
   const hourDegrees =
     ((zonedTime.getHours() % 12) + zonedTime.getMinutes() / 60) * 30;
   const minuteDegrees =
     (zonedTime.getMinutes() + zonedTime.getSeconds() / 60) * 6;
   const secondDegrees = zonedTime.getSeconds() * 6;
 
-  const getDayStatus = () => {
-    if (dayDifference === 0) return "Today";
-    if (dayDifference === 1) return "Tomorrow";
-    if (dayDifference === -1) return "Yesterday";
-    return format(zonedTime, "MMM d");
-  };
-
-  const isDaytime = zonedTime.getHours() >= 7 && zonedTime.getHours() < 19;
+  const isDaytime = !(zonedTime.getHours() >= 7 && zonedTime.getHours() < 19);
 
   const clockFaceClass = isDaytime
     ? "bg-white text-black"
-    : "bg-stone-900 text-white";
+    : "bg-zinc-700 text-white";
 
   const handClass = isDaytime ? "bg-black" : "bg-white";
 
   return (
-    <div className="w-full aspect-square flex flex-col items-center justify-center space-y-4">
-      <div className="relative z-10 w-full max-w-xs aspect-square p-6 flex items-center justify-center bg-black rounded-[4rem] shadow-lg shadow-zinc-900">
+    <div
+      className={cn(
+        "flex size-12 items-center justify-center rounded-xl shadow-lg",
+        "bg-gradient-to-b from-zinc-800 to-zinc-900"
+      )}
+    >
+      <div className="relative flex aspect-square w-8 items-center justify-center rounded-full">
         <div
           className={cn(
-            "relative w-full aspect-square rounded-full flex items-center justify-center p-2",
+            "relative flex aspect-square w-full items-center justify-center rounded-full",
             clockFaceClass
           )}
         >
-          {/* Clock numbers */}
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-full h-full"
-              style={{ transform: `rotate(${30 * i}deg)` }}
-            >
-              <span className="p-2 absolute top-1 left-1/2 -translate-x-1/2 -translate-y-1 text-2xl font-semibold">
-                {i === 0 ? "12" : i}
-              </span>
-            </div>
-          ))}
-
           {/* Hour hand */}
           <div
             className={cn(
-              "absolute w-1 h-[32%] rounded-full origin-bottom",
+              "absolute h-[32%] w-0.5 origin-bottom rounded-full",
               handClass
             )}
             style={{ transform: `translateY(-50%) rotate(${hourDegrees}deg)` }}
-          >
-            <div
-              className={cn(
-                "absolute w-2 h-[75%] -left-0.5 rounded-full",
-                handClass
-              )}
-            />
-          </div>
+          />
 
           {/* Minute hand */}
           <div
             className={cn(
-              "absolute w-1 h-[44%] rounded-full origin-bottom",
+              "absolute h-[44%] w-0.5 origin-bottom rounded-full",
               handClass
             )}
             style={{
               transform: `translateY(-50%) rotate(${minuteDegrees}deg)`,
             }}
-          >
-            <div
-              className={cn(
-                "absolute w-2 h-[75%] -left-0.5 rounded-full",
-                handClass
-              )}
-            />
-          </div>
+          />
 
           {/* Second hand */}
           <div
-            className="absolute w-0.5 h-[48%] bg-orange-500 rounded-full origin-bottom"
+            className="absolute h-[48%] w-0.5 origin-bottom rounded-full bg-orange-400"
             style={{
               transform: `translateY(-50%) rotate(${secondDegrees}deg)`,
             }}
@@ -115,49 +86,22 @@ export const Clock = ({ timezone, isLocalTimezone }: ClockProps) => {
           {/* Center dot */}
           <div
             className={cn(
-              "absolute w-3 h-3 rounded-full flex items-center justify-center",
+              "absolute flex h-1.5 w-1.5 items-center justify-center rounded-full",
               handClass
             )}
           >
-            <div className={cn("w-1 h-1 rounded-full", clockFaceClass)} />
+            <div className={cn("h-0.5 w-0.5 rounded-full", clockFaceClass)} />
           </div>
 
-          {/* Center dot */}
-          <div
-            className={cn(
-              "absolute top-1/2 left-1/2 -translate-x-1.5 -translate-y-20 w-3 h-3 rounded-full flex items-center justify-center"
-            )}
-          ></div>
-        </div>
-      </div>
-      <div className="relative -top-8 max-w-64 w-full flex flex-col items-center justify-center space-y-2 py-6 rounded-b-2xl bg-black/75 backdrop-blur-lg shadow-lg">
-        <h2 className="flex items-center gap-2 text-md font-medium text-white">
-          {timezone}{" "}
-          <span>
+          {/* Day/Night indicator */}
+          <span className="right- 2 absolute bottom-3.5 opacity-50">
             {isDaytime ? (
-              <SunIcon className="size-4 text-white/70" />
+              <SunIcon className={cn("size-1", clockFaceClass)} />
             ) : (
-              <MoonIcon className="size-4 text-white/70" />
+              <MoonIcon className={cn("size-1", clockFaceClass)} />
             )}
           </span>
-        </h2>
-        {!isLocalTimezone ? (
-          <div className="text-center space-y-2">
-            <p className="text-xs text-white/70 font-medium">
-              {getDayStatus()}
-            </p>
-            <p className="text-xs text-white/60 uppercase font-medium">
-              {timeDifference > 0 ? `+${timeDifference}` : timeDifference} hrs
-            </p>
-          </div>
-        ) : (
-          <div className="text-center space-y-2">
-            <p className="text-xs text-white/70 font-medium">Current</p>
-            <p className="text-xs text-white/50 uppercase font-medium">
-              &mdash;
-            </p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

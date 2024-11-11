@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
 interface DockItem {
@@ -132,6 +133,7 @@ export const Dock = () => {
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+            <Clock />
             <LanguageSwitcher />
             <CalendarIcon />
 
