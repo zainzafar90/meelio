@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
@@ -20,9 +21,18 @@ export const LanguageSwitcher = () => {
       title={i18n.language === "en" ? "Switch to German" : "Switch to English"}
       role="button"
     >
-      <span className="text-base font-medium text-white">
-        {i18n.language === "en" ? "EN" : "DE"}
-      </span>
+      <AnimatePresence mode="wait">
+        <motion.span
+          className="text-base font-medium text-white"
+          key={i18n.language}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {i18n.language === "en" ? "EN" : "DE"}
+        </motion.span>
+      </AnimatePresence>
     </button>
   );
 };
