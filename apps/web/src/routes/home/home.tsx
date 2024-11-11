@@ -1,10 +1,8 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import NumberFlow from "@number-flow/react";
 import { ListTodo } from "lucide-react";
 
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import {
   SidebarInset,
@@ -16,6 +14,7 @@ import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
+import { Dock } from "./components/dock";
 import { AppLayout } from "./components/layout";
 import { TimerDynamicIsland } from "./components/timer-dynamic-island";
 
@@ -63,7 +62,7 @@ const BottomBar = () => (
     <div className="flex items-center justify-start">
       <SidebarTrigger />
     </div>
-    <Dock2 />
+    <Dock />
     <div className="flex items-center justify-end">
       <Button
         variant="glass"
@@ -147,93 +146,3 @@ const Quote = () => (
     </p>
   </div>
 );
-
-export const Dock2 = () => {
-  const apps = [
-    {
-      id: 1,
-      icon: <Icons.breathing className="size-6 border-blue-400 text-white" />,
-      name: "Breathepod",
-      bgColor: "bg-gradient-to-b from-zinc-800 to-zinc-900",
-    },
-    {
-      id: 2,
-      icon: <Icons.soundscapes className="size-6 text-white" />,
-      name: "Soundscapes",
-      bgColor: "bg-gradient-to-b from-zinc-800 to-zinc-900",
-    },
-  ];
-
-  const systemApps = [
-    {
-      id: 5,
-      icon: <Icons.settings className="size-6 text-zinc-200" />,
-      name: "Settings",
-      bgColor: "bg-gradient-to-b from-zinc-800 to-zinc-900",
-    },
-  ];
-
-  return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center gap-2">
-        {/* Left apps */}
-        <div className="flex items-center gap-2 pr-1">
-          {apps.map((app) => (
-            <DockIcon
-              key={app.id}
-              icon={app.icon}
-              bgColor={app.bgColor}
-              alt={app.name}
-            />
-          ))}
-
-          <PomodoroCard />
-        </div>
-
-        {/* Right apps */}
-        <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-          {systemApps.map((app) => (
-            <DockIcon
-              key={app.id}
-              icon={app.icon}
-              bgColor={app.bgColor}
-              alt={app.name}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface DockIconProps {
-  icon: ReactNode;
-  alt: string;
-  bgColor: string;
-}
-
-export function DockIcon({ icon, alt, bgColor }: DockIconProps) {
-  return (
-    <div className="group relative flex items-center justify-center">
-      <div
-        className={cn(
-          "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-          bgColor
-        )}
-        title={alt}
-      >
-        {icon}
-      </div>
-    </div>
-  );
-}
-
-export function PomodoroCard() {
-  return (
-    <DockIcon
-      alt="Pomodoro"
-      icon={<Icons.worldClock className="size-6 text-white" />}
-      bgColor="bg-gradient-to-b from-zinc-800 to-zinc-900 hover:from-indigo-500 hover:to-indigo-600"
-    />
-  );
-}

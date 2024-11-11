@@ -125,6 +125,14 @@ export const TimerDynamicIsland = () => {
           //   borderRadius: isExpanded ? "28px" : "24px",
           //   width: "100%",
           // }}
+          initial={{
+            opacity: 0,
+            y: 10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
           transition={{
             type: "spring",
             stiffness: 200,
