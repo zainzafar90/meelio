@@ -112,7 +112,7 @@ export const TimerDynamicIsland = () => {
         <motion.div
           ref={containerRef}
           layout
-          className="min-w-60 rounded-xl bg-white backdrop-blur-xl dark:bg-black"
+          className="min-w-60 rounded-xl bg-white backdrop-blur-xl dark:bg-black/80"
           // initial={{
           //   borderRadius: isExpanded ? "28px" : "24px",
           //   width: "100%",
