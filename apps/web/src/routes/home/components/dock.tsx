@@ -35,7 +35,6 @@ export const Dock = () => {
       icon: Logo,
       activeIcon: Logo,
     },
-
     {
       name: "Pomodoro",
       href: "/pomodoro",
@@ -43,16 +42,16 @@ export const Dock = () => {
       activeIcon: Icons.worldClockActive,
     },
     {
-      name: "Breathepod",
-      href: "/breathing",
-      icon: Icons.breathing,
-      activeIcon: Icons.breathingActive,
-    },
-    {
       name: "Soundscapes",
       href: "/soundscapes",
       icon: Icons.soundscapes,
       activeIcon: Icons.soundscapesActive,
+    },
+    {
+      name: "Breathepod",
+      href: "/breathing",
+      icon: Icons.breathing,
+      activeIcon: Icons.breathingActive,
     },
     {
       name: "Settings",
