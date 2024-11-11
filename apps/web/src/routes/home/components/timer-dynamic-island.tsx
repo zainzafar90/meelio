@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 
 import NumberFlow from "@number-flow/react";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Category } from "@/types/category";
@@ -9,7 +10,14 @@ import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { PomodoroSettingsDialog } from "@/components/pomodoro/pomodoro-settings.dialog";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -91,22 +99,6 @@ export const TimerDynamicIsland = () => {
       playCategory(Category.BeautifulAmbients);
     }
   }, [timer.activeStage, timer.running, pausePlayingSounds, playCategory]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsDialogOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <motion.div className="absolute left-1/2 top-1 z-10 w-full max-w-sm -translate-x-1/2">
@@ -244,9 +236,18 @@ export const TimerDynamicIsland = () => {
           className="sm:max-w-sm"
           onInteractOutside={(e) => {
             e.preventDefault();
-            setIsDialogOpen(true);
           }}
         >
+          <VisuallyHidden.Root>
+            <DialogHeader>
+              <DialogTitle>Pomodoro</DialogTitle>
+              <DialogDescription>
+                Pomodoro is a time management technique that uses a timer to
+                break work into intervals, typically 25 minutes in length,
+                separated by short breaks.
+              </DialogDescription>
+            </DialogHeader>
+          </VisuallyHidden.Root>
           <TimerExpandedContent />
           <DialogFooter className="sm:justify-between">
             <Button
