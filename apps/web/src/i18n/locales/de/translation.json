@@ -1,0 +1,44 @@
+{
+  "common": {
+    "home": "Startseite",
+    "pomodoro": "Pomodoro",
+    "soundscapes": "Klanglandschaften",
+    "breathing": "Atempod",
+    "calendar": {
+      "months": {
+        "short": {
+          "jan": "Jan",
+          "feb": "Feb",
+          "mär": "Mär",
+          "apr": "Apr",
+          "mai": "Mai",
+          "jun": "Jun",
+          "jul": "Jul",
+          "aug": "Aug",
+          "sep": "Sep",
+          "okt": "Okt",
+          "nov": "Nov",
+          "dez": "Dez"
+        }
+      }
+    }
+  },
+  "soundscapes": {
+    "dialog": {
+      "title": "Klanglandschaften",
+      "description": "Klanglandschaften sind eine Sammlung von Umgebungsgeräuschen, die Ihnen helfen können, sich zu entspannen, zu konzentrieren oder zu schlafen."
+    }
+  },
+  "home": {
+    "greetings": {
+      "morning": "☕ Guten Morgen",
+      "afternoon": "🌤️ Guten Tag",
+      "evening": "🌿 Guten Abend",
+      "night": "🌙 Gute Nacht"
+    },
+    "quote": {
+      "text": "Dein Leben ist darauf ausgerichtet, die Ergebnisse zu erzielen, die du jetzt bekommst. Ob du es realisierst oder nicht, du bist der Architekt",
+      "author": "Jim Rohn"
+    }
+  }
+}

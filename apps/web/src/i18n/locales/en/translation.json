@@ -1,0 +1,44 @@
+{
+  "common": {
+    "home": "Home",
+    "pomodoro": "Pomodoro",
+    "soundscapes": "Soundscapes",
+    "breathing": "Breathepod",
+    "calendar": {
+      "months": {
+        "short": {
+          "jan": "Jan",
+          "feb": "Feb",
+          "mar": "Mar",
+          "apr": "Apr",
+          "may": "May",
+          "jun": "Jun",
+          "jul": "Jul",
+          "aug": "Aug",
+          "sep": "Sep",
+          "oct": "Oct",
+          "nov": "Nov",
+          "dec": "Dec"
+        }
+      }
+    }
+  },
+  "soundscapes": {
+    "dialog": {
+      "title": "Soundscapes",
+      "description": "Soundscapes are a collection of ambient sounds that can help you relax, focus, or sleep."
+    }
+  },
+  "home": {
+    "greetings": {
+      "morning": "☕ Good morning",
+      "afternoon": "🌤️ Good afternoon",
+      "evening": "🌿 Good evening",
+      "night": "🌙 Good night"
+    },
+    "quote": {
+      "text": "Your life is designed to get the results you are getting right now. Whether you realize it or not, you are the architect",
+      "author": "Jim Rohn"
+    }
+  }
+}

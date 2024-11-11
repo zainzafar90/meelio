@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import NumberFlow from "@number-flow/react";
 import { ListTodo } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -106,6 +107,7 @@ const Greeting = () => {
   const [greeting, setGreeting] = useState("");
   const [time, setTime] = useState(new Date());
   const { user } = useAuthStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 10 * 60 * 1000);
@@ -115,14 +117,16 @@ const Greeting = () => {
   useEffect(() => {
     const updateGreeting = () => {
       const hour = time.getHours();
-      if (hour >= 4 && hour < 12) setGreeting("☕ Good morning");
-      else if (hour >= 12 && hour < 17) setGreeting("🌤️ Good afternoon");
-      else if (hour >= 17 && hour < 21) setGreeting("🌿 Good evening");
-      else setGreeting("🌙 Good night");
+      if (hour >= 4 && hour < 12) setGreeting(t("home.greetings.morning"));
+      else if (hour >= 12 && hour < 17)
+        setGreeting(t("home.greetings.afternoon"));
+      else if (hour >= 17 && hour < 21)
+        setGreeting(t("home.greetings.evening"));
+      else setGreeting(t("home.greetings.night"));
     };
 
     updateGreeting();
-  }, [time]);
+  }, [time, t]);
 
   const getFirstName = () => {
     if (!user || !user.name) return "";
@@ -137,11 +141,15 @@ const Greeting = () => {
   );
 };
 
-const Quote = () => (
-  <div className="mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-4 py-3 backdrop-blur-lg sm:max-w-sm md:max-w-md lg:max-w-lg lg:px-8 lg:py-6">
-    <p className="text-sm leading-relaxed sm:text-base md:text-lg lg:text-xl">
-      Your life is designed to get the results you are getting right now.
-      Whether you realize it or not, you are the architect &mdash; Jim Rohn
-    </p>
-  </div>
-);
+const Quote = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-4 py-3 backdrop-blur-lg sm:max-w-sm md:max-w-md lg:max-w-lg lg:px-8 lg:py-6">
+      <p className="text-sm leading-relaxed sm:text-base md:text-lg lg:text-xl">
+        {t("home.quote.text")}
+        &mdash; {t("home.quote.author")}
+      </p>
+    </div>
+  );
+};

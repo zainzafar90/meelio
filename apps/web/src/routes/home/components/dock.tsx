@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/logo";
 import { CategoryList } from "@/components/soundscape/categories/category-list";
 import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
@@ -39,33 +41,37 @@ export const Dock = () => {
   const { isTimerVisible } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
   }));
+  const { t, i18n } = useTranslation();
 
-  const allItems: DockItem[] = [
-    {
-      name: "Pomodoro",
-      href: "/pomodoro",
-      icon: Icons.worldClock,
-      activeIcon: Icons.worldClockActive,
-    },
-    {
-      name: "Soundscapes",
-      href: "/soundscapes",
-      icon: Icons.soundscapes,
-      activeIcon: Icons.soundscapesActive,
-    },
-    {
-      name: "Breathepod",
-      href: "/breathing",
-      icon: Icons.breathing,
-      activeIcon: Icons.breathingActive,
-    },
-    // {
-    //   name: "Settings",
-    //   href: "/settings",
-    //   icon: Icons.settings,
-    //   activeIcon: Icons.settingsActive,
-    // },
-  ];
+  const allItems: DockItem[] = useMemo(
+    () => [
+      {
+        name: t("common.pomodoro"),
+        href: "/pomodoro",
+        icon: Icons.worldClock,
+        activeIcon: Icons.worldClockActive,
+      },
+      {
+        name: t("common.soundscapes"),
+        href: "/soundscapes",
+        icon: Icons.soundscapes,
+        activeIcon: Icons.soundscapesActive,
+      },
+      {
+        name: t("common.breathing"),
+        href: "/breathing",
+        icon: Icons.breathing,
+        activeIcon: Icons.breathingActive,
+      },
+      // {
+      //   name: "Settings",
+      //   href: "/settings",
+      //   icon: Icons.settings,
+      //   activeIcon: Icons.settingsActive,
+      // },
+    ],
+    [t, i18n.language]
+  );
 
   const getVisibleItemCount = (width: number) => {
     if (width >= 1280) return Math.min(allItems.length, 10);
@@ -126,6 +132,7 @@ export const Dock = () => {
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+            <LanguageSwitcher />
             <CalendarIcon />
 
             {dropdownItems.length > 0 && (
@@ -184,6 +191,7 @@ const DockButton = ({
   isActive?: boolean;
   className?: string;
 }) => {
+  const { t } = useTranslation();
   const { toggleTimer } = useDockStore((state) => ({
     toggleTimer: state.toggleTimer,
   }));
@@ -221,10 +229,9 @@ const DockButton = ({
         <DialogContent className="h-[80vh] max-w-lg p-0">
           <VisuallyHidden.Root>
             <DialogHeader>
-              <DialogTitle>{name}</DialogTitle>
+              <DialogTitle>{t("soundscapes.dialog.title")}</DialogTitle>
               <DialogDescription>
-                Soundscapes are a collection of ambient sounds that can help you
-                relax, focus, or sleep.
+                {t("soundscapes.dialog.description")}
               </DialogDescription>
             </DialogHeader>
           </VisuallyHidden.Root>
@@ -252,11 +259,13 @@ const DockButton = ({
       role="button"
     >
       <IconComponent className="size-6 text-white" />
+      {/* <div className="span text-2xxs">{t("common.breathing")}</div> */}
     </div>
   );
 };
 
 const CalendarIcon = () => {
+  const { t } = useTranslation();
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
@@ -264,7 +273,9 @@ const CalendarIcon = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const month = date.toLocaleString("default", { month: "short" });
+  const month = t(
+    `common.calendar.months.short.${date.toLocaleString("default", { month: "short" }).toLowerCase()}`
+  );
   const day = date.getDate();
 
   return (
