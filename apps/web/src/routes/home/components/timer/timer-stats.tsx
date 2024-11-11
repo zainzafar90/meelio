@@ -1,5 +1,3 @@
-"use client";
-
 import { memo, useEffect, useState } from "react";
 
 import { Bar, BarChart, XAxis } from "recharts";
