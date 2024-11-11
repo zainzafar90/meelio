@@ -1,14 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { MoreHorizontal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
 import { CategoryList } from "@/components/soundscape/categories/category-list";
+import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
 import { SoundList } from "@/components/soundscape/sound-list/sound-list";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useDockStore } from "@/stores/dock.store";
 
 interface DockItem {
@@ -65,10 +74,11 @@ export const Dock = () => {
   ];
 
   const getVisibleItemCount = (width: number) => {
-    if (width >= 1280) return allItems.length;
+    if (width >= 1280) return Math.min(allItems.length, 10);
     if (width >= 1024) return 6;
     if (width >= 768) return 4;
-    return 3;
+    if (width >= 640) return 3;
+    return 2;
   };
 
   useEffect(() => {
@@ -200,13 +210,24 @@ const DockButton = ({
             </div>
           </div>
         </DialogTrigger>
+
         <DialogContent className="h-[80vh] max-w-lg p-0">
+          <VisuallyHidden.Root>
+            <DialogHeader>
+              <DialogTitle>{name}</DialogTitle>
+              <DialogDescription>
+                Soundscapes are a collection of ambient sounds that can help you
+                relax, focus, or sleep.
+              </DialogDescription>
+            </DialogHeader>
+          </VisuallyHidden.Root>
           <div className="flex h-full flex-col overflow-hidden p-6">
             <CategoryList />
             <div className="flex-1 overflow-y-auto">
               <SoundList />
             </div>
           </div>
+          <SoundControlsBar />
         </DialogContent>
       </Dialog>
     );

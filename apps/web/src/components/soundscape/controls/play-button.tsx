@@ -26,19 +26,26 @@ export const PlayButton = (props: Props) => {
   return (
     <button
       role="button"
-      disabled={!props.isPlayButtonActive}
       onClick={() => toggleAllSounds()}
       aria-label={isAnySoundPlaying ? "Paused" : "Playing"}
+      disabled={!props.isPlayButtonActive}
       className={cn(
-        "group relative flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 md:h-12 md:w-12 dark:bg-slate-200 dark:hover:bg-slate-100 dark:focus:ring-slate-200",
+        "group relative flex cursor-pointer items-center justify-center",
         {
-          "opacity-50 cursor-not-allowed hover:bg-initial":
+          "hover:bg-initial cursor-not-allowed opacity-50":
             !props.isPlayButtonActive,
         }
       )}
     >
-      <div className="absolute -inset-3 md:hidden" />
-      <Icon className="h-4 w-4 md:w-6 md:h-6 text-white group-active:text-white/80 dark:text-slate-900 dark:group-active:text-slate-900/80" />
+      <div
+        className={cn(
+          "flex size-12 items-center justify-center rounded-xl bg-zinc-900",
+          "shadow-sm shadow-zinc-950/50"
+        )}
+        title={isAnySoundPlaying ? "Paused" : "Playing"}
+      >
+        <Icon className="size-3 text-white" />
+      </div>
     </button>
   );
 };

@@ -6,7 +6,7 @@ import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { GlobalVolumeControl } from "./global-volume-control";
 import { OscillationButton } from "./oscillation-button";
 import { PlayButton } from "./play-button";
-import { ResetGlobalSoundSettingsDialog } from "./reset-global-sound-settings.dialog";
+// import { ResetGlobalSoundSettingsDialog } from "./reset-global-sound-settings.dialog";
 // import { SaveComboButton } from "./save-combo-button";
 // import { ShareButton } from "./share-button";
 import { ShuffleButton } from "./shuffle-button";
@@ -23,38 +23,34 @@ export const SoundControlsBar = () => {
   }, [pausedSounds, isAnySoundPlaying]);
 
   return (
-    <div
-      className={cn("fixed inset-x-0 bottom-0 z-[-1] lg:left-72 xl:left-120", {
-        "z-10": isBarVisible,
-      })}
-    >
+    <div className="relative inset-x-0 bottom-0 rounded-lg">
       <div
         className={cn(
-          "relative translate-y-[80px] flex items-center justify-center gap-6 bg-gray-100/90 dark:bg-gray-800/90 px-4 py-4 shadow-sm shadow-foreground/10 ring-1 ring-foreground/5 backdrop-blur-sm transition-all ease-in-out duration-300 transform md:px-6",
+          "relative flex transform items-center justify-center gap-6 rounded-b-lg bg-zinc-800 p-3",
           {
             "translate-y-0": isBarVisible,
           }
         )}
       >
-        <div className="flex items-center gap-4 w-full">
-          <div className="flex flex-1 flex-shrink-0 items-center gap-4">
-            {/* <SaveComboButton />
-          <ShareButton /> */}
+        <div className="flex w-full items-center gap-4">
+          {/* <div className="flex flex-1 flex-shrink-0 items-center gap-4">
+             <SaveComboButton />
+            <ShareButton /> 
             <span className="block md:hidden">
               <ResetGlobalSoundSettingsDialog />
             </span>
-          </div>
-          <div className="flex flex-1 flex-shrink-0 items-center justify-center gap-4">
-            <ShuffleButton />
+          </div> */}
+          <div className="flex flex-1 flex-shrink-0 items-center justify-start gap-4">
             <PlayButton isPlayButtonActive={isBarVisible} />
+            <ShuffleButton />
             <OscillationButton />
           </div>
-          <div className="flex flex-1 flex-shrink-0 items-center gap-2 justify-end w-full">
+          <div className="flex w-full flex-1 flex-shrink-0 items-center justify-end gap-2">
             <GlobalVolumeControl />
 
-            <span className="ml-4 hidden md:block">
+            {/* <span className="ml-4 hidden md:block">
               <ResetGlobalSoundSettingsDialog />
-            </span>
+            </span> */}
           </div>
         </div>
       </div>

@@ -80,16 +80,16 @@ export const ShuffleButton = () => {
         <button
           type="button"
           className={cn(
-            "group flex items-center justify-center w-10 h-10 relative rounded-md bg-muted-background text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-muted-background focus:ring-offset-1",
+            "bg-muted-background focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-offset-1",
             {
-              "bg-background/10 text-foreground": isShuffling,
+              "bg-background/50 text-foreground": isShuffling,
             }
           )}
           onClick={() => toggleShuffle()}
           aria-label={isShuffling ? "Shuffle Enabled" : "Shuffle Disabled"}
         >
           <div className="absolute -inset-4 md:hidden" />
-          <Icons.shuffle className="h-8 w-8" />
+          <Icons.shuffle className="size-6" />
         </button>
       </TooltipTrigger>
       <TooltipContent>
