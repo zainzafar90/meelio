@@ -44,7 +44,7 @@ export const PlayButton = (props: Props) => {
         )}
         title={isAnySoundPlaying ? "Paused" : "Playing"}
       >
-        <Icon className="size-3 text-white" />
+        <Icon className="size-4 text-white" />
       </div>
     </button>
   );

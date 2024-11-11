@@ -369,9 +369,7 @@ const PomodoroControls = ({
         <BatteryCircle percentage={percentage}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 className="absolute inset-0 flex items-center justify-center rounded-full p-1 text-black dark:text-white"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -383,7 +381,7 @@ const PomodoroControls = ({
                 ) : (
                   <Icons.play className="ml-0.5 size-4" />
                 )}
-              </motion.button>
+              </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
               <p> {isRunning ? "Pause" : "Start"}</p>
