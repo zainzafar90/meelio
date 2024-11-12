@@ -17,6 +17,7 @@ import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { Dock } from "./components/dock";
 import { Greeting } from "./components/greetings/greetings";
 import { AppLayout } from "./components/layout";
+import { Quote } from "./components/quote/quote";
 import { TimerDynamicIsland } from "./components/timer-dynamic-island";
 
 export const Home = () => {
@@ -99,19 +100,6 @@ const Clock = () => {
           locales="en-US"
         />
       </h1>
-    </div>
-  );
-};
-
-const Quote = () => {
-  const { t } = useTranslation();
-
-  return (
-    <div className="mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-4 py-3 backdrop-blur-lg sm:max-w-sm md:max-w-md lg:max-w-lg lg:px-8 lg:py-6">
-      <p className="text-sm leading-relaxed sm:text-base md:text-lg lg:text-xl">
-        {t("home.quote.text")}
-        &mdash; {t("home.quote.author")}
-      </p>
     </div>
   );
 };
