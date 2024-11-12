@@ -1,15 +1,15 @@
-import { useRegisterSW } from "virtual:pwa-register/react";
+// import { useRegisterSW } from "virtual:pwa-register/react";
 
 import { useUpdateAlertStore } from "@/stores/update-alert-store";
 
 export function AppUpdatedAlert() {
   const { showUpdateAlert, setShowUpdateAlert } = useUpdateAlertStore();
 
-  const { updateServiceWorker } = useRegisterSW();
+  // const { updateServiceWorker } = useRegisterSW();
 
   const handleRefresh = async () => {
     setShowUpdateAlert(false);
-    await updateServiceWorker(true);
+    // await updateServiceWorker(true);
   };
 
   if (!showUpdateAlert) return null;
@@ -17,7 +17,7 @@ export function AppUpdatedAlert() {
   return (
     <div
       aria-live="assertive"
-      className="pointer-events-none fixed right-2 top-2 flex items-end sm:items-start sm:p-6 z-50 max-w-md w-full"
+      className="pointer-events-none fixed right-2 top-2 z-50 flex w-full max-w-md items-end sm:items-start sm:p-6"
     >
       <div className="flex w-full flex-col items-center space-y-4 sm:items-end">
         <div className="pointer-events-auto flex w-full max-w-md divide-x divide-gray-200 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition data-[closed]:data-[enter]:translate-y-2 data-[enter]:transform data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in data-[closed]:data-[enter]:sm:translate-x-2 data-[closed]:data-[enter]:sm:translate-y-0">
