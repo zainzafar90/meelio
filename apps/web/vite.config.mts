@@ -4,8 +4,23 @@ import { env } from "process";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, UserConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
+  base: "./",
+  build: {
+    outDir: "dist",
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+      },
+      output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -13,6 +28,14 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    viteStaticCopy({
+      targets: [
+        {
+          src: "public/manifest.json",
+          dest: ".",
+        },
+      ],
+    }),
     VitePWA(
       env.NODE_ENV === "development"
         ? {}
@@ -59,15 +82,4 @@ export default defineConfig({
           }
     ),
   ] as UserConfig["plugins"],
-  build: {
-    rollupOptions: {
-      // external: ["react-player/lazy"],
-      output: {
-        manualChunks: {
-          "framer-motion": ["framer-motion"],
-          gsap: ["gsap"],
-        },
-      },
-    },
-  },
 });

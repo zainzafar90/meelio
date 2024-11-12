@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 
 import { Settings } from "lucide-react";
 
-import { NotFoundPage } from "@/routes/errors/404";
 import { ErrorPage } from "@/routes/errors/error";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
 import { ProtectedLayout } from "@/layouts/protected-layout";
@@ -93,7 +92,7 @@ export const Router = () => {
         />
       </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 };

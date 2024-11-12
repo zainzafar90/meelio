@@ -1,7 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 
 import i18n from "@/i18n/i18n";
-import { Analytics } from "@vercel/analytics/react";
 import { I18nextProvider } from "react-i18next";
 import { Toaster } from "sonner";
 
@@ -20,7 +19,9 @@ type AppProviderProps = {
 export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <I18nextProvider i18n={i18n}>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <AuthProvider>
           <ThemeProvider storageKey="ui-theme" defaultTheme="system">
             <TooltipProvider>
@@ -28,7 +29,6 @@ export const AppProvider = ({ children }: AppProviderProps) => {
                 {children}
                 <SoundPlayer />
                 <Toaster richColors />
-                <Analytics />
                 <ConnectionWarning />
               </PomodoroProvider>
             </TooltipProvider>
