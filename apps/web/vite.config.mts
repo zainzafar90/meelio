@@ -61,7 +61,7 @@ export default defineConfig({
   ] as UserConfig["plugins"],
   build: {
     rollupOptions: {
-      external: ["react-player/lazy"],
+      // external: ["react-player/lazy"],
       output: {
         manualChunks: {
           "framer-motion": ["framer-motion"],

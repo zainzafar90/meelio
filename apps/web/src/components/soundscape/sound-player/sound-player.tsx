@@ -1,8 +1,6 @@
-import { lazy } from "react";
+import ReactPlayer from "react-player";
 
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
-
-const ReactPlayer = lazy(() => import("react-player/lazy"));
 
 export const SoundPlayer = () => {
   const { sounds, globalVolume, setSoundLoading } = useSoundscapesStore(
