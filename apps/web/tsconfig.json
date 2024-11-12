@@ -31,7 +31,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "vite.config.ts",
+    "vite.config.mts",
     "prettier.config.js",
     "postcss.config.js"
   ],

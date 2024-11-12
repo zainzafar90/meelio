@@ -1,6 +1,6 @@
-import { useEffect, useId, useRef } from "react";
+import { useId, useRef } from "react";
 
-import { animate, timeline } from "motion";
+import { motion, Variants } from "framer-motion";
 
 interface StarProps {
   point: [number, number, boolean?, boolean?];
@@ -69,52 +69,56 @@ const constellations: [number, number][][] = [
 ];
 
 function Star({ point: [cx, cy, dim, blur] }: StarProps) {
-  const groupRef = useRef<SVGGElement>(null);
-  const ref = useRef<SVGCircleElement>(null);
   const blurId = useId();
+  const delay = Math.random() * 2;
 
-  useEffect(() => {
-    const delay = Math.random() * 2;
+  const fadeInVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 4,
+        delay,
+      },
+    },
+  };
 
-    const animations = [
-      animate(groupRef.current!, { opacity: 1 }, { duration: 4, delay }),
-      animate(
-        ref.current!,
-        {
-          opacity: dim ? [0.2, 0.5] : [1, 0.6],
-          scale: dim ? [1, 1.2] : [1.2, 1],
-        },
-        {
-          delay,
-          duration: Math.random() * 2 + 2,
-          direction: "alternate",
-          repeat: Infinity,
-        }
-      ),
-    ];
-
-    return () => {
-      for (const animation of animations) {
-        animation.cancel();
-      }
-    };
-  }, [dim]);
+  const starVariants: Variants = {
+    dim: {
+      opacity: [0.2, 0.5],
+      scale: [1, 1.2],
+      transition: {
+        duration: Math.random() * 2 + 2,
+        repeat: Infinity,
+        repeatType: "reverse",
+      },
+    },
+    bright: {
+      opacity: [1, 0.6],
+      scale: [1.2, 1],
+      transition: {
+        duration: Math.random() * 2 + 2,
+        repeat: Infinity,
+        repeatType: "reverse",
+      },
+    },
+  };
 
   return (
-    <g ref={groupRef} className="opacity-0">
-      <circle
-        ref={ref}
+    <motion.g initial="hidden" animate="visible" variants={fadeInVariants}>
+      <motion.circle
         cx={cx}
         cy={cy}
         r={1}
         style={{
           transformOrigin: `${cx / 16}rem ${cy / 16}rem`,
-          opacity: dim ? 0.2 : 1,
-          transform: `scale(${dim ? 1 : 1.2})`,
         }}
+        initial={dim ? "dim" : "bright"}
+        animate={dim ? "dim" : "bright"}
+        variants={starVariants}
         filter={blur ? `url(#${blurId})` : undefined}
       />
-    </g>
+    </motion.g>
   );
 }
 
@@ -123,43 +127,46 @@ interface ConstellationProps {
 }
 
 function Constellation({ points }: ConstellationProps) {
-  const ref = useRef();
   const uniquePoints = points.filter(
     (point, pointIndex) =>
       points.findIndex((p) => String(p) === String(point)) === pointIndex
   );
   const isFilled = uniquePoints.length !== points.length;
 
-  useEffect(() => {
-    if (!ref.current) return;
-
-    const sequence = timeline([
-      [
-        ref.current,
-        { strokeDashoffset: 0, visibility: "visible" },
-        { duration: 5, delay: Math.random() * 3 + 2 },
-      ],
-      [ref.current, { fill: "rgb(255 255 255 / 0.02)" }, { duration: 1 }],
-    ]);
-
-    return () => {
-      sequence.cancel();
-    };
-  }, [isFilled]);
+  const pathVariants: Variants = {
+    hidden: {
+      strokeDashoffset: 1,
+      visibility: "hidden",
+      fill: "transparent",
+    },
+    visible: {
+      strokeDashoffset: 0,
+      visibility: "visible",
+      fill: isFilled ? "rgb(255 255 255 / 0.02)" : "transparent",
+      transition: {
+        strokeDashoffset: {
+          duration: 5,
+          delay: Math.random() * 3 + 2,
+        },
+        fill: {
+          delay: 7,
+          duration: 1,
+        },
+      },
+    },
+  };
 
   return (
     <>
-      <path
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ref={ref as any}
+      <motion.path
         stroke="white"
         strokeOpacity="0.2"
         strokeDasharray={1}
-        strokeDashoffset={1}
         pathLength={1}
-        fill="transparent"
         d={`M ${points.join("L")}`}
-        className="invisible"
+        initial="hidden"
+        animate="visible"
+        variants={pathVariants}
       />
       {uniquePoints.map((point, pointIndex) => (
         <Star key={pointIndex} point={point} />
@@ -169,11 +176,7 @@ function Constellation({ points }: ConstellationProps) {
 }
 
 export function StarField() {
-  const blurId = useRef<string>("");
-
-  useEffect(() => {
-    blurId.current = Math.random().toString(36).substr(2, 9);
-  }, []);
+  const blurId = useRef(Math.random().toString(36).substr(2, 9));
 
   return (
     <svg

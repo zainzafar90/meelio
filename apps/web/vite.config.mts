@@ -2,7 +2,7 @@ import path from "path";
 import { env } from "process";
 
 import react from "@vitejs/plugin-react-swc";
-import { defineConfig, splitVendorChunkPlugin, UserConfig } from "vite";
+import { defineConfig, UserConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
@@ -13,7 +13,6 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    splitVendorChunkPlugin(),
     VitePWA(
       env.NODE_ENV === "development"
         ? {}
@@ -60,4 +59,15 @@ export default defineConfig({
           }
     ),
   ] as UserConfig["plugins"],
+  build: {
+    rollupOptions: {
+      external: ["react-player/lazy"],
+      output: {
+        manualChunks: {
+          "framer-motion": ["framer-motion"],
+          gsap: ["gsap"],
+        },
+      },
+    },
+  },
 });
