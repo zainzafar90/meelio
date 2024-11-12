@@ -11,10 +11,10 @@
   "web_accessible_resources": [
     {
       "resources": ["*.js", "*.css", "*.html", "assets/*"],
-      "matches": ["<all_urls>"]
+      "matches": ["https://*.meelio.io/*"]
     }
   ],
-  "host_permissions": ["<all_urls>"],
+  "host_permissions": ["https://*.meelio.io/*"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
   },
