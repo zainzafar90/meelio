@@ -3,7 +3,7 @@
   "name": "Meelio",
   "short_name": "Meelio",
   "version": "0.1.0",
-  "description": "Empower your focus & calm with enhanced soundscapes. Meelio's tools fuel productivity and relaxation",
+  "description": "Find your focus & calm with enhanced soundscapes. Meelio's tools fuel productivity and relaxation",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
