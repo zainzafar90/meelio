@@ -31,7 +31,7 @@ export const Home = () => {
 };
 
 const MainContent = () => (
-  <div className="col-span-3 row-span-3 flex flex-col items-center justify-center text-center text-white transition-all hover:text-white">
+  <div className="flex flex-col items-center justify-center text-center text-white transition-all hover:text-white">
     <Clock />
     <Greeting />
     <Quote />
@@ -42,18 +42,18 @@ const TopBar = () => {
   const { isTimerVisible } = useDockStore();
 
   if (!isTimerVisible) {
-    return <div className="relative col-span-3 flex justify-between" />;
+    return <div className="relative flex w-full justify-center" />;
   }
 
   return (
-    <div className="relative col-span-3 flex justify-between">
+    <div className="relative flex w-full justify-center">
       <TimerDynamicIsland />
     </div>
   );
 };
 
 const BottomBar = () => (
-  <div className="relative col-span-3 flex items-center justify-between">
+  <div className="relative flex items-center justify-between">
     <div className="flex items-center justify-start" />
     <Dock />
     <div className="flex items-center justify-end" />
