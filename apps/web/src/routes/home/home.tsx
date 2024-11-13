@@ -38,12 +38,12 @@ const TopBar = () => {
   const { isTimerVisible } = useDockStore();
 
   const MenuBar = () => (
-    <div className="glass relative flex h-6 w-full justify-center !border-x-0 !border-t-0">
-      {isTimerVisible && <TimerDynamicIsland />}
-
-      <div className="flex items-center justify-end">
+    <div className="relative">
+      <div className="flex h-6 w-full justify-center backdrop-blur-md">
         <Clock />
       </div>
+
+      {isTimerVisible && <TimerDynamicIsland />}
     </div>
   );
 

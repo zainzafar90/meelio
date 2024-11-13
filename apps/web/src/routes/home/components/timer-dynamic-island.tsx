@@ -101,7 +101,7 @@ export const TimerDynamicIsland = () => {
   }, [timer.activeStage, timer.running, pausePlayingSounds, playCategory]);
 
   return (
-    <motion.div className="absolute left-1/2 top-1 z-10 w-full max-w-sm -translate-x-1/2">
+    <motion.div className="absolute left-1/2 top-8 z-10 w-full max-w-sm -translate-x-1/2">
       <AnimatePresence mode="wait">
         <motion.div
           ref={containerRef}
@@ -137,7 +137,7 @@ export const TimerDynamicIsland = () => {
         >
           {/* Main Status Bar */}
           <motion.div
-            className="flex cursor-pointer items-center justify-between p-3"
+            className="flex cursor-pointer items-center justify-between p-3 "
             layout="position"
           >
             <AnimatePresence mode="wait">
