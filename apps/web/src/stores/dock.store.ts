@@ -6,7 +6,7 @@ interface DockStore {
 }
 
 export const useDockStore = create<DockStore>((set) => ({
-  isTimerVisible: true,
+  isTimerVisible: false,
   toggleTimer: () =>
     set((state) => ({ isTimerVisible: !state.isTimerVisible })),
 }));

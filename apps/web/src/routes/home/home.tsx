@@ -41,13 +41,9 @@ const MainContent = () => (
 const TopBar = () => {
   const { isTimerVisible } = useDockStore();
 
-  if (!isTimerVisible) {
-    return <div className="relative flex w-full justify-center" />;
-  }
-
   return (
     <div className="relative flex w-full justify-center">
-      <TimerDynamicIsland />
+      {isTimerVisible && <TimerDynamicIsland />}
     </div>
   );
 };
