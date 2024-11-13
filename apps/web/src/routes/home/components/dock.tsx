@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
@@ -114,12 +115,15 @@ export const Dock = () => {
       <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pr-1">
-            <DockButton
-              icon={Logo}
-              activeIcon={Logo}
-              name="Home"
-              className="hidden sm:flex"
-            />
+            <SidebarTrigger
+              title="Toggle Sidebar"
+              className={cn(
+                "flex size-12 items-center justify-center rounded-xl shadow-lg",
+                "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
+              )}
+            >
+              <Logo className="size-6 text-white" />
+            </SidebarTrigger>
 
             {visibleItems.map((item, index) => (
               <DockButton
@@ -261,7 +265,6 @@ const DockButton = ({
       role="button"
     >
       <IconComponent className="size-6 text-white" />
-      {/* <div className="span text-2xxs">{t("common.breathing")}</div> */}
     </div>
   );
 };

@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 
 import NumberFlow from "@number-flow/react";
-import { ListTodo } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
-import { Button } from "@/components/ui/button";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
@@ -61,19 +54,9 @@ const TopBar = () => {
 
 const BottomBar = () => (
   <div className="relative col-span-3 flex items-center justify-between">
-    <div className="flex items-center justify-start">
-      <SidebarTrigger />
-    </div>
+    <div className="flex items-center justify-start" />
     <Dock />
-    <div className="flex items-center justify-end">
-      <Button
-        variant="glass"
-        size="icon"
-        className="bg-black/10 backdrop-blur-md transition-colors hover:bg-black/20"
-      >
-        <ListTodo className="h-4 w-4 md:h-5 md:w-5" />
-      </Button>
-    </div>
+    <div className="flex items-center justify-end" />
   </div>
 );
 
