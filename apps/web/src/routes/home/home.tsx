@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
-
-import NumberFlow from "@number-flow/react";
-
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
+import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock";
 import { Greeting } from "./components/greetings/greetings";
 import { AppLayout } from "./components/layout";
@@ -32,7 +29,6 @@ export const Home = () => {
 
 const MainContent = () => (
   <div className="flex flex-col items-center justify-center text-center text-white transition-all hover:text-white">
-    <Clock />
     <Greeting />
     <Quote />
   </div>
@@ -41,11 +37,17 @@ const MainContent = () => (
 const TopBar = () => {
   const { isTimerVisible } = useDockStore();
 
-  return (
-    <div className="relative flex w-full justify-center">
+  const MenuBar = () => (
+    <div className="glass relative flex h-6 w-full justify-center !border-x-0 !border-t-0">
       {isTimerVisible && <TimerDynamicIsland />}
+
+      <div className="flex items-center justify-end">
+        <Clock />
+      </div>
     </div>
   );
+
+  return <MenuBar />;
 };
 
 const BottomBar = () => (
@@ -55,30 +57,3 @@ const BottomBar = () => (
     <div className="flex items-center justify-end" />
   </div>
 );
-
-const Clock = () => {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="flex flex-col">
-      <h1 className="text-shadow-lg font-mono text-5xl font-semibold leading-none tracking-tight text-white sm:text-7xl md:text-9xl lg:text-[10rem]">
-        <NumberFlow
-          value={time.getHours()}
-          format={{ notation: "standard", minimumIntegerDigits: 2 }}
-          locales="en-US"
-        />
-        <span className="text-white">:</span>
-        <NumberFlow
-          value={time.getMinutes()}
-          format={{ notation: "standard", minimumIntegerDigits: 2 }}
-          locales="en-US"
-        />
-      </h1>
-    </div>
-  );
-};

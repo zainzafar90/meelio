@@ -11,10 +11,10 @@
     --flip-gradient-top: #ffffff;
     --flip-gradient-bottom: #e0e0e0;
 
-    --home-p-t: 1rem;
+    --home-p-t: 0;
     --home-p-b: 1rem;
-    --home-p-r: 1rem;
-    --home-p-l: 1rem;
+    --home-p-r: 0rem;
+    --home-p-l: 0rem;
 
     --home-grid-block-col-size: 10px;
     --home-grid-block-row-size: 10px;

@@ -65,12 +65,6 @@ export const Dock = () => {
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
       },
-      // {
-      //   name: "Settings",
-      //   href: "/settings",
-      //   icon: Icons.settings,
-      //   activeIcon: Icons.settingsActive,
-      // },
     ],
     [t, i18n.language]
   );
