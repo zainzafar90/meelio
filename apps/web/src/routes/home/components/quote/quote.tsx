@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { QuoteIcon } from "lucide-react";
 
 import { useQuoteStore } from "@/stores/quotes.store";
 
@@ -24,17 +25,21 @@ export const Quote = () => {
 
   return (
     <AnimatePresence mode="wait">
-      <div className="mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-2 py-3 backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg">
+      <div className="relative mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-2 py-3 backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
-          className="text-shadow-lg md:text-md mb-4 mt-2 text-xs leading-relaxed sm:text-sm lg:text-lg"
+          className="text-shadow-lg md:text-md my-2 text-sm leading-relaxed lg:text-lg"
           key={currentQuote.quote}
         >
-          {currentQuote.quote} &mdash; {currentQuote.author}
+          {currentQuote.quote}
         </motion.p>
+        <span className="text-xxs text-white/50 sm:text-xs md:text-sm">
+          &mdash; {currentQuote.author}
+        </span>
+        <QuoteIcon className="absolute bottom-2 right-2 hidden size-6 text-white/20 sm:block" />
       </div>
     </AnimatePresence>
   );
