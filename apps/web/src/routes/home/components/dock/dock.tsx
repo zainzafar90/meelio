@@ -4,14 +4,17 @@ import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
-import { LanguageSwitcher } from "@/routes/home/components/dock/language-switcher";
+import { ClockDock } from "@/routes/home/components/dock/components/clock.dock";
+import { LanguageSwitcherDock } from "@/routes/home/components/dock/components/language-switcher.dock";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
+import { CalendarDock } from "./components/calendar.dock";
+
 interface DockItem {
+  id: string;
   name: string;
   icon: React.ElementType;
   activeIcon: React.ElementType;
@@ -28,12 +31,16 @@ export const Dock = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const {
     isTimerVisible,
+    isBreathingVisible,
+    isSoundscapesVisible,
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
     resetDock,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
+    isSoundscapesVisible: state.isSoundscapesVisible,
+    isBreathingVisible: state.isBreathingVisible,
     resetDock: state.reset,
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
@@ -44,6 +51,7 @@ export const Dock = () => {
   const allItems: DockItem[] = useMemo(
     () => [
       {
+        id: "home",
         name: t("common.home"),
         icon: Logo,
         activeIcon: Logo,
@@ -52,6 +60,7 @@ export const Dock = () => {
         },
       },
       {
+        id: "timer",
         name: t("common.pomodoro"),
         icon: Icons.worldClock,
         activeIcon: Icons.worldClockActive,
@@ -60,6 +69,7 @@ export const Dock = () => {
         },
       },
       {
+        id: "soundscapes",
         name: t("common.soundscapes"),
         icon: Icons.soundscapes,
         activeIcon: Icons.soundscapesActive,
@@ -68,6 +78,7 @@ export const Dock = () => {
         },
       },
       {
+        id: "breathepod",
         name: t("common.breathing"),
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
@@ -76,6 +87,7 @@ export const Dock = () => {
         },
       },
       {
+        id: "settings",
         name: t("common.settings"),
         icon: Icons.settings,
         activeIcon: Icons.settingsActive,
@@ -86,8 +98,7 @@ export const Dock = () => {
 
   const getVisibleItemCount = (width: number) => {
     if (width >= 1280) return Math.min(allItems.length, 10);
-    if (width >= 1024) return 6;
-    if (width >= 768) return 3;
+    if (width >= 768) return 6;
     if (width >= 640) return 1;
     return 1;
   };
@@ -125,21 +136,14 @@ export const Dock = () => {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pr-1">
             {visibleItems.map((item, index) => (
-              <DockButton
-                key={index}
-                icon={item.icon}
-                activeIcon={item.activeIcon}
-                name={item.name}
-                isActive={isTimerVisible && item.name === "Pomodoro"}
-                onClick={item.onClick}
-              />
+              <DockButton key={index} item={item} />
             ))}
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-            <Clock />
-            <LanguageSwitcher />
-            <CalendarIcon />
+            <ClockDock />
+            <LanguageSwitcherDock />
+            <CalendarDock />
 
             {dropdownItems.length > 0 && (
               <div className="group relative flex items-center justify-center">
@@ -162,12 +166,28 @@ export const Dock = () => {
       {isDropdownOpen && dropdownItems.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute bottom-full right-0 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
+          className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
         >
           {dropdownItems.map((item, index) => {
-            // TODO: load from store
-            const isActive = false;
+            const isActive =
+              (item.id === "timer" && isTimerVisible) ||
+              (item.id === "soundscapes" && isSoundscapesVisible) ||
+              (item.id === "breathing" && isBreathingVisible);
+
             const IconComponent = isActive ? item.activeIcon : item.icon;
+
+            if (item.id === "settings") {
+              return (
+                <SidebarTrigger
+                  key={index}
+                  title="Toggle Sidebar"
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <IconComponent className="size-5" />
+                  <span className="text-xs">{item.name}</span>
+                </SidebarTrigger>
+              );
+            }
 
             return (
               <button
@@ -187,21 +207,12 @@ export const Dock = () => {
 };
 
 const DockButton = ({
-  icon: Icon,
-  activeIcon: ActiveIcon,
-  name,
-  isActive,
-  onClick,
+  item,
   className,
 }: {
-  icon: React.ElementType;
-  activeIcon: React.ElementType;
-  name: string;
-  isActive?: boolean;
-  onClick?: () => void;
+  item: DockItem;
   className?: string;
 }) => {
-  const { t } = useTranslation();
   const { isTimerVisible, isBreathingVisible, isSoundscapesVisible } =
     useDockStore((state) => ({
       isTimerVisible: state.isTimerVisible,
@@ -209,20 +220,20 @@ const DockButton = ({
       isBreathingVisible: state.isBreathingVisible,
     }));
 
-  const IconComponent =
-    (name === t("common.pomodoro") && isTimerVisible) ||
-    (name === t("common.soundscapes") && isSoundscapesVisible) ||
-    (name === t("common.breathing") && isBreathingVisible)
-      ? ActiveIcon
-      : Icon;
+  const isActive =
+    (item.id === "timer" && isTimerVisible) ||
+    (item.id === "soundscapes" && isSoundscapesVisible) ||
+    (item.id === "breathing" && isBreathingVisible);
+
+  const IconComponent = isActive ? item.activeIcon : item.icon;
 
   const handleClick = () => {
-    if (onClick) {
-      onClick();
+    if (item.onClick) {
+      item.onClick();
     }
   };
 
-  if (name === t("common.settings")) {
+  if (item.id === "settings") {
     return (
       <SidebarTrigger
         title="Toggle Sidebar"
@@ -244,7 +255,7 @@ const DockButton = ({
         className
       )}
       onClick={handleClick}
-      title={name}
+      title={item.name}
       role="button"
     >
       <IconComponent className="size-6 text-white" />
@@ -252,39 +263,5 @@ const DockButton = ({
         <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
       )}
     </button>
-  );
-};
-
-const CalendarIcon = () => {
-  const { t } = useTranslation();
-  const [date, setDate] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setDate(new Date()), 1000 * 60);
-    return () => clearInterval(timer);
-  }, []);
-
-  const month = t(
-    `common.calendar.months.short.${date
-      .toLocaleString("default", { month: "short" })
-      .toLowerCase()}`
-  );
-  const day = date.getDate();
-
-  return (
-    <div
-      className={cn(
-        "bg-gradient-to-b from-zinc-800 to-zinc-900",
-        "flex size-12 cursor-pointer flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
-      )}
-      title={`${month} ${day}`}
-    >
-      <div className="bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
-        {month}
-      </div>
-      <div className="flex flex-grow items-center justify-center">
-        <span className="text-2xl font-light text-white">{day}</span>
-      </div>
-    </div>
   );
 };

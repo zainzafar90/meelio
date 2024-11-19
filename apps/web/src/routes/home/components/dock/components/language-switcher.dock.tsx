@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
-export const LanguageSwitcher = () => {
+export const LanguageSwitcherDock = () => {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {

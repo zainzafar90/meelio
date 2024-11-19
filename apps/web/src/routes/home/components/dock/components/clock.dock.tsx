@@ -11,7 +11,7 @@ const getLocalTimezone = () => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-export const Clock = () => {
+export const ClockDock = () => {
   const timezone = useMemo(() => {
     return getLocalTimezone();
   }, []);
