@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 import { BreathingCircle } from "./components/breathing-circle";
-import { BreathingPatternSelector } from "./components/breathing-pattern-selector";
+import { BreatheMethodSelectorDialog } from "./components/breathing-method-selector.dialog";
 import { useBreathingTimer } from "./components/breathing-timer";
 
 export const BreathePod = () => {
@@ -21,7 +21,7 @@ export const BreathePod = () => {
           <BreathingCircle />
         </motion.div>
 
-        <BreathingPatternSelector />
+        <BreatheMethodSelectorDialog />
       </div>
     </div>
   );

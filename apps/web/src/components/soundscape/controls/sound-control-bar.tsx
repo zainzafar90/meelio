@@ -26,7 +26,7 @@ export const SoundControlsBar = () => {
     <div className="relative inset-x-0 bottom-0 rounded-lg">
       <div
         className={cn(
-          "relative flex transform items-center justify-center gap-6 rounded-b-lg bg-zinc-800 p-3",
+          "relative flex transform items-center justify-center gap-6 rounded-b-lg bg-zinc-100/50 p-3 dark:bg-zinc-900/50",
           {
             "translate-y-0": isBarVisible,
           }

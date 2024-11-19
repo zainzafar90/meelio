@@ -9,25 +9,24 @@ import { BreathingRings } from "./breathing-rings";
 import { BreathingText } from "./breathing-text";
 
 export const BreathingCircle: React.FC = () => {
-  const { phase, isActive, selectedPattern, toggleActive } =
-    useBreathingStore();
+  const { phase, isActive, selectedMethod, toggleActive } = useBreathingStore();
 
   const circleVariants = {
     inhale: {
       scale: 1.5,
-      transition: { duration: selectedPattern.inhaleTime },
+      transition: { duration: selectedMethod.inhaleTime },
     },
     hold1: {
       scale: 1.5,
-      transition: { duration: selectedPattern.hold1Time },
+      transition: { duration: selectedMethod.hold1Time },
     },
     exhale: {
       scale: 1,
-      transition: { duration: selectedPattern.exhaleTime },
+      transition: { duration: selectedMethod.exhaleTime },
     },
     hold2: {
       scale: 1,
-      transition: { duration: selectedPattern.hold2Time },
+      transition: { duration: selectedMethod.hold2Time },
     },
   };
 
@@ -83,10 +82,10 @@ export const BreathingCircle: React.FC = () => {
               {
                 "--delay": `${delay}s`,
                 "--waves-duration": `${
-                  selectedPattern.inhaleTime +
-                  selectedPattern.hold1Time +
-                  selectedPattern.exhaleTime +
-                  selectedPattern.hold2Time
+                  selectedMethod.inhaleTime +
+                  selectedMethod.hold1Time +
+                  selectedMethod.exhaleTime +
+                  selectedMethod.hold2Time
                 }s`,
               } as React.CSSProperties
             }

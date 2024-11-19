@@ -49,13 +49,15 @@ export const OscillationButton = () => {
         <button
           type="button"
           className={cn(
-            "bg-muted-background focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-offset-1",
+            "focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-offset-1",
             {
-              "bg-background/10 text-foreground": isOscillating,
+              "bg-background/50 text-foreground": isOscillating,
             }
           )}
           onClick={() => toggleOscillation()}
-          aria-label={isOscillating ? "Shuffle Enabled" : "Shuffle Disabled"}
+          aria-label={
+            isOscillating ? "Oscillation Enabled" : "Oscillation Disabled"
+          }
         >
           <div className="absolute -inset-4 md:hidden" />
           <Icons.oscillation className="size-6" />
