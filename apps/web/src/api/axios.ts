@@ -1,4 +1,3 @@
-import { useNotificationStore } from "@/stores/notification.store";
 import Axios from "axios";
 
 import { env } from "@/utils/common.utils";
@@ -22,20 +21,6 @@ axios.defaults.baseURL = env.VITE_SERVER_URL;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.headers.common["Accept"] = "application/json";
 
-axios.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
-  (error) => {
-    const message = error.response?.data?.message || error.message;
-    useNotificationStore.getState().addNotification({
-      type: "error",
-      title: "Error",
-      message,
-    });
 
-    return Promise.reject(error);
-  }
-);
 
 export { axios };

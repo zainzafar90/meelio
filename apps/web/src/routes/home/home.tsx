@@ -3,6 +3,7 @@ import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
+import { BreathingControl } from "./components/breathing/breathing-control";
 import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock";
 import { Greeting } from "./components/greetings/greetings";
@@ -19,7 +20,7 @@ export const Home = () => {
         <BackgroundOverlay />
         <AppLayout>
           <TopBar />
-          <MainContent />
+          <BreathingControl />
           <BottomBar />
         </AppLayout>
       </SidebarInset>
@@ -39,7 +40,7 @@ const TopBar = () => {
 
   const MenuBar = () => (
     <div className="relative">
-      <div className="flex h-6 w-full justify-center backdrop-blur-md">
+      <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
         <Clock />
       </div>
 
