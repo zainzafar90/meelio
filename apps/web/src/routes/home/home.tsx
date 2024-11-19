@@ -4,11 +4,12 @@ import { useDockStore } from "@/stores/dock.store";
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { BreathePod } from "./components/breathing-pod/breathing-pod";
-import { Clock } from "./components/clock/clock";
+// import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock";
 import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
+import { SoundscapesDialog } from "./components/soundscapes/sounscapes.dialog";
 import { TimerDynamicIsland } from "./components/timer-dynamic-island";
 
 export const Home = () => {
@@ -29,15 +30,18 @@ export const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
-    isBreathingVisible: state.isBreathingVisible,
-    isGreetingsVisible: state.isGreetingsVisible,
-  }));
+  const { isBreathingVisible, isGreetingsVisible, isSoundscapesVisible } =
+    useDockStore((state) => ({
+      isBreathingVisible: state.isBreathingVisible,
+      isGreetingsVisible: state.isGreetingsVisible,
+      isSoundscapesVisible: state.isSoundscapesVisible,
+    }));
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center">
       {isGreetingsVisible && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
+      {isSoundscapesVisible && <SoundscapesDialog />}
     </main>
   );
 };

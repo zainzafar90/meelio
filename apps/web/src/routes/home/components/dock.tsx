@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -9,24 +7,12 @@ import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/routes/home/components/dock/language-switcher";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
-import { CategoryList } from "@/components/soundscape/categories/category-list";
-import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
-import { SoundList } from "@/components/soundscape/sound-list/sound-list";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
 interface DockItem {
   name: string;
-  href: string;
   icon: React.ElementType;
   activeIcon: React.ElementType;
   hidden?: boolean;
@@ -40,18 +26,19 @@ export const Dock = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
-  const { isTimerVisible, toggleTimer } = useDockStore((state) => ({
-    isTimerVisible: state.isTimerVisible,
-    toggleTimer: state.toggleTimer,
-  }));
+  const { isTimerVisible, toggleTimer, toggleSoundscapes, toggleBreathing } =
+    useDockStore((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      toggleTimer: state.toggleTimer,
+      toggleSoundscapes: state.toggleSoundscapes,
+      toggleBreathing: state.toggleBreathing,
+    }));
   const { t, i18n } = useTranslation();
 
   const allItems: DockItem[] = useMemo(
     () => [
       {
         name: t("common.pomodoro"),
-        href: "/pomodoro",
         icon: Icons.worldClock,
         activeIcon: Icons.worldClockActive,
         onClick: () => {
@@ -60,18 +47,24 @@ export const Dock = () => {
       },
       {
         name: t("common.soundscapes"),
-        href: "/soundscapes",
         icon: Icons.soundscapes,
         activeIcon: Icons.soundscapesActive,
+        onClick: () => {
+          toggleSoundscapes();
+        },
       },
       {
         name: t("common.breathing"),
-        href: "/breathing",
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
         onClick: () => {
-          useDockStore.getState().toggleBreathing();
+          toggleBreathing();
         },
+      },
+      {
+        name: t("common.settings"),
+        icon: Icons.settings,
+        activeIcon: Icons.settingsActive,
       },
     ],
     [t, i18n.language]
@@ -168,7 +161,8 @@ export const Dock = () => {
           className="absolute bottom-full right-0 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
         >
           {dropdownItems.map((item, index) => {
-            const isActive = location.pathname === item.href;
+            // TODO: load from store
+            const isActive = false;
             const IconComponent = isActive ? item.activeIcon : item.icon;
 
             return (
@@ -215,50 +209,6 @@ const DockButton = ({
       onClick();
     }
   };
-
-  if (name === t("common.soundscapes")) {
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <div
-            className={cn(
-              "group relative flex cursor-pointer items-center justify-center",
-              className
-            )}
-            title={name}
-          >
-            <div
-              className={cn(
-                "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-                "bg-gradient-to-b from-zinc-800 to-zinc-900"
-              )}
-              title={name}
-            >
-              <IconComponent className="size-6 text-white" />
-            </div>
-          </div>
-        </DialogTrigger>
-
-        <DialogContent className="h-[80vh] max-w-lg p-0">
-          <VisuallyHidden.Root>
-            <DialogHeader>
-              <DialogTitle>{t("soundscapes.dialog.title")}</DialogTitle>
-              <DialogDescription>
-                {t("soundscapes.dialog.description")}
-              </DialogDescription>
-            </DialogHeader>
-          </VisuallyHidden.Root>
-          <div className="flex h-full flex-col overflow-hidden p-6">
-            <CategoryList />
-            <div className="flex-1 overflow-y-auto">
-              <SoundList />
-            </div>
-          </div>
-          <SoundControlsBar />
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <div
