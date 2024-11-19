@@ -11,7 +11,7 @@ export const Background = () => {
       <div
         className="absolute inset-0 bg-transparent bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('./img/bg-07.webp')",
+          backgroundImage: "url('./img/bg-08.webp')",
         }}
       />
     </div>

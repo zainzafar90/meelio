@@ -14,8 +14,6 @@ import { Register } from "./auth/register";
 import { VerifyMagicLink } from "./auth/verify-magic-link";
 import { Home } from "./home";
 
-const Breathing = React.lazy(() => import("@/routes/breathing"));
-
 export const Router = () => {
   return (
     <Routes>
@@ -81,15 +79,6 @@ export const Router = () => {
             errorElement={<ErrorPage />}
           />
         </Route>
-        <Route
-          path="breathing"
-          element={
-            <React.Suspense fallback={<PageSkeleton />}>
-              <Breathing />
-            </React.Suspense>
-          }
-          errorElement={<ErrorPage />}
-        />
       </Route>
 
       <Route path="*" element={<Home />} />

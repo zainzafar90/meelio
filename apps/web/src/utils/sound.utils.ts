@@ -96,7 +96,7 @@ export const playBreathingSound = (mode: string) => {
   if (mode === "inhale" || mode === "exhale") {
     const audio = new Audio("./sounds/breathing/inhale-exhale.mp3");
     audio.play();
-  } else if (mode === "hold") {
+  } else if (mode === "hold1" || mode === "hold2") {
     const audio = new Audio("./sounds/breathing/hold.mp3");
     audio.play();
   }
