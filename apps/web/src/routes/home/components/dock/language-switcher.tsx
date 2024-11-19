@@ -14,8 +14,11 @@ export const LanguageSwitcher = () => {
   return (
     <button
       className={cn(
-        "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 hover:scale-105",
-        "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
+        "cursor-pointer",
+        "size-12 rounded-xl shadow-lg",
+        "hidden items-center justify-center sm:flex",
+        "transition-all duration-200 hover:scale-105",
+        "bg-gradient-to-b from-zinc-800 to-zinc-900"
       )}
       onClick={toggleLanguage}
       title={i18n.language === "en" ? "Switch to German" : "Switch to English"}

@@ -6,8 +6,8 @@ import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
+import { LanguageSwitcher } from "@/routes/home/components/dock/language-switcher";
 import { Icons } from "@/components/icons/icons";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { Logo } from "@/components/logo";
 import { CategoryList } from "@/components/soundscape/categories/category-list";
 import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
@@ -43,8 +43,9 @@ export const Dock = () => {
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const { isTimerVisible } = useDockStore((state) => ({
+  const { isTimerVisible, toggleTimer } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
+    toggleTimer: state.toggleTimer,
   }));
   const { t, i18n } = useTranslation();
 
@@ -55,6 +56,9 @@ export const Dock = () => {
         href: "/pomodoro",
         icon: Icons.worldClock,
         activeIcon: Icons.worldClockActive,
+        onClick: () => {
+          toggleTimer();
+        },
       },
       {
         name: t("common.soundscapes"),
@@ -67,7 +71,10 @@ export const Dock = () => {
         href: "/breathing",
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
-        onClick: () => useBreathingDialogStore.getState().setIsOpen(true),
+        onClick: () => {
+          useBreathingDialogStore.getState().setIsOpen(true);
+          useDockStore.getState().toggleBreathing();
+        },
       },
     ],
     [t, i18n.language]
@@ -200,15 +207,13 @@ const DockButton = ({
   className?: string;
 }) => {
   const { t } = useTranslation();
-  const { toggleTimer } = useDockStore((state) => ({
-    toggleTimer: state.toggleTimer,
-  }));
-  const IconComponent = isActive ? ActiveIcon : Icon;
+  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+  const IconComponent =
+    isActive || (name === t("common.pomodoro") && isTimerVisible)
+      ? ActiveIcon
+      : Icon;
 
   const handleClick = () => {
-    if (name === t("common.pomodoro")) {
-      toggleTimer();
-    }
     if (onClick) {
       onClick();
     }
@@ -261,7 +266,7 @@ const DockButton = ({
   return (
     <div
       className={cn(
-        "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+        "relative flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
         "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
         className
       )}
@@ -270,6 +275,7 @@ const DockButton = ({
       role="button"
     >
       <IconComponent className="size-6 text-white" />
+      <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
     </div>
   );
 };

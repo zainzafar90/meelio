@@ -1,12 +1,49 @@
 import { create } from "zustand";
 
-interface DockStore {
+interface DockState {
   isTimerVisible: boolean;
+  isBreathingVisible: boolean;
+  isGreetingsVisible: boolean;
   toggleTimer: () => void;
+  toggleBreathing: () => void;
+  toggleGreetings: () => void;
+  setTimerVisible: (visible: boolean) => void;
+  setBreathingVisible: (visible: boolean) => void;
+  setGreetingsVisible: (visible: boolean) => void;
 }
 
-export const useDockStore = create<DockStore>((set) => ({
-  isTimerVisible: false,
-  toggleTimer: () =>
-    set((state) => ({ isTimerVisible: !state.isTimerVisible })),
+export const useDockStore = create<DockState>()((set) => ({
+  isTimerVisible: true,
+  isBreathingVisible: false,
+  isGreetingsVisible: true,
+
+  toggleTimer: () => {
+    set((state) => {
+      return { isTimerVisible: !state.isTimerVisible };
+    });
+  },
+
+  toggleBreathing: () => {
+    set((state) => ({
+      isBreathingVisible: !state.isBreathingVisible,
+      isTimerVisible: false,
+      isGreetingsVisible: state.isBreathingVisible ? true : false,
+    }));
+  },
+
+  toggleGreetings: () => {
+    set((state) => ({ isGreetingsVisible: !state.isGreetingsVisible }));
+  },
+
+  setTimerVisible: (visible: boolean) => {
+    set({ isTimerVisible: visible });
+  },
+
+  setBreathingVisible: (visible: boolean) => {
+    set({ isBreathingVisible: visible });
+  },
+
+  setGreetingsVisible: (visible: boolean) => {
+    set({ isGreetingsVisible: visible });
+  },
 }));

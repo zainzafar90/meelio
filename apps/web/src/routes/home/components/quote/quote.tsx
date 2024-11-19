@@ -25,7 +25,7 @@ export const Quote = () => {
 
   return (
     <AnimatePresence mode="wait">
-      <div className="relative mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 px-2 py-3 backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg">
+      <div className="relative mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 p-3 text-center backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg">
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

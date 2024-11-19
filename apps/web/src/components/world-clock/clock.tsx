@@ -44,7 +44,8 @@ export const Clock = () => {
   return (
     <div
       className={cn(
-        "flex size-12 items-center justify-center rounded-xl shadow-lg",
+        "size-12 rounded-xl shadow-lg",
+        "hidden items-center justify-center sm:flex",
         "bg-gradient-to-b from-zinc-800 to-zinc-900"
       )}
     >

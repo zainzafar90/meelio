@@ -4,9 +4,9 @@ import { useDockStore } from "@/stores/dock.store";
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { BreathingControl } from "./components/breathing/components/breathing-control";
-// import { Clock } from "./components/clock/clock";
+import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock";
-import { Greeting } from "./components/greetings/greetings";
+import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
 import { TimerDynamicIsland } from "./components/timer-dynamic-island";
@@ -20,7 +20,7 @@ export const Home = () => {
         <BackgroundOverlay />
         <AppLayout>
           <TopBar />
-          <BreathingControl />
+          <Content />
           <BottomBar />
         </AppLayout>
       </SidebarInset>
@@ -28,17 +28,39 @@ export const Home = () => {
   );
 };
 
-const MainContent = () => (
-  <div className="flex flex-col items-center justify-center text-center text-white transition-all hover:text-white">
-    <Greeting />
-    <Quote />
-  </div>
-);
+const Content = () => {
+  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+    isBreathingVisible: state.isBreathingVisible,
+    isGreetingsVisible: state.isGreetingsVisible,
+  }));
+
+  return (
+    <main className="flex flex-1 flex-col items-center justify-center">
+      {isGreetingsVisible && <GreetingsContent />}
+      {isBreathingVisible && <BreathingContent />}
+    </main>
+  );
+};
+
+const GreetingsContent = () => {
+  return (
+    <div className="flex flex-col items-center justify-center gap-8">
+      <Greeting />
+      <Quote />
+    </div>
+  );
+};
+
+const BreathingContent = () => {
+  return <BreathingControl />;
+};
 
 const TopBar = () => {
-  const { isTimerVisible } = useDockStore();
+  const isTimerVisible = useDockStore((state) => {
+    return state.isTimerVisible;
+  });
 
-  const MenuBar = () => (
+  return (
     <div className="relative">
       {/* <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
         <Clock />
@@ -47,14 +69,10 @@ const TopBar = () => {
       {isTimerVisible && <TimerDynamicIsland />}
     </div>
   );
-
-  return <MenuBar />;
 };
 
 const BottomBar = () => (
-  <div className="relative flex items-center justify-between">
-    <div className="flex items-center justify-start" />
+  <footer className="flex items-center justify-center pb-6">
     <Dock />
-    <div className="flex items-center justify-end" />
-  </div>
+  </footer>
 );
