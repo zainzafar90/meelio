@@ -172,7 +172,7 @@ export const Dock = () => {
             const isActive =
               (item.id === "timer" && isTimerVisible) ||
               (item.id === "soundscapes" && isSoundscapesVisible) ||
-              (item.id === "breathing" && isBreathingVisible);
+              (item.id === "breathepod" && isBreathingVisible);
 
             const IconComponent = isActive ? item.activeIcon : item.icon;
 
@@ -223,7 +223,7 @@ const DockButton = ({
   const isActive =
     (item.id === "timer" && isTimerVisible) ||
     (item.id === "soundscapes" && isSoundscapesVisible) ||
-    (item.id === "breathing" && isBreathingVisible);
+    (item.id === "breathepod" && isBreathingVisible);
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 
