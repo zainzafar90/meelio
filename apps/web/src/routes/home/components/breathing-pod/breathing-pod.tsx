@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 
-import { BreathingCircle } from "../components/breathing-circle";
-import { useBreathingTimer } from "../components/breathing-timer";
-import { BreathingPatternSelector } from "./breathing-pattern-selector";
+import { BreathingCircle } from "./components/breathing-circle";
+import { BreathingPatternSelector } from "./components/breathing-pattern-selector";
+import { useBreathingTimer } from "./components/breathing-timer";
 
-export const BreathingControl = () => {
+export const BreathePod = () => {
   useBreathingTimer();
 
   return (

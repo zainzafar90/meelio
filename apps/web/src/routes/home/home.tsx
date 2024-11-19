@@ -3,7 +3,7 @@ import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
-import { BreathingControl } from "./components/breathing/components/breathing-control";
+import { BreathePod } from "./components/breathing-pod/breathing-pod";
 import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock";
 import { Greeting } from "./components/greetings/greetings-mantras";
@@ -52,7 +52,7 @@ const GreetingsContent = () => {
 };
 
 const BreathingContent = () => {
-  return <BreathingControl />;
+  return <BreathePod />;
 };
 
 const TopBar = () => {

@@ -24,7 +24,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
-import { useBreathingDialogStore } from "./breathing/store/breathing-dialog.store";
+import { useBreathingDialogStore } from "./breathing-pod/store/breathing-dialog.store";
 
 interface DockItem {
   name: string;
