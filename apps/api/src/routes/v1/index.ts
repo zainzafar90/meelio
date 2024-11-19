@@ -4,6 +4,7 @@ import userRoute from './user.route';
 import accountRoute from './account.route';
 import billingRoute from './billing.route';
 import subscriptionRoute from './subscription.route';
+import weatherRoute from './weather.route';
 import config from '../../config/config';
 
 const router = express.Router();
@@ -29,6 +30,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: '/subscriptions',
     route: subscriptionRoute,
+  },
+  {
+    path: '/weather',
+    route: weatherRoute,
   },
 ];
 

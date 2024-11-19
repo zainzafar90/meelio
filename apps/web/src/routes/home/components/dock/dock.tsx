@@ -142,8 +142,8 @@ export const Dock = () => {
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
             <ClockDock />
-            <LanguageSwitcherDock />
             <CalendarDock />
+            <LanguageSwitcherDock />
 
             {dropdownItems.length > 0 && (
               <div className="group relative flex items-center justify-center">
