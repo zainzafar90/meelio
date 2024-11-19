@@ -24,8 +24,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
-import { useBreathingDialogStore } from "./breathing-pod/store/breathing-dialog.store";
-
 interface DockItem {
   name: string;
   href: string;
@@ -72,7 +70,6 @@ export const Dock = () => {
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
         onClick: () => {
-          useBreathingDialogStore.getState().setIsOpen(true);
           useDockStore.getState().toggleBreathing();
         },
       },
