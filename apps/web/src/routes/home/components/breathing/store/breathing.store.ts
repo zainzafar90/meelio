@@ -12,6 +12,7 @@ export type BreathingPattern = {
   hold1Time: number;
   exhaleTime: number;
   hold2Time: number;
+  className?: string;
 };
 
 export const BREATHING_PATTERNS: BreathingPattern[] = [
@@ -23,6 +24,7 @@ export const BREATHING_PATTERNS: BreathingPattern[] = [
     hold1Time: 0,
     exhaleTime: 6,
     hold2Time: 0,
+    className:"text-amber-400 bg-amber-900/10",
   },
   {
     name: "Clear the Mind",
@@ -32,6 +34,7 @@ export const BREATHING_PATTERNS: BreathingPattern[] = [
     hold1Time: 0,
     exhaleTime: 4,
     hold2Time: 0,
+    className:"text-green-400 bg-green-900/10",
   },
   {
     name: "Relax Deeply",
@@ -41,6 +44,7 @@ export const BREATHING_PATTERNS: BreathingPattern[] = [
     hold1Time: 7,
     exhaleTime: 8,
     hold2Time: 0,
+    className:"text-blue-400 bg-blue-900/10",
   },
   {
     name: "Relieve Stress",
@@ -51,6 +55,7 @@ export const BREATHING_PATTERNS: BreathingPattern[] = [
     hold1Time: 4,
     exhaleTime: 4,
     hold2Time: 4,
+    className:"text-purple-400 bg-indigo-900/10",
   },
 ];
 

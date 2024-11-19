@@ -24,6 +24,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from "@/components/world-clock/clock";
 import { useDockStore } from "@/stores/dock.store";
 
+import { useBreathingDialogStore } from "./breathing/store/breathing-dialog.store";
+
 interface DockItem {
   name: string;
   href: string;
@@ -31,6 +33,7 @@ interface DockItem {
   activeIcon: React.ElementType;
   hidden?: boolean;
   isActive?: boolean;
+  onClick?: () => void;
 }
 
 export const Dock = () => {
@@ -64,6 +67,7 @@ export const Dock = () => {
         href: "/breathing",
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
+        onClick: () => useBreathingDialogStore.getState().setIsOpen(true),
       },
     ],
     [t, i18n.language]
@@ -88,7 +92,7 @@ export const Dock = () => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [allItems]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -126,6 +130,7 @@ export const Dock = () => {
                 activeIcon={item.activeIcon}
                 name={item.name}
                 isActive={isTimerVisible && item.name === "Pomodoro"}
+                onClick={item.onClick}
               />
             ))}
           </div>
@@ -166,6 +171,7 @@ export const Dock = () => {
               <button
                 key={index}
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                onClick={item.onClick}
               >
                 <IconComponent className="size-5" />
                 <span className="text-xs">{item.name}</span>
@@ -183,12 +189,14 @@ const DockButton = ({
   activeIcon: ActiveIcon,
   name,
   isActive,
+  onClick,
   className,
 }: {
   icon: React.ElementType;
   activeIcon: React.ElementType;
   name: string;
   isActive?: boolean;
+  onClick?: () => void;
   className?: string;
 }) => {
   const { t } = useTranslation();
@@ -198,12 +206,15 @@ const DockButton = ({
   const IconComponent = isActive ? ActiveIcon : Icon;
 
   const handleClick = () => {
-    if (name === "Pomodoro") {
+    if (name === t("common.pomodoro")) {
       toggleTimer();
+    }
+    if (onClick) {
+      onClick();
     }
   };
 
-  if (name === "Soundscapes") {
+  if (name === t("common.soundscapes")) {
     return (
       <Dialog>
         <DialogTrigger asChild>
@@ -273,7 +284,9 @@ const CalendarIcon = () => {
   }, []);
 
   const month = t(
-    `common.calendar.months.short.${date.toLocaleString("default", { month: "short" }).toLowerCase()}`
+    `common.calendar.months.short.${date
+      .toLocaleString("default", { month: "short" })
+      .toLowerCase()}`
   );
   const day = date.getDate();
 

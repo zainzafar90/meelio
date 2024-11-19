@@ -1,7 +1,18 @@
 import React from "react";
 
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { useBreathingDialogStore } from "../store/breathing-dialog.store";
 import {
   BREATHING_PATTERNS,
   useBreathingStore,
@@ -9,26 +20,56 @@ import {
 
 export const BreathingPatternSelector: React.FC = () => {
   const { selectedPattern, setSelectedPattern } = useBreathingStore();
+  const { isOpen, setIsOpen } = useBreathingDialogStore();
+
+  if (!selectedPattern) return null;
 
   return (
-    <div className="fixed bottom-32 left-0 right-0 flex items-center justify-center gap-4">
-      {BREATHING_PATTERNS.map((pattern) => (
-        <button
-          key={pattern.name}
-          onClick={() => setSelectedPattern(pattern)}
-          className={cn(
-            "rounded-lg px-6 py-3 transition-colors",
-            selectedPattern.name === pattern.name
-              ? "bg-white/20 text-white"
-              : "bg-white/10 text-white/60 hover:bg-white/15"
-          )}
-        >
-          <div className="text-left">
-            <div className="font-semibold">{pattern.name}</div>
-            <div className="text-sm opacity-80">{pattern.description}</div>
-          </div>
-        </button>
-      ))}
-    </div>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="bg-gray-900 p-0">
+        <DialogHeader className="p-6 pb-0">
+          <DialogTitle className="text-2xl">Breathing Pattern</DialogTitle>
+          <DialogDescription>
+            Select a breathing pattern to help you relax and focus
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 p-6 sm:grid-cols-2">
+          {BREATHING_PATTERNS.map((pattern) => {
+            return (
+              <motion.button
+                key={pattern.name}
+                onClick={() => {
+                  setSelectedPattern(pattern);
+                  setIsOpen(false);
+                }}
+                className={cn(
+                  "relative flex flex-col justify-start gap-1 rounded-xl p-6 text-left transition-all hover:bg-opacity-20",
+                  pattern.className,
+                  selectedPattern.name === pattern.name &&
+                    "ring-2 ring-white/20"
+                )}
+                whileTap={{ scale: 0.95 }}
+              >
+                <h2 className={cn("mb-2 text-xl font-semibold")}>
+                  {pattern.name}
+                </h2>
+                <p className="text-md mb-1 text-white/80">
+                  {pattern.description}
+                </p>
+                <p className="hidden text-sm text-white/60 sm:block">
+                  {pattern.details}
+                </p>
+                {selectedPattern.name === pattern.name && (
+                  <div className="absolute right-4 top-4">
+                    <Icons.checkFilled className={cn("h-5 w-5")} />
+                  </div>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

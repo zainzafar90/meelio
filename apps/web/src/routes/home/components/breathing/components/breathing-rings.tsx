@@ -7,7 +7,7 @@ const transition = {
   repeatDelay: 1.25,
 };
 
-export const Rings = () => {
+export const BreathingRings = () => {
   return (
     <svg
       fill="none"

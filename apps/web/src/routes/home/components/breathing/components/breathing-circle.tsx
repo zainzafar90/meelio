@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 import { useBreathingStore } from "../store/breathing.store";
+import { BreathingRings } from "./breathing-rings";
 import { BreathingText } from "./breathing-text";
-import { Rings } from "./rings";
 
 export const BreathingCircle: React.FC = () => {
   const { phase, isActive, selectedPattern, toggleActive } =
@@ -56,7 +56,7 @@ export const BreathingCircle: React.FC = () => {
           variants={{ idle: {}, active: {} }}
           className="size-full"
         >
-          <Rings />
+          <BreathingRings />
         </motion.div>
       </motion.div>
 
