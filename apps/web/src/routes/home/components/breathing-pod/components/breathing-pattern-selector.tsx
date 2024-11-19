@@ -32,7 +32,7 @@ export const BreathingPatternSelector: React.FC = () => {
           <small> {selectedPattern.description}</small>
         </p>
         <Button variant="glass" onClick={() => open()}>
-          Change Breathe Pattern
+          Change Breathe Method
         </Button>
       </div>
 
