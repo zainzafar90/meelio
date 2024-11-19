@@ -5,7 +5,7 @@ import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { BreathePod } from "./components/breathing-pod/breathing-pod";
 // import { Clock } from "./components/clock/clock";
-import { Dock } from "./components/dock";
+import { Dock } from "./components/dock/dock";
 import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";

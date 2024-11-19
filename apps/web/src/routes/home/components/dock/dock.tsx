@@ -26,17 +26,31 @@ export const Dock = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { isTimerVisible, toggleTimer, toggleSoundscapes, toggleBreathing } =
-    useDockStore((state) => ({
-      isTimerVisible: state.isTimerVisible,
-      toggleTimer: state.toggleTimer,
-      toggleSoundscapes: state.toggleSoundscapes,
-      toggleBreathing: state.toggleBreathing,
-    }));
+  const {
+    isTimerVisible,
+    toggleTimer,
+    toggleSoundscapes,
+    toggleBreathing,
+    resetDock,
+  } = useDockStore((state) => ({
+    isTimerVisible: state.isTimerVisible,
+    resetDock: state.reset,
+    toggleTimer: state.toggleTimer,
+    toggleSoundscapes: state.toggleSoundscapes,
+    toggleBreathing: state.toggleBreathing,
+  }));
   const { t, i18n } = useTranslation();
 
   const allItems: DockItem[] = useMemo(
     () => [
+      {
+        name: t("common.home"),
+        icon: Logo,
+        activeIcon: Logo,
+        onClick: () => {
+          resetDock();
+        },
+      },
       {
         name: t("common.pomodoro"),
         icon: Icons.worldClock,
@@ -110,16 +124,6 @@ export const Dock = () => {
       <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pr-1">
-            <SidebarTrigger
-              title="Toggle Sidebar"
-              className={cn(
-                "flex size-12 items-center justify-center rounded-xl shadow-lg",
-                "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
-              )}
-            >
-              <Logo className="size-6 text-white" />
-            </SidebarTrigger>
-
             {visibleItems.map((item, index) => (
               <DockButton
                 key={index}
@@ -198,9 +202,17 @@ const DockButton = ({
   className?: string;
 }) => {
   const { t } = useTranslation();
-  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+  const { isTimerVisible, isBreathingVisible, isSoundscapesVisible } =
+    useDockStore((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      isSoundscapesVisible: state.isSoundscapesVisible,
+      isBreathingVisible: state.isBreathingVisible,
+    }));
+
   const IconComponent =
-    isActive || (name === t("common.pomodoro") && isTimerVisible)
+    (name === t("common.pomodoro") && isTimerVisible) ||
+    (name === t("common.soundscapes") && isSoundscapesVisible) ||
+    (name === t("common.breathing") && isBreathingVisible)
       ? ActiveIcon
       : Icon;
 
@@ -210,8 +222,22 @@ const DockButton = ({
     }
   };
 
+  if (name === t("common.settings")) {
+    return (
+      <SidebarTrigger
+        title="Toggle Sidebar"
+        className={cn(
+          "flex size-12 items-center justify-center rounded-xl shadow-lg",
+          "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
+        )}
+      >
+        <IconComponent className="size-6 text-white" />
+      </SidebarTrigger>
+    );
+  }
+
   return (
-    <div
+    <button
       className={cn(
         "relative flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
         "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
@@ -222,8 +248,10 @@ const DockButton = ({
       role="button"
     >
       <IconComponent className="size-6 text-white" />
-      <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
-    </div>
+      {isActive && (
+        <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
+      )}
+    </button>
   );
 };
 

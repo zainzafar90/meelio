@@ -13,6 +13,7 @@ interface DockState {
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
   setSoundscapesVisible: (visible: boolean) => void;
+  reset: () => void;
 }
 
 export const useDockStore = create<DockState>()((set) => ({
@@ -57,5 +58,14 @@ export const useDockStore = create<DockState>()((set) => ({
 
   setSoundscapesVisible: (visible: boolean) => {
     set({ isSoundscapesVisible: visible });
+  },
+
+  reset: () => {
+    set({
+      isTimerVisible: false,
+      isBreathingVisible: false,
+      isGreetingsVisible: true,
+      isSoundscapesVisible: false,
+    });
   },
 }));
