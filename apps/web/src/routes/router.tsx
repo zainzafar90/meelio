@@ -1,18 +1,17 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 
-import { Settings } from "lucide-react";
-
 import { ErrorPage } from "@/routes/errors/error";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
-import { ProtectedLayout } from "@/layouts/protected-layout";
 import { PublicLayout } from "@/layouts/public-layout";
+import { ProtectedLayout } from "@/layouts/protected-layout";
 
 import { Billing } from "./account/billing";
 import { Login } from "./auth/login";
 import { Register } from "./auth/register";
 import { VerifyMagicLink } from "./auth/verify-magic-link";
 import { Home } from "./home";
+import { Settings } from "./account/settings";
 
 export const Router = () => {
   return (
@@ -48,17 +47,19 @@ export const Router = () => {
         />
       </Route>
 
-      <Route element={<ProtectedLayout />}>
-        <Route
-          path="/"
-          element={
-            <React.Suspense fallback={<PageSkeleton />}>
-              <Home />
-            </React.Suspense>
-          }
-          errorElement={<ErrorPage />}
-        />
+      {/* Make home route public */}
+      <Route
+        path="/"
+        element={
+          <React.Suspense fallback={<PageSkeleton />}>
+            <Home />
+          </React.Suspense>
+        }
+        errorElement={<ErrorPage />}
+      />
 
+      {/* Keep account routes protected */}
+      <Route element={<ProtectedLayout />}>
         <Route path="account">
           <Route
             path="billing"
