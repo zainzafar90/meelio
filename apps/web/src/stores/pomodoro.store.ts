@@ -51,15 +51,37 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     todaysFocusTime: 0,
   },
   startTimer: () =>
-    set((state) => ({ timer: { ...state.timer, running: true } })),
+    set((state) => {
+      const channel = new BroadcastChannel("pomodoro-sync");
+      channel.postMessage({
+        type: "TIMER_STATE",
+        payload: { running: true, remaining: state.timer.remaining },
+      });
+      channel.close();
+      return { timer: { ...state.timer, running: true } };
+    }),
 
   pauseTimer: () =>
-    set((state) => ({
-      timer: { ...state.timer, running: false },
-    })),
+    set((state) => {
+      const channel = new BroadcastChannel("pomodoro-sync");
+      channel.postMessage({
+        type: "TIMER_STATE",
+        payload: { running: false, remaining: state.timer.remaining },
+      });
+      channel.close();
+      return { timer: { ...state.timer, running: false } };
+    }),
 
   resumeTimer: () =>
-    set((state) => ({ timer: { ...state.timer, running: true } })),
+    set((state) => {
+      const channel = new BroadcastChannel("pomodoro-sync");
+      channel.postMessage({
+        type: "TIMER_STATE",
+        payload: { running: true, remaining: state.timer.remaining },
+      });
+      channel.close();
+      return { timer: { ...state.timer, running: true } };
+    }),
 
   resetTimer: () =>
     set((state) => ({
@@ -73,9 +95,18 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     })),
 
   updateTimer: (remaining: number) =>
-    set((state) => ({
-      timer: { ...state.timer, remaining },
-    })),
+    set((state) => {
+      // Only broadcast if timer is running
+      if (state.timer.running) {
+        const channel = new BroadcastChannel("pomodoro-sync");
+        channel.postMessage({
+          type: "TIMER_UPDATE",
+          payload: { remaining, running: state.timer.running },
+        });
+        channel.close();
+      }
+      return { timer: { ...state.timer, remaining } };
+    }),
 
   advanceTimer: () =>
     set((state) => {
@@ -98,6 +129,14 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       } else {
         nextStage = PomodoroStage.WorkTime;
       }
+
+      // Get the broadcast function from the sync hook
+      const channel = new BroadcastChannel("pomodoro-sync");
+      channel.postMessage({
+        type: "STAGE_CHANGE",
+        payload: { stage: nextStage },
+      });
+      channel.close();
 
       return {
         timer: {

@@ -1,4 +1,3 @@
-import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,6 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { usePomodoroSync } from "@/hooks/use-pomodoro-sync";
+import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
 
 import { Button } from "../ui/button";
@@ -43,6 +44,7 @@ export const PomodoroSettingsDialog = ({
     toggleTimerSound,
     changeTimerSettings,
   } = usePomodoroStore();
+  const { broadcastDurationChange } = usePomodoroSync();
 
   const { stageSeconds } = timer;
 
@@ -59,6 +61,12 @@ export const PomodoroSettingsDialog = ({
     changeTimerSettings(PomodoroStage.WorkTime, data.workTime);
     changeTimerSettings(PomodoroStage.ShortBreak, data.shortBreak);
     changeTimerSettings(PomodoroStage.LongBreak, data.longBreak);
+
+    // Broadcast duration changes to other tabs
+    broadcastDurationChange(data.workTime * MINUTE_IN_SECONDS);
+    broadcastDurationChange(data.shortBreak * MINUTE_IN_SECONDS);
+    broadcastDurationChange(data.longBreak * MINUTE_IN_SECONDS);
+
     toast.success("Settings saved", {
       description: "Your settings have been saved.",
     });
@@ -183,7 +191,7 @@ export const PomodoroSettingsDialog = ({
           <div className="flex items-center justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
               <span className="text-md">Auto Start Breaks</span>
-              <span className="font-normal text-sm leading-snug text-foreground/70">
+              <span className="text-sm font-normal leading-snug text-foreground/70">
                 Start breaks after work sessions, i.e. after 25 minutes of work
                 time automatically start a 5 minute break.
               </span>
@@ -198,7 +206,7 @@ export const PomodoroSettingsDialog = ({
           <div className="flex items-center justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
               <span className="text-md">Enable Sounds</span>
-              <span className="font-normal text-sm leading-snug text-foreground/70">
+              <span className="text-sm font-normal leading-snug text-foreground/70">
                 Play sounds when the timer ends, and when breaks start.
               </span>
             </Label>
@@ -212,14 +220,14 @@ export const PomodoroSettingsDialog = ({
           <div className="flex items-start justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
               <span className="text-md"> Reset Pomodoro Timer</span>
-              <span className="font-normal text-sm leading-snug text-foreground/70">
+              <span className="text-sm font-normal leading-snug text-foreground/70">
                 Are you sure you want to reset the timer? This will reset the
                 timer to the default settings.
               </span>
             </Label>
             <ResetTimerDialog onReset={resetTimer} />
           </div>
-          <DialogFooter className="flex gap-2 sm:gap-1 mt-4 border-t border-t-zinc-100 dark:border-t-zinc-900 pt-4">
+          <DialogFooter className="mt-4 flex gap-2 border-t border-t-zinc-100 pt-4 dark:border-t-zinc-900 sm:gap-1">
             <Button type="button" variant="secondary" onClick={() => onClose()}>
               Close
             </Button>

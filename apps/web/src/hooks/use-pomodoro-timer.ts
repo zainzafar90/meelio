@@ -8,6 +8,8 @@ import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { changeFavicon } from "@/utils/favicon.utils";
 import { playPomodoroSound } from "@/utils/sound.utils";
 
+import { usePomodoroSync } from "./use-pomodoro-sync";
+
 const worker = new Worker();
 
 export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
@@ -16,6 +18,8 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
     updateTimer: state.updateTimer,
     advanceTimer: state.advanceTimer,
   }));
+
+  const { broadcastTimerUpdate } = usePomodoroSync();
 
   const resetAppTitle = () => {
     document.title = "Meelio - focus, calm, & productivity";
@@ -27,6 +31,7 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
     const handleMessage = (e: MessageEvent) => {
       if (e.data.type === "tick") {
         updateTimer(e.data.remaining);
+        broadcastTimerUpdate(e.data.remaining);
       } else if (e.data.type === "complete") {
         if (timer.enableSound) playPomodoroSound("timeout");
         advanceTimer();
@@ -35,7 +40,7 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
 
     worker.addEventListener("message", handleMessage);
     return () => worker.removeEventListener("message", handleMessage);
-  }, [timer.enableSound, updateTimer, advanceTimer]);
+  }, [timer.enableSound, updateTimer, advanceTimer, broadcastTimerUpdate]);
 
   useEffect(() => {
     if (!worker) return;
@@ -65,7 +70,7 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
     const isFocus = timer.activeStage === PomodoroStage.WorkTime;
 
     document.title = `${formatTime(timer.remaining)} ${isFocus ? "\u00A0💡\u00B7\u00A0Focus" : "\u00A0✨\u00B7\u00A0Break"}`;
-  }, [timer.remaining]);
+  }, [timer.remaining, timer.activeStage]);
 
   useEffect(() => {
     if (!timer.running) {
