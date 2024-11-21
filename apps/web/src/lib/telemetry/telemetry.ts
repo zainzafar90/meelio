@@ -1,4 +1,4 @@
-import mixpanel from "mixpanel-browser";
+import posthog from "posthog-js";
 
 import { Sound } from "@/types/sound";
 import { env } from "@/utils/common.utils";
@@ -29,19 +29,25 @@ export class Telemetry {
       );
     }
 
-    mixpanel.init(env.VITE_MIXPANEL_TOKEN as string, {
+    posthog.init(env.VITE_APP_PUBLIC_POSTHOG_KEY as string, {
+      api_host: env.VITE_APP_PUBLIC_POSTHOG_HOST as string,
       persistence: "localStorage",
-      track_pageview: true,
+      autocapture: true,
       debug: env.DEV,
+      loaded: (posthog) => {
+        if (env.DEV) {
+          posthog.debug();
+        }
+      },
     });
   }
 
   public track(event: string, properties?: Record<string, unknown>): void {
-    mixpanel.track(event, properties);
+    posthog.capture(event, properties);
   }
 
   public identify(id: string): void {
-    mixpanel.identify(id);
+    posthog.identify(id);
   }
 
   public pageView(): void {
