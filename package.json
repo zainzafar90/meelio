@@ -22,7 +22,7 @@
   "dependencies": {},
   "devDependencies": {
     "prettier": "^3.2.5",
-    "turbo": "^2.2.3"
+    "turbo": "^2.3.0"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.24.0"
