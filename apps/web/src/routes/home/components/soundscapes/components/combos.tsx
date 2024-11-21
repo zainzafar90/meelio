@@ -1,7 +1,6 @@
 import { SoundState } from "@/types/sound";
+import { Button } from "@/components/ui/button";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
-
-import { Button } from "../ui/button";
 
 export const Combos: React.FC = () => {
   const addCombo = useSoundscapesStore((state) => state.addCombo);

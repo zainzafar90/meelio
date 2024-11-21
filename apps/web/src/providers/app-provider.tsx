@@ -4,8 +4,8 @@ import i18n from "@/i18n/i18n";
 import { I18nextProvider } from "react-i18next";
 import { Toaster } from "sonner";
 
+import { SoundPlayer } from "@/routes/home/components/soundscapes/components/sound-player/sound-player";
 import { ConnectionWarning } from "@/components/connection-warning";
-import { SoundPlayer } from "@/components/soundscape/sound-player/sound-player";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 

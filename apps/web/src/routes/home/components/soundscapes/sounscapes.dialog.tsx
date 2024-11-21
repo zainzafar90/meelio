@@ -3,9 +3,9 @@ import React from "react";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { useTranslation } from "react-i18next";
 
-import { CategoryList } from "@/components/soundscape/categories/category-list";
-import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
-import { SoundList } from "@/components/soundscape/sound-list/sound-list";
+import { CategoryList } from "@/routes/home/components/soundscapes/components/categories/category-list";
+import { SoundList } from "@/routes/home/components/soundscapes/components/sound-list/sound-list";
+import { SoundControlsBar } from "@/routes/home/components/soundscapes/components/sound-player/controls/sound-control-bar";
 import {
   Dialog,
   DialogContent,

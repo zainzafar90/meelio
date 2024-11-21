@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import { Dialog, Transition } from "@headlessui/react";
 import { MenuIcon, X } from "lucide-react";
 
+import { SoundControlsBar } from "@/routes/home/components/soundscapes/components/sound-player/controls/sound-control-bar";
 import { Logomark } from "@/components/logo";
 import { SidebarOld } from "@/components/sidebar";
-import { SoundControlsBar } from "@/components/soundscape/controls/sound-control-bar";
 import { UserProfileDropdown } from "@/components/user-profile-dropdown";
 
 interface AuthLayoutProps {
