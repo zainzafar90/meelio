@@ -6,18 +6,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Category } from "@/types/category";
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons/icons";
-import { PomodoroSettingsDialog } from "@/components/pomodoro/pomodoro-settings.dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { getTime } from "@/utils/timer.utils";
 
 import { TimerControls } from "./components/timer-controls";
+import { TimerSettingsDialog } from "./dialog/timer-settings.dialog";
 import { TimerStatsDialog } from "./dialog/timer-stats.dialog";
 
 export const Timer = () => {
@@ -226,7 +220,7 @@ export const Timer = () => {
         onSettingsClick={() => setShowSettingsDialog(true)}
       />
 
-      <PomodoroSettingsDialog
+      <TimerSettingsDialog
         isOpen={showSettingsDialog}
         onClose={() => setShowSettingsDialog(false)}
       />

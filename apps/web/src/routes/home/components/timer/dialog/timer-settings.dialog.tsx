@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { PomodoroStage } from "@/types/pomodoro";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,25 +13,24 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { usePomodoroSync } from "@/hooks/use-pomodoro-sync";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
 
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
 import { ResetTimerDialog } from "./reset-timer.dialog";
 
-const pomodoroSettingsSchema = z.object({
+const timerSettingsSchema = z.object({
   workTime: z.number().min(0).max(POMODORO_MAX_MINUTES),
   shortBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
   longBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
 });
 
-type PomodoroSettingsValues = z.infer<typeof pomodoroSettingsSchema>;
+type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
 
-export const PomodoroSettingsDialog = ({
+export const TimerSettingsDialog = ({
   isOpen,
   onClose,
 }: {
@@ -48,8 +48,8 @@ export const PomodoroSettingsDialog = ({
 
   const { stageSeconds } = timer;
 
-  const form = useForm<PomodoroSettingsValues>({
-    resolver: zodResolver(pomodoroSettingsSchema),
+  const form = useForm<TimerSettingsValues>({
+    resolver: zodResolver(timerSettingsSchema),
     defaultValues: {
       workTime: stageSeconds[PomodoroStage.WorkTime] / MINUTE_IN_SECONDS,
       shortBreak: stageSeconds[PomodoroStage.ShortBreak] / MINUTE_IN_SECONDS,
@@ -57,7 +57,7 @@ export const PomodoroSettingsDialog = ({
     },
   });
 
-  const handleSave = (data: PomodoroSettingsValues) => {
+  const handleSave = (data: TimerSettingsValues) => {
     changeTimerSettings(PomodoroStage.WorkTime, data.workTime);
     changeTimerSettings(PomodoroStage.ShortBreak, data.shortBreak);
     changeTimerSettings(PomodoroStage.LongBreak, data.longBreak);
