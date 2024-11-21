@@ -10,7 +10,7 @@ import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
 import { SoundscapesDialog } from "./components/soundscapes/sounscapes.dialog";
-import { TimerDynamicIsland } from "./components/timer-dynamic-island";
+import { Timer } from "./components/timer/timer";
 
 export const Home = () => {
   return (
@@ -70,7 +70,7 @@ const TopBar = () => {
         <Clock />
       </div> */}
 
-      {isTimerVisible && <TimerDynamicIsland />}
+      {isTimerVisible && <Timer />}
     </div>
   );
 };
