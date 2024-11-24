@@ -54,12 +54,6 @@ export const TodoListSheet = () => {
         <SheetHeader className="px-6 pt-6">
           <div className="flex items-center justify-between">
             <SheetTitle>Tasks</SheetTitle>
-            <CreateList>
-              <Button variant="outline" size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                New List
-              </Button>
-            </CreateList>
           </div>
           <SheetDescription>
             <span className="mb-2 block">
@@ -70,32 +64,41 @@ export const TodoListSheet = () => {
         </SheetHeader>
 
         <main className="flex-1 overflow-auto p-4">
-          <Select
-            value={activeListId}
-            onValueChange={(value) => setActiveList(value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue>
-                <span className="flex items-center gap-2">
-                  <span>{activeList?.emoji}</span>
-                  <span>{activeList?.name}</span>
-                </span>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {lists.map((list) => (
-                <SelectItem key={list.id} value={list.id}>
+          <div className="flex items-center gap-2">
+            <Select
+              value={activeListId}
+              onValueChange={(value) => setActiveList(value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue>
                   <span className="flex items-center gap-2">
-                    <span>{list.emoji}</span>
-                    <span>{list.name}</span>
+                    <span>{activeList?.emoji}</span>
+                    <span>{activeList?.name}</span>
                   </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {lists.map((list) => (
+                  <SelectItem key={list.id} value={list.id}>
+                    <span className="flex items-center gap-2">
+                      <span>{list.emoji}</span>
+                      <span>{list.name}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <CreateList>
+              <Button variant="outline">
+                <Plus className="mr-2 h-4 w-4" />
+                New List
+              </Button>
+            </CreateList>
+          </div>
 
           <div className="space-y-8">
             <TaskList
+              activeListId={activeListId}
               title={activeList?.name || ""}
               tasks={sortedTasks}
               count={sortedTasks.length}

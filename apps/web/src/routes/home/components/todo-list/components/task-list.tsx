@@ -8,9 +8,18 @@ interface TaskListProps {
   tasks: Task[];
   count: number;
   icon?: string;
+  activeListId: string;
 }
 
-export function TaskList({ title, tasks, count, icon }: TaskListProps) {
+export function TaskList({
+  title,
+  tasks,
+  count,
+  icon,
+  activeListId,
+}: TaskListProps) {
+  const { lists } = useTodoStore();
+
   if (tasks.length === 0)
     return (
       <div className="mt-4">
@@ -18,9 +27,50 @@ export function TaskList({ title, tasks, count, icon }: TaskListProps) {
       </div>
     );
 
+  if (activeListId === "all") {
+    const tasksByList = tasks.reduce(
+      (acc, task) => {
+        if (!acc[task.listId]) {
+          acc[task.listId] = [];
+        }
+        acc[task.listId].push(task);
+        return acc;
+      },
+      {} as Record<string, Task[]>
+    );
+
+    return (
+      <div className="mt-4 space-y-8">
+        {Object.entries(tasksByList).map(([listId, listTasks]) => {
+          const list = lists.find((l) => l.id === listId);
+          if (!list) return null;
+
+          return (
+            <div key={listId} className="space-y-2">
+              <div className="flex items-center justify-between px-2 py-1">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{list.emoji}</span>
+                  <span>{list.name}</span>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {listTasks.length}
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                {listTasks.map((task) => (
+                  <TaskItem key={task.id} task={task} />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-4">
-      <div className="ml-0 space-y-2 border-l border-border/10">
+      <div className="mt-2 space-y-2">
         {tasks.map((task) => (
           <TaskItem key={task.id} task={task} />
         ))}
@@ -30,8 +80,7 @@ export function TaskList({ title, tasks, count, icon }: TaskListProps) {
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const { toggleTask, deleteTask, lists, activeListId } = useTodoStore();
-  const taskList = lists.find((list) => list.id === task.listId);
+  const { toggleTask, deleteTask } = useTodoStore();
 
   return (
     <div
@@ -60,11 +109,6 @@ const TaskItem = ({ task }: { task: Task }) => {
         >
           {task.title}
         </span>
-        {activeListId === "all" && taskList && (
-          <span className="text-xs text-muted-foreground">
-            {taskList.emoji} {taskList.name}
-          </span>
-        )}
       </div>
       <div className="ml-auto flex items-center gap-2">
         <Badge
