@@ -23,7 +23,32 @@ interface DockItem {
   hidden?: boolean;
   isActive?: boolean;
   onClick?: () => void;
+  isStatic?: boolean;
 }
+
+const STATIC_DOCK_ITEMS: DockItem[] = [
+  {
+    id: "clock",
+    name: "Clock",
+    icon: ClockDock,
+    activeIcon: ClockDock,
+    isStatic: true,
+  },
+  {
+    id: "calendar",
+    name: "Calendar",
+    icon: CalendarDock,
+    activeIcon: CalendarDock,
+    isStatic: true,
+  },
+  {
+    id: "language",
+    name: "Language",
+    icon: LanguageSwitcherDock,
+    activeIcon: LanguageSwitcherDock,
+    isStatic: true,
+  },
+];
 
 export const Dock = () => {
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
@@ -48,54 +73,44 @@ export const Dock = () => {
     toggleSoundscapes: state.toggleSoundscapes,
     toggleBreathing: state.toggleBreathing,
   }));
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  const allItems: DockItem[] = useMemo(
+  const mainDockItems: DockItem[] = useMemo(
     () => [
       {
         id: "home",
         name: t("common.home"),
         icon: Logo,
         activeIcon: Logo,
-        onClick: () => {
-          resetDock();
-        },
+        onClick: () => resetDock(),
       },
       {
         id: "timer",
         name: t("common.pomodoro"),
         icon: Icons.worldClock,
         activeIcon: Icons.worldClockActive,
-        onClick: () => {
-          toggleTimer();
-        },
+        onClick: () => toggleTimer(),
       },
       {
         id: "soundscapes",
         name: t("common.soundscapes"),
         icon: Icons.soundscapes,
         activeIcon: Icons.soundscapesActive,
-        onClick: () => {
-          toggleSoundscapes();
-        },
+        onClick: () => toggleSoundscapes(),
       },
       {
         id: "breathepod",
         name: t("common.breathing"),
         icon: Icons.breathing,
         activeIcon: Icons.breathingActive,
-        onClick: () => {
-          toggleBreathing();
-        },
+        onClick: () => toggleBreathing(),
       },
       {
         id: "todo",
         name: t("common.todo"),
         icon: Icons.todoList,
         activeIcon: Icons.todoListActive,
-        onClick: () => {
-          useTodoStore.getState().setIsVisible(true);
-        },
+        onClick: () => useTodoStore.getState().setIsVisible(true),
       },
       {
         id: "settings",
@@ -104,13 +119,14 @@ export const Dock = () => {
         activeIcon: Icons.settingsActive,
       },
     ],
-    [t, i18n.language]
+    [t, resetDock, toggleTimer, toggleSoundscapes, toggleBreathing]
   );
 
   const getVisibleItemCount = (width: number) => {
-    if (width >= 1280) return Math.min(allItems.length, 10);
+    if (width >= 1280) return Math.min(mainDockItems.length, 14);
+    if (width >= 1024) return 10;
     if (width >= 768) return 6;
-    if (width >= 640) return 1;
+    if (width >= 640) return 4;
     return 1;
   };
 
@@ -118,14 +134,14 @@ export const Dock = () => {
     const handleResize = () => {
       if (!dockRef.current) return;
       const visibleCount = getVisibleItemCount(window.innerWidth);
-      setVisibleItems(allItems.slice(0, visibleCount));
-      setDropdownItems(allItems.slice(visibleCount));
+      setVisibleItems(mainDockItems.slice(0, visibleCount));
+      setDropdownItems(mainDockItems.slice(visibleCount));
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [allItems]);
+  }, [mainDockItems]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -153,9 +169,11 @@ export const Dock = () => {
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-              <ClockDock />
-              <CalendarDock />
-              <LanguageSwitcherDock />
+              {STATIC_DOCK_ITEMS.map((item) => (
+                <div key={item.id} className="flex items-center justify-center">
+                  <item.icon />
+                </div>
+              ))}
 
               {dropdownItems.length > 0 && (
                 <div className="group relative flex items-center justify-center">
