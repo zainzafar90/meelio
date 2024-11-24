@@ -89,12 +89,6 @@ export const Dock = () => {
         },
       },
       {
-        id: "settings",
-        name: t("common.settings"),
-        icon: Icons.settings,
-        activeIcon: Icons.settingsActive,
-      },
-      {
         id: "todo",
         name: t("common.todo"),
         icon: Icons.todoList,
@@ -102,6 +96,12 @@ export const Dock = () => {
         onClick: () => {
           useTodoStore.getState().setIsVisible(true);
         },
+      },
+      {
+        id: "settings",
+        name: t("common.settings"),
+        icon: Icons.settings,
+        activeIcon: Icons.settingsActive,
       },
     ],
     [t, i18n.language]
