@@ -79,7 +79,6 @@ export default {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         heading: ["var(--font-heading)", ...fontFamily.sans],
         serif: ["var(--font-serif)", ...fontFamily.serif],
-        alumini: ["Alumni Sans Pinstripe", ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
