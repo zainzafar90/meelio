@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.38](https://github.com/zainzafar90/meelio/compare/v0.0.37...v0.0.38) (2024-11-24)
+
+
+### Bug Fixes
+
+* light mode issues ([53a43da](https://github.com/zainzafar90/meelio/commit/53a43da0887fefa33a9c89b27036142bef1e8bd8))
+
 ### [0.0.37](https://github.com/zainzafar90/meelio/compare/v0.0.36...v0.0.37) (2024-11-13)
 
 ### [0.0.36](https://github.com/zainzafar90/meelio/compare/v0.0.35...v0.0.36) (2024-11-12)
