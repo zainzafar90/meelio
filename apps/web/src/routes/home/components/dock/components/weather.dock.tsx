@@ -78,7 +78,7 @@ export const WeatherDock: React.FC = () => {
     <div
       className={cn(
         "bg-gradient-to-b from-zinc-800 to-zinc-900",
-        "flex size-12 cursor-pointer flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
+        "flex size-10 cursor-pointer flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg"
       )}
       title={`${weatherData.temperature.metric.value}°${weatherData.temperature.metric.unit}`}
     >

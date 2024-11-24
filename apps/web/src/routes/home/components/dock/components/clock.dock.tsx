@@ -44,7 +44,7 @@ export const ClockDock = () => {
   return (
     <div
       className={cn(
-        "size-12 rounded-xl shadow-lg",
+        "size-10 rounded-xl shadow-lg",
         "hidden items-center justify-center sm:flex",
         "bg-gradient-to-b from-zinc-800 to-zinc-900"
       )}

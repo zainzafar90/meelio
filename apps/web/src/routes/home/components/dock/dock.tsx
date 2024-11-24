@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -13,18 +13,9 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 import { useTodoStore } from "@/stores/todo.store";
 
+import { DockButton, DockItem } from "../dock-button";
 import { CalendarDock } from "./components/calendar.dock";
-
-interface DockItem {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  activeIcon: React.ElementType;
-  hidden?: boolean;
-  isActive?: boolean;
-  onClick?: () => void;
-  isStatic?: boolean;
-}
+import { SettingsDock } from "./components/settings.dock";
 
 const STATIC_DOCK_ITEMS: DockItem[] = [
   {
@@ -46,6 +37,13 @@ const STATIC_DOCK_ITEMS: DockItem[] = [
     name: "Language",
     icon: LanguageSwitcherDock,
     activeIcon: LanguageSwitcherDock,
+    isStatic: true,
+  },
+  {
+    id: "settings",
+    name: "Settings",
+    icon: SettingsDock,
+    activeIcon: SettingsDock,
     isStatic: true,
   },
 ];
@@ -111,12 +109,6 @@ export const Dock = () => {
         icon: Icons.todoList,
         activeIcon: Icons.todoListActive,
         onClick: () => useTodoStore.getState().setIsVisible(true),
-      },
-      {
-        id: "settings",
-        name: t("common.settings"),
-        icon: Icons.settings,
-        activeIcon: Icons.settingsActive,
       },
     ],
     [t, resetDock, toggleTimer, toggleSoundscapes, toggleBreathing]
@@ -235,65 +227,5 @@ export const Dock = () => {
       </div>
       <TodoListSheet />
     </>
-  );
-};
-
-const DockButton = ({
-  item,
-  className,
-}: {
-  item: DockItem;
-  className?: string;
-}) => {
-  const { isTimerVisible, isBreathingVisible, isSoundscapesVisible } =
-    useDockStore((state) => ({
-      isTimerVisible: state.isTimerVisible,
-      isSoundscapesVisible: state.isSoundscapesVisible,
-      isBreathingVisible: state.isBreathingVisible,
-    }));
-
-  const isActive =
-    (item.id === "timer" && isTimerVisible) ||
-    (item.id === "soundscapes" && isSoundscapesVisible) ||
-    (item.id === "breathepod" && isBreathingVisible);
-
-  const IconComponent = isActive ? item.activeIcon : item.icon;
-
-  const handleClick = () => {
-    if (item.onClick) {
-      item.onClick();
-    }
-  };
-
-  if (item.id === "settings") {
-    return (
-      <SidebarTrigger
-        title="Toggle Sidebar"
-        className={cn(
-          "flex size-12 items-center justify-center rounded-xl shadow-lg",
-          "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
-        )}
-      >
-        <IconComponent className="size-6 text-white" />
-      </SidebarTrigger>
-    );
-  }
-
-  return (
-    <button
-      className={cn(
-        "relative flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-        "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
-        className
-      )}
-      onClick={handleClick}
-      title={item.name}
-      role="button"
-    >
-      <IconComponent className="size-6 text-white" />
-      {isActive && (
-        <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
-      )}
-    </button>
   );
 };

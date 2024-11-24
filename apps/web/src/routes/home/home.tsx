@@ -4,6 +4,7 @@ import { useDockStore } from "@/stores/dock.store";
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
 import { BreathePod } from "./components/breathing-pod/breathing-pod";
+import { Clock } from "./components/clock/clock";
 // import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock/dock";
 import { Greeting } from "./components/greetings/greetings-mantras";
@@ -66,9 +67,9 @@ const TopBar = () => {
 
   return (
     <div className="relative">
-      {/* <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
+      <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
         <Clock />
-      </div> */}
+      </div>
 
       {isTimerVisible && <Timer />}
     </div>
@@ -76,7 +77,7 @@ const TopBar = () => {
 };
 
 const BottomBar = () => (
-  <footer className="flex items-center justify-center pb-6">
+  <footer className="flex items-center justify-center pb-2">
     <Dock />
   </footer>
 );
