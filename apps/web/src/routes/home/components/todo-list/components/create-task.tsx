@@ -32,10 +32,8 @@ export function CreateTask() {
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder="Add a Task"
+        autoFocus
       />
-      <div className="ml-auto flex items-center gap-2">
-        <kbd className="rounded bg-muted px-2 py-1 text-xs">T</kbd>
-      </div>
     </div>
   );
 }

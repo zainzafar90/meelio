@@ -136,7 +136,7 @@ export function CreateList({ children }: CreateListProps) {
             className="w-full"
             disabled={!name.trim()}
           >
-            <Plus className="mr-2 h-4 w-4" /> Create List
+            <Plus className="h-4 w-4" /> Create List
           </Button>
         </DialogFooter>
       </DialogContent>
