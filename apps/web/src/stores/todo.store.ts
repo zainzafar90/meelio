@@ -21,6 +21,79 @@ export interface List {
   count?: number;
 }
 
+const initialTasks: Task[] = [
+  {
+    id: "1",
+    title: "Buy groceries",
+    completed: false,
+    date: "Today",
+    listId: "home",
+  },
+  {
+    id: "2",
+    title: "Clean the house",
+    completed: true,
+    date: "Today",
+    listId: "home",
+  },
+  {
+    id: "3",
+    title: "Finish project presentation",
+    completed: false,
+    date: "Today",
+    listId: "work",
+  },
+  {
+    id: "4",
+    title: "Schedule team meeting",
+    completed: false,
+    date: "Tomorrow",
+    listId: "work",
+  },
+  {
+    id: "5",
+    title: "Go to the gym",
+    completed: false,
+    date: "Today",
+    listId: "personal",
+  },
+  {
+    id: "6",
+    title: "Read a book",
+    completed: true,
+    date: "Today",
+    listId: "personal",
+  },
+  {
+    id: "7",
+    title: "Pay bills",
+    completed: false,
+    date: "Tomorrow",
+    listId: "home",
+  },
+  {
+    id: "8",
+    title: "Call mom",
+    completed: false,
+    date: "Today",
+    listId: "personal",
+  },
+  {
+    id: "9",
+    title: "Review code PR",
+    completed: true,
+    date: "Today",
+    listId: "work",
+  },
+  {
+    id: "10",
+    title: "Update portfolio",
+    completed: false,
+    date: "Tomorrow",
+    listId: "work",
+  },
+];
+
 const initialLists: List[] = [
   {
     id: "all",
@@ -66,7 +139,7 @@ interface TodoState {
 export const useTodoStore = create<TodoState>((set) => ({
   isVisible: false,
   lists: initialLists,
-  tasks: [],
+  tasks: initialTasks,
   activeListId: "home",
   setIsVisible: (isVisible) => set({ isVisible }),
   addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
