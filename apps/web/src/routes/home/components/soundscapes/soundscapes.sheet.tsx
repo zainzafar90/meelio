@@ -6,16 +6,16 @@ import { CategoryList } from "@/routes/home/components/soundscapes/components/ca
 import { SoundList } from "@/routes/home/components/soundscapes/components/sound-list/sound-list";
 import { SoundControlsBar } from "@/routes/home/components/soundscapes/components/sound-player/controls/sound-control-bar";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { useDockStore } from "@/stores/dock.store";
 
-export const SoundscapesDialog: React.FC = () => {
+export const SoundscapesSheet: React.FC = () => {
   const { t } = useTranslation();
 
   const { isSoundscapesVisible, setSoundscapesVisible } = useDockStore(
@@ -26,15 +26,18 @@ export const SoundscapesDialog: React.FC = () => {
   );
 
   return (
-    <Dialog open={isSoundscapesVisible} onOpenChange={setSoundscapesVisible}>
-      <DialogContent className="h-[80vh] max-w-lg p-0">
+    <Sheet open={isSoundscapesVisible} onOpenChange={setSoundscapesVisible}>
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
+      >
         <VisuallyHidden>
-          <DialogHeader>
-            <DialogTitle>{t("soundscapes.dialog.title")}</DialogTitle>
-            <DialogDescription>
+          <SheetHeader>
+            <SheetTitle>{t("soundscapes.dialog.title")}</SheetTitle>
+            <SheetDescription>
               {t("soundscapes.dialog.description")}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
         </VisuallyHidden>
         <div className="flex h-full flex-col overflow-hidden p-6">
           <CategoryList />
@@ -43,7 +46,7 @@ export const SoundscapesDialog: React.FC = () => {
           </div>
         </div>
         <SoundControlsBar />
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };

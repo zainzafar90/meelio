@@ -9,6 +9,7 @@ import { Dock } from "./components/dock/dock";
 import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
+import { SoundscapesSheet } from "./components/soundscapes/soundscapes.sheet";
 import { SoundscapesDialog } from "./components/soundscapes/sounscapes.dialog";
 import { Timer } from "./components/timer/timer";
 import { TodoListSheet } from "./components/todo-list/components/todo-list.sheet";
@@ -31,18 +32,16 @@ export const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible, isSoundscapesVisible } =
-    useDockStore((state) => ({
-      isBreathingVisible: state.isBreathingVisible,
-      isGreetingsVisible: state.isGreetingsVisible,
-      isSoundscapesVisible: state.isSoundscapesVisible,
-    }));
+  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+    isBreathingVisible: state.isBreathingVisible,
+    isGreetingsVisible: state.isGreetingsVisible,
+  }));
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center">
       {isGreetingsVisible && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
-      {isSoundscapesVisible && <SoundscapesDialog />}
+      <SoundscapesSheet />
       <TodoListSheet />
     </main>
   );
