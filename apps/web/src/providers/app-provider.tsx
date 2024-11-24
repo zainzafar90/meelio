@@ -8,6 +8,7 @@ import { SoundPlayer } from "@/routes/home/components/soundscapes/components/sou
 import { ConnectionWarning } from "@/components/connection-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useDockStore } from "@/stores/dock.store";
 
 import { AuthProvider } from "./auth-provider";
 import { PomodoroProvider } from "./pomodoro-provider";
@@ -17,6 +18,9 @@ type AppProviderProps = {
 };
 
 export const AppProvider = ({ children }: AppProviderProps) => {
+  const { isSoundscapesVisible } = useDockStore((state) => ({
+    isSoundscapesVisible: state.isSoundscapesVisible,
+  }));
   return (
     <I18nextProvider i18n={i18n}>
       <BrowserRouter
@@ -27,7 +31,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
             <TooltipProvider>
               <PomodoroProvider>
                 {children}
-                <SoundPlayer />
+                {isSoundscapesVisible && <SoundPlayer />}
                 <Toaster richColors />
                 <ConnectionWarning />
               </PomodoroProvider>
