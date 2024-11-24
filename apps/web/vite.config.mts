@@ -9,19 +9,19 @@ import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
   base: "./",
-  build: {
-    outDir: "dist",
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "index.html"),
-      },
-      output: {
-        entryFileNames: `assets/[name].[hash].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`,
-      },
-    },
-  },
+  // build: {
+  //   outDir: "dist",
+  //   rollupOptions: {
+  //     input: {
+  //       main: path.resolve(__dirname, "index.html"),
+  //     },
+  //     output: {
+  //       entryFileNames: `assets/[name].[hash].js`,
+  //       chunkFileNames: `assets/[name].js`,
+  //       assetFileNames: `assets/[name].[hash].[ext]`,
+  //     },
+  //   },
+  // },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
