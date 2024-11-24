@@ -12,6 +12,7 @@ import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
 import { SoundscapesDialog } from "./components/soundscapes/sounscapes.dialog";
 import { Timer } from "./components/timer/timer";
+import { TodoListSheet } from "./components/todo-list/components/todo-list.sheet";
 
 export const Home = () => {
   return (
@@ -31,18 +32,24 @@ export const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible, isSoundscapesVisible } =
-    useDockStore((state) => ({
-      isBreathingVisible: state.isBreathingVisible,
-      isGreetingsVisible: state.isGreetingsVisible,
-      isSoundscapesVisible: state.isSoundscapesVisible,
-    }));
+  const {
+    isBreathingVisible,
+    isGreetingsVisible,
+    isSoundscapesVisible,
+    isTodosVisible,
+  } = useDockStore((state) => ({
+    isBreathingVisible: state.isBreathingVisible,
+    isGreetingsVisible: state.isGreetingsVisible,
+    isSoundscapesVisible: state.isSoundscapesVisible,
+    isTodosVisible: state.isTodosVisible,
+  }));
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center">
       {isGreetingsVisible && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       {isSoundscapesVisible && <SoundscapesDialog />}
+      <TodoListSheet />
     </main>
   );
 };

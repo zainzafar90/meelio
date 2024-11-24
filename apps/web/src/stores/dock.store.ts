@@ -5,14 +5,17 @@ interface DockState {
   isBreathingVisible: boolean;
   isGreetingsVisible: boolean;
   isSoundscapesVisible: boolean;
+  isTodosVisible: boolean;
   toggleTimer: () => void;
   toggleBreathing: () => void;
   toggleGreetings: () => void;
   toggleSoundscapes: () => void;
+  toggleTodos: () => void;
   setTimerVisible: (visible: boolean) => void;
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
   setSoundscapesVisible: (visible: boolean) => void;
+  setTodosVisible: (visible: boolean) => void;
   reset: () => void;
 }
 
@@ -21,6 +24,7 @@ export const useDockStore = create<DockState>()((set) => ({
   isBreathingVisible: false,
   isGreetingsVisible: true,
   isSoundscapesVisible: false,
+  isTodosVisible: false,
 
   toggleTimer: () => {
     set((state) => {
@@ -38,6 +42,10 @@ export const useDockStore = create<DockState>()((set) => ({
 
   toggleSoundscapes: () => {
     set((state) => ({ isSoundscapesVisible: !state.isSoundscapesVisible }));
+  },
+
+  toggleTodos: () => {
+    set((state) => ({ isTodosVisible: !state.isTodosVisible }));
   },
 
   toggleGreetings: () => {
@@ -60,12 +68,17 @@ export const useDockStore = create<DockState>()((set) => ({
     set({ isSoundscapesVisible: visible });
   },
 
+  setTodosVisible: (visible: boolean) => {
+    set({ isTodosVisible: visible });
+  },
+
   reset: () => {
     set({
       isTimerVisible: false,
       isBreathingVisible: false,
       isGreetingsVisible: true,
       isSoundscapesVisible: false,
+      isTodosVisible: false,
     });
   },
 }));

@@ -6,12 +6,10 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { ClockDock } from "@/routes/home/components/dock/components/clock.dock";
 import { LanguageSwitcherDock } from "@/routes/home/components/dock/components/language-switcher.dock";
-import { TodoListSheet } from "@/routes/home/components/todo-list/components/todo-list.sheet";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
-import { useTodoStore } from "@/stores/todo.store";
 
 import { DockButton, DockItem } from "../dock-button";
 import { CalendarDock } from "./components/calendar.dock";
@@ -61,6 +59,7 @@ export const Dock = () => {
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
+    toggleTodos,
     resetDock,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
@@ -70,6 +69,7 @@ export const Dock = () => {
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
     toggleBreathing: state.toggleBreathing,
+    toggleTodos: state.toggleTodos,
   }));
   const { t } = useTranslation();
 
@@ -108,7 +108,7 @@ export const Dock = () => {
         name: t("common.todo"),
         icon: Icons.todoList,
         activeIcon: Icons.todoListActive,
-        onClick: () => useTodoStore.getState().setIsVisible(true),
+        onClick: () => toggleTodos(),
       },
     ],
     [t, resetDock, toggleTimer, toggleSoundscapes, toggleBreathing]
@@ -150,82 +150,79 @@ export const Dock = () => {
   }, []);
 
   return (
-    <>
-      <div className="relative" ref={dockRef}>
-        <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 pr-1">
-              {visibleItems.map((item, index) => (
-                <DockButton key={index} item={item} />
-              ))}
-            </div>
+    <div className="relative" ref={dockRef}>
+      <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-1">
+            {visibleItems.map((item, index) => (
+              <DockButton key={index} item={item} />
+            ))}
+          </div>
 
-            <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-              {STATIC_DOCK_ITEMS.map((item) => (
-                <div key={item.id} className="flex items-center justify-center">
-                  <item.icon />
-                </div>
-              ))}
+          <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+            {STATIC_DOCK_ITEMS.map((item) => (
+              <div key={item.id} className="flex items-center justify-center">
+                <item.icon />
+              </div>
+            ))}
 
-              {dropdownItems.length > 0 && (
-                <div className="group relative flex items-center justify-center">
-                  <div
-                    className={cn(
-                      "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-                      "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
-                    )}
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    title="More Options"
-                  >
-                    <MoreHorizontal className="size-6 text-white" />
-                  </div>
+            {dropdownItems.length > 0 && (
+              <div className="group relative flex items-center justify-center">
+                <div
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+                    "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
+                  )}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  title="More Options"
+                >
+                  <MoreHorizontal className="size-6 text-white" />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {isDropdownOpen && dropdownItems.length > 0 && (
-          <div
-            ref={dropdownRef}
-            className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
-          >
-            {dropdownItems.map((item, index) => {
-              const isActive =
-                (item.id === "timer" && isTimerVisible) ||
-                (item.id === "soundscapes" && isSoundscapesVisible) ||
-                (item.id === "breathepod" && isBreathingVisible);
+      {isDropdownOpen && dropdownItems.length > 0 && (
+        <div
+          ref={dropdownRef}
+          className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
+        >
+          {dropdownItems.map((item, index) => {
+            const isActive =
+              (item.id === "timer" && isTimerVisible) ||
+              (item.id === "soundscapes" && isSoundscapesVisible) ||
+              (item.id === "breathepod" && isBreathingVisible);
 
-              const IconComponent = isActive ? item.activeIcon : item.icon;
+            const IconComponent = isActive ? item.activeIcon : item.icon;
 
-              if (item.id === "settings") {
-                return (
-                  <SidebarTrigger
-                    key={index}
-                    title="Toggle Sidebar"
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                  >
-                    <IconComponent className="size-5" />
-                    <span className="text-xs">{item.name}</span>
-                  </SidebarTrigger>
-                );
-              }
-
+            if (item.id === "settings") {
               return (
-                <button
+                <SidebarTrigger
                   key={index}
+                  title="Toggle Sidebar"
                   className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                  onClick={item.onClick}
                 >
                   <IconComponent className="size-5" />
                   <span className="text-xs">{item.name}</span>
-                </button>
+                </SidebarTrigger>
               );
-            })}
-          </div>
-        )}
-      </div>
-      <TodoListSheet />
-    </>
+            }
+
+            return (
+              <button
+                key={index}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                onClick={item.onClick}
+              >
+                <IconComponent className="size-5" />
+                <span className="text-xs">{item.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };

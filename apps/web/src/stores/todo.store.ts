@@ -15,11 +15,9 @@ import {
 } from "@/lib/db/todo-db";
 
 interface TodoState {
-  isVisible: boolean;
   lists: TodoList[];
   tasks: Task[];
   activeListId: string;
-  setIsVisible: (isVisible: boolean) => void;
   addTask: (task: Omit<Task, "createdAt" | "updatedAt">) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
@@ -31,12 +29,9 @@ interface TodoState {
 }
 
 export const useTodoStore = create<TodoState>((set, get) => ({
-  isVisible: false,
   lists: [],
   tasks: [],
   activeListId: "today",
-
-  setIsVisible: (isVisible) => set({ isVisible }),
 
   addTask: async (task) => {
     await addTask(task);

@@ -19,17 +19,23 @@ export const DockButton = ({
   item: DockItem;
   className?: string;
 }) => {
-  const { isTimerVisible, isBreathingVisible, isSoundscapesVisible } =
-    useDockStore((state) => ({
-      isTimerVisible: state.isTimerVisible,
-      isSoundscapesVisible: state.isSoundscapesVisible,
-      isBreathingVisible: state.isBreathingVisible,
-    }));
+  const {
+    isTimerVisible,
+    isBreathingVisible,
+    isSoundscapesVisible,
+    isTodosVisible,
+  } = useDockStore((state) => ({
+    isTimerVisible: state.isTimerVisible,
+    isSoundscapesVisible: state.isSoundscapesVisible,
+    isBreathingVisible: state.isBreathingVisible,
+    isTodosVisible: state.isTodosVisible,
+  }));
 
   const isActive =
     (item.id === "timer" && isTimerVisible) ||
     (item.id === "soundscapes" && isSoundscapesVisible) ||
-    (item.id === "breathepod" && isBreathingVisible);
+    (item.id === "breathepod" && isBreathingVisible) ||
+    (item.id === "todos" && isTodosVisible);
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 

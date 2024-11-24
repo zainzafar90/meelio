@@ -16,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useDockStore } from "@/stores/dock.store";
 import { useTodoStore } from "@/stores/todo.store";
 
 import { CreateList } from "./create-list";
@@ -23,8 +24,8 @@ import { CreateTask } from "./create-task";
 import { TaskList } from "./task-list";
 
 export const TodoListSheet = () => {
-  const { isVisible, setIsVisible, lists, tasks, activeListId, setActiveList } =
-    useTodoStore();
+  const { isTodosVisible, setTodosVisible } = useDockStore();
+  const { lists, tasks, activeListId, setActiveList } = useTodoStore();
   const activeList = lists.find((list) => list.id === activeListId);
 
   const filteredTasks = tasks.filter((task) => {
@@ -40,7 +41,7 @@ export const TodoListSheet = () => {
   });
 
   return (
-    <Sheet open={isVisible} onOpenChange={setIsVisible}>
+    <Sheet open={isTodosVisible} onOpenChange={setTodosVisible}>
       <SheetContent
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
