@@ -10,7 +10,6 @@ import { Greeting } from "./components/greetings/greetings-mantras";
 import { AppLayout } from "./components/layout";
 import { Quote } from "./components/quote/quote";
 import { SoundscapesSheet } from "./components/soundscapes/soundscapes.sheet";
-import { SoundscapesDialog } from "./components/soundscapes/sounscapes.dialog";
 import { Timer } from "./components/timer/timer";
 import { TodoListSheet } from "./components/todo-list/components/todo-list.sheet";
 
