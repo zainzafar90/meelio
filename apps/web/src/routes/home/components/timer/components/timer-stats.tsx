@@ -2,6 +2,8 @@ import { memo, useEffect, useState } from "react";
 
 import { Bar, BarChart, XAxis } from "recharts";
 
+import { useTranslation } from "react-i18next";
+
 import { getWeeklySummary } from "@/lib/db/pomodoro-db";
 import {
   Card,
@@ -30,6 +32,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export const TimerStats = memo(() => {
+  const { t } = useTranslation();
   const [chartData, setChartData] = useState<
     Array<{ date: string; focus: number; breaks: number }>
   >([]);
@@ -51,9 +54,9 @@ export const TimerStats = memo(() => {
   return (
     <Card className="mt-4">
       <CardHeader>
-        <CardTitle className="text-sm">Stats</CardTitle>
+        <CardTitle className="text-sm">{t("timer.stats.title")}</CardTitle>
         <CardDescription className="text-xs">
-          Focus and break time for the week
+          {t("timer.stats.description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -65,8 +68,8 @@ export const TimerStats = memo(() => {
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => {
-                return new Date(value).toLocaleDateString("en-US", {
-                  weekday: "short",
+                return new Date(value).toLocaleDateString(t("timer.stats.chart.weekday.format"), {
+                  weekday: t("timer.stats.chart.weekday.format"),
                 });
               }}
             />
@@ -97,12 +100,11 @@ export const TimerStats = memo(() => {
                           } as React.CSSProperties
                         }
                       />
-                      {chartConfig[name as keyof typeof chartConfig]?.label ||
-                        name}
+                      {t(`timer.stats.chart.${name}`)}
                       <div className="ml-auto flex items-baseline gap-0.5 font-mono font-medium tabular-nums text-foreground">
                         {value}
                         <span className="font-normal text-muted-foreground">
-                          mins
+                          {t("timer.stats.chart.minutes")}
                         </span>
                       </div>
                     </>

@@ -1,5 +1,6 @@
 import { VERSION } from "@/version";
 import Avatar from "boring-avatars";
+import { useTranslation } from "react-i18next";
 
 import { AuthUser } from "@/types/auth";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export function UserProfileDropdown(props: Props) {
   const profileImage = user.image;
   const email = user.email;
   const isProMember = user.isPro;
+  const { t } = useTranslation();
 
   return (
     <SettingsDialog>
@@ -38,7 +40,7 @@ export function UserProfileDropdown(props: Props) {
             <img
               className="h-8 w-8 rounded-full bg-black"
               src={profileImage}
-              alt="Profile"
+              alt={t("profile.image.alt")}
               width={32}
               height={32}
             />
@@ -53,12 +55,12 @@ export function UserProfileDropdown(props: Props) {
 
         {!props.mobileView && (
           <>
-            <span className="sr-only">Your profile</span>
+            <span className="sr-only">{t("profile.your-profile")}</span>
             <div className="flex flex-col w-full text-left truncate">
               <div aria-hidden="true">{email}</div>
 
               <div className="font-light text-xs text-muted-foreground">
-                Meelio Version: v{VERSION}
+                {t("profile.meelio-version")} v{VERSION}
               </div>
             </div>
           </>

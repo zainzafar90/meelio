@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Bell, Home, Lock, Paintbrush, Settings } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Breadcrumb,
@@ -30,24 +31,25 @@ import {
 
 const data = {
   nav: [
-    { name: "Home", icon: Home },
-    { name: "Notifications", icon: Bell },
-    { name: "Appearance", icon: Paintbrush },
-    { name: "Privacy & visibility", icon: Lock },
-    { name: "Advanced", icon: Settings },
+    { name: "home", icon: Home },
+    { name: "notifications", icon: Bell },
+    { name: "appearance", icon: Paintbrush },
+    { name: "privacy", icon: Lock },
+    { name: "advanced", icon: Settings },
   ],
 };
 
 export function SettingsDialog(props: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
+  const { t } = useTranslation();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{props.children}</DialogTrigger>
       <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
-        <DialogTitle className="sr-only">Settings</DialogTitle>
+        <DialogTitle className="sr-only">{t("settings.dialog.title")}</DialogTitle>
         <DialogDescription className="sr-only">
-          Manage your account settings
+          {t("settings.dialog.description")}
         </DialogDescription>
         <SidebarProvider className="items-start">
           <Sidebar collapsible="none" className="hidden md:flex">
@@ -57,14 +59,9 @@ export function SettingsDialog(props: { children: React.ReactNode }) {
                   <SidebarMenu>
                     {data.nav.map((item) => (
                       <SidebarMenuItem key={item.name}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={item.name === "Messages & media"}
-                        >
-                          <a href="#">
-                            <item.icon />
-                            <span>{item.name}</span>
-                          </a>
+                        <SidebarMenuButton>
+                          <item.icon className="h-4 w-4" />
+                          <span>{t(`settings.dialog.nav.${item.name}`)}</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
@@ -79,11 +76,11 @@ export function SettingsDialog(props: { children: React.ReactNode }) {
                 <Breadcrumb>
                   <BreadcrumbList>
                     <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink href="#">Settings</BreadcrumbLink>
+                      <BreadcrumbLink href="#">{t("settings.breadcrumb")}</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
-                      <BreadcrumbPage>Messages & media</BreadcrumbPage>
+                      <BreadcrumbPage>{t("settings.dialog.nav.messages")}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>

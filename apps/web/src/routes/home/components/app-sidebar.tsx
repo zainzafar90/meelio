@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { VERSION } from "@/version";
 import Avatar from "boring-avatars";
@@ -197,6 +198,7 @@ export const AppSidebar = () => {
   const email = user.email || "";
   const name = user.name || "Guest";
   const isProMember = user.isPro || false;
+  const { t } = useTranslation();
 
   return (
     <Sidebar variant="floating">
@@ -209,7 +211,7 @@ export const AppSidebar = () => {
                   <Logo className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-lg leading-tight">
-                  <span className="truncate font-medium">Meelio</span>
+                  <span className="truncate font-medium">{t("sidebar.app.title")}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -235,7 +237,7 @@ export const AppSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Productivity</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.app.sections.productivity")}</SidebarGroupLabel>
           <SidebarMenu>
             {data.productivity.map((item) => (
               <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
@@ -251,7 +253,7 @@ export const AppSidebar = () => {
                       <CollapsibleTrigger asChild>
                         <SidebarMenuAction className="data-[state=open]:rotate-90">
                           <ChevronRight />
-                          <span className="sr-only">Toggle</span>
+                          <span className="sr-only">{t("sidebar.app.toggle")}</span>
                         </SidebarMenuAction>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -276,7 +278,7 @@ export const AppSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Wellbeing</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("sidebar.app.sections.wellbeing")}</SidebarGroupLabel>
           <SidebarMenu>
             {data.wellbeing.map((item) => (
               <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
@@ -292,7 +294,7 @@ export const AppSidebar = () => {
                       <CollapsibleTrigger asChild>
                         <SidebarMenuAction className="data-[state=open]:rotate-90">
                           <ChevronRight />
-                          <span className="sr-only">Toggle</span>
+                          <span className="sr-only">{t("sidebar.app.toggle")}</span>
                         </SidebarMenuAction>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -323,12 +325,12 @@ export const AppSidebar = () => {
               <>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link to="/account/settings">Settings</Link>
+                    <Link to="/account/settings">{t("sidebar.app.account.settings")}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link to="/account/billing">Billing</Link>
+                    <Link to="/account/billing">{t("sidebar.app.account.billing")}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </>
@@ -338,12 +340,12 @@ export const AppSidebar = () => {
               <>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link to="/login">Login</Link>
+                    <Link to="/login">{t("sidebar.app.login")}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <Link to="/register">Register</Link>
+                    <Link to="/register">{t("sidebar.app.register")}</Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </>
@@ -450,24 +452,24 @@ export const AppSidebar = () => {
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="gap-2">
                     <Sparkles className="size-4" />
-                    Upgrade to Pro
+                    {t("sidebar.app.upgradeToPro")}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem className="gap-2">
                     <BadgeCheck className="size-4" />
-                    Account
+                    {t("sidebar.app.account")}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="gap-2">
                     <CreditCard className="size-4" />
-                    Billing
+                    {t("sidebar.app.billing")}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="gap-2">
                   <LogOut className="size-4" />
-                  Log out
+                  {t("sidebar.app.logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

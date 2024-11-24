@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Badge } from "@/components/ui/badge";
 import { useTodoStore } from "@/stores/todo.store";
+import { useTranslation } from "react-i18next";
 
 interface TaskListProps {
   title: string;
@@ -20,11 +21,12 @@ export function TaskList({
   activeListId,
 }: TaskListProps) {
   const { lists } = useTodoStore();
+  const { t } = useTranslation();
 
   if (tasks.length === 0)
     return (
       <div className="mt-4">
-        <p className="text-sm text-muted-foreground">No tasks</p>
+        <p className="text-sm text-muted-foreground">{t("todo.list.empty")}</p>
       </div>
     );
 

@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ import { CreateTask } from "./create-task";
 import { TaskList } from "./task-list";
 
 export const TodoListSheet = () => {
+  const { t } = useTranslation();
   const { isTodosVisible, setTodosVisible } = useDockStore();
   const { lists, tasks, activeListId, setActiveList } = useTodoStore();
   const activeList = lists.find((list) => list.id === activeListId);
@@ -46,21 +48,16 @@ export const TodoListSheet = () => {
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
         style={{
-          //   backgroundImage:
-          //     "url(https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&q=80)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
         <SheetHeader className="px-6 pt-6">
           <div className="flex items-center justify-between">
-            <SheetTitle>Tasks</SheetTitle>
+            <SheetTitle>{t("todo.sheet.title")}</SheetTitle>
           </div>
           <SheetDescription>
-            <span className="mb-2 block">
-              A list of tasks to help you stay organized and on top of your
-              work, projects, and goals.
-            </span>
+            <span className="mb-2 block">{t("todo.sheet.description")}</span>
           </SheetDescription>
         </SheetHeader>
 
@@ -92,7 +89,7 @@ export const TodoListSheet = () => {
             <CreateList>
               <Button variant="outline">
                 <Plus className="h-4 w-4" />
-                New List
+                {t("todo.sheet.add")}
               </Button>
             </CreateList>
           </div>

@@ -1,4 +1,5 @@
 import { KeyboardEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Icons } from "@/components/icons/icons";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { useTodoStore } from "@/stores/todo.store";
 export function CreateTask() {
   const [title, setTitle] = useState("");
   const { activeListId, addTask } = useTodoStore();
+  const { t } = useTranslation();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && title.trim()) {
@@ -30,7 +32,9 @@ export function CreateTask() {
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder={
-          activeListId === "completed" ? "Add a completed task" : "Add a task"
+          activeListId === "completed"
+            ? t("todo.list.task.add.completed")
+            : t("todo.list.task.add.normal")
         }
         autoFocus
       />

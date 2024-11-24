@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useDisclosure } from "@/hooks/use-disclosure";
+import { useTranslation } from "react-i18next";
 
 import { BREATHING_METHODS, useBreathingStore } from "../store/breathing.store";
 
@@ -20,6 +21,7 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
   const { selectedMethod, setSelectedMethod: setSelectedMethod } =
     useBreathingStore();
   const { isOpen, open, close } = useDisclosure();
+  const { t } = useTranslation();
 
   if (!selectedMethod) return null;
 
@@ -30,7 +32,7 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
           <small> {selectedMethod.description}</small>
         </p>
         <Button variant="glass" onClick={() => open()}>
-          Change Breathe Method
+          {t("breathing.method.change")}
         </Button>
       </div>
 
@@ -46,9 +48,9 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
       >
         <DialogContent className="p-0">
           <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-2xl">Breathing Method</DialogTitle>
+            <DialogTitle className="text-2xl">{t("breathing.method.title")}</DialogTitle>
             <DialogDescription>
-              Select a breathing method to help you relax and focus
+              {t("breathing.method.description")}
             </DialogDescription>
           </DialogHeader>
 

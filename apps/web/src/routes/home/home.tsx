@@ -1,5 +1,6 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
+import { useTranslation } from "react-i18next";
 
 import { AppSidebar } from "./components/app-sidebar";
 import { Background, BackgroundOverlay } from "./components/backgrounds";
@@ -35,9 +36,13 @@ const Content = () => {
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
   }));
+  const { t } = useTranslation();
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center">
+    <main 
+      className="flex flex-1 flex-col items-center justify-center"
+      aria-label={t("home.layout.main.aria")}
+    >
       {isGreetingsVisible && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
@@ -75,8 +80,14 @@ const TopBar = () => {
   );
 };
 
-const BottomBar = () => (
-  <footer className="flex items-center justify-center pb-2">
-    <Dock />
-  </footer>
-);
+const BottomBar = () => {
+  const { t } = useTranslation();
+  return (
+    <footer 
+      className="flex items-center justify-center pb-2"
+      aria-label={t("home.layout.footer.aria")}
+    >
+      <Dock />
+    </footer>
+  );
+};

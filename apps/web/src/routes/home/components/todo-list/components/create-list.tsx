@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Plus } from "lucide-react";
 
@@ -53,6 +54,7 @@ export function CreateList({ children }: CreateListProps) {
   const [name, setName] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { addList, setActiveList } = useTodoStore();
+  const { t } = useTranslation();
 
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -78,17 +80,16 @@ export function CreateList({ children }: CreateListProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New List</DialogTitle>
+          <DialogTitle>{t("todo.list.create.title")}</DialogTitle>
           <DialogDescription>
-            Create a new list to organize your tasks. Choose an emoji and give
-            it a name.
+            {t("todo.list.create.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-2">
             <Label htmlFor="emoji" className="sr-only">
-              List Icon
+              {t("todo.list.create.emoji.label")}
             </Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -96,7 +97,7 @@ export function CreateList({ children }: CreateListProps) {
                   id="emoji"
                   variant="outline"
                   className="w-[60px] text-lg"
-                  aria-label={`Selected emoji: ${selectedEmoji}`}
+                  aria-label={t("todo.list.create.emoji.selected", { emoji: selectedEmoji })}
                 >
                   {selectedEmoji}
                 </Button>
@@ -109,7 +110,7 @@ export function CreateList({ children }: CreateListProps) {
                       variant="ghost"
                       className="h-10 w-10 p-0 text-lg"
                       onClick={() => setSelectedEmoji(emoji)}
-                      aria-label={`Select emoji ${emoji}`}
+                      aria-label={t("todo.list.create.emoji.select", { emoji })}
                     >
                       {emoji}
                     </Button>
@@ -119,11 +120,11 @@ export function CreateList({ children }: CreateListProps) {
             </Popover>
 
             <Label htmlFor="name" className="sr-only">
-              List Name
+              {t("todo.list.create.name.label")}
             </Label>
             <Input
               id="name"
-              placeholder="Enter list name"
+              placeholder={t("todo.list.create.name.placeholder")}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -136,7 +137,7 @@ export function CreateList({ children }: CreateListProps) {
             className="w-full"
             disabled={!name.trim()}
           >
-            <Plus className="h-4 w-4" /> Create List
+            <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
           </Button>
         </DialogFooter>
       </DialogContent>

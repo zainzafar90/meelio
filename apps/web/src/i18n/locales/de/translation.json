@@ -23,12 +23,26 @@
           "dez": "Dez"
         }
       }
+    },
+    "actions": {
+      "play": "Abspielen",
+      "pause": "Pause",
+      "close": "Schließen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "cancel": "Abbrechen"
     }
   },
   "soundscapes": {
     "dialog": {
       "title": "Klanglandschaften",
       "description": "Klanglandschaften sind eine Sammlung von Umgebungsgeräuschen, die Ihnen helfen können, sich zu entspannen, zu konzentrieren oder zu schlafen."
+    },
+    "player": {
+      "loading": "Klang wird geladen...",
+      "error": "Fehler beim Laden des Klangs",
+      "volume": "Lautstärke"
     }
   },
   "home": {
@@ -40,7 +54,130 @@
     },
     "quote": {
       "text": "Dein Leben ist darauf ausgerichtet, die Ergebnisse zu erzielen, die du jetzt bekommst. Ob du es realisierst oder nicht, du bist der Architekt",
-      "author": "Jim Rohn"
+      "author": "Jim Rohn",
+      "aria": {
+        "quote": "Inspirierendes Zitat",
+        "author": "Autor des Zitats"
+      }
+    },
+    "layout": {
+      "main": {
+        "aria": "Hauptinhalt"
+      },
+      "footer": {
+        "aria": "Anwendungsdock"
+      }
     }
+  },
+  "todo": {
+    "sheet": {
+      "title": "Aufgabenliste",
+      "empty": "Noch keine Aufgaben",
+      "add": "Neue Liste",
+      "description": "Eine Liste von Aufgaben, die dir hilft, organisiert zu bleiben und deine Arbeit, Projekte und Ziele im Auge zu behalten.",
+      "input": {
+        "placeholder": "Was muss erledigt werden?"
+      }
+    },
+    "item": {
+      "completed": "Erledigt",
+      "uncompleted": "Nicht erledigt"
+    },
+    "list": {
+      "create": {
+        "title": "Neue Liste erstellen",
+        "description": "Erstelle eine neue Liste, um deine Aufgaben zu organisieren. Wähle ein Emoji und gib ihr einen Namen.",
+        "emoji": {
+          "label": "Listen-Symbol",
+          "selected": "Ausgewähltes Emoji: {{emoji}}",
+          "select": "Emoji {{emoji}} auswählen"
+        },
+        "name": {
+          "label": "Listenname",
+          "placeholder": "Listennamen eingeben"
+        },
+        "button": "Liste erstellen"
+      },
+      "empty": "Keine Aufgaben",
+      "task": {
+        "add": {
+          "completed": "Erledigte Aufgabe hinzufügen",
+          "normal": "Aufgabe hinzufügen"
+        }
+      }
+    }
+  },
+  "sidebar": {
+    "app": {
+      "title": "Meelio",
+      "sections": {
+        "productivity": "Produktivität",
+        "wellbeing": "Wohlbefinden"
+      },
+      "toggle": "Umschalten"
+    }
+  },
+  "breathing": {
+    "method": {
+      "title": "Atemmethode",
+      "description": "Wähle eine Atemmethode, die dir hilft, dich zu entspannen und zu konzentrieren",
+      "change": "Atemmethode ändern",
+      "methods": {
+        "calmDown": {
+          "name": "Beruhigen",
+          "description": "4-6 Verlängerte Ausatmung",
+          "details": "4 Sekunden einatmen, 6 Sekunden ausatmen"
+        },
+        "clearMind": {
+          "name": "Geist klären",
+          "description": "4-4 Gleichmäßige Atmung",
+          "details": "4 Sekunden einatmen, 4 Sekunden ausatmen"
+        },
+        "relaxDeeply": {
+          "name": "Tief entspannen",
+          "description": "4-7-8 Atmung",
+          "details": "4 Sekunden einatmen, 7 Sekunden halten, 8 Sekunden ausatmen"
+        },
+        "relieveStress": {
+          "name": "Stress abbauen",
+          "description": "4-4-4-4 Box-Atmung",
+          "details": "4 Sekunden einatmen, 4 Sekunden halten, 4 Sekunden ausatmen, 4 Sekunden halten"
+        }
+      }
+    }
+  },
+  "timer": {
+    "stats": {
+      "title": "Statistiken",
+      "description": "Fokus- und Pausenzeit der Woche",
+      "chart": {
+        "focus": "Fokus",
+        "breaks": "Pausen",
+        "minutes": "Min",
+        "weekday": {
+          "format": "short"
+        }
+      }
+    }
+  },
+  "settings": {
+    "dialog": {
+      "title": "Einstellungen",
+      "description": "Verwalte deine Kontoeinstellungen",
+      "nav": {
+        "home": "Startseite",
+        "notifications": "Benachrichtigungen",
+        "appearance": "Erscheinungsbild",
+        "privacy": "Datenschutz & Sichtbarkeit",
+        "advanced": "Erweitert"
+      }
+    }
+  },
+  "profile": {
+    "image": {
+      "alt": "Profil"
+    },
+    "your-profile": "Dein Profil",
+    "meelio-version": "Meelio Version:"
   }
 }

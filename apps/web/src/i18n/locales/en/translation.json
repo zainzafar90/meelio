@@ -23,12 +23,26 @@
           "dec": "Dec"
         }
       }
+    },
+    "actions": {
+      "play": "Play",
+      "pause": "Pause",
+      "close": "Close",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "cancel": "Cancel"
     }
   },
   "soundscapes": {
     "dialog": {
       "title": "Soundscapes",
       "description": "Soundscapes are a collection of ambient sounds that can help you relax, focus, or sleep."
+    },
+    "player": {
+      "loading": "Loading sound...",
+      "error": "Error loading sound",
+      "volume": "Volume"
     }
   },
   "home": {
@@ -40,7 +54,130 @@
     },
     "quote": {
       "text": "Your life is designed to get the results you are getting right now. Whether you realize it or not, you are the architect",
-      "author": "Jim Rohn"
+      "author": "Jim Rohn",
+      "aria": {
+        "quote": "Inspirational quote",
+        "author": "Quote author"
+      }
+    },
+    "layout": {
+      "main": {
+        "aria": "Main content area"
+      },
+      "footer": {
+        "aria": "Application dock"
+      }
     }
+  },
+  "todo": {
+    "sheet": {
+      "title": "Todo List",
+      "empty": "No todos yet",
+      "add": "New List",
+      "description": "A list of tasks to help you stay organized and on top of your work, projects, and goals.",
+      "input": {
+        "placeholder": "What needs to be done?"
+      }
+    },
+    "item": {
+      "completed": "Completed",
+      "uncompleted": "Uncompleted"
+    },
+    "list": {
+      "create": {
+        "title": "Create New List",
+        "description": "Create a new list to organize your tasks. Choose an emoji and give it a name.",
+        "emoji": {
+          "label": "List Icon",
+          "selected": "Selected emoji: {{emoji}}",
+          "select": "Select emoji {{emoji}}"
+        },
+        "name": {
+          "label": "List Name",
+          "placeholder": "Enter list name"
+        },
+        "button": "Create List"
+      },
+      "empty": "No tasks",
+      "task": {
+        "add": {
+          "completed": "Add a completed task",
+          "normal": "Add a task"
+        }
+      }
+    }
+  },
+  "sidebar": {
+    "app": {
+      "title": "Meelio",
+      "sections": {
+        "productivity": "Productivity",
+        "wellbeing": "Wellbeing"
+      },
+      "toggle": "Toggle"
+    }
+  },
+  "breathing": {
+    "method": {
+      "title": "Breathing Method",
+      "description": "Select a breathing method to help you relax and focus",
+      "change": "Change Breathe Method",
+      "methods": {
+        "calmDown": {
+          "name": "Calm Down",
+          "description": "4-6 Extended Exhale",
+          "details": "Inhale for 4 seconds, exhale for 6 seconds"
+        },
+        "clearMind": {
+          "name": "Clear the Mind",
+          "description": "4-4 Equal Breathing",
+          "details": "Inhale for 4 seconds, exhale for 4 seconds"
+        },
+        "relaxDeeply": {
+          "name": "Relax Deeply",
+          "description": "4-7-8 Breathing",
+          "details": "Inhale for 4 seconds, hold for 7 seconds, exhale for 8 seconds"
+        },
+        "relieveStress": {
+          "name": "Relieve Stress",
+          "description": "4-4-4-4 Box Breathing",
+          "details": "Inhale for 4 seconds, hold for 4 seconds, exhale for 4 seconds, hold for 4 seconds"
+        }
+      }
+    }
+  },
+  "timer": {
+    "stats": {
+      "title": "Stats",
+      "description": "Focus and break time for the week",
+      "chart": {
+        "focus": "Focus",
+        "breaks": "Breaks",
+        "minutes": "mins",
+        "weekday": {
+          "format": "short"
+        }
+      }
+    }
+  },
+  "settings": {
+    "dialog": {
+      "title": "Settings",
+      "description": "Manage your account settings",
+      "nav": {
+        "home": "Home",
+        "notifications": "Notifications",
+        "appearance": "Appearance",
+        "privacy": "Privacy & visibility",
+        "advanced": "Advanced"
+      }
+    }
+  },
+  "profile": {
+    "image": {
+      "alt": "Profile"
+    },
+    "your-profile": "Your profile",
+    "meelio-version": "Meelio Version:"
   }
 }
