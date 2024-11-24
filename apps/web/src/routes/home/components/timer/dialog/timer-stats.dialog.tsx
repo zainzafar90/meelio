@@ -1,5 +1,3 @@
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-
 import { Icons } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 import { TimerExpandedContent } from "../components/timer-expanded-content";
 
@@ -33,7 +32,7 @@ export const TimerStatsDialog = ({
         //   e.preventDefault();
         // }}
       >
-        <VisuallyHidden.Root>
+        <VisuallyHidden>
           <DialogHeader>
             <DialogTitle>Pomodoro</DialogTitle>
             <DialogDescription>
@@ -42,7 +41,7 @@ export const TimerStatsDialog = ({
               short breaks.
             </DialogDescription>
           </DialogHeader>
-        </VisuallyHidden.Root>
+        </VisuallyHidden>
         <TimerExpandedContent />
         <DialogFooter className="sm:justify-between">
           <Button variant="secondary" onClick={onSettingsClick}>

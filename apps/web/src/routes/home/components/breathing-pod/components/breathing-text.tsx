@@ -23,7 +23,7 @@ export const BreathingText: React.FC = () => {
           animate="animate"
           variants={textVariants}
           transition={{ duration: 0.5 }}
-          className="inline-block bg-gradient-to-br from-indigo-600/80 to-sky-600/80 bg-clip-text font-alumini text-3xl font-semibold tracking-normal text-transparent"
+          className="inline-block bg-gradient-to-br from-red-600/80 to-amber-600/80 bg-clip-text text-lg font-light uppercase tracking-normal text-transparent"
         >
           {isActive
             ? phase === "inhale"
