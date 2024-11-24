@@ -1,169 +1,90 @@
 import { create } from "zustand";
 
-export interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  date: string;
-  listId: string;
-  assignees?: {
-    name: string;
-    image?: string;
-  }[];
-}
-
-export interface List {
-  id: string;
-  name: string;
-  icon?: string;
-  emoji: string;
-  type: "system" | "custom";
-  count?: number;
-}
-
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    title: "Buy groceries",
-    completed: false,
-    date: "Today",
-    listId: "home",
-  },
-  {
-    id: "2",
-    title: "Clean the house",
-    completed: true,
-    date: "Today",
-    listId: "home",
-  },
-  {
-    id: "3",
-    title: "Finish project presentation",
-    completed: false,
-    date: "Today",
-    listId: "work",
-  },
-  {
-    id: "4",
-    title: "Schedule team meeting",
-    completed: false,
-    date: "Tomorrow",
-    listId: "work",
-  },
-  {
-    id: "5",
-    title: "Go to the gym",
-    completed: false,
-    date: "Today",
-    listId: "personal",
-  },
-  {
-    id: "6",
-    title: "Read a book",
-    completed: true,
-    date: "Today",
-    listId: "personal",
-  },
-  {
-    id: "7",
-    title: "Pay bills",
-    completed: false,
-    date: "Tomorrow",
-    listId: "home",
-  },
-  {
-    id: "8",
-    title: "Call mom",
-    completed: false,
-    date: "Today",
-    listId: "personal",
-  },
-  {
-    id: "9",
-    title: "Review code PR",
-    completed: true,
-    date: "Today",
-    listId: "work",
-  },
-  {
-    id: "10",
-    title: "Update portfolio",
-    completed: false,
-    date: "Tomorrow",
-    listId: "work",
-  },
-];
-
-const initialLists: List[] = [
-  {
-    id: "all",
-    name: "All Tasks",
-    icon: "ListTodo",
-    emoji: "📋",
-    type: "system",
-  },
-  { id: "home", name: "Home", icon: "Home", emoji: "🏠", type: "system" },
-  {
-    id: "completed",
-    name: "Completed",
-    icon: "CheckSquare",
-    emoji: "✅",
-    type: "system",
-  },
-  { id: "today", name: "Today", icon: "Calendar", emoji: "📅", type: "system" },
-  {
-    id: "personal",
-    name: "Personal",
-    icon: "User",
-    emoji: "👤",
-    type: "system",
-  },
-  { id: "work", name: "Work", icon: "Briefcase", emoji: "💼", type: "system" },
-];
+import {
+  addList,
+  addTask,
+  deleteList,
+  deleteTask,
+  ensureSystemLists,
+  getAllLists,
+  getAllTasks,
+  Task,
+  TodoList,
+  updateList,
+  updateTask,
+} from "@/lib/db/todo-db";
 
 interface TodoState {
   isVisible: boolean;
-  lists: List[];
+  lists: TodoList[];
   tasks: Task[];
   activeListId: string;
   setIsVisible: (isVisible: boolean) => void;
-  addTask: (task: Task) => void;
-  toggleTask: (taskId: string) => void;
-  deleteTask: (taskId: string) => void;
-  addList: (list: List) => void;
-  deleteList: (listId: string) => void;
+  addTask: (task: Omit<Task, "createdAt" | "updatedAt">) => Promise<void>;
+  toggleTask: (taskId: string) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
+  addList: (list: Omit<TodoList, "createdAt" | "updatedAt">) => Promise<void>;
+  deleteList: (listId: string) => Promise<void>;
   setActiveList: (listId: string) => void;
-  updateListEmoji: (listId: string, emoji: string) => void;
+  updateListEmoji: (listId: string, emoji: string) => Promise<void>;
+  initializeStore: () => Promise<void>;
 }
 
-export const useTodoStore = create<TodoState>((set) => ({
+export const useTodoStore = create<TodoState>((set, get) => ({
   isVisible: false,
-  lists: initialLists,
-  tasks: initialTasks,
-  activeListId: "home",
+  lists: [],
+  tasks: [],
+  activeListId: "today",
+
   setIsVisible: (isVisible) => set({ isVisible }),
-  addTask: (task) => set((state) => ({ tasks: [...state.tasks, task] })),
-  toggleTask: (taskId) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      ),
-    })),
-  deleteTask: (taskId) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== taskId),
-    })),
-  addList: (list) => set((state) => ({ lists: [...state.lists, list] })),
-  deleteList: (listId) =>
-    set((state) => ({
-      lists: state.lists.filter((list) => list.id !== listId),
-      tasks: state.tasks.filter((task) => task.listId !== listId),
-    })),
+
+  addTask: async (task) => {
+    await addTask(task);
+    const tasks = await getAllTasks();
+    set({ tasks });
+  },
+
+  toggleTask: async (taskId) => {
+    const task = get().tasks.find((t) => t.id === taskId);
+    if (task) {
+      await updateTask(taskId, { completed: !task.completed });
+      const tasks = await getAllTasks();
+      set({ tasks });
+    }
+  },
+
+  deleteTask: async (taskId) => {
+    await deleteTask(taskId);
+    const tasks = await getAllTasks();
+    set({ tasks });
+  },
+
+  addList: async (list) => {
+    await addList(list);
+    const lists = await getAllLists();
+    set({ lists });
+  },
+
+  deleteList: async (listId) => {
+    await deleteList(listId);
+    const [lists, tasks] = await Promise.all([getAllLists(), getAllTasks()]);
+    set({ lists, tasks });
+  },
+
   setActiveList: (listId) => set({ activeListId: listId }),
-  updateListEmoji: (listId, emoji) =>
-    set((state) => ({
-      lists: state.lists.map((list) =>
-        list.id === listId ? { ...list, emoji } : list
-      ),
-    })),
+
+  updateListEmoji: async (listId, emoji) => {
+    await updateList(listId, { emoji });
+    const lists = await getAllLists();
+    set({ lists });
+  },
+
+  initializeStore: async () => {
+    await ensureSystemLists();
+    const [lists, tasks] = await Promise.all([getAllLists(), getAllTasks()]);
+    set({ lists, tasks });
+  },
 }));
+
+// Initialize the store when the app starts
+useTodoStore.getState().initializeStore();

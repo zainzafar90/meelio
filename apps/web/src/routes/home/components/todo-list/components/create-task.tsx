@@ -1,7 +1,5 @@
 import { KeyboardEvent, useState } from "react";
 
-import { Circle, Plus } from "lucide-react";
-
 import { Icons } from "@/components/icons/icons";
 import { Input } from "@/components/ui/input";
 import { useTodoStore } from "@/stores/todo.store";
@@ -15,9 +13,9 @@ export function CreateTask() {
       addTask({
         id: crypto.randomUUID(),
         title: title.trim(),
-        completed: false,
+        completed: activeListId === "completed",
         date: "Today",
-        listId: activeListId,
+        listId: activeListId === "completed" ? "today" : activeListId,
       });
       setTitle("");
     }
@@ -31,7 +29,9 @@ export function CreateTask() {
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
-        placeholder="Add a Task"
+        placeholder={
+          activeListId === "completed" ? "Add a completed task" : "Add a task"
+        }
         autoFocus
       />
     </div>

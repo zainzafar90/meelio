@@ -1,7 +1,8 @@
+import { Task } from "@/lib/db/todo-db";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 import { Badge } from "@/components/ui/badge";
-import { Task, useTodoStore } from "@/stores/todo.store";
+import { useTodoStore } from "@/stores/todo.store";
 
 interface TaskListProps {
   title: string;

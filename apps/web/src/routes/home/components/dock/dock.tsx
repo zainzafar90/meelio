@@ -94,15 +94,15 @@ export const Dock = () => {
         icon: Icons.settings,
         activeIcon: Icons.settingsActive,
       },
-      // {
-      //   id: "todo",
-      //   name: t("common.todo"),
-      //   icon: Icons.todoList,
-      //   activeIcon: Icons.todoListActive,
-      //   onClick: () => {
-      //     useTodoStore.getState().setIsVisible(true);
-      //   },
-      // },
+      {
+        id: "todo",
+        name: t("common.todo"),
+        icon: Icons.todoList,
+        activeIcon: Icons.todoListActive,
+        onClick: () => {
+          useTodoStore.getState().setIsVisible(true);
+        },
+      },
     ],
     [t, i18n.language]
   );
