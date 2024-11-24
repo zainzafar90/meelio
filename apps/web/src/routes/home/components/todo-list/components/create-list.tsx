@@ -52,17 +52,21 @@ export function CreateList({ children }: CreateListProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
-  const { addList } = useTodoStore();
+  const { addList, setActiveList } = useTodoStore();
 
   const handleCreate = () => {
     if (!name.trim()) return;
 
+    const newListId = crypto.randomUUID();
+
     addList({
-      id: crypto.randomUUID(),
+      id: newListId,
       name: name.trim(),
       type: "custom",
       emoji: selectedEmoji,
     });
+
+    setActiveList(newListId);
 
     setName("");
     setSelectedEmoji("📝");
