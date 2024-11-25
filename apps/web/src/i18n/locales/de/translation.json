@@ -234,5 +234,11 @@
     },
     "your-profile": "Dein Profil",
     "meelio-version": "Meelio Version:"
+  },
+  "backgrounds": {
+    "title": "Hintergrund ändern",
+    "addNew": "Neuen Hintergrund hinzufügen",
+    "source": "Quelle",
+    "author": "Autor"
   }
 }

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { toZonedTime } from "date-fns-tz";
-import { MoonIcon, SunIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -49,7 +48,7 @@ export const ClockDock = () => {
         "bg-gradient-to-b from-zinc-800 to-zinc-900"
       )}
     >
-      <div className="relative flex aspect-square w-8 items-center justify-center rounded-full">
+      <div className="relative flex aspect-square w-7 items-center justify-center rounded-full">
         <div
           className={cn(
             "relative flex aspect-square w-full items-center justify-center rounded-full",
@@ -93,15 +92,6 @@ export const ClockDock = () => {
           >
             <div className={cn("h-0.5 w-0.5 rounded-full", clockFaceClass)} />
           </div>
-
-          {/* Day/Night indicator */}
-          <span className="right- 2 absolute bottom-3.5 opacity-50">
-            {isDaytime ? (
-              <SunIcon className={cn("size-1", clockFaceClass)} />
-            ) : (
-              <MoonIcon className={cn("size-1", clockFaceClass)} />
-            )}
-          </span>
         </div>
       </div>
     </div>

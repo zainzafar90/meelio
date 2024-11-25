@@ -1,9 +1,14 @@
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useDockStore } from "@/stores/dock.store";
 import { useTranslation } from "react-i18next";
 
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { useDockStore } from "@/stores/dock.store";
+
 import { AppSidebar } from "./components/app-sidebar";
-import { Background, BackgroundOverlay } from "./components/backgrounds";
+import {
+  Background,
+  BackgroundOverlay,
+} from "./components/backgrounds/backgrounds";
+import { BackgroundSelectorSheet } from "./components/backgrounds/components/background-selector.sheet";
 import { BreathePod } from "./components/breathing-pod/breathing-pod";
 // import { Clock } from "./components/clock/clock";
 import { Dock } from "./components/dock/dock";
@@ -39,7 +44,7 @@ const Content = () => {
   const { t } = useTranslation();
 
   return (
-    <main 
+    <main
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
@@ -47,6 +52,7 @@ const Content = () => {
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TodoListSheet />
+      <BackgroundSelectorSheet />
     </main>
   );
 };
@@ -83,7 +89,7 @@ const TopBar = () => {
 const BottomBar = () => {
   const { t } = useTranslation();
   return (
-    <footer 
+    <footer
       className="flex items-center justify-center pb-2"
       aria-label={t("home.layout.footer.aria")}
     >

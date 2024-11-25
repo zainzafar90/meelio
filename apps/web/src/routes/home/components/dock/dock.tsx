@@ -12,10 +12,18 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 
 import { DockButton, DockItem } from "../dock-button";
+import { BackgroundDock } from "./components/background.dock";
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
 
 const STATIC_DOCK_ITEMS: DockItem[] = [
+  {
+    id: "background",
+    name: "Background",
+    icon: BackgroundDock,
+    activeIcon: BackgroundDock,
+    isStatic: true,
+  },
   {
     id: "clock",
     name: "Clock",

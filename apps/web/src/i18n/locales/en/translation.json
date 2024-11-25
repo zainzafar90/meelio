@@ -235,5 +235,11 @@
     },
     "your-profile": "Your profile",
     "meelio-version": "Meelio Version:"
+  },
+  "backgrounds": {
+    "title": "Change Background",
+    "addNew": "Add New Background",
+    "source": "Source",
+    "author": "Author"
   }
 }
