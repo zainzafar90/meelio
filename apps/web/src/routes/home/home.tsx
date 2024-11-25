@@ -4,10 +4,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 
 import { AppSidebar } from "./components/app-sidebar";
-import {
-  Background,
-  BackgroundOverlay,
-} from "./components/backgrounds/backgrounds";
+import { Background } from "./components/backgrounds/backgrounds";
+import { BackgroundOverlay } from "./components/backgrounds/components/background-overlay";
 import { BackgroundSelectorSheet } from "./components/backgrounds/components/background-selector.sheet";
 import { BreathePod } from "./components/breathing-pod/breathing-pod";
 // import { Clock } from "./components/clock/clock";

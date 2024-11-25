@@ -38,11 +38,20 @@ export const BackgroundSelectorSheet = () => {
                   : "border-transparent"
               )}
             >
-              <img
-                src={background.url}
-                alt={background.title}
-                className="h-full w-full object-cover"
-              />
+              <picture>
+                {/* Thumbnail for preview */}
+                <source
+                  srcSet={`${background.thumbnail}&dpr=2`}
+                  media="(-webkit-min-device-pixel-ratio: 2)"
+                />
+                <img
+                  src={background.thumbnail}
+                  alt={background.title}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
               <div className="absolute inset-0 bg-black/40 p-4 opacity-0 transition-opacity group-hover:opacity-100">
                 <p className="text-sm font-medium text-white">
                   {background.title}

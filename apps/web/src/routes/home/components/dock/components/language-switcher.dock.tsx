@@ -7,7 +7,8 @@ export const LanguageSwitcherDock = () => {
   const { i18n } = useTranslation();
 
   const toggleLanguage = () => {
-    const newLang = i18n.language === "en" ? "de" : "en";
+    const newLang =
+      i18n.language === "en" || i18n.language === "en-US" ? "de" : "en";
     i18n.changeLanguage(newLang);
   };
 
@@ -26,14 +27,14 @@ export const LanguageSwitcherDock = () => {
     >
       <AnimatePresence mode="wait">
         <motion.span
-          className="text-base font-medium text-white"
+          className="text-base font-medium uppercase text-white"
           key={i18n.language}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.2 }}
         >
-          {i18n.language === "en" ? "EN" : "DE"}
+          {i18n.language === "en-US" || i18n.language === "en" ? "en" : "de"}
         </motion.span>
       </AnimatePresence>
     </button>
