@@ -23,7 +23,7 @@ interface DockState {
 }
 
 export const useDockStore = create<DockState>()((set) => ({
-  isTimerVisible: true,
+  isTimerVisible: false,
   isBreathingVisible: false,
   isGreetingsVisible: true,
   isSoundscapesVisible: false,
