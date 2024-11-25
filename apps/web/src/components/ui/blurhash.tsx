@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { decode } from "blurhash";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface BlurhashProps {
   hash: string;
@@ -18,7 +19,7 @@ export function Blurhash({
   className,
 }: BlurhashProps) {
   const [url, setUrl] = useState<string>();
-  console.log(hash);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,14 +45,22 @@ export function Blurhash({
 
   if (!hash) return null;
 
-  return url ? (
-    <div
-      className={className}
-      style={{
-        backgroundImage: `url(${url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    />
-  ) : null;
+  return (
+    <AnimatePresence>
+      {isVisible && url && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          onAnimationComplete={() => setIsVisible(false)}
+          className={className}
+          style={{
+            backgroundImage: `url(${url})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+      )}
+    </AnimatePresence>
+  );
 }

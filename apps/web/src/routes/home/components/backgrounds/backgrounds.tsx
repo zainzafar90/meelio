@@ -19,35 +19,44 @@ const LiveWallpaperComponent = ({
 
   return (
     <div className="relative h-full w-full">
-      {!isLoaded && (
-        <Blurhash
-          hash={wallpaper.blurhash}
-          width={32}
-          height={32}
-          className="absolute inset-0 h-full w-full"
-        />
-      )}
-      <video
-        key={wallpaper.video.src}
-        className={cn(
-          "absolute inset-0 h-full w-full object-cover",
-          !isLoaded && "opacity-0",
-          "transition-opacity duration-500"
+      <AnimatePresence>
+        {!isLoaded && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="absolute inset-0"
+          >
+            <Blurhash
+              hash={wallpaper.blurhash}
+              width={32}
+              height={32}
+              className="h-full w-full"
+            />
+          </motion.div>
         )}
+      </AnimatePresence>
+
+      <motion.video
+        key={wallpaper.video.src}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: "easeIn" }}
+        className="absolute inset-0 h-full w-full object-cover"
         autoPlay
         muted
         loop
         playsInline
         poster={wallpaper.video.fallbackImage}
+        onLoadedData={() => setIsLoaded(true)}
       >
         <source src={wallpaper.video.src} type="video/mp4" />
         <img
           src={wallpaper.video.fallbackImage}
           alt={wallpaper.title}
           className="absolute inset-0 h-full w-full object-cover"
-          onLoad={() => setIsLoaded(true)}
         />
-      </video>
+      </motion.video>
     </div>
   );
 };
@@ -61,14 +70,24 @@ const StaticWallpaperComponent = ({
 
   return (
     <div className="relative h-full w-full">
-      {!isLoaded && (
-        <Blurhash
-          hash={wallpaper.blurhash}
-          width={32}
-          height={32}
-          className="absolute inset-0 h-full w-full"
-        />
-      )}
+      <AnimatePresence>
+        {!isLoaded && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="absolute inset-0"
+          >
+            <Blurhash
+              hash={wallpaper.blurhash}
+              width={32}
+              height={32}
+              className="h-full w-full"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <picture>
         <source
           media="(max-width: 640px)"
@@ -86,14 +105,13 @@ const StaticWallpaperComponent = ({
           media="(min-width: 1921px)"
           srcSet={`${wallpaper.url}?w=3840&q=80&auto=format`}
         />
-        <img
+        <motion.img
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isLoaded ? 1 : 0 }}
+          transition={{ duration: 0.5, ease: "easeIn" }}
           src={`${wallpaper.url}?w=1920&q=80&auto=format`}
           alt={wallpaper.title}
-          className={cn(
-            "h-full w-full object-cover",
-            !isLoaded && "opacity-0",
-            "transition-opacity duration-500"
-          )}
+          className="h-full w-full object-cover"
           loading="eager"
           onLoad={() => setIsLoaded(true)}
         />
