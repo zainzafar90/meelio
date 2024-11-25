@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,23 +14,27 @@ import {
 import { Button } from "@/components/ui/button";
 
 export const ResetTimerDialog = (props: { onReset: () => void }) => {
+  const { t } = useTranslation();
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button size="lg" variant="destructive">
-          Reset
+          {t("common.actions.delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reset Timer</AlertDialogTitle>
+          <AlertDialogTitle>{t("timer.reset.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to reset the timer? All progress will be lost.
+            {t("timer.reset.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={props.onReset}>Yes</AlertDialogAction>
+          <AlertDialogCancel>{t("common.actions.cancel")}</AlertDialogCancel>
+          <AlertDialogAction onClick={props.onReset}>
+            {t("common.actions.confirm")}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

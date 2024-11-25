@@ -14,6 +14,8 @@
 |-----------------------------------------------------------------------------------|
 */
 
+import { t } from "i18next";
+
 export type PomodoroTimer = {
   activeStage: PomodoroStage;
   running: boolean;
@@ -34,7 +36,7 @@ export enum PomodoroStage {
 }
 
 export const PomodoroStageMap = {
-  [PomodoroStage.WorkTime]: "Focus",
-  [PomodoroStage.ShortBreak]: "Short Break",
-  [PomodoroStage.LongBreak]: "Long Break",
+  [PomodoroStage.WorkTime]: t("timer.stages.focus"),
+  [PomodoroStage.ShortBreak]: t("timer.stages.shortBreak"),
+  [PomodoroStage.LongBreak]: t("timer.stages.longBreak"),
 };

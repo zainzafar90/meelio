@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { useTranslation } from "react-i18next";
 
 import { PomodoroStage } from "@/types/pomodoro";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export const TimerSettingsDialog = ({
     changeTimerSettings,
   } = usePomodoroStore();
   const { broadcastDurationChange } = usePomodoroSync();
+  const { t } = useTranslation();
 
   const { stageSeconds } = timer;
 
@@ -67,8 +69,8 @@ export const TimerSettingsDialog = ({
     broadcastDurationChange(data.shortBreak * MINUTE_IN_SECONDS);
     broadcastDurationChange(data.longBreak * MINUTE_IN_SECONDS);
 
-    toast.success("Settings saved", {
-      description: "Your settings have been saved.",
+    toast.success(t("timer.settings.toast.success"), {
+      description: t("timer.settings.toast.description"),
     });
     onClose();
   };
@@ -84,8 +86,8 @@ export const TimerSettingsDialog = ({
     >
       <DialogContent className="">
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
-          <DialogDescription>Configure the timer settings</DialogDescription>
+          <DialogTitle>{t("timer.settings.title")}</DialogTitle>
+          <DialogDescription>{t("timer.settings.description")}</DialogDescription>
         </DialogHeader>
 
         <form
@@ -94,11 +96,10 @@ export const TimerSettingsDialog = ({
         >
           <div className="border-t border-foreground/5 pt-4">
             <h3 className="text-base font-semibold leading-6 text-foreground">
-              Timer
+              {t("timer.settings.timer.title")}
             </h3>
             <p className="mt-1 text-sm text-foreground/70">
-              Configure the timer settings in minutes, recommended values are
-              between 1 and 60 minutes.
+              {t("timer.settings.timer.description")}
             </p>
           </div>
 
@@ -108,7 +109,7 @@ export const TimerSettingsDialog = ({
                 htmlFor="pomodoro"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
-                Pomodoro
+                {t("timer.settings.pomodoro.label")}
               </label>
               <div className="mt-2">
                 <Controller
@@ -136,7 +137,7 @@ export const TimerSettingsDialog = ({
                 htmlFor="short-break"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
-                Short Break
+                {t("timer.settings.pomodoro.shortBreak")}
               </label>
               <div className="mt-2">
                 <Controller
@@ -164,7 +165,7 @@ export const TimerSettingsDialog = ({
                 htmlFor="long-break"
                 className="block text-sm font-medium leading-6 text-foreground"
               >
-                Long Break
+                {t("timer.settings.pomodoro.longBreak")}
               </label>
               <div className="mt-2">
                 <Controller
@@ -190,10 +191,9 @@ export const TimerSettingsDialog = ({
           </div>
           <div className="flex items-center justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
-              <span className="text-md">Auto Start Breaks</span>
+              <span className="text-md">{t("timer.settings.autoStart.label")}</span>
               <span className="text-sm font-normal leading-snug text-foreground/70">
-                Start breaks after work sessions, i.e. after 25 minutes of work
-                time automatically start a 5 minute break.
+                {t("timer.settings.autoStart.description")}
               </span>
             </Label>
             <Switch
@@ -205,9 +205,9 @@ export const TimerSettingsDialog = ({
 
           <div className="flex items-center justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
-              <span className="text-md">Enable Sounds</span>
+              <span className="text-md">{t("timer.settings.sound.label")}</span>
               <span className="text-sm font-normal leading-snug text-foreground/70">
-                Play sounds when the timer ends, and when breaks start.
+                {t("timer.settings.sound.description")}
               </span>
             </Label>
             <Switch
@@ -219,19 +219,18 @@ export const TimerSettingsDialog = ({
 
           <div className="flex items-start justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
-              <span className="text-md"> Reset Pomodoro Timer</span>
+              <span className="text-md">{t("timer.settings.reset.label")}</span>
               <span className="text-sm font-normal leading-snug text-foreground/70">
-                Are you sure you want to reset the timer? This will reset the
-                timer to the default settings.
+                {t("timer.settings.reset.description")}
               </span>
             </Label>
             <ResetTimerDialog onReset={resetTimer} />
           </div>
           <DialogFooter className="mt-4 flex gap-2 border-t border-t-zinc-100 pt-4 dark:border-t-zinc-900 sm:gap-1">
             <Button type="button" variant="secondary" onClick={() => onClose()}>
-              Close
+              {t("common.actions.close")}
             </Button>
-            <Button type="submit">Save</Button>
+            <Button type="submit">{t("common.actions.save")}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

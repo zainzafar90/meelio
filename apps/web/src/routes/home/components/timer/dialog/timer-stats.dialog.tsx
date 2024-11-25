@@ -1,3 +1,5 @@
+import { t } from "i18next";
+
 import { Icons } from "@/components/icons/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,11 +36,9 @@ export const TimerStatsDialog = ({
       >
         <VisuallyHidden>
           <DialogHeader>
-            <DialogTitle>Pomodoro</DialogTitle>
+            <DialogTitle>{t("timer.stats.title")}</DialogTitle>
             <DialogDescription>
-              Pomodoro is a time management technique that uses a timer to break
-              work into intervals, typically 25 minutes in length, separated by
-              short breaks.
+              {t("timer.stats.description")}
             </DialogDescription>
           </DialogHeader>
         </VisuallyHidden>
@@ -46,10 +46,11 @@ export const TimerStatsDialog = ({
         <DialogFooter className="sm:justify-between">
           <Button variant="secondary" onClick={onSettingsClick}>
             <Icons.settings className="size-4" />
+            <span className="sr-only">{t("common.actions.edit")}</span>
           </Button>
 
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            {t("common.actions.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -31,7 +31,24 @@
       "save": "Save",
       "delete": "Delete",
       "edit": "Edit",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "reset": "Reset",
+      "start": "Start",
+      "stop": "Stop",
+      "skip": "Skip"
+    },
+    "close": "Close",
+    "weekdays": {
+      "short": {
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat",
+        "sunday": "Sun"
+      }
     }
   },
   "soundscapes": {
@@ -147,6 +164,11 @@
     }
   },
   "timer": {
+    "stages": {
+      "focus": "Focus",
+      "shortBreak": "Short Break",
+      "longBreak": "Long Break"
+    },
     "stats": {
       "title": "Stats",
       "description": "Focus and break time for the week",
@@ -158,6 +180,40 @@
           "format": "short"
         }
       }
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Configure the timer settings",
+      "timer": {
+        "title": "Timer",
+        "description": "Configure the timer settings in minutes, recommended values are between 1 and 60 minutes."
+      },
+      "pomodoro": {
+        "label": "Pomodoro",
+        "shortBreak": "Short Break",
+        "longBreak": "Long Break"
+      },
+      "autoStart": {
+        "label": "Auto Start Breaks",
+        "description": "Start breaks after work sessions, i.e. after 25 minutes of work time automatically start a 5 minute break."
+      },
+      "sound": {
+        "label": "Enable Sounds",
+        "description": "Play sounds when the timer ends, and when breaks start."
+      },
+      "reset": {
+        "label": "Reset Pomodoro Timer",
+        "description": "Are you sure you want to reset the timer? This will reset the timer to the default settings.",
+        "button": "Reset"
+      },
+      "toast": {
+        "success": "Settings saved",
+        "description": "Your settings have been saved."
+      }
+    },
+    "reset": {
+      "title": "Reset Timer",
+      "description": "Are you sure you want to reset the timer? All progress will be lost."
     }
   },
   "settings": {

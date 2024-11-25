@@ -1,8 +1,8 @@
 import { memo, useEffect, useState } from "react";
 
-import { Bar, BarChart, XAxis } from "recharts";
-
+import { t } from "i18next";
 import { useTranslation } from "react-i18next";
+import { Bar, BarChart, XAxis } from "recharts";
 
 import { getWeeklySummary } from "@/lib/db/pomodoro-db";
 import {
@@ -22,11 +22,11 @@ import { MINUTE_IN_SECONDS } from "@/utils/common.utils";
 
 const chartConfig = {
   focus: {
-    label: "Focus",
+    label: t("timer.stages.focus"),
     color: "hsl(var(--chart-1))",
   },
   breaks: {
-    label: "Breaks",
+    label: t("timer.stages.shortBreak"),
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -51,6 +51,20 @@ export const TimerStats = memo(() => {
     loadData();
   }, []);
 
+  const getDayTranslation = (date: string) => {
+    const day = new Date(date).getDay();
+    const days = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    return t(`common.weekdays.short.${days[day]}`);
+  };
+
   return (
     <Card className="mt-4">
       <CardHeader>
@@ -67,11 +81,7 @@ export const TimerStats = memo(() => {
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => {
-                return new Date(value).toLocaleDateString(t("timer.stats.chart.weekday.format"), {
-                  weekday: t("timer.stats.chart.weekday.format"),
-                });
-              }}
+              tickFormatter={getDayTranslation}
             />
             <Bar
               dataKey="focus"

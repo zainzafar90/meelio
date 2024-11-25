@@ -31,7 +31,23 @@
       "save": "Speichern",
       "delete": "Löschen",
       "edit": "Bearbeiten",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "confirm": "Bestätigen",
+      "reset": "Zurücksetzen",
+      "start": "Starten",
+      "stop": "Stoppen",
+      "skip": "Überspringen"
+    },
+    "weekdays": {
+      "short": {
+        "monday": "Mo",
+        "tuesday": "Di",
+        "wednesday": "Mi",
+        "thursday": "Do",
+        "friday": "Fr",
+        "saturday": "Sa",
+        "sunday": "So"
+      }
     }
   },
   "soundscapes": {
@@ -147,6 +163,11 @@
     }
   },
   "timer": {
+    "stages": {
+      "focus": "Fokus",
+      "shortBreak": "Kurze Pause",
+      "longBreak": "Lange Pause"
+    },
     "stats": {
       "title": "Statistiken",
       "description": "Fokus- und Pausenzeit der Woche",
@@ -158,6 +179,40 @@
           "format": "short"
         }
       }
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Timer-Einstellungen konfigurieren",
+      "timer": {
+        "title": "Timer",
+        "description": "Konfiguriere die Timer-Einstellungen in Minuten, empfohlene Werte liegen zwischen 1 und 60 Minuten."
+      },
+      "pomodoro": {
+        "label": "Pomodoro",
+        "shortBreak": "Kurze Pause",
+        "longBreak": "Lange Pause"
+      },
+      "autoStart": {
+        "label": "Pausen automatisch starten",
+        "description": "Starte Pausen nach Arbeitseinheiten automatisch, z.B. nach 25 Minuten Arbeitszeit automatisch eine 5-minütige Pause starten."
+      },
+      "sound": {
+        "label": "Töne aktivieren",
+        "description": "Spiele Töne ab, wenn der Timer endet und Pausen beginnen."
+      },
+      "reset": {
+        "label": "Pomodoro Timer zurücksetzen",
+        "description": "Bist du sicher, dass du den Timer zurücksetzen möchtest? Dies setzt den Timer auf die Standardeinstellungen zurück.",
+        "button": "Zurücksetzen"
+      },
+      "toast": {
+        "success": "Einstellungen gespeichert",
+        "description": "Deine Einstellungen wurden gespeichert."
+      }
+    },
+    "reset": {
+      "title": "Timer zurücksetzen",
+      "description": "Bist du sicher, dass du den Timer zurücksetzen möchtest? Der gesamte Fortschritt geht verloren."
     }
   },
   "settings": {
