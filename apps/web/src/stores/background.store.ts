@@ -9,6 +9,7 @@ export interface BaseWallpaper {
   title: string;
   author: string;
   thumbnail: string;
+  blurhash: string;
   source: "unsplash" | "custom" | "local";
 }
 
@@ -43,6 +44,7 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     type: "live",
     title: "Rainy Forest",
     thumbnail: "/live-wallpapers/02-rainy-forest.avif",
+    blurhash: "L33b,b:#q@Y8.A#Ov|%hMdS5tmwZ",
     author: "Local",
     source: "local",
     video: {
@@ -55,6 +57,7 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     type: "live",
     title: "Spring Lofi",
     thumbnail: "/live-wallpapers/01-spring-lofi.avif",
+    blurhash: "LjI6AjogNtNG_4V@ocI;I@M_aKS#",
     author: "Local",
     source: "local",
     video: {
@@ -67,8 +70,10 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     type: "static",
     url: "https://images.unsplash.com/photo-1505699261378-c372af38134c",
     title: "Gray Bridge Golden Hour",
+
     thumbnail:
       "https://images.unsplash.com/photo-1505699261378-c372af38134c?w=160&fit=max",
+    blurhash: "L}JFcXIpNbX8}?RlS4W;xYe:a#W;",
     author: "Unsplash",
     source: "unsplash",
   },
@@ -79,6 +84,7 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     title: "Road In Trees",
     thumbnail:
       "https://images.unsplash.com/photo-1731432248688-b0b0d1743add?w=160&fit=max",
+    blurhash: "L39tbzoz02~TQqV]?Zxt01nO~m9b",
     author: "Unsplash",
     source: "unsplash",
   },
@@ -89,6 +95,7 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     title: "Mountain Lake",
     thumbnail:
       "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=160&fit=max",
+    blurhash: "LG87OVl:ICIoL#TKyZs;nNyYVXQ,",
     author: "Unsplash",
     source: "unsplash",
   },
@@ -99,6 +106,18 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     title: "Hills Aerial Snow Capped",
     thumbnail:
       "https://images.unsplash.com/photo-1543253539-58c7d1c00c8a?w=160&fit=max",
+    blurhash: "LXF}]PENNas:~EI?bHax4.X6s+ju",
+    author: "Unsplash",
+    source: "unsplash",
+  },
+  {
+    id: "static-5",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1732465286852-a0b95393a90d",
+    title: "Group of Mountains with Snow",
+    thumbnail:
+      "https://images.unsplash.com/photo-1732465286852-a0b95393a90d?w=160&fit=max",
+    blurhash: "LgF5%3E2Nxax~VIpX8ayT0o0s:R*",
     author: "Unsplash",
     source: "unsplash",
   },
