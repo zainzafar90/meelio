@@ -28,7 +28,7 @@ export const CalendarDock = () => {
       )}
       title={`${month} ${day}`}
     >
-      <div className="bg-red-600 pt-0 text-center text-xxs font-bold uppercase text-white">
+      <div className="bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
         {month}
       </div>
       <div className="flex flex-grow items-center justify-center">
