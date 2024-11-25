@@ -11,6 +11,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDockStore } from "@/stores/dock.store";
 
 import { AuthProvider } from "./auth-provider";
+import { BackgroundProvider } from "./background-provider";
 import { PomodoroProvider } from "./pomodoro-provider";
 
 type AppProviderProps = {
@@ -29,12 +30,14 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         <AuthProvider>
           <ThemeProvider storageKey="ui-theme" defaultTheme="system">
             <TooltipProvider>
-              <PomodoroProvider>
-                {children}
-                {isSoundscapesVisible && <SoundPlayer />}
-                <Toaster richColors />
-                <ConnectionWarning />
-              </PomodoroProvider>
+              <BackgroundProvider>
+                <PomodoroProvider>
+                  {children}
+                  {isSoundscapesVisible && <SoundPlayer />}
+                  <Toaster richColors />
+                  <ConnectionWarning />
+                </PomodoroProvider>
+              </BackgroundProvider>
             </TooltipProvider>
           </ThemeProvider>
         </AuthProvider>

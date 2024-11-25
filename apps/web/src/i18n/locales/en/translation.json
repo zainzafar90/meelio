@@ -131,6 +131,12 @@
         "productivity": "Productivity",
         "wellbeing": "Wellbeing"
       },
+      "login": "Login",
+      "register": "Register",
+      "account": "Account",
+      "billing": "Billing",
+      "upgradeToPro": "Upgrade to Pro",
+      "logout": "Logout",
       "toggle": "Toggle"
     }
   },
@@ -238,8 +244,12 @@
   },
   "backgrounds": {
     "title": "Change Background",
+    "description": "Select a background to change the wallpaper",
     "addNew": "Add New Background",
     "source": "Source",
-    "author": "Author"
+    "author": "Author",
+    "liveWallpapers": "Live Wallpapers",
+    "staticWallpapers": "Static Wallpapers",
+    "resetToDefault": "Reset to Default"
   }
 }

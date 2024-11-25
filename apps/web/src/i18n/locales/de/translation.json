@@ -130,6 +130,12 @@
         "productivity": "Produktivität",
         "wellbeing": "Wohlbefinden"
       },
+      "login": "Login",
+      "register": "Registrieren",
+      "account": "Account",
+      "billing": "Abrechnung",
+      "upgradeToPro": "Upgrade zu Pro",
+      "logout": "Logout",
       "toggle": "Umschalten"
     }
   },
@@ -237,8 +243,12 @@
   },
   "backgrounds": {
     "title": "Hintergrund ändern",
+    "description": "Wähle einen Hintergrund um den Bildschirm zu ändern",
     "addNew": "Neuen Hintergrund hinzufügen",
     "source": "Quelle",
-    "author": "Autor"
+    "author": "Autor",
+    "liveWallpapers": "Lebende Hintergründe",
+    "staticWallpapers": "Statische Hintergründe",
+    "resetToDefault": "Zurücksetzen auf Standard"
   }
 }
