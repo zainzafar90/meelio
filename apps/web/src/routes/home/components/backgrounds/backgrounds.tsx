@@ -39,13 +39,13 @@ const LiveWallpaperComponent = ({
         loop
         playsInline
         poster={wallpaper.video.fallbackImage}
-        onLoadedData={() => setIsLoaded(true)}
       >
         <source src={wallpaper.video.src} type="video/mp4" />
         <img
           src={wallpaper.video.fallbackImage}
           alt={wallpaper.title}
           className="absolute inset-0 h-full w-full object-cover"
+          onLoad={() => setIsLoaded(true)}
         />
       </video>
     </div>
