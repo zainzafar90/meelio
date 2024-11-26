@@ -1,6 +1,8 @@
 import { useState } from "react";
 
 import { PlanInterval } from "@/types/subscription";
+import { Icons } from "@/components/icons/icons";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 
 import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
@@ -9,24 +11,24 @@ const allPlans = [
   {
     value: "monthly",
     label: "Monthly",
-    price: 2,
-    priceLabel: "/ Mo",
+    price: 4,
+    priceLabel: "",
     description: "Billed Montly",
   },
   {
     value: "yearly",
     label: "Yearly",
-    price: 20,
-    priceLabel: "/ Yr",
-    description: "Billed Yearly (20% Off)",
+    price: 40,
+    priceLabel: "",
+    description: "Billed Yearly",
   },
-  {
-    value: "lifetime",
-    label: "Lifetime",
-    price: 30,
-    priceLabel: "/ Lifetime",
-    description: "Pay Once Use Forever",
-  },
+  // {
+  //   value: "lifetime",
+  //   label: "Lifetime",
+  //   price: 100,
+  //   priceLabel: "/ Lifetime",
+  //   description: "Use Forever",
+  // },
 ];
 
 export const Plans = ({
@@ -44,32 +46,40 @@ export const Plans = ({
         setSelectedPlan(value);
         onPlanChange(value);
       }}
-      className="overflow-x-scroll no-scrollbar flex py-4 gap-y-6 gap-x-4 pr-24 px-1"
+      className="no-scrollbar flex flex-wrap gap-x-4 gap-y-6 overflow-x-scroll px-1 py-4 pr-24"
     >
       {allPlans.map((plan) => (
         <div key={plan.value}>
           <Label
             htmlFor={plan.value}
-            className="relative flex min-w-48 flex-shrink-0 cursor-pointer rounded-lg border bg-background/50 p-4 shadow-sm select-none focus:outline-none border-foreground/20 hover:border-foreground/50 transition [&:has([data-state=checked])]:border-accent [&:has([data-state=checked])]:ring-1 [&:has([data-state=checked])]:ring-accent"
+            className="relative flex flex-shrink-0 cursor-pointer select-none flex-wrap rounded-lg border border-foreground/20 bg-background/50 p-3 shadow-sm transition hover:border-foreground/50 focus:outline-none [&:has([data-state=checked])]:border-accent [&:has([data-state=checked])]:ring-1 [&:has([data-state=checked])]:ring-accent"
           >
             <RadioGroupItem
               id={plan.value}
               value={plan.value}
               className="peer sr-only"
             />
-            <div className="flex gap-4 flex-1 px-2">
+            <div className="flex min-w-max flex-1 gap-4 px-2">
               <div className="flex flex-col">
-                <span className="block text-base font-medium text-foreground/90">
+                <span className="block text-sm font-medium text-foreground/90">
                   {plan.price}${" "}
-                  <small className="align-baseline opacity-90 uppercase">
+                  <small className="align-baseline text-xs uppercase opacity-90">
                     {plan.priceLabel}
                   </small>
                 </span>
-                <span className="mt-1 flex max-w-[12rem] items-center text-sm text-foreground/50 font-normal">
+                <span className="mt-1 flex items-center text-sm font-normal text-foreground/50">
                   {plan.description}
                 </span>
               </div>
             </div>
+
+            {plan.value === "yearly" && (
+              <div className="absolute right-1 top-2">
+                <Badge className="bg-red-500 px-1 uppercase">
+                  <span className="text-xs">20% off</span>
+                </Badge>
+              </div>
+            )}
           </Label>
         </div>
       ))}

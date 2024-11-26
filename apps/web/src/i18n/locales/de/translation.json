@@ -251,6 +251,20 @@
         "dark": "Dunkel",
         "system": "System"
       }
+    },
+    "account": {
+      "description": "Verwalte dein Konto",
+      "updateError": "Fehler beim Aktualisieren des Kontos",
+      "nameUpdated": "Name aktualisiert",
+      "name": {
+        "label": "Name",
+        "description": "Bitte gib deinen Namen ein",
+        "placeholder": "John Doe"
+      }
+    },
+    "billing": {
+      "title": "Abrechnung",
+      "description": "Verwalte deine Abrechnung"
     }
   },
   "profile": {

@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { SettingsDialog } from "@/components/settings.dialog";
 import { useSettingsStore } from "@/stores/settings.store";
+
+import { SettingsDialog } from "../../settings/settings.dialog";
 
 export const SettingsDock = () => {
   const { openSettings } = useSettingsStore();

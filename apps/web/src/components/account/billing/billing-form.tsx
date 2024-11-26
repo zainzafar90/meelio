@@ -7,14 +7,6 @@ import { AuthUser } from "@/types/auth";
 import { PlanInterval, Subscription } from "@/types/subscription";
 import { cn, formatDate } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { env } from "@/utils/common.utils";
 
@@ -110,15 +102,15 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {subscriptionPlan ? (
-        <ProPlanCard
+        <ProPlanSection
           subscriptionPlan={subscriptionPlan}
           isLoadingPortal={isLoadingPortal}
           onManageSubscription={onManageSubscription}
         />
       ) : (
-        <FreePlanCard
+        <FreePlanSection
           isLoadingPortal={isLoadingPortal}
           onOpenCheckout={onOpenCheckout}
         />
@@ -139,7 +131,7 @@ function SkeletonSubscription() {
   );
 }
 
-function ProPlanCard({
+function ProPlanSection({
   subscriptionPlan,
   isLoadingPortal,
   onManageSubscription,
@@ -159,54 +151,51 @@ function ProPlanCard({
   };
 
   return (
-    <Card className="bg-background">
-      <CardHeader>
-        <CardTitle className="text-md">Subscription Plan</CardTitle>
-        <CardDescription className="text-foreground/70">
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium">Subscription Plan</h3>
+        <p className="text-sm text-foreground/70">
           You are currently on the{" "}
           <strong className="font-semibold">
             {subscriptionPlan.productName}
           </strong>{" "}
           plan.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="text-sm">
-        {isProSubscriptionValid(subscriptionPlan) ? (
-          <p className="rounded-full text-xs">
-            {subscriptionPlan.cancelled
-              ? "Your plan will be canceled on "
-              : "Your plan renews on "}
-            <strong className="font-semibold">
-              {subscriptionPlan.renewsAt &&
-                formatDate(subscriptionPlan.renewsAt)}
-            </strong>
-          </p>
-        ) : null}
-      </CardContent>
-      <CardFooter className="p-4 border-t rounded-b-md border-grey-200 bg-background/80 text-foreground">
-        <div className="flex flex-col items-start justify-between sm:w-full sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            Manage your subscription plan and billing information.
-          </p>
-          <button
-            className={cn(buttonVariants(), "sm:ml-auto")}
-            disabled={isLoadingPortal}
-            onClick={onManageSubscription}
-          >
-            {isLoadingPortal && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            {isProSubscriptionValid(subscriptionPlan)
-              ? "Open Customer Portal"
-              : "Upgrade to PRO"}
-          </button>
-        </div>
-      </CardFooter>
-    </Card>
+        </p>
+      </div>
+
+      {isProSubscriptionValid(subscriptionPlan) && (
+        <p className="text-sm">
+          {subscriptionPlan.cancelled
+            ? "Your plan will be canceled on "
+            : "Your plan renews on "}
+          <strong className="font-semibold">
+            {subscriptionPlan.renewsAt && formatDate(subscriptionPlan.renewsAt)}
+          </strong>
+        </p>
+      )}
+
+      <div className="flex items-center justify-between border-t pt-4">
+        <p className="text-sm text-foreground/70">
+          Manage your subscription plan and billing information.
+        </p>
+        <button
+          className={cn(buttonVariants())}
+          disabled={isLoadingPortal}
+          onClick={onManageSubscription}
+        >
+          {isLoadingPortal && (
+            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          {isProSubscriptionValid(subscriptionPlan)
+            ? "Open Customer Portal"
+            : "Upgrade to PRO"}
+        </button>
+      </div>
+    </div>
   );
 }
 
-function FreePlanCard({
+function FreePlanSection({
   isLoadingPortal,
   onOpenCheckout,
 }: {
@@ -218,32 +207,34 @@ function FreePlanCard({
   const IS_PAYMENTS_ENABLED = false;
 
   return (
-    <Card className="bg-background">
-      <CardHeader>
-        <CardTitle className="text-md">Free Plan</CardTitle>
-        <CardDescription className="text-foreground/70">
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Free Plan</h3>
+        <p className="text-sm text-foreground/70">
           You are currently on the{" "}
           <strong className="font-semibold">Free</strong> plan.
-        </CardDescription>
-      </CardHeader>
-      <hr />
-      <CardContent className="mt-4 text-sm flex flex-col space-y-2">
-        <CardTitle className="text-md">Switch to Pro </CardTitle>
-        <CardDescription className="text-foreground/70">
-          Upgrade to a paid plan for additional features.
-          <br /> Choose a plan below to get started.
-        </CardDescription>
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <h4 className="text-base font-medium">Switch to Pro</h4>
+          <p className="text-sm text-foreground/70">
+            Upgrade to a paid plan for additional features.
+          </p>
+        </div>
+
         <Plans onPlanChange={(plan) => setSelectedPlan(plan)} />
+
         {showError && (
           <p className="text-sm text-red-500">
-            Please select a plan to above to continue.
+            Please select a plan above to continue.
           </p>
         )}
-      </CardContent>
-      <CardFooter className="p-4 border-t rounded-b-md border-grey-200 bg-background/80 text-foreground">
-        <div className="flex flex-col items-start justify-between sm:w-full sm:flex-row sm:items-center">
+
+        <div className="border-t pt-4">
           <button
-            className={cn(buttonVariants(), "mb-4 sm:mb-0")}
+            className={cn(buttonVariants())}
             disabled={isLoadingPortal}
             onClick={() => {
               if (!IS_PAYMENTS_ENABLED) {
@@ -265,12 +256,8 @@ function FreePlanCard({
             )}
             Upgrade to PRO
           </button>
-
-          <p className="sm:ml-auto">
-            Upgrade to a paid plan for additional features.
-          </p>
         </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }

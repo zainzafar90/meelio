@@ -4,14 +4,11 @@ import { Route, Routes } from "react-router-dom";
 import { ErrorPage } from "@/routes/errors/error";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
 import { PublicLayout } from "@/layouts/public-layout";
-import { ProtectedLayout } from "@/layouts/protected-layout";
 
-import { Billing } from "./account/billing";
 import { Login } from "./auth/login";
 import { Register } from "./auth/register";
 import { VerifyMagicLink } from "./auth/verify-magic-link";
 import { Home } from "./home";
-import { Settings } from "./account/settings";
 
 export const Router = () => {
   return (
@@ -57,30 +54,6 @@ export const Router = () => {
         }
         errorElement={<ErrorPage />}
       />
-
-      {/* Keep account routes protected */}
-      <Route element={<ProtectedLayout />}>
-        <Route path="account">
-          <Route
-            path="billing"
-            element={
-              <React.Suspense fallback={<PageSkeleton />}>
-                <Billing />
-              </React.Suspense>
-            }
-            errorElement={<ErrorPage />}
-          />
-          <Route
-            path="settings"
-            element={
-              <React.Suspense fallback={<PageSkeleton />}>
-                <Settings />
-              </React.Suspense>
-            }
-            errorElement={<ErrorPage />}
-          />
-        </Route>
-      </Route>
 
       <Route path="*" element={<Home />} />
     </Routes>

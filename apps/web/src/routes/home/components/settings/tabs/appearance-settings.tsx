@@ -44,11 +44,9 @@ export const AppearanceSettings = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            {t("settings.appearance.description")}
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          {t("settings.appearance.description")}
+        </p>
 
         <FormField
           control={form.control}

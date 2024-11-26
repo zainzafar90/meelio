@@ -252,6 +252,20 @@
         "dark": "Dark",
         "system": "System"
       }
+    },
+    "account": {
+      "description": "Manage account and website settings.",
+      "updateError": "Error updating account",
+      "nameUpdated": "Name updated",
+      "name": {
+        "label": "Name",
+        "description": "Please enter your name",
+        "placeholder": "John Doe"
+      }
+    },
+    "billing": {
+      "title": "Billing",
+      "description": "Manage your billing"
     }
   },
   "profile": {
