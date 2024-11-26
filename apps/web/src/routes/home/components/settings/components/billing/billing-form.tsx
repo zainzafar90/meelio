@@ -6,11 +6,11 @@ import { toast } from "sonner";
 import { AuthUser } from "@/types/auth";
 import { PlanInterval, Subscription } from "@/types/subscription";
 import { cn, formatDate } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { env } from "@/utils/common.utils";
 
-import { Icons } from "../../icons/icons";
 import { Plans } from "./plans";
 
 export const BillingForm = ({ user }: { user: AuthUser }) => {
@@ -208,13 +208,10 @@ function FreePlanSection({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Free Plan</h3>
-        <p className="text-sm text-foreground/70">
-          You are currently on the{" "}
-          <strong className="font-semibold">Free</strong> plan.
-        </p>
-      </div>
+      <p className="text-sm text-foreground/70">
+        You are currently on the <strong className="font-semibold">Free</strong>{" "}
+        plan.
+      </p>
 
       <div className="space-y-4">
         <div>

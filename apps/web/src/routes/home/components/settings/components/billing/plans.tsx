@@ -1,34 +1,32 @@
 import { useState } from "react";
 
 import { PlanInterval } from "@/types/subscription";
-import { Icons } from "@/components/icons/icons";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-
-import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const allPlans = [
   {
     value: "monthly",
     label: "Monthly",
     price: 4,
-    priceLabel: "",
+    priceLabel: "/ mo",
     description: "Billed Montly",
   },
   {
     value: "yearly",
     label: "Yearly",
     price: 40,
-    priceLabel: "",
+    priceLabel: "/ yr",
     description: "Billed Yearly",
   },
-  // {
-  //   value: "lifetime",
-  //   label: "Lifetime",
-  //   price: 100,
-  //   priceLabel: "/ Lifetime",
-  //   description: "Use Forever",
-  // },
+  {
+    value: "lifetime",
+    label: "Lifetime",
+    price: 100,
+    priceLabel: "/ Lifetime",
+    description: "Use Forever",
+  },
 ];
 
 export const Plans = ({

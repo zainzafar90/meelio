@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { AccountForm } from "@/components/account/account-form";
+import { AccountForm } from "@/routes/home/components/settings/components/account/account-form";
 import { useAuthStore } from "@/stores/auth.store";
 
 export const AccountSettings = () => {
