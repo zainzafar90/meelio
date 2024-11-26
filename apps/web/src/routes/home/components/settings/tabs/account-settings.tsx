@@ -17,11 +17,13 @@ export const AccountSettings = () => {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="flex h-full flex-col">
       <p className="text-sm font-normal leading-snug text-foreground/70">
         {t("settings.account.description")}
       </p>
-      <AccountForm user={user} />
+      <div className="flex-1 overflow-y-auto">
+        <AccountForm user={user} />
+      </div>
     </div>
   );
 };

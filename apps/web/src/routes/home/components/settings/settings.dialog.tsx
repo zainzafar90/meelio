@@ -59,14 +59,14 @@ export function SettingsDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeSettings()}>
-      <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
+      <DialogContent className="flex h-[90vh] max-h-[900px] overflow-hidden bg-background/80 p-0 backdrop-blur-3xl md:max-w-[700px] lg:max-w-[800px] ">
         <DialogTitle className="sr-only">
           {t("settings.dialog.title")}
         </DialogTitle>
         <DialogDescription className="sr-only">
           {t("settings.dialog.description")}
         </DialogDescription>
-        <SidebarProvider className="items-start">
+        <SidebarProvider className="flex h-full w-full items-start">
           <Sidebar collapsible="icon" className="hidden md:flex">
             <SidebarContent>
               <SidebarGroup>
@@ -88,7 +88,7 @@ export function SettingsDialog() {
               </SidebarGroup>
             </SidebarContent>
           </Sidebar>
-          <main className="flex flex-1 flex-col overflow-hidden">
+          <main className="flex h-full w-full flex-col">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b">
               <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="rounded-sm p-2 hover:bg-zinc-200">
@@ -97,7 +97,7 @@ export function SettingsDialog() {
                 <span>{t(`settings.nav.${currentTab}`)}</span>
               </div>
             </header>
-            <div className="flex flex-1 flex-col overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 pb-32">
               {renderTabContent()}
             </div>
           </main>

@@ -50,7 +50,7 @@ export const Plans = ({
         <div key={plan.value}>
           <Label
             htmlFor={plan.value}
-            className="relative flex flex-shrink-0 cursor-pointer select-none flex-wrap rounded-lg border border-foreground/20 bg-background/50 p-3 shadow-sm transition hover:border-foreground/50 focus:outline-none [&:has([data-state=checked])]:border-accent [&:has([data-state=checked])]:ring-1 [&:has([data-state=checked])]:ring-accent"
+            className="relative flex flex-shrink-0 cursor-pointer select-none flex-wrap rounded-lg border border-foreground/20 bg-background/50 p-4 shadow-sm transition hover:border-foreground/50 focus:outline-none [&:has([data-state=checked])]:border-accent [&:has([data-state=checked])]:ring-1 [&:has([data-state=checked])]:ring-accent"
           >
             <RadioGroupItem
               id={plan.value}
@@ -72,10 +72,10 @@ export const Plans = ({
             </div>
 
             {plan.value === "yearly" && (
-              <div className="absolute -top-2 left-2">
-                <Badge className="bg-red-500 px-1 uppercase">
-                  <span className="text-xs">20% off</span>
-                </Badge>
+              <div className="absolute -inset-x-[1px] -top-2">
+                <div className="flex w-full items-start justify-center rounded-t-md bg-accent py-1 text-center text-xs uppercase text-background">
+                  20% off
+                </div>
               </div>
             )}
           </Label>
