@@ -95,7 +95,7 @@ export const AppLayout = memo(({ children }: AuthLayoutProps) => {
             <Logomark className="h-6 w-auto" />
           </Link>
         </div>
-        <UserProfileDropdown mobileView={true} />
+        <UserProfileDropdown />
       </div>
 
       <main className="lg:pl-72">{children}</main>

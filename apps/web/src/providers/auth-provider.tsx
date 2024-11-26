@@ -3,7 +3,6 @@ import { ReactNode, useEffect } from "react";
 import { api } from "@/api";
 import { AuthContext } from "@/context/auth-context";
 
-import { AuthUser } from "@/types/auth";
 import { useAuthStore } from "@/stores/auth.store";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -15,11 +14,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     (async () => {
       try {
         const response = await api.auth.getAuthenticatedAccount();
-        const user = response as AuthUser;
-        authenticate(user);
+        const user = response;
+        authenticate(user.data);
       } catch (error) {
-        console.error(error);
-        authenticate({} as AuthUser);
+        authenticate(null as any);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

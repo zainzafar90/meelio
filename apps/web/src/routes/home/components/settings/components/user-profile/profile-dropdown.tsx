@@ -1,16 +1,14 @@
 import { VERSION } from "@/version";
 import { useTranslation } from "react-i18next";
 
-import { AuthUser } from "@/types/auth";
 import { Icons } from "@/components/icons/icons";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth.store";
 
-import { SidebarMenuButton } from "./ui/sidebar";
-
-export function UserProfileDropdown() {
-  const user = useAuthStore((state) => state.user) || ({} as AuthUser);
-  const profileImage = user.image;
-  const isProMember = user.isPro;
+export function ProfileDropdown() {
+  const { user } = useAuthStore();
+  const profileImage = user?.image;
+  const isProMember = user?.isPro;
   const { t } = useTranslation();
 
   return (

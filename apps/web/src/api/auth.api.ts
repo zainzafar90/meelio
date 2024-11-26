@@ -38,7 +38,7 @@ export function verifyMagicLink({ token }: { token: string }) {
   );
 }
 
-export function getAuthenticatedAccount(): Promise<AuthUser | null> {
+export function getAuthenticatedAccount() {
   return axios.get("/v1/account");
 }
 

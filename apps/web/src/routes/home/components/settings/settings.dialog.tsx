@@ -1,3 +1,4 @@
+import { api } from "@/api";
 import { CreditCard, Home, Paintbrush, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -13,15 +14,18 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth.store";
 import { SettingsTab, useSettingsStore } from "@/stores/settings.store";
 
 import { Icons } from "../../../../components/icons/icons";
+import { ProfileDropdown } from "./components/user-profile/profile-dropdown";
 import { AccountSettings } from "./tabs/account-settings";
 import { AppearanceSettings } from "./tabs/appearance-settings";
 import { BillingSettings } from "./tabs/billing-settings";
@@ -41,6 +45,12 @@ const SETTINGS_NAV: {
 export function SettingsDialog() {
   const { t } = useTranslation();
   const { isOpen, closeSettings, currentTab, setTab } = useSettingsStore();
+  const { user, logout } = useAuthStore((state) => state);
+
+  const signOut = async () => {
+    logout();
+    await api.auth.logoutAccount();
+  };
 
   const renderTabContent = () => {
     switch (currentTab) {
@@ -68,6 +78,16 @@ export function SettingsDialog() {
         </DialogDescription>
         <SidebarProvider className="flex h-full w-full items-start">
           <Sidebar collapsible="icon" className="hidden md:flex">
+            {/* User Profile */}
+            <SidebarHeader>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <ProfileDropdown />
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarHeader>
+
+            {/* Sidebar Navigation Items */}
             <SidebarContent>
               <SidebarGroup>
                 <SidebarGroupContent>
@@ -83,6 +103,14 @@ export function SettingsDialog() {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
+                    {user && (
+                      <SidebarMenuItem>
+                        <SidebarMenuButton onClick={() => void signOut()}>
+                          <Icons.logout className="h-4 w-4" />
+                          <span>Logout</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
@@ -91,7 +119,7 @@ export function SettingsDialog() {
           <main className="flex h-full w-full flex-col">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b">
               <div className="flex items-center gap-2 px-4">
-                <SidebarTrigger className="rounded-sm p-2 hover:bg-zinc-200">
+                <SidebarTrigger className="rounded-sm p-2 hover:bg-sidebar-primary/10">
                   <Icons.panelleft className="size-4" />
                 </SidebarTrigger>
                 <span>{t(`settings.nav.${currentTab}`)}</span>
