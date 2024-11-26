@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  ClipboardList,
   CloudRainWind,
   Coffee,
   Command,
@@ -19,6 +18,7 @@ import {
   Headphones,
   HelpCircle,
   History,
+  Home,
   Image,
   Laptop,
   Layers,
@@ -102,6 +102,7 @@ export const Icons = {
   history: History,
   panelleft: PanelLeft,
   timerOff: TimerOff,
+  home: Home,
   logout: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path

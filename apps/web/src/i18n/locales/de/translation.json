@@ -222,15 +222,34 @@
     }
   },
   "settings": {
+    "tabs": {
+      "comingSoon": "Dieser Tab ist noch nicht verfügbar",
+      "generalDescription": "Verwalte deine Kontoeinstellungen"
+    },
     "dialog": {
       "title": "Einstellungen",
-      "description": "Verwalte deine Kontoeinstellungen",
-      "nav": {
-        "home": "Startseite",
-        "notifications": "Benachrichtigungen",
-        "appearance": "Erscheinungsbild",
-        "privacy": "Datenschutz & Sichtbarkeit",
-        "advanced": "Erweitert"
+      "description": "Verwalte deine Kontoeinstellungen"
+    },
+    "nav": {
+      "home": "Startseite",
+      "general": "Allgemein",
+      "notifications": "Benachrichtigungen",
+      "appearance": "Erscheinungsbild",
+      "account": "Konto",
+      "billing": "Abrechnung",
+      "privacy": "Datenschutz & Sichtbarkeit",
+      "advanced": "Erweitert"
+    },
+    "appearance": {
+      "title": "Erscheinungsbild",
+      "description": "Konfiguriere das Erscheinungsbild der Anwendung",
+      "themeUpdated": "Thema aktualisiert",
+      "theme": {
+        "label": "Thema",
+        "description": "Wähle das Thema für die Anwendung",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "system": "System"
       }
     }
   },

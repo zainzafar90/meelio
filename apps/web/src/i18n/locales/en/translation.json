@@ -223,15 +223,34 @@
     }
   },
   "settings": {
+    "tabs": {
+      "comingSoon": "This tab is not available yet",
+      "generalDescription": "Manage your account settings"
+    },
     "dialog": {
       "title": "Settings",
-      "description": "Manage your account settings",
-      "nav": {
-        "home": "Home",
-        "notifications": "Notifications",
-        "appearance": "Appearance",
-        "privacy": "Privacy & visibility",
-        "advanced": "Advanced"
+      "description": "Manage your account settings"
+    },
+    "nav": {
+      "home": "Home",
+      "general": "General",
+      "notifications": "Notifications",
+      "appearance": "Appearance",
+      "account": "Account",
+      "billing": "Billing",
+      "privacy": "Privacy & visibility",
+      "advanced": "Advanced"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Configure the appearance settings",
+      "themeUpdated": "Theme updated",
+      "theme": {
+        "label": "Theme",
+        "description": "Select the theme for the application",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
       }
     }
   },
