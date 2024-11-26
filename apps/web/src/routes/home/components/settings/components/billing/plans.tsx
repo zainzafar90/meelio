@@ -65,14 +65,14 @@ export const Plans = ({
                     {plan.priceLabel}
                   </small>
                 </span>
-                <span className="mt-1 flex items-center text-sm font-normal text-foreground/50">
+                <span className="mt-1 flex items-center text-xs font-normal text-foreground/50">
                   {plan.description}
                 </span>
               </div>
             </div>
 
             {plan.value === "yearly" && (
-              <div className="absolute right-1 top-2">
+              <div className="absolute -top-2 left-2">
                 <Badge className="bg-red-500 px-1 uppercase">
                   <span className="text-xs">20% off</span>
                 </Badge>
