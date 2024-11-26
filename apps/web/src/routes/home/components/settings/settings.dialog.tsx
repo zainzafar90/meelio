@@ -17,6 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { SettingsTab, useSettingsStore } from "@/stores/settings.store";
 
@@ -66,7 +67,7 @@ export function SettingsDialog() {
           {t("settings.dialog.description")}
         </DialogDescription>
         <SidebarProvider className="items-start">
-          <Sidebar collapsible="none" className="hidden md:flex">
+          <Sidebar collapsible="icon" className="hidden md:flex">
             <SidebarContent>
               <SidebarGroup>
                 <SidebarGroupContent>
@@ -90,7 +91,9 @@ export function SettingsDialog() {
           <main className="flex flex-1 flex-col overflow-hidden">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b">
               <div className="flex items-center gap-2 px-4">
-                <Icons.home className="h-4 w-4" />
+                <SidebarTrigger className="rounded-sm p-2 hover:bg-zinc-200">
+                  <Icons.panelleft className="size-4" />
+                </SidebarTrigger>
                 <span>{t(`settings.nav.${currentTab}`)}</span>
               </div>
             </header>
