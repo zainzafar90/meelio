@@ -1,6 +1,6 @@
 import cssText from "data-text:@/style.css"
 import type { PlasmoCSConfig } from "plasmo"
-import React, { useEffect, useState } from "react"
+import React from "react"
 
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
@@ -29,6 +29,7 @@ const isBlockedSite = (blockedSites: string[]) => {
 }
 
 const PlasmoOverlay = () => {
+  const currentSite = getCurrentSite()
   const [blockedSites] = useStorage<string[]>(
     {
       key: "blockedSites",
@@ -38,24 +39,17 @@ const PlasmoOverlay = () => {
     },
     []
   )
-  const [message, setMessage] = useState<any>()
-  const currentSite = getCurrentSite()
 
-  useEffect(() => {
-    ;(async () => {
-      const isBlocked = isBlockedSite(blockedSites)
+  const message = getCustomBlockerMessage()
+  const isBlocked = isBlockedSite(blockedSites)
 
-      if (isBlocked) {
-        setMessage(getCustomBlockerMessage())
-      } else {
-        setMessage(null)
-      }
-    })()
-  }, [blockedSites])
+  if (!isBlocked) return null
 
-  if (!currentSite || !message) return null
-
-  return <Blocker message={message} siteName={currentSite} />
+  return (
+    <div className="meelio-fixed meelio-inset-0 meelio-bg-black z-[2147483647]">
+      <Blocker message={message} siteName={currentSite} />
+    </div>
+  )
 }
 
 export default PlasmoOverlay

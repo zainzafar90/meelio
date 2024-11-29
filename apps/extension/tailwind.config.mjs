@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./src/**/*.{tsx,html}"],
+export default {
+  content: ["./src/**/*.{tsx,ts,html}"],
   darkMode: "media",
   prefix: "meelio-"
 }

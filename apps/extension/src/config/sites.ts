@@ -1,51 +1,91 @@
 export interface BlockedSite {
-  text: string
-  reminder: string
+  icon: string
+  bgColor: string
+  title: string
+  quote: string
   author: string
-  theme: string
   buttonText: string
-  mainEmoji: string
 }
 
 export const DEFAULT_SITES: BlockedSite[] = [
   {
-    text: "Your Target\nIsn't Social Media",
-    reminder: "You miss 100% of the shots you don't take.",
-    author: "Wayne Gretzky",
-    theme: "red",
-    buttonText: "Fire!",
-    mainEmoji: "🎯"
+    icon: '🚀',
+    bgColor: 'meelio-bg-indigo-950',
+    title: 'Launch Your Potential',
+    quote: 'Success is not final, failure is not fatal: it is the courage to continue that counts.',
+    author: 'Winston Churchill',
+    buttonText: 'Ignite'
   },
   {
-    text: "Trees Over\nSocial Media",
-    reminder: "Time spent amongst trees is never wasted time.",
-    author: "Katrina Mayer",
-    theme: "green",
-    buttonText: "Forest On",
-    mainEmoji: "🌲"
+    icon: '🧠',
+    bgColor: 'meelio-bg-purple-950',
+    title: 'Mind Over Distraction',
+    quote: 'The mind is everything. What you think you become.',
+    author: 'Buddha',
+    buttonText: 'Focus'
   },
   {
-    text: "Create Now\nScroll Later",
-    reminder: "Art requires uninterrupted attention.",
-    author: "Creative Mind",
-    theme: "purple",
-    buttonText: "Create",
-    mainEmoji: "🎨"
+    icon: '🌱',
+      bgColor: 'meelio-bg-green-950',
+    title: 'Grow Beyond Limits',
+    quote: 'The only way to do great work is to love what you do.',
+    author: 'Steve Jobs',
+    buttonText: 'Nurture'
   },
   {
-    text: "Run Your Race\nNot Your Feed",
-    reminder: "Progress happens outside your comfort zone.",
-    author: "Peak Performance",
-    theme: "teal",
-    buttonText: "Sprint",
-    mainEmoji: "🏃"
+    icon: '⏳',
+    bgColor: 'meelio-bg-amber-950',
+    title: 'Time is Precious',
+    quote: "The bad news is time flies. The good news is you're the pilot.",
+    author: 'Michael Altshuler',
+    buttonText: 'Optimize'
   },
   {
-    text: "Shine Bright\nOffline",
-    reminder: "Stars don't need likes to sparkle.",
-    author: "Stellar Focus",
-    theme: "amber",
-    buttonText: "Glow",
-    mainEmoji: "⭐"
+    icon: '🎯',
+    bgColor: 'meelio-bg-red-950',
+    title: 'Hit Your Targets',
+    quote: 'The secret of getting ahead is getting started.',
+    author: 'Mark Twain',
+    buttonText: 'Conquer'
+  },
+  {
+    icon: '🌟',
+      bgColor: 'meelio-bg-blue-950',
+    title: 'Shine Your Brightest',
+    quote: "Believe you can and you're halfway there.",
+    author: 'Theodore Roosevelt',
+    buttonText: 'Illuminate'
+  },
+  {
+    icon: '🏋️',
+      bgColor: 'meelio-bg-emerald-950',
+    title: 'Strengthen Your Willpower',
+    quote: 'Strength does not come from physical capacity. It comes from an indomitable will.',
+    author: 'Mahatma Gandhi',
+    buttonText: 'Empower'
+  },
+  {
+    icon: '🏆',
+    bgColor: 'meelio-bg-cyan-950',
+    title: 'Victory Over Procrastination',
+    quote: 'Our goals can only be reached through a vehicle of a plan, in which we must fervently believe, and upon which we must vigorously act.',
+    author: 'Pablo Picasso',
+    buttonText: 'Aim'
+  },
+  {
+    icon: '🌊',
+    bgColor: 'meelio-bg-teal-950',
+    title: 'Flow State Activated',
+    quote: 'The more you lose yourself in something bigger than yourself, the more energy you will have.',
+    author: 'Norman Vincent Peale',
+    buttonText: 'Immerse'
+  },
+  {
+    icon: '⚡',
+    bgColor: 'meelio-bg-yellow-950',
+    title: 'Energize Your Ambitions',
+    quote: 'The only way to achieve the impossible is to believe it is possible.',
+    author: 'Charles Kingsleigh',
+    buttonText: 'Charge'
   }
 ]
