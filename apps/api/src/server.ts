@@ -41,9 +41,9 @@ export const createServer = (): Express => {
     .use(cors(corsOptions))
     .options("*", cors(corsOptions))
     .use(cookieParser())
-    .use(passport.initialize())
-    .use(ExpressMongoSanitize())
-    .use(compression())
+    .use(passport.initialize() as any)
+    .use(ExpressMongoSanitize() as any)
+    .use(compression() as any)
     .use("/v1", routes)
     .get("/", (_, res) => {
       res.status(200).json({ message: "Meelio API" });
@@ -58,14 +58,14 @@ export const createServer = (): Express => {
   passport.use("google", googleStrategy);
 
   if (config.env === "production") {
-    app.use("/v1/account", authLimiter);
+    app.use("/v1/account", authLimiter as any);
   }
 
   app.enable("trust proxy");
 
   app.use((req, res, next) => {
     if (config.env !== "development") {
-      authLimiter(req, res, next);
+      authLimiter(req as any, res as any, next as any);
     } else {
       next();
     }
