@@ -1,6 +1,9 @@
 import cssText from "data-text:@/style.css"
 import type { PlasmoCSConfig } from "plasmo"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
+
+import { Storage } from "@plasmohq/storage"
+import { useStorage } from "@plasmohq/storage/hook"
 
 import Blocker from "./features/blocker"
 import { getCustomBlockerMessage } from "./utils/site.utils"
@@ -16,33 +19,39 @@ export const getStyle = () => {
   return style
 }
 
-const getBlockedSites = () => {
-  const blockedSites = [
-    "https://www.youtube.com",
-    "https://www.facebook.com",
-    "https://www.instagram.com"
-  ]
+const getCurrentSite = () => {
+  return new URL(window.location.href).hostname
+}
 
-  return blockedSites.map((site) => new URL(site).hostname.replace("www.", ""))
+const isBlockedSite = (blockedSites: string[]) => {
+  const currentSite = getCurrentSite()
+  return blockedSites.some((site) => currentSite.includes(site))
 }
 
 const PlasmoOverlay = () => {
-  const [currentSite, setCurrentSite] = useState<string | undefined>()
+  const [blockedSites] = useStorage<string[]>(
+    {
+      key: "blockedSites",
+      instance: new Storage({
+        area: "local"
+      })
+    },
+    []
+  )
   const [message, setMessage] = useState<any>()
+  const currentSite = getCurrentSite()
 
   useEffect(() => {
-    const sites = getBlockedSites()
-    const currentSite = sites.find((site) =>
-      window.location.href.includes(site)
-    )
+    ;(async () => {
+      const isBlocked = isBlockedSite(blockedSites)
 
-    if (currentSite) {
-      setMessage(getCustomBlockerMessage())
-      setCurrentSite(currentSite)
-    } else {
-      setMessage(null)
-    }
-  }, [])
+      if (isBlocked) {
+        setMessage(getCustomBlockerMessage())
+      } else {
+        setMessage(null)
+      }
+    })()
+  }, [blockedSites])
 
   if (!currentSite || !message) return null
 

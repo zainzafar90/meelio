@@ -10,6 +10,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@plasmohq/storage": "^1.13.0",
     "plasmo": "0.89.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -28,6 +29,9 @@
   "manifest": {
     "host_permissions": [
       "https://*/*"
+    ],
+    "permissions": [
+      "storage"
     ]
   }
 }
