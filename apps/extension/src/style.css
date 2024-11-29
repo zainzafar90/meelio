@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:host {
+  font-size: 16px; /* NOTE: This is the default font size for the extension otherwise it will be 10px on youtube */
+}
