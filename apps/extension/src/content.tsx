@@ -6,7 +6,7 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
 import Blocker from "./features/content/blocker";
-import { getCustomBlockerMessage } from "./utils/site.utils";
+import { getCustomBlockerMessage } from "./utils/blocker.utils";
 import { pauseAllVideos } from "./utils/video.utils";
 
 export const config: PlasmoCSConfig = {

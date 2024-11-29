@@ -1,9 +1,9 @@
 import React from "react";
-import { type BlockedSite } from "@/config/sites";
+import { type Quote } from "@/config/quote";
 
 interface BlockerProps {
   siteName: string;
-  message: BlockedSite | null;
+  message: Quote | null;
 }
 
 export default function Blocker({ siteName, message }: BlockerProps) {

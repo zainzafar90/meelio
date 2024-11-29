@@ -1,4 +1,4 @@
-export interface BlockedSite {
+export interface Quote {
   icon: string;
   bgColor: string;
   title: string;
@@ -7,7 +7,7 @@ export interface BlockedSite {
   buttonText: string;
 }
 
-export const DEFAULT_SITES: BlockedSite[] = [
+export const QUOTES: Quote[] = [
   {
     icon: "🚀",
     bgColor: "meelio-bg-indigo-950",
