@@ -7,6 +7,7 @@ import { useStorage } from "@plasmohq/storage/hook"
 
 import Blocker from "./features/blocker"
 import { getCustomBlockerMessage } from "./utils/site.utils"
+import { pauseAllVideos } from "./utils/video.utils"
 
 export const config: PlasmoCSConfig = {
   matches: ["<all_urls>"],
@@ -43,10 +44,16 @@ const PlasmoOverlay = () => {
   const message = getCustomBlockerMessage()
   const isBlocked = isBlockedSite(blockedSites)
 
+  React.useEffect(() => {
+    if (isBlocked) {
+      pauseAllVideos()
+    }
+  }, [isBlocked])
+
   if (!isBlocked) return null
 
   return (
-    <div className="meelio-fixed meelio-inset-0 meelio-bg-black z-[2147483647]">
+    <div className="meelio-fixed meelio-inset-0 z-[2147483647]">
       <Blocker message={message} siteName={currentSite} />
     </div>
   )

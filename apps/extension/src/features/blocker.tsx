@@ -10,11 +10,12 @@ export default function Blocker({ siteName, message }: BlockerProps) {
 
   return (
     <div
-      className={`meelio-fixed meelio-inset-0 meelio-w-screen meelio-h-screen ${message.bgColor} meelio-overflow-hidden meelio-p-8 meelio-shadow-xl meelio-cursor-pointer meelio-transition-colors meelio-duration-300 meelio-flex meelio-items-center meelio-justify-center meelio-flex-1`}>
+      className={`meelio-fixed meelio-inset-0 meelio-w-screen meelio-h-screen meelio-overflow-hidden meelio-p-8 meelio-shadow-xl meelio-cursor-pointer meelio-transition-colors meelio-duration-300 meelio-flex meelio-items-center meelio-justify-center meelio-flex-1`}>
       <div className="meelio-flex meelio-items-center meelio-justify-center meelio-h-full meelio-w-full meelio-max-w-md meelio-mx-auto">
         <div className="meelio-flex meelio-flex-col meelio-items-center meelio-text-center meelio-gap-8">
           {/* Emoji */}
           <div className="meelio-text-6xl meelio-mb-4">{message.icon}</div>
+          
 
           {/* Title */}
           <h1 className="meelio-text-3xl meelio-font-semibold meelio-text-white meelio-mb-4 meelio-leading-tight meelio-text-balance">
