@@ -5,7 +5,7 @@ import React from "react";
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
-import Blocker from "./features/blocker";
+import Blocker from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/site.utils";
 import { pauseAllVideos } from "./utils/video.utils";
 
