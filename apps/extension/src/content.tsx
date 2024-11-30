@@ -5,7 +5,7 @@ import React from "react";
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
-import Blocker from "./features/content/blocker";
+import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
 import { pauseAllVideos } from "./utils/video.utils";
 
@@ -31,7 +31,7 @@ const isBlockedSite = (blockedSites: string[]) => {
 
 const PlasmoOverlay = () => {
   const currentSite = getCurrentSite();
-  const [blockedSites] = useStorage<string[]>(
+  const [blockedSites, setBlockedSites] = useStorage<string[]>(
     {
       key: "blockedSites",
       instance: new Storage({
@@ -50,11 +50,23 @@ const PlasmoOverlay = () => {
     }
   }, [isBlocked]);
 
+  const openAnyway = () => {
+    const currentSite = getCurrentSite();
+    const blockedSite = blockedSites.find((site) => currentSite.includes(site));
+    if (blockedSite) {
+      setBlockedSites(blockedSites.filter((site) => site !== blockedSite));
+    }
+  };
+
   if (!isBlocked) return null;
 
   return (
     <div className="z-[2147483647] meelio-fixed meelio-inset-0 meelio-bg-black">
-      <Blocker message={message} siteName={currentSite} />
+      <Blocker
+        message={message}
+        siteName={currentSite}
+        onOpenAnyway={() => openAnyway()}
+      />
     </div>
   );
 };

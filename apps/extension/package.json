@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@plasmohq/storage": "^1.13.0",
-    "plasmo": "0.89.4",
     "lucide-react": "^0.454.0",
+    "plasmo": "0.89.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "simple-icons": "^13.18.0",
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
