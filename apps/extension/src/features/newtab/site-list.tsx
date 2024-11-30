@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { SITE_CATEGORIES, SITE_LIST } from "../../config/site-categories";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { SiteItem } from "./site-item";
 
 interface SiteListProps {
   blockedSites: string[];
@@ -7,8 +9,18 @@ interface SiteListProps {
 }
 
 export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  const toggleCategory = (categoryKey: string) => {
+    setExpandedCategories((prev) =>
+      prev.includes(categoryKey)
+        ? prev.filter((key) => key !== categoryKey)
+        : [...prev, categoryKey]
+    );
+  };
+
   return (
-    <div className="meelio-mx-auto meelio-max-w-4xl meelio-p-4">
+    <div className="meelio-mx-auto">
       <h2 className="meelio-mb-6 meelio-text-2xl meelio-font-bold">
         Blocked Sites
       </h2>
@@ -17,41 +29,37 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
         {SITE_CATEGORIES.map((category) => (
           <div
             key={category.key}
-            className="meelio-rounded-lg meelio-bg-white/5 meelio-p-4"
+            className="meelio-flex meelio-flex-col meelio-space-y-4 meelio-rounded-lg meelio-bg-white/5 meelio-p-4"
           >
-            <div className="meelio-mb-4 meelio-flex meelio-items-center meelio-gap-2">
-              <span className="meelio-text-2xl">{category.icon}</span>
-              <h3 className="meelio-text-xl meelio-font-semibold">
-                {category.name}
-              </h3>
-            </div>
+            <button
+              onClick={() => toggleCategory(category.key)}
+              className="meelio-flex meelio-w-full meelio-cursor-pointer meelio-items-center meelio-justify-between"
+            >
+              <div className="meelio-flex meelio-items-center meelio-gap-2">
+                <span className="meelio-text-xl">{category.icon}</span>
+                <h3 className="meelio-text-lg meelio-font-semibold">
+                  {category.name}
+                </h3>
+              </div>
+              {expandedCategories.includes(category.key) ? (
+                <ChevronDown className="transition-transform meelio-h-5 meelio-w-5 meelio-rotate-180" />
+              ) : (
+                <ChevronRight className="transition-transform meelio-h-5 meelio-w-5 meelio-rotate-0" />
+              )}
+            </button>
 
-            <div className="meelio-md:grid-cols-2 meelio-lg:grid-cols-3 meelio-grid meelio-grid-cols-1 meelio-gap-4">
-              {SITE_LIST[category.key]?.map((site) => {
-                const isBlocked = blockedSites.includes(site.url);
-                return (
-                  <button
+            {expandedCategories.includes(category.key) && (
+              <div className="meelio-md:grid-cols-2 meelio-lg:grid-cols-3 meelio-grid meelio-grid-cols-1 meelio-gap-4">
+                {SITE_LIST[category.key]?.map((site) => (
+                  <SiteItem
                     key={site.url}
-                    onClick={() => onToggleSite(site.url)}
-                    className={`meelio-flex meelio-w-full meelio-items-center meelio-justify-between meelio-rounded meelio-p-3 meelio-transition-colors ${
-                      isBlocked
-                        ? "meelio-bg-red-500/20 hover:meelio-bg-red-500/30"
-                        : "meelio-bg-white/10 hover:meelio-bg-white/20"
-                    }`}
-                  >
-                    <span>{site.name}</span>
-                    <div className="meelio-flex meelio-items-center meelio-gap-2">
-                      <span className="meelio-text-sm meelio-text-gray-400">
-                        {site.url}
-                      </span>
-                      <span className="meelio-text-sm">
-                        {isBlocked ? "🚫" : "➕"}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    site={site}
+                    isBlocked={blockedSites.includes(site.url)}
+                    onToggle={onToggleSite}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

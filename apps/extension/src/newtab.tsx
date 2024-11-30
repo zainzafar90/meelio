@@ -41,25 +41,23 @@ export default function NewTab() {
 
   return (
     <div className="meelio-min-h-screen meelio-bg-gray-900 meelio-text-white">
-      <main className="meelio-container meelio-mx-auto meelio-py-8">
+      <main className="meelio-mx-auto meelio-max-w-md meelio-py-8">
         <div className="meelio-p-4 meelio-font-sans">
-          <div className="meelio-mt-8 meelio-border-t meelio-border-white/10 meelio-pt-8">
-            <h3 className="meelio-mb-4 meelio-text-xl">Add Custom Site</h3>
-            <div className="meelio-flex meelio-gap-2">
-              <input
-                type="text"
-                value={siteInput}
-                onChange={(e) => setSiteInput(e.target.value)}
-                placeholder="Enter custom site URL (e.g., example.com)"
-                className="meelio-flex-1 meelio-rounded meelio-border meelio-border-white/10 meelio-bg-white/5 meelio-p-2"
-              />
-              <button
-                onClick={addCustomSite}
-                className="meelio-rounded meelio-bg-blue-500 meelio-px-4 meelio-py-2 meelio-text-white hover:meelio-bg-blue-600"
-              >
-                Add Custom Site
-              </button>
-            </div>
+          <h3 className="meelio-mb-4 meelio-text-xl">Add Custom Site</h3>
+          <div className="meelio-mb-4 meelio-flex meelio-gap-2">
+            <input
+              type="text"
+              value={siteInput}
+              onChange={(e) => setSiteInput(e.target.value)}
+              placeholder="Enter custom site URL (e.g., example.com)"
+              className="meelio-flex-1 meelio-rounded meelio-border meelio-border-white/10 meelio-bg-white/5 meelio-p-2"
+            />
+            <button
+              onClick={addCustomSite}
+              className="meelio-rounded meelio-bg-blue-500 meelio-px-4 meelio-py-2 meelio-text-white hover:meelio-bg-blue-600"
+            >
+              Add Custom Site
+            </button>
           </div>
 
           {blockedSites.length > 0 && (
