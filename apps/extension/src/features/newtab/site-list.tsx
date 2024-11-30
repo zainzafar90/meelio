@@ -52,7 +52,7 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
               <div className="meelio-md:grid-cols-2 meelio-lg:grid-cols-3 meelio-grid meelio-grid-cols-1 meelio-gap-4">
                 {SITE_LIST[category.key]?.map((site) => (
                   <SiteItem
-                    key={site.url}
+                    key={site.id}
                     site={site}
                     isBlocked={blockedSites.includes(site.url)}
                     onToggle={onToggleSite}
