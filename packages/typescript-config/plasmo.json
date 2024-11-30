@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Plasmo Extension",
+  "extends": "./base.json",
+  "files": ["./plasmo.d.ts"],
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "jsx": "preserve"
+  }
+}

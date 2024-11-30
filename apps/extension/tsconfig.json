@@ -1,6 +1,11 @@
 {
-  "extends": "plasmo/templates/tsconfig.base",
-  "exclude": ["node_modules"],
+  "extends": "@repo/typescript-config/plasmo.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
+  },
   "include": [
     ".plasmo/index.d.ts",
     "./**/*.ts",
@@ -8,11 +13,5 @@
     "tailwind.config.mjs",
     "prettier.config.mjs"
   ],
-  "compilerOptions": {
-    "jsx": "react",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "baseUrl": "."
-  }
+  "exclude": ["node_modules", "build", "dist", ".plasmo"]
 }

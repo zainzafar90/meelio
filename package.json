@@ -10,6 +10,7 @@
     "build": "turbo run build",
     "build:api": "turbo run build --filter=api",
     "build:web": "turbo run build --filter=web",
+    "build:extension": "turbo run build --filter=extension",
     "start:api": "turbo run start --filter=api",
     "start:web": "turbo run start --filter=web",
     "clean": "turbo run clean",
