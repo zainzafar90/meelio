@@ -1,6 +1,8 @@
-import { Site } from "@/config/site-categories";
+import React, { useEffect, useState } from "react";
 import { Ban, Plus } from "lucide-react";
-import React from "react";
+
+import { Site } from "@/config/site-list";
+import { getFaviconUrl } from "@/utils/domain.utils";
 
 interface SiteItemProps {
   site: Site;
@@ -38,7 +40,7 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
               <path d={site.icon.path} fill={getIconColor()} />
             </svg>
           ) : (
-            <FallbackIcon />
+            <FallbackIcon url={site.url} />
           )}
         </div>
         <span
@@ -62,15 +64,39 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
   );
 }
 
-const getFaviconUrl = (url: string) => {
-  return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${url}&size=32`;
-};
+const FallbackIcon = ({ url, size = 32 }: { url: string; size?: number }) => {
+  const [iconSrc, setIconSrc] = useState("");
+  const [hasError, setHasError] = useState(false);
+  const BLANK = "blank";
 
-const FallbackIcon = () => {
+  const loadFavicon = async (url: string) => {
+    const img = new Image(size, size);
+    img.onload = () => setIconSrc(url);
+    img.onerror = () => setIconSrc(BLANK); // Final fallback to placeholder blank icon
+    img.src = url;
+  };
+
+  useEffect(() => {
+    if (hasError) {
+      const faviconUrl = getFaviconUrl(url);
+      loadFavicon(faviconUrl);
+    }
+  }, [hasError, url]);
+
   return (
-    <img
-      src={getFaviconUrl("https://google.com")}
-      className="meelio-flex meelio-size-6 meelio-items-center meelio-justify-center meelio-rounded"
-    />
+    <div className="inline-flex items-center justify-center">
+      {iconSrc === BLANK ? (
+        <div className="meelio-size-6 meelio-rounded meelio-bg-white/10" />
+      ) : (
+        <img
+          src={iconSrc}
+          width={size}
+          height={size}
+          alt={`Icon for ${url}`}
+          className="meelio-flex meelio-size-6 meelio-items-center meelio-justify-center meelio-rounded"
+          onError={() => setHasError(true)}
+        />
+      )}
+    </div>
   );
 };

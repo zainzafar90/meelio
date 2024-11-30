@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { SITE_CATEGORIES, SITE_LIST } from "../../config/site-categories";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { SiteItem } from "./site-item";
 
+import { SITE_CATEGORIES, SITE_LIST } from "@/config/site-list";
+import { SiteItem } from "./site-item";
 interface SiteListProps {
   blockedSites: string[];
   onToggleSite: (site: string) => void;

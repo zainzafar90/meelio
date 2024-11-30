@@ -3,12 +3,12 @@ import { useState } from "react";
 
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
-import { SiteList } from "./features/newtab/site-list";
 
-import { SITE_LIST } from "./config/site-categories";
+import { SiteList } from "@/features/newtab/site-list";
+import { SITE_LIST } from "@/config/site-list";
+import { SiteItem } from "@/features/newtab/site-item";
 
 import "@/style.css";
-import { SiteItem } from "./features/newtab/site-item";
 
 export default function NewTab() {
   const [siteInput, setSiteInput] = useState("");
