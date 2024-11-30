@@ -28,14 +28,18 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
       onClick={() => onToggle(site.url)}
       className={`meelio-flex meelio-w-full meelio-items-center meelio-justify-between meelio-rounded meelio-border meelio-border-white/10 meelio-p-3 meelio-transition-colors hover:meelio-border-white/50`}
       style={{
-        backgroundColor: getBackgroundColor(site.icon.hex),
+        backgroundColor: getBackgroundColor(site.icon?.hex || "#000"),
       }}
     >
       <div className="meelio-flex meelio-items-center meelio-gap-2">
         <div className="meelio-flex meelio-scale-75 meelio-transform meelio-items-center meelio-justify-center meelio-rounded">
-          <svg className="meelio-size-6">
-            <path d={site.icon.path} fill={getIconColor()} />
-          </svg>
+          {site.icon ? (
+            <svg className="meelio-size-6">
+              <path d={site.icon.path} fill={getIconColor()} />
+            </svg>
+          ) : (
+            <FallbackIcon />
+          )}
         </div>
         <span
           className="text-white/90 font-medium meelio-flex meelio-items-center"
@@ -57,3 +61,16 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
     </button>
   );
 }
+
+const getFaviconUrl = (url: string) => {
+  return `https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${url}&size=32`;
+};
+
+const FallbackIcon = () => {
+  return (
+    <img
+      src={getFaviconUrl("https://google.com")}
+      className="meelio-flex meelio-size-6 meelio-items-center meelio-justify-center meelio-rounded"
+    />
+  );
+};

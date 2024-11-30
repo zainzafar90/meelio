@@ -21,7 +21,6 @@ import {
   siAppletv,
   siSpotify,
   siCrunchyroll,
-  siCodesandbox,
   siDribbble,
   siBehance,
   siDeviantart,
@@ -79,7 +78,7 @@ export interface Site {
   id: string;
   url: string;
   name: string;
-  icon: SimpleIcon;
+  icon?: SimpleIcon;
   order?: number;
   enabled?: boolean;
   groupId?: string;
@@ -236,10 +235,10 @@ export const SITE_LIST: Record<string, Site[]> = {
       id: "disneyplus",
       name: "Disney+",
       url: "disneyplus.com",
-      icon: siCodesandbox,
+      icon: undefined,
     },
     { id: "vimeo", name: "Vimeo", url: "vimeo.com", icon: siVimeo },
-    { id: "hulu", name: "Hulu", url: "hulu.com", icon: siCodesandbox },
+    { id: "hulu", name: "Hulu", url: "hulu.com", icon: undefined },
     { id: "hbo-max", name: "HBO Max", url: "max.com", icon: siHbo },
     { id: "rumble", name: "Rumble", url: "rumble.com", icon: siRumble },
     {
@@ -320,7 +319,7 @@ export const SITE_LIST: Record<string, Site[]> = {
     },
     { id: "github", name: "GitHub", url: "github.com", icon: siGithub },
     { id: "cnn", name: "CNN", url: "cnn.com", icon: siCnn },
-    { id: "bbc", name: "BBC", url: "bbc.com", icon: siCodesandbox },
+    { id: "bbc", name: "BBC", url: "bbc.com", icon: undefined },
     {
       id: "new-york-times",
       name: "New York Times",

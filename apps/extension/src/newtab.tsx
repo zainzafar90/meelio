@@ -9,7 +9,6 @@ import { SITE_LIST } from "./config/site-categories";
 
 import "@/style.css";
 import { SiteItem } from "./features/newtab/site-item";
-import { siCodesandbox } from "simple-icons";
 
 export default function NewTab() {
   const [siteInput, setSiteInput] = useState("");
@@ -98,10 +97,9 @@ const CustomBlockedSites = ({
         {customBlockedSites.map((site) => (
           <SiteItem
             site={{
-              id: "codesandbox",
+              id: site,
               name: site,
               url: site,
-              icon: siCodesandbox,
             }}
             isBlocked={true}
             onToggle={onToggleSite}
