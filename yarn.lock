@@ -12061,6 +12061,11 @@ simple-get@^4.0.0, simple-get@^4.0.1:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
+simple-icons@^13.18.0:
+  version "13.18.0"
+  resolved "https://registry.yarnpkg.com/simple-icons/-/simple-icons-13.18.0.tgz#fff26ebdb77dccfb4654fa776b966a76764d2119"
+  integrity sha512-nxG6XOUKWgt0K7eochrIn46tLBvOcUhcSpVUwWpo8WRkS4RHxreRIRosScDm4KmmTeDuNbW114GjviHlOSWyTg==
+
 simple-swizzle@^0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/simple-swizzle/-/simple-swizzle-0.2.2.tgz#a4da6b635ffcccca33f70d17cb92592de95e557a"
