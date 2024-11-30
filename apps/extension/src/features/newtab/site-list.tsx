@@ -25,7 +25,7 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
         Blocked Sites
       </h2>
 
-      <div className="meelio-space-y-8">
+      <div className="meelio-space-y-2">
         {SITE_CATEGORIES.map((category) => (
           <div
             key={category.key}
@@ -36,8 +36,8 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
               className="meelio-flex meelio-w-full meelio-cursor-pointer meelio-items-center meelio-justify-between"
             >
               <div className="meelio-flex meelio-items-center meelio-gap-2">
-                <span className="meelio-text-xl">{category.icon}</span>
-                <h3 className="meelio-text-lg meelio-font-semibold">
+                <span className="meelio-text-md">{category.icon}</span>
+                <h3 className="meelio-text-md meelio-font-semibold">
                   {category.name}
                 </h3>
               </div>

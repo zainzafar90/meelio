@@ -19,7 +19,7 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
     return isBlocked ? "#ffffff66" : "#ffffff";
   };
 
-  const getIconColor = (hex: string) => {
+  const getIconColor = () => {
     return isBlocked ? "#ffffff66" : "#fff";
   };
 
@@ -34,7 +34,7 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
       <div className="meelio-flex meelio-items-center meelio-gap-2">
         <div className="meelio-flex meelio-scale-75 meelio-transform meelio-items-center meelio-justify-center meelio-rounded">
           <svg className="meelio-size-6">
-            <path d={site.icon.path} fill={getIconColor(site.icon.hex)} />
+            <path d={site.icon.path} fill={getIconColor()} />
           </svg>
         </div>
         <span
