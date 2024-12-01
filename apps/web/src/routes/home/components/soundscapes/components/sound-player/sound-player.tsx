@@ -7,9 +7,11 @@ export const SoundPlayer = () => {
     (state) => state
   );
 
+  const playingSounds = sounds.filter((sound) => sound.playing);
+
   return (
     <div>
-      {sounds.map((sound) => (
+      {playingSounds.map((sound) => (
         <ReactPlayer
           key={sound.id}
           url={sound.url}
