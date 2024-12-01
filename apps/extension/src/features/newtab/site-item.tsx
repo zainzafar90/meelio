@@ -28,7 +28,7 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
   return (
     <button
       onClick={() => onToggle(site.url)}
-      className={`meelio-flex meelio-w-full meelio-items-center meelio-justify-between meelio-rounded meelio-border meelio-border-white/10 meelio-p-3 meelio-transition-colors hover:meelio-border-white/50`}
+      className={`meelio-flex meelio-w-full meelio-items-center meelio-justify-between meelio-rounded meelio-border meelio-border-white/10 meelio-p-2 meelio-transition-colors hover:meelio-border-white/50`}
       style={{
         backgroundColor: getBackgroundColor(site.icon?.hex || "#000"),
       }}

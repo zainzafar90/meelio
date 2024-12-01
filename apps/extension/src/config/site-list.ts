@@ -88,6 +88,12 @@ export interface Site {
 
 export const SITE_CATEGORIES: SiteCategory[] = [
   {
+    name: "Entertainment",
+    enabled: true,
+    key: "entertainment-group",
+    icon: "🎥",
+  },
+  {
     name: "Social",
     enabled: true,
     key: "social-group",
@@ -98,12 +104,6 @@ export const SITE_CATEGORIES: SiteCategory[] = [
     enabled: true,
     key: "games-group",
     icon: "🚀",
-  },
-  {
-    name: "Entertainment",
-    enabled: true,
-    key: "entertainment-group",
-    icon: "🎥",
   },
   {
     name: "Creativity",
@@ -150,6 +150,39 @@ export const SITE_CATEGORIES: SiteCategory[] = [
 ];
 
 export const SITE_LIST: Record<string, Site[]> = {
+  "entertainment-group": [
+    { id: "youtube", name: "YouTube", url: "youtube.com", icon: siYoutube },
+    { id: "netflix", name: "Netflix", url: "netflix.com", icon: siNetflix },
+    {
+      id: "primevideo",
+      name: "Prime Video",
+      url: "primevideo.com",
+      icon: siAmazonprime,
+    },
+    {
+      id: "disneyplus",
+      name: "Disney+",
+      url: "disneyplus.com",
+      icon: undefined,
+    },
+    { id: "vimeo", name: "Vimeo", url: "vimeo.com", icon: siVimeo },
+    { id: "hulu", name: "Hulu", url: "hulu.com", icon: undefined },
+    { id: "hbo-max", name: "HBO Max", url: "max.com", icon: siHbo },
+    { id: "rumble", name: "Rumble", url: "rumble.com", icon: siRumble },
+    {
+      id: "spotify-web",
+      name: "Spotify Web",
+      url: "open.spotify.com",
+      icon: siSpotify,
+    },
+    { id: "apple-tv", name: "Apple TV+", url: "tv.apple.com", icon: siAppletv },
+    {
+      id: "crunchyroll",
+      name: "Crunchyroll",
+      url: "crunchyroll.com",
+      icon: siCrunchyroll,
+    },
+  ],
   "social-group": [
     {
       id: "facebook",
@@ -221,39 +254,6 @@ export const SITE_LIST: Record<string, Site[]> = {
     },
     { id: "roblox", name: "Roblox", url: "roblox.com", icon: siRoblox },
     { id: "twitch", name: "Twitch", url: "twitch.tv", icon: siTwitch },
-  ],
-  "entertainment-group": [
-    { id: "youtube", name: "YouTube", url: "youtube.com", icon: siYoutube },
-    { id: "netflix", name: "Netflix", url: "netflix.com", icon: siNetflix },
-    {
-      id: "primevideo",
-      name: "Prime Video",
-      url: "primevideo.com",
-      icon: siAmazonprime,
-    },
-    {
-      id: "disneyplus",
-      name: "Disney+",
-      url: "disneyplus.com",
-      icon: undefined,
-    },
-    { id: "vimeo", name: "Vimeo", url: "vimeo.com", icon: siVimeo },
-    { id: "hulu", name: "Hulu", url: "hulu.com", icon: undefined },
-    { id: "hbo-max", name: "HBO Max", url: "max.com", icon: siHbo },
-    { id: "rumble", name: "Rumble", url: "rumble.com", icon: siRumble },
-    {
-      id: "spotify-web",
-      name: "Spotify Web",
-      url: "open.spotify.com",
-      icon: siSpotify,
-    },
-    { id: "apple-tv", name: "Apple TV+", url: "tv.apple.com", icon: siAppletv },
-    {
-      id: "crunchyroll",
-      name: "Crunchyroll",
-      url: "crunchyroll.com",
-      icon: siCrunchyroll,
-    },
   ],
   "creativity-group": [
     { id: "behance", name: "Behance", url: "behance.net", icon: siBehance },
