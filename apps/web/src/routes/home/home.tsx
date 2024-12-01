@@ -1,3 +1,4 @@
+import { add } from "@repo/core";
 import { useTranslation } from "react-i18next";
 
 import { useDockStore } from "@/stores/dock.store";
@@ -23,6 +24,7 @@ export const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
+        <div>{add(1, 2)}</div>
         <BottomBar />
       </AppLayout>
     </>

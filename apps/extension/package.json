@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@plasmohq/storage": "^1.13.0",
+    "@repo/core": "*",
     "lucide-react": "^0.454.0",
     "plasmo": "0.89.4",
     "react": "^18.2.0",

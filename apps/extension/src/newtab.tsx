@@ -1,12 +1,12 @@
 import React from "react";
 import { useState } from "react";
-
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 
 import { SiteList } from "@/features/newtab/site-list";
 import { SITE_LIST } from "@/config/site-list";
 import { SiteItem } from "@/features/newtab/site-item";
+import { add } from "@repo/core";
 
 import "@/style.css";
 
@@ -42,6 +42,7 @@ export default function NewTab() {
 
   return (
     <div className="meelio-min-h-screen meelio-bg-gray-900 meelio-text-white">
+      <div>{add(1, 2)}</div>
       <main className="meelio-mx-auto meelio-max-w-md meelio-py-8">
         <div className="meelio-p-4 meelio-font-sans">
           <h3 className="meelio-mb-4 meelio-text-xl">Add Custom Site</h3>
