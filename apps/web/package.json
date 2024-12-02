@@ -10,7 +10,6 @@
     "release": "standard-version"
   },
   "dependencies": {
-    "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
     "@tailwindcss/typography": "^0.5.9",

@@ -1,4 +1,3 @@
-import { Switch } from "@headlessui/react";
 import { cn } from "@repo/ui/lib/utils";
 
 import { Category, CategoryType } from "@/types/category";
@@ -25,21 +24,22 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
     playCategory(category);
   };
 
-  return (
-    <Switch
-      key={category.id}
-      as="div"
-      checked={activeCategoryId === category.name}
-      onChange={() => {
-        playCategorySound(category.name as Category);
+  const handleToggle = () => {
+    playCategorySound(category.name as Category);
 
-        if (typeof window === "undefined") return;
-        if (isActiveCategory(category.name as Category)) {
-          Telemetry.instance.categoryStopped(category.name as Category);
-        } else {
-          Telemetry.instance.categoryPlayed(category.name as Category);
-        }
-      }}
+    if (typeof window === "undefined") return;
+    if (isActiveCategory(category.name as Category)) {
+      Telemetry.instance.categoryStopped(category.name as Category);
+    } else {
+      Telemetry.instance.categoryPlayed(category.name as Category);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggle}
+      aria-pressed={isActiveCategory(category.name as Category)}
       className={cn(
         isActiveCategory(category.name as Category)
           ? "border-accent ring-1 ring-accent"
@@ -57,9 +57,6 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
           <span className="block text-sm font-medium text-foreground/90">
             {category.title}
           </span>
-          {/* <span className="mt-1 flex max-w-[12rem] items-center text-sm text-foreground/50">
-            {category.description}
-          </span> */}
         </div>
       </div>
       <div className="pl-5">
@@ -71,7 +68,7 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
           aria-hidden="true"
         />
       </div>
-    </Switch>
+    </button>
   );
 };
 

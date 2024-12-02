@@ -1,6 +1,5 @@
 import { memo } from "react";
 
-import { Switch } from "@headlessui/react";
 import { Spinner } from "@repo/ui/components/ui/spinner";
 import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
 
@@ -19,19 +18,22 @@ export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
     (state) => state
   );
 
+  const handleToggle = () => {
+    if (typeof window === "undefined") return;
+    if (sound.playing) {
+      Telemetry.instance.soundStopped(sound);
+    } else {
+      Telemetry.instance.soundPlayed(sound);
+    }
+    toggleSoundState(sound.id);
+  };
+
   return (
     <div className="relative flex w-full flex-col items-center p-2">
-      <Switch
-        checked={sound.playing}
-        onChange={() => {
-          if (typeof window === "undefined") return;
-          if (sound.playing) {
-            Telemetry.instance.soundStopped(sound);
-          } else {
-            Telemetry.instance.soundPlayed(sound);
-          }
-          toggleSoundState(sound.id);
-        }}
+      <button
+        type="button"
+        aria-pressed={sound.playing}
+        onClick={handleToggle}
         className="relative"
       >
         <div className="group flex w-full flex-col items-center p-2">
@@ -61,7 +63,7 @@ export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
         <div className="mt-2 flex scale-75 items-center justify-center gap-x-2">
           {sound.loading && <Spinner />}
         </div>
-      </Switch>
+      </button>
 
       <div
         className={cn("mt-4 w-full px-8 py-4 transition-all duration-200", {
