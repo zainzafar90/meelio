@@ -48,6 +48,8 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@repo/tailwind-config": "*",
+    "@repo/prettier-config": "*",
     "@repo/ui": "*",
     "@repo/core": "*",
     "@types/node": "^20.11.24",
