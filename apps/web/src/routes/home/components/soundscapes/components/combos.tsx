@@ -1,5 +1,6 @@
+import { Button } from "@repo/ui/components/ui/button";
+
 import { SoundState } from "@/types/sound";
-import { Button } from "@/components/ui/button";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 export const Combos: React.FC = () => {

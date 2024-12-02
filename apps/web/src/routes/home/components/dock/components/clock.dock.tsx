@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { cn } from "@repo/ui/lib/utils";
 import { toZonedTime } from "date-fns-tz";
-
-import { cn } from "@/lib/utils";
 
 const CLOCK_UPDATE_INTERVAL = 1000;
 

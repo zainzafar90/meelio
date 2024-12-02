@@ -1,13 +1,13 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 import { motion } from "framer-motion";
 
 import { PomodoroStage } from "@/types/pomodoro";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 
 import { TimerDonutGraph } from "./timer-donut-graph";

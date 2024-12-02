@@ -1,11 +1,12 @@
-import { SoundState } from "@/types/sound";
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons/icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@repo/ui/components/ui/tooltip";
+
+import { SoundState } from "@/types/sound";
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 export const SaveComboButton = () => {
@@ -39,7 +40,7 @@ export const SaveComboButton = () => {
         <button
           type="button"
           className={cn(
-            "group flex items-center justify-center w-8 h-8 p-1 relative rounded-md bg-background/90 text-foreground/70 focus:outline-none focus:ring-1 focus:ring-muted-background focus:ring-offset-1"
+            "focus:ring-muted-background group relative flex h-8 w-8 items-center justify-center rounded-md bg-background/90 p-1 text-foreground/70 focus:outline-none focus:ring-1 focus:ring-offset-1"
           )}
           onClick={saveCurrentSoundsAsCombo}
         >

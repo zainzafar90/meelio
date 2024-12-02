@@ -1,11 +1,11 @@
 import { useState } from "react";
 
+import { buttonVariants } from "@repo/ui/components/ui/button";
+import { cn } from "@repo/ui/lib/utils";
 import { toast } from "sonner";
 
 import { PlanInterval } from "@/types/subscription";
-import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { buttonVariants } from "@/components/ui/button";
 
 import { Plans } from "./plans";
 

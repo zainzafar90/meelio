@@ -1,9 +1,10 @@
+import { Badge } from "@repo/ui/components/ui/badge";
+import { useTranslation } from "react-i18next";
+
 import { Task } from "@/lib/db/todo-db";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { Badge } from "@/components/ui/badge";
 import { useTodoStore } from "@/stores/todo.store";
-import { useTranslation } from "react-i18next";
 
 interface TaskListProps {
   title: string;

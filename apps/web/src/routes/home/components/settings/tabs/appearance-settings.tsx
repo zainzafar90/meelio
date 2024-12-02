@@ -1,11 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import * as z from "zod";
-
-import { useTheme } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,8 +8,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+} from "@repo/ui/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { useTheme } from "@/components/theme-provider";
 
 const appearanceFormSchema = z.object({
   theme: z.enum(["light", "dark", "system"], {

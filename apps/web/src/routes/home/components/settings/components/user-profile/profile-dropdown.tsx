@@ -1,8 +1,8 @@
 import { VERSION } from "@/version";
+import { SidebarMenuButton } from "@repo/ui/components/ui/sidebar";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "@/components/icons/icons";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function ProfileDropdown() {

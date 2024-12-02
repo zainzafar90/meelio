@@ -1,7 +1,6 @@
+import { cn } from "@repo/ui/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-
-import { cn } from "@/lib/utils";
 
 export const LanguageSwitcherDock = () => {
   const { i18n } = useTranslation();

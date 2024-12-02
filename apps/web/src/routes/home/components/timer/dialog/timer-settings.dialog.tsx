@@ -1,11 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
-import { useTranslation } from "react-i18next";
-
-import { PomodoroStage } from "@/types/pomodoro";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,10 +7,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Switch } from "@repo/ui/components/ui/switch";
+import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { PomodoroStage } from "@/types/pomodoro";
 import { usePomodoroSync } from "@/hooks/use-pomodoro-sync";
 import { usePomodoroStore } from "@/stores/pomodoro.store";
 import { MINUTE_IN_SECONDS, POMODORO_MAX_MINUTES } from "@/utils/common.utils";
@@ -87,7 +87,9 @@ export const TimerSettingsDialog = ({
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle>{t("timer.settings.title")}</DialogTitle>
-          <DialogDescription>{t("timer.settings.description")}</DialogDescription>
+          <DialogDescription>
+            {t("timer.settings.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <form
@@ -191,7 +193,9 @@ export const TimerSettingsDialog = ({
           </div>
           <div className="flex items-center justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
-              <span className="text-md">{t("timer.settings.autoStart.label")}</span>
+              <span className="text-md">
+                {t("timer.settings.autoStart.label")}
+              </span>
               <span className="text-sm font-normal leading-snug text-foreground/70">
                 {t("timer.settings.autoStart.description")}
               </span>

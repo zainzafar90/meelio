@@ -1,5 +1,6 @@
+import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
+
 import { Icons } from "@/components/icons/icons";
-import { VolumeSlider } from "@/components/ui/volume-slider";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 export const GlobalVolumeControl = () => {
@@ -7,7 +8,7 @@ export const GlobalVolumeControl = () => {
 
   return (
     <>
-      <Icons.volume className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0" />
+      <Icons.volume className="h-5 w-5 flex-shrink-0 md:h-6 md:w-6" />
       <VolumeSlider
         min={0}
         max={1}

@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import { api } from "@/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, buttonVariants } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -9,9 +12,6 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { userAuthSchema } from "@/lib/validations/auth";
 import { Icons } from "@/components/icons/icons";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { env } from "@/utils/common.utils";
 
 type FormData = z.infer<typeof userAuthSchema>;

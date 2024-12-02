@@ -1,8 +1,8 @@
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@repo/ui/components/ui/spinner";
 
 export function PageSkeleton({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-y-3 items-center justify-center min-h-screen">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-y-3">
       <Spinner />
       {children}
     </div>

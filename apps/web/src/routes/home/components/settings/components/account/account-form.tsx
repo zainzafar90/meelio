@@ -2,14 +2,7 @@ import { useState } from "react";
 
 import { api } from "@/api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import * as z from "zod";
-
-import { AuthUser } from "@/types/auth";
-import { Icons } from "@/components/icons/icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Form,
   FormControl,
@@ -18,8 +11,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@repo/ui/components/ui/form";
+import { Input } from "@repo/ui/components/ui/input";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import * as z from "zod";
+
+import { AuthUser } from "@/types/auth";
+import { Icons } from "@/components/icons/icons";
 import { useAuthStore } from "@/stores/auth.store";
 
 const accountFormSchema = z.object({

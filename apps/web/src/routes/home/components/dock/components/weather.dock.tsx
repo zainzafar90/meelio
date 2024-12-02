@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { api } from "@/api";
+import { cn } from "@repo/ui/lib/utils";
 import { ShieldAlert } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 
 interface WeatherData {

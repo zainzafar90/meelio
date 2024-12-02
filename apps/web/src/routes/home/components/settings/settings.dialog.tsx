@@ -1,14 +1,10 @@
 import { api } from "@/api";
-import { CreditCard, Home, Paintbrush, User } from "lucide-react";
-import { useTranslation } from "react-i18next";
-
-import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@repo/ui/components/ui/dialog";
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +16,11 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
+} from "@repo/ui/components/ui/sidebar";
+import { CreditCard, Home, Paintbrush, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 import { SettingsTab, useSettingsStore } from "@/stores/settings.store";
 
@@ -31,11 +31,13 @@ import { AppearanceSettings } from "./tabs/appearance-settings";
 import { BillingSettings } from "./tabs/billing-settings";
 import { GeneralSettings } from "./tabs/general-settings";
 
-const SETTINGS_NAV: {
+type SettingsNavItem = {
   id: SettingsTab;
   name: string;
-  icon: React.ElementType;
-}[] = [
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "general", name: "general", icon: Home },
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "account", name: "account", icon: User },

@@ -1,4 +1,5 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
+
 import { Icons } from "@/components/icons/icons";
 import { useDockStore } from "@/stores/dock.store";
 

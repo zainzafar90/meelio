@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
+import { cn } from "@repo/ui/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { cn } from "@/lib/utils";
 import { ClockDock } from "@/routes/home/components/dock/components/clock.dock";
 import { LanguageSwitcherDock } from "@/routes/home/components/dock/components/language-switcher.dock";
 import { Icons } from "@/components/icons/icons";
 import { Logo } from "@/components/logo";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDockStore } from "@/stores/dock.store";
 
 import { DockButton, DockItem } from "../dock-button";
@@ -16,7 +16,15 @@ import { BackgroundDock } from "./components/background.dock";
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
 
-const STATIC_DOCK_ITEMS: DockItem[] = [
+type DockIconComponent = React.ComponentType<{ className?: string }>;
+
+const STATIC_DOCK_ITEMS: {
+  id: string;
+  name: string;
+  icon: DockIconComponent;
+  activeIcon: DockIconComponent;
+  isStatic: boolean;
+}[] = [
   {
     id: "background",
     name: "Background",
@@ -203,7 +211,9 @@ export const Dock = () => {
               (item.id === "soundscapes" && isSoundscapesVisible) ||
               (item.id === "breathepod" && isBreathingVisible);
 
-            const IconComponent = isActive ? item.activeIcon : item.icon;
+            const IconComponent = (
+              isActive ? item.activeIcon : item.icon
+            ) as DockIconComponent;
 
             if (item.id === "settings") {
               return (

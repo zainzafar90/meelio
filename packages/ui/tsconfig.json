@@ -1,5 +1,17 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
-  "include": ["."],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/ui/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "src",
+    "postcss.config.mjs",
+    "tailwind.config.ts",
+    "prettier.config.mjs",
+    ".eslintrc.js"
+  ],
   "exclude": ["dist", "build", "node_modules", "**/public/sounds/**"]
 }

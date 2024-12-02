@@ -1,9 +1,9 @@
 import { useState } from "react";
 
+import { cn } from "@repo/ui/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { cn } from "@/lib/utils";
-import { Blurhash } from "@/components/ui/blurhash";
+import { Blurhash } from "@/components/blurhash";
 import {
   LiveWallpaper,
   StaticWallpaper,

@@ -1,7 +1,7 @@
+import { cn } from "@repo/ui/lib/utils";
 import { motion } from "framer-motion";
 
 import { PomodoroStage, PomodoroStageMap } from "@/types/pomodoro";
-import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
 
 interface TimerStageButtonProps {
@@ -26,7 +26,7 @@ export const TimerStageButton = ({
     <motion.button
       onClick={() => onClick(stage)}
       className={cn(
-        "relative bg-gray-100 dark:bg-gray-900 rounded-xl p-3 text-left transition-colors hover:opacity-80",
+        "relative rounded-xl bg-gray-100 p-3 text-left transition-colors hover:opacity-80 dark:bg-gray-900",
         isActive && "bg-gray-200 dark:bg-gray-800"
       )}
       initial={{ scale: 0.9, opacity: 0 }}
@@ -34,7 +34,7 @@ export const TimerStageButton = ({
       transition={{ delay }}
       whileTap={{ scale: 0.95 }}
     >
-      <h3 className="text-black dark:text-white text-sm font-medium mb-1">
+      <h3 className="mb-1 text-sm font-medium text-black dark:text-white">
         {PomodoroStageMap[stage]}
       </h3>
       <p
@@ -49,7 +49,7 @@ export const TimerStageButton = ({
       </p>
       {isActive && (
         <div className="absolute bottom-4 right-4">
-          <Icons.checkFilled className="w-4 h-4" />
+          <Icons.checkFilled className="h-4 w-4" />
         </div>
       )}
     </motion.button>

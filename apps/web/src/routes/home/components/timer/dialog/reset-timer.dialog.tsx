@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,8 +8,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@repo/ui/components/ui/alert-dialog";
+import { Button } from "@repo/ui/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export const ResetTimerDialog = (props: { onReset: () => void }) => {
   const { t } = useTranslation();

@@ -24,7 +24,6 @@ export const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
-        <div>{add(1, 2)}</div>
         <BottomBar />
       </AppLayout>
     </>

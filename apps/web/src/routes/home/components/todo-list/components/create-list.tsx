@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
-import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,14 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@repo/ui/components/ui/popover";
+import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { useTodoStore } from "@/stores/todo.store";
 
 const emojis = [
@@ -97,7 +97,9 @@ export function CreateList({ children }: CreateListProps) {
                   id="emoji"
                   variant="outline"
                   className="w-[60px] text-lg"
-                  aria-label={t("todo.list.create.emoji.selected", { emoji: selectedEmoji })}
+                  aria-label={t("todo.list.create.emoji.selected", {
+                    emoji: selectedEmoji,
+                  })}
                 >
                   {selectedEmoji}
                 </Button>

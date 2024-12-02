@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import NumberFlow from "@number-flow/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,7 +16,6 @@ import { TimerStatsDialog } from "./dialog/timer-stats.dialog";
 
 export const Timer = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const {
     timer,
     startTimer,
@@ -88,21 +87,8 @@ export const Timer = () => {
     <motion.div className="absolute left-1/2 top-8 z-10 w-full max-w-sm -translate-x-1/2">
       <AnimatePresence mode="wait">
         <motion.div
-          ref={containerRef}
           layout
           className="min-w-60 rounded-xl bg-white backdrop-blur-xl dark:bg-black/80"
-          // initial={{
-          //   borderRadius: isExpanded ? "28px" : "24px",
-          //   width: "100%",
-          // }}
-          // animate={{
-          //   borderRadius: isExpanded ? "24px" : "28px",
-          //   width: "95%",
-          // }}
-          // exit={{
-          //   borderRadius: isExpanded ? "28px" : "24px",
-          //   width: "100%",
-          // }}
           initial={{
             opacity: 0,
             y: 10,

@@ -1,8 +1,7 @@
 import * as React from "react";
 
 import * as SliderPrimitive from "@radix-ui/react-slider";
-
-import { cn } from "@/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 
 /**
  * VolumeSlider
@@ -18,13 +17,13 @@ const VolumeSlider = React.forwardRef<
   <SliderPrimitive.Root
     ref={ref}
     className={cn(
-      "relative group flex w-full touch-none select-none items-center",
+      "group relative flex w-full touch-none select-none items-center",
       className
     )}
     {...props}
   >
-    <div className="relative h-4 w-full flex items-center">
-      <SliderPrimitive.Track className="absolute h-2 w-full cursor-pointer grow overflow-hidden rounded-full bg-muted-foreground/50 transform group-hover:h-4 transition-all ease-in duration-300">
+    <div className="relative flex h-4 w-full items-center">
+      <SliderPrimitive.Track className="absolute h-2 w-full grow transform cursor-pointer overflow-hidden rounded-full bg-muted-foreground/50 transition-all duration-300 ease-in group-hover:h-4">
         <SliderPrimitive.Range className="absolute h-full bg-primary" />
       </SliderPrimitive.Track>
     </div>

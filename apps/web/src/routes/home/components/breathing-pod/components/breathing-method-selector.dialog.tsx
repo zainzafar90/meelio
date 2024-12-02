@@ -1,19 +1,19 @@
 import React from "react";
 
-import { motion } from "framer-motion";
-
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons/icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useDisclosure } from "@/hooks/use-disclosure";
+} from "@repo/ui/components/ui/dialog";
+import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
+import { useDisclosure } from "@/hooks/use-disclosure";
 
 import { BREATHING_METHODS, useBreathingStore } from "../store/breathing.store";
 
@@ -48,7 +48,9 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
       >
         <DialogContent className="p-0">
           <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-2xl">{t("breathing.method.title")}</DialogTitle>
+            <DialogTitle className="text-2xl">
+              {t("breathing.method.title")}
+            </DialogTitle>
             <DialogDescription>
               {t("breathing.method.description")}
             </DialogDescription>

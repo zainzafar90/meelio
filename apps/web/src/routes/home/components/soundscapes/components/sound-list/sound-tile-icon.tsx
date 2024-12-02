@@ -1,13 +1,13 @@
 import { memo } from "react";
 
 import { Switch } from "@headlessui/react";
+import { Spinner } from "@repo/ui/components/ui/spinner";
+import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
 
 import { Sound } from "@/types/sound";
 import { Telemetry } from "@/lib/telemetry/telemetry";
 import { cn } from "@/lib/utils";
 import { RipplesEffect } from "@/components/ripple-effects";
-import { Spinner } from "@/components/ui/spinner";
-import { VolumeSlider } from "@/components/ui/volume-slider";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 type Props = {
@@ -64,9 +64,9 @@ export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
       </Switch>
 
       <div
-        className={cn("w-full py-4 mt-4 px-8 transition-all duration-200", {
-          "opacity-0 invisible": !sound.playing,
-          "opacity-100 visible": sound.playing,
+        className={cn("mt-4 w-full px-8 py-4 transition-all duration-200", {
+          "invisible opacity-0": !sound.playing,
+          "visible opacity-100": sound.playing,
         })}
       >
         <VolumeSlider

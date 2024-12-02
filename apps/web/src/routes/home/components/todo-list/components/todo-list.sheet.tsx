@@ -1,14 +1,11 @@
-import { Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@repo/ui/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -16,7 +13,10 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from "@repo/ui/components/ui/sheet";
+import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
 import { useDockStore } from "@/stores/dock.store";
 import { useTodoStore } from "@/stores/todo.store";
 

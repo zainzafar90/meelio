@@ -1,23 +1,23 @@
 import { memo, useEffect, useState } from "react";
 
-import { t } from "i18next";
-import { useTranslation } from "react-i18next";
-import { Bar, BarChart, XAxis } from "recharts";
-
-import { getWeeklySummary } from "@/lib/db/pomodoro-db";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@repo/ui/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@repo/ui/components/ui/chart";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
+import { Bar, BarChart, XAxis } from "recharts";
+
+import { getWeeklySummary } from "@/lib/db/pomodoro-db";
 import { MINUTE_IN_SECONDS } from "@/utils/common.utils";
 
 const chartConfig = {

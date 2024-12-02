@@ -1,3 +1,5 @@
+import { AxiosResponse } from "axios";
+
 import { AuthUser } from "@/types/auth";
 import { axios } from "@/api/axios";
 
@@ -7,38 +9,27 @@ export function loginAccount({
 }: {
   email: string;
   password: string;
-}) {
-  return axios.post("/v1/account/login", {
-    email,
-    password,
-  });
+}): Promise<AxiosResponse<AuthUser>> {
+  return axios.post("/v1/account/login", { email, password });
 }
 
-export function sendMagicLink({ email }: { email: string }) {
-  return axios.post(
-    "/v1/account/send-magic-link",
-    {},
-    {
-      params: {
-        email,
-      },
-    }
-  );
+export function sendMagicLink({
+  email,
+}: {
+  email: string;
+}): Promise<AxiosResponse> {
+  return axios.post("/v1/account/send-magic-link", {}, { params: { email } });
 }
 
-export function verifyMagicLink({ token }: { token: string }) {
-  return axios.post(
-    "/v1/account/verify-magic-link",
-    {},
-    {
-      params: {
-        token,
-      },
-    }
-  );
+export function verifyMagicLink({
+  token,
+}: {
+  token: string;
+}): Promise<AxiosResponse<AuthUser>> {
+  return axios.post("/v1/account/verify-magic-link", {}, { params: { token } });
 }
 
-export function getAuthenticatedAccount() {
+export function getAuthenticatedAccount(): Promise<AxiosResponse<AuthUser>> {
   return axios.get("/v1/account");
 }
 
@@ -47,11 +38,9 @@ export function updateAccount({
 }: {
   name: string;
 }): Promise<AuthUser | null> {
-  return axios.put("/v1/account", {
-    name,
-  });
+  return axios.put("/v1/account", { name });
 }
 
-export function logoutAccount() {
+export function logoutAccount(): Promise<AxiosResponse> {
   return axios.post("/v1/account/logout");
 }

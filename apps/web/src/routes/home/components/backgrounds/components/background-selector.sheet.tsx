@@ -1,16 +1,16 @@
-import { Play, Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
-
-import { cn } from "@/lib/utils";
-import { Icons } from "@/components/icons/icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from "@repo/ui/components/ui/sheet";
+import { Play, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/icons/icons";
 import { useBackgroundStore } from "@/stores/background.store";
 import { useDockStore } from "@/stores/dock.store";
 

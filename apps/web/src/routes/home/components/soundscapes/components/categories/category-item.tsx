@@ -1,8 +1,8 @@
 import { Switch } from "@headlessui/react";
+import { cn } from "@repo/ui/lib/utils";
 
 import { Category, CategoryType } from "@/types/category";
 import { Telemetry } from "@/lib/telemetry/telemetry";
-import { cn } from "@/lib/utils";
 import { CategoryIcons } from "@/components/icons/category-icons";
 import { Icons } from "@/components/icons/icons";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";

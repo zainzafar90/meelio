@@ -1,7 +1,4 @@
-import { t } from "i18next";
-
-import { Icons } from "@/components/icons/icons";
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/ui/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,8 +6,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
+} from "@repo/ui/components/ui/dialog";
+import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
+import { t } from "i18next";
+
+import { Icons } from "@/components/icons/icons";
 
 import { TimerExpandedContent } from "../components/timer-expanded-content";
 

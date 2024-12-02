@@ -1,8 +1,9 @@
 import { KeyboardEvent, useState } from "react";
+
+import { Input } from "@repo/ui/components/ui/input";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "@/components/icons/icons";
-import { Input } from "@/components/ui/input";
 import { useTodoStore } from "@/stores/todo.store";
 
 export function CreateTask() {

@@ -1,7 +1,8 @@
+import { buttonVariants } from "@repo/ui/components/ui/button";
+
 import { Subscription } from "@/types/subscription";
 import { cn, formatDate } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import { buttonVariants } from "@/components/ui/button";
 
 interface ProPlanSectionProps {
   subscriptionPlan: Subscription;

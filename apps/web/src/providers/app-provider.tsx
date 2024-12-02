@@ -1,13 +1,13 @@
 import { BrowserRouter } from "react-router-dom";
 
 import i18n from "@/i18n/i18n";
+import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { I18nextProvider } from "react-i18next";
 import { Toaster } from "sonner";
 
 import { SoundPlayer } from "@/routes/home/components/soundscapes/components/sound-player/sound-player";
 import { ConnectionWarning } from "@/components/connection-warning";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 
 import { AuthProvider } from "./auth-provider";

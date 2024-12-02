@@ -1,13 +1,13 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 import gsap from "gsap";
 
 import { Sound } from "@/types/sound";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons/icons";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useInterval } from "@/hooks/use-interval";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import {

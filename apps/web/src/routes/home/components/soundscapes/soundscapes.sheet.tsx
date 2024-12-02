@@ -1,18 +1,18 @@
 import React from "react";
 
-import { useTranslation } from "react-i18next";
-
-import { CategoryList } from "@/routes/home/components/soundscapes/components/categories/category-list";
-import { SoundList } from "@/routes/home/components/soundscapes/components/sound-list/sound-list";
-import { SoundControlsBar } from "@/routes/home/components/soundscapes/components/sound-player/controls/sound-control-bar";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
+} from "@repo/ui/components/ui/sheet";
+import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
+import { useTranslation } from "react-i18next";
+
+import { CategoryList } from "@/routes/home/components/soundscapes/components/categories/category-list";
+import { SoundList } from "@/routes/home/components/soundscapes/components/sound-list/sound-list";
+import { SoundControlsBar } from "@/routes/home/components/soundscapes/components/sound-player/controls/sound-control-bar";
 import { useDockStore } from "@/stores/dock.store";
 
 export const SoundscapesSheet: React.FC = () => {
