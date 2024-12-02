@@ -2,7 +2,6 @@
   "name": "web",
   "version": "0.0.38",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "vite --port=4000",
     "build": "vite build",
