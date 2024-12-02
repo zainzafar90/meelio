@@ -72,6 +72,7 @@ export const Dock = () => {
     isTimerVisible,
     isBreathingVisible,
     isSoundscapesVisible,
+    isTodosVisible,
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
@@ -81,6 +82,7 @@ export const Dock = () => {
     isTimerVisible: state.isTimerVisible,
     isSoundscapesVisible: state.isSoundscapesVisible,
     isBreathingVisible: state.isBreathingVisible,
+    isTodosVisible: state.isTodosVisible,
     resetDock: state.reset,
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
@@ -120,7 +122,7 @@ export const Dock = () => {
         onClick: () => toggleBreathing(),
       },
       {
-        id: "todo",
+        id: "todos",
         name: t("common.todo"),
         icon: Icons.todoList,
         activeIcon: Icons.todoListActive,
@@ -209,7 +211,8 @@ export const Dock = () => {
             const isActive =
               (item.id === "timer" && isTimerVisible) ||
               (item.id === "soundscapes" && isSoundscapesVisible) ||
-              (item.id === "breathepod" && isBreathingVisible);
+              (item.id === "breathepod" && isBreathingVisible) ||
+              (item.id === "todos" && isTodosVisible);
 
             const IconComponent = (
               isActive ? item.activeIcon : item.icon

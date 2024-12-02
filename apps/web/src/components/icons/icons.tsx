@@ -192,67 +192,18 @@ export const Icons = {
     </svg>
   ),
   soundscapes: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <rect width={9} height={9} x={2} y={2} fill="currentColor" rx={1} />
-      <rect
-        width={9}
-        height={9}
-        x={2}
-        y={13}
+    <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24" width="1em" {...props}>
+      <path opacity="0.5" fill="currentColor" d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z" />
+      <path
         fill="currentColor"
-        rx={1}
-        opacity=".5"
-      />
-      <rect
-        width={9}
-        height={9}
-        x={13}
-        y={2}
-        fill="currentColor"
-        rx={1}
-        opacity=".5"
-      />
-      <rect
-        width={9}
-        height={9}
-        x={13}
-        y={13}
-        fill="currentColor"
-        rx={1}
-        opacity=".5"
+        d="M18 11v2h1c.353 0 .686.073 1 .185V11a8 8 0 0 0-16 0v2.185A2.976 2.976 0 0 1 5 13h1v-2a6 6 0 1 1 12 0z"
       />
     </svg>
   ),
   soundscapesActive: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <rect width={9} height={9} x={2} y={2} fill="currentColor" rx={1} />
-      <rect
-        width={9}
-        height={9}
-        x={2}
-        y={13}
-        fill="currentColor"
-        rx={1}
-        opacity=".5"
-      />
-      <rect
-        width={9}
-        height={9}
-        x={13}
-        y={2}
-        fill="currentColor"
-        rx={1}
-        opacity=".5"
-      />
-      <rect
-        width={9}
-        height={9}
-        x={13}
-        y={13}
-        fill="currentColor"
-        rx={1}
-        opacity=".5"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24" width="1em" {...props}>
+      <path fill="currentColor" d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z" />
+      <path fill="currentColor" d="M18 11v2h1c.353 0 .686.073 1 .185V11a8 8 0 0 0-16 0v2.185A2.976 2.976 0 0 1 5 13h1v-2a6 6 0 1 1 12 0z" />
     </svg>
   ),
   pomodoro: ({ ...props }: LucideProps) => (
@@ -363,6 +314,7 @@ export const Icons = {
       {...props}
     >
       <path
+        opacity=".75"
         fill="currentColor"
         d="M17 22H7a3.003 3.003 0 0 1-3-3V7a3.003 3.003 0 0 1 3-3h10a3.003 3.003 0 0 1 3 3v12a3.003 3.003 0 0 1-3 3Z"
       />

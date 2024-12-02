@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
 import { useDockStore } from "@/stores/dock.store";
+import { ComponentType } from 'react';
 
 export interface DockItem {
   id: string;
   name: string;
-  icon: React.ElementType;
-  activeIcon: React.ElementType;
+  icon: ComponentType<{ className?: string }>;
+  activeIcon: ComponentType<{ className?: string }>;
   hidden?: boolean;
   isActive?: boolean;
   onClick?: () => void;
