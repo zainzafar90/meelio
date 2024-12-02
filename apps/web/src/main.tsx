@@ -6,7 +6,7 @@ import ReactDOM from "react-dom/client";
 import { App } from "./app";
 import { AppUpdatedAlert } from "./components/app-updated-alert";
 
-import "@/styles/globals.css";
+import "@repo/ui/globals.css";
 
 // import { usePomodoroStore } from "./stores/pomodoro.store";
 // import { useUpdateAlertStore } from "./stores/update-alert-store";
