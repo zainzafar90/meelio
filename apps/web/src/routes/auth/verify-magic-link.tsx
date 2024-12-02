@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
 import { useMounted } from "@/hooks/use-mounted";
 
-export const VerifyMagicLink = () => {
+const VerifyMagicLink = () => {
   const mounted = useMounted();
   const searchParams = new URLSearchParams(useLocation().search);
   const [verificationStatus, setVerificationStatus] = useState("verifying");
@@ -57,3 +57,5 @@ export const VerifyMagicLink = () => {
 
   return <Navigate to="/login" />;
 };
+
+export default VerifyMagicLink;

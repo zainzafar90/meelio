@@ -4,7 +4,7 @@ import { UserAuthForm } from "@/components/auth/user-auth-form";
 import { Logo } from "@/components/logo";
 import { AuthLayout } from "@/layouts/auth-layout";
 
-export const Login = () => {
+const Login = () => {
   return (
     <AuthLayout>
       <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
@@ -37,3 +37,5 @@ export const Login = () => {
     </AuthLayout>
   );
 };
+
+export default Login;

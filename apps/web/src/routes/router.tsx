@@ -5,10 +5,11 @@ import { ErrorPage } from "@/routes/errors/error";
 import { PageSkeleton } from "@/components/skeletons/page-skeleton";
 import { PublicLayout } from "@/layouts/public-layout";
 
-import { Login } from "./auth/login";
-import { Register } from "./auth/register";
-import { VerifyMagicLink } from "./auth/verify-magic-link";
-import { Home } from "./home";
+
+const Home = React.lazy(() => import("@/routes/home/home"));
+const Login = React.lazy(() => import("@/routes/auth/login"));
+const Register = React.lazy(() => import("@/routes/auth/register"));
+const VerifyMagicLink = React.lazy(() => import("@/routes/auth/verify-magic-link"));
 
 export const Router = () => {
   return (

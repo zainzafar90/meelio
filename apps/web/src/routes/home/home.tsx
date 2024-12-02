@@ -16,7 +16,7 @@ import { SoundscapesSheet } from "./components/soundscapes/soundscapes.sheet";
 import { Timer } from "./components/timer/timer";
 import { TodoListSheet } from "./components/todo-list/components/todo-list.sheet";
 
-export const Home = () => {
+const Home = () => {
   return (
     <>
       <Background />
@@ -91,3 +91,5 @@ const BottomBar = () => {
     </footer>
   );
 };
+
+export default Home;
