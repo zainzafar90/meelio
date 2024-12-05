@@ -61,7 +61,7 @@ const PlasmoOverlay = () => {
   if (!isBlocked) return null;
 
   return (
-    <div className="z-[2147483647] meelio-fixed meelio-inset-0 meelio-bg-black">
+    <div className="z-[2147483647] fixed inset-0 bg-black">
       <Blocker
         message={message}
         siteName={currentSite}

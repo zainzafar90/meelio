@@ -1,6 +1,7 @@
 {
   "extends": "@repo/typescript-config/plasmo.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -10,7 +11,8 @@
     ".plasmo/index.d.ts",
     "./**/*.ts",
     "./**/*.tsx",
-    "tailwind.config.mjs",
+    "tailwind.config.ts",
+    "postcss.config.js",
     "prettier.config.mjs"
   ],
   "exclude": ["node_modules", "build", "dist", ".plasmo"]

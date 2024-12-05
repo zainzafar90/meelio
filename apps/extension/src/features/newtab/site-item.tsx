@@ -28,15 +28,15 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
   return (
     <button
       onClick={() => onToggle(site.url)}
-      className={`meelio-flex meelio-w-full meelio-items-center meelio-justify-between meelio-rounded meelio-border meelio-border-white/10 meelio-p-2 meelio-transition-colors hover:meelio-border-white/50`}
+      className={`flex w-full items-center justify-between rounded border border-white/10 p-2 transition-colors hover:border-white/50`}
       style={{
         backgroundColor: getBackgroundColor(site.icon?.hex || "#000"),
       }}
     >
-      <div className="meelio-flex meelio-items-center meelio-gap-2">
-        <div className="meelio-flex meelio-scale-75 meelio-transform meelio-items-center meelio-justify-center meelio-rounded">
+      <div className="flex items-center gap-2">
+        <div className="flex scale-75 transform items-center justify-center rounded">
           {site.icon ? (
-            <svg className="meelio-size-6">
+            <svg className="size-6">
               <path d={site.icon.path} fill={getIconColor()} />
             </svg>
           ) : (
@@ -44,19 +44,19 @@ export function SiteItem({ site, isBlocked, onToggle }: SiteItemProps) {
           )}
         </div>
         <span
-          className="text-white/90 font-medium meelio-flex meelio-items-center"
+          className="text-white/90 font-medium flex items-center"
           style={{ color: getTextColor() }}
         >
           {site.name}
         </span>
       </div>
-      <div className="meelio-flex meelio-items-center meelio-gap-2">
-        <span className="text-white/80 meelio-text-sm">{site.url}</span>
-        <span className="text-white/90 meelio-text-sm">
+      <div className="flex items-center gap-2">
+        <span className="text-white/80 text-sm">{site.url}</span>
+        <span className="text-white/90 text-sm">
           {isBlocked ? (
-            <Ban className="meelio-size-4 meelio-text-red-500" />
+            <Ban className="size-4 text-red-500" />
           ) : (
-            <Plus className="meelio-size-4" />
+            <Plus className="size-4" />
           )}
         </span>
       </div>
@@ -86,14 +86,14 @@ const FallbackIcon = ({ url, size = 32 }: { url: string; size?: number }) => {
   return (
     <div className="inline-flex items-center justify-center">
       {iconSrc === BLANK ? (
-        <div className="meelio-size-6 meelio-rounded meelio-bg-white/10" />
+        <div className="size-6 rounded bg-white/10" />
       ) : (
         <img
           src={iconSrc}
           width={size}
           height={size}
           alt={`Icon for ${url}`}
-          className="meelio-flex meelio-size-6 meelio-items-center meelio-justify-center meelio-rounded"
+          className="flex size-6 items-center justify-center rounded"
           onError={() => setHasError(true)}
         />
       )}

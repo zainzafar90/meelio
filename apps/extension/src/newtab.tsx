@@ -1,112 +1,100 @@
 import React from "react";
-import { useState } from "react";
-import { Storage } from "@plasmohq/storage";
-import { useStorage } from "@plasmohq/storage/hook";
 
-import { SiteList } from "@/features/newtab/site-list";
-import { SITE_LIST } from "@/config/site-list";
-import { SiteItem } from "@/features/newtab/site-item";
-import { add } from "@repo/core";
+import { useTranslation } from "react-i18next";
 
-import "@/style.css";
+import { useDockStore } from "@/stores/dock.store";
 
-export default function NewTab() {
-  const [siteInput, setSiteInput] = useState("");
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
-    {
-      key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
-    },
-    []
+import { Background } from "./routes/home/components/backgrounds/backgrounds";
+import { BackgroundSelectorSheet } from "./routes/home/components/backgrounds/components/background-selector.sheet";
+import { BackgroundOverlay } from "./routes/home/components/backgrounds/components/background-overlay";
+import { AppLayout } from "./routes/home/components/layout";
+import { SoundscapesSheet } from "./routes/home/components/soundscapes/soundscapes.sheet";
+import { TodoListSheet } from "./routes/home/components/todo-list/components/todo-list.sheet";
+import { Greeting } from "./routes/home/components/greetings/greetings-mantras";
+import { Quote } from "./routes/home/components/quote/quote";
+import { BreathePod } from "./routes/home/components/breathing-pod/breathing-pod";
+import { Timer } from "./routes/home/components/timer/timer";
+import { Dock } from "./routes/home/components/dock/dock";
+import { AppProvider } from "./providers/app-provider";
+
+import "./style.css";
+import { Clock } from "./routes/home/components/clock/clock";
+
+const Home = () => {
+  return (
+    <AppProvider>
+      <Background />
+      <BackgroundOverlay />
+      <AppLayout>
+        <TopBar />
+        <Content />
+        <BottomBar />
+      </AppLayout>
+    </AppProvider>
   );
+};
 
-  const addCustomSite = async () => {
-    const site = siteInput.trim();
-    if (!site) return;
-
-    if (!blockedSites.includes(site)) {
-      setBlockedSites([...blockedSites, site]);
-      setSiteInput("");
-    }
-  };
-
-  const toggleSite = (site: string) => {
-    if (blockedSites.includes(site)) {
-      setBlockedSites(blockedSites.filter((s) => s !== site));
-    } else {
-      setBlockedSites([...blockedSites, site]);
-    }
-  };
+const Content = () => {
+  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+    isBreathingVisible: state.isBreathingVisible,
+    isGreetingsVisible: state.isGreetingsVisible,
+  }));
+  const { t } = useTranslation();
 
   return (
-    <div className="meelio-min-h-screen meelio-bg-gray-900 meelio-text-white">
-      <div>{add(1, 2)}</div>
-      <main className="meelio-mx-auto meelio-max-w-md meelio-py-8">
-        <div className="meelio-p-4 meelio-font-sans">
-          <h3 className="meelio-mb-4 meelio-text-xl">Add Custom Site</h3>
-          <div className="meelio-mb-4 meelio-flex meelio-gap-2">
-            <input
-              type="text"
-              value={siteInput}
-              onChange={(e) => setSiteInput(e.target.value)}
-              placeholder="Enter custom site URL (e.g., example.com)"
-              className="meelio-flex-1 meelio-rounded meelio-border meelio-border-white/10 meelio-bg-white/5 meelio-p-2"
-            />
-            <button
-              onClick={addCustomSite}
-              className="meelio-rounded meelio-bg-blue-500 meelio-px-4 meelio-py-2 meelio-text-white hover:meelio-bg-blue-600"
-            >
-              Add Custom Site
-            </button>
-          </div>
-
-          <CustomBlockedSites
-            blockedSites={blockedSites}
-            onToggleSite={toggleSite}
-          />
-
-          <SiteList blockedSites={blockedSites} onToggleSite={toggleSite} />
-        </div>
-      </main>
-    </div>
+    <main
+      className="flex flex-1 flex-col items-center justify-center"
+      aria-label={t("home.layout.main.aria")}
+    >
+      {isGreetingsVisible && <GreetingsContent />}
+      {isBreathingVisible && <BreathingContent />}
+      <SoundscapesSheet />
+      <TodoListSheet />
+      <BackgroundSelectorSheet />
+    </main>
   );
-}
+};
 
-const CustomBlockedSites = ({
-  blockedSites,
-  onToggleSite,
-}: {
-  blockedSites: string[];
-  onToggleSite: (site: string) => void;
-}) => {
-  const customBlockedSites = blockedSites.filter(
-    (site) =>
-      !Object.values(SITE_LIST)
-        .flat()
-        .some((s) => s.url === site)
-  );
-
-  if (customBlockedSites.length === 0) return null;
+const GreetingsContent = () => {
   return (
-    <div className="meelio-my-8">
-      <h2 className="meelio-mb-6 meelio-text-2xl meelio-font-bold">
-        Custom Blocked Sites
-      </h2>
-      <ul className="meelio-space-y-2">
-        {customBlockedSites.map((site) => (
-          <SiteItem
-            site={{
-              id: site,
-              name: site,
-              url: site,
-            }}
-            isBlocked={true}
-            onToggle={onToggleSite}
-          />
-        ))}
-      </ul>
+    <div className="flex flex-col items-center justify-center gap-8">
+      <Greeting />
+      <Quote />
     </div>
   );
 };
+
+const BreathingContent = () => {
+  return <BreathePod />;
+};
+
+const TopBar = () => {
+  const isTimerVisible = useDockStore((state) => {
+    return state.isTimerVisible;
+  });
+
+  return (
+    <div className="relative">
+          <div className="flex h-6 w-full justify-center bg-zinc-900/20 backdrop-blur-md">
+            <Clock />
+          </div>
+
+      {isTimerVisible && <Timer />}
+    </div>
+  );
+};
+
+const BottomBar = () => {
+  const { t } = useTranslation();
+  return (
+    <footer
+      className="flex items-center justify-center pb-2"
+      aria-label={t("home.layout.footer.aria")}
+    >
+      <Dock />
+    </footer>
+  );
+};
+
+export default Home;
+
