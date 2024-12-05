@@ -1,7 +1,7 @@
 import posthog from "posthog-js";
 
 import { Sound } from "@/types/sound";
-import { env } from "@/utils/common.utils";
+import { env } from "@/utils/env.utils";
 
 export enum TelemetryEvent {
   PageView = "Page View",
@@ -29,13 +29,13 @@ export class Telemetry {
       );
     }
 
-    posthog.init(env.VITE_APP_PUBLIC_POSTHOG_KEY as string, {
-      api_host: env.VITE_APP_PUBLIC_POSTHOG_HOST as string,
+    posthog.init(env.posthogKey as string, {
+      api_host: env.posthogHost as string,
       persistence: "localStorage",
       autocapture: true,
-      debug: env.DEV,
+      debug: env.dev === "true",
       loaded: (posthog) => {
-        if (env.DEV) {
+        if (env.dev === "true") {
           posthog.debug();
         }
       },

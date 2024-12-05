@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { AuthUser } from "@/types/auth";
 import { PlanInterval, Subscription } from "@/types/subscription";
-import { env } from "@/utils/common.utils";
+import { env } from "@/utils/env.utils";
 
 import { FreePlanSection } from "./free-plan-section";
 import { ProPlanSection } from "./pro-plan-section";
@@ -67,9 +67,9 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
       const allPlanIds: {
         [key in PlanInterval]: string;
       } = {
-        monthly: env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID as string,
-        yearly: env.VITE_LEMON_SQUEEZY_YEARLY_VARIANT_ID as string,
-        lifetime: env.VITE_LEMON_SQUEEZY_LIFETIME_VARIANT_ID as string,
+        monthly: env.lemonSqueezyMonthlyVariantId as string,
+        yearly: env.lemonSqueezyYearlyVariantId as string,
+        lifetime: env.lemonSqueezyLifetimeVariantId as string,
       };
 
       const planId: string = allPlanIds[plan as PlanInterval];

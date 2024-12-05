@@ -1,7 +1,6 @@
 import Axios from "axios";
 
-import { env } from "@/utils/common.utils";
-
+import { env } from "@/utils/env.utils";
 /*
 |--------------------------------------------------------------------------
 | Axios
@@ -12,12 +11,10 @@ import { env } from "@/utils/common.utils";
 | notifications.
 |
 */
-const axios = Axios.create({
-  baseURL: env.VITE_SERVER_URL,
-});
+const axios = Axios.create({});
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = env.VITE_SERVER_URL;
+axios.defaults.baseURL = env.serverUrl;
 axios.defaults.headers.common["Content-Type"] = "application/json";
 axios.defaults.headers.common["Accept"] = "application/json";
 

@@ -12,7 +12,7 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { userAuthSchema } from "@/lib/validations/auth";
 import { Icons } from "@/components/icons/icons";
-import { env } from "@/utils/common.utils";
+import { env } from "@/utils/env.utils";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
@@ -30,7 +30,7 @@ export const UserAuthForm = () => {
 
   const handleGoogleClick = async () => {
     setIsGoogleLoading(true);
-    window.location.href = `${env.VITE_SERVER_URL}/v1/account/google`;
+    window.location.href = `${env.serverUrl}/v1/account/google`;
   };
 
   async function onSubmit(data: FormData) {
