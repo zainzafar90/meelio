@@ -1,7 +1,7 @@
-import { env } from "@/utils/common.utils";
+import { env } from "@/utils/env.utils";
 
 const getSoundFileUrl = () => {
-  if (env.DEV) {
+  if (env.dev) {
     return "/sounds/yT3sxTz";
   }
 
@@ -10,7 +10,7 @@ const getSoundFileUrl = () => {
 };
 
 const getSoundFileExtension = () => {
-  if (env.DEV) {
+  if (env.dev) {
     return ".mp3";
   }
 

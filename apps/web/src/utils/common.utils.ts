@@ -1,4 +1,3 @@
-export const env = import.meta.env;
 export const MINUTE_IN_SECONDS = 60; // 1 minute
 export const POMODORO_MAX_MINUTES = 300; // 300 minutes
 
