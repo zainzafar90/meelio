@@ -6,12 +6,6 @@
       "@repo/ui/*": ["./src/*"]
     }
   },
-  "include": [
-    "src",
-    "postcss.config.mjs",
-    "tailwind.config.ts",
-    "prettier.config.mjs",
-    ".eslintrc.js"
-  ],
+  "include": ["src", "prettier.config.mjs", ".eslintrc.js"],
   "exclude": ["dist", "build", "node_modules"]
 }

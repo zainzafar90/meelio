@@ -1,0 +1,20 @@
+{
+  "name": "@repo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@repo/ui": "*",
+    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}
