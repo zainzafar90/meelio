@@ -1,6 +1,11 @@
 {
-  "extends": "@repo/typescript-config/plasmo.json",
+  "extends": [
+    "plasmo/templates/tsconfig.base",
+    "@repo/typescript-config/base.json"
+  ],
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["./src/*"]
