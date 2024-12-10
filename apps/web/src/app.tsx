@@ -1,6 +1,7 @@
-import { AppProvider } from "@/providers/app-provider";
+
 
 import { Router } from "@/routes/router";
+import { AppProvider } from "@repo/shared";
 
 export const App = () => {
   return (

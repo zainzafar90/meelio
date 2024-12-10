@@ -1,0 +1,52 @@
+{
+  "name": "@repo/shared",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@number-flow/react": "^0.3.0",
+    "@repo/eslint-config": "*",
+    "@repo/tailwind-config": "*",
+    "@repo/typescript-config": "*",
+    "@repo/ui": "*",
+    "axios": "^1.5.0",
+    "blurhash": "^2.0.5",
+    "clsx": "^2.1.1",
+    "date-fns-tz": "^3.2.0",
+    "dexie": "^4.0.10",
+    "framer-motion": "^11.13.4",
+    "i18next": "^24.0.5",
+    "i18next-browser-languagedetector": "^8.0.2",
+    "lucide-react": "^0.468.0",
+    "posthog-js": "^1.194.6",
+    "react-i18next": "^15.1.4",
+    "react-player": "^2.16.0",
+    "sonner": "^1.7.1",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.3.3",
+    "usehooks-ts": "^3.1.0",
+    "zod": "^3.24.0",
+    "zustand": "^4.4.1"
+  },
+  "exports": {
+    ".": "./src/index.tsx",
+    "./api/*": "./src/api/**/*.ts",
+    "./components/*": "./src/components/**/*.{tsx,ts}",
+    "./context/*": "./src/context/**/*.{ts,tsx}",
+    "./data/*": "./src/data/**/*.{ts,json}",
+    "./hooks/*": "./src/hooks/**/*.{ts,tsx}",
+    "./i18n/*": "./src/i18n/**/*.{ts,tsx}",
+    "./lib/*": "./src/lib/**/*.ts",
+    "./providers/*": "./src/providers/**/*.{ts,tsx}",
+    "./stores/*": "./src/stores/**/*.{ts,tsx}",
+    "./types/*": "./src/types/**/*.{ts,tsx}",
+    "./utils/*": "./src/utils/**/*.{ts,tsx}"
+  }
+}

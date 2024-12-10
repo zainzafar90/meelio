@@ -13,5 +13,5 @@
     "prettier.config.mjs",
     ".eslintrc.js"
   ],
-  "exclude": ["dist", "build", "node_modules", "**/public/sounds/**"]
+  "exclude": ["dist", "build", "node_modules"]
 }

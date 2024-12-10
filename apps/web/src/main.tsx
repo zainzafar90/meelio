@@ -1,68 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-// import { registerSW } from "virtual:pwa-register";
-
-import { App } from "./app";
-import { AppUpdatedAlert } from "./components/app-updated-alert";
-
 import "@repo/ui/globals.css";
 
-// import { usePomodoroStore } from "./stores/pomodoro.store";
-// import { useUpdateAlertStore } from "./stores/update-alert-store";
-
-// const INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
-
-// let updateSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
-
-// const initializeSW = () => {
-//   updateSW = registerSW({
-//     onRegisteredSW(r) {
-//       r && setInterval(checkForUpdates, INTERVAL_MS);
-//     },
-//     onNeedRefresh() {
-//       useUpdateAlertStore.getState().setShowUpdateAlert(true);
-//     },
-//     onOfflineReady() {
-//       console.log("The app is ready to work offline.");
-//     },
-//   });
-// };
-
-// const checkForUpdates = async () => {
-//   if (!navigator.onLine) return;
-
-//   try {
-//     const registration = await navigator.serviceWorker.getRegistration();
-//     if (registration) {
-//       const isTimerActive = usePomodoroStore.getState().isTimerRunning();
-//       if (isTimerActive) {
-//         console.log("Timer is running, skipping update check", updateSW);
-//         return;
-//       }
-
-//       updateSW && updateSW();
-
-//       await registration.update();
-//     }
-//   } catch (error) {
-//     console.error("Error checking for updates: ", error);
-//   }
-// };
-
-// initializeSW();
-
-const AppContainer = () => {
-  return (
-    <>
-      <AppUpdatedAlert />
-      <App />
-    </>
-  );
-};
+import { App } from "./app";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <AppContainer />
+      <App />
   </React.StrictMode>
 );

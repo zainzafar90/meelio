@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-import { api } from "@/api";
+import { api } from "@repo/shared";
 import { toast } from "sonner";
 
-import { PageSkeleton } from "@/components/skeletons/page-skeleton";
-import { useMounted } from "@/hooks/use-mounted";
+import { PageSkeleton } from "@repo/shared";
+import { useMounted } from "@repo/shared";
 
 const VerifyMagicLink = () => {
   const mounted = useMounted();

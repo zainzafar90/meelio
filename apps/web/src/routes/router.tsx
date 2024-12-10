@@ -2,9 +2,9 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { ErrorPage } from "@/routes/errors/error";
-import { PageSkeleton } from "@/components/skeletons/page-skeleton";
-import { PublicLayout } from "@/layouts/public-layout";
 
+import { PageSkeleton } from "@repo/shared";
+import { PublicLayout } from "@/layouts/public-layout";
 
 const Home = React.lazy(() => import("@/routes/home/home"));
 const Login = React.lazy(() => import("@/routes/auth/login"));

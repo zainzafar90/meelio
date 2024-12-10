@@ -1,20 +1,18 @@
-import { add } from "@repo/core";
 import { useTranslation } from "react-i18next";
 
-import { useDockStore } from "@/stores/dock.store";
+import { Clock, useDockStore } from "@repo/shared";
 
-import { Background } from "./components/backgrounds/backgrounds";
-import { BackgroundOverlay } from "./components/backgrounds/components/background-overlay";
-import { BackgroundSelectorSheet } from "./components/backgrounds/components/background-selector.sheet";
-import { BreathePod } from "./components/breathing-pod/breathing-pod";
-// import { Clock } from "./components/clock/clock";
-import { Dock } from "./components/dock/dock";
-import { Greeting } from "./components/greetings/greetings-mantras";
-import { AppLayout } from "./components/layout";
-import { Quote } from "./components/quote/quote";
-import { SoundscapesSheet } from "./components/soundscapes/soundscapes.sheet";
-import { Timer } from "./components/timer/timer";
-import { TodoListSheet } from "./components/todo-list/components/todo-list.sheet";
+import { Background } from "@repo/shared";
+import { BackgroundOverlay } from "@repo/shared";
+import { BackgroundSelectorSheet } from "@repo/shared";
+import { BreathePod } from "@repo/shared";
+import { Greeting } from "@repo/shared";
+import { AppLayout } from "@repo/shared";
+import { Quote } from "@repo/shared";
+import { SoundscapesSheet } from "@repo/shared";
+import { Timer } from "@repo/shared";
+import { TodoListSheet } from "@repo/shared";
+import { Dock } from "@repo/shared";
 
 const Home = () => {
   return (
@@ -71,9 +69,9 @@ const TopBar = () => {
 
   return (
     <div className="relative">
-      {/* <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
-        <Clock />
-      </div> */}
+              <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
+                <Clock />
+              </div>
 
       {isTimerVisible && <Timer />}
     </div>
