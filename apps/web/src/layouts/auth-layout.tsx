@@ -1,8 +1,8 @@
 import { useId } from "react";
 import { Link } from "react-router-dom";
 
-import { StarField } from "@/components/auth/star-field";
-import { Logomark } from "@/components/logo";
+import { Logomark, StarField } from "@repo/shared";
+
 
 interface AuthLayoutProps {
   children: React.ReactNode;

@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@repo/shared";
 
 export function PublicLayout() {
   const { user } = useAuthStore();

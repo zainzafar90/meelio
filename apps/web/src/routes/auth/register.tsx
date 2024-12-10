@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
-import { UserAuthForm } from "@/components/auth/user-auth-form";
-import { Logo } from "@/components/logo";
+import { UserAuthForm } from "@repo/shared";
+import { Logo } from "@repo/shared";
 import { AuthLayout } from "@/layouts/auth-layout";
 
 const Register = () => {
