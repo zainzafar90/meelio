@@ -22,11 +22,7 @@ export class EnvWrapper {
   }
 
   private isExtension() {
-    return (
-      typeof chrome !== "undefined" &&
-      chrome.runtime &&
-      chrome.runtime.getManifest
-    );
+    return typeof chrome !== "undefined" && chrome.runtime;
   }
 
   private getWebEnv(): Environment {

@@ -39,3 +39,7 @@ const fallbackCopyToClipboard = (text: string) => {
   document.execCommand("copy");
   document.body.removeChild(textarea);
 };
+
+export const isChromeExtension = () => {
+  return typeof chrome !== "undefined" && chrome.runtime;
+};

@@ -1,4 +1,5 @@
 import { Sound } from "../types";
+import { getAssetPath } from "./path.utils";
 
 export const OSCILLATION_INTERVAL_MS = 60_000; // 1 minute
 export const SHUFFLE_SOUNDS_INTERVAL_MS = 120_000; // 2 minutes
@@ -65,22 +66,24 @@ export const generateNextVolumeForShuffle = () => {
 |
 */
 const KEY_SOUNDS = [
-  "/public/sounds/keyboard/key-01.mp3",
-  "/public/sounds/keyboard/key-02.mp3",
-  "/public/sounds/keyboard/key-03.mp3",
-  "/public/sounds/keyboard/key-04.mp3",
-  "/public/sounds/keyboard/key-05.mp3",
+  getAssetPath("/public/sounds/keyboard/key-01.mp3"),
+  getAssetPath("/public/sounds/keyboard/key-02.mp3"),
+  getAssetPath("/public/sounds/keyboard/key-03.mp3"),
+  getAssetPath("/public/sounds/keyboard/key-04.mp3"),
+  getAssetPath("/public/sounds/keyboard/key-05.mp3"),
 ];
 
 export const playTypewriterSound = (key: string) => {
   if (key === "Space") {
-    const audio = new Audio("/public/sounds/keyboard/space.mp3");
+    const audio = new Audio(getAssetPath("/public/sounds/keyboard/space.mp3"));
     audio.play();
   } else if (key === "Enter") {
-    const audio = new Audio("/public/sounds/keyboard/return.mp3");
+    const audio = new Audio(getAssetPath("/public/sounds/keyboard/return.mp3"));
     audio.play();
   } else if (key === "Backspace") {
-    const audio = new Audio("/public/sounds/keyboard/backspace.mp3");
+    const audio = new Audio(
+      getAssetPath("/public/sounds/keyboard/backspace.mp3")
+    );
     audio.play();
   } else if (
     // eslint-disable-next-line no-useless-escape
@@ -94,16 +97,18 @@ export const playTypewriterSound = (key: string) => {
 
 export const playBreathingSound = (mode: string) => {
   if (mode === "inhale" || mode === "exhale") {
-    const audio = new Audio("/public/sounds/breathing/inhale-exhale.mp3");
+    const audio = new Audio(
+      getAssetPath("/public/sounds/breathing/inhale-exhale.mp3")
+    );
     audio.play();
   } else if (mode === "hold1" || mode === "hold2") {
-    const audio = new Audio("/public/sounds/breathing/hold.mp3");
+    const audio = new Audio(getAssetPath("/public/sounds/breathing/hold.mp3"));
     audio.play();
   }
 };
 
 const pomodorAudioDing = new Audio(
-  "/public/sounds/pomodoro/timeout-3-forward-single-chime.mp3"
+  getAssetPath("/public/sounds/pomodoro/timeout-3-forward-single-chime.mp3")
 );
 
 export const playPomodoroSound = (sound: "timeout" | "ticking") => {

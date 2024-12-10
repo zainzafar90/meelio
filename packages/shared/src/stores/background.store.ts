@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getAssetPath } from "../utils/path.utils";
 
 export type WallpaperType = "static" | "live";
 
@@ -43,26 +44,34 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = [
     id: "live-1",
     type: "live",
     title: "Spring Lofi",
-    thumbnail: "/public/live-wallpapers/01-spring-lofi-thumbnail.png",
+    thumbnail: getAssetPath(
+      "/public/live-wallpapers/01-spring-lofi-thumbnail.png"
+    ),
     blurhash: "LjI6AjogNtNG_4V@ocI;I@M_aKS#",
     author: "Local",
     source: "local",
     video: {
-      src: "/public/live-wallpapers/01-spring-lofi.mp4",
-      fallbackImage: "/public/live-wallpapers/01-spring-lofi.avif",
+      src: getAssetPath("/public/live-wallpapers/01-spring-lofi.mp4"),
+      fallbackImage: getAssetPath(
+        "/public/live-wallpapers/01-spring-lofi.avif"
+      ),
     },
   },
   {
     id: "live-2",
     type: "live",
     title: "Rainy Forest",
-    thumbnail: "/public/live-wallpapers/02-rainy-forest-thumbnail.png",
+    thumbnail: getAssetPath(
+      "/public/live-wallpapers/02-rainy-forest-thumbnail.png"
+    ),
     blurhash: "L33b,b:#q@Y8.A#Ov|%hMdS5tmwZ",
     author: "Local",
     source: "local",
     video: {
-      src: "/public/live-wallpapers/02-rainy-forest.mp4",
-      fallbackImage: "/public/live-wallpapers/02-rainy-forest.avif",
+      src: getAssetPath("/public/live-wallpapers/02-rainy-forest.mp4"),
+      fallbackImage: getAssetPath(
+        "/public/live-wallpapers/02-rainy-forest.avif"
+      ),
     },
   },
 
