@@ -10,7 +10,7 @@
     "src",
     "prettier.config.mjs",
     "tailwind.config.ts",
-    ".eslintrc.js"
+    "./.eslintrc.js"
   ],
   "exclude": ["dist", "build", "node_modules"]
 }

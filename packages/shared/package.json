@@ -13,7 +13,9 @@
     "@repo/ui": "*",
     "@repo/tailwind-config": "*",
     "@repo/typescript-config": "*",
-    "@repo/eslint-config": "*"
+    "@repo/eslint-config": "*",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.3.3"
   },
   "exports": {
     ".": "./src/index.ts"
