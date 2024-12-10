@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 48 48" width="48" height="48">
+    <radialGradient id="8N7BGPq2B267DzwWglBxAa_5K7kpfbXZSLT_gr1" cx="24" cy="25" r="19"
+        gradientTransform="matrix(1 0 0 -1 0 48)" gradientUnits="userSpaceOnUse">
+        <stop offset=".385" stop-color="#2ebbff"></stop>
+        <stop offset="1" stop-color="#037cd6"></stop>
+    </radialGradient>
+    <circle cx="24" cy="23" r="19" fill="url(#8N7BGPq2B267DzwWglBxAa_5K7kpfbXZSLT_gr1)"></circle>
+    <path fill="#6e757b"
+        d="M29,38H19c0,0.7,0,2,0,2c0,2.8,2.2,5,5,5s5-2.2,5-5C29,40,29,38.7,29,38z"></path>
+    <path fill="#fefefe"
+        d="M34,23c0-5.5-4.5-10-10-10s-10,4.5-10,10c0,5,5,9,5,14v1h10v-1C29,32,34,28,34,23z"></path>
+</svg>

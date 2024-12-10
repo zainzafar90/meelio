@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+    <defs>
+        <linearGradient id="campfire1" x1="22.122" x2="25.065" y1="-2123.593" y2="-2139.752"
+            gradientTransform="matrix(1 0 0 -1 0 -2096)"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#f44f5a" />
+            <stop offset=".443" stop-color="#ee3d4a" />
+            <stop offset="1" stop-color="#e52030" />
+        </linearGradient>
+        <linearGradient id="campfire2" x1="22.673" x2="25.164" y1="-2128.508" y2="-2142.114"
+            gradientTransform="matrix(1 0 0 -1 0 -2096)"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#fed100" />
+            <stop offset="1" stop-color="#e36001" />
+        </linearGradient>
+    </defs>
+    <path fill="#f2a91c"
+        d="M22.222 5.084 6.271 36.056a1.89 1.89 0 0 0 1.479 2.935h32.5a1.89 1.89 0 0 0 1.479-2.935L25.779 5.084a2 2 0 0 0-3.557 0Z" />
+    <path fill="#404d3f"
+        d="M23.108 15.46 11.186 38.972h25.628L24.892 15.46a1 1 0 0 0-1.784 0Z" />
+    <path fill="none" stroke="#c26715" stroke-linecap="round" stroke-linejoin="round"
+        stroke-width="2" d="m29 44.991-12-3" />
+    <path fill="none" stroke="#d6742d" stroke-linecap="round" stroke-linejoin="round"
+        stroke-width="2" d="m19 44.991 12-3" />
+    <path fill="url(#campfire1)"
+        d="M22.807 27.986a.405.405 0 0 1 .391-.495.443.443 0 0 1 .186.045c.49.193 3.857 1.786 3.079 6.394 1.13-.684.726-2.012 1.096-2.012.139 0 .196.052.28.174a10.807 10.807 0 0 1 2.174 5.863 6.014 6.014 0 1 1-12.026 0c0-4.905 5.758-5.81 4.82-9.969Z" />
+    <path fill="url(#campfire2)"
+        d="M23.846 33.398a.418.418 0 0 0-.25-.087.406.406 0 0 0-.406.406c.405 2.438-2.428 3.25-2.428 6.095a3.238 3.238 0 1 0 6.476 0c0-2.316-2.032-5.407-3.392-6.414Z" />
+</svg>
+  

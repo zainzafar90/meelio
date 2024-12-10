@@ -5,7 +5,6 @@ import { TooltipProvider } from "@repo/ui/components/ui/tooltip";
 import { I18nextProvider } from "react-i18next";
 import { Toaster } from "sonner";
 
-import { SoundPlayer } from "@/routes/home/components/soundscapes/components/sound-player/sound-player";
 import { ConnectionWarning } from "@/components/connection-warning";
 import { ThemeProvider } from "@/components/theme-provider";
 import { useSoundscapesStore } from "@/stores/soundscapes.store";
@@ -13,6 +12,9 @@ import { useSoundscapesStore } from "@/stores/soundscapes.store";
 import { AuthProvider } from "./auth-provider";
 import { BackgroundProvider } from "./background-provider";
 import { PomodoroProvider } from "./pomodoro-provider";
+import { SoundPlayer } from "@repo/shared";
+
+
 
 type AppProviderProps = {
   children: React.ReactNode;
