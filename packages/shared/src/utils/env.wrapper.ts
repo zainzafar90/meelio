@@ -5,7 +5,7 @@ export type Environment = {
   lemonSqueezyLifetimeVariantId: string;
   posthogKey: string;
   posthogHost: string;
-  dev: boolean;
+  dev: boolean | string;
 };
 
 export class EnvWrapper {
@@ -31,23 +31,23 @@ export class EnvWrapper {
 
   private getWebEnv(): Environment {
     return {
-      // @ts-ignore - Webpack specific
+      // @ts-ignore - Vite specific
       serverUrl: import.meta.env.VITE_SERVER_URL || "",
       lemonSqueezyMonthlyVariantId:
-        // @ts-ignore - Webpack specific
+        // @ts-ignore - Vite specific
         import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID || "",
       lemonSqueezyYearlyVariantId:
-        // @ts-ignore - Webpack specific
+        // @ts-ignore - Vite specific
         import.meta.env.VITE_LEMON_SQUEEZY_YEARLY_VARIANT_ID || "",
       lemonSqueezyLifetimeVariantId:
-        // @ts-ignore - Webpack specific
+        // @ts-ignore - Vite specific
         import.meta.env.VITE_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
       posthogKey:
-        // @ts-ignore - Webpack specific
+        // @ts-ignore - Vite specific
         import.meta.env.VITE_POSTHOG_KEY || "",
-      // @ts-ignore - Webpack specific
+      // @ts-ignore - Vite specific
       posthogHost: import.meta.env.VITE_POSTHOG_HOST || "",
-      // @ts-ignore - Webpack specific
+      // @ts-ignore - Vite specific
       dev: import.meta.env.DEV || false,
     };
   }
@@ -63,7 +63,7 @@ export class EnvWrapper {
         process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
       posthogKey: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_KEY || "",
       posthogHost: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_HOST || "",
-      dev: process.env.PLASMO_PUBLIC_DEV === "true" || false,
+      dev: process.env.PLASMO_PUBLIC_DEV || false,
     };
   }
 

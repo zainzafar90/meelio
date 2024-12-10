@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
+
+import { Sound } from "../../types/sound";
 import { env } from "../../utils/env.utils";
-import { Sound } from "../..";
 
 export enum TelemetryEvent {
   PageView = "Page View",
@@ -12,37 +13,38 @@ export enum TelemetryEvent {
 
 export class Telemetry {
   private static _instance: Telemetry;
-  private initialized = false;
 
   public static get instance(): Telemetry {
+    console.log(Telemetry._instance);
     if (!Telemetry._instance) {
       Telemetry._instance = new Telemetry();
     }
+
     return Telemetry._instance;
   }
 
-  public initialize() {
-    if (this.initialized) return;
+  public constructor() {
+    if (Telemetry._instance) {
+      throw new Error(
+        "Error: Instantiation failed: Use Telemetry.instance instead of new."
+      );
+    }
 
-    posthog.init(env.posthogKey, {
-      api_host: env.posthogHost,
+    console.log(env.posthogHost);
+    posthog.init(env.posthogKey as string, {
+      api_host: env.posthogHost as string,
       persistence: "localStorage",
       autocapture: true,
-      debug: env.dev,
+      debug: env.dev === true,
       loaded: (posthog) => {
-        if (env.dev) {
+        if (env.dev === true) {
           posthog.debug();
         }
       },
     });
-
-    this.initialized = true;
   }
 
   public track(event: string, properties?: Record<string, unknown>): void {
-    if (!this.initialized) {
-      throw new Error("Telemetry not initialized. Call initialize() first");
-    }
     posthog.capture(event, properties);
   }
 
