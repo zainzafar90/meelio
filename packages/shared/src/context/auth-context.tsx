@@ -1,4 +1,4 @@
-import { AuthState } from "@repo/shared";
+import { AuthState } from "../stores";
 import React from "react";
 
 export const AuthContext = React.createContext<AuthState>({

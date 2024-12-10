@@ -6,7 +6,7 @@
     "dev": "vite --port=4000",
     "build": "vite build",
     "lint": "eslint . --max-warnings 0",
-    "preview": "vite preview",
+    "preview": "vite preview --port=4000",
     "release": "standard-version"
   },
   "dependencies": {

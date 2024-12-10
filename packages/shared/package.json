@@ -10,7 +10,7 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@number-flow/react": "^0.4.2",
+    "@number-flow/react": "^0.3.0",
     "@repo/eslint-config": "*",
     "@repo/tailwind-config": "*",
     "@repo/typescript-config": "*",
@@ -32,7 +32,7 @@
     "typescript": "^5.3.3",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.24.0",
-    "zustand": "^5.0.2"
+    "zustand": "^4.4.1"
   },
   "exports": {
     ".": "./src/index.tsx",

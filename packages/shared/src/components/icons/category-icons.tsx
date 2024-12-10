@@ -1,4 +1,4 @@
-import { IconProps } from "@repo/shared";
+import { IconProps } from "../../types";
 
 export const CategoryIcons = {
   beautifulAmbients: ({ ...props }: IconProps) => (

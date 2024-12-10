@@ -1,24 +1,24 @@
 import React from "react";
-
 import { useTranslation } from "react-i18next";
 
-import { useDockStore } from "@/stores/dock.store";
+import { AppProvider, Clock, useDockStore } from "@repo/shared";
 
-import { Background } from "./routes/home/components/backgrounds/backgrounds";
-import { BackgroundSelectorSheet } from "./routes/home/components/backgrounds/components/background-selector.sheet";
-import { BackgroundOverlay } from "./routes/home/components/backgrounds/components/background-overlay";
-import { AppLayout } from "./routes/home/components/layout";
-import { SoundscapesSheet } from "./routes/home/components/soundscapes/soundscapes.sheet";
-import { TodoListSheet } from "./routes/home/components/todo-list/components/todo-list.sheet";
-import { Greeting } from "./routes/home/components/greetings/greetings-mantras";
-import { Quote } from "./routes/home/components/quote/quote";
-import { BreathePod } from "./routes/home/components/breathing-pod/breathing-pod";
-import { Timer } from "./routes/home/components/timer/timer";
-import { Dock } from "./routes/home/components/dock/dock";
-import { AppProvider } from "./providers/app-provider";
+import {
+  TodoListSheet,
+  Background,
+  BackgroundOverlay,
+  BackgroundSelectorSheet,
+  BreathePod,
+  Greeting,
+  AppLayout,
+  Quote,
+  SoundscapesSheet,
+  Timer,
+  Dock,
+} from "@repo/shared";
 
 import "./style.css";
-import { Clock } from "./routes/home/components/clock/clock";
+
 
 const Home = () => {
   return (
@@ -75,9 +75,9 @@ const TopBar = () => {
 
   return (
     <div className="relative">
-          <div className="flex h-6 w-full justify-center bg-zinc-900/20 backdrop-blur-md">
-            <Clock />
-          </div>
+      <div className="flex h-6 w-full justify-center bg-zinc-900/20 backdrop-blur-md">
+        <Clock />
+      </div>
 
       {isTimerVisible && <Timer />}
     </div>

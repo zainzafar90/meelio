@@ -1,4 +1,4 @@
-import { IconProps } from "@repo/shared";
+import { IconProps } from "../../types";
 
 export const SoundIcons = {
   airplane: ({ ...props }: IconProps) => (

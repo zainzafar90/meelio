@@ -1,6 +1,6 @@
-import { api } from "@repo/shared";
-import { AuthContext } from "@repo/shared";
-import { useAuthStore } from "@repo/shared";
+import { useAuthStore } from "../stores";
+import { api } from "../api";
+import { AuthContext } from "../context/auth-context";
 import { ReactNode, useEffect } from "react";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         authenticate(null as any);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -12,7 +12,7 @@ import {
   TodoList,
   updateList,
   updateTask,
-} from "@repo/shared";
+} from "../lib/db/todo-db";
 
 interface TodoState {
   lists: TodoList[];

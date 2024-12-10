@@ -1,6 +1,6 @@
 import { cn } from "@repo/ui/lib/utils";
 import { Category, CategoryType } from "../../../../../types";
-import { useTelemetry } from "../../../../../lib";
+import { useTelemetry } from "../../../../../lib/telemetry/use-telemetry";
 import { CategoryIcons } from "../../../../../components/icons/category-icons";
 import { Icons } from "../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";

@@ -1954,14 +1954,6 @@
     esm-env "^1.1.4"
     number-flow "0.3.10"
 
-"@number-flow/react@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@number-flow/react/-/react-0.4.2.tgz#54033fa45b1523e41bf5324522f9b89a9e1b1928"
-  integrity sha512-lCAkLuK/3+Nlhb/oy1tpRnadp1vvfc/cWTtWUL9hMksHsJOGh+1T5Y/dyeQhyCD0heaWTjNYWX2ndBKLJwuC0A==
-  dependencies:
-    esm-env "^1.1.4"
-    number-flow "0.4.1"
-
 "@parcel/bundler-default@2.9.3":
   version "2.9.3"
   resolved "https://registry.yarnpkg.com/@parcel/bundler-default/-/bundler-default-2.9.3.tgz#df18c4b8390a03f83ac6c89da302f9edf48c8fe2"
@@ -10629,13 +10621,6 @@ number-flow@0.3.10:
   dependencies:
     esm-env "^1.1.4"
 
-number-flow@0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/number-flow/-/number-flow-0.4.1.tgz#592b74100538dc38bf05b9ee7132c00a369e0003"
-  integrity sha512-d39o1tWL7mMMBLuOfHswtQ8r0fj9eUcatb4G1Spdv0ZO/I30kg9DBdSzSPjNG6hrj1slQ6KA3TQXk1RmOq4qOA==
-  dependencies:
-    esm-env "^1.1.4"
-
 oauth@0.10.x:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/oauth/-/oauth-0.10.0.tgz#3551c4c9b95c53ea437e1e21e46b649482339c58"
@@ -14005,8 +13990,3 @@ zustand@^4.4.1:
   integrity sha512-+0PALYNJNgK6hldkgDq2vLrw5f6g/jCInz52n9RTpropGgeAf/ioFUCdtsjCqu4gNhW9D01rUQBROoRjdzyn2Q==
   dependencies:
     use-sync-external-store "1.2.2"
-
-zustand@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.2.tgz#f7595ada55a565f1fd6464f002a91e701ee0cfca"
-  integrity sha512-8qNdnJVJlHlrKXi50LDqqUNmUbuBjoKLrYQBnoChIbVph7vni+sY+YpvdjXG9YLd/Bxr6scMcR+rm5H3aSqPaw==
