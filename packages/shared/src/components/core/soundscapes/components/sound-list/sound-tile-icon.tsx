@@ -4,16 +4,18 @@ import { Spinner } from "@repo/ui/components/ui/spinner";
 import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
 
 import { Sound } from "../../../../../types";
-import { Telemetry } from "../../../../../lib";
+
 import { cn } from "../../../../../lib";
 import { RipplesEffect } from "../../../../../components";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
+import { useTelemetry } from "../../../../../lib/telemetry/use-telemetry";
 
 type Props = {
   sound: Sound;
 };
 
 export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
+  const { soundPlayed, soundStopped } = useTelemetry();
   const { setVolumeForSound, toggleSoundState } = useSoundscapesStore(
     (state) => state
   );
@@ -21,9 +23,9 @@ export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
   const handleToggle = () => {
     if (typeof window === "undefined") return;
     if (sound.playing) {
-      Telemetry.instance.soundStopped(sound);
+      soundStopped(sound);
     } else {
-      Telemetry.instance.soundPlayed(sound);
+      soundPlayed(sound);
     }
     toggleSoundState(sound.id);
   };
