@@ -26,6 +26,7 @@
     "lucide-react": "^0.468.0",
     "posthog-js": "^1.194.6",
     "react-i18next": "^15.1.4",
+    "react-player": "^2.16.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.3.3",
@@ -46,7 +47,6 @@
     "./providers/*": "./src/providers/**/*.{ts,tsx}",
     "./stores/*": "./src/stores/**/*.{ts,tsx}",
     "./types/*": "./src/types/**/*.{ts,tsx}",
-    "./utils/*": "./src/utils/**/*.{ts,tsx}",
-    "./workers/*": "./src/workers/**/*.{ts,tsx}"
+    "./utils/*": "./src/utils/**/*.{ts,tsx}"
   }
 }
