@@ -1,6 +1,6 @@
 import { cn } from "@repo/ui/lib/utils";
 import { Category, CategoryType } from "../../../../../types";
-import { Telemetry } from "../../../../../lib";
+import { useTelemetry } from "../../../../../lib";
 import { CategoryIcons } from "../../../../../components/icons/category-icons";
 import { Icons } from "../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
@@ -9,6 +9,7 @@ interface CategoryItemProps {
   category: CategoryType;
 }
 export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
+  const { categoryPlayed, categoryStopped } = useTelemetry();
   const { playCategory, playRandom, activeCategoryId } = useSoundscapesStore();
 
   const isActiveCategory = (category: Category) => {
@@ -28,9 +29,9 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
 
     if (typeof window === "undefined") return;
     if (isActiveCategory(category.name as Category)) {
-      Telemetry.instance.categoryStopped(category.name as Category);
+      categoryStopped(category.name as Category);
     } else {
-      Telemetry.instance.categoryPlayed(category.name as Category);
+      categoryPlayed(category.name as Category);
     }
   };
 
