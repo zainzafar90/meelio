@@ -6,3 +6,4 @@ export * from "./use-oscillation";
 export * from "./use-pomodoro-sync";
 export * from "./use-pomodoro-timer";
 export * from "./use-previous";
+export * from "./use-timer";
