@@ -11,7 +11,7 @@ export const Clock = () => {
   }, []);
 
   return (
-    <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold flex tracking-wider text-white/90">
+    <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold flex tracking-tighter text-white/90">
       <div className="flex items-center justify-center">
         <NumberFlow
           value={time.getHours()}
