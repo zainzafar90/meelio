@@ -11,25 +11,22 @@ export const Clock = () => {
   }, []);
 
   return (
-    <h1 className="text-shadow-lg text-md flex font-mono tracking-wide text-white/90">
-      <div className="flex items-center justify-center w-10">
+    <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold flex tracking-wider text-white/90">
+      <div className="flex items-center justify-center">
         <NumberFlow
           value={time.getHours()}
           format={{ notation: "standard", minimumIntegerDigits: 2 }}
           locales="en-US"
         />
-        <span className="text-xxs uppercase">h</span>
-      </div>
-      {/* <span>:</span> */}
-      <div className="flex items-center justify-center w-10">
+        <span className="text-5xl sm:text-7xl md:text-9xl font-semibold mx-1">
+          :
+        </span>
         <NumberFlow
           value={time.getMinutes()}
           format={{ notation: "standard", minimumIntegerDigits: 2 }}
           locales="en-US"
         />
-        <span className="text-xxs uppercase">m</span>
       </div>
-    
     </h1>
   );
 };

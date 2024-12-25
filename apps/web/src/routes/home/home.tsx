@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 
 import { Clock, useDockStore } from "@repo/shared";
-
 import { Background } from "@repo/shared";
 import { BackgroundOverlay } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -52,6 +51,7 @@ const Content = () => {
 const GreetingsContent = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-8">
+      <Clock />
       <Greeting />
       <Quote />
     </div>
@@ -69,9 +69,9 @@ const TopBar = () => {
 
   return (
     <div className="relative">
-              <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
-                <Clock />
-              </div>
+      <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
+        {/* Here we can add the clock */}
+      </div>
 
       {isTimerVisible && <Timer />}
     </div>
