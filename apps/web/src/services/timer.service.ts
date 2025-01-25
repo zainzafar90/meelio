@@ -11,13 +11,37 @@ export class WebTimerService {
   };
 
   constructor() {
+    // Use heartbeat worker for web app, timer worker for extension
+    const isExtension = window.location.protocol === 'chrome-extension:';
+    const workerPath = isExtension ? '../workers/timer.worker.ts' : '../workers/heartbeat.worker.ts';
+    
     this.worker = new Worker(
-      new URL('../workers/timer.worker.ts', import.meta.url),
+      new URL(workerPath, import.meta.url),
       { type: 'module' }
     );
 
     this.worker.onmessage = (event) => {
-      this.state = event.data;
+      if (isExtension) {
+        this.state = event.data;
+      } else {
+        // Handle heartbeat worker messages
+        if (event.data.type === 'heartbeat') {
+          const elapsed = event.data.elapsed / 1000; // Convert ms to seconds
+          this.state = {
+            ...this.state,
+            isRunning: true,
+            timeLeft: Math.max(0, this.state.totalTime - Math.floor(elapsed)),
+          };
+          
+          // Handle mode switch when timer completes
+          if (this.state.timeLeft <= 0) {
+            this.state.mode = this.state.mode === 'focus' ? 'break' : 'focus';
+            this.state.totalTime = this.state.mode === 'focus' ? 25 * 60 : 5 * 60;
+            this.state.timeLeft = this.state.totalTime;
+            this.worker.postMessage({ type: 'reset' });
+          }
+        }
+      }
       this.notifyListeners();
     };
   }
@@ -35,19 +59,44 @@ export class WebTimerService {
   }
 
   start() {
-    this.worker.postMessage({ type: 'START' });
+    const isExtension = window.location.protocol === 'chrome-extension:';
+    this.worker.postMessage({ type: isExtension ? 'START' : 'start' });
+    if (!isExtension) {
+      this.state.isRunning = true;
+      this.notifyListeners();
+    }
   }
 
   pause() {
-    this.worker.postMessage({ type: 'PAUSE' });
+    const isExtension = window.location.protocol === 'chrome-extension:';
+    this.worker.postMessage({ type: isExtension ? 'PAUSE' : 'stop' });
+    if (!isExtension) {
+      this.state.isRunning = false;
+      this.notifyListeners();
+    }
   }
 
   reset() {
-    this.worker.postMessage({ type: 'RESET' });
+    const isExtension = window.location.protocol === 'chrome-extension:';
+    this.worker.postMessage({ type: isExtension ? 'RESET' : 'reset' });
+    if (!isExtension) {
+      this.state.timeLeft = this.state.totalTime;
+      this.state.isRunning = false;
+      this.notifyListeners();
+    }
   }
 
   setMode(mode: 'focus' | 'break') {
-    this.worker.postMessage({ type: 'SET_MODE', mode });
+    const isExtension = window.location.protocol === 'chrome-extension:';
+    if (isExtension) {
+      this.worker.postMessage({ type: 'SET_MODE', mode });
+    } else {
+      this.state.mode = mode;
+      this.state.totalTime = mode === 'focus' ? 25 * 60 : 5 * 60;
+      this.state.timeLeft = this.state.totalTime;
+      this.worker.postMessage({ type: 'reset' });
+      this.notifyListeners();
+    }
   }
 }
 
