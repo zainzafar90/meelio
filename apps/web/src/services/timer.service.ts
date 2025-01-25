@@ -1,13 +1,26 @@
 import { TimerState } from "@repo/shared";
 
+const SECONDS_MULTIPLIER = 60;
+const FOCUS_DURATION = 25 * SECONDS_MULTIPLIER; // 25 minutes in seconds
+const BREAK_DURATION = 5 * SECONDS_MULTIPLIER;  // 5 minutes in seconds
+
+export interface TimerConfig {
+  autoStartBreaks: boolean;
+  autoStartFocus: boolean;
+}
+
 export class WebTimerService {
   private worker: Worker;
   private listeners: ((state: TimerState) => void)[] = [];
+  private config: TimerConfig = {
+    autoStartBreaks: false,
+    autoStartFocus: false
+  };
   private state: TimerState = {
     isRunning: false,
-    timeLeft: 25 * 60,
+    timeLeft: FOCUS_DURATION,
     mode: 'focus',
-    totalTime: 25 * 60
+    totalTime: FOCUS_DURATION
   };
 
   constructor() {
@@ -35,10 +48,24 @@ export class WebTimerService {
           
           // Handle mode switch when timer completes
           if (this.state.timeLeft <= 0) {
-            this.state.mode = this.state.mode === 'focus' ? 'break' : 'focus';
-            this.state.totalTime = this.state.mode === 'focus' ? 25 * 60 : 5 * 60;
-            this.state.timeLeft = this.state.totalTime;
+            const nextMode = this.state.mode === 'focus' ? 'break' : 'focus';
+            const nextDuration = nextMode === 'focus' ? FOCUS_DURATION : BREAK_DURATION;
+            const shouldAutoStart = nextMode === 'focus' 
+              ? this.config.autoStartFocus 
+              : this.config.autoStartBreaks;
+
+            this.state = {
+              ...this.state,
+              mode: nextMode,
+              totalTime: nextDuration,
+              timeLeft: nextDuration,
+              isRunning: shouldAutoStart
+            };
+            
             this.worker.postMessage({ type: 'reset' });
+            if (shouldAutoStart) {
+              this.worker.postMessage({ type: 'start' });
+            }
           }
         }
       }
@@ -56,6 +83,14 @@ export class WebTimerService {
 
   private notifyListeners() {
     this.listeners.forEach(listener => listener(this.state));
+  }
+
+  updateConfig(config: Partial<TimerConfig>) {
+    this.config = { ...this.config, ...config };
+  }
+
+  getConfig(): TimerConfig {
+    return { ...this.config };
   }
 
   start() {
@@ -91,9 +126,10 @@ export class WebTimerService {
     if (isExtension) {
       this.worker.postMessage({ type: 'SET_MODE', mode });
     } else {
+      const duration = mode === 'focus' ? FOCUS_DURATION : BREAK_DURATION;
       this.state.mode = mode;
-      this.state.totalTime = mode === 'focus' ? 25 * 60 : 5 * 60;
-      this.state.timeLeft = this.state.totalTime;
+      this.state.totalTime = duration;
+      this.state.timeLeft = duration;
       this.worker.postMessage({ type: 'reset' });
       this.notifyListeners();
     }
