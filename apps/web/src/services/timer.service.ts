@@ -13,8 +13,8 @@ export class WebTimerService {
   private worker: Worker;
   private listeners: ((state: TimerState) => void)[] = [];
   private config: TimerConfig = {
-    autoStartBreaks: false,
-    autoStartFocus: false
+    autoStartBreaks: true,
+    autoStartFocus: true
   };
   private state: TimerState = {
     isRunning: false,
