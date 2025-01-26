@@ -4,7 +4,6 @@ import { PomodoroStage } from "../types/pomodoro";
 import { usePomodoroStore } from "../stores/pomodoro.store";
 import { changeFavicon } from "../utils/favicon.utils";
 import { playPomodoroSound } from "../utils/sound.utils";
-import { usePomodoroSync } from "./use-pomodoro-sync";
 
 export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
   const { timer, updateTimer, advanceTimer } = usePomodoroStore((state) => ({
@@ -13,7 +12,6 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
     advanceTimer: state.advanceTimer,
   }));
 
-  const { broadcastTimerUpdate } = usePomodoroSync();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
   const lastTickRef = useRef<number>(0);
@@ -55,7 +53,6 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
       if (remaining !== lastTickRef.current) {
         lastTickRef.current = remaining;
         updateTimer(remaining);
-        broadcastTimerUpdate(remaining);
 
         if (remaining <= 0) {
           stopTimer();
