@@ -24,20 +24,13 @@ export class WebTimerService {
   };
 
   constructor() {
-    // Use heartbeat worker for web app, timer worker for extension
-    const isExtension = window.location.protocol === 'chrome-extension:';
-    const workerPath = isExtension ? '../workers/timer.worker.ts' : '../workers/heartbeat.worker.ts';
-    
     this.worker = new Worker(
-      new URL(workerPath, import.meta.url),
+      new URL('../workers/heartbeat.worker.ts', import.meta.url),
       { type: 'module' }
     );
 
     this.worker.onmessage = (event) => {
-      if (isExtension) {
-        this.state = event.data;
-      } else {
-        // Handle heartbeat worker messages
+
         if (event.data.type === 'heartbeat') {
           const elapsed = event.data.elapsed / 1000; // Convert ms to seconds
           this.state = {
@@ -69,8 +62,6 @@ export class WebTimerService {
           }
         }
       }
-      this.notifyListeners();
-    };
   }
 
   subscribe(listener: (state: TimerState) => void) {

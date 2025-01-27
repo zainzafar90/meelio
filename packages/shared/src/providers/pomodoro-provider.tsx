@@ -5,11 +5,13 @@ import { emptySoundUrl } from "../data/sounds-data";
 
 export const PomodoroProvider = ({
   children,
+  worker,
 }: {
   children: React.ReactNode;
+  worker: Worker;
 }) => {
   const { user } = useAuthStore();
-  usePomodoroTimer({ user });
+  usePomodoroTimer({ user, worker });
 
   return (
     <>

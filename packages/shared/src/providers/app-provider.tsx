@@ -33,9 +33,10 @@ import { i18n } from "../i18n";
 
 type AppProviderProps = {
   children: React.ReactNode;
+  worker: Worker;
 };
 
-export const AppProvider = ({ children }: AppProviderProps) => {
+export const AppProvider = ({ children, worker }: AppProviderProps) => {
   const sounds = useSoundscapesStore((state) => state.sounds);
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
 
@@ -49,7 +50,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
           <ThemeProvider storageKey="ui-theme" defaultTheme="system">
             <TooltipProvider>
               <BackgroundProvider>
-                <PomodoroProvider>
+                <PomodoroProvider worker={worker}>
                   {children}
                   {hasPlayingSounds && <SoundPlayer />}
                   <Toaster richColors />

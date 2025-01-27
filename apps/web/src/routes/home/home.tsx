@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 
 import { Clock, useDockStore } from "@repo/shared";
 import { Background } from "@repo/shared";
@@ -13,8 +13,8 @@ import { SoundscapesSheet } from "@repo/shared";
 import { Timer } from "@repo/shared";
 import { TodoListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
-import { webTimerService } from '../../services/timer.service';
-import { useTimer } from '@repo/shared';
+// import { webTimerService } from '../../services/timer.service';
+// import { useTimer } from '@repo/shared';
 
 const Home = () => {
   return (
@@ -67,22 +67,22 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   const isTimerVisible = useDockStore((state) => state.isTimerVisible);
-  const timer = useTimer(webTimerService);
+  // const timer = useTimer(webTimerService);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  // const formatTime = (seconds: number) => {
+  //   const mins = Math.floor(seconds / 60);
+  //   const secs = seconds % 60;
+  //   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  // };
 
-  // Update document title effect
-  useEffect(() => {
-    const emoji = timer.mode === 'focus' ? '🎯' : '☕';
-    const timeStr = formatTime(timer.timeLeft);
-    document.title = timer.isRunning 
-      ? `${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
-      : 'Serenity';
-  }, [timer.timeLeft, timer.mode, timer.isRunning]);
+  // // Update document title effect
+  // useEffect(() => {
+  //   const emoji = timer.mode === 'focus' ? '🎯' : '☕';
+  //   const timeStr = formatTime(timer.timeLeft);
+  //   document.title = timer.isRunning 
+  //     ? `${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
+  //     : 'Serenity';
+  // }, [timer.timeLeft, timer.mode, timer.isRunning]);
 
   return (
     <div className="relative">
@@ -90,7 +90,9 @@ const TopBar = () => {
         {/* <Clock /> */}
       </div>
 
-      <div className="flex flex-col items-center justify-center gap-4 p-4">
+      {isTimerVisible && <Timer />}
+
+      {/* <div className="flex flex-col items-center justify-center gap-4 p-4">
         <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white/90">
           {formatTime(timer.timeLeft)}
         </h1>
@@ -130,7 +132,7 @@ const TopBar = () => {
         <div className="text-white/70 text-sm">
           {timer.mode === 'focus' ? '🎯 Focus Time' : '☕ Break Time'}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
