@@ -1,17 +1,15 @@
+import { TimerService } from "../services/timer.service";
 import ReactPlayer from "react-player";
-import { usePomodoroTimer } from "../hooks/use-pomodoro-timer";
 import { useAuthStore } from "../stores/auth.store";
 import { emptySoundUrl } from "../data/sounds-data";
+import { usePomodoroTimer } from "../hooks/use-pomodoro-timer";
 
-export const PomodoroProvider = ({
-  children,
-  worker,
-}: {
+export const PomodoroProvider: React.FC<{
   children: React.ReactNode;
-  worker: Worker;
-}) => {
+  timerService: TimerService;
+}> = ({ children, timerService }) => {
   const { user } = useAuthStore();
-  usePomodoroTimer({ user, worker });
+  usePomodoroTimer({ user, timerService });
 
   return (
     <>

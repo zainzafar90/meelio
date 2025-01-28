@@ -1,93 +1,61 @@
-import { TimerState } from "@repo/shared";
+let interval: ReturnType<typeof setInterval> | null = null;
+let remaining = 0;
 
-type Timer = {
-  timeLeft: number
-  initialTime: number
-  isRunning: boolean
-  mode: 'focus' | 'break'
-  cycleCount: number
-  intervalId?: ReturnType<typeof setInterval>
-}
-
-const FOCUS_TIME = 25 * 60; // 25 minutes
-const BREAK_TIME = 5 * 60;  // 5 minutes
-
-let timer: Timer = {
-  timeLeft: FOCUS_TIME,
-  initialTime: FOCUS_TIME,
-  isRunning: false,
-  mode: 'focus',
-  cycleCount: 1
-};
-
-function switchMode() {
-  if (timer.mode === "focus") {
-    timer.mode = "break";
-  } else {
-    timer.mode = "focus";
-    timer.cycleCount++;
-  }
-  timer.initialTime = timer.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  timer.timeLeft = timer.initialTime;
-
-  // Auto-start the next session
-  timer.isRunning = true;
-  timer.intervalId = setInterval(() => {
-    if (timer.timeLeft > 0) {
-      timer.timeLeft--;
-      if (timer.timeLeft === 0) {
-        timer.isRunning = false;
-        clearInterval(timer.intervalId);
-        switchMode();
-      }
+function startTimer(duration: number) {
+  remaining = duration;
+  if (interval) clearInterval(interval);
+  interval = setInterval(() => {
+    if (remaining > 0) {
+      remaining -= 1;
+      chrome.runtime.sendMessage({ type: "tick", remaining });
+    }
+    if (remaining <= 0) {
+      clearInterval(interval!);
+      interval = null;
+      chrome.runtime.sendMessage({ type: "complete" });
     }
   }, 1000);
 }
 
+function pauseTimer() {
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+  }
+}
+
+function resumeTimer() {
+  if (!interval && remaining > 0) {
+    startTimer(remaining);
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("background received:", message);
   switch (message.type) {
-    case "GET_TIME":
-      sendResponse({ ...timer });
+    case "start":
+        startTimer(message.duration);
       break;
-
-    case "START_TIMER":
-      if (!timer.isRunning) {
-        timer.isRunning = true;
-        timer.intervalId = setInterval(() => {
-          if (timer.timeLeft > 0) {
-            timer.timeLeft--;
-            if (timer.timeLeft === 0) {
-              timer.isRunning = false;
-              clearInterval(timer.intervalId);
-              switchMode();
-            }
-          }
-        }, 1000);
-      }
-      sendResponse({ ...timer });
+    case "pause":
+      pauseTimer();
       break;
-
-    case "PAUSE_TIMER":
-      timer.isRunning = false;
-      if (timer.intervalId) {
-        clearInterval(timer.intervalId);
-      }
-      sendResponse(timer);
+    case "resume":
+      resumeTimer();
       break;
-
+    case "reset":
+      pauseTimer();
+      remaining = 0;
+      break;
     default:
       sendResponse({ error: "Unknown message type" });
   }
+  sendResponse({ success: true });
   return true; // Keep message channel open for async response
 });
 
 // Reset timer when extension is installed/updated
 chrome.runtime.onInstalled.addListener(() => {
-  timer = {
-    timeLeft: FOCUS_TIME,
-    initialTime: FOCUS_TIME,
-    isRunning: false,
-    mode: "focus",
-    cycleCount: 1
-  };
+  if (interval) clearInterval(interval);
+  interval = null;
+  remaining = 0;
 }); 

@@ -5,12 +5,14 @@ function startTimer(duration: number) {
   remaining = duration;
   if (interval) clearInterval(interval);
   interval = setInterval(() => {
-    remaining -= 1;
-    self.postMessage({ type: "tick", remaining });
+    if (remaining > 0) {
+      remaining -= 1;
+      self.postMessage({ type: "tick", remaining, message:"web:hola mundo!" });
+    }
     if (remaining <= 0) {
       clearInterval(interval!);
       interval = null;
-      self.postMessage({ type: "complete" });
+      self.postMessage({ type: "complete", message:"web:hola mundo!!" });
     }
   }, 1000);
 }

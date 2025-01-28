@@ -4,13 +4,14 @@ import { PomodoroStage } from "../types/pomodoro";
 import { usePomodoroStore } from "../stores/pomodoro.store";
 import { changeFavicon } from "../utils/favicon.utils";
 import { playPomodoroSound } from "../utils/sound.utils";
+import { TimerService } from "../services/timer.service";
 
 export const usePomodoroTimer = ({
   user,
-  worker,
+  timerService,
 }: {
   user: AuthUser | null;
-  worker: Worker;
+  timerService: TimerService;
 }) => {
   const { timer, updateTimer, advanceTimer } = usePomodoroStore((state) => ({
     timer: state.timer,
@@ -24,29 +25,27 @@ export const usePomodoroTimer = ({
   };
 
   useEffect(() => {
-    if (!worker) return;
+    if (!timerService) return;
 
     if (timer.running) {
-      worker.postMessage({ command: "start", duration: timer.remaining });
+      timerService.start(timer.remaining);
     } else {
-      worker.postMessage({ command: "pause" });
+      timerService.pause();
     }
   }, [timer.running, timer.remaining]);
 
   useEffect(() => {
-    if (!worker) return;
+    if (!timerService) return;
 
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data.type === "tick") {
-        updateTimer(e.data.remaining);
-      } else if (e.data.type === "complete") {
-        if (timer.enableSound) playPomodoroSound("timeout");
-        advanceTimer();
-      }
-    };
+    timerService.onTick((remaining) => {
+      console.log("onTick", remaining);
+      updateTimer(remaining);
+    });
 
-    worker.addEventListener("message", handleMessage);
-    return () => worker.removeEventListener("message", handleMessage);
+    timerService.onComplete(() => {
+      if (timer.enableSound) playPomodoroSound("timeout");
+      advanceTimer();
+    });
   }, [timer.enableSound, updateTimer, advanceTimer]);
 
   useEffect(() => {
@@ -77,7 +76,7 @@ export const usePomodoroTimer = ({
 
   useEffect(() => {
     if (!user) {
-      worker.postMessage({ command: "pause" });
+      timerService.pause();
       resetAppTitle();
     }
   }, [user]);

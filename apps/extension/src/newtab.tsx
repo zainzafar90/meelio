@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, Timer, useDockStore } from "@repo/shared";
+import { AppProvider, Clock, Timer, useDockStore, TimerService } from "@repo/shared";
 
 import {
   TodoListSheet,
@@ -13,16 +13,16 @@ import {
   AppLayout,
   Quote,
   SoundscapesSheet,
-  // Timer,
   Dock,
 } from "@repo/shared";
 
 import "./style.css";
 
-
 const Home = () => {
+  const timerService = new TimerService("extension");
+  
   return (
-    <AppProvider>
+    <AppProvider timerService={timerService}>
       <Background />
       <BackgroundOverlay />
       <AppLayout>
@@ -70,43 +70,43 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   const isTimerVisible = useDockStore((state) => state.isTimerVisible);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [mode, setMode] = useState<"focus" | "break">("focus");
-  const [cycleCount, setCycleCount] = useState(1);
+  // const [timeLeft, setTimeLeft] = useState(0);
+  // const [isRunning, setIsRunning] = useState(false);
+  // const [mode, setMode] = useState<"focus" | "break">("focus");
+  // const [cycleCount, setCycleCount] = useState(1);
 
-  useEffect(() => {
-    chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
-      setTimeLeft(response.timeLeft);
-      setIsRunning(response.isRunning);
-      setMode(response.mode);
-      setCycleCount(response.cycleCount);
-    });
+  // useEffect(() => {
+  //   chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+  //     setTimeLeft(response.timeLeft);
+  //     setIsRunning(response.isRunning);
+  //     setMode(response.mode);
+  //     setCycleCount(response.cycleCount);
+  //   });
 
-    const interval = setInterval(() => {
-      chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
-        setTimeLeft(response.timeLeft);
-        setIsRunning(response.isRunning);
-        setMode(response.mode);
-        setCycleCount(response.cycleCount);
-      });
-    }, 1000);
+  //   const interval = setInterval(() => {
+  //     chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+  //       setTimeLeft(response.timeLeft);
+  //       setIsRunning(response.isRunning);
+  //       setMode(response.mode);
+  //       setCycleCount(response.cycleCount);
+  //     });
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  useEffect(() => {
-    const emoji = mode === "focus" ? "🎯" : "☕";
-    const mins = Math.floor(timeLeft / 60);
-    const secs = timeLeft % 60;
-    document.title = `#${cycleCount} ${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
-  }, [timeLeft, mode, cycleCount]);
+  // useEffect(() => {
+  //   const emoji = mode === "focus" ? "🎯" : "☕";
+  //   const mins = Math.floor(timeLeft / 60);
+  //   const secs = timeLeft % 60;
+  //   document.title = `#${cycleCount} ${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
+  // }, [timeLeft, mode, cycleCount]);
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
+  // const formatTime = (seconds: number) => {
+  //   const mins = Math.floor(seconds / 60);
+  //   const secs = seconds % 60;
+  //   return `${mins}:${secs.toString().padStart(2, "0")}`;
+  // };
 
   return (
     <div className="relative">
@@ -114,7 +114,9 @@ const TopBar = () => {
         {/* <Clock /> */}
       </div>
 
-      <div className="flex flex-col items-center justify-center gap-4 p-4">
+      {isTimerVisible && <Timer />}
+
+      {/* <div className="flex flex-col items-center justify-center gap-4 p-4">
         <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white/90">
           {formatTime(timeLeft)}
         </h1>
@@ -135,8 +137,8 @@ const TopBar = () => {
 
         <div className="text-white/70 text-sm">
           {mode === "focus" ? `Focus #${cycleCount} 🎯` : "Break Time ☕"}
-        </div>
-      </div>
+        </div> 
+      </div>*/}
     </div>
   );
 };
