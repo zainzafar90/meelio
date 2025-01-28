@@ -21,7 +21,7 @@ export const SoundPlayer = () => {
           height={0}
           width={0}
           playsinline
-          muted={false}
+          muted={true}
           onBuffer={() => {
             setSoundLoading(sound.id, true);
           }}

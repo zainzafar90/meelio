@@ -37,15 +37,16 @@ export const usePomodoroTimer = ({
   useEffect(() => {
     if (!timerService) return;
 
-    timerService.onTick((remaining) => {
-      console.log("onTick", remaining);
-      updateTimer(remaining);
+    const unsubscribe = timerService.onStateChange((state) => {
+      updateTimer(state.remaining);
+
+      if (!state.isRunning && state.remaining === 0) {
+        if (timer.enableSound) playPomodoroSound("timeout");
+        advanceTimer();
+      }
     });
 
-    timerService.onComplete(() => {
-      if (timer.enableSound) playPomodoroSound("timeout");
-      advanceTimer();
-    });
+    return () => unsubscribe();
   }, [timer.enableSound, updateTimer, advanceTimer]);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export const usePomodoroTimer = ({
     } else {
       resetAppTitle();
     }
-  }, [timer.remaining, timer.activeStage]);
+  }, [timer.remaining, timer.activeStage, timer.running]);
 
   useEffect(() => {
     if (!user) {
