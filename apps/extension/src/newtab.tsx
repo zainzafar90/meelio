@@ -1,7 +1,7 @@
-import React from "react";
+import React, {  useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, Timer, useDockStore, TimerService } from "@repo/shared";
+import { AppProvider, Clock, useDockStore, TimerService, useTimer, useInterval } from "@repo/shared";
 
 import {
   TodoListSheet,
@@ -17,6 +17,7 @@ import {
 } from "@repo/shared";
 
 import "./style.css";
+// import { extensionTimerService } from "./services/timer.service";
 
 const Home = () => {
   const timerService = new TimerService("extension");
@@ -58,6 +59,7 @@ const Content = () => {
 const GreetingsContent = () => {
   return (
     <div className="flex flex-col items-center justify-center gap-8">
+      <Clock />
       <Greeting />
       <Quote />
     </div>
@@ -67,56 +69,44 @@ const GreetingsContent = () => {
 const BreathingContent = () => {
   return <BreathePod />;
 };
-
 const TopBar = () => {
   const isTimerVisible = useDockStore((state) => state.isTimerVisible);
-  // const [timeLeft, setTimeLeft] = useState(0);
-  // const [isRunning, setIsRunning] = useState(false);
-  // const [mode, setMode] = useState<"focus" | "break">("focus");
-  // const [cycleCount, setCycleCount] = useState(1);
-
-  // useEffect(() => {
-  //   chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
-  //     setTimeLeft(response.timeLeft);
-  //     setIsRunning(response.isRunning);
-  //     setMode(response.mode);
-  //     setCycleCount(response.cycleCount);
-  //   });
-
-  //   const interval = setInterval(() => {
-  //     chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
-  //       setTimeLeft(response.timeLeft);
-  //       setIsRunning(response.isRunning);
-  //       setMode(response.mode);
-  //       setCycleCount(response.cycleCount);
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
-
-  // useEffect(() => {
-  //   const emoji = mode === "focus" ? "🎯" : "☕";
-  //   const mins = Math.floor(timeLeft / 60);
-  //   const secs = timeLeft % 60;
-  //   document.title = `#${cycleCount} ${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
-  // }, [timeLeft, mode, cycleCount]);
-
-  // const formatTime = (seconds: number) => {
-  //   const mins = Math.floor(seconds / 60);
-  //   const secs = seconds % 60;
-  //   return `${mins}:${secs.toString().padStart(2, "0")}`;
-  // };
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState<"focus" | "break">("focus");
+  const [cycleCount, setCycleCount] = useState(1);
+  useEffect(() => {
+    chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+      setTimeLeft(response.timeLeft);
+      setIsRunning(response.isRunning);
+      setMode(response.mode);
+      setCycleCount(response.cycleCount);
+    });
+    const interval = setInterval(() => {
+      chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+        setTimeLeft(response.timeLeft);
+        setIsRunning(response.isRunning);
+        setMode(response.mode);
+        setCycleCount(response.cycleCount);
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  useEffect(() => {
+    const emoji = mode === "focus" ? "🎯" : "☕";
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    document.title = `#${cycleCount} ${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
+  }, [timeLeft, mode, cycleCount]);
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="relative">
-      <div className="flex h-6 w-full justify-center bg-zinc-900/20 backdrop-blur-md">
-        {/* <Clock /> */}
-      </div>
-
-      {isTimerVisible && <Timer />}
-
-      {/* <div className="flex flex-col items-center justify-center gap-4 p-4">
+      <div className="flex flex-col items-center justify-center gap-4 p-4">
         <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white/90">
           {formatTime(timeLeft)}
         </h1>
@@ -134,11 +124,10 @@ const TopBar = () => {
             {isRunning ? "Pause" : "Start"}
           </button>
         </div>
-
         <div className="text-white/70 text-sm">
           {mode === "focus" ? `Focus #${cycleCount} 🎯` : "Break Time ☕"}
         </div> 
-      </div>*/}
+      </div>
     </div>
   );
 };

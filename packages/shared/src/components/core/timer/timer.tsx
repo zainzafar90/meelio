@@ -299,7 +299,7 @@ export const Timer = () => {
                     duration: 0.25,
                   }}
                 >
-                  <NumberFlow
+                  {/* <NumberFlow
                     value={minutesTens}
                     format={{ notation: "compact" }}
                     locales="en-US"
@@ -323,7 +323,11 @@ export const Timer = () => {
                     format={{ notation: "compact" }}
                     locales="en-US"
                     trend={"decreasing" as any}
-                  />
+                  /> */}
+                  <span className="text-2xl">{minutesTens}</span>
+                  <span className="text-2xl">{minutesUnit}</span>:
+                  <span className="text-2xl">{secondsTens}</span>
+                  <span className="text-2xl">{secondsUnit}</span>
                 </motion.p>
               </AnimatePresence>
               <motion.p

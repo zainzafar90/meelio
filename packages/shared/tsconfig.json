@@ -1,12 +1,7 @@
 {
   "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "allowImportingTsExtensions": true,
-    "allowSyntheticDefaultImports": true
-    // "paths": {
-    //   "@/shared/*": ["./src/*"]
-    // },
+    "baseUrl": "."
   },
   "include": [
     "src",

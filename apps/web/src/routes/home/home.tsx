@@ -10,12 +10,12 @@ import { Greeting } from "@repo/shared";
 import { AppLayout } from "@repo/shared";
 import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
-import { Timer } from "@repo/shared";
+// import { Timer } from "@repo/shared";
 import { TodoListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
-// import { webTimerService } from '../../services/timer.service';
-// import { useTimer } from '@repo/shared';
-
+import { useTimer } from '@repo/shared';
+import { useEffect, useState } from "react";
+import { webTimerService } from "../../services/timer.service";
 const Home = () => {
   return (
     <>
@@ -67,32 +67,39 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   const isTimerVisible = useDockStore((state) => state.isTimerVisible);
-  // const timer = useTimer(webTimerService);
+  const timer = useTimer(webTimerService);
+  const [focusedMinutes, setFocusedMinutes] = useState(0);
+  const [breakMinutes, setBreakMinutes] = useState(0);
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-  // const formatTime = (seconds: number) => {
-  //   const mins = Math.floor(seconds / 60);
-  //   const secs = seconds % 60;
-  //   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  // };
+  useEffect(() => {
+    const emoji = timer.mode === 'focus' ? '🎯' : '☕';
+    const timeStr = formatTime(timer.timeLeft);
+    document.title = timer.isRunning 
+      ? `${focusedMinutes}:${breakMinutes} ${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
+      : 'Serenity';
+  }, [timer.timeLeft, timer.mode, timer.isRunning, focusedMinutes, breakMinutes]);
 
-  // // Update document title effect
-  // useEffect(() => {
-  //   const emoji = timer.mode === 'focus' ? '🎯' : '☕';
-  //   const timeStr = formatTime(timer.timeLeft);
-  //   document.title = timer.isRunning 
-  //     ? `${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
-  //     : 'Serenity';
-  // }, [timer.timeLeft, timer.mode, timer.isRunning]);
+  useEffect(() => {
+    if (timer.mode === 'focus') {
+      setFocusedMinutes(prev => prev + 25);
+    } else {
+      setBreakMinutes(prev => prev + 5);
+    }
+  }, [timer.mode]);
+
 
   return (
     <div className="relative">
-      <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
-        {/* <Clock /> */}
-      </div>
+     
 
-      {isTimerVisible && <Timer />}
+      {/* {isTimerVisible && <Timer />} */}
 
-      {/* <div className="flex flex-col items-center justify-center gap-4 p-4">
+    <div className="flex flex-col items-center justify-center gap-4 p-4">
         <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white/90">
           {formatTime(timer.timeLeft)}
         </h1>
@@ -128,11 +135,10 @@ const TopBar = () => {
             Switch to {timer.mode === 'focus' ? 'Break' : 'Focus'}
           </button>
         </div>
-
         <div className="text-white/70 text-sm">
           {timer.mode === 'focus' ? '🎯 Focus Time' : '☕ Break Time'}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
