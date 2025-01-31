@@ -1,7 +1,7 @@
-import React, {  useCallback, useEffect, useState } from "react";
+import React, {   useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, useDockStore, TimerService, useTimer, useInterval } from "@repo/shared";
+import { AppProvider, Clock, useDockStore} from "@repo/shared";
 
 import {
   TodoListSheet,
@@ -20,10 +20,9 @@ import "./style.css";
 // import { extensionTimerService } from "./services/timer.service";
 
 const Home = () => {
-  const timerService = new TimerService("extension");
   
   return (
-    <AppProvider timerService={timerService}>
+    <AppProvider >
       <Background />
       <BackgroundOverlay />
       <AppLayout>
@@ -70,34 +69,38 @@ const BreathingContent = () => {
   return <BreathePod />;
 };
 const TopBar = () => {
-  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+  // const isTimerVisible = useDockStore((state) => state.isTimerVisible);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<"focus" | "break">("focus");
-  const [cycleCount, setCycleCount] = useState(1);
+
+
   useEffect(() => {
-    chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+    chrome.runtime.sendMessage({ type: "HEARTBEAT" }, (response) => {
       setTimeLeft(response.timeLeft);
       setIsRunning(response.isRunning);
       setMode(response.mode);
-      setCycleCount(response.cycleCount);
+      console.log(response);
     });
     const interval = setInterval(() => {
-      chrome.runtime.sendMessage({ type: "GET_TIME" }, (response) => {
+      chrome.runtime.sendMessage({ type: "HEARTBEAT" }, (response) => {
         setTimeLeft(response.timeLeft);
         setIsRunning(response.isRunning);
         setMode(response.mode);
-        setCycleCount(response.cycleCount);
+      console.log(response);
+
       });
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
   useEffect(() => {
     const emoji = mode === "focus" ? "🎯" : "☕";
     const mins = Math.floor(timeLeft / 60);
     const secs = timeLeft % 60;
-    document.title = `#${cycleCount} ${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
-  }, [timeLeft, mode, cycleCount]);
+    document.title = `#${mins}:${secs.toString().padStart(2, "0")} ${emoji}`;
+  }, [timeLeft, mode]);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -115,7 +118,7 @@ const TopBar = () => {
           <button
             onClick={() => {
               chrome.runtime.sendMessage({
-                type: isRunning ? "PAUSE_TIMER" : "START_TIMER"
+                type: isRunning ? "PAUSE" : "START"
               });
               setIsRunning(!isRunning);
             }}
@@ -125,7 +128,7 @@ const TopBar = () => {
           </button>
         </div>
         <div className="text-white/70 text-sm">
-          {mode === "focus" ? `Focus #${cycleCount} 🎯` : "Break Time ☕"}
+          {mode === "focus" ? `Focus 🎯` : "Break ☕"}
         </div> 
       </div>
     </div>

@@ -1,9 +1,9 @@
-let interval: number | null = null;
+let interval: NodeJS.Timeout | null = null;
+
 const state = {
   isRunning: false,
   timeLeft: 25 * 60,
   mode: 'focus',
-  totalTime: 25 * 60
 };
 
 const FOCUS_TIME = 25 * 60; // 25 minutes in seconds
@@ -18,12 +18,11 @@ function startTimer() {
     if (state.timeLeft <= 0) {
       // Switch modes automatically
       state.mode = state.mode === 'focus' ? 'break' : 'focus';
-      state.totalTime = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-      state.timeLeft = state.totalTime;
+      state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
     }
     
     postMessage(state);
-  }, 100) as unknown as number;
+  }, 1000);
 }
 function pauseTimer() {
   if (interval) {
@@ -35,7 +34,7 @@ function pauseTimer() {
 }
 function resetTimer() {
   pauseTimer();
-  state.timeLeft = state.totalTime;
+  state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
   postMessage(state);
 }
 self.onmessage = (event) => {
@@ -51,8 +50,7 @@ self.onmessage = (event) => {
       break;
     case 'SET_MODE':
       state.mode = event.data.mode;
-      state.totalTime = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-      state.timeLeft = state.totalTime;
+      state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
       postMessage(state);
       break;
   }

@@ -1,48 +1,32 @@
-interface TimerState {
-    isRunning: boolean;
-    timeLeft: number;
-    mode: "focus" | "break";
-    totalTime: number;
-    cycleCount: number;
-}
+let interval: NodeJS.Timeout | null = null;
 
+const state = {
+  isRunning: false,
+  timeLeft: 25 * 60,
+  mode: 'focus',
+};
 
-type Timer = {
-  timeLeft: number
-  initialTime: number
-  isRunning: boolean
-  mode: 'focus' | 'break'
-  cycleCount: number
-  intervalId?: ReturnType<typeof setInterval>
-}
 
 const FOCUS_TIME = 25 * 60; // 25 minutes
 const BREAK_TIME = 5 * 60;  // 5 minutes
-let timer: Timer = {
-  timeLeft: FOCUS_TIME,
-  initialTime: FOCUS_TIME,
-  isRunning: false,
-  mode: 'focus',
-  cycleCount: 1
-};
+
+
 function switchMode() {
-  if (timer.mode === "focus") {
-    timer.mode = "break";
+  if (state.mode === "focus") {
+    state.mode = "break";
   } else {
-    timer.mode = "focus";
-    timer.cycleCount++;
+    state.mode = "focus";
   }
-  timer.initialTime = timer.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  timer.timeLeft = timer.initialTime;
+  state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
 
   // Auto-start the next session
-  timer.isRunning = true;
-  timer.intervalId = setInterval(() => {
-    if (timer.timeLeft > 0) {
-      timer.timeLeft--;
-      if (timer.timeLeft === 0) {
-        timer.isRunning = false;
-        clearInterval(timer.intervalId);
+  state.isRunning = true;
+  interval = setInterval(() => {
+    if (state.timeLeft > 0) {
+      state.timeLeft--;
+      if (state.timeLeft === 0) {
+        state.isRunning = false;
+        clearInterval(interval!);
         switchMode();
       }
     }
@@ -51,31 +35,37 @@ function switchMode() {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
-    case "GET_TIME":
-      sendResponse({ ...timer });
+    case "HEARTBEAT":
+      sendResponse({ ...state });
       break;
-    case "START_TIMER":
-      if (!timer.isRunning) {
-        timer.isRunning = true;
-        timer.intervalId = setInterval(() => {
-          if (timer.timeLeft > 0) {
-            timer.timeLeft--;
-            if (timer.timeLeft === 0) {
-              timer.isRunning = false;
-              clearInterval(timer.intervalId);
+    case "START":
+      if (!state.isRunning) {
+        state.isRunning = true;
+        interval = setInterval(() => {
+          if (state.timeLeft > 0) {
+            state.timeLeft--;
+            if (state.timeLeft === 0) {
+              state.isRunning = false;
+              clearInterval(interval!);
               switchMode();
             }
           }
         }, 1000);
       }
-      sendResponse({ ...timer });
+      sendResponse({ ...state });
       break;
-    case "PAUSE_TIMER":
-      timer.isRunning = false;
-      if (timer.intervalId) {
-        clearInterval(timer.intervalId);
+    case "PAUSE":
+      state.isRunning = false;
+        if (interval) {
+        clearInterval(interval);
+        interval = null;
       }
-      sendResponse(timer);
+      sendResponse(state);
+      break;
+    case "RESET":
+      state.isRunning = false;
+      state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
+      sendResponse(state);
       break;
     default:
       sendResponse({ error: "Unknown message type" });
@@ -85,11 +75,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Reset timer when extension is installed/updated
 chrome.runtime.onInstalled.addListener(() => {
-  timer = {
-    timeLeft: FOCUS_TIME,
-    initialTime: FOCUS_TIME,
-    isRunning: false,
-    mode: "focus",
-    cycleCount: 1
-  };
+    state.isRunning = false;
+    state.timeLeft = FOCUS_TIME;
+    state.mode = "focus";
 }); 
