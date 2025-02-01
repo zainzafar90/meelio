@@ -2,35 +2,49 @@ let interval: NodeJS.Timeout | null = null;
 
 const state = {
   isRunning: false,
-  timeLeft: 25 * 60,
+  timeLeft: 0,
   mode: 'focus',
 };
-
 
 const FOCUS_TIME = 25 * 60; // 25 minutes
 const BREAK_TIME = 5 * 60;  // 5 minutes
 
-
-function switchMode() {
-  if (state.mode === "focus") {
-    state.mode = "break";
-  } else {
-    state.mode = "focus";
-  }
-  state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-
-  // Auto-start the next session
+function startTimer(sendResponse: (response: any) => void) {
+  if (interval) return;
+  
   state.isRunning = true;
   interval = setInterval(() => {
-    if (state.timeLeft > 0) {
-      state.timeLeft--;
-      if (state.timeLeft === 0) {
-        state.isRunning = false;
-        clearInterval(interval!);
-        switchMode();
-      }
+    state.timeLeft -= 1;
+
+    if (state.timeLeft <= 0) {
+      // Switch modes automatically
+      state.mode = state.mode === 'focus' ? 'break' : 'focus';
+      state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
     }
+
+    sendResponse({ ...state });
   }, 1000);
+}
+
+function pauseTimer(sendResponse: (response: any) => void) {
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+  }
+  state.isRunning = false;
+  sendResponse(state);
+}
+
+function resetTimer(sendResponse: (response: any) => void) {
+  pauseTimer(sendResponse);
+  state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
+  sendResponse(state);
+}
+
+function setMode(sendResponse: (response: any) => void, mode: 'focus' | 'break') {
+  state.mode = mode;
+  state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
+  sendResponse(state);
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -39,33 +53,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       sendResponse({ ...state });
       break;
     case "START":
-      if (!state.isRunning) {
-        state.isRunning = true;
-        interval = setInterval(() => {
-          if (state.timeLeft > 0) {
-            state.timeLeft--;
-            if (state.timeLeft === 0) {
-              state.isRunning = false;
-              clearInterval(interval!);
-              switchMode();
-            }
-          }
-        }, 1000);
-      }
-      sendResponse({ ...state });
+      startTimer(sendResponse);
       break;
     case "PAUSE":
-      state.isRunning = false;
-        if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
-      sendResponse(state);
+      pauseTimer(sendResponse);
       break;
     case "RESET":
-      state.isRunning = false;
-      state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-      sendResponse(state);
+      resetTimer(sendResponse);
+      break;
+    case "SET_MODE":
+      setMode(sendResponse, message.mode);
       break;
     default:
       sendResponse({ error: "Unknown message type" });

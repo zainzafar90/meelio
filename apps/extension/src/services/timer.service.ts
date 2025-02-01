@@ -8,7 +8,6 @@ export class ExtensionTimerService {
     isRunning: false,
     timeLeft: 25 * 60,
     mode: 'focus',
-    totalTime: 25 * 60
   };
 
   constructor() {

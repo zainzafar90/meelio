@@ -7,9 +7,8 @@ export class WebTimerService {
   private listeners: ((state: TimerState) => void)[] = [];
   private state: TimerState = {
     isRunning: false,
-    timeLeft: 25 * 60,
+    timeLeft: 0,
     mode: 'focus',
-    totalTime: 25 * 60
   };
   constructor() {
     this.worker = new TimerWorker();
