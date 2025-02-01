@@ -1,6 +1,8 @@
+
 import { useEffect } from "react";
-import { formatTime, TimerState, useInterval} from "@repo/shared";
+import { formatTime, Icons, TimerState, useInterval } from "@repo/shared";
 import { useState } from "react";
+
 import TimerWorker from '../workers/timer-worker?worker';
 
 const worker = new TimerWorker();
@@ -17,7 +19,11 @@ export const WebTimer = () => {
 
   const heartbeatListener = (event: any) => {
     if (event.data.type === 'TICK') {
-      setTimer(event.data);
+      setTimer({
+        timeLeft: event.data.timeLeft,
+        isRunning: event.data.isRunning,
+        mode: event.data.mode,
+      });
     }
   };
 
@@ -56,7 +62,6 @@ export const WebTimer = () => {
   const handleStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     worker.postMessage({ type: 'START' });
-    console.log('start');
   }
 
   const handlePause = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -71,52 +76,108 @@ export const WebTimer = () => {
 
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    worker.postMessage({ type: 'SET_MODE', mode: timer.mode === 'focus' ? 'break' : 'focus' });
+    worker.postMessage({ type: 'SET_MODE', mode: timer.mode });
   }
-
 
   return (
     <div className="relative">
+      <div className="max-w-full w-80 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white transition-colors duration-100">
+        <div className="p-6 space-y-12">
+          {/* Timer Mode Tabs */}
+          <div className="w-full">
+            <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
+              <button
+                onClick={handleSwitch}
+                className={(`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors ${timer.mode === 'focus' ? 'bg-white/50' : ''
+                  }`)}
+              >
+                {/* <span>🎯</span> */}
+                <span>Focus</span>
+              </button>
+              <button
+                onClick={handleSwitch}
+                className={(`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors ${timer.mode === 'break' ? 'bg-white/50' : ''
+                  }`)}
+              >
+                {/* <span >☕</span> */}
+                <span>Break</span>
+              </button>
+            </div>
+          </div>
 
+          {/* Timer Display */}
+          <div className="text-center space-y-4">
+            <div className="text-9xl font-bold tracking-normal">
+              {formatTime(timer.timeLeft)}
+            </div>
 
-      <div className="flex flex-col items-center justify-center gap-4 p-4">
-        <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white/90">
-          {formatTime(timer.timeLeft)}
-        </h1>
+          </div>
 
-        <div className="flex gap-4">
-          {!timer.isRunning ? (
+          {/* Current Task
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-xl">{timer.mode === 'focus' ? '🎯' : '☕'}</span>
+            <p className="font-medium truncate">
+              {timer.mode === 'focus' ? 'Focus Time' : 'Break Time'}
+            </p>
+          </div> */}
+
+          {/* Control Buttons */}
+          <div className="flex items-center justify-between gap-4">
             <button
-              onClick={handleStart}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/90 backdrop-blur-md transition-colors"
+              className="cursor-pointer relative flex shrink-0 size-12 items-center justify-center rounded-xl shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
+              onClick={handleReset}
+              title="Reset timer"
+              role="button"
             >
-              Start {timer.mode === 'focus' ? 'Focus' : 'Break'}
+              <Icons.resetTimer className="size-6 text-white/80" />
+              <span className="sr-only">Reset timer</span>
             </button>
-          ) : (
+
             <button
-              onClick={handlePause}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/90 backdrop-blur-md transition-colors"
+              // className={cn(
+              //   "cursor-pointer",
+              //   "relative flex h-12 w-full items-center justify-center rounded-xl shadow-lg",
+              //   "bg-gradient-to-b from-zinc-800 to-zinc-900",
+
+              // )}
+
+              className="cursor-pointer relative flex h-12 w-full items-center justify-center rounded-xl shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/80 backdrop-blur-sm "
+
+              onClick={timer.isRunning ? handlePause : handleStart}
+              title="Switch timer"
+              role="button"
             >
-              Pause
+              {timer.isRunning ? <Icons.pause className="size-6" /> : <Icons.play className="size-6" />}
+              <span className="ml-2 uppercase">{timer.isRunning ? 'Stop' : 'Start'}</span>
             </button>
-          )}
 
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/90 backdrop-blur-md transition-colors"
-          >
-            Reset
-          </button>
 
-          <button
-            onClick={handleSwitch}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white/90 backdrop-blur-md transition-colors"
-          >
-            Switch to {timer.mode === 'focus' ? 'Break' : 'Focus'}
-          </button>
-        </div>
-        <div className="text-white/70 text-sm">
-          {timer.mode === 'focus' ? '🎯 Focus Time' : '☕ Break Time'}
+            <button
+              className="cursor-pointer relative flex shrink-0 size-12 items-center justify-center rounded-xl shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
+              onClick={handleSwitch}
+              title="Switch timer"
+              role="button"
+            >
+              <Icons.forward className="size-6 text-white/80" />
+              <span className="sr-only">Switch to next timer</span>
+            </button>
+
+
+          </div>
+
+          {/* Progress Bar */}
+          <div className="h-1.5 bg-grey-200/50 rounded-full">
+            <div
+              className="h-full bg-green-500 rounded-full transition-all"
+              style={{
+                width: `${(timer.timeLeft / (timer.mode === 'focus' ? 25 * 60 : 5 * 60)) * 100}%`
+              }}
+              role="progressbar"
+              aria-valuenow={(timer.timeLeft / (timer.mode === 'focus' ? 25 * 60 : 5 * 60)) * 100}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            />
+          </div>
         </div>
       </div>
     </div>

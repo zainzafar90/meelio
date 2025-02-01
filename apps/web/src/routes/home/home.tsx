@@ -11,7 +11,6 @@ import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
 import { TodoListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { WebTimer } from "@/components/web-timer";
 
@@ -51,33 +50,12 @@ const Content = () => {
 };
 
 const GreetingsContent = () => {
-  const [mode, setMode] = useState<"clock" | "timer">("clock");
-
-  const handleClick = () => {
-    setMode(mode === "clock" ? "timer" : "clock");
-  };
+  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
 
   return (
-    <motion.div
-      onClick={handleClick}
-      className="cursor-pointer"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-    >
+    <motion.div>
       <AnimatePresence mode="wait">
-        {mode === "clock" ? (
-          <motion.div
-            key="clock"
-            className="flex flex-col items-center justify-center gap-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-              <Clock />
-              <Greeting />
-              <Quote />
-          </motion.div>
-        ) : (
+        {isTimerVisible ? (
           <motion.div
             key="timer"
             initial={{ opacity: 0, y: 20 }}
@@ -85,6 +63,18 @@ const GreetingsContent = () => {
             exit={{ opacity: 0, y: -20 }}
           >
             <WebTimer />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="clock"
+            className="flex flex-col items-center justify-center gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <Clock />
+            <Greeting />
+            <Quote />
           </motion.div>
         )}
       </AnimatePresence>
@@ -99,7 +89,7 @@ const BreathingContent = () => {
 const TopBar = () => {
   return (
     <div className="relative">
-     
+
 
     </div>
   );

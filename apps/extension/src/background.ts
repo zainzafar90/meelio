@@ -17,6 +17,13 @@ function startTimer(sendResponse: (response: any) => void) {
   
   state.isRunning = true;
   interval = setInterval(() => {
+
+    // FIX: for switching timers manually it should stop the timer, uncomment this 
+    // if (!state.isRunning) {
+    //   clearInterval(interval!);
+    //   return;
+    // }
+
     state.timeLeft -= 1;
 
     if (state.timeLeft <= 0) {
@@ -41,12 +48,14 @@ function pauseTimer(sendResponse: (response: any) => void) {
 function resetTimer(sendResponse: (response: any) => void) {
   pauseTimer(sendResponse);
   state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
+  state.isRunning = false;
   sendResponse({ type: 'TICK', ...state });
 }
 
 function setMode(sendResponse: (response: any) => void, mode: 'focus' | 'break') {
   state.mode = mode;
   state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
+  state.isRunning = false;
   sendResponse({ type: 'TICK', ...state });
 }
 

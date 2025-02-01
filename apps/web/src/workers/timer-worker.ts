@@ -14,18 +14,25 @@ const state = {
 
 function startTimer() {
   if (interval) return;
-  
+
   state.isRunning = true;
   interval = setInterval(() => {
+
+    // FIX: for switching timers manually it should stop the timer, uncomment this 
+    // if (!state.isRunning) {
+    //   clearInterval(interval!);
+    //   return;
+    // }
+
     state.timeLeft -= 1;
-    
+
     if (state.timeLeft <= 0) {
       // Switch modes automatically
       state.mode = state.mode === 'focus' ? 'break' : 'focus';
       state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
     }
-    
-    postMessage({type: 'TICK', ...state});
+
+    postMessage({ type: 'TICK', ...state });
   }, 1000);
 }
 
@@ -35,25 +42,27 @@ function pauseTimer() {
     interval = null;
   }
   state.isRunning = false;
-  postMessage({type: 'TICK', ...state});
+  postMessage({ type: 'TICK', ...state });
 }
 
 function resetTimer() {
   pauseTimer();
   state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  postMessage({type: 'TICK', ...state});
+  state.isRunning = false;
+  postMessage({ type: 'TICK', ...state });
 }
 
 function setMode(mode: 'focus' | 'break') {
   state.mode = mode;
   state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  postMessage({type: 'TICK', ...state});
+  state.isRunning = false;
+  postMessage({ type: 'TICK', ...state });
 }
 
 self.onmessage = (event) => {
   switch (event.data.type) {
     case 'TICK':
-      postMessage({type: 'TICK', ...state} );
+      postMessage({ type: 'TICK', ...state });
       break;
     case 'START':
       startTimer();

@@ -192,8 +192,18 @@ export const Icons = {
     </svg>
   ),
   soundscapes: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24" width="1em" {...props}>
-      <path opacity="0.5" fill="currentColor" d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      enableBackground="new 0 0 24 24"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        opacity="0.5"
+        fill="currentColor"
+        d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z"
+      />
       <path
         fill="currentColor"
         d="M18 11v2h1c.353 0 .686.073 1 .185V11a8 8 0 0 0-16 0v2.185A2.976 2.976 0 0 1 5 13h1v-2a6 6 0 1 1 12 0z"
@@ -201,9 +211,21 @@ export const Icons = {
     </svg>
   ),
   soundscapesActive: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" viewBox="0 0 24 24" width="1em" {...props}>
-      <path fill="currentColor" d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z" />
-      <path fill="currentColor" d="M18 11v2h1c.353 0 .686.073 1 .185V11a8 8 0 0 0-16 0v2.185A2.976 2.976 0 0 1 5 13h1v-2a6 6 0 1 1 12 0z" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      enableBackground="new 0 0 24 24"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        d="M8 21H5a3.003 3.003 0 0 1-3-3v-2a3.003 3.003 0 0 1 3-3h3a1 1 0 0 1 1 .999V20a1 1 0 0 1-.999 1H8zm11 0h-3a1 1 0 0 1-1-.999V14a1 1 0 0 1 .999-1H19a3.003 3.003 0 0 1 3 3v2a3.003 3.003 0 0 1-3 3z"
+      />
+      <path
+        fill="currentColor"
+        d="M18 11v2h1c.353 0 .686.073 1 .185V11a8 8 0 0 0-16 0v2.185A2.976 2.976 0 0 1 5 13h1v-2a6 6 0 1 1 12 0z"
+      />
     </svg>
   ),
   pomodoro: ({ ...props }: LucideProps) => (
@@ -366,6 +388,36 @@ export const Icons = {
       <path
         fill="currentColor"
         d="M7.168 21.002a3.428 3.428 0 0 1-3.416-3.42V6.418a3.416 3.416 0 0 1 5.124-2.958l9.664 5.581a3.416 3.416 0 0 1 0 5.916l-9.664 5.581a3.41 3.41 0 0 1-1.708.463Z"
+      />
+    </svg>
+  ),
+  forward: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        className="fill-current"
+        d="M12.666 18.52A2.676 2.676 0 0 1 10 15.85v-7.7a2.667 2.667 0 0 1 4-2.31l6.667 3.85a2.667 2.667 0 0 1 0 4.62L14 18.16c-.405.235-.865.36-1.334.36z"
+      />
+      <path
+        opacity=".5"
+        className="fill-current"
+        d="M10 8.15 5.999 5.844A2.666 2.666 0 0 0 2 8.15v7.7a2.675 2.675 0 0 0 2.667 2.667c.468-.001.927-.126 1.332-.36L10 15.85v-7.7z"
+      />
+    </svg>
+  ),
+  resetTimer: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        className="fill-current"
+        d="M12,2A10.01687,10.01687,0,0,0,5,4.87714V3A1,1,0,0,0,3,3V7.5a.99974.99974,0,0,0,1,1H8.5a1,1,0,0,0,0-2H6.21844A7.99161,7.99161,0,1,1,12,20a1,1,0,0,0,0,2A10,10,0,0,0,12,2Z"
+      />
+      <path
+        className="fill-current"
+        d="M14,13H12a.99974.99974,0,0,1-1-1V9a1,1,0,0,1,2,0v2h1a1,1,0,0,1,0,2Z"
+      />
+      <path
+        opacity=".5"
+        className="fill-current"
+        d="M12,4A8.00807,8.00807,0,0,0,6.21844,6.5H8.5a1,1,0,0,1,0,2H4a.98882.98882,0,0,1-.97583-.88013A9.977,9.977,0,0,0,12,22a1,1,0,0,1,0-2A8,8,0,0,0,12,4Zm2,9H12a.99974.99974,0,0,1-1-1V9a1,1,0,0,1,2,0v2h1a1,1,0,0,1,0,2Z"
       />
     </svg>
   ),
