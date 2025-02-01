@@ -76,12 +76,12 @@ export const WebTimer = () => {
 
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    worker.postMessage({ type: 'SET_MODE', mode: timer.mode });
+    worker.postMessage({ type: 'SET_MODE', mode: timer.mode === 'focus' ? 'break' : 'focus' });
   }
 
   return (
     <div className="relative">
-      <div className="max-w-full w-80 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white transition-colors duration-100">
+      <div className="max-w-full w-80 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
         <div className="p-6 space-y-12">
           {/* Timer Mode Tabs */}
           <div className="w-full">
@@ -134,15 +134,7 @@ export const WebTimer = () => {
             </button>
 
             <button
-              // className={cn(
-              //   "cursor-pointer",
-              //   "relative flex h-12 w-full items-center justify-center rounded-xl shadow-lg",
-              //   "bg-gradient-to-b from-zinc-800 to-zinc-900",
-
-              // )}
-
               className="cursor-pointer relative flex h-12 w-full items-center justify-center rounded-xl shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/80 backdrop-blur-sm "
-
               onClick={timer.isRunning ? handlePause : handleStart}
               title="Switch timer"
               role="button"

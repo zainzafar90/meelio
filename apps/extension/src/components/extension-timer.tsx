@@ -68,7 +68,7 @@ export const ExtensionTimer = () => {
   }
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    chrome.runtime.sendMessage({ type: "SET_MODE", mode: timer.mode });
+    chrome.runtime.sendMessage({ type: "SET_MODE", mode: timer.mode === 'focus' ? 'break' : 'focus' });
   }
 
   return (
@@ -127,7 +127,6 @@ export const ExtensionTimer = () => {
 
             <button
               className="cursor-pointer relative flex h-12 w-full items-center justify-center rounded-xl shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/80 backdrop-blur-sm "
-
               onClick={timer.isRunning ? handlePause : handleStart}
               title="Switch timer"
               role="button"
@@ -135,7 +134,6 @@ export const ExtensionTimer = () => {
               {timer.isRunning ? <Icons.pause className="size-6" /> : <Icons.play className="size-6" />}
               <span className="ml-2 uppercase">{timer.isRunning ? 'Stop' : 'Start'}</span>
             </button>
-
 
             <button
               className="cursor-pointer relative flex shrink-0 size-12 items-center justify-center rounded-xl shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
@@ -146,8 +144,6 @@ export const ExtensionTimer = () => {
               <Icons.forward className="size-6 text-white/80" />
               <span className="sr-only">Switch to next timer</span>
             </button>
-
-
           </div>
 
           {/* Progress Bar */}

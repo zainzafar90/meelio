@@ -54,7 +54,7 @@ function resetTimer() {
 
 function setMode(mode: 'focus' | 'break') {
   state.mode = mode;
-  state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
+  state.timeLeft = mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
   state.isRunning = false;
   postMessage({ type: 'TICK', ...state });
 }
