@@ -8,6 +8,7 @@ import {
   useGreetingStore,
   useMantraStore,
 } from "../../../stores/greetings.store";
+import { useInterval } from "src/hooks";
 
 export const Greeting = () => {
   const { user } = useAuthStore();
@@ -19,26 +20,21 @@ export const Greeting = () => {
   useEffect(() => {
     updateGreeting(new Date(), t);
     updateMantra();
-
-    const timeInterval = setInterval(
-      () => {
-        updateGreeting(new Date(), t);
-      },
-      10 * 60 * 1000
-    ); // Every 10 minutes
-
-    const mantraInterval = setInterval(
-      () => {
-        updateMantra();
-      },
-      24 * 60 * 60 * 1000
-    ); // Every 24 hours
-
-    return () => {
-      clearInterval(timeInterval);
-      clearInterval(mantraInterval);
-    };
   }, [t]);
+
+  useInterval(
+    () => {
+      updateGreeting(new Date(), t);
+    },
+    10 * 60 * 1000
+  );
+
+  useInterval(
+    () => {
+      updateMantra();
+    },
+    24 * 60 * 60 * 1000
+  );
 
   const getFirstName = () => {
     if (!user || !user.name) return "";
