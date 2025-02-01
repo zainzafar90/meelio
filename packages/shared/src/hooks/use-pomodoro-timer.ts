@@ -4,15 +4,9 @@ import { PomodoroStage } from "../types/pomodoro";
 import { usePomodoroStore } from "../stores/pomodoro.store";
 import { changeFavicon } from "../utils/favicon.utils";
 import { playPomodoroSound } from "../utils/sound.utils";
-import { TimerService } from "../services/timer.service";
 
-export const usePomodoroTimer = ({
-  user,
-  timerService,
-}: {
-  user: AuthUser | null;
-  timerService: TimerService;
-}) => {
+export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
+  const timerService = null as any;
   const { timer, updateTimer, advanceTimer } = usePomodoroStore((state) => ({
     timer: state.timer,
     updateTimer: state.updateTimer,
@@ -37,7 +31,7 @@ export const usePomodoroTimer = ({
   useEffect(() => {
     if (!timerService) return;
 
-    const unsubscribe = timerService.onStateChange((state) => {
+    const unsubscribe = timerService.onStateChange((state: any) => {
       updateTimer(state.remaining);
 
       if (!state.isRunning && state.remaining === 0) {

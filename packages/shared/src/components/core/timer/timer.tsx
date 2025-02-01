@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import NumberFlow from "@number-flow/react";
+// import NumberFlow from "@number-flow/react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { Category } from "../../../types";
@@ -14,7 +14,7 @@ import { TimerStatsDialog } from "./dialog/timer-stats.dialog";
 
 // Import worker directly
 // @ts-ignore
-import TimerWorker from "../../../workers/web-timer.worker?worker";
+// import TimerWorker from "../../../workers/web-timer.worker?worker";
 
 type TimerMode = "focus" | "short-break" | "long-break";
 
@@ -48,9 +48,9 @@ function getDurationForMode(mode: TimerMode): number {
 }
 
 // Create worker lazily
-let worker: Worker | null = null;
+let worker: Worker | null = null as any;
 
-export const Timer = () => {
+export const TimerOld = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [timerState, setTimerState] = useState<TimerState>({
@@ -71,7 +71,7 @@ export const Timer = () => {
 
     // Create worker if it doesn't exist
     if (!worker) {
-      worker = new TimerWorker();
+      // worker = new TimerWorker();
     }
 
     // Set up worker message handler
@@ -111,7 +111,7 @@ export const Timer = () => {
       }
     };
 
-    worker.addEventListener("message", handleMessage);
+    worker?.addEventListener("message", handleMessage);
 
     // Handle storage events from other tabs
     const handleStorage = (e: StorageEvent) => {
@@ -132,7 +132,7 @@ export const Timer = () => {
       const savedState = localStorage.getItem(STORAGE_KEY);
       if (savedState) {
         const parsedState = JSON.parse(savedState);
-        worker.postMessage({ type: "LOAD_SAVED_STATE", state: parsedState });
+        worker?.postMessage({ type: "LOAD_SAVED_STATE", state: parsedState });
       }
     } catch (error) {
       console.error("[Timer] Error loading initial state:", error);
