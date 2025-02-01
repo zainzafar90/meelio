@@ -17,7 +17,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { PomodoroStage } from "../../../../types/pomodoro";
-import { usePomodoroSync } from "../../../../hooks/use-pomodoro-sync";
 import { usePomodoroStore } from "../../../../stores/pomodoro.store";
 import {
   MINUTE_IN_SECONDS,
@@ -48,7 +47,6 @@ export const TimerSettingsDialog = ({
     toggleTimerSound,
     changeTimerSettings,
   } = usePomodoroStore();
-  const { broadcastDurationChange } = usePomodoroSync();
   const { t } = useTranslation();
 
   const { stageSeconds } = timer;
@@ -66,11 +64,6 @@ export const TimerSettingsDialog = ({
     changeTimerSettings(PomodoroStage.WorkTime, data.workTime);
     changeTimerSettings(PomodoroStage.ShortBreak, data.shortBreak);
     changeTimerSettings(PomodoroStage.LongBreak, data.longBreak);
-
-    // Broadcast duration changes to other tabs
-    broadcastDurationChange(data.workTime * MINUTE_IN_SECONDS);
-    broadcastDurationChange(data.shortBreak * MINUTE_IN_SECONDS);
-    broadcastDurationChange(data.longBreak * MINUTE_IN_SECONDS);
 
     toast.success(t("timer.settings.toast.success"), {
       description: t("timer.settings.toast.description"),

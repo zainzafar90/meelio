@@ -34,7 +34,6 @@
     "./.eslintrc.js",
     "vite.config.mts",
     "prettier.config.js",
-    "postcss.config.js"
-  ],
+    "postcss.config.js" ],
   "exclude": ["node_modules", "**/public/sounds/**"]
 }

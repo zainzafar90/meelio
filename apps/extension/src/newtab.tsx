@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -13,16 +14,17 @@ import {
   AppLayout,
   Quote,
   SoundscapesSheet,
-  Timer,
   Dock,
 } from "@repo/shared";
 
+import { ExtensionTimer } from "./components/extension-timer";
+
 import "./style.css";
 
-
 const Home = () => {
+
   return (
-    <AppProvider>
+    <AppProvider platform="extension">
       <Background />
       <BackgroundOverlay />
       <AppLayout>
@@ -56,11 +58,35 @@ const Content = () => {
 };
 
 const GreetingsContent = () => {
+  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8">
-      <Greeting />
-      <Quote />
-    </div>
+    <motion.div>
+      <AnimatePresence mode="wait">
+        {isTimerVisible ? (
+          <motion.div
+            key="timer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <ExtensionTimer />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="clock"
+            className="flex flex-col items-center justify-center gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <Clock />
+            <Greeting />
+            <Quote />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
@@ -69,18 +95,8 @@ const BreathingContent = () => {
 };
 
 const TopBar = () => {
-  const isTimerVisible = useDockStore((state) => {
-    return state.isTimerVisible;
-  });
-
   return (
-    <div className="relative">
-      <div className="flex h-6 w-full justify-center bg-zinc-900/20 backdrop-blur-md">
-        <Clock />
-      </div>
-
-      {isTimerVisible && <Timer />}
-    </div>
+    <div className="relative" />
   );
 };
 

@@ -9,9 +9,10 @@ import { Greeting } from "@repo/shared";
 import { AppLayout } from "@repo/shared";
 import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
-import { Timer } from "@repo/shared";
 import { TodoListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
+import { AnimatePresence, motion } from "framer-motion";
+import { WebTimer } from "@/components/web-timer";
 
 const Home = () => {
   return (
@@ -49,12 +50,35 @@ const Content = () => {
 };
 
 const GreetingsContent = () => {
+  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+
   return (
-    <div className="flex flex-col items-center justify-center gap-8">
-      <Clock />
-      <Greeting />
-      <Quote />
-    </div>
+    <motion.div>
+      <AnimatePresence mode="wait">
+        {isTimerVisible ? (
+          <motion.div
+            key="timer"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <WebTimer />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="clock"
+            className="flex flex-col items-center justify-center gap-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <Clock />
+            <Greeting />
+            <Quote />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
@@ -63,17 +87,10 @@ const BreathingContent = () => {
 };
 
 const TopBar = () => {
-  const isTimerVisible = useDockStore((state) => {
-    return state.isTimerVisible;
-  });
-
   return (
     <div className="relative">
-      <div className="flex h-6 w-full justify-center bg-black/5 backdrop-blur-md">
-        {/* Here we can add the clock */}
-      </div>
 
-      {isTimerVisible && <Timer />}
+
     </div>
   );
 };

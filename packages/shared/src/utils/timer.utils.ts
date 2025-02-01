@@ -73,3 +73,21 @@ export const getTime = (seconds: number): [number, number, number, number] => {
 
   return [minuteTens, minuteUnits, secondTens, secondUnits];
 };
+
+/*
+|--------------------------------------------------------------------------
+| Format Time
+|--------------------------------------------------------------------------
+|
+| These functions format the time for the pomodoro timer. They are used
+| to display the time for the pomodoro timer.
+|
+| @param seconds - The time in seconds
+| @returns The time in minutes and seconds
+|
+*/
+export const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};

@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import NumberFlow from "@number-flow/react";
+import { useInterval } from "usehooks-ts";
 
 export const Clock = () => {
   const [time, setTime] = useState(new Date());
 
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  useInterval(() => setTime(new Date()), 1000);
 
   return (
     <h1 className="text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold flex tracking-tighter text-white/90">
