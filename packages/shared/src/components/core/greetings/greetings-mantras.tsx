@@ -8,7 +8,7 @@ import {
   useGreetingStore,
   useMantraStore,
 } from "../../../stores/greetings.store";
-import { useInterval } from "src/hooks";
+import { useInterval } from "../../../hooks";
 
 export const Greeting = () => {
   const { user } = useAuthStore();

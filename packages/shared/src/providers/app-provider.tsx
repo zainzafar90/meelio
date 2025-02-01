@@ -15,7 +15,6 @@ import { AuthProvider } from "./auth-provider";
 // import { env } from "../utils/env.utils";
 import { i18n } from "../i18n";
 // import { TelemetryProvider } from "./telemetry-provider";
-import { TimerService } from "../services/timer.service";
 
 // import posthog from "posthog-js/dist/module.full.no-external";
 
@@ -34,12 +33,12 @@ import { TimerService } from "../services/timer.service";
 
 type AppProviderProps = {
   children: React.ReactNode;
-  timerService: TimerService;
+  platform: "extension" | "web";
 };
 
 export const AppProvider: React.FC<AppProviderProps> = ({
   children,
-  timerService,
+  platform,
 }) => {
   const sounds = useSoundscapesStore((state) => state.sounds);
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
@@ -54,7 +53,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({
           <ThemeProvider storageKey="ui-theme" defaultTheme="system">
             <TooltipProvider>
               <BackgroundProvider>
-                <PomodoroProvider timerService={timerService}>
+                <PomodoroProvider>
                   {children}
                   {hasPlayingSounds && <SoundPlayer />}
                   <Toaster richColors />

@@ -27,7 +27,7 @@ export * from "./core/breathing-pod/store/breathing-dialog.store";
 export * from "./core/breathing-pod/store/breathing.store";
 
 // Clock
-export * from "./core/clock/clock";
+export * from "./core/clock";
 
 // Dock components
 export * from "./core/dock/dock";
