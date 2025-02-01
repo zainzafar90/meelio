@@ -1,13 +1,16 @@
 let interval: NodeJS.Timeout | null = null;
 
+// 25 minutes
+const FOCUS_TIME = 25 * 60;
+// 5 minutes
+const BREAK_TIME = 5 * 60;
+
 const state = {
   isRunning: false,
-  timeLeft: 0,
+  timeLeft: FOCUS_TIME,
   mode: 'focus',
 };
 
-const FOCUS_TIME = 25 * 60; // 25 minutes
-const BREAK_TIME = 5 * 60;  // 5 minutes
 
 function startTimer(sendResponse: (response: any) => void) {
   if (interval) return;
@@ -22,7 +25,7 @@ function startTimer(sendResponse: (response: any) => void) {
       state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
     }
 
-    sendResponse({ ...state });
+    sendResponse({ type: 'TICK', ...state });
   }, 1000);
 }
 
@@ -32,25 +35,25 @@ function pauseTimer(sendResponse: (response: any) => void) {
     interval = null;
   }
   state.isRunning = false;
-  sendResponse(state);
+  sendResponse({ type: 'TICK', ...state });
 }
 
 function resetTimer(sendResponse: (response: any) => void) {
   pauseTimer(sendResponse);
   state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  sendResponse(state);
+  sendResponse({ type: 'TICK', ...state });
 }
 
 function setMode(sendResponse: (response: any) => void, mode: 'focus' | 'break') {
   state.mode = mode;
   state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  sendResponse(state);
+  sendResponse({ type: 'TICK', ...state });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
-    case "HEARTBEAT":
-      sendResponse({ ...state });
+    case "TICK":
+      sendResponse({ type: 'TICK', ...state });
       break;
     case "START":
       startTimer(sendResponse);

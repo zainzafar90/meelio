@@ -1,20 +1,41 @@
-import { webTimerService } from "@/services/timer.service";
 import { useEffect } from "react";
-import { formatTime, useTimer } from "@repo/shared";
+import { formatTime, TimerState, useInterval} from "@repo/shared";
 import { useState } from "react";
+import TimerWorker from '../workers/timer-worker?worker';
+
+const worker = new TimerWorker();
 
 export const WebTimer = () => {
-  const timer = useTimer(webTimerService);
   const [focusedMinutes, setFocusedMinutes] = useState(0);
   const [breakMinutes, setBreakMinutes] = useState(0);
+  const [timer, setTimer] = useState<TimerState>({
+    timeLeft: 25 * 60,
+    isRunning: false,
+    mode: "focus",
+  });
+
+
+  const heartbeatListener = (event: any) => {
+    if (event.data.type === 'TICK') {
+      setTimer(event.data);
+    }
+  };
 
   useEffect(() => {
-    const emoji = timer.mode === 'focus' ? '🎯' : '☕';
-    const timeStr = formatTime(timer.timeLeft);
-    document.title = timer.isRunning
-      ? `${focusedMinutes}:${breakMinutes} ${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
-      : 'Meelio - focus, calm, & productivity';
-  }, [timer.timeLeft, timer.mode, timer.isRunning, focusedMinutes, breakMinutes]);
+    worker.onmessage = heartbeatListener;
+  }, []);
+
+  useInterval(() => {
+    worker.onmessage = heartbeatListener;
+  }, 1000);
+
+  // TODO: remove listener when component unmounts
+  // useEffect(() => {
+  //   return () => {
+  //     worker.onmessage = null;
+  //     worker.terminate();
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (timer.mode === 'focus') {
@@ -24,24 +45,33 @@ export const WebTimer = () => {
     }
   }, [timer.mode]);
 
+  useEffect(() => {
+    const emoji = timer.mode === 'focus' ? '🎯' : '☕';
+    const timeStr = formatTime(timer.timeLeft);
+    document.title = timer.isRunning
+      ? `${focusedMinutes}:${breakMinutes} ${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
+      : 'Meelio - focus, calm, & productivity';
+  }, [timer.timeLeft, timer.mode, timer.isRunning, focusedMinutes, breakMinutes]);
+
   const handleStart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    timer.start();
+    worker.postMessage({ type: 'START' });
+    console.log('start');
   }
 
   const handlePause = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    timer.pause();
+    worker.postMessage({ type: 'PAUSE' });
   }
 
   const handleReset = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    timer.reset();
+    worker.postMessage({ type: 'RESET' });
   }
 
   const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    timer.setMode(timer.mode === 'focus' ? 'break' : 'focus');
+    worker.postMessage({ type: 'SET_MODE', mode: timer.mode === 'focus' ? 'break' : 'focus' });
   }
 
 

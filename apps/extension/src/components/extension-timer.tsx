@@ -2,33 +2,39 @@ import { useEffect, useState } from "react";
 import { formatTime, TimerState, useInterval } from "@repo/shared";
 
 export const ExtensionTimer = () => {
+  const [focusedMinutes, setFocusedMinutes] = useState(0);
+  const [breakMinutes, setBreakMinutes] = useState(0);
   const [timer, setTimer] = useState<TimerState>({
-    timeLeft: 0,
+    timeLeft: 25 * 60,
     isRunning: false,
     mode: "focus",
   });
-  const [focusedMinutes, setFocusedMinutes] = useState(0);
-  const [breakMinutes, setBreakMinutes] = useState(0);
+
+
+  const heartbeatListener = (message: any) => {
+    if (message.type === "TICK") {
+      setTimer({
+        timeLeft: message.timeLeft,
+        isRunning: message.isRunning,
+        mode: message.mode,
+      });
+    }
+  };
 
   useEffect(() => {
-    chrome.runtime.sendMessage({ type: "HEARTBEAT" }, (response) => {
-      setTimer({
-        timeLeft: response.timeLeft,
-        isRunning: response.isRunning,
-        mode: response.mode,
-      });
-    });
+    chrome.runtime.sendMessage({ type: 'TICK', ...timer },heartbeatListener);
   }, []);
 
   useInterval(() => {
-    chrome.runtime.sendMessage({ type: "HEARTBEAT" }, (response) => {
-      setTimer({
-        timeLeft: response.timeLeft,
-        isRunning: response.isRunning,
-        mode: response.mode,
-      });
-    });
+    chrome.runtime.sendMessage({ type: 'TICK', ...timer },heartbeatListener);
   }, 1000);
+
+  // TODO: remove listener when component unmounts
+  // useEffect(() => {
+  //   return () => {
+  //     chrome.runtime.onMessage.removeListener(heartbeatListener);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (timer.mode === 'focus') {

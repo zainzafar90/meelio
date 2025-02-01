@@ -1,13 +1,16 @@
 let interval: NodeJS.Timeout | null = null;
 
+// 25 minutes
+const FOCUS_TIME = 25 * 60;
+// 5 minutes
+const BREAK_TIME = 5 * 60;
+
 const state = {
   isRunning: false,
-  timeLeft: 0,
+  timeLeft: FOCUS_TIME,
   mode: 'focus',
 };
 
-const FOCUS_TIME = 25 * 60; // 25 minutes
-const BREAK_TIME = 5 * 60;  // 5 minutes
 
 function startTimer() {
   if (interval) return;
@@ -22,7 +25,7 @@ function startTimer() {
       state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
     }
     
-    postMessage(state);
+    postMessage({type: 'TICK', ...state});
   }, 1000);
 }
 
@@ -32,23 +35,26 @@ function pauseTimer() {
     interval = null;
   }
   state.isRunning = false;
-  postMessage(state);
+  postMessage({type: 'TICK', ...state});
 }
 
 function resetTimer() {
   pauseTimer();
   state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  postMessage(state);
+  postMessage({type: 'TICK', ...state});
 }
 
 function setMode(mode: 'focus' | 'break') {
   state.mode = mode;
   state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  postMessage(state);
+  postMessage({type: 'TICK', ...state});
 }
 
 self.onmessage = (event) => {
   switch (event.data.type) {
+    case 'TICK':
+      postMessage({type: 'TICK', ...state} );
+      break;
     case 'START':
       startTimer();
       break;
