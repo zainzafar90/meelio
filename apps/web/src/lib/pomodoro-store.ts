@@ -27,7 +27,7 @@ class PomodoroDB extends Dexie {
   state!: Dexie.Table<PomodoroState, number>;
   
   constructor() {
-    super('PomodoroDB');
+    super('meelio:pomodoro');
     this.version(1).stores({
       state: '++id,lastUpdated'
     });
@@ -65,6 +65,9 @@ broadcastChannel.onmessage = async (event) => {
   if (event.data.type === 'STATE_UPDATE') {
     const remoteState = event.data.state;
     const localState = usePomodoroStore.getState();
+
+    console.log('remoteState', remoteState);
+    console.log('localState', localState);
     
     if (remoteState.lastUpdated > localState.lastUpdated) {
       usePomodoroStore.setState(remoteState);

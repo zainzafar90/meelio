@@ -11,12 +11,8 @@ export const WebTimer = () => {
   const {
     activeStage,
     isRunning,
-    // stats,
-    stageDurations,
-    // sessionCount,
-    // longBreakInterval,
-    // startTimestamp,
-    // ...store
+    startTimestamp,
+    stageDurations
   } = usePomodoroStore();
 
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
@@ -27,6 +23,7 @@ export const WebTimer = () => {
     const handleMessage = ({ data }: MessageEvent) => {
       switch(data.type) {
         case 'TICK':
+          console.log('TICK', data.remaining);
           setRemaining(data.remaining);
           break;
           
@@ -46,6 +43,19 @@ export const WebTimer = () => {
     workerRef.current.onmessage = handleMessage;
     return () => workerRef.current?.terminate();
   }, []);
+
+  useEffect(() => {
+    if (isRunning && startTimestamp && workerRef.current) {
+      const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
+      const originalDuration = stageDurations[activeStage];
+      const remainingTime = originalDuration - elapsedSeconds;
+      if (remainingTime > 0) {
+        workerRef.current.postMessage({ type: 'START', payload: { duration: remainingTime } });
+      } else {
+        workerRef.current.postMessage({ type: 'STAGE_COMPLETE' });
+      }
+    }
+  }, [isRunning, startTimestamp, activeStage, stageDurations]);
 
   const completeStage = () => {
     const state = usePomodoroStore.getState();
