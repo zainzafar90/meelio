@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
 import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
+import { Spinner } from '@repo/ui/components/ui/spinner';
 
 import TimerWorker from '../workers/timer-worker?worker';
 
@@ -17,6 +18,7 @@ export const WebTimer = () => {
   } = usePomodoroStore();
 
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     workerRef.current = new TimerWorker();
@@ -24,7 +26,7 @@ export const WebTimer = () => {
     const handleMessage = ({ data }: MessageEvent) => {
       switch(data.type) {
         case 'TICK':
-          console.log('TICK', data.remaining);
+          setIsLoading(false);
           setRemaining(data.remaining);
           break;
           
@@ -48,6 +50,7 @@ export const WebTimer = () => {
 
   useEffect(() => {
     if (isRunning && startTimestamp && workerRef.current) {
+      setIsLoading(true);
       const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
       const originalDuration = stageDurations[activeStage];
       const remainingTime = originalDuration - elapsedSeconds;
@@ -58,6 +61,14 @@ export const WebTimer = () => {
       }
     }
   }, [isRunning, startTimestamp, activeStage, stageDurations]);
+
+  useEffect(() => {
+    const emoji = activeStage === PomodoroStage.WorkTime ? '🎯' : '☕';
+    const timeStr = formatTime(remaining);
+    const mode = activeStage === PomodoroStage.WorkTime ? 'Focus' : 'Break';
+    console.log('document.title', document.title);
+    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
+  }, [remaining, activeStage, isRunning, stageDurations]);
 
   const completeStage = () => {
     const state = usePomodoroStore.getState();
@@ -143,12 +154,7 @@ export const WebTimer = () => {
     });
   };
 
-  useEffect(() => {
-    const emoji = activeStage === PomodoroStage.WorkTime ? '🎯' : '☕';
-    const timeStr = formatTime(remaining);
-    const mode = activeStage === PomodoroStage.WorkTime ? 'Focus' : 'Break';
-    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
-  }, [remaining, activeStage, isRunning, stageDurations]);
+
 
   return (
     <div className="relative">
@@ -179,7 +185,7 @@ export const WebTimer = () => {
           {/* Timer Display */}
           <div className="text-center space-y-4">
             <div className="text-9xl font-bold tracking-normal">
-              {formatTime(remaining)}
+             {isLoading ? <Spinner className="inline-block ml-2 w-4 h-4" /> : formatTime(remaining)}
             </div>
           </div>
 
