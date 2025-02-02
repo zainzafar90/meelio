@@ -1,83 +1,57 @@
 let interval: NodeJS.Timeout | null = null;
+let currentStart = 0;
+let currentDuration = 0;
 
-// 25 minutes
-const FOCUS_TIME = 25 * 60;
-// 5 minutes
-const BREAK_TIME = 5 * 60;
-
-const state = {
-  isRunning: false,
-  timeLeft: FOCUS_TIME,
-  mode: 'focus',
-};
-
-
-function startTimer() {
-  if (interval) return;
-
-  state.isRunning = true;
-  interval = setInterval(() => {
-
-    // FIX: for switching timers manually it should stop the timer, uncomment this 
-    // if (!state.isRunning) {
-    //   clearInterval(interval!);
-    //   return;
-    // }
-
-    state.timeLeft -= 1;
-
-    if (state.timeLeft <= 0) {
-      // Switch modes automatically
-      state.mode = state.mode === 'focus' ? 'break' : 'focus';
-      state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-    }
-
-    postMessage({ type: 'TICK', ...state });
-  }, 1000);
+function calculateRemaining() {
+  return currentDuration - Math.floor((Date.now() - currentStart) / 1000);
 }
 
-function pauseTimer() {
-  if (interval) {
-    clearInterval(interval);
-    interval = null;
-  }
-  state.isRunning = false;
-  postMessage({ type: 'TICK', ...state });
-}
-
-function resetTimer() {
-  pauseTimer();
-  state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  state.isRunning = false;
-  postMessage({ type: 'TICK', ...state });
-}
-
-function setMode(mode: 'focus' | 'break') {
-  state.mode = mode;
-  state.timeLeft = mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-  state.isRunning = false;
-  postMessage({ type: 'TICK', ...state });
-}
-
-self.onmessage = (event) => {
-  switch (event.data.type) {
-    case 'TICK':
-      postMessage({ type: 'TICK', ...state });
-      break;
+self.onmessage = function(e) {
+  const { type, payload } = e.data;
+  
+  switch(type) {
     case 'START':
-      startTimer();
-      break;
-    case 'PAUSE':
-      pauseTimer();
-      break;
-    case 'RESET':
-      resetTimer();
-      break;
-    case 'SET_MODE':
-      setMode(event.data.mode);
+      if (!interval) {
+        currentStart = Date.now();
+        currentDuration = payload.duration;
+        
+        interval = setInterval(() => {
+          const remaining = calculateRemaining();
+          
+          if (remaining <= 0) {
+            self.postMessage({ type: 'STAGE_COMPLETE' });
+            clearInterval(interval!);
+            interval = null;
+          } else {
+            self.postMessage({ type: 'TICK', remaining });
+          }
+        }, 1000);
+      }
       break;
 
-    default:
-      return;
+    case 'PAUSE':
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+        self.postMessage({ 
+          type: 'PAUSED',
+          remaining: calculateRemaining()
+        });
+      }
+      break;
+
+    case 'RESET':
+      if (interval) clearInterval(interval);
+      interval = null;
+      currentStart = 0;
+      currentDuration = 0;
+      break;
+
+    case 'UPDATE_DURATION':
+      currentDuration = payload.duration;
+      if (interval) {
+        currentStart = Date.now();
+      }
+      break;
   }
-}; 
+};
