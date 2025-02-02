@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
 import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
+
 import TimerWorker from '../workers/timer-worker?worker';
 
 export const WebTimer = () => {
@@ -42,6 +43,7 @@ export const WebTimer = () => {
 
     workerRef.current.onmessage = handleMessage;
     return () => workerRef.current?.terminate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -140,6 +142,13 @@ export const WebTimer = () => {
       lastUpdated: Date.now()
     });
   };
+
+  useEffect(() => {
+    const emoji = activeStage === PomodoroStage.WorkTime ? '🎯' : '☕';
+    const timeStr = formatTime(remaining);
+    const mode = activeStage === PomodoroStage.WorkTime ? 'Focus' : 'Break';
+    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
+  }, [remaining, activeStage, isRunning, stageDurations]);
 
   return (
     <div className="relative">
