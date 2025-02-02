@@ -17,24 +17,23 @@ export const WebTimer = () => {
     startTimestamp,
     stageDurations,
     autoStartTimers,
-    enableSound
   } = usePomodoroStore();
 
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [isLoading, setIsLoading] = useState(false);
 
-
   const completeStage = () => {
     const state = usePomodoroStore.getState();
     const newStats = { ...state.stats };
-    const isFocus = state.activeStage === PomodoroStage.WorkTime;
+    const isFocus = state.activeStage === PomodoroStage.Focus;
 
     if (isFocus) {
       newStats.todaysFocusSessions += 1;
-      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.WorkTime];
+      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
     } else {
-      if (state.activeStage === PomodoroStage.ShortBreak) newStats.todaysShortBreaks += 1;
-      else newStats.todaysLongBreaks += 1;
+      if (state.activeStage === PomodoroStage.Break) {
+        newStats.todaysShortBreaks += 1;
+      }
     }
 
     const nextStage = getNextStage(state);
@@ -58,12 +57,10 @@ export const WebTimer = () => {
   };
 
   const getNextStage = (state: PomodoroState) => {
-    if (state.activeStage === PomodoroStage.WorkTime) {
-      return state.sessionCount + 1 >= state.longBreakInterval
-        ? PomodoroStage.LongBreak
-        : PomodoroStage.ShortBreak;
+    if (state.activeStage === PomodoroStage.Focus) {
+      return PomodoroStage.Break;
     }
-    return PomodoroStage.WorkTime;
+    return PomodoroStage.Focus;
   };
 
   const handleStart = useCallback(() => {
@@ -81,6 +78,11 @@ export const WebTimer = () => {
 
   const handlePause = () => {
     workerRef.current?.postMessage({ type: 'PAUSE' });
+    usePomodoroStore.setState({
+      isRunning: false,
+      startTimestamp: null,
+      lastUpdated: Date.now()
+    });
   };
 
   const handleReset = () => {
@@ -89,7 +91,7 @@ export const WebTimer = () => {
       isRunning: false,
       startTimestamp: null,
       sessionCount: 0,
-      activeStage: PomodoroStage.WorkTime,
+      activeStage: PomodoroStage.Focus,
       lastUpdated: Date.now()
     });
   };
@@ -108,7 +110,6 @@ export const WebTimer = () => {
     });
   };
 
-
   useEffect(() => {
     workerRef.current = new TimerWorker();
 
@@ -118,14 +119,19 @@ export const WebTimer = () => {
           setIsLoading(false);
           setRemaining(data.remaining);
           break;
-
+        case 'PERSIST_REMAINING':
+          usePomodoroStore.setState({
+            pausedRemaining: data.remaining,
+            lastUpdated: Date.now()
+          });
+          break;
         case 'STAGE_COMPLETE':
           completeStage();
           break;
-
         case 'PAUSED':
           usePomodoroStore.setState({
             isRunning: false,
+            startTimestamp: null,
             lastUpdated: Date.now()
           });
           break;
@@ -138,6 +144,7 @@ export const WebTimer = () => {
   }, []);
 
   useEffect(() => {
+    console.log('isRunning', isRunning);
     if (isRunning && startTimestamp && workerRef.current) {
       setIsLoading(true);
       const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
@@ -154,19 +161,34 @@ export const WebTimer = () => {
   useEffect(() => {
     if (isLoading) return;
 
-    const emoji = activeStage === PomodoroStage.WorkTime ? '🎯' : '☕';
+    const emoji = activeStage === PomodoroStage.Focus ? '🎯' : '☕';
     const timeStr = formatTime(remaining);
-    const mode = activeStage === PomodoroStage.WorkTime ? 'Focus' : 'Break';
+    const mode = activeStage === PomodoroStage.Focus ? 'Focus' : 'Break';
 
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
   useEffect(() => {
-    if (autoStartTimers && isRunning && !startTimestamp) {
-      handleStart();
-    }
-  }, [autoStartTimers, isRunning, startTimestamp, handleStart]);
+      if (autoStartTimers && !isRunning && !startTimestamp) {
+        handleStart();
+      }
+  }, [activeStage, autoStartTimers, isRunning, startTimestamp, handleStart]);
 
+  useEffect(() => {
+    return usePomodoroStore.subscribe(
+      (state) => {
+        if (state.lastUpdated > Date.now() - 100) {
+          if (!state.isRunning && state.pausedRemaining !== null) {
+            workerRef.current?.postMessage({
+              type: 'FORCE_SYNC',
+              payload: { duration: state.pausedRemaining }
+            });
+            setRemaining(state.pausedRemaining);
+          }
+        }
+      }
+    );
+  }, []);
 
   return (
     <div className="relative">
@@ -177,14 +199,14 @@ export const WebTimer = () => {
             <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
               <button
                 onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.WorkTime ? 'bg-white/50' : ''
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
                   }`}
               >
                 <span>Focus</span>
               </button>
               <button
                 onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.ShortBreak || activeStage === PomodoroStage.LongBreak ? 'bg-white/50' : ''
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
                   }`}
               >
                 <span>Break</span>

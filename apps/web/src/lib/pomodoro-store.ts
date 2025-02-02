@@ -8,7 +8,6 @@ export interface PomodoroState {
   stats: {
     todaysFocusSessions: number;
     todaysShortBreaks: number;
-    todaysLongBreaks: number;
     todaysFocusTime: number;
   };
   activeStage: PomodoroStage;
@@ -18,10 +17,10 @@ export interface PomodoroState {
   stageDurations: {
     [key in PomodoroStage]: number;
   };
-  longBreakInterval: number;
   lastUpdated: number;
   autoStartTimers: boolean;
   enableSound: boolean;
+  pausedRemaining: number | null;
 }
 
 class PomodoroDB extends Dexie {
@@ -44,21 +43,19 @@ export const usePomodoroStore = create(
     stats: {
       todaysFocusSessions: 0,
       todaysShortBreaks: 0,
-      todaysLongBreaks: 0,
       todaysFocusTime: 0
     },
-    activeStage: PomodoroStage.WorkTime,
+    activeStage: PomodoroStage.Focus,
     isRunning: false,
     startTimestamp: null,
     sessionCount: 0,
     stageDurations: {
-      [PomodoroStage.WorkTime]: 25 * 60,
-      [PomodoroStage.ShortBreak]: 5 * 60,
-      [PomodoroStage.LongBreak]: 15 * 60
+      [PomodoroStage.Focus]: 1 * 60,
+      [PomodoroStage.Break]: 1 * 60,
     },
-    longBreakInterval: 4,
     autoStartTimers: true,
     enableSound: false,
+    pausedRemaining: null,
     lastUpdated: Date.now()
   }))
 );

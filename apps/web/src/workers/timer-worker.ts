@@ -34,9 +34,14 @@ self.onmessage = function(e) {
       if (interval) {
         clearInterval(interval);
         interval = null;
+        const remaining = calculateRemaining();
         self.postMessage({ 
           type: 'PAUSED',
-          remaining: calculateRemaining()
+          remaining
+        });
+        self.postMessage({
+          type: 'PERSIST_REMAINING',
+          remaining
         });
       }
       break;
@@ -52,6 +57,15 @@ self.onmessage = function(e) {
       currentDuration = payload.duration;
       if (interval) {
         currentStart = Date.now();
+      }
+      break;
+
+    case 'FORCE_SYNC':
+      currentDuration = payload.duration;
+      currentStart = Date.now() - (currentDuration - payload.duration) * 1000;
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
       }
       break;
   }
