@@ -9,7 +9,6 @@ type PomodoroStore = {
   stats: {
     todaysFocusSessions: number;
     todaysShortBreaks: number;
-    todaysLongBreaks: number;
     todaysFocusTime: number;
   };
   startTimer: () => void;
@@ -31,23 +30,20 @@ type PomodoroStore = {
 
 export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   timer: {
-    activeStage: PomodoroStage.WorkTime,
+    activeStage: PomodoroStage.Focus,
     running: false,
     remaining: 25 * MINUTE_IN_SECONDS,
     sessionCount: 0,
     stageSeconds: {
-      [PomodoroStage.WorkTime]: 25 * MINUTE_IN_SECONDS,
-      [PomodoroStage.ShortBreak]: 5 * MINUTE_IN_SECONDS,
-      [PomodoroStage.LongBreak]: 15 * MINUTE_IN_SECONDS,
+      [PomodoroStage.Focus]: 25 * MINUTE_IN_SECONDS,
+      [PomodoroStage.Break]: 5 * MINUTE_IN_SECONDS,
     },
-    longBreakInterval: 4,
     autoStartBreaks: true,
     enableSound: true,
   },
   stats: {
     todaysFocusSessions: 0,
     todaysShortBreaks: 0,
-    todaysLongBreaks: 0,
     todaysFocusTime: 0,
   },
   startTimer: () =>
@@ -70,8 +66,8 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       timer: {
         ...state.timer,
         running: false,
-        activeStage: PomodoroStage.WorkTime,
-        remaining: state.timer.stageSeconds[PomodoroStage.WorkTime],
+        activeStage: PomodoroStage.Focus,
+        remaining: state.timer.stageSeconds[PomodoroStage.Focus],
         sessionCount: 0,
       },
     })),
@@ -83,24 +79,17 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
 
   advanceTimer: () =>
     set((state) => {
-      const {
-        activeStage,
-        stageSeconds,
-        sessionCount,
-        longBreakInterval,
-        autoStartBreaks,
-      } = state.timer;
+      const { activeStage, stageSeconds, sessionCount, autoStartBreaks } =
+        state.timer;
       let nextStage: PomodoroStage;
       let newSessionCount = sessionCount;
 
-      if (activeStage === PomodoroStage.WorkTime) {
+      if (activeStage === PomodoroStage.Focus) {
         newSessionCount++;
         nextStage =
-          newSessionCount % longBreakInterval === 0
-            ? PomodoroStage.LongBreak
-            : PomodoroStage.ShortBreak;
+          newSessionCount % 2 === 0 ? PomodoroStage.Break : PomodoroStage.Focus;
       } else {
-        nextStage = PomodoroStage.WorkTime;
+        nextStage = PomodoroStage.Focus;
       }
 
       return {
@@ -108,7 +97,7 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
           ...state.timer,
           activeStage: nextStage,
           remaining: stageSeconds[nextStage],
-          running: autoStartBreaks || nextStage === PomodoroStage.WorkTime,
+          running: autoStartBreaks || nextStage === PomodoroStage.Focus,
           sessionCount: newSessionCount,
         },
       };
@@ -183,10 +172,10 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
 
     const summary = await getTodaysSummary();
 
-    if (timer.activeStage === PomodoroStage.WorkTime) {
+    if (timer.activeStage === PomodoroStage.Focus) {
       summary.focusSessions++;
       summary.totalFocusTime += timer.stageSeconds[timer.activeStage];
-    } else if (timer.activeStage === PomodoroStage.ShortBreak) {
+    } else if (timer.activeStage === PomodoroStage.Break) {
       summary.shortBreaks++;
     } else {
       summary.longBreaks++;
@@ -207,7 +196,6 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       stats: {
         todaysFocusSessions: summary.focusSessions,
         todaysShortBreaks: summary.shortBreaks,
-        todaysLongBreaks: summary.longBreaks,
         todaysFocusTime: summary.totalFocusTime,
       },
     });

@@ -27,9 +27,7 @@ export const TimerControls = ({
     timer: state.timer,
   }));
 
-  const isBreak =
-    timer.activeStage === PomodoroStage.ShortBreak ||
-    timer.activeStage === PomodoroStage.LongBreak;
+  const isBreak = timer.activeStage === PomodoroStage.Break;
 
   return (
     <div className="flex items-center justify-center gap-3">

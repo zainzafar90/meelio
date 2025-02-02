@@ -19,7 +19,7 @@ export const TimerStageButton = ({
   onClick,
   delay = 0,
 }: TimerStageButtonProps) => {
-  const isWorkStage = stage === PomodoroStage.WorkTime;
+  const isWorkStage = stage === PomodoroStage.Focus;
   const isActive = activeStage === stage;
 
   return (
