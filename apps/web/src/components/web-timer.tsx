@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
+import { motion } from "framer-motion";
 import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
-import { Spinner } from '@repo/ui/components/ui/spinner';
+
+import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
 
 import TimerWorker from '../workers/timer-worker?worker';
 
@@ -9,7 +10,7 @@ export const WebTimer = () => {
   const workerRef = useRef<Worker>();
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
   const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
-  
+
   const {
     activeStage,
     isRunning,
@@ -22,18 +23,18 @@ export const WebTimer = () => {
 
   useEffect(() => {
     workerRef.current = new TimerWorker();
-    
+
     const handleMessage = ({ data }: MessageEvent) => {
-      switch(data.type) {
+      switch (data.type) {
         case 'TICK':
           setIsLoading(false);
           setRemaining(data.remaining);
           break;
-          
+
         case 'STAGE_COMPLETE':
           completeStage();
           break;
-          
+
         case 'PAUSED':
           usePomodoroStore.setState({
             isRunning: false,
@@ -45,7 +46,7 @@ export const WebTimer = () => {
 
     workerRef.current.onmessage = handleMessage;
     return () => workerRef.current?.terminate();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -105,7 +106,7 @@ export const WebTimer = () => {
 
   const getNextStage = (state: PomodoroState) => {
     if (state.activeStage === PomodoroStage.WorkTime) {
-      return state.sessionCount + 1 >= state.longBreakInterval 
+      return state.sessionCount + 1 >= state.longBreakInterval
         ? PomodoroStage.LongBreak
         : PomodoroStage.ShortBreak;
     }
@@ -114,7 +115,7 @@ export const WebTimer = () => {
 
   const handleStart = () => {
     const duration = usePomodoroStore.getState().stageDurations[activeStage];
-    workerRef.current?.postMessage({ 
+    workerRef.current?.postMessage({
       type: 'START',
       payload: { duration }
     });
@@ -158,24 +159,22 @@ export const WebTimer = () => {
 
   return (
     <div className="relative">
-      <div className="max-w-full w-80 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+      <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
         <div className="p-6 space-y-10">
           {/* Timer Mode Tabs */}
           <div className="w-full">
             <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
               <button
                 onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                  activeStage === PomodoroStage.WorkTime ? 'bg-white/50' : ''
-                }`}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.WorkTime ? 'bg-white/50' : ''
+                  }`}
               >
                 <span>Focus</span>
               </button>
               <button
                 onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                    activeStage === PomodoroStage.ShortBreak || activeStage === PomodoroStage.LongBreak ? 'bg-white/50' : ''
-                }`}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.ShortBreak || activeStage === PomodoroStage.LongBreak ? 'bg-white/50' : ''
+                  }`}
               >
                 <span>Break</span>
               </button>
@@ -184,8 +183,8 @@ export const WebTimer = () => {
 
           {/* Timer Display */}
           <div className="text-center space-y-4">
-            <div className="text-9xl font-bold tracking-normal">
-             {isLoading ? <Spinner className="inline-block ml-2 w-4 h-4" /> : formatTime(remaining)}
+            <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+              {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
             </div>
           </div>
 
@@ -209,7 +208,7 @@ export const WebTimer = () => {
                 role="button"
               >
                 {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                <span className="ml-2 uppercase">{isRunning ? 'Stop' : 'Start'}</span>
+                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : 'Start'}</span>
               </button>
 
               <button
@@ -236,7 +235,7 @@ export const WebTimer = () => {
             {/* Progress Bar */}
             <div className="h-1.5 bg-gray-200/20 rounded-full">
               <div
-                className="h-full bg-green-500 rounded-full transition-all"
+                className="h-full bg-gray-100 rounded-full transition-all"
                 style={{
                   width: `${((stageDurations[activeStage] - remaining) / stageDurations[activeStage]) * 100}%`
                 }}
@@ -263,3 +262,30 @@ export const WebTimer = () => {
     </div>
   );
 };
+
+function TimeSkeleton() {
+  return (
+    <motion.div
+      className="flex items-center justify-center gap-2"
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: [0.5, 0.8, 0.5] }}
+      transition={{
+        duration: 1.5,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut",
+      }}
+    >
+      {/* Hours */}
+      <div className="h-12 w-12 sm:w-[72px] sm:h-[72px] md:w-32 md:h-32 bg-white/80 rounded-lg backdrop-blur-sm" />
+
+      {/* Colon */}
+      <div className="flex flex-col gap-2">
+        <div className="h-1.5 w-1.5 sm:w-4 sm:h-4 bg-white/80 rounded-full backdrop-blur-sm" />
+        <div className="h-1.5 w-1.5 sm:w-4 sm:h-4 bg-white/80 rounded-full backdrop-blur-sm" />
+      </div>
+
+      {/* Minutes */}
+      <div className="h-12 w-12 sm:w-[72px] sm:h-[72px] md:w-32 md:h-32 bg-white/80 rounded-lg backdrop-blur-sm" />
+    </motion.div>
+  )
+}
