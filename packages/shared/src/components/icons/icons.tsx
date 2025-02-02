@@ -429,6 +429,24 @@ export const Icons = {
       />
     </svg>
   ),
+  graph: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        opacity=".5"
+        className="fill-current"
+        d="M6 23H2a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1Z"
+      />
+      <path
+        className="fill-current"
+        d="M14 23h-4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v20a1 1 0 0 1-1 1Z"
+      />
+      <path
+        opacity=".25"
+        className="fill-current"
+        d="M22 23h-4a1 1 0 0 1-1-1V10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1Z"
+      />
+    </svg>
+  ),
   google: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

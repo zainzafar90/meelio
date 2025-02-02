@@ -189,7 +189,7 @@ export const Dock = () => {
               <div className="group relative flex items-center justify-center">
                 <div
                   className={cn(
-                    "flex size-12 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+                    "flex size-10 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
                     "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
                   )}
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
