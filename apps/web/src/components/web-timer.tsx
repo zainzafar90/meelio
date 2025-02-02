@@ -15,7 +15,9 @@ export const WebTimer = () => {
     activeStage,
     isRunning,
     startTimestamp,
-    stageDurations
+    stageDurations,
+    autoStartTimers,
+    enableSound
   } = usePomodoroStore();
 
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);

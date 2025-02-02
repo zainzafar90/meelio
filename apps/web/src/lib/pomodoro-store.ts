@@ -1,4 +1,3 @@
-// src/lib/pomodoro-store.ts (Main thread only)
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import Dexie from 'dexie';
@@ -21,6 +20,8 @@ export interface PomodoroState {
   };
   longBreakInterval: number;
   lastUpdated: number;
+  autoStartTimers: boolean;
+  enableSound: boolean;
 }
 
 class PomodoroDB extends Dexie {
@@ -38,7 +39,7 @@ const db = new PomodoroDB();
 const broadcastChannel = new BroadcastChannel('pomodoro-sync');
 
 export const usePomodoroStore = create(
-  subscribeWithSelector<PomodoroState>((set, get) => ({
+  subscribeWithSelector<PomodoroState>(() => ({
     id: 1,
     stats: {
       todaysFocusSessions: 0,
@@ -56,6 +57,8 @@ export const usePomodoroStore = create(
       [PomodoroStage.LongBreak]: 15 * 60
     },
     longBreakInterval: 4,
+    autoStartTimers: true,
+    enableSound: false,
     lastUpdated: Date.now()
   }))
 );
@@ -66,22 +69,23 @@ broadcastChannel.onmessage = async (event) => {
     const remoteState = event.data.state;
     const localState = usePomodoroStore.getState();
 
-    console.log('remoteState', remoteState);
-    console.log('localState', localState);
-    
     if (remoteState.lastUpdated > localState.lastUpdated) {
       usePomodoroStore.setState(remoteState);
     }
   }
 };
 
-// Persistence logic
+/**
+ * Persist state to DB and broadcast to other tabs
+ */
 usePomodoroStore.subscribe(async (state) => {
   await db.state.put({ ...state, id: 1 });
   broadcastChannel.postMessage({ type: 'STATE_UPDATE', state });
 });
 
-// Initialize store from DB
+/**
+ * Initialize store from DB
+ */
 db.state.get(1).then((savedState) => {
   if (savedState) usePomodoroStore.setState(savedState);
 });
