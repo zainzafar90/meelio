@@ -19,6 +19,7 @@ self.onmessage = function(e) {
           const remaining = calculateRemaining();
           
           if (remaining <= 0) {
+            self.postMessage({ type: 'TICK', remaining });
             self.postMessage({ type: 'STAGE_COMPLETE' });
             clearInterval(interval!);
             interval = null;

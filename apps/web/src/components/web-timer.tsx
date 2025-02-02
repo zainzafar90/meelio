@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
 
@@ -22,6 +22,92 @@ export const WebTimer = () => {
 
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [isLoading, setIsLoading] = useState(false);
+
+
+  const completeStage = () => {
+    const state = usePomodoroStore.getState();
+    const newStats = { ...state.stats };
+    const isFocus = state.activeStage === PomodoroStage.WorkTime;
+
+    if (isFocus) {
+      newStats.todaysFocusSessions += 1;
+      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.WorkTime];
+    } else {
+      if (state.activeStage === PomodoroStage.ShortBreak) newStats.todaysShortBreaks += 1;
+      else newStats.todaysLongBreaks += 1;
+    }
+
+    const nextStage = getNextStage(state);
+    const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
+
+    usePomodoroStore.setState({
+      stats: newStats,
+      activeStage: nextStage,
+      sessionCount: newSessionCount,
+      isRunning: false,
+      startTimestamp: null,
+      lastUpdated: Date.now()
+    });
+
+    if (nextStage !== state.activeStage) {
+      workerRef.current?.postMessage({
+        type: 'UPDATE_DURATION',
+        payload: { duration: state.stageDurations[nextStage] }
+      });
+    }
+  };
+
+  const getNextStage = (state: PomodoroState) => {
+    if (state.activeStage === PomodoroStage.WorkTime) {
+      return state.sessionCount + 1 >= state.longBreakInterval
+        ? PomodoroStage.LongBreak
+        : PomodoroStage.ShortBreak;
+    }
+    return PomodoroStage.WorkTime;
+  };
+
+  const handleStart = useCallback(() => {
+    const duration = usePomodoroStore.getState().stageDurations[activeStage];
+    workerRef.current?.postMessage({
+      type: 'START',
+      payload: { duration }
+    });
+    usePomodoroStore.setState({
+      isRunning: true,
+      startTimestamp: Date.now(),
+      lastUpdated: Date.now()
+    });
+  }, [activeStage]);
+
+  const handlePause = () => {
+    workerRef.current?.postMessage({ type: 'PAUSE' });
+  };
+
+  const handleReset = () => {
+    workerRef.current?.postMessage({ type: 'RESET' });
+    usePomodoroStore.setState({
+      isRunning: false,
+      startTimestamp: null,
+      sessionCount: 0,
+      activeStage: PomodoroStage.WorkTime,
+      lastUpdated: Date.now()
+    });
+  };
+
+  const handleSwitch = () => {
+    const nextStage = getNextStage(usePomodoroStore.getState());
+    workerRef.current?.postMessage({
+      type: 'UPDATE_DURATION',
+      payload: { duration: stageDurations[nextStage] }
+    });
+    usePomodoroStore.setState({
+      activeStage: nextStage,
+      isRunning: false,
+      startTimestamp: null,
+      lastUpdated: Date.now()
+    });
+  };
+
 
   useEffect(() => {
     workerRef.current = new TimerWorker();
@@ -66,97 +152,20 @@ export const WebTimer = () => {
   }, [isRunning, startTimestamp, activeStage, stageDurations]);
 
   useEffect(() => {
+    if (isLoading) return;
+
     const emoji = activeStage === PomodoroStage.WorkTime ? '🎯' : '☕';
     const timeStr = formatTime(remaining);
     const mode = activeStage === PomodoroStage.WorkTime ? 'Focus' : 'Break';
-    console.log('document.title', document.title);
+
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
-  }, [remaining, activeStage, isRunning, stageDurations]);
+  }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
-  const completeStage = () => {
-    const state = usePomodoroStore.getState();
-    const newStats = { ...state.stats };
-    const isFocus = state.activeStage === PomodoroStage.WorkTime;
-
-    if (isFocus) {
-      newStats.todaysFocusSessions += 1;
-      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.WorkTime];
-    } else {
-      if (state.activeStage === PomodoroStage.ShortBreak) newStats.todaysShortBreaks += 1;
-      else newStats.todaysLongBreaks += 1;
+  useEffect(() => {
+    if (autoStartTimers && isRunning && !startTimestamp) {
+      handleStart();
     }
-
-    const nextStage = getNextStage(state);
-    const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
-
-    usePomodoroStore.setState({
-      stats: newStats,
-      activeStage: nextStage,
-      sessionCount: newSessionCount,
-      isRunning: false,
-      startTimestamp: null,
-      lastUpdated: Date.now()
-    });
-
-    if (nextStage !== state.activeStage) {
-      workerRef.current?.postMessage({
-        type: 'UPDATE_DURATION',
-        payload: { duration: state.stageDurations[nextStage] }
-      });
-    }
-  };
-
-  const getNextStage = (state: PomodoroState) => {
-    if (state.activeStage === PomodoroStage.WorkTime) {
-      return state.sessionCount + 1 >= state.longBreakInterval
-        ? PomodoroStage.LongBreak
-        : PomodoroStage.ShortBreak;
-    }
-    return PomodoroStage.WorkTime;
-  };
-
-  const handleStart = () => {
-    const duration = usePomodoroStore.getState().stageDurations[activeStage];
-    workerRef.current?.postMessage({
-      type: 'START',
-      payload: { duration }
-    });
-    usePomodoroStore.setState({
-      isRunning: true,
-      startTimestamp: Date.now(),
-      lastUpdated: Date.now()
-    });
-  };
-
-  const handlePause = () => {
-    workerRef.current?.postMessage({ type: 'PAUSE' });
-  };
-
-  const handleReset = () => {
-    workerRef.current?.postMessage({ type: 'RESET' });
-    usePomodoroStore.setState({
-      isRunning: false,
-      startTimestamp: null,
-      sessionCount: 0,
-      activeStage: PomodoroStage.WorkTime,
-      lastUpdated: Date.now()
-    });
-  };
-
-  const handleSwitch = () => {
-    const nextStage = getNextStage(usePomodoroStore.getState());
-    workerRef.current?.postMessage({
-      type: 'UPDATE_DURATION',
-      payload: { duration: stageDurations[nextStage] }
-    });
-    usePomodoroStore.setState({
-      activeStage: nextStage,
-      isRunning: false,
-      startTimestamp: null,
-      lastUpdated: Date.now()
-    });
-  };
-
+  }, [autoStartTimers, isRunning, startTimestamp, handleStart]);
 
 
   return (
