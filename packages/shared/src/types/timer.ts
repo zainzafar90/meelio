@@ -1,4 +1,5 @@
 export interface TimerState {
-  remaining: number;
   isRunning: boolean;
+  timeLeft: number;
+  mode: "focus" | "break";
 }

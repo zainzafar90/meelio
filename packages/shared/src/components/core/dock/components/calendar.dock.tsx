@@ -22,12 +22,13 @@ export const CalendarDock = () => {
   return (
     <div
       className={cn(
-        "relative flex size-10 cursor-pointer flex-col overflow-hidden rounded-xl bg-zinc-900 shadow-lg",
-        "bg-gradient-to-b from-zinc-800 to-zinc-900"
+        "flex size-10 items-center justify-center rounded-xl shadow-lg",
+        "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
+        "flex-col overflow-hidden"
       )}
       title={`${month} ${day}`}
     >
-      <div className="bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
+      <div className="w-full bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
         {month}
       </div>
       <div className="flex flex-grow items-center justify-center">

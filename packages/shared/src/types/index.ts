@@ -4,3 +4,4 @@ export * from "./combo";
 export * from "./pomodoro";
 export * from "./sound";
 export * from "./subscription";
+export * from "./timer";

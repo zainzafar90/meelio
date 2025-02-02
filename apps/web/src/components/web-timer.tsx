@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import { formatTime, Icons, TimerSettingsDialog, TimerState, TimerStatsDialog, useDisclosure, useInterval } from "@repo/shared";
+import { formatTime, Icons, TimerSettingsDialog,  TimerState,  TimerStatsDialog, useDisclosure, useInterval } from "@repo/shared";
 import { useState } from "react";
 
 import TimerWorker from '../workers/timer-worker?worker';
