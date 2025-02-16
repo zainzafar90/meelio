@@ -7,12 +7,12 @@ export interface PomodoroState {
   id: number;
   stats: {
     todaysFocusSessions: number;
-    todaysShortBreaks: number;
+    todaysBreaks: number;
     todaysFocusTime: number;
   };
   activeStage: PomodoroStage;
   isRunning: boolean;
-  startTimestamp: number | null;
+  endTimestamp: number | null;
   sessionCount: number;
   stageDurations: {
     [key in PomodoroStage]: number;
@@ -25,7 +25,7 @@ export interface PomodoroState {
 
 class PomodoroDB extends Dexie {
   state!: Dexie.Table<PomodoroState, number>;
-  
+
   constructor() {
     super('meelio:pomodoro');
     this.version(1).stores({
@@ -35,23 +35,23 @@ class PomodoroDB extends Dexie {
 }
 
 const db = new PomodoroDB();
-const broadcastChannel = new BroadcastChannel('pomodoro-sync');
+const broadcastChannel = new BroadcastChannel('meelio:broadcast:pomodoro-sync');
 
 export const usePomodoroStore = create(
   subscribeWithSelector<PomodoroState>(() => ({
     id: 1,
     stats: {
       todaysFocusSessions: 0,
-      todaysShortBreaks: 0,
+      todaysBreaks: 0,
       todaysFocusTime: 0
     },
     activeStage: PomodoroStage.Focus,
     isRunning: false,
-    startTimestamp: null,
+    endTimestamp: null,
     sessionCount: 0,
     stageDurations: {
-      [PomodoroStage.Focus]: 1 * 60,
-      [PomodoroStage.Break]: 1 * 60,
+      [PomodoroStage.Focus]: 1 * 10,
+      [PomodoroStage.Break]: 1 * 10,
     },
     autoStartTimers: true,
     enableSound: false,
@@ -84,5 +84,7 @@ usePomodoroStore.subscribe(async (state) => {
  * Initialize store from DB
  */
 db.state.get(1).then((savedState) => {
-  if (savedState) usePomodoroStore.setState(savedState);
+  if (savedState) {
+    usePomodoroStore.setState(savedState);
+  }
 });

@@ -172,8 +172,7 @@
   "timer": {
     "stages": {
       "focus": "Focus",
-      "shortBreak": "Short Break",
-      "longBreak": "Long Break"
+      "shortBreak": "Short Break"
     },
     "stats": {
       "title": "Stats",
@@ -196,8 +195,7 @@
       },
       "pomodoro": {
         "label": "Pomodoro",
-        "shortBreak": "Short Break",
-        "longBreak": "Long Break"
+        "shortBreak": "Short Break"
       },
       "autoStart": {
         "label": "Auto Start Breaks",

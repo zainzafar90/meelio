@@ -14,7 +14,7 @@ export const WebTimer = () => {
   const {
     activeStage,
     isRunning,
-    startTimestamp,
+    endTimestamp,
     stageDurations,
     autoStartTimers,
   } = usePomodoroStore();
@@ -32,19 +32,20 @@ export const WebTimer = () => {
       newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
     } else {
       if (state.activeStage === PomodoroStage.Break) {
-        newStats.todaysShortBreaks += 1;
+        newStats.todaysBreaks += 1;
       }
     }
 
     const nextStage = getNextStage(state);
     const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
+    const duration = usePomodoroStore.getState().stageDurations[activeStage];
 
     usePomodoroStore.setState({
       stats: newStats,
       activeStage: nextStage,
       sessionCount: newSessionCount,
-      isRunning: false,
-      startTimestamp: null,
+      isRunning: autoStartTimers ? true : false,
+      endTimestamp: autoStartTimers ? Date.now()  + (duration * 1000) : null,
       lastUpdated: Date.now()
     });
 
@@ -71,7 +72,7 @@ export const WebTimer = () => {
     });
     usePomodoroStore.setState({
       isRunning: true,
-      startTimestamp: Date.now(),
+      endTimestamp: Date.now()  + (duration * 1000),
       lastUpdated: Date.now()
     });
   }, [activeStage]);
@@ -80,7 +81,7 @@ export const WebTimer = () => {
     workerRef.current?.postMessage({ type: 'PAUSE' });
     usePomodoroStore.setState({
       isRunning: false,
-      startTimestamp: null,
+      endTimestamp: null,
       lastUpdated: Date.now()
     });
   };
@@ -89,7 +90,7 @@ export const WebTimer = () => {
     workerRef.current?.postMessage({ type: 'RESET' });
     usePomodoroStore.setState({
       isRunning: false,
-      startTimestamp: null,
+      endTimestamp: null,
       sessionCount: 0,
       activeStage: PomodoroStage.Focus,
       lastUpdated: Date.now()
@@ -105,9 +106,10 @@ export const WebTimer = () => {
     usePomodoroStore.setState({
       activeStage: nextStage,
       isRunning: false,
-      startTimestamp: null,
+      endTimestamp: null,
       lastUpdated: Date.now()
     });
+    setRemaining(stageDurations[nextStage]);
   };
 
   useEffect(() => {
@@ -119,19 +121,13 @@ export const WebTimer = () => {
           setIsLoading(false);
           setRemaining(data.remaining);
           break;
-        case 'PERSIST_REMAINING':
-          usePomodoroStore.setState({
-            pausedRemaining: data.remaining,
-            lastUpdated: Date.now()
-          });
-          break;
         case 'STAGE_COMPLETE':
           completeStage();
           break;
         case 'PAUSED':
           usePomodoroStore.setState({
             isRunning: false,
-            startTimestamp: null,
+            endTimestamp: null,
             lastUpdated: Date.now()
           });
           break;
@@ -144,19 +140,17 @@ export const WebTimer = () => {
   }, []);
 
   useEffect(() => {
-    console.log('isRunning', isRunning);
-    if (isRunning && startTimestamp && workerRef.current) {
-      setIsLoading(true);
-      const elapsedSeconds = Math.floor((Date.now() - startTimestamp) / 1000);
-      const originalDuration = stageDurations[activeStage];
-      const remainingTime = originalDuration - elapsedSeconds;
+    console.log('isRunning', isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers);
+
+    if (isRunning && endTimestamp && workerRef.current) {
+      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
       if (remainingTime > 0) {
         workerRef.current.postMessage({ type: 'START', payload: { duration: remainingTime } });
       } else {
         workerRef.current.postMessage({ type: 'STAGE_COMPLETE' });
       }
     }
-  }, [isRunning, startTimestamp, activeStage, stageDurations]);
+  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers, handleStart]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -167,12 +161,6 @@ export const WebTimer = () => {
 
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
-
-  useEffect(() => {
-      if (autoStartTimers && !isRunning && !startTimestamp) {
-        handleStart();
-      }
-  }, [activeStage, autoStartTimers, isRunning, startTimestamp, handleStart]);
 
   useEffect(() => {
     return usePomodoroStore.subscribe(
@@ -270,10 +258,10 @@ export const WebTimer = () => {
               <div
                 className="h-full bg-gray-100 rounded-full transition-all"
                 style={{
-                  width: `${((stageDurations[activeStage] - remaining) / stageDurations[activeStage]) * 100}%`
+                  width: `${(remaining / stageDurations[activeStage]) * 100}%`
                 }}
                 role="progressbar"
-                aria-valuenow={((stageDurations[activeStage] - remaining) / stageDurations[activeStage]) * 100}
+                aria-valuenow={(remaining / stageDurations[activeStage]) * 100}
                 aria-valuemin={0}
                 aria-valuemax={100}
               />

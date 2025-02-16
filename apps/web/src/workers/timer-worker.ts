@@ -1,25 +1,26 @@
 let interval: NodeJS.Timeout | null = null;
-let currentStart = 0;
+let endTime = 0;
 let currentDuration = 0;
 
 function calculateRemaining() {
-  return currentDuration - Math.floor((Date.now() - currentStart) / 1000);
+  return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
 }
 
-self.onmessage = function(e) {
+self.onmessage = function (e) {
   const { type, payload } = e.data;
-  
-  switch(type) {
+
+  switch (type) {
     case 'START':
       if (!interval) {
-        currentStart = Date.now();
         currentDuration = payload.duration;
-        
+        endTime = Date.now() + (currentDuration * 1000);
+
+        self.postMessage({ type: 'TICK', remaining: currentDuration });
         interval = setInterval(() => {
           const remaining = calculateRemaining();
-          
+
           if (remaining <= 0) {
-            self.postMessage({ type: 'TICK', remaining });
+            self.postMessage({ type: 'TICK', remaining: 0 });
             self.postMessage({ type: 'STAGE_COMPLETE' });
             clearInterval(interval!);
             interval = null;
@@ -35,34 +36,31 @@ self.onmessage = function(e) {
         clearInterval(interval);
         interval = null;
         const remaining = calculateRemaining();
-        self.postMessage({ 
+        self.postMessage({
           type: 'PAUSED',
           remaining
         });
-        self.postMessage({
-          type: 'PERSIST_REMAINING',
-          remaining
-        });
+
       }
       break;
 
     case 'RESET':
       if (interval) clearInterval(interval);
       interval = null;
-      currentStart = 0;
+      endTime = 0;
       currentDuration = 0;
       break;
 
     case 'UPDATE_DURATION':
       currentDuration = payload.duration;
       if (interval) {
-        currentStart = Date.now();
+        endTime = Date.now() + (currentDuration * 1000);
       }
       break;
 
     case 'FORCE_SYNC':
       currentDuration = payload.duration;
-      currentStart = Date.now() - (currentDuration - payload.duration) * 1000;
+      endTime = Date.now() + (payload.duration * 1000);
       if (interval) {
         clearInterval(interval);
         interval = null;
