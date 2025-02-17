@@ -116,6 +116,7 @@ export const ExtensionTimer = () => {
           completeStage();
           break;
         case 'PAUSED':
+          setRemaining(msg.remaining);
           usePomodoroStore.setState({
             isRunning: false,
             endTimestamp: null,
@@ -131,7 +132,7 @@ export const ExtensionTimer = () => {
 
   useEffect(() => {
     if (isRunning && endTimestamp) {
-      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000)+1);
+      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
       if (remainingTime > 0) {
         chrome.runtime.sendMessage({ type: 'START', duration: remainingTime });
       } else {
