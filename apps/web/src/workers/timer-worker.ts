@@ -58,13 +58,13 @@ self.onmessage = function (e) {
       }
       break;
 
-    case 'FORCE_SYNC':
-      currentDuration = payload.duration;
-      endTime = Date.now() + (payload.duration * 1000);
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
-      break;
+    // case 'FORCE_SYNC':
+    //   currentDuration = payload.duration;
+    //   endTime = Date.now() + (payload.duration * 1000);
+    //   if (interval) {
+    //     clearInterval(interval);
+    //     interval = null;
+    //   }
+    //   break;
   }
 };

@@ -185,21 +185,21 @@ export const WebTimer = () => {
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
-  useEffect(() => {
-    return usePomodoroStore.subscribe(
-      (state) => {
-        if (state.lastUpdated > Date.now() - 100) {
-          if (!state.isRunning && state.pausedRemaining !== null) {
-            workerRef.current?.postMessage({
-              type: 'FORCE_SYNC',
-              payload: { duration: state.pausedRemaining }
-            });
-            setRemaining(state.pausedRemaining);
-          }
-        }
-      }
-    );
-  }, []);
+  // useEffect(() => {
+  //   return usePomodoroStore.subscribe(
+  //     (state) => {
+  //       if (state.lastUpdated > Date.now() - 100) {
+  //         if (!state.isRunning && state.pausedRemaining !== null) {
+  //           workerRef.current?.postMessage({
+  //             type: 'FORCE_SYNC',
+  //             payload: { duration: state.pausedRemaining }
+  //           });
+  //           setRemaining(state.pausedRemaining);
+  //         }
+  //       }
+  //     }
+  //   );
+  // }, []);
 
   return (
     <div className="relative">
