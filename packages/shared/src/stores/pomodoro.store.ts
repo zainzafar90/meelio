@@ -8,8 +8,9 @@ type PomodoroStore = {
   timer: PomodoroTimer;
   stats: {
     todaysFocusSessions: number;
-    todaysShortBreaks: number;
+    todaysBreaks: number;
     todaysFocusTime: number;
+    todaysBreakTime: number;
   };
   startTimer: () => void;
   pauseTimer: () => void;
@@ -43,8 +44,9 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   },
   stats: {
     todaysFocusSessions: 0,
-    todaysShortBreaks: 0,
+    todaysBreaks: 0,
     todaysFocusTime: 0,
+    todaysBreakTime: 0,
   },
   startTimer: () =>
     set((state) => {
@@ -176,9 +178,8 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       summary.focusSessions++;
       summary.totalFocusTime += timer.stageSeconds[timer.activeStage];
     } else if (timer.activeStage === PomodoroStage.Break) {
-      summary.shortBreaks++;
-    } else {
-      summary.longBreaks++;
+      summary.breaks++;
+      summary.totalBreakTime += timer.stageSeconds[timer.activeStage];
     }
 
     await db.dailySummaries.put(summary);
@@ -195,8 +196,9 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       },
       stats: {
         todaysFocusSessions: summary.focusSessions,
-        todaysShortBreaks: summary.shortBreaks,
+        todaysBreaks: summary.breaks,
         todaysFocusTime: summary.totalFocusTime,
+        todaysBreakTime: summary.totalBreakTime,
       },
     });
   },

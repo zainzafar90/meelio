@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { PomodoroStage, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
-import {  PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
+import { PomodoroState, usePomodoroStore, addPomodoroSession, addPomodoroSummary } from "../lib/pomodoro-store";
 import { motion } from "framer-motion";
 
 export const ExtensionTimer = () => {
@@ -17,18 +17,18 @@ export const ExtensionTimer = () => {
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [hasStarted, setHasStarted] = useState(false);
 
-  const completeStage = () => {
+  const completeStage = async () => {
     const state = usePomodoroStore.getState();
+    const completedStage = state.activeStage;
     const newStats = { ...state.stats };
-    const isFocus = state.activeStage === PomodoroStage.Focus;
+    const isFocus = completedStage === PomodoroStage.Focus;
 
     if (isFocus) {
       newStats.todaysFocusSessions += 1;
       newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
-    } else {
-      if (state.activeStage === PomodoroStage.Break) {
-        newStats.todaysBreaks += 1;
-      }
+    } else if (completedStage === PomodoroStage.Break) {
+      newStats.todaysBreaks += 1;
+      newStats.todaysBreakTime += state.stageDurations[PomodoroStage.Break];
     }
 
     const nextStage = getNextStage(state);
@@ -40,17 +40,29 @@ export const ExtensionTimer = () => {
       activeStage: nextStage,
       sessionCount: newSessionCount,
       isRunning: autoStartTimers ? true : false,
-      endTimestamp: autoStartTimers ? Date.now() + (duration * 1000) : null,
+      endTimestamp: autoStartTimers ? Date.now() + duration * 1000 : null,
       lastUpdated: Date.now()
     });
 
-
-    if (nextStage !== state.activeStage) {
+    if (nextStage !== completedStage) {
       chrome.runtime.sendMessage({
-        type: 'UPDATE_DURATION',
+        type: "UPDATE_DURATION",
         duration
       });
     }
+    
+    addPomodoroSession( {
+      timestamp: Date.now(),
+      stage: completedStage,
+      duration: state.stageDurations[completedStage],
+      completed: true,
+    }).catch((error) =>
+      console.error("Failed to record session stat:", error)
+    );
+
+    addPomodoroSummary(state.stageDurations[completedStage], completedStage).catch((error) =>
+      console.error("Failed to record summary stat:", error)
+    );
   };
 
   const getNextStage = ( state: PomodoroState) => {

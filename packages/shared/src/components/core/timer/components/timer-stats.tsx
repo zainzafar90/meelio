@@ -43,7 +43,7 @@ export const TimerStats = memo(() => {
       const formattedData = weeklySummary.map((day) => ({
         date: day.date,
         focus: Math.round(day.totalFocusTime / MINUTE_IN_SECONDS),
-        breaks: Math.round(day.shortBreaks * 5 + day.longBreaks * 15),
+        breaks: Math.round(day.totalBreakTime / MINUTE_IN_SECONDS),
       }));
       setChartData(formattedData);
     };

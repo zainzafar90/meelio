@@ -12,9 +12,9 @@ export interface DailySummary {
   id?: number;
   date: string; // YYYY-MM-DD format
   focusSessions: number;
-  shortBreaks: number;
-  longBreaks: number;
+  breaks: number;
   totalFocusTime: number; // in seconds
+  totalBreakTime: number; // in seconds
 }
 
 export class PomodoroDB extends Dexie {
@@ -22,7 +22,7 @@ export class PomodoroDB extends Dexie {
   dailySummaries!: Table<DailySummary>;
 
   constructor() {
-    super("pomodoro-db");
+    super("meelio:pomodoro");
     this.version(1).stores({
       sessions: "++id, timestamp",
       dailySummaries: "++id, date",
@@ -40,9 +40,9 @@ export const getTodaysSummary = async (): Promise<DailySummary> => {
     return {
       date: today,
       focusSessions: 0,
-      shortBreaks: 0,
-      longBreaks: 0,
+      breaks: 0,
       totalFocusTime: 0,
+      totalBreakTime: 0,
     };
   }
 
@@ -67,9 +67,9 @@ export const getWeeklySummary = async (): Promise<DailySummary[]> => {
         summary || {
           date,
           focusSessions: 0,
-          shortBreaks: 0,
-          longBreaks: 0,
+          breaks: 0,
           totalFocusTime: 0,
+          totalBreakTime: 0,
         }
       );
     })

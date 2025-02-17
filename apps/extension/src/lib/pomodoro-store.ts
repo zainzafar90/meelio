@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { PomodoroStage } from '@repo/shared';
+import { PomodoroSession, PomodoroStage, db, getTodaysSummary } from '@repo/shared';
 
 export interface PomodoroState {
   stats: {
     todaysFocusSessions: number;
     todaysBreaks: number;
     todaysFocusTime: number;
+    todaysBreakTime: number;
   };
   activeStage: PomodoroStage;
   isRunning: boolean;
@@ -26,15 +27,16 @@ export const usePomodoroStore = create(
     stats: {
       todaysFocusSessions: 0,
       todaysBreaks: 0,
-      todaysFocusTime: 0
+      todaysFocusTime: 0,
+      todaysBreakTime: 0,
     },
     activeStage: PomodoroStage.Focus,
     isRunning: false,
     endTimestamp: null,
     sessionCount: 0,
     stageDurations: {
-      [PomodoroStage.Focus]: 20 * 60,
-      [PomodoroStage.Break]: 5 * 60,
+      [PomodoroStage.Focus]: 1 * 10,
+      [PomodoroStage.Break]: 1 * 5,
     },
     autoStartTimers: true,
     enableSound: false,
@@ -53,4 +55,25 @@ chrome.storage.local.get('pomodoroState').then((result) => {
   if (result.pomodoroState) {
     usePomodoroStore.setState(result.pomodoroState);
   }
-}); 
+});
+
+
+export function addPomodoroSession(session: PomodoroSession): Promise<number> {
+  return db.sessions.add(session);
+} 
+
+
+export async function addPomodoroSummary(duration: number, stage: PomodoroStage): Promise<number> {
+  const todaysSummary = await getTodaysSummary();
+
+  if (stage === PomodoroStage.Focus) {
+    todaysSummary.focusSessions++;
+    todaysSummary.totalFocusTime += duration;
+  } else if (stage === PomodoroStage.Break) {
+    todaysSummary.breaks++;
+    todaysSummary.totalBreakTime += duration;
+  }
+
+  return db.dailySummaries.put(todaysSummary);
+
+}
