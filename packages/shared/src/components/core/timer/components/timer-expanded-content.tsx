@@ -15,18 +15,10 @@ export const TimerExpandedContent = memo(() => {
 
   return (
     <div className="space-y-4">
-      <TimerSessionIndicators
-        sessionCount={timer.sessionCount}
-        longBreakInterval={timer.longBreakInterval}
-        activeStage={timer.activeStage}
-      />
+      <TimerSessionIndicators sessionCount={timer.sessionCount} />
 
       <div className="grid grid-cols-3 gap-3">
-        {[
-          PomodoroStage.WorkTime,
-          PomodoroStage.ShortBreak,
-          PomodoroStage.LongBreak,
-        ].map((stage, index) => (
+        {[PomodoroStage.Focus, PomodoroStage.Break].map((stage, index) => (
           <TimerStageButton
             key={stage}
             stage={stage}

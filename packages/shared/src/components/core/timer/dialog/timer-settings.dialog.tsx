@@ -54,16 +54,14 @@ export const TimerSettingsDialog = ({
   const form = useForm<TimerSettingsValues>({
     resolver: zodResolver(timerSettingsSchema as any),
     defaultValues: {
-      workTime: stageSeconds[PomodoroStage.WorkTime] / MINUTE_IN_SECONDS,
-      shortBreak: stageSeconds[PomodoroStage.ShortBreak] / MINUTE_IN_SECONDS,
-      longBreak: stageSeconds[PomodoroStage.LongBreak] / MINUTE_IN_SECONDS,
+      workTime: stageSeconds[PomodoroStage.Focus] / MINUTE_IN_SECONDS,
+      shortBreak: stageSeconds[PomodoroStage.Break] / MINUTE_IN_SECONDS,
     },
   });
 
   const handleSave = (data: TimerSettingsValues) => {
-    changeTimerSettings(PomodoroStage.WorkTime, data.workTime);
-    changeTimerSettings(PomodoroStage.ShortBreak, data.shortBreak);
-    changeTimerSettings(PomodoroStage.LongBreak, data.longBreak);
+    changeTimerSettings(PomodoroStage.Focus, data.workTime);
+    changeTimerSettings(PomodoroStage.Break, data.shortBreak);
 
     toast.success(t("timer.settings.toast.success"), {
       description: t("timer.settings.toast.description"),
@@ -151,34 +149,6 @@ export const TimerSettingsDialog = ({
                       autoCorrect="off"
                       autoCapitalize="none"
                       autoComplete="short-break"
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
-                  )}
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <label
-                htmlFor="long-break"
-                className="block text-sm font-medium leading-6 text-foreground"
-              >
-                {t("timer.settings.pomodoro.longBreak")}
-              </label>
-              <div className="mt-2">
-                <Controller
-                  name="longBreak"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      min={0}
-                      max={POMODORO_MAX_MINUTES}
-                      type="number"
-                      id="long-break"
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      autoComplete="long-break"
                       value={field.value}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     />

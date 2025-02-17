@@ -9,18 +9,11 @@ import { PomodoroStage } from "../types";
 | used to display the next stage of the pomodoro timer. 
 |
 */
-export const getNextStage = (
-  activeStage: PomodoroStage,
-  sessionCount: number,
-  longBreakInterval: number
-) => {
-  if (activeStage === PomodoroStage.WorkTime) {
-    const isLongBreakDue =
-      sessionCount > 0 && sessionCount % longBreakInterval === 0;
-    return isLongBreakDue ? PomodoroStage.LongBreak : PomodoroStage.ShortBreak;
-  } else {
-    return PomodoroStage.WorkTime;
+export const getNextStage = (activeStage: PomodoroStage) => {
+  if (activeStage === PomodoroStage.Focus) {
+    return PomodoroStage.Break;
   }
+  return PomodoroStage.Focus;
 };
 
 /*
@@ -38,7 +31,7 @@ export const getSessionCount = (
 ) => {
   let newSessionCount = sessionCount;
 
-  if (activeStage === PomodoroStage.WorkTime) {
+  if (activeStage === PomodoroStage.Focus) {
     newSessionCount++;
   }
   return newSessionCount;

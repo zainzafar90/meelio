@@ -1,90 +1,71 @@
 let interval: NodeJS.Timeout | null = null;
+let endTime = 0;
+let currentDuration = 0;
 
-// 25 minutes
-const FOCUS_TIME = 25 * 60;
-// 5 minutes
-const BREAK_TIME = 5 * 60;
-
-const state = {
-  isRunning: false,
-  timeLeft: FOCUS_TIME,
-  mode: 'focus',
-};
-
-
-function startTimer(sendResponse: (response: any) => void) {
-  if (interval) return;
-  
-  state.isRunning = true;
-  interval = setInterval(() => {
-
-    // FIX: for switching timers manually it should stop the timer, uncomment this 
-    // if (!state.isRunning) {
-    //   clearInterval(interval!);
-    //   return;
-    // }
-
-    state.timeLeft -= 1;
-
-    if (state.timeLeft <= 0) {
-      // Switch modes automatically
-      state.mode = state.mode === 'focus' ? 'break' : 'focus';
-      state.timeLeft = state.mode === 'focus' ? FOCUS_TIME : BREAK_TIME;
-    }
-
-    sendResponse({ type: 'TICK', ...state });
-  }, 1000);
-}
-
-function pauseTimer(sendResponse: (response: any) => void) {
-  if (interval) {
-    clearInterval(interval);
-    interval = null;
-  }
-  state.isRunning = false;
-  sendResponse({ type: 'TICK', ...state });
-}
-
-function resetTimer(sendResponse: (response: any) => void) {
-  pauseTimer(sendResponse);
-  state.timeLeft = state.mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  state.isRunning = false;
-  sendResponse({ type: 'TICK', ...state });
-}
-
-function setMode(sendResponse: (response: any) => void, mode: 'focus' | 'break') {
-  state.mode = mode;
-  state.timeLeft = mode === "focus" ? FOCUS_TIME : BREAK_TIME;
-  state.isRunning = false;
-  sendResponse({ type: 'TICK', ...state });
+function calculateRemaining() {
+  return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
-    case "TICK":
-      sendResponse({ type: 'TICK', ...state });
-      break;
-    case "START":
-      startTimer(sendResponse);
-      break;
-    case "PAUSE":
-      pauseTimer(sendResponse);
-      break;
-    case "RESET":
-      resetTimer(sendResponse);
-      break;
-    case "SET_MODE":
-      setMode(sendResponse, message.mode);
-      break;
-    default:
-      sendResponse({ error: "Unknown message type" });
-  }
-  return true; // Keep message channel open for async response
-});
+    case 'START':
+      if (!interval) {
+        currentDuration = message.duration;
+        endTime = Date.now() + (currentDuration * 1000);
 
-// Reset timer when extension is installed/updated
+        chrome.runtime.sendMessage({ type: 'TICK', remaining: currentDuration });
+        interval = setInterval(() => {
+          const remaining = calculateRemaining();
+
+          if (remaining <= 0) {
+            chrome.runtime.sendMessage({ type: 'TICK', remaining: 0 });
+            chrome.runtime.sendMessage({ type: 'STAGE_COMPLETE' });
+            clearInterval(interval!);
+            interval = null;
+          } else {
+            chrome.runtime.sendMessage({ type: 'TICK', remaining });
+          }
+        }, 1000);
+      }
+      break;
+
+    case 'PAUSE':
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+        const remaining = calculateRemaining();
+        chrome.runtime.sendMessage({ type: 'PAUSED', remaining });
+      } 
+      break;
+
+    case 'RESET':
+      if (interval) clearInterval(interval);
+      interval = null;
+      endTime = 0;
+      currentDuration = 0;
+      break;
+
+    case 'UPDATE_DURATION':
+      currentDuration = message.duration;
+      if (interval) {
+        endTime = Date.now() + (currentDuration * 1000);
+      }
+      break;
+
+    // case 'FORCE_SYNC':
+    //   currentDuration = message.duration;
+    //   endTime = Date.now() + (message.duration * 1000);
+    //   if (interval) {
+    //     clearInterval(interval);
+    //     interval = null;
+    //   }
+    //   break;
+      
+  }
+}); 
+
 chrome.runtime.onInstalled.addListener(() => {
-    state.isRunning = false;
-    state.timeLeft = FOCUS_TIME;
-    state.mode = "focus";
+  interval = null;
+  endTime = 0;
+  currentDuration = 0;
 }); 

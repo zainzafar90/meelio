@@ -172,12 +172,7 @@ export const TimerOld = () => {
   // Update document title when timer state changes
   useEffect(() => {
     const time = formatTimeForTitle(timerState.timeLeft);
-    const mode =
-      timerState.mode === "focus"
-        ? "Focus"
-        : timerState.mode === "short-break"
-          ? "Break"
-          : "Long Break";
+    const mode = timerState.mode === "focus" ? "Focus" : "Break";
     const icon = timerState.mode === "focus" ? "🎯" : "☕️";
     document.title = `${time} - ${mode} ${icon}`;
   }, [timerState]);
@@ -343,11 +338,7 @@ export const TimerOld = () => {
                   duration: 0.25,
                 }}
               >
-                {timerState.mode === "focus"
-                  ? "Focus Time"
-                  : timerState.mode === "short-break"
-                    ? "Short Break"
-                    : "Long Break"}
+                {timerState.mode === "focus" ? "Focus Time" : "Break"}
               </motion.p>
             </motion.div>
             <TimerControls

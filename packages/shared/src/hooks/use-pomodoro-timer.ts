@@ -44,9 +44,7 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
   }, [timer.enableSound, updateTimer, advanceTimer]);
 
   useEffect(() => {
-    const isBreak =
-      timer.activeStage === PomodoroStage.ShortBreak ||
-      timer.activeStage === PomodoroStage.LongBreak;
+    const isBreak = timer.activeStage === PomodoroStage.Break;
     const faviconPath = isBreak ? "/favicon-break.ico" : "/favicon.ico";
     changeFavicon(faviconPath);
   }, [timer.activeStage]);
@@ -59,7 +57,7 @@ export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
     };
 
     if (timer.running) {
-      const isFocus = timer.activeStage === PomodoroStage.WorkTime;
+      const isFocus = timer.activeStage === PomodoroStage.Focus;
 
       document.title = `${formatTime(timer.remaining)} ${
         isFocus ? "\u00A0💡\u00B7\u00A0Focus" : "\u00A0✨\u00B7\u00A0Break"

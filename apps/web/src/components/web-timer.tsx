@@ -1,105 +1,210 @@
+import { useEffect, useRef, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
 
-import { useEffect } from "react";
-import { formatTime, Icons, TimerSettingsDialog,  TimerState,  TimerStatsDialog, useDisclosure, useInterval } from "@repo/shared";
-import { useState } from "react";
+import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
 
 import TimerWorker from '../workers/timer-worker?worker';
 
-const worker = new TimerWorker();
-
 export const WebTimer = () => {
-  const [focusedMinutes, setFocusedMinutes] = useState(0);
-  const [breakMinutes, setBreakMinutes] = useState(0);
+  const workerRef = useRef<Worker>();
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
   const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
+  const {
+    activeStage,
+    isRunning,
+    endTimestamp,
+    stageDurations,
+    autoStartTimers,
+  } = usePomodoroStore();
+  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
-  const [timer, setTimer] = useState<TimerState>({
-    timeLeft: 25 * 60,
-    isRunning: false,
-    mode: "focus",
-  });
 
+  const completeStage = () => {
+    const state = usePomodoroStore.getState();
+    const newStats = { ...state.stats };
+    const isFocus = state.activeStage === PomodoroStage.Focus;
 
-  const heartbeatListener = (event: any) => {
-    if (event.data.type === 'TICK') {
-      setTimer({
-        timeLeft: event.data.timeLeft,
-        isRunning: event.data.isRunning,
-        mode: event.data.mode,
+    if (isFocus) {
+      newStats.todaysFocusSessions += 1;
+      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
+    } else {
+      if (state.activeStage === PomodoroStage.Break) {
+        newStats.todaysBreaks += 1;
+      }
+    }
+
+    const nextStage = getNextStage(state);
+    const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
+    const duration = usePomodoroStore.getState().stageDurations[activeStage];
+
+    usePomodoroStore.setState({
+      stats: newStats,
+      activeStage: nextStage,
+      sessionCount: newSessionCount,
+      isRunning: autoStartTimers ? true : false,
+      endTimestamp: autoStartTimers ? Date.now()  + (duration * 1000) : null,
+      lastUpdated: Date.now()
+    });
+
+    if (nextStage !== state.activeStage) {
+      workerRef.current?.postMessage({
+        type: 'UPDATE_DURATION',
+        payload: { duration: state.stageDurations[nextStage] }
       });
     }
   };
 
+  const getNextStage = (state: PomodoroState) => {
+    if (state.activeStage === PomodoroStage.Focus) {
+      return PomodoroStage.Break;
+    }
+    return PomodoroStage.Focus;
+  };
+
+  const handleStart = useCallback(() => {
+    setHasStarted(true);
+    const duration = usePomodoroStore.getState().stageDurations[activeStage];
+    workerRef.current?.postMessage({
+      type: 'START',
+      payload: { duration }
+    });
+    usePomodoroStore.setState({
+      isRunning: true,
+      endTimestamp: Date.now()  + (duration * 1000),
+      lastUpdated: Date.now()
+    });
+  }, [activeStage]);
+
+  const handlePause = () => {
+    workerRef.current?.postMessage({ type: 'PAUSE' });
+    usePomodoroStore.setState({
+      isRunning: false,
+      endTimestamp: null,
+      lastUpdated: Date.now()
+    });
+  };
+
+  const handleResume = () => {
+    usePomodoroStore.setState({
+      isRunning: true,
+      endTimestamp: Date.now() + remaining * 1000,
+      lastUpdated: Date.now()
+    });
+  };
+
+  const handleReset = () => {
+    workerRef.current?.postMessage({ type: 'RESET' });
+    usePomodoroStore.setState({
+      isRunning: false,
+      endTimestamp: null,
+      sessionCount: 0,
+      activeStage: PomodoroStage.Focus,
+      lastUpdated: Date.now()
+    });
+    setHasStarted(false);
+  };
+
+  const handleSwitch = () => {
+    const nextStage = getNextStage(usePomodoroStore.getState());
+    workerRef.current?.postMessage({
+      type: 'UPDATE_DURATION',
+      payload: { duration: stageDurations[nextStage] }
+    });
+    usePomodoroStore.setState({
+      activeStage: nextStage,
+      isRunning: false,
+      endTimestamp: null,
+      lastUpdated: Date.now()
+    });
+    setRemaining(stageDurations[nextStage]);
+  };
+
   useEffect(() => {
-    worker.onmessage = heartbeatListener;
+    workerRef.current = new TimerWorker();
+
+    const handleMessage = ({ data }: MessageEvent) => {
+      switch (data.type) {
+        case 'TICK':
+          setIsLoading(false);
+          setRemaining(data.remaining);
+          break;
+        case 'STAGE_COMPLETE':
+          completeStage();
+          break;
+        case 'PAUSED':
+          setRemaining(data.remaining);
+          usePomodoroStore.setState({
+            isRunning: false,
+            endTimestamp: null,
+            lastUpdated: Date.now()
+          });
+          break;
+      }
+    };
+
+    workerRef.current.onmessage = handleMessage;
+    return () => workerRef.current?.terminate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useInterval(() => {
-    worker.onmessage = heartbeatListener;
-  }, 1000);
-
-  // TODO: remove listener when component unmounts
-  // useEffect(() => {
-  //   return () => {
-  //     worker.onmessage = null;
-  //     worker.terminate();
-  //   };
-  // }, []);
-
   useEffect(() => {
-    if (timer.mode === 'focus') {
-      setFocusedMinutes(prev => prev + 25);
-    } else {
-      setBreakMinutes(prev => prev + 5);
+    if (isRunning && endTimestamp && workerRef.current) {
+      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
+      if (remainingTime > 0) {
+        workerRef.current.postMessage({ type: 'START', payload: { duration: remainingTime } });
+      } else {
+        workerRef.current.postMessage({ type: 'STAGE_COMPLETE' });
+      }
     }
-  }, [timer.mode]);
+  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers]);
 
   useEffect(() => {
-    const emoji = timer.mode === 'focus' ? '🎯' : '☕';
-    const timeStr = formatTime(timer.timeLeft);
-    document.title = timer.isRunning
-      ? `${focusedMinutes}:${breakMinutes} ${emoji} ${timeStr} - ${timer.mode === 'focus' ? 'Focus' : 'Break'}`
-      : 'Meelio - focus, calm, & productivity';
-  }, [timer.timeLeft, timer.mode, timer.isRunning, focusedMinutes, breakMinutes]);
+    if (isLoading) return;
 
-  const handleStart = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    worker.postMessage({ type: 'START' });
-  }
+    const emoji = activeStage === PomodoroStage.Focus ? '🎯' : '☕';
+    const timeStr = formatTime(remaining);
+    const mode = activeStage === PomodoroStage.Focus ? 'Focus' : 'Break';
 
-  const handlePause = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    worker.postMessage({ type: 'PAUSE' });
-  }
+    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
+  }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
-  const handleReset = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    worker.postMessage({ type: 'RESET' });
-  }
-
-  const handleSwitch = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    worker.postMessage({ type: 'SET_MODE', mode: timer.mode === 'focus' ? 'break' : 'focus' });
-  }
+  useEffect(() => {
+    return usePomodoroStore.subscribe(
+      (state) => {
+        if (state.lastUpdated > Date.now() - 100) {
+          if (!state.isRunning && state.pausedRemaining !== null) {
+            workerRef.current?.postMessage({
+              type: 'FORCE_SYNC',
+              payload: { duration: state.pausedRemaining }
+            });
+            setRemaining(state.pausedRemaining);
+          }
+        }
+      }
+    );
+  }, []);
 
   return (
     <div className="relative">
-      <div className="max-w-full w-80 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+      <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
         <div className="p-6 space-y-10">
           {/* Timer Mode Tabs */}
           <div className="w-full">
             <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
               <button
                 onClick={handleSwitch}
-                className={(`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${timer.mode === 'focus' ? 'bg-white/50' : ''
-                  }`)}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
+                  }`}
               >
                 <span>Focus</span>
               </button>
               <button
                 onClick={handleSwitch}
-                className={(`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${timer.mode === 'break' ? 'bg-white/50' : ''
-                  }`)}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
+                  }`}
               >
                 <span>Break</span>
               </button>
@@ -108,26 +213,16 @@ export const WebTimer = () => {
 
           {/* Timer Display */}
           <div className="text-center space-y-4">
-            <div className="text-9xl font-bold tracking-normal">
-              {formatTime(timer.timeLeft)}
+            <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+              {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
             </div>
-
           </div>
 
-          {/* Current Task
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-3">
-            <span className="text-xl">{timer.mode === 'focus' ? '🎯' : '☕'}</span>
-            <p className="font-medium truncate">
-              {timer.mode === 'focus' ? 'Focus Time' : 'Break Time'}
-            </p>
-          </div> */}
-
           <div className="flex flex-col gap-4">
-
             {/* Control Buttons */}
             <div className="flex items-center justify-between gap-4">
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
+                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={handleReset}
                 title="Reset timer"
                 role="button"
@@ -137,18 +232,17 @@ export const WebTimer = () => {
               </button>
 
               <button
-                className="cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm "
-                onClick={timer.isRunning ? handlePause : handleStart}
+                className="cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
+                onClick={isRunning ? handlePause : hasStarted ? handleResume : handleStart}
                 title="Switch timer"
                 role="button"
               >
-                {timer.isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                <span className="ml-2 uppercase">{timer.isRunning ? 'Stop' : 'Start'}</span>
+                {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
+                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}</span>
               </button>
 
-
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
+                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={handleSwitch}
                 title="Switch timer"
                 role="button"
@@ -158,7 +252,7 @@ export const WebTimer = () => {
               </button>
 
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm "
+                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={toggleStatsDialog}
                 title="Stats"
                 role="button"
@@ -166,24 +260,22 @@ export const WebTimer = () => {
                 <Icons.graph className="size-4 text-white/90" />
                 <span className="sr-only">Stats</span>
               </button>
-
             </div>
 
             {/* Progress Bar */}
             <div className="h-1.5 bg-gray-200/20 rounded-full">
               <div
-                className="h-full bg-green-500 rounded-full transition-all"
+                className="h-full bg-gray-100 rounded-full transition-all"
                 style={{
-                  width: `${(timer.timeLeft / (timer.mode === 'focus' ? 25 * 60 : 5 * 60)) * 50}%`
+                  width: `${(remaining / stageDurations[activeStage]) * 100}%`
                 }}
                 role="progressbar"
-                aria-valuenow={(timer.timeLeft / (timer.mode === 'focus' ? 25 * 60 : 5 * 60)) * 100}
+                aria-valuenow={(remaining / stageDurations[activeStage]) * 100}
                 aria-valuemin={0}
                 aria-valuemax={100}
               />
             </div>
           </div>
-
         </div>
       </div>
 
@@ -200,3 +292,30 @@ export const WebTimer = () => {
     </div>
   );
 };
+
+function TimeSkeleton() {
+  return (
+    <motion.div
+      className="flex items-center justify-center gap-2"
+      initial={{ opacity: 0.5 }}
+      animate={{ opacity: [0.5, 0.8, 0.5] }}
+      transition={{
+        duration: 1.5,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: "easeInOut",
+      }}
+    >
+      {/* Hours */}
+      <div className="h-12 w-12 sm:w-[72px] sm:h-[72px] md:w-32 md:h-32 bg-white/80 rounded-lg backdrop-blur-sm" />
+
+      {/* Colon */}
+      <div className="flex flex-col gap-2">
+        <div className="h-1.5 w-1.5 sm:w-4 sm:h-4 bg-white/80 rounded-full backdrop-blur-sm" />
+        <div className="h-1.5 w-1.5 sm:w-4 sm:h-4 bg-white/80 rounded-full backdrop-blur-sm" />
+      </div>
+
+      {/* Minutes */}
+      <div className="h-12 w-12 sm:w-[72px] sm:h-[72px] md:w-32 md:h-32 bg-white/80 rounded-lg backdrop-blur-sm" />
+    </motion.div>
+  )
+}

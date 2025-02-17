@@ -24,19 +24,16 @@ export type PomodoroTimer = {
   stageSeconds: {
     [key in PomodoroStage]: number;
   };
-  longBreakInterval: number;
   autoStartBreaks: boolean;
   enableSound: boolean;
 };
 
 export enum PomodoroStage {
-  WorkTime = 0,
-  ShortBreak = 1,
-  LongBreak = 2,
+  Focus = 0,
+  Break = 1,
 }
 
 export const PomodoroStageMap = {
-  [PomodoroStage.WorkTime]: t("timer.stages.focus"),
-  [PomodoroStage.ShortBreak]: t("timer.stages.shortBreak"),
-  [PomodoroStage.LongBreak]: t("timer.stages.longBreak"),
+  [PomodoroStage.Focus]: t("timer.stages.focus"),
+  [PomodoroStage.Break]: t("timer.stages.shortBreak"),
 };
