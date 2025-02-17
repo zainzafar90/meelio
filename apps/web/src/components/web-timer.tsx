@@ -19,6 +19,8 @@ export const WebTimer = () => {
   } = usePomodoroStore();
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+
 
   const completeStage = () => {
     const state = usePomodoroStore.getState();
@@ -63,6 +65,7 @@ export const WebTimer = () => {
   };
 
   const handleStart = useCallback(() => {
+    setHasStarted(true);
     const duration = usePomodoroStore.getState().stageDurations[activeStage];
     workerRef.current?.postMessage({
       type: 'START',
@@ -84,6 +87,18 @@ export const WebTimer = () => {
     });
   };
 
+  const handleResume = () => {
+    workerRef.current?.postMessage({
+      type: 'RESUME',
+      payload: { duration: remaining },
+    });
+    usePomodoroStore.setState({
+      isRunning: true,
+      endTimestamp: Date.now() + remaining * 1000,
+      lastUpdated: Date.now()
+    });
+  };
+
   const handleReset = () => {
     workerRef.current?.postMessage({ type: 'RESET' });
     usePomodoroStore.setState({
@@ -93,6 +108,7 @@ export const WebTimer = () => {
       activeStage: PomodoroStage.Focus,
       lastUpdated: Date.now()
     });
+    setHasStarted(false);
   };
 
   const handleSwitch = () => {
@@ -123,6 +139,7 @@ export const WebTimer = () => {
           completeStage();
           break;
         case 'PAUSED':
+          setRemaining(data.remaining);
           usePomodoroStore.setState({
             isRunning: false,
             endTimestamp: null,
@@ -220,12 +237,12 @@ export const WebTimer = () => {
 
               <button
                 className="cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
-                onClick={isRunning ? handlePause : handleStart}
+                onClick={isRunning ? handlePause : hasStarted ? handleResume : handleStart}
                 title="Switch timer"
                 role="button"
               >
                 {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : 'Start'}</span>
+                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}</span>
               </button>
 
               <button

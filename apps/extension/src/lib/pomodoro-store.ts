@@ -33,8 +33,8 @@ export const usePomodoroStore = create(
     endTimestamp: null,
     sessionCount: 0,
     stageDurations: {
-      [PomodoroStage.Focus]: 1 * 10,
-      [PomodoroStage.Break]: 1 * 10,
+      [PomodoroStage.Focus]: 20 * 60,
+      [PomodoroStage.Break]: 5 * 60,
     },
     autoStartTimers: true,
     enableSound: false,
