@@ -36,7 +36,7 @@ export const usePomodoroStore = create(
       [PomodoroStage.Focus]: 1 * 10,
       [PomodoroStage.Break]: 1 * 10,
     },
-    autoStartTimers: false,
+    autoStartTimers: true,
     enableSound: false,
     pausedRemaining: null,
     lastUpdated: Date.now()

@@ -131,9 +131,9 @@ export const ExtensionTimer = () => {
 
   useEffect(() => {
     if (isRunning && endTimestamp) {
-      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
+      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000)+1);
       if (remainingTime > 0) {
-        chrome.runtime.sendMessage({ type: 'START', payload: { duration: remainingTime } });
+        chrome.runtime.sendMessage({ type: 'START', duration: remainingTime });
       } else {
         chrome.runtime.sendMessage({ type: 'STAGE_COMPLETE' });
       }
