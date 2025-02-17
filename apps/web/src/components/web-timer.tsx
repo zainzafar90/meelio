@@ -10,7 +10,6 @@ export const WebTimer = () => {
   const workerRef = useRef<Worker>();
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
   const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
-
   const {
     activeStage,
     isRunning,
@@ -18,7 +17,6 @@ export const WebTimer = () => {
     stageDurations,
     autoStartTimers,
   } = usePomodoroStore();
-
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -140,8 +138,6 @@ export const WebTimer = () => {
   }, []);
 
   useEffect(() => {
-    console.log('isRunning', isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers);
-
     if (isRunning && endTimestamp && workerRef.current) {
       const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
       if (remainingTime > 0) {
@@ -150,7 +146,7 @@ export const WebTimer = () => {
         workerRef.current.postMessage({ type: 'STAGE_COMPLETE' });
       }
     }
-  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers, handleStart]);
+  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers]);
 
   useEffect(() => {
     if (isLoading) return;
