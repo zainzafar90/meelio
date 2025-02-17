@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { formatTime, Icons, PomodoroStage, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
+import { formatTime, Icons, PomodoroStage, PomodoroState, TimerSettingsDialog, TimerStatsDialog, useDisclosure, addPomodoroSession, addPomodoroSummary } from "@repo/shared";
 
-import { PomodoroState, usePomodoroStore } from "../lib/pomodoro-store";
+import { usePomodoroStore } from "../lib/pomodoro-store";
 
 import TimerWorker from '../workers/timer-worker?worker';
 
@@ -17,23 +17,23 @@ export const WebTimer = () => {
     stageDurations,
     autoStartTimers,
   } = usePomodoroStore();
-  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
 
-  const completeStage = () => {
+  const completeStage = async () => {
     const state = usePomodoroStore.getState();
+    const completedStage = state.activeStage;
     const newStats = { ...state.stats };
-    const isFocus = state.activeStage === PomodoroStage.Focus;
+    const isFocus = completedStage === PomodoroStage.Focus;
 
     if (isFocus) {
       newStats.todaysFocusSessions += 1;
       newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
-    } else {
-      if (state.activeStage === PomodoroStage.Break) {
-        newStats.todaysBreaks += 1;
-      }
+    } else if (completedStage === PomodoroStage.Break) {
+      newStats.todaysBreaks += 1;
+      newStats.todaysBreakTime += state.stageDurations[PomodoroStage.Break];
     }
 
     const nextStage = getNextStage(state);
@@ -55,6 +55,19 @@ export const WebTimer = () => {
         payload: { duration: state.stageDurations[nextStage] }
       });
     }
+
+    addPomodoroSession( {
+      timestamp: Date.now(),
+      stage: completedStage,
+      duration: state.stageDurations[completedStage],
+      completed: true,
+    }).catch((error) =>
+      console.error("Failed to record session stat:", error)
+    );
+
+    addPomodoroSummary(state.stageDurations[completedStage], completedStage).catch((error) =>
+      console.error("Failed to record summary stat:", error)
+    );
   };
 
   const getNextStage = (state: PomodoroState) => {
@@ -64,19 +77,20 @@ export const WebTimer = () => {
     return PomodoroStage.Focus;
   };
 
-  const handleStart = useCallback(() => {
+  const handleStart = () => {
     setHasStarted(true);
     const duration = usePomodoroStore.getState().stageDurations[activeStage];
     workerRef.current?.postMessage({
       type: 'START',
       payload: { duration }
     });
+    
     usePomodoroStore.setState({
       isRunning: true,
       endTimestamp: Date.now()  + (duration * 1000),
       lastUpdated: Date.now()
     });
-  }, [activeStage]);
+  };
 
   const handlePause = () => {
     workerRef.current?.postMessage({ type: 'PAUSE' });

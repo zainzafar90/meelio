@@ -1,40 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import Dexie from 'dexie';
-import { PomodoroStage } from '@repo/shared';
+import { PomodoroStage, PomodoroState, db } from '@repo/shared';
 
-export interface PomodoroState {
-  id: number;
-  stats: {
-    todaysFocusSessions: number;
-    todaysBreaks: number;
-    todaysFocusTime: number;
-  };
-  activeStage: PomodoroStage;
-  isRunning: boolean;
-  endTimestamp: number | null;
-  sessionCount: number;
-  stageDurations: {
-    [key in PomodoroStage]: number;
-  };
-  lastUpdated: number;
-  autoStartTimers: boolean;
-  enableSound: boolean;
-  pausedRemaining: number | null;
-}
-
-class PomodoroDB extends Dexie {
-  state!: Dexie.Table<PomodoroState, number>;
-
-  constructor() {
-    super('meelio:pomodoro');
-    this.version(1).stores({
-      state: '++id,lastUpdated'
-    });
-  }
-}
-
-const db = new PomodoroDB();
 const broadcastChannel = new BroadcastChannel('meelio:broadcast:pomodoro-sync');
 
 export const usePomodoroStore = create(
@@ -43,15 +10,16 @@ export const usePomodoroStore = create(
     stats: {
       todaysFocusSessions: 0,
       todaysBreaks: 0,
-      todaysFocusTime: 0
+      todaysFocusTime: 0,
+      todaysBreakTime: 0,
     },
     activeStage: PomodoroStage.Focus,
     isRunning: false,
     endTimestamp: null,
     sessionCount: 0,
     stageDurations: {
-      [PomodoroStage.Focus]: 20 * 60,
-      [PomodoroStage.Break]: 5 * 60,
+      [PomodoroStage.Focus]: 1 * 10,
+      [PomodoroStage.Break]: 1 * 5,
     },
     autoStartTimers: true,
     enableSound: false,

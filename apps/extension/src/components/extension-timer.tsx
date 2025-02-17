@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { PomodoroStage, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure } from "@repo/shared";
-import { PomodoroState, usePomodoroStore, addPomodoroSession, addPomodoroSummary } from "../lib/pomodoro-store";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
+import { usePomodoroStore } from "../lib/pomodoro-store";
 import { motion } from "framer-motion";
 
 export const ExtensionTimer = () => {
@@ -14,8 +14,8 @@ export const ExtensionTimer = () => {
     autoStartTimers,
   } = usePomodoroStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
   const [hasStarted, setHasStarted] = useState(false);
+  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
   const completeStage = async () => {
     const state = usePomodoroStore.getState();
@@ -73,24 +73,16 @@ export const ExtensionTimer = () => {
   };
 
   const handleStart = () => {
+    setHasStarted(true);
     const duration = usePomodoroStore.getState().stageDurations[activeStage];
     chrome.runtime.sendMessage({ 
       type: 'START', 
       duration 
     });
     
-    setHasStarted(true);
     usePomodoroStore.setState({
       isRunning: true,
       endTimestamp: Date.now() + (duration * 1000),
-      lastUpdated: Date.now()
-    });
-  };
-
-  const handleResume = () => {
-    usePomodoroStore.setState({
-      isRunning: true,
-      endTimestamp: Date.now() + remaining * 1000,
       lastUpdated: Date.now()
     });
   };
@@ -100,6 +92,14 @@ export const ExtensionTimer = () => {
     usePomodoroStore.setState({
       isRunning: false,
       endTimestamp: null,
+      lastUpdated: Date.now()
+    });
+  };
+
+  const handleResume = () => {
+    usePomodoroStore.setState({
+      isRunning: true,
+      endTimestamp: Date.now() + remaining * 1000,
       lastUpdated: Date.now()
     });
   };
