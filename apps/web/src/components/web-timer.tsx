@@ -88,10 +88,6 @@ export const WebTimer = () => {
   };
 
   const handleResume = () => {
-    workerRef.current?.postMessage({
-      type: 'RESUME',
-      payload: { duration: remaining },
-    });
     usePomodoroStore.setState({
       isRunning: true,
       endTimestamp: Date.now() + remaining * 1000,

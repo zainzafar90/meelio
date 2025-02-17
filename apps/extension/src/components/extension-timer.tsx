@@ -76,10 +76,6 @@ export const ExtensionTimer = () => {
   };
 
   const handleResume = () => {
-    chrome.runtime.sendMessage({
-      type: 'RESUME',
-      duration: remaining,
-    });
     usePomodoroStore.setState({
       isRunning: true,
       endTimestamp: Date.now() + remaining * 1000,
