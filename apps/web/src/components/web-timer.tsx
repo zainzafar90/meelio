@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { formatTime, Icons, PomodoroStage, PomodoroState, TimerSettingsDialog, TimerStatsDialog, useDisclosure, addPomodoroSession, addPomodoroSummary } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
 
 import { usePomodoroStore } from "../lib/pomodoro-store";
 
@@ -38,18 +38,18 @@ export const WebTimer = () => {
 
     const nextStage = getNextStage(state);
     const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
-    const duration = usePomodoroStore.getState().stageDurations[activeStage];
+    const duration = state.stageDurations[nextStage];
 
     usePomodoroStore.setState({
       stats: newStats,
       activeStage: nextStage,
       sessionCount: newSessionCount,
       isRunning: autoStartTimers ? true : false,
-      endTimestamp: autoStartTimers ? Date.now()  + (duration * 1000) : null,
+      endTimestamp: autoStartTimers ? Date.now() + duration * 1000 : null,
       lastUpdated: Date.now()
     });
 
-    if (nextStage !== state.activeStage) {
+    if (nextStage !== completedStage) {
       workerRef.current?.postMessage({
         type: 'UPDATE_DURATION',
         payload: { duration: state.stageDurations[nextStage] }
@@ -87,7 +87,7 @@ export const WebTimer = () => {
     
     usePomodoroStore.setState({
       isRunning: true,
-      endTimestamp: Date.now()  + (duration * 1000),
+      endTimestamp: Date.now() + (duration * 1000),
       lastUpdated: Date.now()
     });
   };

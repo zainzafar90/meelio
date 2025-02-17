@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
-import { usePomodoroStore } from "../lib/pomodoro-store";
 import { motion } from "framer-motion";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
+
+import { usePomodoroStore } from "../lib/pomodoro-store";
 
 export const ExtensionTimer = () => {
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
@@ -50,7 +51,7 @@ export const ExtensionTimer = () => {
         duration
       });
     }
-    
+
     addPomodoroSession( {
       timestamp: Date.now(),
       stage: completedStage,
@@ -65,7 +66,7 @@ export const ExtensionTimer = () => {
     );
   };
 
-  const getNextStage = ( state: PomodoroState) => {
+  const getNextStage = (state: PomodoroState) => {
     if (state.activeStage === PomodoroStage.Focus) {
       return PomodoroStage.Break;
     }
@@ -118,7 +119,7 @@ export const ExtensionTimer = () => {
 
   const handleSwitch = () => {
     const nextStage = getNextStage(usePomodoroStore.getState());
-    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: usePomodoroStore.getState().stageDurations[nextStage] });
+    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: stageDurations[nextStage] });
     usePomodoroStore.setState({
       activeStage: nextStage,
       isRunning: false,
