@@ -93,7 +93,11 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     const isCurrentlyActive = get().isActive;
     const newIsActive = !isCurrentlyActive;
 
-    set({ isActive: newIsActive });
+    set({
+      isActive: newIsActive,
+      phase: "inhale",
+      count: 0,
+    });
 
     if (newIsActive) {
       playBreathingSound("inhale");
