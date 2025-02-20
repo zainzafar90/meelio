@@ -15,6 +15,7 @@ import {
   Quote,
   SoundscapesSheet,
   Dock,
+  SiteBlockerSheet
 } from "@repo/shared";
 
 import { ExtensionTimer } from "./components/extension-timer";
@@ -37,11 +38,11 @@ const Home = () => {
 };
 
 const Content = () => {
+  const { t } = useTranslation();
   const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
   }));
-  const { t } = useTranslation();
 
   return (
     <main
@@ -53,6 +54,7 @@ const Content = () => {
       <SoundscapesSheet />
       <TodoListSheet />
       <BackgroundSelectorSheet />
+      <SiteBlockerSheet />
     </main>
   );
 };

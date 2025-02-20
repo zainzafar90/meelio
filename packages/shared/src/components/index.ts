@@ -31,7 +31,6 @@ export * from "./core/clock";
 
 // Dock components
 export * from "./core/dock/dock";
-export * from "./core/dock/components/background.dock";
 export * from "./core/dock/components/calendar.dock";
 export * from "./core/dock/components/clock.dock";
 export * from "./core/dock/components/language-switcher.dock";
@@ -92,6 +91,9 @@ export * from "./core/todo-list/components/create-list";
 export * from "./core/todo-list/components/create-task";
 export * from "./core/todo-list/components/task-list";
 export * from "./core/todo-list/todo-list.sheet";
+
+// Site Blocker
+export * from "./core/site-blocker/site-blocker.sheet";
 
 // ------------- ICONS -------------
 export * from "./icons";

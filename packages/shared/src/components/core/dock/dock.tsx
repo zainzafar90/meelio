@@ -9,7 +9,6 @@ import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 
-import { BackgroundDock } from "./components/background.dock";
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
 import { ClockDock } from "./components/clock.dock";
@@ -26,13 +25,6 @@ const STATIC_DOCK_ITEMS: {
   activeIcon: DockIconComponent;
   isStatic: boolean;
 }[] = [
-  {
-    id: "background",
-    name: "Background",
-    icon: BackgroundDock,
-    activeIcon: BackgroundDock,
-    isStatic: true,
-  },
   {
     id: "clock",
     name: "Clock",
@@ -74,21 +66,29 @@ export const Dock = () => {
     isBreathingVisible,
     isSoundscapesVisible,
     isTodosVisible,
+    isSiteBlockerVisible,
+    isBackgroundsVisible,
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
     toggleTodos,
+    toggleSiteBlocker,
+    toggleBackgrounds,
     resetDock,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
     isSoundscapesVisible: state.isSoundscapesVisible,
     isBreathingVisible: state.isBreathingVisible,
     isTodosVisible: state.isTodosVisible,
+    isSiteBlockerVisible: state.isSiteBlockerVisible,
+    isBackgroundsVisible: state.isBackgroundsVisible,
     resetDock: state.reset,
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
     toggleBreathing: state.toggleBreathing,
     toggleTodos: state.toggleTodos,
+    toggleSiteBlocker: state.toggleSiteBlocker,
+    toggleBackgrounds: state.toggleBackgrounds,
   }));
   const { t } = useTranslation();
 
@@ -128,6 +128,20 @@ export const Dock = () => {
         icon: Icons.todoList,
         activeIcon: Icons.todoListActive,
         onClick: () => toggleTodos(),
+      },
+      {
+        id: "site-blocker",
+        name: t("common.site-blocker"),
+        icon: Icons.siteBlocker,
+        activeIcon: Icons.siteBlockerActive,
+        onClick: () => toggleSiteBlocker(),
+      },
+      {
+        id: "background",
+        name: t("common.background"),
+        icon: Icons.background,
+        activeIcon: Icons.background,
+        onClick: () => toggleBackgrounds(),
       },
     ],
     [t, resetDock, toggleTimer, toggleSoundscapes, toggleBreathing]
@@ -213,7 +227,9 @@ export const Dock = () => {
               (item.id === "timer" && isTimerVisible) ||
               (item.id === "soundscapes" && isSoundscapesVisible) ||
               (item.id === "breathepod" && isBreathingVisible) ||
-              (item.id === "todos" && isTodosVisible);
+              (item.id === "todos" && isTodosVisible) ||
+              (item.id === "site-blocker" && isSiteBlockerVisible) ||
+              (item.id === "background" && isBackgroundsVisible);
 
             const IconComponent = (
               isActive ? item.activeIcon : item.icon

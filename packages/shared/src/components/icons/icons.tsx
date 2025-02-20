@@ -383,6 +383,32 @@ export const Icons = {
       />
     </svg>
   ),
+  siteBlocker: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        opacity=".5"
+        fill="currentColor"
+        d="M12 22a.999.999 0 0 1-.581-.187l-3.65-2.607A9.016 9.016 0 0 1 4 11.883V4.426a1 1 0 0 1 1.206-.979 8 8 0 0 0 6.222-1.267.999.999 0 0 1 1.144 0 7.998 7.998 0 0 0 6.222 1.267A1 1 0 0 1 20 4.426v7.457a9.016 9.016 0 0 1-3.769 7.323l-3.65 2.607A.999.999 0 0 1 12 22Z"
+      />
+      <path
+        opacity=".5"
+        fill="currentColor"
+        d="M21 22a.997.997 0 0 1-.707-.293l-18-18a1 1 0 0 1 1.414-1.414l18 18A1 1 0 0 1 21 22Z"
+      />
+    </svg>
+  ),
+  siteBlockerActive: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
+      <path
+        fill="currentColor"
+        d="M12 22a.999.999 0 0 1-.581-.187l-3.65-2.607A9.016 9.016 0 0 1 4 11.883V4.426a1 1 0 0 1 1.206-.979 8 8 0 0 0 6.222-1.267.999.999 0 0 1 1.144 0 7.998 7.998 0 0 0 6.222 1.267A1 1 0 0 1 20 4.426v7.457a9.016 9.016 0 0 1-3.769 7.323l-3.65 2.607A.999.999 0 0 1 12 22Z"
+      />
+      <path
+        fill="currentColor"
+        d="M21 22a.997.997 0 0 1-.707-.293l-18-18a1 1 0 0 1 1.414-1.414l18 18A1 1 0 0 1 21 22Z"
+      />
+    </svg>
+  ),
   play: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path

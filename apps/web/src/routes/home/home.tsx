@@ -13,6 +13,7 @@ import { TodoListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
 import { WebTimer } from "@/components/web-timer";
+import { SiteBlockerSheet } from "@repo/shared";
 
 const Home = () => {
   return (
@@ -45,6 +46,7 @@ const Content = () => {
       <SoundscapesSheet />
       <TodoListSheet />
       <BackgroundSelectorSheet />
+      <SiteBlockerSheet />
     </main>
   );
 };
