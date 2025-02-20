@@ -1,4 +1,4 @@
-import { TabInfo } from "../types/tab-stash.types";
+import { TabInfo } from "../../../../types/tab-stash.types";
 
 export const groupTabsByWindow = (
   tabs: TabInfo[]

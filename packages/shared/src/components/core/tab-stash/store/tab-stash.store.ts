@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { TabStashState } from "../types/tab-stash.types";
+import { TabStashState } from "../../../../types/tab-stash.types";
 import {
   checkTabPermissions,
   groupTabsByWindow,

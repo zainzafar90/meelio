@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../../../icons/icons";
-import { useTabStashStore } from "../../../../stores/tab-stash.store";
+import { useTabStashStore } from "../store/tab-stash.store";
 
 export const PermissionBanner = () => {
   const { t } = useTranslation();

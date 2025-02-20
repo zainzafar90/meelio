@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { TabInfo, TabSession } from "../types/tab-stash.types";
-import { useTabStashStore } from "../stores/tab-stash.store";
+import { useTabStashStore } from "../store/tab-stash.store";
+import { TabInfo, TabSession } from "src/types/tab-stash.types";
 import {
   filterValidTabs,
   requestTabPermissions,

@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@repo/ui/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { TabSession } from "../../../../types/tab-stash.types";
-import { useTabStashStore } from "../../../../stores/tab-stash.store";
-import { groupTabsByWindow } from "../../../../utils/tab-stash.utils";
+import { useTabStashStore } from "../store/tab-stash.store";
+import { groupTabsByWindow } from "../utils/tab-stash.utils";
 
 interface SessionViewProps {
   session: TabSession;

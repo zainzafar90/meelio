@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Icons } from "../../../icons/icons";
-import { useTabStashStore } from "../../../../stores/tab-stash.store";
+import { useTabStashStore } from "../store/tab-stash.store";
 import { TabSession } from "../../../../types/tab-stash.types";
 import {
   DropdownMenu,
