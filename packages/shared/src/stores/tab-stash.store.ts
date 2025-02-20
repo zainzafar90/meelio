@@ -1,32 +1,11 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-export interface TabSession {
-  id: string;
-  name: string;
-  timestamp: number;
-  tabs: {
-    title: string;
-    url: string;
-    favicon?: string;
-    windowId: number;
-    pinned: boolean;
-  }[];
-  windowCount: number;
-}
-
-interface TabStashState {
-  sessions: TabSession[];
-  hasPermissions: boolean;
-  addSession: (session: TabSession) => void;
-  removeSession: (sessionId: string) => void;
-  renameSession: (sessionId: string, newName: string) => void;
-  restoreSession: (sessionId: string) => Promise<void>;
-  clearAllSessions: () => void;
-  loadSessions: () => Promise<void>;
-  checkPermissions: () => Promise<boolean>;
-  requestPermissions: () => Promise<boolean>;
-}
+import { TabStashState } from "../types/tab-stash.types";
+import {
+  checkTabPermissions,
+  groupTabsByWindow,
+  restoreTabsToWindow,
+} from "../utils/tab-stash.utils";
 
 export const useTabStashStore = create<TabStashState>()(
   persist(
@@ -35,28 +14,25 @@ export const useTabStashStore = create<TabStashState>()(
       hasPermissions: false,
 
       addSession: (session) => {
-        set((state) => {
-          const newSessions = [session, ...state.sessions];
-          return { sessions: newSessions };
-        });
+        set((state) => ({
+          sessions: [session, ...state.sessions],
+        }));
       },
 
       removeSession: (sessionId) => {
-        set((state) => {
-          const newSessions = state.sessions.filter(
+        set((state) => ({
+          sessions: state.sessions.filter(
             (session) => session.id !== sessionId
-          );
-          return { sessions: newSessions };
-        });
+          ),
+        }));
       },
 
       renameSession: (sessionId, newName) => {
-        set((state) => {
-          const newSessions = state.sessions.map((session) =>
+        set((state) => ({
+          sessions: state.sessions.map((session) =>
             session.id === sessionId ? { ...session, name: newName } : session
-          );
-          return { sessions: newSessions };
-        });
+          ),
+        }));
       },
 
       restoreSession: async (sessionId) => {
@@ -64,10 +40,7 @@ export const useTabStashStore = create<TabStashState>()(
         if (!session) return;
 
         try {
-          const hasPermissions = await chrome.permissions.contains({
-            permissions: ["tabs"],
-          });
-
+          const hasPermissions = await checkTabPermissions();
           if (!hasPermissions) {
             const granted = await chrome.permissions.request({
               permissions: ["tabs"],
@@ -75,38 +48,14 @@ export const useTabStashStore = create<TabStashState>()(
             if (!granted) {
               throw new Error("Required permissions not granted");
             }
+            set({ hasPermissions: true });
           }
 
-          const tabsByWindow = session.tabs.reduce(
-            (acc, tab) => {
-              if (!acc[tab.windowId]) {
-                acc[tab.windowId] = [];
-              }
-              acc[tab.windowId].push(tab);
-              return acc;
-            },
-            {} as Record<number, typeof session.tabs>
-          );
+          const tabsByWindow = groupTabsByWindow(session.tabs);
 
           // Create each window with its tabs
           for (const tabs of Object.values(tabsByWindow)) {
-            const window = await chrome.windows.create({
-              url: tabs.map((tab) => tab.url),
-              focused: true,
-            });
-
-            // Set pinned state for tabs that were pinned
-            if (window.tabs) {
-              const pinnedTabs = tabs.filter((tab) => tab.pinned);
-              for (let i = 0; i < window.tabs.length; i++) {
-                const originalTab = tabs[i];
-                if (originalTab?.pinned) {
-                  await chrome.tabs.update(window.tabs[i].id!, {
-                    pinned: true,
-                  });
-                }
-              }
-            }
+            await restoreTabsToWindow(tabs);
           }
         } catch (error) {
           console.error("Error restoring session:", error);
@@ -119,9 +68,7 @@ export const useTabStashStore = create<TabStashState>()(
       },
 
       checkPermissions: async () => {
-        const hasPermissions = await chrome.permissions.contains({
-          permissions: ["tabs"],
-        });
+        const hasPermissions = await checkTabPermissions();
         set({ hasPermissions });
         return hasPermissions;
       },
@@ -136,6 +83,7 @@ export const useTabStashStore = create<TabStashState>()(
 
       loadSessions: async () => {
         await get().checkPermissions();
+
         if (!chrome?.storage?.local) return;
 
         try {
@@ -172,7 +120,13 @@ export const useTabStashStore = create<TabStashState>()(
       version: 1,
       partialize: (state) => ({
         sessions: state.sessions,
+        hasPermissions: state.hasPermissions,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.checkPermissions();
+        }
+      },
     }
   )
 );
