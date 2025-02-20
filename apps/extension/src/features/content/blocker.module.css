@@ -9,7 +9,6 @@
   width: 100vw;
   flex: 1;
 }
- 
 
 .container {
   position: fixed;
@@ -25,12 +24,6 @@
   padding: 1rem;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   transition: background-color 0.3s;
-}
-
-@media (min-width: 640px) {
-  .container {
-    padding: 2rem;
-  }
 }
 
 .wrapper {
@@ -52,27 +45,9 @@
   text-align: center;
 }
 
-@media (min-width: 640px) {
-  .content {
-    gap: 1.5rem;
-  }
-}
-
 .emoji {
   animation: bounce 1s infinite;
   font-size: 30px;
-}
-
-@media (min-width: 640px) {
-  .emoji {
-    font-size: 60px;
-  }
-}
-
-@media (min-width: 768px) {
-  .emoji {
-    font-size: 36px;
-  }
 }
 
 .title {
@@ -82,28 +57,10 @@
   color: white;
 }
 
-@media (min-width: 640px) {
-  .title {
-    font-size: 30px;
-  }
-}
-
-@media (min-width: 768px) {
-  .title {
-    font-size: 24px;
-  }
-}
-
 .quoteContainer {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-}
-
-@media (min-width: 640px) {
-  .quoteContainer {
-    gap: 0.5rem;
-  }
 }
 
 .quote {
@@ -111,21 +68,9 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-@media (min-width: 640px) {
-  .quote {
-    font-size: 16px;
-  }
-}
-
 .author {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
-}
-
-@media (min-width: 640px) {
-  .author {
-    font-size: 14px;
-  }
 }
 
 .stats {
@@ -143,20 +88,8 @@
   font-size: 12px;
 }
 
-@media (min-width: 640px) {
-  .siteName {
-    font-size: 14px;
-  }
-}
-
 .streak {
   font-size: 12px;
-}
-
-@media (min-width: 640px) {
-  .streak {
-    font-size: 14px;
-  }
 }
 
 .streakEmoji {
@@ -168,6 +101,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 1rem;
 }
 
 .closeButton {
@@ -178,20 +112,14 @@
   font-size: 12px;
   font-weight: 500;
   color: rgb(17, 24, 39);
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
 }
 
 .closeButton:hover {
   background-color: white;
-}
-
-@media (min-width: 640px) {
-  .closeButton {
-    margin-top: 1rem;
-    max-width: 16rem;
-    padding: 0.75rem 1.5rem;
-    font-size: 16px;
-  }
+  transform: translateY(-1px);
 }
 
 .openAnywayButton {
@@ -201,22 +129,32 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem 1.5rem;
+  background-color: transparent;
   color: rgba(255, 255, 255, 0.6);
-  transition: color 0.3s;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .openAnywayButton:hover {
   color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .openAnywayIcon {
   height: 1rem;
   width: 1rem;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
 }
 
-.openAnywayText {
-  font-size: 14px;
+.openAnywayButton:hover .openAnywayIcon {
+  opacity: 0.9;
 }
 
 @keyframes bounce {
@@ -237,7 +175,63 @@
   50% {
     opacity: .5;
   }
-} 
-.openAnywayText {
-  font-size: 14px;
+}
+
+/* Tablet and above (sm) */
+@media (min-width: 640px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .content {
+    gap: 1.5rem;
+  }
+
+  .emoji {
+    font-size: 60px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+
+  .quoteContainer {
+    gap: 0.5rem;
+  }
+
+  .quote {
+    font-size: 16px;
+  }
+
+  .author {
+    font-size: 14px;
+  }
+
+  .siteName,
+  .streak {
+    font-size: 14px;
+  }
+
+  .closeButton {
+    max-width: 16rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 16px;
+    margin: 0 auto;
+  }
+
+  .openAnywayButton {
+    font-size: 14px;
+    padding: 0.5rem 0;
+  }
+}
+
+/* Desktop (md) */
+@media (min-width: 768px) {
+  .emoji {
+    font-size: 36px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
 } 
