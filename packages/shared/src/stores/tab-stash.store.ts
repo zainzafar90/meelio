@@ -16,16 +16,20 @@ export interface TabSession {
 
 interface TabStashState {
   sessions: TabSession[];
+  hasPermissions: boolean;
   addSession: (session: TabSession) => void;
   removeSession: (sessionId: string) => void;
   renameSession: (sessionId: string, newName: string) => void;
   restoreSession: (sessionId: string) => Promise<void>;
   clearAllSessions: () => void;
   loadSessions: () => Promise<void>;
+  checkPermissions: () => Promise<boolean>;
+  requestPermissions: () => Promise<boolean>;
 }
 
 export const useTabStashStore = create<TabStashState>((set, get) => ({
   sessions: [],
+  hasPermissions: false,
 
   addSession: (session) => {
     set((state) => {
@@ -125,7 +129,24 @@ export const useTabStashStore = create<TabStashState>((set, get) => ({
     }
   },
 
+  checkPermissions: async () => {
+    const hasPermissions = await chrome.permissions.contains({
+      permissions: ["tabs"],
+    });
+    set({ hasPermissions });
+    return hasPermissions;
+  },
+
+  requestPermissions: async () => {
+    const granted = await chrome.permissions.request({
+      permissions: ["tabs"],
+    });
+    set({ hasPermissions: granted });
+    return granted;
+  },
+
   loadSessions: async () => {
+    await get().checkPermissions();
     if (!chrome?.storage?.local) return;
 
     try {

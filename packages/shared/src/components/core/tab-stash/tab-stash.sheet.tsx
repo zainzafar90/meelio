@@ -14,16 +14,9 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import { MoreVertical, ChevronLeft } from "lucide-react";
+import { filterValidTabs } from "../../../utils/tab-utils";
 
-const isExtension =
-  typeof chrome !== "undefined" && chrome.storage !== undefined;
-
-interface ChromeTab {
-  title: string;
-  url: string;
-  favicon?: string;
-  windowId: number;
-}
+const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
 
 export const TabStashSheet = () => {
   const { t } = useTranslation();
@@ -215,8 +208,10 @@ const SessionsList = ({
                         variant="ghost"
                         className="flex-1 justify-start px-0 text-lg font-medium text-white hover:bg-transparent"
                         onClick={() => onSelectSession(session)}
+                        type="button"
+                        asChild={false}
                       >
-                        {session.name}
+                        <span className="truncate">{session.name}</span>
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -301,6 +296,44 @@ const SessionsList = ({
   );
 };
 
+const PermissionBanner = () => {
+  const { t } = useTranslation();
+  const { checkPermissions, requestPermissions, hasPermissions } =
+    useTabStashStore();
+
+  if (hasPermissions) return null;
+
+  return (
+    <div className="bg-yellow-900/30 border border-yellow-800 rounded-lg p-4 mb-4">
+      <div className="flex items-center gap-3">
+        <Icons.warning className="size-5 text-yellow-500" />
+        <div className="flex-1">
+          <h3 className="font-medium text-yellow-200">
+            {t(
+              "tab-stash.permissions-needed",
+              "Additional permissions required"
+            )}
+          </h3>
+          <p className="text-sm text-yellow-400/80 mt-1">
+            {t(
+              "tab-stash.permissions-description",
+              "We need permission to manage your tabs to use this feature"
+            )}
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="text-yellow-200 border-yellow-700 hover:bg-yellow-900/20"
+          onClick={() => requestPermissions()}
+        >
+          {t("common.grant-permission", "Grant Permission")}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const ExtensionTabStashContent = () => {
   const { t } = useTranslation();
   const [isStashingAll, setIsStashingAll] = useState(false);
@@ -310,35 +343,33 @@ const ExtensionTabStashContent = () => {
   );
   const {
     sessions,
+    hasPermissions,
+    checkPermissions,
     addSession,
-    removeSession,
-    renameSession,
-    restoreSession,
-    clearAllSessions,
     loadSessions,
+    requestPermissions,
   } = useTabStashStore();
-  const [sessionNameInput, setSessionNameInput] = useState("");
 
-  // Load sessions on mount
+  // Load initial permissions
   useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
+    checkPermissions();
+  }, [checkPermissions]);
 
-  const handleStashAllTabs = async () => {
+  // Unified stash handler
+  const handleStashTabs = async (scope: "all" | "current") => {
     setIsStashingAll(true);
     setError(null);
+
     try {
-      const windows = await chrome.windows.getAll({ populate: true });
-      const currentTab = await chrome.tabs.getCurrent();
+      const [currentTab, windows] = await Promise.all([
+        chrome.tabs.getCurrent(),
+        scope === "all"
+          ? chrome.windows.getAll({ populate: true })
+          : [await chrome.windows.getCurrent({ populate: true })],
+      ]);
 
       const tabsToStash = windows.flatMap((window) =>
-        (window.tabs || []).filter(
-          (tab): tab is chrome.tabs.Tab =>
-            !!tab &&
-            !!window.id &&
-            tab.id !== currentTab?.id && // Exclude current tab
-            !tab.url?.startsWith("chrome://") // Don't close chrome:// URLs
-        )
+        filterValidTabs(window.tabs || [], currentTab?.id)
       );
 
       if (tabsToStash.length === 0) {
@@ -346,95 +377,35 @@ const ExtensionTabStashContent = () => {
         return;
       }
 
-      const tabs = tabsToStash.map((tab) => ({
-        title: tab.title || "",
-        url: tab.url || "",
-        favicon: tab.favIconUrl || undefined,
-        windowId: tab.windowId,
-        pinned: tab.pinned || false,
-      }));
-
       const newSession: TabSession = {
         id: crypto.randomUUID(),
         name: format(new Date(), "MMM d, yyyy h:mm a"),
         timestamp: Date.now(),
-        tabs,
+        tabs: tabsToStash,
         windowCount: windows.length,
       };
 
-      addSession(newSession);
+      await addSession(newSession);
 
-      // Close all tabs except the current one and chrome:// URLs
-      const tabsToClose = tabsToStash
-        .map((tab) => tab.id)
-        .filter((id): id is number => id !== undefined);
+      // Close stashed tabs using proper tab IDs
+      const tabIds = tabsToStash
+        .map((t) => t.id)
+        .filter((id): id is number => !!id);
 
-      if (tabsToClose.length > 0) {
-        await chrome.tabs.remove(tabsToClose);
+      if (tabIds.length > 0) {
+        try {
+          await chrome.tabs.remove(tabIds);
+        } catch (error) {
+          console.warn("Some tabs couldn't be closed:", error);
+        }
       }
     } catch (error) {
-      console.error("Error stashing tabs:", error);
-      setError(t("tab-stash.stash-error", "Error stashing tabs"));
-    }
-    setIsStashingAll(false);
-  };
-
-  const handleStashCurrentWindow = async () => {
-    setError(null);
-    try {
-      const currentWindow = await chrome.windows.getCurrent({ populate: true });
-      const currentTab = await chrome.tabs.getCurrent();
-
-      if (!currentWindow.tabs || !currentWindow.id) {
-        setError(t("tab-stash.no-window", "No window available"));
-        return;
-      }
-
-      const tabs = currentWindow.tabs
-        .filter(
-          (tab): tab is chrome.tabs.Tab =>
-            !!tab &&
-            tab.id !== currentTab?.id && // Exclude current tab
-            !tab.url?.startsWith("chrome://") // Don't close chrome:// URLs
-        )
-        .map((tab) => ({
-          title: tab.title || "",
-          url: tab.url || "",
-          favicon: tab.favIconUrl || undefined,
-          windowId: currentWindow.id!,
-          pinned: tab.pinned || false,
-        }));
-
-      if (tabs.length === 0) {
-        setError(t("tab-stash.no-tabs", "No tabs available to stash"));
-        return;
-      }
-
-      const newSession: TabSession = {
-        id: crypto.randomUUID(),
-        name: format(new Date(), "MMM d, yyyy h:mm a"),
-        timestamp: Date.now(),
-        tabs,
-        windowCount: 1,
-      };
-
-      addSession(newSession);
-
-      // Close all tabs in the current window except the current one and chrome:// URLs
-      const tabsToClose = currentWindow.tabs
-        .filter(
-          (tab) =>
-            tab.id !== currentTab?.id && !tab.url?.startsWith("chrome://")
-        )
-        .map((tab) => tab.id)
-        .filter((id): id is number => id !== undefined);
-
-      if (tabsToClose.length > 0) {
-        await chrome.tabs.remove(tabsToClose);
-      }
-    } catch (error) {
-      console.error("Error stashing current window:", error);
-      setError(t("tab-stash.stash-error", "Error stashing tabs"));
+      console.error("Tab stashing failed:", error);
+      setError(
+        t("tab-stash.stash-error", "Failed to stash tabs. Please try again.")
+      );
+    } finally {
+      setIsStashingAll(false);
     }
   };
 
@@ -450,19 +421,22 @@ const ExtensionTabStashContent = () => {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <div className="flex flex-col gap-2 border-b border-white/10 p-4">
+        <PermissionBanner />
+
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             className="flex-1"
-            onClick={handleStashAllTabs}
-            disabled={isStashingAll}
+            onClick={() => handleStashTabs("all")}
+            disabled={!hasPermissions || isStashingAll}
           >
             {t("tab-stash.stash-all", "Stash All Windows")}
           </Button>
           <Button
             variant="outline"
             className="flex-1"
-            onClick={handleStashCurrentWindow}
+            onClick={() => handleStashTabs("current")}
+            disabled={!hasPermissions}
           >
             {t("tab-stash.stash-current", "Stash Current Window")}
           </Button>
@@ -470,7 +444,19 @@ const ExtensionTabStashContent = () => {
         {error && <div className="text-sm text-red-500">{error}</div>}
       </div>
 
-      <SessionsList sessions={sessions} onSelectSession={setSelectedSession} />
+      {hasPermissions ? (
+        <SessionsList
+          sessions={sessions}
+          onSelectSession={setSelectedSession}
+        />
+      ) : (
+        <div className="flex-1 flex items-center justify-center p-6 text-center text-white/60">
+          {t(
+            "tab-stash.needs-permission",
+            "Grant permissions to view stashed sessions"
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -491,7 +477,8 @@ const BrowserTabStashContent = () => {
         onClick={() =>
           window.open(
             "https://chrome.google.com/webstore/detail/your-extension-id",
-            "_blank"
+            "_blank",
+            "noopener,noreferrer"
           )
         }
       >
