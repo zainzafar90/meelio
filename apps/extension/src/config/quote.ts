@@ -10,7 +10,7 @@ export interface Quote {
 export const QUOTES: Quote[] = [
   {
     icon: "🚀",
-    bgColor: "meelio-bg-indigo-950",
+    bgColor: "#030712",
     title: "Launch Your Potential",
     quote:
       "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -19,7 +19,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🧠",
-    bgColor: "meelio-bg-purple-950",
+    bgColor: "#0C0A1D",
     title: "Mind Over Distraction",
     quote: "The mind is everything. What you think you become.",
     author: "Buddha",
@@ -27,7 +27,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🌱",
-    bgColor: "meelio-bg-green-950",
+    bgColor: "#052e16",
     title: "Grow Beyond Limits",
     quote: "The only way to do great work is to love what you do.",
     author: "Steve Jobs",
@@ -35,7 +35,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "⏳",
-    bgColor: "meelio-bg-amber-950",
+    bgColor: "#431407",
     title: "Time is Precious",
     quote: "The bad news is time flies. The good news is you're the pilot.",
     author: "Michael Altshuler",
@@ -43,7 +43,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🎯",
-    bgColor: "meelio-bg-red-950",
+    bgColor: "#450a0a",
     title: "Hit Your Targets",
     quote: "The secret of getting ahead is getting started.",
     author: "Mark Twain",
@@ -51,7 +51,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🌟",
-    bgColor: "meelio-bg-blue-950",
+    bgColor: "#172554",
     title: "Shine Your Brightest",
     quote: "Believe you can and you're halfway there.",
     author: "Theodore Roosevelt",
@@ -59,7 +59,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🏋️",
-    bgColor: "meelio-bg-emerald-950",
+    bgColor: "#052e16",
     title: "Strengthen Your Willpower",
     quote:
       "Strength does not come from physical capacity. It comes from an indomitable will.",
@@ -68,7 +68,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🏆",
-    bgColor: "meelio-bg-cyan-950",
+    bgColor: "#083344",
     title: "Victory Over Procrastination",
     quote:
       "Our goals can only be reached through a vehicle of a plan, in which we must fervently believe, and upon which we must vigorously act.",
@@ -77,7 +77,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🌊",
-    bgColor: "meelio-bg-teal-950",
+    bgColor: "#042f2e",
     title: "Flow State Activated",
     quote:
       "The more you lose yourself in something bigger than yourself, the more energy you will have.",
@@ -86,7 +86,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "⚡",
-    bgColor: "meelio-bg-yellow-950",
+    bgColor: "#422006",
     title: "Energize Your Ambitions",
     quote:
       "The only way to achieve the impossible is to believe it is possible.",
@@ -95,7 +95,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🎭",
-    bgColor: "meelio-bg-pink-950",
+    bgColor: "#500724",
     title: "Digital Detox",
     quote:
       "The more you get away from technological buzz, the more freedom you have.",
@@ -104,7 +104,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🌄",
-    bgColor: "meelio-bg-orange-950",
+    bgColor: "#431407",
     title: "New Horizons",
     quote:
       "Every moment spent offline is an opportunity for real-world growth.",
@@ -113,7 +113,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🎯",
-    bgColor: "meelio-bg-violet-950",
+    bgColor: "#2e1065",
     title: "Mindful Minutes",
     quote: "Your focus determines your reality.",
     author: "Productivity Guide",
@@ -121,7 +121,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🔮",
-    bgColor: "meelio-bg-rose-950",
+    bgColor: "#4c0519",
     title: "Future Self",
     quote: "Small steps today lead to big changes tomorrow.",
     author: "Growth Mindset",
@@ -129,7 +129,7 @@ export const QUOTES: Quote[] = [
   },
   {
     icon: "🎨",
-    bgColor: "meelio-bg-fuchsia-950",
+    bgColor: "#4a044e",
     title: "Create Not Consume",
     quote: "Creativity flourishes in the absence of distractions.",
     author: "Artist's Way",

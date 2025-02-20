@@ -1,6 +1,6 @@
-import cssText from "data-text:@/style.css";
 import type { PlasmoCSConfig } from "plasmo";
 import React from "react";
+import cssText from "data-text:./features/content/blocker.module.css"
 
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
@@ -15,10 +15,10 @@ export const config: PlasmoCSConfig = {
 };
 
 export const getStyle = () => {
-  const style = document.createElement("style");
-  style.textContent = cssText;
-  return style;
-};
+  const style = document.createElement("style")
+  style.textContent = cssText
+  return style
+}
 
 const getCurrentSite = () => {
   return new URL(window.location.href).hostname;
@@ -61,7 +61,19 @@ const PlasmoOverlay = () => {
   if (!isBlocked) return null;
 
   return (
-    <div className="z-[2147483647] fixed inset-0 bg-black">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 1)',
+        backdropFilter: 'blur(10px)',
+        zIndex: 2147483647,
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        flex: 1,
+      }}
+    >
       <Blocker
         message={message}
         siteName={currentSite}

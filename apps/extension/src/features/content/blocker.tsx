@@ -2,6 +2,8 @@ import { type Quote } from "@/config/quote";
 import { LockKeyhole } from "lucide-react";
 import React from "react";
 
+import * as style from "./blocker.module.css"
+
 interface BlockerProps {
   siteName: string;
   message: Quote;
@@ -15,63 +17,44 @@ export function Blocker({ siteName, message, onOpenAnyway }: BlockerProps) {
   };
 
   return (
-    <div
-      className={`${message.bgColor} meelio-fixed meelio-inset-0 meelio-flex meelio-h-screen meelio-w-screen meelio-flex-1 meelio-cursor-pointer meelio-items-center meelio-justify-center meelio-overflow-auto meelio-p-4 meelio-shadow-xl meelio-transition-colors meelio-duration-300 sm:meelio-p-8`}
+    <div className={`${style.container}`}
+      style={{
+        backgroundColor: message.bgColor,
+      }}
     >
-      <div className="meelio-my-auto meelio-flex meelio-w-full meelio-max-w-lg meelio-items-center meelio-justify-center meelio-px-4">
-        <div className="max-h-[90vh] meelio-flex meelio-flex-col meelio-items-center meelio-gap-3 meelio-text-center sm:meelio-gap-6">
+      <div className={style.wrapper}>
+        <div className={style.content}>
           {/* Emoji */}
-          <div className="meelio-animate-bounce meelio-text-[30px] sm:meelio-text-[60px] md:meelio-text-[36px]">
-            {message.icon}
-          </div>
+          <div className={style.emoji}>{message.icon}</div>
 
           {/* Title */}
-          <h1 className="meelio-text-[20px] meelio-font-semibold meelio-leading-tight meelio-text-white sm:meelio-text-[30px] md:meelio-text-[24px]">
-            {message.title}
-          </h1>
+          <h1 className={style.title}>{message.title}</h1>
 
           {/* Quote */}
-          <div className="meelio-space-y-1 sm:meelio-space-y-2">
-            <p className="meelio-text-[14px] meelio-text-white/90 sm:meelio-text-[16px]">
-              "{message.quote}"
-            </p>
-            <p className="meelio-text-[12px] meelio-text-white/70 sm:meelio-text-[14px]">
-              - {message.author}
-            </p>
+          <div className={style.quoteContainer}>
+            <p className={style.quote}>"{message.quote}"</p>
+            <p className={style.author}>- {message.author}</p>
           </div>
 
           {/* Stats */}
-          <div className="meelio-space-y-1 meelio-text-white/80">
-            <p className="meelio-flex meelio-items-center meelio-justify-center meelio-gap-2 meelio-text-[12px] sm:meelio-text-[14px]">
-              {siteName}
-            </p>
-            <p className="meelio-text-[12px] sm:meelio-text-[14px]">
-              <span className="meelio-animate-pulse meelio-text-blue-300">
-                🔥
-              </span>{" "}
-              Block Streak: 4
+          <div className={style.stats}>
+            <p className={style.siteName}>{siteName}</p>
+            <p className={style.streak}>
+              <span className={style.streakEmoji}>🔥</span> Block Streak: 4
             </p>
           </div>
 
-          <div className="meelio-flex meelio-flex-col meelio-space-y-4">
+          <div className={style.buttonContainer}>
             {/* Action Button */}
             <div>
-              <button
-                onClick={handleClose}
-                className="meelio-mt-2 meelio-rounded-full meelio-bg-white/90 meelio-px-6 meelio-py-2 meelio-text-[12px] meelio-font-medium meelio-text-gray-900 meelio-transition-colors hover:meelio-bg-white sm:meelio-mt-4 sm:meelio-max-w-64 sm:meelio-py-3 sm:meelio-text-[16px]"
-              >
+              <button onClick={handleClose} className={style.closeButton}>
                 {message.buttonText}
               </button>
             </div>
 
-            <button
-              onClick={onOpenAnyway}
-              className="meelio-mt-2 meelio-flex meelio-w-full meelio-items-center meelio-justify-center meelio-gap-2 meelio-py-2 meelio-text-white/60 meelio-transition-colors hover:meelio-text-white/90"
-            >
-              <LockKeyhole className="meelio-h-4 meelio-w-4" />
-              <span className="meelio-text-[14px]">
-                Open "{siteName}" anyway
-              </span>
+            <button onClick={onOpenAnyway} className={style.openAnywayButton}>
+              <LockKeyhole className={style.openAnywayIcon} />
+              <span className={style.openAnywayText}>Open "{siteName}" anyway</span>
             </button>
           </div>
         </div>
