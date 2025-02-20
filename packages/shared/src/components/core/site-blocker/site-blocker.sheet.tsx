@@ -75,6 +75,16 @@ const ExtensionSiteBlockerContent = () => {
     }
   };
 
+  const onBlockSites = (sites: string[]) => {
+    setBlockedSites((prev) => [...new Set([...(prev || []), ...sites])]);
+  };
+
+  const onUnblockSites = (sites: string[]) => {
+    setBlockedSites((prev) =>
+      (prev || []).filter((site) => !sites.includes(site))
+    );
+  };
+
   return (
     <>
       <div className="flex items-center gap-2 border-b border-white/10 p-4">
@@ -99,7 +109,12 @@ const ExtensionSiteBlockerContent = () => {
             blockedSites={blockedSites}
             onToggleSite={toggleSite}
           />
-          <SiteList blockedSites={blockedSites} onToggleSite={toggleSite} />
+          <SiteList
+            blockedSites={blockedSites}
+            onToggleSite={toggleSite}
+            onBlockSites={onBlockSites}
+            onUnblockSites={onUnblockSites}
+          />
         </div>
       </div>
     </>

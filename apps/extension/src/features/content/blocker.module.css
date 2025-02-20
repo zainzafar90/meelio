@@ -1,15 +1,3 @@
-#plasmo-shadow-container {
-  z-index: 99999;
-  background-color: rgba(0, 0, 0, 1);
-  backdrop-filter: blur(10px);
-  position: fixed;
-  inset: 0;
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-  flex: 1;
-}
-
 .container {
   position: fixed;
   inset: 0;
@@ -24,6 +12,8 @@
   padding: 1rem;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   transition: background-color 0.3s;
+  font-family: "Inter", sans-serif;
+
 }
 
 .wrapper {
@@ -34,6 +24,8 @@
   align-items: center;
   justify-content: center;
   padding: 0 1rem;
+  font-family: "Inter", sans-serif;
+
 }
 
 .content {
@@ -43,6 +35,8 @@
   align-items: center;
   gap: 0.75rem;
   text-align: center;
+  font-family: "Inter", sans-serif;
+
 }
 
 .emoji {
@@ -55,22 +49,30 @@
   font-weight: 600;
   line-height: 1.25;
   color: white;
+  font-family: "Inter", sans-serif;
+
 }
 
 .quoteContainer {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  font-family: "Inter", sans-serif;
+
 }
 
 .quote {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.9);
+  font-family: "Inter", sans-serif;
+
 }
 
 .author {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
+  font-family: "Inter", sans-serif;
+
 }
 
 .stats {
@@ -78,6 +80,8 @@
   flex-direction: column;
   gap: 0.25rem;
   color: rgba(255, 255, 255, 0.8);
+  font-family: "Inter", sans-serif;
+
 }
 
 .siteName {
@@ -86,15 +90,21 @@
   justify-content: center;
   gap: 0.5rem;
   font-size: 12px;
+  font-family: "Inter", sans-serif;
+
 }
 
 .streak {
   font-size: 12px;
+  font-family: "Inter", sans-serif;
+
 }
 
 .streakEmoji {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   color: rgb(147, 197, 253);
+  font-family: "Inter", sans-serif;
+
 }
 
 .buttonContainer {
@@ -102,6 +112,8 @@
   flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
+  font-family: "Inter", sans-serif;
+
 }
 
 .closeButton {
@@ -115,11 +127,14 @@
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  font-family: "Inter", sans-serif;
+
 }
 
 .closeButton:hover {
   background-color: white;
   transform: translateY(-1px);
+
 }
 
 .openAnywayButton {
@@ -138,6 +153,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  font-family: "Inter", sans-serif;
 }
 
 .openAnywayButton:hover {
@@ -151,6 +167,7 @@
   width: 1rem;
   opacity: 0.6;
   transition: opacity 0.3s ease;
+  font-family: "Inter", sans-serif;
 }
 
 .openAnywayButton:hover .openAnywayIcon {

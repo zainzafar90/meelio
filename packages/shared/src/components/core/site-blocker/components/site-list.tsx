@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Ban, Plus } from "lucide-react";
 import { SiteItem } from "./site-item";
 import { SITE_LIST, SITE_CATEGORIES } from "../data/site-list";
 
@@ -16,9 +16,21 @@ export interface Site {
 interface SiteListProps {
   blockedSites: string[];
   onToggleSite: (site: string) => void;
+  onBlockSites: (sites: string[]) => void;
+  onUnblockSites: (sites: string[]) => void;
 }
 
-export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
+const isGroupBlocked = (categoryKey: string, blockedSites: string[]) => {
+  const groupSites = SITE_LIST[categoryKey] || [];
+  return groupSites.every((site) => blockedSites.includes(site.url));
+};
+
+export function SiteList({
+  blockedSites,
+  onToggleSite,
+  onBlockSites,
+  onUnblockSites,
+}: SiteListProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryKey: string) => {
@@ -27,6 +39,18 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
         ? prev.filter((key) => key !== categoryKey)
         : [...prev, categoryKey]
     );
+  };
+
+  const toggleGroupBlock = (categoryKey: string) => {
+    const groupSites = SITE_LIST[categoryKey] || [];
+    const isCurrentlyBlocked = isGroupBlocked(categoryKey, blockedSites);
+    const urls = groupSites.map((site) => site.url);
+
+    if (isCurrentlyBlocked) {
+      onUnblockSites(urls);
+    } else {
+      onBlockSites(urls);
+    }
   };
 
   return (
@@ -39,22 +63,42 @@ export function SiteList({ blockedSites, onToggleSite }: SiteListProps) {
             key={category.key}
             className="rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/[0.075]"
           >
-            <button
-              onClick={() => toggleCategory(category.key)}
-              className="flex w-full cursor-pointer items-center justify-between"
-            >
-              <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-between">
+              <button
+                onClick={() => toggleCategory(category.key)}
+                className="flex items-center gap-2"
+              >
                 <span className="text-xl">{category.icon}</span>
                 <h3 className="text-sm font-medium text-white/90">
                   {category.name}
                 </h3>
-              </div>
-              {expandedCategories.includes(category.key) ? (
-                <ChevronDown className="h-4 w-4 text-white/60" />
-              ) : (
-                <ChevronRight className="h-4 w-4 text-white/60" />
-              )}
-            </button>
+                {expandedCategories.includes(category.key) ? (
+                  <ChevronDown className="h-4 w-4 text-white/60" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-white/60" />
+                )}
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleGroupBlock(category.key);
+                }}
+                className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60 hover:bg-white/[0.075]"
+              >
+                {isGroupBlocked(category.key, blockedSites) ? (
+                  <>
+                    <Ban className="h-4 w-4 text-red-500" />
+                    <span>Unblock All</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    <span>Block All</span>
+                  </>
+                )}
+              </button>
+            </div>
 
             {expandedCategories.includes(category.key) && (
               <div className="mt-4 space-y-2">
