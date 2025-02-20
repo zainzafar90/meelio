@@ -9,6 +9,7 @@ export interface TabSession {
     url: string;
     favicon?: string;
     windowId: number;
+    pinned: boolean;
   }[];
   windowCount: number;
 }
@@ -68,7 +69,6 @@ export const useTabStashStore = create<TabStashState>((set, get) => ({
     if (!session) return;
 
     try {
-      // Request permissions if not already granted
       const hasPermissions = await chrome.permissions.contains({
         permissions: ["tabs"],
       });
@@ -82,7 +82,6 @@ export const useTabStashStore = create<TabStashState>((set, get) => ({
         }
       }
 
-      // Group tabs by window
       const tabsByWindow = session.tabs.reduce(
         (acc, tab) => {
           if (!acc[tab.windowId]) {
@@ -96,10 +95,21 @@ export const useTabStashStore = create<TabStashState>((set, get) => ({
 
       // Create each window with its tabs
       for (const tabs of Object.values(tabsByWindow)) {
-        await chrome.windows.create({
+        const window = await chrome.windows.create({
           url: tabs.map((tab) => tab.url),
           focused: true,
         });
+
+        // Set pinned state for tabs that were pinned
+        if (window.tabs) {
+          const pinnedTabs = tabs.filter((tab) => tab.pinned);
+          for (let i = 0; i < window.tabs.length; i++) {
+            const originalTab = tabs[i];
+            if (originalTab?.pinned) {
+              await chrome.tabs.update(window.tabs[i].id!, { pinned: true });
+            }
+          }
+        }
       }
     } catch (error) {
       console.error("Error restoring session:", error);

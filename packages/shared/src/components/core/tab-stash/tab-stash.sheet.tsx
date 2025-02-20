@@ -62,7 +62,12 @@ const SessionView = ({
   onBack: () => void;
 }) => {
   const { t } = useTranslation();
-  const { restoreSession } = useTabStashStore();
+  const { restoreSession, removeSession } = useTabStashStore();
+
+  const handleDelete = () => {
+    removeSession(session.id);
+    onBack();
+  };
 
   // Group tabs by window
   const tabsByWindow = session.tabs.reduce(
@@ -97,6 +102,7 @@ const SessionView = ({
           <Button
             variant="outline"
             className="flex-1 border-zinc-700 text-red-400 hover:bg-red-400/10 hover:text-red-300"
+            onClick={handleDelete}
           >
             {t("tab-stash.delete-session", "Delete session")}
           </Button>
@@ -331,7 +337,6 @@ const ExtensionTabStashContent = () => {
             !!tab &&
             !!window.id &&
             tab.id !== currentTab?.id && // Exclude current tab
-            !tab.pinned && // Don't close pinned tabs
             !tab.url?.startsWith("chrome://") // Don't close chrome:// URLs
         )
       );
@@ -346,6 +351,7 @@ const ExtensionTabStashContent = () => {
         url: tab.url || "",
         favicon: tab.favIconUrl || undefined,
         windowId: tab.windowId,
+        pinned: tab.pinned || false,
       }));
 
       const newSession: TabSession = {
@@ -358,7 +364,7 @@ const ExtensionTabStashContent = () => {
 
       addSession(newSession);
 
-      // Close all tabs except the current one, pinned tabs, and chrome:// URLs
+      // Close all tabs except the current one and chrome:// URLs
       const tabsToClose = tabsToStash
         .map((tab) => tab.id)
         .filter((id): id is number => id !== undefined);
@@ -389,7 +395,6 @@ const ExtensionTabStashContent = () => {
           (tab): tab is chrome.tabs.Tab =>
             !!tab &&
             tab.id !== currentTab?.id && // Exclude current tab
-            !tab.pinned && // Don't close pinned tabs
             !tab.url?.startsWith("chrome://") // Don't close chrome:// URLs
         )
         .map((tab) => ({
@@ -397,6 +402,7 @@ const ExtensionTabStashContent = () => {
           url: tab.url || "",
           favicon: tab.favIconUrl || undefined,
           windowId: currentWindow.id!,
+          pinned: tab.pinned || false,
         }));
 
       if (tabs.length === 0) {
@@ -414,13 +420,11 @@ const ExtensionTabStashContent = () => {
 
       addSession(newSession);
 
-      // Close all tabs in the current window except the current one, pinned tabs, and chrome:// URLs
+      // Close all tabs in the current window except the current one and chrome:// URLs
       const tabsToClose = currentWindow.tabs
         .filter(
           (tab) =>
-            tab.id !== currentTab?.id &&
-            !tab.pinned &&
-            !tab.url?.startsWith("chrome://")
+            tab.id !== currentTab?.id && !tab.url?.startsWith("chrome://")
         )
         .map((tab) => tab.id)
         .filter((id): id is number => id !== undefined);
