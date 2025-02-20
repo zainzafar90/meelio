@@ -1,0 +1,130 @@
+import { create } from "zustand";
+
+export interface TabSession {
+  id: string;
+  name: string;
+  timestamp: number;
+  tabs: {
+    title: string;
+    url: string;
+    favicon?: string;
+    windowId: number;
+  }[];
+  windowCount: number;
+}
+
+interface TabStashState {
+  sessions: TabSession[];
+  addSession: (session: TabSession) => void;
+  removeSession: (sessionId: string) => void;
+  renameSession: (sessionId: string, newName: string) => void;
+  restoreSession: (sessionId: string) => Promise<void>;
+  clearAllSessions: () => void;
+  loadSessions: () => Promise<void>;
+}
+
+export const useTabStashStore = create<TabStashState>((set, get) => ({
+  sessions: [],
+
+  addSession: (session) => {
+    set((state) => {
+      const newSessions = [session, ...state.sessions];
+      // Persist to chrome storage
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ tabSessions: newSessions });
+      }
+      return { sessions: newSessions };
+    });
+  },
+
+  removeSession: (sessionId) => {
+    set((state) => {
+      const newSessions = state.sessions.filter(
+        (session) => session.id !== sessionId
+      );
+      // Persist to chrome storage
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ tabSessions: newSessions });
+      }
+      return { sessions: newSessions };
+    });
+  },
+
+  renameSession: (sessionId, newName) => {
+    set((state) => {
+      const newSessions = state.sessions.map((session) =>
+        session.id === sessionId ? { ...session, name: newName } : session
+      );
+      // Persist to chrome storage
+      if (chrome?.storage?.local) {
+        chrome.storage.local.set({ tabSessions: newSessions });
+      }
+      return { sessions: newSessions };
+    });
+  },
+
+  restoreSession: async (sessionId) => {
+    const session = get().sessions.find((s) => s.id === sessionId);
+    if (!session) return;
+
+    try {
+      // Request permissions if not already granted
+      const hasPermissions = await chrome.permissions.contains({
+        permissions: ["tabs"],
+      });
+
+      if (!hasPermissions) {
+        const granted = await chrome.permissions.request({
+          permissions: ["tabs"],
+        });
+        if (!granted) {
+          throw new Error("Required permissions not granted");
+        }
+      }
+
+      // Group tabs by window
+      const tabsByWindow = session.tabs.reduce(
+        (acc, tab) => {
+          if (!acc[tab.windowId]) {
+            acc[tab.windowId] = [];
+          }
+          acc[tab.windowId].push(tab);
+          return acc;
+        },
+        {} as Record<number, typeof session.tabs>
+      );
+
+      // Create each window with its tabs
+      for (const tabs of Object.values(tabsByWindow)) {
+        await chrome.windows.create({
+          url: tabs.map((tab) => tab.url),
+          focused: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error restoring session:", error);
+      throw error;
+    }
+  },
+
+  clearAllSessions: () => {
+    set({ sessions: [] });
+    // Clear from chrome storage
+    if (chrome?.storage?.local) {
+      chrome.storage.local.remove("tabSessions");
+    }
+  },
+
+  loadSessions: async () => {
+    if (!chrome?.storage?.local) return;
+
+    try {
+      const result = await chrome.storage.local.get("tabSessions");
+      if (result.tabSessions) {
+        set({ sessions: result.tabSessions });
+      }
+    } catch (error) {
+      console.error("Error loading sessions:", error);
+    }
+  },
+}));

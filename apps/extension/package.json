@@ -102,6 +102,9 @@
     "permissions": [
       "cookies",
       "storage"
+    ],
+    "optional_permissions": [
+      "tabs"
     ]
   }
 }
