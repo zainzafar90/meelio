@@ -298,8 +298,7 @@ const SessionsList = ({
 
 const PermissionBanner = () => {
   const { t } = useTranslation();
-  const { checkPermissions, requestPermissions, hasPermissions } =
-    useTabStashStore();
+  const { requestPermissions, hasPermissions } = useTabStashStore();
 
   if (hasPermissions) return null;
 
@@ -341,21 +340,13 @@ const ExtensionTabStashContent = () => {
   const [selectedSession, setSelectedSession] = useState<TabSession | null>(
     null
   );
-  const {
-    sessions,
-    hasPermissions,
-    checkPermissions,
-    addSession,
-    loadSessions,
-    requestPermissions,
-  } = useTabStashStore();
+  const { sessions, hasPermissions, checkPermissions, addSession } =
+    useTabStashStore();
 
-  // Load initial permissions
   useEffect(() => {
     checkPermissions();
   }, [checkPermissions]);
 
-  // Unified stash handler
   const handleStashTabs = async (scope: "all" | "current") => {
     setIsStashingAll(true);
     setError(null);
@@ -373,7 +364,12 @@ const ExtensionTabStashContent = () => {
       );
 
       if (tabsToStash.length === 0) {
-        setError(t("tab-stash.no-tabs", "No tabs available to stash"));
+        setError(
+          t(
+            "tab-stash.no-tabs-warning",
+            "No stashable tabs found. Extension tabs and empty pages are excluded."
+          )
+        );
         return;
       }
 
@@ -441,7 +437,16 @@ const ExtensionTabStashContent = () => {
             {t("tab-stash.stash-current", "Stash Current Window")}
           </Button>
         </div>
-        {error && <div className="text-sm text-red-500">{error}</div>}
+        {error && (
+          <div className="bg-yellow-900/30 border border-yellow-800 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <Icons.warning className="size-5 text-yellow-500" />
+              <div className="flex-1">
+                <p className="text-sm text-yellow-200">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {hasPermissions ? (
