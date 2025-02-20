@@ -137,7 +137,7 @@ export const useBackgroundStore = create<BackgroundState>()(
   persist(
     (set, get) => ({
       wallpapers: DEFAULT_WALLPAPERS,
-      currentWallpaper: DEFAULT_WALLPAPERS[0],
+      currentWallpaper: DEFAULT_WALLPAPERS[2],
 
       addWallpaper: (wallpaper) =>
         set((state) => ({
@@ -157,7 +157,7 @@ export const useBackgroundStore = create<BackgroundState>()(
       resetToDefault: () =>
         set({
           wallpapers: DEFAULT_WALLPAPERS,
-          currentWallpaper: DEFAULT_WALLPAPERS[0],
+          currentWallpaper: DEFAULT_WALLPAPERS[2],
         }),
 
       initializeWallpapers: () => {
@@ -169,7 +169,7 @@ export const useBackgroundStore = create<BackgroundState>()(
 
         if (!state.currentWallpaper || !state.wallpapers.length) {
           set({
-            currentWallpaper: DEFAULT_WALLPAPERS[0],
+            currentWallpaper: DEFAULT_WALLPAPERS[2],
           });
         }
       },

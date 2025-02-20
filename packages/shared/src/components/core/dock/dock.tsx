@@ -68,12 +68,14 @@ export const Dock = () => {
     isTodosVisible,
     isSiteBlockerVisible,
     isBackgroundsVisible,
+    isTabStashVisible,
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
     toggleTodos,
     toggleSiteBlocker,
     toggleBackgrounds,
+    toggleTabStash,
     resetDock,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
@@ -82,6 +84,7 @@ export const Dock = () => {
     isTodosVisible: state.isTodosVisible,
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     isBackgroundsVisible: state.isBackgroundsVisible,
+    isTabStashVisible: state.isTabStashVisible,
     resetDock: state.reset,
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
@@ -89,6 +92,7 @@ export const Dock = () => {
     toggleTodos: state.toggleTodos,
     toggleSiteBlocker: state.toggleSiteBlocker,
     toggleBackgrounds: state.toggleBackgrounds,
+    toggleTabStash: state.toggleTabStash,
   }));
   const { t } = useTranslation();
 
@@ -135,6 +139,13 @@ export const Dock = () => {
         icon: Icons.siteBlocker,
         activeIcon: Icons.siteBlockerActive,
         onClick: () => toggleSiteBlocker(),
+      },
+      {
+        id: "tab-stash",
+        name: t("common.tab-stash"),
+        icon: Icons.tabStash,
+        activeIcon: Icons.tabStashActive,
+        onClick: () => toggleTabStash(),
       },
       {
         id: "background",
@@ -229,7 +240,8 @@ export const Dock = () => {
               (item.id === "breathepod" && isBreathingVisible) ||
               (item.id === "todos" && isTodosVisible) ||
               (item.id === "site-blocker" && isSiteBlockerVisible) ||
-              (item.id === "background" && isBackgroundsVisible);
+              (item.id === "background" && isBackgroundsVisible) ||
+              (item.id === "tab-stash" && isTabStashVisible);
 
             const IconComponent = (
               isActive ? item.activeIcon : item.icon

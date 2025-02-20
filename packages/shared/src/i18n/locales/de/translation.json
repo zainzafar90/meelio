@@ -8,6 +8,7 @@
     "todo": "Aufgaben",
     "site-blocker": "Seitenblocker",
     "background": "Hintergrund",
+    "tab-stash": "Tab-Stash",
     "calendar": {
       "months": {
         "short": {
@@ -285,5 +286,17 @@
     "liveWallpapers": "Lebende Hintergründe",
     "staticWallpapers": "Statische Hintergründe",
     "resetToDefault": "Zurücksetzen auf Standard"
+  },
+  "site-blocker": {
+    "title": "Seitenblocker",
+    "description": "Block websites to help you stay focused",
+    "extension-only": "Site blocking functionality is only available in the browser extension.",
+    "get-extension": "Get the Extension"
+  },
+  "tab-stash": {
+    "title": "Tab-Stash",
+    "description": "Stash your tabs for later",
+    "extension-only": "Tab stash functionality is only available in the browser extension.",
+    "get-extension": "Get the Extension"
   }
 }

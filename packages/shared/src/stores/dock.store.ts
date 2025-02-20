@@ -8,6 +8,7 @@ interface DockState {
   isTodosVisible: boolean;
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
+  isTabStashVisible: boolean;
   toggleTimer: () => void;
   toggleBreathing: () => void;
   toggleGreetings: () => void;
@@ -15,6 +16,7 @@ interface DockState {
   toggleTodos: () => void;
   toggleBackgrounds: () => void;
   toggleSiteBlocker: () => void;
+  toggleTabStash: () => void;
   setTimerVisible: (visible: boolean) => void;
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
@@ -22,17 +24,19 @@ interface DockState {
   setTodosVisible: (visible: boolean) => void;
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
+  setTabStashVisible: (visible: boolean) => void;
   reset: () => void;
 }
 
 export const useDockStore = create<DockState>()((set) => ({
-  isTimerVisible: true,
+  isTimerVisible: false,
   isBreathingVisible: false,
   isGreetingsVisible: true,
   isSoundscapesVisible: false,
   isTodosVisible: false,
   isBackgroundsVisible: false,
   isSiteBlockerVisible: false,
+  isTabStashVisible: false,
 
   toggleTimer: () => {
     set((state) => {
@@ -68,6 +72,10 @@ export const useDockStore = create<DockState>()((set) => ({
     set((state) => ({ isSiteBlockerVisible: !state.isSiteBlockerVisible }));
   },
 
+  toggleTabStash: () => {
+    set((state) => ({ isTabStashVisible: !state.isTabStashVisible }));
+  },
+
   setTimerVisible: (visible: boolean) => {
     set({ isTimerVisible: visible });
   },
@@ -96,6 +104,10 @@ export const useDockStore = create<DockState>()((set) => ({
     set({ isSiteBlockerVisible: visible });
   },
 
+  setTabStashVisible: (visible: boolean) => {
+    set({ isTabStashVisible: visible });
+  },
+
   reset: () => {
     set({
       isTimerVisible: false,
@@ -104,6 +116,8 @@ export const useDockStore = create<DockState>()((set) => ({
       isSoundscapesVisible: false,
       isTodosVisible: false,
       isBackgroundsVisible: false,
+      isSiteBlockerVisible: false,
+      isTabStashVisible: false,
     });
   },
 }));

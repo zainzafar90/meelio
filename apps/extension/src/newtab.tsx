@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, useDockStore } from "@repo/shared";
+import { AppProvider, Clock, TabStashSheet, useDockStore } from "@repo/shared";
 
 import {
   TodoListSheet,
@@ -55,6 +55,7 @@ const Content = () => {
       <TodoListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
+      <TabStashSheet />
     </main>
   );
 };

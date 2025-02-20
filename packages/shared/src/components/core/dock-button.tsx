@@ -27,6 +27,7 @@ export const DockButton = ({
     isTodosVisible,
     isSiteBlockerVisible,
     isBackgroundsVisible,
+    isTabStashVisible,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
     isSoundscapesVisible: state.isSoundscapesVisible,
@@ -34,6 +35,7 @@ export const DockButton = ({
     isTodosVisible: state.isTodosVisible,
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     isBackgroundsVisible: state.isBackgroundsVisible,
+    isTabStashVisible: state.isTabStashVisible,
   }));
 
   const isActive =
@@ -42,7 +44,8 @@ export const DockButton = ({
     (item.id === "breathepod" && isBreathingVisible) ||
     (item.id === "todos" && isTodosVisible) ||
     (item.id === "site-blocker" && isSiteBlockerVisible) ||
-    (item.id === "background" && isBackgroundsVisible);
+    (item.id === "background" && isBackgroundsVisible) ||
+    (item.id === "tab-stash" && isTabStashVisible);
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 

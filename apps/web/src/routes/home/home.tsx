@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { Clock, useDockStore } from "@repo/shared";
+import { Clock, TabStashSheet, useDockStore } from "@repo/shared";
 import { Background } from "@repo/shared";
 import { BackgroundOverlay } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -47,6 +47,7 @@ const Content = () => {
       <TodoListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
+      <TabStashSheet />
     </main>
   );
 };

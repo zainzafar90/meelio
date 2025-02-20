@@ -95,6 +95,9 @@ export * from "./core/todo-list/todo-list.sheet";
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";
 
+// Tab Stash
+export * from "./core/tab-stash/tab-stash.sheet";
+
 // ------------- ICONS -------------
 export * from "./icons";
 
