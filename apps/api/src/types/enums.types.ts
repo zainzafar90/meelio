@@ -10,3 +10,8 @@ export enum Provider {
   PASSWORD = "password",
   MAGIC_LINK = "magicLink",
 }
+
+export enum RoleType {
+  User = "user",
+  Guest = "guest",
+}

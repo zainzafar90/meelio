@@ -1,5 +1,4 @@
-import { RoleType } from "@/types/role.types";
-
+import { RoleType } from "@/types/enums.types";
 import permissions from "./permissions.json";
 
 /**

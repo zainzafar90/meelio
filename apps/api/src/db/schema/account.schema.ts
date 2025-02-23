@@ -1,17 +1,26 @@
-import { pgTable, text, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  customType,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 import { users } from "./user.schema";
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { Provider } from "@/types/enums.types";
 
-export const accountProviders = ["google", "password", "magicLink"] as const;
-export type AccountProvider = (typeof accountProviders)[number];
-export const accountProviderEnum = pgEnum("account_provider", accountProviders);
+const EnumProvider = customType<{
+  data: Provider;
+}>({
+  dataType: () => "text",
+});
 
 export const accounts = pgTable("accounts", {
   id,
   userId: text("user_id").notNull(),
-  provider: accountProviderEnum().notNull(),
+  provider: EnumProvider("provider").notNull(),
   providerAccountId: text("provider_account_id"),
   refreshToken: text("refresh_token"),
   accessToken: text("access_token"),

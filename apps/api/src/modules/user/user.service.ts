@@ -5,7 +5,7 @@ import {
   RegisterUserReq,
   UpdateUserReq,
 } from "@/types/api/api-payloads";
-import { RoleType } from "@/types/role.types";
+import { RoleType } from "@/types/enums.types";
 
 import { ApiError } from "@/common/errors/api-error";
 import { db } from "@/db";

@@ -15,7 +15,6 @@ import {
 } from "@/types/api/api-responses";
 import { IUser } from "@/types/interfaces/resources";
 import { IOptions } from "@/types/interfaces/pagination";
-import { RoleType } from "@/types/role.types";
 
 export const createUser = catchAsync(
   async (req: Request, res: Response<UserResponse>) => {

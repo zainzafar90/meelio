@@ -13,18 +13,6 @@ import { users } from "./user.schema";
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { VerificationTokenType } from "@/types/enums.types";
 
-// export const verificationTokenTypes = [
-//   "resetPassword",
-//   "verifyEmail",
-//   "magicLink",
-//   "invite",
-// ] as const;
-// export type VerificationTokenType = (typeof verificationTokenTypes)[number];
-// const verificationTokenTypeEnum = pgEnum(
-//   "verification_token_type",
-//   verificationTokenTypes
-// );
-
 const EnumVerificationTokenType = customType<{
   data: VerificationTokenType;
 }>({

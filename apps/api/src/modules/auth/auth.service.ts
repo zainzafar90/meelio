@@ -17,7 +17,6 @@ import {
 import {
   Account,
   AccountInsert,
-  AccountProvider,
   accounts,
   subscriptions,
   users,
@@ -26,7 +25,7 @@ import { verifyPassword } from "../user/user.utils";
 import { verificationTokenService } from "../verification-token";
 import { userService } from "../user";
 import { updateUserById } from "../user/user.service";
-import { RoleType } from "@/types/role.types";
+import { RoleType } from "@/types/enums.types";
 /**
  * Generate token
  * @param {string} userId
@@ -140,7 +139,7 @@ const updateAccountTokens = async (
   const account = await db.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, userId),
-      eq(accounts.provider, provider as AccountProvider)
+      eq(accounts.provider, provider as Provider)
     ),
   });
 

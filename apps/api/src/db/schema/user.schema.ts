@@ -2,18 +2,21 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
-  pgEnum,
   pgTable,
   timestamp,
   varchar,
+  customType,
 } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { verificationTokens } from "./verification-token.schema";
+import { RoleType } from "@/types/enums.types";
 
-export const userRoles = ["user", "guest"] as const;
-export type UserRole = (typeof userRoles)[number];
-export const userRoleEnum = pgEnum("user_role", userRoles);
+const EnumUserRole = customType<{
+  data: RoleType;
+}>({
+  dataType: () => "text",
+});
 
 export const users = pgTable(
   "users",
@@ -24,7 +27,7 @@ export const users = pgTable(
     password: varchar("password", { length: 255 }),
     isEmailVerified: boolean("is_email_verified").default(false),
     image: varchar("image", { length: 255 }),
-    role: userRoleEnum().notNull().default("user"),
+    role: EnumUserRole("role").notNull().default(RoleType.User),
     deletedAt: timestamp({ withTimezone: true }),
     createdAt,
     updatedAt,

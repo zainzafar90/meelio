@@ -1,5 +1,6 @@
 import Joi from "joi";
-import { RoleType } from "@/types/role.types";
+
+import { RoleType } from "@/types/enums.types";
 
 import { password, uuid } from "@/common/validate/custom.validation";
 import { CreateUserReq } from "@/types/api/api-payloads";

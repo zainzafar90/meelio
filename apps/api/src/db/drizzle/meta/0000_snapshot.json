@@ -1,5 +1,5 @@
 {
-  "id": "09d5251c-51e1-4840-bc71-8e5468da35ea",
+  "id": "0f8a4961-923a-4653-81fe-11367ba79ee1",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -48,8 +48,7 @@
         },
         "role": {
           "name": "role",
-          "type": "user_role",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
@@ -258,8 +257,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "account_provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -480,25 +478,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.user_role": {
-      "name": "user_role",
-      "schema": "public",
-      "values": [
-        "user",
-        "guest"
-      ]
-    },
-    "public.account_provider": {
-      "name": "account_provider",
-      "schema": "public",
-      "values": [
-        "google",
-        "password",
-        "magicLink"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},
