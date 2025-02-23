@@ -1,0 +1,20 @@
+{
+  "resourcePolicies": [
+    {
+      "version": "default",
+      "resource": "users",
+      "rules": [
+        {
+          "actions": ["*"],
+          "roles": ["user"],
+          "effect": "EFFECT_ALLOW"
+        },
+        {
+          "actions": ["view", "update"],
+          "roles": ["guest"],
+          "effect": "EFFECT_ALLOW"
+        }
+      ]
+    }
+  ]
+}

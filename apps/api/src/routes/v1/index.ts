@@ -1,13 +1,12 @@
-import express, { Router } from 'express';
-import docsRoute from './swagger.route';
-import userRoute from './user.route';
-import accountRoute from './account.route';
-import billingRoute from './billing.route';
-import subscriptionRoute from './subscription.route';
-import weatherRoute from './weather.route';
-import config from '../../config/config';
+import express, { Router } from "express";
 
-const router = express.Router();
+import { config } from "@/config/config";
+
+import authRoute from "./auth.routes";
+import docsRoute from "./swagger.routes";
+import userRoute from "./user.routes";
+
+const router: express.Router = express.Router();
 
 interface IRoute {
   path: string;
@@ -16,31 +15,19 @@ interface IRoute {
 
 const defaultIRoute: IRoute[] = [
   {
-    path: '/users',
+    path: "/auth",
+    route: authRoute,
+  },
+  {
+    path: "/users",
     route: userRoute,
-  },
-  {
-    path: '/account',
-    route: accountRoute,
-  },
-  {
-    path: '/billing',
-    route: billingRoute,
-  },
-  {
-    path: '/subscriptions',
-    route: subscriptionRoute,
-  },
-  {
-    path: '/weather',
-    route: weatherRoute,
   },
 ];
 
 const devIRoute: IRoute[] = [
   // IRoute available only in development mode
   {
-    path: '/docs',
+    path: "/docs",
     route: docsRoute,
   },
 ];
@@ -50,7 +37,7 @@ defaultIRoute.forEach((route) => {
 });
 
 /* istanbul ignore next */
-if (config.env === 'development') {
+if (config.env === "development") {
   devIRoute.forEach((route) => {
     router.use(route.path, route.route);
   });
