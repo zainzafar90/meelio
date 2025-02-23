@@ -82,13 +82,13 @@ const generateResetPasswordToken = async (email: string): Promise<string> => {
   const resetPasswordToken = generateVerificationToken(
     user.email,
     expires,
-    Provider.PASSWORD
+    TokenType.RESET_PASSWORD
   );
   await saveVerificationToken(
     resetPasswordToken,
     user.email,
     expires,
-    Provider.PASSWORD
+    TokenType.RESET_PASSWORD
   );
   return resetPasswordToken;
 };
