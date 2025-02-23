@@ -28,7 +28,7 @@ export function ProfileDropdown() {
             ) : (
               <Icons.user className="size-4" />
             )}
-            {!isProMember && (
+            {isProMember && (
               <Icons.proMember className="absolute -right-1.5 -top-1.5 h-4 w-4 text-background" />
             )}
           </div>
