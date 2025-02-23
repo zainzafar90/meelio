@@ -42,3 +42,32 @@ export interface IUser {
   role: RoleType;
   image?: string;
 }
+
+export interface IBillingWebhook {
+  eventName: string;
+  processed: boolean;
+  eventBody: object;
+  processingError: string;
+}
+
+export interface ISubscription {
+  id?: string;
+  lemonSqueezyId: number | string;
+  subscriptionItemId?: number | string | null;
+  orderId: number | string;
+  name: string;
+  email: string;
+  status: string;
+  renewsAt?: Date;
+  endsAt?: Date;
+  trialEndsAt?: Date;
+  resumesAt?: Date;
+  priceId: number | string;
+  planId: number | string;
+  userId: string;
+  cancelled: boolean;
+  productName: string;
+  updatePaymentUrl?: string;
+  customerPortalUrl?: string;
+  isUsageBased?: boolean;
+}

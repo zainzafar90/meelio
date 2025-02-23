@@ -88,7 +88,7 @@ const config = {
     clientId: envVars.GOOGLE_CLIENT_ID,
     clientSecret: envVars.GOOGLE_CLIENT_SECRET,
   },
-  lemonSqueezy: {
+  billing: {
     signingSecret: envVars.LEMON_SQUEEZY_SIGNING_SECRET,
     apiKey: envVars.LEMON_SQUEEZY_API_KEY,
     storeId: envVars.LEMON_SQUEEZY_STORE_ID,

@@ -13,6 +13,8 @@ import { ApiError, errorConverter, errorHandler } from "@/common/errors";
 import { jwtStrategy, googleStrategy } from "@/modules/auth";
 import { authLimiter } from "@/utils";
 
+export type RequestWithRawBody = express.Request & { rawBody: Buffer };
+
 export const createServer = (): Express => {
   const app = express();
 
@@ -27,6 +29,13 @@ export const createServer = (): Express => {
   app
     .disable("x-powered-by")
     .use(morgan("dev"))
+    .use(
+      json({
+        verify: (req, _, buf) => {
+          (req as RequestWithRawBody).rawBody = buf;
+        },
+      })
+    )
     .use(
       helmet({
         crossOriginResourcePolicy: { policy: "cross-origin" },

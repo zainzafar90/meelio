@@ -5,6 +5,8 @@ import { config } from "@/config/config";
 import authRoute from "./auth.routes";
 import docsRoute from "./swagger.routes";
 import userRoute from "./user.routes";
+import billingRoute from "./billing.routes";
+import subscriptionRoute from "./subscription.routes";
 
 const router: express.Router = express.Router();
 
@@ -21,6 +23,14 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/users",
     route: userRoute,
+  },
+  {
+    path: "/billing",
+    route: billingRoute,
+  },
+  {
+    path: "/subscriptions",
+    route: subscriptionRoute,
   },
 ];
 
