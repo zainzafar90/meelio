@@ -3,7 +3,7 @@
   "globalEnv": [
     "NODE_ENV",
     "PORT",
-    "MONGODB_URL",
+    "DB_URL",
     "JWT_SECRET",
     "JWT_ACCESS_EXPIRATION_MINUTES",
     "JWT_REFRESH_EXPIRATION_DAYS",
@@ -24,7 +24,14 @@
   "tasks": {
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**", ".plasmo/**", "build/**"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "public/dist/**",
+        ".plasmo/**",
+        "build/**"
+      ],
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_API_HOST"]
     },
