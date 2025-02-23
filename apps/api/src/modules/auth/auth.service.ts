@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { ApiError } from "@/common/errors/api-error";
 import { db } from "@/db";
 
-import { Provider, TokenType } from "@/types/enums.types";
+import { Provider, VerificationTokenType } from "@/types/enums.types";
 import { Moment } from "moment";
 import { config } from "@/config/config";
 import {
@@ -38,7 +38,7 @@ import { RoleType } from "@/types/role.types";
 export const generateToken = (
   userId: string,
   expires: Moment,
-  type: TokenType,
+  type: "access" | "refresh",
   secret: string = config.jwt.secret
 ): string => {
   const payload = {
@@ -109,16 +109,8 @@ const generateAuthTokens = async (
     "days"
   );
 
-  const accessToken = generateToken(
-    user.id,
-    accessExpiration,
-    TokenType.ACCESS
-  );
-  const refreshToken = generateToken(
-    user.id,
-    refreshExpiration,
-    TokenType.REFRESH
-  );
+  const accessToken = generateToken(user.id, accessExpiration, "access");
+  const refreshToken = generateToken(user.id, refreshExpiration, "refresh");
 
   const tokens = {
     access: {
@@ -307,7 +299,7 @@ const resetPassword = async (
     const resetPasswordTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         resetPasswordToken,
-        TokenType.RESET_PASSWORD
+        VerificationTokenType.RESET_PASSWORD
       );
     const user = await userService.getUserByEmail(resetPasswordTokenDoc.email);
     if (!user) {
@@ -317,7 +309,7 @@ const resetPassword = async (
 
     await verificationTokenService.deleteMany(
       user.email,
-      TokenType.RESET_PASSWORD
+      VerificationTokenType.RESET_PASSWORD
     );
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Password reset failed");
@@ -333,7 +325,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
     const verifyEmailTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyEmailToken,
-        TokenType.VERIFY_EMAIL
+        VerificationTokenType.VERIFY_EMAIL
       );
     const user = await userService.getUserByEmail(verifyEmailTokenDoc.email);
 
@@ -343,7 +335,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
 
     await verificationTokenService.deleteMany(
       user.email,
-      TokenType.VERIFY_EMAIL
+      VerificationTokenType.VERIFY_EMAIL
     );
     const updatedUser = await updateUserById(user.id, {
       isEmailVerified: true,
@@ -365,7 +357,7 @@ const verifyMagicLink = async (
     const verifyMagicLinkTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyMagicLinkToken,
-        Provider.MAGIC_LINK
+        VerificationTokenType.MAGIC_LINK
       );
 
     if (!verifyMagicLinkTokenDoc) {

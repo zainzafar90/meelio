@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
-  pgEnum,
+  customType,
   pgTable,
   text,
   timestamp,
@@ -11,17 +11,25 @@ import {
 
 import { users } from "./user.schema";
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { VerificationTokenType } from "@/types/enums.types";
 
-export const verificationTokenTypes = [
-  "resetPassword",
-  "verifyEmail",
-  "magicLink",
-] as const;
-export type VerificationTokenType = (typeof verificationTokenTypes)[number];
-export const verificationTokenTypeEnum = pgEnum(
-  "verification_token_type",
-  verificationTokenTypes
-);
+// export const verificationTokenTypes = [
+//   "resetPassword",
+//   "verifyEmail",
+//   "magicLink",
+//   "invite",
+// ] as const;
+// export type VerificationTokenType = (typeof verificationTokenTypes)[number];
+// const verificationTokenTypeEnum = pgEnum(
+//   "verification_token_type",
+//   verificationTokenTypes
+// );
+
+const EnumVerificationTokenType = customType<{
+  data: VerificationTokenType;
+}>({
+  dataType: () => "text",
+});
 
 export const verificationTokens = pgTable(
   "verification_tokens",
@@ -29,7 +37,7 @@ export const verificationTokens = pgTable(
     id,
     email: varchar("email", { length: 255 }).notNull(),
     token: text("token").notNull(),
-    type: verificationTokenTypeEnum().notNull(),
+    type: EnumVerificationTokenType("type").notNull(),
     expiresAt: timestamp("expires_at"),
     blacklisted: boolean("blacklisted").notNull().default(false),
     createdAt,

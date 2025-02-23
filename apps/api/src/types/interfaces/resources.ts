@@ -1,4 +1,13 @@
+import { JwtPayload } from "jsonwebtoken";
+
 import { RoleType } from "@/types/role.types";
+
+export interface IPayload extends JwtPayload {
+  sub: string;
+  iat: number;
+  exp: number;
+  type: "access" | "refresh";
+}
 
 export type IAccessAndRefreshTokens = {
   access: {

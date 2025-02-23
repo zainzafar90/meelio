@@ -1,9 +1,8 @@
-export enum TokenType {
-  ACCESS = "access",
-  REFRESH = "refresh",
+export enum VerificationTokenType {
   RESET_PASSWORD = "resetPassword",
   VERIFY_EMAIL = "verifyEmail",
   INVITE = "invite",
+  MAGIC_LINK = "magicLink",
 }
 
 export enum Provider {

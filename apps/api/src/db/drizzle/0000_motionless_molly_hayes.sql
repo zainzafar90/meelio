@@ -1,5 +1,4 @@
 CREATE TYPE "public"."user_role" AS ENUM('user', 'guest');--> statement-breakpoint
-CREATE TYPE "public"."verification_token_type" AS ENUM('resetPassword', 'verifyEmail', 'magicLink');--> statement-breakpoint
 CREATE TYPE "public"."account_provider" AS ENUM('google', 'password', 'magicLink');--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -19,7 +18,7 @@ CREATE TABLE "verification_tokens" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"token" text NOT NULL,
-	"type" "verification_token_type" NOT NULL,
+	"type" text NOT NULL,
 	"expires_at" timestamp,
 	"blacklisted" boolean DEFAULT false NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,

@@ -1,5 +1,5 @@
 {
-  "id": "cc47be0b-7ba4-45ba-b5bf-847d6fd8c079",
+  "id": "09d5251c-51e1-4840-bc71-8e5468da35ea",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -162,8 +162,7 @@
         },
         "type": {
           "name": "type",
-          "type": "verification_token_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -488,15 +487,6 @@
       "values": [
         "user",
         "guest"
-      ]
-    },
-    "public.verification_token_type": {
-      "name": "verification_token_type",
-      "schema": "public",
-      "values": [
-        "resetPassword",
-        "verifyEmail",
-        "magicLink"
       ]
     },
     "public.account_provider": {

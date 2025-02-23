@@ -1,17 +1,9 @@
-import { JwtPayload } from "jsonwebtoken";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { Request } from "express";
 
 import { config } from "@/config/config";
-import { TokenType } from "@/types/enums.types";
 import { userService } from "../../user";
-
-interface IPayload extends JwtPayload {
-  sub: string;
-  iat: number;
-  exp: number;
-  type: TokenType;
-}
+import { IPayload } from "@/types/interfaces/resources";
 
 export const COOKIE_API_TOKEN = "api-token";
 
@@ -28,7 +20,7 @@ export const jwtStrategy = new JwtStrategy(
   },
   async (payload: IPayload, done) => {
     try {
-      if (payload.type !== TokenType.ACCESS) {
+      if (payload.type !== "access") {
         throw new Error("Invalid token type");
       }
       const user = await userService.getUserById(payload.sub);

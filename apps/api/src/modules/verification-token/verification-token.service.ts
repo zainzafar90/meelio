@@ -5,12 +5,8 @@ import { config } from "../../config/config";
 
 import { IUser } from "../../types/interfaces/resources";
 import { userService } from "../user";
-import { Provider, TokenType } from "../../types/enums.types";
-import {
-  VerificationTokenInsert,
-  verificationTokens,
-  VerificationTokenType,
-} from "../../db/schema";
+import { Provider, VerificationTokenType } from "../../types/enums.types";
+import { VerificationTokenInsert, verificationTokens } from "../../db/schema";
 import { ApiError } from "@/common/errors";
 import { db } from "@/db";
 import { and } from "drizzle-orm";
@@ -82,13 +78,13 @@ const generateResetPasswordToken = async (email: string): Promise<string> => {
   const resetPasswordToken = generateVerificationToken(
     user.email,
     expires,
-    TokenType.RESET_PASSWORD
+    VerificationTokenType.RESET_PASSWORD
   );
   await saveVerificationToken(
     resetPasswordToken,
     user.email,
     expires,
-    TokenType.RESET_PASSWORD
+    VerificationTokenType.RESET_PASSWORD
   );
   return resetPasswordToken;
 };
@@ -106,13 +102,13 @@ const generateVerifyEmailToken = async (user: IUser): Promise<string> => {
   const verifyEmailToken = generateVerificationToken(
     user.email,
     expires,
-    TokenType.VERIFY_EMAIL
+    VerificationTokenType.VERIFY_EMAIL
   );
   await saveVerificationToken(
     verifyEmailToken,
     user.email,
     expires,
-    TokenType.VERIFY_EMAIL
+    VerificationTokenType.VERIFY_EMAIL
   );
   return verifyEmailToken;
 };
@@ -146,7 +142,10 @@ const generateMagicLinkToken = async (email: string): Promise<string> => {
  * @param {string} token
  * @param {string} type
  */
-const verifyVerificationToken = async (token: string, type: string) => {
+const verifyVerificationToken = async (
+  token: string,
+  type: VerificationTokenType
+) => {
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
