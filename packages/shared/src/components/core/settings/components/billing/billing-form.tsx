@@ -46,7 +46,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         });
 
         if (portal) {
-          window.location.href = portal.url;
+          window.location.href = portal.data.url;
         }
       }
     } catch (error) {
