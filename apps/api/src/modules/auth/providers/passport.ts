@@ -15,10 +15,8 @@ interface IPayload extends JwtPayload {
 
 export const COOKIE_API_TOKEN = "api-token";
 
-const cookieExtractor = (req: Request) => {
-  console.log(JSON.stringify(req.cookies, null, 2), "req.cookies");
-  return (req && req.cookies && req.cookies[COOKIE_API_TOKEN]) || null;
-};
+const cookieExtractor = (req: Request) =>
+  (req && req.cookies && req.cookies[COOKIE_API_TOKEN]) || null;
 
 export const jwtStrategy = new JwtStrategy(
   {

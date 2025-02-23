@@ -17,16 +17,21 @@ export const createServer = (): Express => {
   const app = express();
 
   const corsOptions = {
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    optionsSuccessStatus: 204,
+    origin: true, // Allow all origins in development for Postman testing
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["set-cookie"],
   };
 
   app
     .disable("x-powered-by")
     .use(morgan("dev"))
-    .use(helmet())
+    .use(
+      helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin" },
+      })
+    )
     .use(urlencoded({ extended: true }))
     .use(json())
     .use(compression() as any)

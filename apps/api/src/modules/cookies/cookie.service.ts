@@ -14,13 +14,15 @@ export const setResponseCookie = async (
   res: Response,
   tokens: IAccessAndRefreshTokens
 ): Promise<void> => {
-  res.cookie(COOKIE_API_TOKEN, tokens.access.token, {
-    secure: true,
-    sameSite: "none",
+  const cookieOptions = {
+    secure: config.env === "production",
+    sameSite: "lax",
     expires: tokens.access.expires,
-    httpOnly: config.env === "production",
-    domain: config.env === "production" ? "meelio.io" : undefined,
-  });
+    httpOnly: true,
+    path: "/",
+  };
+
+  res.cookie(COOKIE_API_TOKEN, tokens.access.token, cookieOptions);
 };
 
 /**
@@ -29,12 +31,14 @@ export const setResponseCookie = async (
  * @returns {Promise<void>}
  */
 export const clearJwtCookie = (response: Response) => {
-  response.clearCookie(COOKIE_API_TOKEN, {
-    secure: true,
-    sameSite: "none",
-    httpOnly: config.env === "production",
-    domain: config.env === "production" ? "meelio.io" : undefined,
-  });
+  const cookieOptions = {
+    secure: config.env === "production",
+    sameSite: "lax" as const,
+    httpOnly: true,
+    path: "/",
+  };
+
+  response.clearCookie(COOKIE_API_TOKEN, cookieOptions);
 };
 
 /**
