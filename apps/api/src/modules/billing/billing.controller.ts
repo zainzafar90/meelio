@@ -1,19 +1,25 @@
-import { Request, Response } from 'express';
-import httpStatus from 'http-status';
-import { catchAsync } from '../utils';
-import { billingService } from './billing.service';
-import { WebhookObject } from '../webhooks/billing-webhook.interface';
-import { billingWebhookService } from '../webhooks/billing-webhook.service';
+import { Request, Response } from "express";
+import httpStatus from "http-status";
+
+import { billingService } from "./billing.service";
+import { billingWebhookService } from "@/modules/webhooks/billing-webhook.service";
+import { WebhookObject } from "@/types";
+import { catchAsync } from "@/utils/catch-async";
 
 const webhook = catchAsync(async (req: Request, res: Response) => {
   const lemonSqueezyEvent = req.body as WebhookObject;
-  const webhookEvent = await billingWebhookService.createWebhookEvent(lemonSqueezyEvent);
-  const eventProcessed = await billingService.processEvent(lemonSqueezyEvent, webhookEvent?.id);
+  const webhookEvent =
+    await billingWebhookService.createWebhookEvent(lemonSqueezyEvent);
+
+  const eventProcessed = await billingService.processEvent(
+    lemonSqueezyEvent,
+    webhookEvent?.id
+  );
 
   if (!eventProcessed) {
     return res.status(httpStatus.BAD_REQUEST).send({
       success: false,
-      message: 'Event not processed',
+      message: "Event not processed",
     });
   }
 

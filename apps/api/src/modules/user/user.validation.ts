@@ -1,13 +1,16 @@
-import Joi from 'joi';
-import { password, objectId } from '../validate/custom.validation';
-import { NewCreatedUser } from './user.interfaces';
+import Joi from "joi";
 
-const createUserBody: Record<keyof NewCreatedUser, any> = {
+import { RoleType } from "@/types/enums.types";
+
+import { password, uuid } from "@/common/validate/custom.validation";
+import { CreateUserReq } from "@/types/api/api-payloads";
+
+const createUserBody: Record<keyof CreateUserReq, any> = {
   email: Joi.string().required().email(),
-  password: Joi.string().optional().custom(password),
+  password: Joi.string().required().custom(password),
   name: Joi.string().required(),
-  role: Joi.string().required().valid('user', 'admin'),
   image: Joi.string().optional(),
+  role: Joi.string().valid(RoleType.User, RoleType.Guest).required(),
 };
 
 export const createUser = {
@@ -19,21 +22,22 @@ export const getUsers = {
     name: Joi.string(),
     role: Joi.string(),
     sortBy: Joi.string(),
+    sortOrder: Joi.string().valid("asc", "desc"),
     projectBy: Joi.string(),
     limit: Joi.number().integer(),
-    page: Joi.number().integer(),
+    offset: Joi.number().integer(),
   }),
 };
 
 export const getUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.string().custom(uuid),
   }),
 };
 
 export const updateUser = {
   params: Joi.object().keys({
-    userId: Joi.required().custom(objectId),
+    userId: Joi.required().custom(uuid),
   }),
   body: Joi.object()
     .keys({
@@ -46,6 +50,22 @@ export const updateUser = {
 
 export const deleteUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.string().custom(uuid),
+  }),
+};
+
+export const createGuestUser = {
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+  }),
+};
+
+export const convertGuestToRegular = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
   }),
 };

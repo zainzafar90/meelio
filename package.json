@@ -18,7 +18,15 @@
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "db:generate:name": "cd apps/api && npx drizzle-kit generate --name=$name",
+    "db:generate": "cd apps/api && npx drizzle-kit generate",
+    "db:migrate": "cd apps/api && npx drizzle-kit migrate",
+    "db:studio": "cd apps/api && npx drizzle-kit studio",
+    "db:seed": "cd apps/api && npx tsx ./src/db/seed.ts",
+    "db:up": "npm run db:generate && npm run db:migrate",
+    "db:push": "cd apps/api && npx drizzle-kit push",
+    "db:export": "cd apps/api && npx drizzle-kit export"
   },
   "dependencies": {},
   "devDependencies": {

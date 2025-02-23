@@ -1,1 +1,1 @@
-export * as cookieService from './cookie.service';
+export * as cookieService from "./cookie.service";

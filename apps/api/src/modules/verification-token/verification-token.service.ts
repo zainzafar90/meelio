@@ -1,13 +1,16 @@
-import jwt from 'jsonwebtoken';
-import moment, { Moment } from 'moment';
-import httpStatus from 'http-status';
-import config from '../../config/config';
-import ApiError from '../errors/ApiError';
-import { IVerificationTokenDoc } from './verification-token.interfaces';
-import { IUserDoc } from '../user/user.interfaces';
-import { userService } from '../user';
-import { TokenType } from './verification-token.types';
-import VerificationToken from './verification-token.model';
+import jwt from "jsonwebtoken";
+import moment, { Moment } from "moment";
+import httpStatus from "http-status";
+import { config } from "../../config/config";
+
+import { IUser } from "../../types/interfaces/resources";
+import { userService } from "../user";
+import { Provider, VerificationTokenType } from "../../types/enums.types";
+import { VerificationTokenInsert, verificationTokens } from "../../db/schema";
+import { ApiError } from "@/common/errors";
+import { db } from "@/db";
+import { and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 /**
  * Generate verification token
@@ -47,14 +50,14 @@ const saveVerificationToken = async (
   expires: Moment,
   type: string,
   blacklisted: boolean = false
-): Promise<IVerificationTokenDoc> => {
-  const tokenDoc = await VerificationToken.create({
+) => {
+  const tokenDoc = await db.insert(verificationTokens).values({
     token,
     email,
     expires: expires.toDate(),
     type,
     blacklisted,
-  });
+  } as VerificationTokenInsert);
   return tokenDoc;
 };
 
@@ -66,23 +69,47 @@ const saveVerificationToken = async (
 const generateResetPasswordToken = async (email: string): Promise<string> => {
   const user = await userService.getUserByEmail(email);
   if (!user) {
-    throw new ApiError(httpStatus.NO_CONTENT, '');
+    throw new ApiError(httpStatus.NO_CONTENT, "");
   }
-  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
-  const resetPasswordToken = generateVerificationToken(user.email, expires, TokenType.RESET_PASSWORD);
-  await saveVerificationToken(resetPasswordToken, user.email, expires, TokenType.RESET_PASSWORD);
+  const expires = moment().add(
+    config.jwt.resetPasswordExpirationMinutes,
+    "minutes"
+  );
+  const resetPasswordToken = generateVerificationToken(
+    user.email,
+    expires,
+    VerificationTokenType.RESET_PASSWORD
+  );
+  await saveVerificationToken(
+    resetPasswordToken,
+    user.email,
+    expires,
+    VerificationTokenType.RESET_PASSWORD
+  );
   return resetPasswordToken;
 };
 
 /**
  * Generate verify email token
- * @param {IUserDoc} user
+ * @param {IUser} user
  * @returns {Promise<string>}
  */
-const generateVerifyEmailToken = async (user: IUserDoc): Promise<string> => {
-  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateVerificationToken(user.email, expires, TokenType.VERIFY_EMAIL);
-  await saveVerificationToken(verifyEmailToken, user.email, expires, TokenType.VERIFY_EMAIL);
+const generateVerifyEmailToken = async (user: IUser): Promise<string> => {
+  const expires = moment().add(
+    config.jwt.verifyEmailExpirationMinutes,
+    "minutes"
+  );
+  const verifyEmailToken = generateVerificationToken(
+    user.email,
+    expires,
+    VerificationTokenType.VERIFY_EMAIL
+  );
+  await saveVerificationToken(
+    verifyEmailToken,
+    user.email,
+    expires,
+    VerificationTokenType.VERIFY_EMAIL
+  );
   return verifyEmailToken;
 };
 
@@ -92,9 +119,21 @@ const generateVerifyEmailToken = async (user: IUserDoc): Promise<string> => {
  * @returns {Promise<string>}
  */
 const generateMagicLinkToken = async (email: string): Promise<string> => {
-  const expires = moment().add(config.jwt.verifyEmailExpirationMinutes, 'minutes');
-  const verifyEmailToken = generateVerificationToken(email, expires, TokenType.MAGIC_LINK);
-  await saveVerificationToken(verifyEmailToken, email, expires, TokenType.MAGIC_LINK);
+  const expires = moment().add(
+    config.jwt.verifyEmailExpirationMinutes,
+    "minutes"
+  );
+  const verifyEmailToken = generateVerificationToken(
+    email,
+    expires,
+    Provider.MAGIC_LINK
+  );
+  await saveVerificationToken(
+    verifyEmailToken,
+    email,
+    expires,
+    Provider.MAGIC_LINK
+  );
   return verifyEmailToken;
 };
 
@@ -102,34 +141,55 @@ const generateMagicLinkToken = async (email: string): Promise<string> => {
  * Verify token and return verification token doc (or throw an error if it is not valid)
  * @param {string} token
  * @param {string} type
- * @returns {Promise<IVerificationTokenDoc>}
  */
-const verifyVerificationToken = async (token: string, type: string): Promise<IVerificationTokenDoc> => {
+const verifyVerificationToken = async (
+  token: string,
+  type: VerificationTokenType
+) => {
   if (!token) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Verification token is missing');
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Verification token is missing"
+    );
   }
 
   let payload;
   try {
     payload = jwt.verify(token, config.jwt.secret);
   } catch (err) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired token');
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid or expired token");
   }
 
-  if (!payload || !payload.sub || typeof payload.sub !== 'string') {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Token payload is malformed or bad user');
+  if (!payload || !payload.sub || typeof payload.sub !== "string") {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Token payload is malformed or bad user"
+    );
   }
 
-  const verificationTokenDoc = await VerificationToken.findOne({
-    token,
-    type,
-    email: payload.sub,
-    blacklisted: false,
+  const verificationTokenDoc = await db.query.verificationTokens.findFirst({
+    where: and(
+      eq(verificationTokens.token, token),
+      eq(verificationTokens.type, type as VerificationTokenType),
+      eq(verificationTokens.email, payload.sub),
+      eq(verificationTokens.blacklisted, false)
+    ),
   });
   if (!verificationTokenDoc) {
-    throw new Error('Verification token not found');
+    throw new Error("Verification token not found");
   }
   return verificationTokenDoc;
+};
+
+const deleteMany = async (email: string, type: string) => {
+  await db
+    .delete(verificationTokens)
+    .where(
+      and(
+        eq(verificationTokens.email, email),
+        eq(verificationTokens.type, type as VerificationTokenType)
+      )
+    );
 };
 
 export const verificationTokenService = {
@@ -137,4 +197,5 @@ export const verificationTokenService = {
   generateVerifyEmailToken,
   generateMagicLinkToken,
   verifyVerificationToken,
+  deleteMany,
 };

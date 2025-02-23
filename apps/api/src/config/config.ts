@@ -1,7 +1,6 @@
 import Joi from "joi";
 
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 const envVarsSchema = Joi.object()
   .keys({
@@ -9,7 +8,7 @@ const envVarsSchema = Joi.object()
       .valid("production", "development", "test")
       .required(),
     PORT: Joi.number().default(3000),
-    MONGODB_URL: Joi.string().required().description("Mongo DB url"),
+    DB_URL: Joi.string().required().description("Database url"),
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number()
       .default(30)
@@ -30,7 +29,6 @@ const envVarsSchema = Joi.object()
     EMAIL_FROM: Joi.string().description(
       "the from field in the emails sent by the app"
     ),
-    CLIENT_URL: Joi.string().required().description("Client url"),
     GOOGLE_CLIENT_ID: Joi.string().required().description("Google client id"),
     GOOGLE_CLIENT_SECRET: Joi.string()
       .required()
@@ -44,6 +42,7 @@ const envVarsSchema = Joi.object()
     LEMON_SQUEEZY_STORE_ID: Joi.string()
       .required()
       .description("Lemon Squeezy store id"),
+    CLIENT_URL: Joi.string().required().description("Client url"),
   })
   .unknown();
 
@@ -58,13 +57,8 @@ if (error) {
 const config = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
-  mongoose: {
-    url: envVars.MONGODB_URL + (envVars.NODE_ENV === "test" ? "-test" : ""),
-    options: {
-      // useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
+  db: {
+    url: envVars.DB_URL,
   },
   jwt: {
     secret: envVars.JWT_SECRET,
@@ -79,15 +73,10 @@ const config = {
       signed: true,
     },
   },
-  google: {
-    clientId: envVars.GOOGLE_CLIENT_ID,
-    clientSecret: envVars.GOOGLE_CLIENT_SECRET,
-  },
   email: {
     smtp: {
       host: envVars.SMTP_HOST,
       port: envVars.SMTP_PORT,
-      secure: true,
       auth: {
         user: envVars.SMTP_USERNAME,
         pass: envVars.SMTP_PASSWORD,
@@ -95,12 +84,16 @@ const config = {
     },
     from: envVars.EMAIL_FROM,
   },
-  clientUrl: envVars.CLIENT_URL,
+  google: {
+    clientId: envVars.GOOGLE_CLIENT_ID,
+    clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+  },
   billing: {
-    secret: envVars.LEMON_SQUEEZY_SIGNING_SECRET,
+    signingSecret: envVars.LEMON_SQUEEZY_SIGNING_SECRET,
     apiKey: envVars.LEMON_SQUEEZY_API_KEY,
     storeId: envVars.LEMON_SQUEEZY_STORE_ID,
   },
+  clientUrl: envVars.CLIENT_URL,
 };
 
-export default config;
+export { config };

@@ -26,7 +26,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
             subscriptionId: user.subscriptionId,
           });
 
-          setSubscriptionPlan(subscription);
+          setSubscriptionPlan(subscription?.data);
         }
       } catch (error) {
         console.error(error);
@@ -34,7 +34,6 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         setIsLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onManageSubscription = async () => {
@@ -47,7 +46,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         });
 
         if (portal) {
-          window.location.href = portal.url;
+          window.location.href = portal.data.url;
         }
       }
     } catch (error) {
@@ -77,15 +76,12 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         variantId: planId,
       });
 
-      if (checkout) {
-        window.location.href = checkout.url;
-        // (window as any).LemonSqueezy.Url.Open(checkout.url);
-        // window.LemonSqueezy.Url.Open(checkout.url);
+      if (checkout?.data?.url) {
+        window.open(checkout.data.url, "_blank");
       }
     } catch (error) {
       return toast.error("Something went wrong.", {
         description:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (error as any)?.message ||
           "Checkout portal not working. Please try again.",
       });

@@ -1,10 +1,7 @@
 import { logger } from "@repo/logger";
 import { subscriptionService } from "../subscription/subscription.service";
 import { userService } from "../user";
-import {
-  WebhookObject,
-  WebhookEvent,
-} from "../webhooks/billing-webhook.interface";
+import { WebhookObject, WebhookEvent, RoleType } from "@/types";
 import { billingWebhookService } from "../webhooks/billing-webhook.service";
 
 const processEvent = async (
@@ -20,7 +17,14 @@ const processEvent = async (
         const email = event.data.attributes.user_email;
         const user = await userService.getUserByEmail(email);
         if (!user) {
-          // TODO: create a new user if one doesn't exist
+          logger.log(
+            `[Creating] User: ${email} as user with ${RoleType.User} role, for subscription ${event.data.id} needs to be created`
+          );
+          await userService.createUser({
+            email,
+            name: email,
+            role: RoleType.User,
+          });
         }
 
         let processingError = "";

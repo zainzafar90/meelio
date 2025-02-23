@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 
-import config from "../../config/config";
-import { RequestWithRawBody } from "../../server";
+import { config } from "@/config/config";
+import { RequestWithRawBody } from "@/server";
 
 export const verifySignatureMiddleware =
   () => (req: Request, _: Response, next: NextFunction) =>
     new Promise<void>((resolve, reject) => {
       try {
-        const { secret } = config.billing;
-        const hmac = crypto.createHmac("sha256", secret);
+        const { signingSecret } = config.billing;
+        const hmac = crypto.createHmac("sha256", signingSecret);
         const digest = Buffer.from(
           hmac.update((req as RequestWithRawBody).rawBody).digest("hex"),
           "utf8"

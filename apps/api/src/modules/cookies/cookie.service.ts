@@ -1,9 +1,8 @@
-import { Response, Request } from 'express';
+import { Response, Request } from "express";
 
-import config from '../../config/config';
-import { AccountTokens } from '../account/account.interfaces';
-
-export const COOKIE_API_TOKEN = 'api-token';
+import { config } from "@/config/config";
+import { IAccessAndRefreshTokens } from "@/types/interfaces/resources";
+import { COOKIE_API_TOKEN } from "../auth/providers/passport";
 
 /**
  * Setting Cookie with token, domain & expiration
@@ -11,14 +10,19 @@ export const COOKIE_API_TOKEN = 'api-token';
  * @param {AccountTokens} tokens
  * @returns {Promise<void>}
  */
-export const setResponseCookie = async (res: Response, tokens: AccountTokens): Promise<void> => {
-  res.cookie(COOKIE_API_TOKEN, tokens.access.token, {
-    secure: true,
-    sameSite: 'none',
+export const setResponseCookie = async (
+  res: Response,
+  tokens: IAccessAndRefreshTokens
+): Promise<void> => {
+  const cookieOptions = {
+    secure: config.env === "production",
+    sameSite: "lax" as const,
     expires: tokens.access.expires,
-    httpOnly: config.env === 'production',
-    domain: config.env === 'production' ? 'meelio.io' : undefined,
-  });
+    httpOnly: true,
+    path: "/",
+  };
+
+  res.cookie(COOKIE_API_TOKEN, tokens.access.token, cookieOptions);
 };
 
 /**
@@ -27,12 +31,14 @@ export const setResponseCookie = async (res: Response, tokens: AccountTokens): P
  * @returns {Promise<void>}
  */
 export const clearJwtCookie = (response: Response) => {
-  response.clearCookie(COOKIE_API_TOKEN, {
-    secure: true,
-    sameSite: 'none',
-    httpOnly: config.env === 'production',
-    domain: config.env === 'production' ? 'meelio.io' : undefined,
-  });
+  const cookieOptions = {
+    secure: config.env === "production",
+    sameSite: "lax" as const,
+    httpOnly: true,
+    path: "/",
+  };
+
+  response.clearCookie(COOKIE_API_TOKEN, cookieOptions);
 };
 
 /**

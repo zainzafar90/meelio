@@ -1,9 +1,8 @@
-import Joi from 'joi';
-import { objectId } from '../validate';
+import Joi from "joi";
 
 const getSubscription = {
   params: Joi.object().keys({
-    subscriptionId: Joi.string().custom(objectId),
+    subscriptionId: Joi.string(),
   }),
 };
 
