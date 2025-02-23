@@ -16,7 +16,7 @@ export const setResponseCookie = async (
 ): Promise<void> => {
   const cookieOptions = {
     secure: config.env === "production",
-    sameSite: "lax",
+    sameSite: "lax" as const,
     expires: tokens.access.expires,
     httpOnly: true,
     path: "/",

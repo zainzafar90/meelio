@@ -17,7 +17,7 @@ export const createServer = (): Express => {
   const app = express();
 
   const corsOptions = {
-    origin: true, // Allow all origins in development for Postman testing
+    origin: config.env === "production" ? config.clientUrl : true,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
