@@ -208,3 +208,47 @@ export const getUserByEmailAndPassword = async (email: string) => {
 
   return user;
 };
+
+export const createGuestUser = async (name: string) => {
+  const [user] = await db
+    .insert(users)
+    .values({
+      name,
+      role: RoleType.Guest,
+    } as UserInsert)
+    .returning();
+
+  return userDTO(user);
+};
+
+export const updateGuestToRegular = async (
+  userId: string,
+  email: string,
+  password: string
+) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+  }
+  if (user.role !== RoleType.Guest) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "User is not a guest");
+  }
+
+  const isEmailAlreadyTaken = await isEmailTaken(email);
+  if (isEmailAlreadyTaken) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+  }
+
+  const hashedPassword = await hashPassword(password);
+  const [updatedUser] = await db
+    .update(users)
+    .set({
+      email,
+      password: hashedPassword,
+      role: RoleType.User,
+    } as Partial<User>)
+    .where(eq(users.id, userId))
+    .returning();
+
+  return userDTO(updatedUser);
+};

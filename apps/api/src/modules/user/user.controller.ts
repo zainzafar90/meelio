@@ -148,3 +148,21 @@ export const deleteUser = catchAsync(
     }
   }
 );
+
+export const createGuestUser = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = await userService.createGuestUser(req.body.name);
+    res.status(httpStatus.CREATED).send(user);
+  }
+);
+
+export const convertGuestToRegular = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = await userService.updateGuestToRegular(
+      req.params.userId,
+      req.body.email,
+      req.body.password
+    );
+    res.status(httpStatus.OK).send(user);
+  }
+);

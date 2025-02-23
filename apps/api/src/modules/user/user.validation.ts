@@ -53,3 +53,19 @@ export const deleteUser = {
     userId: Joi.string().custom(uuid),
   }),
 };
+
+export const createGuestUser = {
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+  }),
+};
+
+export const convertGuestToRegular = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+};

@@ -36,7 +36,7 @@ export interface IToken {
 export interface IUser {
   id?: string;
   name: string;
-  email: string;
+  email?: string;
   password?: string;
   isEmailVerified: boolean;
   role: RoleType;

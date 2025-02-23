@@ -11,6 +11,19 @@ router
   .post(auth(), validate(userValidation.createUser), userController.createUser)
   .get(auth(), validate(userValidation.getUsers), userController.getUsers);
 
+router.post(
+  "/guest",
+  validate(userValidation.createGuestUser),
+  userController.createGuestUser
+);
+
+router.post(
+  "/:userId/convert-guest",
+  auth(),
+  validate(userValidation.convertGuestToRegular),
+  userController.convertGuestToRegular
+);
+
 router.get("/me", auth(), userController.getMe);
 
 router
