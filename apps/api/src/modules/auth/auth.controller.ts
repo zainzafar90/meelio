@@ -141,9 +141,7 @@ const googleAuthCallback = catchAsync(
       );
       cookieService.setResponseCookie(res, tokens);
       const redirectCallbackURL =
-        config.env === "production"
-          ? config.clientUrl
-          : `http://${config.clientUrl}`;
+        config.env === "production" ? config.clientUrl : `${config.clientUrl}`;
       return res.redirect(redirectCallbackURL);
     })(req, res, next);
   }

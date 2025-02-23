@@ -15,7 +15,7 @@ interface IRoute {
 
 const defaultIRoute: IRoute[] = [
   {
-    path: "/auth",
+    path: "/account",
     route: authRoute,
   },
   {
