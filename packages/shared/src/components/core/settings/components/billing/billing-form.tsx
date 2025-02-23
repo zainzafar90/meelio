@@ -77,7 +77,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
       });
 
       if (checkout?.data?.url) {
-        window.location.href = checkout.data.url;
+        window.open(checkout.data.url, "_blank");
       }
     } catch (error) {
       return toast.error("Something went wrong.", {
