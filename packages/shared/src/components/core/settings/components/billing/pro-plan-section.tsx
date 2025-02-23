@@ -20,15 +20,36 @@ export function ProPlanSection({
     const isCancelledSubscriptionCurrentlyValid =
       subscription.status === "cancelled" &&
       subscription.endsAt &&
-      subscription.endsAt > new Date();
+      new Date(subscription.endsAt) > new Date();
 
     return isSubscriptionActive || isCancelledSubscriptionCurrentlyValid;
   };
 
+  const getSubscriptionStatusBadge = (subscription: Subscription) => {
+    if (subscription.status === "active") {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+          Active
+        </span>
+      );
+    }
+    if (subscription.status === "cancelled") {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">
+          Auto-Renew Off
+        </span>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-medium">Subscription Plan</h3>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-medium">Subscription Plan</h3>
+          {getSubscriptionStatusBadge(subscriptionPlan)}
+        </div>
         <p className="text-sm text-foreground/70">
           You are currently on the{" "}
           <strong className="font-semibold">
@@ -38,21 +59,47 @@ export function ProPlanSection({
         </p>
       </div>
 
-      {isProSubscriptionValid(subscriptionPlan) && (
-        <p className="text-sm">
-          {subscriptionPlan.cancelled
-            ? "Your plan will be canceled on "
-            : "Your plan renews on "}
-          <strong className="font-semibold">
-            {subscriptionPlan.renewsAt && formatDate(subscriptionPlan.renewsAt)}
-          </strong>
-        </p>
-      )}
+      <div className="space-y-2">
+        {subscriptionPlan.status === "cancelled" ? (
+          <>
+            <p className="text-sm text-foreground/70">
+              Your subscription has been cancelled and will end on{" "}
+              <strong className="font-semibold">
+                {subscriptionPlan.endsAt && formatDate(subscriptionPlan.endsAt)}
+              </strong>
+            </p>
+            <p className="text-sm text-foreground/70">
+              You will lose access to premium features after this date unless
+              you reactivate your subscription.
+            </p>
+          </>
+        ) : (
+          <p className="text-sm text-foreground/70">
+            Your plan will automatically renew on{" "}
+            <strong className="font-semibold">
+              {subscriptionPlan.renewsAt &&
+                formatDate(subscriptionPlan.renewsAt)}
+            </strong>
+          </p>
+        )}
+
+        {subscriptionPlan.trialEndsAt && (
+          <p className="text-sm text-foreground/70">
+            Trial ends on{" "}
+            <strong className="font-semibold">
+              {formatDate(subscriptionPlan.trialEndsAt)}
+            </strong>
+          </p>
+        )}
+      </div>
 
       <div className="flex items-center justify-between border-t pt-4">
-        <p className="text-sm text-foreground/70">
-          Manage your subscription plan and billing information.
-        </p>
+        <div className="space-y-1">
+          <p className="text-sm font-medium">Manage Subscription</p>
+          <p className="text-sm text-foreground/70">
+            Update your plan, payment method, or billing information
+          </p>
+        </div>
         <button
           className={cn(buttonVariants())}
           disabled={isLoadingPortal}
@@ -61,9 +108,7 @@ export function ProPlanSection({
           {isLoadingPortal && (
             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
           )}
-          {isProSubscriptionValid(subscriptionPlan)
-            ? "Open Customer Portal"
-            : "Upgrade to PRO"}
+          {isProSubscriptionValid(subscriptionPlan) ? "Manage" : "Upgrade Plan"}
         </button>
       </div>
     </div>

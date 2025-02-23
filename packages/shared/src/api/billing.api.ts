@@ -5,7 +5,7 @@ export function getSubscription({
   subscriptionId,
 }: {
   subscriptionId: string;
-}): Promise<Subscription | null> {
+}): Promise<{ data: Subscription } | null> {
   return axios.get(`/v1/subscriptions/${subscriptionId}`);
 }
 
@@ -13,7 +13,7 @@ export function getLemonSqueezyPortalUrl({
   subscriptionId,
 }: {
   subscriptionId: string;
-}): Promise<{ url: string } | null> {
+}): Promise<{ data: { url: string } } | null> {
   return axios.get(`/v1/subscriptions/${subscriptionId}/portal`);
 }
 
@@ -21,7 +21,7 @@ export function getLemonSqeezyCheckoutUrl({
   variantId,
 }: {
   variantId: string;
-}): Promise<{ url: string } | null> {
+}): Promise<{ data: { url: string } } | null> {
   return axios.get(`/v1/subscriptions/checkout`, {
     params: {
       variantId,

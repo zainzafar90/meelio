@@ -2,19 +2,13 @@ import { useTranslation } from "react-i18next";
 
 import { useAuthStore } from "../../../../stores/auth.store";
 import { AccountForm } from "../components/account/account-form";
+import { LoginProtected } from "../components/common/login-protected";
 
 export const AccountSettings = () => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
-  if (!user)
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-sm text-muted-foreground">
-          Please login to view this page.
-        </div>
-      </div>
-    );
+  if (!user) return <LoginProtected />;
 
   return (
     <div className="flex h-full flex-col">
