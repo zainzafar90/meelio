@@ -21,7 +21,7 @@ import {
   subscriptions,
   users,
 } from "@/db/schema";
-import { verifyPassword } from "../user/user.utils";
+import { sanitizeUser, verifyPassword } from "../user/user.utils";
 import { verificationTokenService } from "../verification-token";
 import { userService } from "../user";
 import { updateUserById } from "../user/user.service";
@@ -222,8 +222,9 @@ const getUserAccount = async (
 
   const { isPro, subscriptionId } = await checkSubscription(user.email);
 
+  const safeUser = sanitizeUser(user);
   return {
-    user: user as IUser,
+    user: safeUser,
     isPro,
     subscriptionId,
     userId: includeId ? user.id : "",
@@ -258,8 +259,9 @@ const updateUserAccount = async (
 
   const { isPro, subscriptionId } = await checkSubscription(user.email);
 
+  const safeUser = sanitizeUser(user);
   return {
-    user: user as IUser,
+    user: safeUser,
     isPro,
     subscriptionId,
   };
@@ -278,9 +280,25 @@ const loginUserWithEmailAndPassword = async (
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
   });
+
+  const account = await db.query.accounts.findFirst({
+    where: and(
+      eq(accounts.userId, user?.id),
+      eq(accounts.provider, Provider.PASSWORD)
+    ),
+  });
+
+  if (!account) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "This email is registered with a different provider. Please make sure you are using the right email and password."
+    );
+  }
+
   if (!user || !(await verifyPassword(password, user.password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
+
   return user as IUser;
 };
 
