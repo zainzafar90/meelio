@@ -24,7 +24,6 @@ export const getBackgrounds = catchAsync(
       });
     }
 
-    console.log("userId", userId);
     const backgrounds = await backgroundService.getBackgrounds(userId);
     return res.status(httpStatus.OK).json(backgrounds);
   }
@@ -47,7 +46,6 @@ export const getBackgroundById = catchAsync(
 
     const { id } = req.params;
     const background = await backgroundService.getBackgroundById(id);
-    console.log("userId", userId);
 
     if (!background) {
       return res.status(httpStatus.NOT_FOUND).json({
@@ -55,6 +53,56 @@ export const getBackgroundById = catchAsync(
       });
     }
 
+    return res.status(httpStatus.OK).json(background);
+  }
+);
+
+/**
+ * Set a background as selected for the authenticated user
+ * @param {AuthenticatedRequest} req - The request object
+ * @param {Response} res - The response object
+ * @returns {Promise<void>}
+ */
+export const setSelectedBackground = catchAsync(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.email;
+    if (!userId) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const { backgroundId } = req.body;
+    if (!backgroundId) {
+      return res.status(httpStatus.BAD_REQUEST).json({
+        message: "Background ID is required",
+      });
+    }
+
+    const background = await backgroundService.setSelectedBackground(
+      userId,
+      backgroundId
+    );
+    return res.status(httpStatus.OK).json(background);
+  }
+);
+
+/**
+ * Get a random background (for daily rotation)
+ * @param {AuthenticatedRequest} req - The request object
+ * @param {Response} res - The response object
+ * @returns {Promise<void>}
+ */
+export const getRandomBackground = catchAsync(
+  async (req: AuthenticatedRequest, res: Response) => {
+    const userId = req.user?.email;
+    if (!userId) {
+      return res.status(httpStatus.UNAUTHORIZED).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const background = await backgroundService.getRandomBackground();
     return res.status(httpStatus.OK).json(background);
   }
 );

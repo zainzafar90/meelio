@@ -47,9 +47,16 @@ const deleteBackground = {
   }),
 };
 
+const setSelectedBackground = {
+  body: Joi.object().keys({
+    backgroundId: Joi.string().required(),
+  }),
+};
+
 export const backgroundValidation = {
   createBackground,
   updateBackground,
   getBackground,
   deleteBackground,
+  setSelectedBackground,
 };

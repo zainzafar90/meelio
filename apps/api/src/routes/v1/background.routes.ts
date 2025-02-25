@@ -26,6 +26,61 @@ router.get(
 
 /**
  * @swagger
+ * /api/v1/backgrounds/random:
+ *   get:
+ *     summary: Get a random background
+ *     tags: [Backgrounds]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Random background
+ *       401:
+ *         description: Unauthorized
+ */
+router.get(
+  "/random",
+  auth(),
+  backgroundController.getRandomBackground.bind(backgroundController)
+);
+
+/**
+ * @swagger
+ * /api/v1/backgrounds/selected:
+ *   post:
+ *     summary: Set a background as selected
+ *     tags: [Backgrounds]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - backgroundId
+ *             properties:
+ *               backgroundId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Background set as selected
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Background not found
+ */
+router.post(
+  "/selected",
+  auth(),
+  backgroundController.setSelectedBackground.bind(backgroundController)
+);
+
+/**
+ * @swagger
  * /api/v1/backgrounds/{id}:
  *   get:
  *     summary: Get a specific background
