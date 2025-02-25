@@ -28,21 +28,22 @@ This document provides a summary of the offline-first implementation for the Mee
 ### API Implementation
 - ✅ Created sync endpoint for bulk operations
 - ✅ Implemented authentication for sync operations
+- ✅ Implemented background routes
+- ✅ Implemented soundscape routes
+- ✅ Implemented mantra routes
+- ✅ Implemented task routes
+- ✅ Implemented pomodoro settings routes
 
 ### Documentation
 - ✅ Documented offline-first architecture
 - ✅ Created developer guide for offline-first development
 - ✅ Documented sync conflict resolution strategies
+- ✅ Documented sync implementation
 
 ## Next Steps
 
 ### API Routes Implementation
-1. Implement CRUD operations for all entities:
-   - Backgrounds
-   - Soundscapes
-   - Mantras
-   - Tasks
-   - Pomodoro Settings
+1. Implement CRUD operations for remaining entities:
    - Site Blockers
    - Tab Stashes
    - Notes
@@ -75,7 +76,7 @@ This document provides a summary of the offline-first implementation for the Mee
 
 | Phase | Tasks | Estimated Time |
 |-------|-------|----------------|
-| 1 | Complete remaining API routes | 2 weeks |
+| 1 | Complete remaining API routes | 1 week |
 | 2 | Implement frontend offline capabilities | 2 weeks |
 | 3 | Implement Chrome extension features | 2 weeks |
 | 4 | Testing and bug fixes | 1 week |
@@ -120,8 +121,27 @@ This document provides a summary of the offline-first implementation for the Mee
 | Focus Sessions | Limited | Unlimited + Analytics |
 | Offline Sync | Limited | Priority + Unlimited |
 
+## Site Blocker Module
+
+The site blocker module has been implemented with the following components:
+
+1. **Validation**: Created validation schemas for creating and updating site blockers.
+2. **Service**: Implemented service functions for CRUD operations on site blockers.
+3. **Controller**: Added controller functions to handle HTTP requests for site blockers.
+4. **Routes**: Set up routes for the site blocker API endpoints.
+5. **Integration**: Integrated the site blocker module with the main API routes.
+
+The site blocker module allows users to:
+- Create site blockers with URLs and optional categories
+- Retrieve all site blockers or filter by category
+- Get a specific site blocker by ID
+- Update existing site blockers
+- Delete site blockers
+
+API endpoints are available at `/site-blockers` and follow RESTful conventions.
+
 ## Conclusion
 
 The offline-first implementation for Meelio provides a robust foundation for a seamless user experience regardless of network connectivity. The architecture allows for efficient data synchronization while minimizing conflicts and data loss.
 
-The next steps focus on completing the API routes, implementing the frontend components, and ensuring thorough testing before deployment. 
+The next steps focus on completing the API routes for the remaining entities, implementing the frontend components, and ensuring thorough testing before deployment. 

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { SyncController } from "@/controllers/sync.controller";
+import { validate } from "@/common/validate";
 import { auth } from "@/modules/auth";
+import { syncController, syncValidation } from "@/modules/sync";
 
 const router = Router();
-const syncController = new SyncController();
 
 /**
  * @swagger
@@ -35,7 +35,12 @@ const syncController = new SyncController();
  *       401:
  *         description: Unauthorized
  */
-router.post("/bulk", auth(), syncController.bulkSync.bind(syncController));
+router.post(
+  "/bulk",
+  auth(),
+  validate(syncValidation.bulkSync),
+  syncController.bulkSync
+);
 
 /**
  * @swagger
@@ -54,7 +59,8 @@ router.post("/bulk", auth(), syncController.bulkSync.bind(syncController));
 router.get(
   "/status",
   auth(),
-  syncController.getSyncStatus.bind(syncController)
+  validate(syncValidation.getSyncStatus),
+  syncController.getSyncStatus
 );
 
 export default router;
