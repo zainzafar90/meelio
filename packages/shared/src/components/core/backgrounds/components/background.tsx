@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { useAuthStore } from "../../../../stores/auth.store";
-import { useBackgrounds } from "../../../../lib/hooks/useBackgrounds";
+import { useBackgrounds, useSelectedBackground } from "../../../../lib/hooks";
 
 export const Background = () => {
   const { user } = useAuthStore();
-  const { data: backgrounds } = useBackgrounds(user?.id || "");
-  const [currentBackground, setCurrentBackground] = useState<
-    (typeof backgrounds)[0] | null
-  >(null);
+  const { data: backgrounds, isLoading: isLoadingBackgrounds } = useBackgrounds(
+    user?.id || ""
+  );
+  const { data: selectedBackground } = useSelectedBackground();
+  const [currentBackground, setCurrentBackground] = useState<any | null>(null);
 
   useEffect(() => {
-    if (backgrounds?.length) {
-      const favoriteBackground = backgrounds.find((bg) => bg.isFavorite);
-      if (favoriteBackground) {
-        setCurrentBackground(favoriteBackground);
-      } else {
-        setCurrentBackground(backgrounds[0]);
-      }
+    // First try to use the selected background from IndexedDB
+    if (selectedBackground) {
+      setCurrentBackground(selectedBackground);
+      return;
     }
-  }, [backgrounds]);
+
+    // If no selected background, use the first available one
+    if (backgrounds?.length) {
+      setCurrentBackground(backgrounds[0]);
+    }
+  }, [backgrounds, selectedBackground]);
 
   if (!currentBackground) {
     return null;
@@ -27,7 +30,7 @@ export const Background = () => {
 
   return (
     <div className="fixed inset-0 -z-10">
-      {currentBackground.type === "video" ? (
+      {currentBackground.type === "live" ? (
         <ReactPlayer
           url={currentBackground.url}
           playing
@@ -40,7 +43,7 @@ export const Background = () => {
       ) : (
         <img
           src={currentBackground.url}
-          alt={currentBackground.name}
+          alt={currentBackground.metadata?.name || "Background"}
           className="h-full w-full object-cover"
           loading="eager"
         />

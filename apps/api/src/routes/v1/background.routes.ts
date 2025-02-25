@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { BackgroundController } from "@/controllers/background.controller";
 import { auth } from "@/modules/auth";
+import { backgroundController } from "@/modules/background";
 
 const router = Router();
-const backgroundController = new BackgroundController();
 
 /**
  * @swagger
@@ -50,7 +49,7 @@ router.get(
 router.get(
   "/:id",
   auth(),
-  backgroundController.getBackground.bind(backgroundController)
+  backgroundController.getBackgroundById.bind(backgroundController)
 );
 
 /**

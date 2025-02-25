@@ -1,22 +1,25 @@
 import { AxiosResponse } from "axios";
-import type { Background } from "../lib/db/models";
+import { Background } from "../lib/db/models";
 import { axios } from "./axios";
 
 export function getBackgrounds(): Promise<AxiosResponse<Background[]>> {
   return axios.get("/v1/backgrounds");
 }
 
-export function createBackground(
-  background: Omit<
-    Background,
-    | "id"
-    | "_syncStatus"
-    | "_version"
-    | "_lastModified"
-    | "createdAt"
-    | "updatedAt"
-  >
-): Promise<AxiosResponse<Background>> {
+export function getBackground(id: string): Promise<AxiosResponse<Background>> {
+  return axios.get(`/v1/backgrounds/${id}`);
+}
+
+export function createBackground(background: {
+  type: "static" | "live";
+  url: string;
+  metadata: {
+    name: string;
+    category: string;
+    tags: string[];
+    thumbnailUrl: string;
+  };
+}): Promise<AxiosResponse<Background>> {
   return axios.post("/v1/backgrounds", background);
 }
 

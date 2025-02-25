@@ -8,6 +8,13 @@
       "when": 1740504463825,
       "tag": "0000_slippery_silvermane",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740507135208,
+      "tag": "0001_complete_sleepwalker",
+      "breakpoints": true
     }
   ]
 }

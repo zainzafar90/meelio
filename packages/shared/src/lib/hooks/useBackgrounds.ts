@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { db } from "../db";
 import type { Background } from "../db/models";
+import {
+  getBackgrounds,
+  getBackground,
+  createBackground,
+  updateBackground,
+  deleteBackground,
+} from "../../api/backgrounds.api";
 
 const BACKGROUND_KEYS = {
   all: ["backgrounds"] as const,
@@ -15,19 +22,20 @@ export function useBackgrounds(userId: string) {
   return useQuery({
     queryKey: BACKGROUND_KEYS.list(userId),
     queryFn: async () => {
-      const response = await fetch(`/api/backgrounds?userId=${userId}`);
-      return response.json();
+      const response = await getBackgrounds();
+      return response.data;
     },
   });
 }
 
-export function useBackground(id: string, userId: string) {
+export function useBackground(id: string) {
   return useQuery({
     queryKey: BACKGROUND_KEYS.detail(id),
     queryFn: async () => {
-      const response = await fetch(`/api/backgrounds/${id}?userId=${userId}`);
-      return response.json();
+      const response = await getBackground(id);
+      return response.data;
     },
+    enabled: !!id,
   });
 }
 
@@ -58,18 +66,21 @@ export function useCreateBackground() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: Omit<Background, "id">) => {
-      const response = await fetch("/api/backgrounds", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      return response.json();
+    mutationFn: async (data: {
+      type: "static" | "live";
+      url: string;
+      metadata: {
+        name: string;
+        category: string;
+        tags: string[];
+        thumbnailUrl: string;
+      };
+    }) => {
+      const response = await createBackground(data);
+      return response.data;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: BACKGROUND_KEYS.list(variables.userId),
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BACKGROUND_KEYS.lists() });
     },
   });
 }
@@ -85,17 +96,11 @@ export function useUpdateBackground() {
       id: string;
       data: Partial<Background>;
     }) => {
-      const response = await fetch(`/api/backgrounds/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      const response = await updateBackground(id, data);
+      return response.data;
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: BACKGROUND_KEYS.list(variables.data.userId),
-      });
+      queryClient.invalidateQueries({ queryKey: BACKGROUND_KEYS.lists() });
       queryClient.invalidateQueries({
         queryKey: BACKGROUND_KEYS.detail(variables.id),
       });
@@ -107,16 +112,13 @@ export function useDeleteBackground() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, userId }: { id: string; userId: string }) => {
-      const response = await fetch(`/api/backgrounds/${id}?userId=${userId}`, {
-        method: "DELETE",
-      });
-      return response.json();
+    mutationFn: async (id: string) => {
+      await deleteBackground(id);
+      return id;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: BACKGROUND_KEYS.list(variables.userId),
-      });
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: BACKGROUND_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: BACKGROUND_KEYS.detail(id) });
     },
   });
 }

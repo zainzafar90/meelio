@@ -15,28 +15,25 @@ import { useDockStore } from "../../../../stores/dock.store";
 import { useAuthStore } from "../../../../stores/auth.store";
 import {
   useBackgrounds,
-  useUpdateBackground,
+  useSetSelectedBackground,
   useCreateBackground,
-} from "../../../../lib/hooks/useBackgrounds";
+} from "../../../../lib/hooks";
 
 export const BackgroundSelectorSheet = () => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
   const { isBackgroundsVisible, toggleBackgrounds } = useDockStore();
   const { data: backgrounds, isLoading } = useBackgrounds(user?.id || "");
-  const { mutate: updateBackground } = useUpdateBackground();
+  const { mutate: setSelectedBackground } = useSetSelectedBackground();
   const { mutate: createBackground } = useCreateBackground();
 
-  const liveWallpapers = backgrounds?.filter((w) => w.type === "video") || [];
-  const staticWallpapers = backgrounds?.filter((w) => w.type === "image") || [];
+  const liveWallpapers = backgrounds?.filter((w) => w.type === "live") || [];
+  const staticWallpapers =
+    backgrounds?.filter((w) => w.type === "static") || [];
 
-  const handleSetBackground = (background: (typeof backgrounds)[0]) => {
+  const handleSetBackground = (background: any) => {
     if (!user) return;
-
-    updateBackground({
-      id: background.id,
-      data: { isFavorite: true },
-    });
+    setSelectedBackground(background.id);
   };
 
   const handleAddBackground = async () => {
@@ -44,14 +41,14 @@ export const BackgroundSelectorSheet = () => {
 
     // TODO: Implement file upload and create new background
     createBackground({
-      name: "Custom Background",
-      url: "...",
-      type: "image",
-      category: "custom",
-      tags: [],
-      userId: user.id,
-      isCustom: true,
-      isFavorite: false,
+      type: "static",
+      url: "https://example.com/placeholder.jpg", // This would be replaced with the uploaded file URL
+      metadata: {
+        name: "Custom Background",
+        category: "custom",
+        tags: ["custom"],
+        thumbnailUrl: "https://example.com/placeholder-thumb.jpg",
+      },
     });
   };
 
@@ -82,14 +79,14 @@ export const BackgroundSelectorSheet = () => {
                     className={cn(
                       "group relative aspect-video overflow-hidden rounded-lg",
                       "border-2 transition-all hover:border-white/50",
-                      wallpaper.isFavorite
+                      wallpaper.isSelected
                         ? "border-white/50"
                         : "border-transparent"
                     )}
                   >
                     <img
-                      src={wallpaper.thumbnailUrl || wallpaper.url}
-                      alt={wallpaper.name}
+                      src={wallpaper.metadata?.thumbnailUrl || wallpaper.url}
+                      alt={wallpaper.metadata?.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -99,10 +96,10 @@ export const BackgroundSelectorSheet = () => {
                     </div>
                     <div className="absolute inset-0 bg-black/40 p-4 opacity-0 transition-opacity group-hover:opacity-100">
                       <p className="text-sm font-medium text-white">
-                        {wallpaper.name}
+                        {wallpaper.metadata?.name}
                       </p>
                       <p className="text-xs text-white/70">
-                        {wallpaper.category} • Live
+                        {wallpaper.metadata?.category} • Live
                       </p>
                     </div>
                   </button>
@@ -124,19 +121,19 @@ export const BackgroundSelectorSheet = () => {
                   className={cn(
                     "group relative aspect-video overflow-hidden rounded-lg",
                     "border-2 transition-all hover:border-white/50",
-                    wallpaper.isFavorite
+                    wallpaper.isSelected
                       ? "border-white/50"
                       : "border-transparent"
                   )}
                 >
                   <picture>
                     <source
-                      srcSet={`${wallpaper.thumbnailUrl || wallpaper.url}&dpr=2`}
+                      srcSet={`${wallpaper.metadata?.thumbnailUrl || wallpaper.url}&dpr=2`}
                       media="(-webkit-min-device-pixel-ratio: 2)"
                     />
                     <img
-                      src={wallpaper.thumbnailUrl || wallpaper.url}
-                      alt={wallpaper.name}
+                      src={wallpaper.metadata?.thumbnailUrl || wallpaper.url}
+                      alt={wallpaper.metadata?.name}
                       className="h-full w-full object-cover"
                       loading="lazy"
                       decoding="async"
@@ -144,10 +141,10 @@ export const BackgroundSelectorSheet = () => {
                   </picture>
                   <div className="absolute inset-0 bg-black/40 p-4 opacity-0 transition-opacity group-hover:opacity-100">
                     <p className="text-sm font-medium text-white">
-                      {wallpaper.name}
+                      {wallpaper.metadata?.name}
                     </p>
                     <p className="text-xs text-white/70">
-                      {wallpaper.category}
+                      {wallpaper.metadata?.category}
                     </p>
                   </div>
                 </button>
