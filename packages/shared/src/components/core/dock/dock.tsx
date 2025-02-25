@@ -16,7 +16,7 @@ import { ClockDock } from "./components/clock.dock";
 import { LanguageSwitcherDock } from "./components/language-switcher.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
-import { DockOnboarding } from "./components/dock-onboarding";
+import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
@@ -208,7 +208,9 @@ export const Dock = () => {
                 key={index}
                 className={cn(
                   "relative",
-                  currentOnboardingStep === index &&
+                  currentOnboardingStep >= 0 &&
+                    ONBOARDING_STEPS[currentOnboardingStep].position ===
+                      index &&
                     "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                 )}
               >
@@ -223,7 +225,9 @@ export const Dock = () => {
                 key={item.id}
                 className={cn(
                   "relative",
-                  currentOnboardingStep === (item.id === "settings" ? 8 : -1) &&
+                  currentOnboardingStep >= 0 &&
+                    ONBOARDING_STEPS[currentOnboardingStep].position === 8 &&
+                    item.id === "settings" &&
                     "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                 )}
               >

@@ -8,7 +8,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { Logo } from "../../../../components/common/logo";
 import { useDockStore } from "../../../../stores/dock.store";
 
-const ONBOARDING_STEPS = [
+export const ONBOARDING_STEPS = [
   {
     id: "welcome",
     titleKey: "onboarding.welcome.title",
@@ -118,12 +118,15 @@ export const DockOnboarding = () => {
   } = useDockStore();
 
   useEffect(() => {
-    setCurrentOnboardingStep(currentStep);
+    if (!hasDockOnboardingCompleted) {
+      setCurrentOnboardingStep(currentStep);
+    }
     return () => setCurrentOnboardingStep(-1); // Reset when unmounted
-  }, [currentStep, setCurrentOnboardingStep]);
+  }, [currentStep, setCurrentOnboardingStep, hasDockOnboardingCompleted]);
 
   const handleNext = useCallback(() => {
     if (currentStep === ONBOARDING_STEPS.length - 1) {
+      setCurrentOnboardingStep(-1); // Reset highlight
       setDockOnboardingCompleted();
     } else {
       // Reset previous feature if it was toggled
@@ -147,7 +150,13 @@ export const DockOnboarding = () => {
         actionFn?.();
       }
     }
-  }, [currentStep, setDockOnboardingCompleted, toggleTimer, toggleBreathing]);
+  }, [
+    currentStep,
+    setDockOnboardingCompleted,
+    setCurrentOnboardingStep,
+    toggleTimer,
+    toggleBreathing,
+  ]);
 
   const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
@@ -207,6 +216,7 @@ export const DockOnboarding = () => {
       }[currentAction];
       actionFn?.();
     }
+    setCurrentOnboardingStep(-1); // Reset highlight
     setDockOnboardingCompleted();
   };
 
