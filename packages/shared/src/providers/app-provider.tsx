@@ -6,7 +6,6 @@ import { Toaster } from "sonner";
 
 import { useSoundscapesStore } from "../stores/soundscapes.store";
 
-import { BackgroundProvider } from "./background-provider";
 import { PomodoroProvider } from "./pomodoro-provider";
 import { ThemeProvider } from "../components/common/theme-provider";
 import { ConnectionWarning } from "../components/common/connection-warning";
@@ -54,14 +53,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({
             {/* <TelemetryProvider> */}
             <ThemeProvider storageKey="ui-theme" defaultTheme="system">
               <TooltipProvider>
-                <BackgroundProvider>
-                  <PomodoroProvider>
-                    {children}
-                    {hasPlayingSounds && <SoundPlayer />}
-                    <Toaster richColors />
-                    <ConnectionWarning />
-                  </PomodoroProvider>
-                </BackgroundProvider>
+                <PomodoroProvider>
+                  {children}
+                  {hasPlayingSounds && <SoundPlayer />}
+                  <Toaster richColors />
+                  <ConnectionWarning />
+                </PomodoroProvider>
               </TooltipProvider>
             </ThemeProvider>
             {/* </TelemetryProvider> */}
