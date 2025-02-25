@@ -445,7 +445,7 @@ async function canUseFeature(feature: string): Promise<boolean> {
   const featureAccess = {
     'custom-backgrounds': true, // Free for all
     'soundscapes': hasPremium,
-    'site-blocker': true, // Free for all
+    'site-blocker': hasPremium, // Free for all
     'tab-stashes': true, // Free for all
     'notes': true, // Free for all
     'weather': hasPremium,

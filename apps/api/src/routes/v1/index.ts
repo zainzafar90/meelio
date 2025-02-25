@@ -8,6 +8,10 @@ import userRoute from "./user.routes";
 import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
 import syncRoute from "./sync.routes";
+import backgroundRoute from "./background.routes";
+import soundscapeRoute from "./soundscape.routes";
+import mantraRoute from "./mantra.routes";
+import taskRoute from "./task.routes";
 
 const router: express.Router = express.Router();
 
@@ -36,6 +40,22 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/sync",
     route: syncRoute,
+  },
+  {
+    path: "/backgrounds",
+    route: backgroundRoute,
+  },
+  {
+    path: "/soundscapes",
+    route: soundscapeRoute,
+  },
+  {
+    path: "/mantras",
+    route: mantraRoute,
+  },
+  {
+    path: "/tasks",
+    route: taskRoute,
   },
 ];
 

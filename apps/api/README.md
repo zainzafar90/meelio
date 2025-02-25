@@ -28,10 +28,10 @@ This document outlines the plan for implementing offline-first capabilities in t
 ## API Routes Implementation
 
 - [x] Create sync endpoint for bulk operations
-- [ ] Implement background routes
-- [ ] Implement soundscape routes
-- [ ] Implement mantra routes
-- [ ] Implement task routes
+- [x] Implement background routes
+- [x] Implement soundscape routes
+- [x] Implement mantra routes
+- [x] Implement task routes
 - [ ] Implement pomodoro settings routes
 - [ ] Implement site blocker routes
 - [ ] Implement tab stash routes
