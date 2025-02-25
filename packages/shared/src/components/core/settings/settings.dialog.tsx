@@ -16,7 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@repo/ui/components/ui/sidebar";
-import { CreditCard, Home, Paintbrush, User } from "lucide-react";
+import { CreditCard, Home, Paintbrush, User, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { ProfileDropdown } from "./components/user-profile/profile-dropdown";
@@ -24,6 +24,7 @@ import { AccountSettings } from "./tabs/account-settings";
 import { AppearanceSettings } from "./tabs/appearance-settings";
 import { BillingSettings } from "./tabs/billing-settings";
 import { GeneralSettings } from "./tabs/general-settings";
+import { LanguageSettings } from "./tabs/language-settings";
 import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
@@ -38,6 +39,7 @@ type SettingsNavItem = {
 const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "general", name: "general", icon: Home },
   { id: "appearance", name: "appearance", icon: Paintbrush },
+  { id: "language", name: "language", icon: Languages },
   { id: "account", name: "account", icon: User },
   { id: "billing", name: "billing", icon: CreditCard },
 ] as const;
@@ -59,6 +61,8 @@ export function SettingsDialog() {
         return <GeneralSettings />;
       case "appearance":
         return <AppearanceSettings />;
+      case "language":
+        return <LanguageSettings />;
       case "account":
         return <AccountSettings />;
       case "billing":

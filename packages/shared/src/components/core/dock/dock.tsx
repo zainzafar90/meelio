@@ -13,7 +13,6 @@ import { useAuthStore } from "../../../stores/auth.store";
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
 import { ClockDock } from "./components/clock.dock";
-import { LanguageSwitcherDock } from "./components/language-switcher.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
@@ -39,13 +38,6 @@ const STATIC_DOCK_ITEMS: {
     name: "Calendar",
     icon: CalendarDock,
     activeIcon: CalendarDock,
-    isStatic: true,
-  },
-  {
-    id: "language",
-    name: "Language",
-    icon: LanguageSwitcherDock,
-    activeIcon: LanguageSwitcherDock,
     isStatic: true,
   },
   {
@@ -166,7 +158,7 @@ export const Dock = () => {
   const getVisibleItemCount = (width: number) => {
     if (width >= 1280) return Math.min(mainDockItems.length, 14);
     if (width >= 1024) return 10;
-    if (width >= 768) return 6;
+    if (width >= 768) return 8;
     if (width >= 640) return 4;
     return 1;
   };

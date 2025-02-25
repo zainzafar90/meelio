@@ -1,6 +1,11 @@
 import { create } from "zustand";
 
-export type SettingsTab = "general" | "appearance" | "account" | "billing";
+export type SettingsTab =
+  | "general"
+  | "appearance"
+  | "account"
+  | "billing"
+  | "language";
 
 interface SettingsState {
   isOpen: boolean;

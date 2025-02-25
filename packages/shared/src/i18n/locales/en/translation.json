@@ -281,7 +281,8 @@
       "account": "Account",
       "billing": "Billing",
       "privacy": "Privacy & visibility",
-      "advanced": "Advanced"
+      "advanced": "Advanced",
+      "language": "Language"
     },
     "appearance": {
       "title": "Appearance",
@@ -308,6 +309,10 @@
     "billing": {
       "title": "Billing",
       "description": "Manage your billing"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Select your preferred language"
     }
   },
   "profile": {

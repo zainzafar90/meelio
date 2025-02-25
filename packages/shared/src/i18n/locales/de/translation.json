@@ -282,7 +282,8 @@
       "account": "Konto",
       "billing": "Abrechnung",
       "privacy": "Datenschutz & Sichtbarkeit",
-      "advanced": "Erweitert"
+      "advanced": "Erweitert",
+      "language": "Sprache"
     },
     "appearance": {
       "title": "Erscheinungsbild",
@@ -309,6 +310,10 @@
     "billing": {
       "title": "Abrechnung",
       "description": "Verwalte deine Abrechnung"
+    },
+    "language": {
+      "title": "Sprache",
+      "description": "Wähle deine bevorzugte Sprache"
     }
   },
   "profile": {
