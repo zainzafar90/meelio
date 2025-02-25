@@ -315,9 +315,9 @@ export const DockOnboarding = () => {
 
           <div className="flex flex-col gap-4 mt-4">
             <div className="flex justify-center gap-1">
-              {ONBOARDING_STEPS.map((_, index) => (
+              {ONBOARDING_STEPS.map((step, index) => (
                 <motion.div
-                  key={index}
+                  key={step.id}
                   className={cn(
                     "h-1 rounded-full transition-all duration-300",
                     index === currentStep ? "w-8 bg-white" : "w-4 bg-white/20"
