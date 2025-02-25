@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { backgrounds } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { Background, BackgroundInsert, backgrounds } from "@/db/schema";
+import { eq, and, sql } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
@@ -189,7 +189,8 @@ export class BackgroundService {
     const background = await db
       .select()
       .from(backgrounds)
-      .where(eq(backgrounds.id, id));
+      .where(eq(backgrounds.id, id))
+      .limit(1);
 
     if (background.length === 0) {
       return null;
@@ -206,9 +207,12 @@ export class BackgroundService {
    */
   async setSelectedBackground(userId: string, backgroundId: string) {
     // First, unselect any currently selected background
-    await db.execute(
-      sql`UPDATE backgrounds SET is_selected = false WHERE user_id = ${userId} AND is_selected = true`
-    );
+    await db
+      .update(backgrounds)
+      .set({ isSelected: false } as Background)
+      .where(
+        and(eq(backgrounds.userId, userId), eq(backgrounds.isSelected, true))
+      );
 
     // Check if the background to select is a default one
     const isDefaultBackground = defaultBackgrounds.some(
@@ -218,51 +222,65 @@ export class BackgroundService {
     if (isDefaultBackground) {
       // If it's a default background, we need to create a reference in the user's backgrounds
       // First check if the user already has a reference to this default background
-      const existingRef = await db.execute(
-        sql`SELECT * FROM backgrounds WHERE user_id = ${userId} AND default_background_id = ${backgroundId}`
-      );
+      const existingRef = await db
+        .select()
+        .from(backgrounds)
+        .where(
+          and(
+            eq(backgrounds.userId, userId),
+            eq(backgrounds.defaultBackgroundId, backgroundId)
+          )
+        )
+        .limit(1);
 
-      if (existingRef.rows.length > 0) {
+      if (existingRef.length > 0) {
         // Update the existing reference
-        const result = await db.execute(
-          sql`UPDATE backgrounds SET is_selected = true, updated_at = NOW() 
-              WHERE id = ${existingRef.rows[0].id} RETURNING *`
-        );
+        const updatedBackground = await db
+          .update(backgrounds)
+          .set({
+            isSelected: true,
+            updatedAt: new Date(),
+          } as Background)
+          .where(eq(backgrounds.id, existingRef[0].id))
+          .returning();
 
-        return result.rows[0];
+        return updatedBackground[0];
       } else {
         // Create a new reference
         const defaultBg = defaultBackgrounds.find(
           (bg) => bg.id === backgroundId
         );
 
-        const result = await db.execute(
-          sql`INSERT INTO backgrounds (
-                user_id, type, url, metadata, is_selected, default_background_id
-              ) VALUES (
-                ${userId}, 
-                ${defaultBg.type}, 
-                ${defaultBg.url}, 
-                ${JSON.stringify(defaultBg.metadata)}, 
-                true, 
-                ${backgroundId}
-              ) RETURNING *`
-        );
+        const newBackground = await db
+          .insert(backgrounds)
+          .values({
+            userId,
+            type: defaultBg.type,
+            url: defaultBg.url,
+            metadata: defaultBg.metadata,
+            isSelected: true,
+            defaultBackgroundId: backgroundId,
+          } as BackgroundInsert)
+          .returning();
 
-        return result.rows[0];
+        return newBackground[0];
       }
     } else {
       // If it's a user-created background, just mark it as selected
-      const result = await db.execute(
-        sql`UPDATE backgrounds SET is_selected = true, updated_at = NOW() 
-            WHERE id = ${backgroundId} RETURNING *`
-      );
+      const updatedBackground = await db
+        .update(backgrounds)
+        .set({
+          isSelected: true,
+          updatedAt: new Date(),
+        } as Background)
+        .where(eq(backgrounds.id, backgroundId))
+        .returning();
 
-      if (result.rows.length === 0) {
+      if (updatedBackground.length === 0) {
         throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
       }
 
-      return result.rows[0];
+      return updatedBackground[0];
     }
   }
 
@@ -291,19 +309,18 @@ export class BackgroundService {
       blurhash: metadata?.blurhash || "LKO2?U%2Tw=w]~RBVZRi};RPxuwH", // Default blurhash if none provided
     };
 
-    const result = await db.execute(
-      sql`INSERT INTO backgrounds (
-            user_id, type, url, metadata, schedule
-          ) VALUES (
-            ${userId}, 
-            ${type}, 
-            ${url}, 
-            ${JSON.stringify(updatedMetadata)}, 
-            ${JSON.stringify(schedule || {})}
-          ) RETURNING *`
-    );
+    const newBackground = await db
+      .insert(backgrounds)
+      .values({
+        userId,
+        type,
+        url,
+        metadata: updatedMetadata,
+        schedule: schedule || {},
+      } as BackgroundInsert)
+      .returning();
 
-    return result.rows[0];
+    return newBackground[0];
   }
 
   /**
@@ -338,19 +355,20 @@ export class BackgroundService {
       };
     }
 
-    // For simplicity, just update all fields
-    const result = await db.execute(
-      sql`UPDATE backgrounds 
-          SET type = COALESCE(${type}, type),
-              url = COALESCE(${url}, url),
-              metadata = COALESCE(${updatedMetadata ? JSON.stringify(updatedMetadata) : null}, metadata),
-              schedule = COALESCE(${schedule ? JSON.stringify(schedule) : null}, schedule),
-              updated_at = NOW()
-          WHERE id = ${id}
-          RETURNING *`
-    );
+    // Build update object with only provided fields
+    const updateData: any = { updatedAt: new Date() };
+    if (type !== undefined) updateData.type = type;
+    if (url !== undefined) updateData.url = url;
+    if (updatedMetadata !== undefined) updateData.metadata = updatedMetadata;
+    if (schedule !== undefined) updateData.schedule = schedule;
 
-    return result.rows[0];
+    const updatedBackground = await db
+      .update(backgrounds)
+      .set(updateData)
+      .where(eq(backgrounds.id, id))
+      .returning();
+
+    return updatedBackground[0];
   }
 
   /**
@@ -373,7 +391,7 @@ export class BackgroundService {
       );
     }
 
-    await db.execute(sql`DELETE FROM backgrounds WHERE id = ${id}`);
+    await db.delete(backgrounds).where(eq(backgrounds.id, id));
   }
 }
 
