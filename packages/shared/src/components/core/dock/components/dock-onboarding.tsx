@@ -23,8 +23,8 @@ const ONBOARDING_STEPS = [
     titleKey: "onboarding.timer.title",
     descriptionKey: "onboarding.timer.description",
     icon: Icons.worldClockActive,
-    gradient: "from-red-500/20 to-orange-500/20",
-    iconClass: "text-red-400",
+    gradient: "from-orange-500/20 to-amber-500/20",
+    iconClass: "text-orange-400",
     action: "toggleTimer",
   },
   {
@@ -50,8 +50,9 @@ const ONBOARDING_STEPS = [
     titleKey: "onboarding.todos.title",
     descriptionKey: "onboarding.todos.description",
     icon: Icons.todoListActive,
-    gradient: "from-yellow-500/20 to-amber-500/20",
-    iconClass: "text-yellow-400",
+    gradient: "from-indigo-500/20 to-violet-500/20",
+    iconClass: "text-indigo-400",
+
     action: null,
   },
   {
@@ -68,8 +69,8 @@ const ONBOARDING_STEPS = [
     titleKey: "onboarding.tab-stash.title",
     descriptionKey: "onboarding.tab-stash.description",
     icon: Icons.tabStashActive,
-    gradient: "from-indigo-500/20 to-violet-500/20",
-    iconClass: "text-indigo-400",
+    gradient: "from-sky-500/20 to-cyan-500/20",
+    iconClass: "text-sky-400",
     action: null,
   },
   {
