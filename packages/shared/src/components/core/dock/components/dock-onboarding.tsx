@@ -231,7 +231,7 @@ export const DockOnboarding = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
-        className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 transform"
+        className="fixed bottom-24 inset-x-0 z-50 mx-auto w-[340px]"
         role="dialog"
         aria-labelledby="onboarding-title"
         aria-describedby="onboarding-description"
@@ -266,7 +266,7 @@ export const DockOnboarding = () => {
             </motion.div>
           </div>
 
-          <div className="space-y-2 pt-12">
+          <div className="space-y-4 pt-12">
             <motion.h3
               id="onboarding-title"
               className="text-center text-xl font-medium text-white"
@@ -287,7 +287,7 @@ export const DockOnboarding = () => {
             </motion.p>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-4">
             <div className="flex justify-center gap-1">
               {ONBOARDING_STEPS.map((_, index) => (
                 <motion.div
