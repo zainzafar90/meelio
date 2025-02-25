@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Sheet, SheetContent } from "@repo/ui/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@repo/ui/components/ui/sheet";
 import { Button } from "@repo/ui/components/ui/button";
 import { useDockStore } from "../../../stores/dock.store";
 import { useTabStashStore } from "./store/tab-stash.store";
@@ -9,6 +15,7 @@ import { TabSession } from "../../../types/tab-stash.types";
 import { PermissionBanner } from "./components/permission-banner";
 import { SessionList } from "./components/session-list";
 import { SessionView } from "./components/session-view";
+import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 
 const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
 
@@ -25,9 +32,15 @@ export const TabStashSheet = () => {
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900 backdrop-blur-xl"
       >
+        <VisuallyHidden>
+          <SheetHeader>
+            <SheetTitle>{t("tab-stash.title")}</SheetTitle>
+            <SheetDescription>{t("tab-stash.description")}</SheetDescription>
+          </SheetHeader>
+        </VisuallyHidden>
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
           <h2 className="text-lg font-semibold text-white">
-            {t("common.tab-stash", "Tab Stash")}
+            {t("tab-stash.title")}
           </h2>
         </div>
 

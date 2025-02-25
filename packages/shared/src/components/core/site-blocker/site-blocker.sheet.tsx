@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Sheet, SheetContent } from "@repo/ui/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@repo/ui/components/ui/sheet";
 import { useDockStore } from "../../../stores/dock.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -7,6 +13,7 @@ import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
+import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -28,9 +35,16 @@ export const SiteBlockerSheet = () => {
           backgroundPosition: "center",
         }}
       >
+        <VisuallyHidden>
+          <SheetHeader>
+            <SheetTitle>{t("site-blocker.title")}</SheetTitle>
+            <SheetDescription>{t("site-blocker.description")}</SheetDescription>
+          </SheetHeader>
+        </VisuallyHidden>
+
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
           <h2 className="text-lg font-semibold text-white">
-            {t("common.site-blocker", "Site Blocker")}
+            {t("site-blocker.title")}
           </h2>
         </div>
 
