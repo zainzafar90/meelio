@@ -42,7 +42,8 @@
       "skip": "Überspringen",
       "previous": "Vorherige",
       "next": "Nächste",
-      "finish": "Fertig"
+      "finish": "Fertig",
+      "toggle": "Umschalten"
     },
     "weekdays": {
       "short": {
@@ -283,7 +284,8 @@
       "billing": "Abrechnung",
       "privacy": "Datenschutz & Sichtbarkeit",
       "advanced": "Erweitert",
-      "language": "Sprache"
+      "language": "Sprache",
+      "dock": "Dock"
     },
     "appearance": {
       "title": "Erscheinungsbild",
@@ -295,6 +297,35 @@
         "light": "Hell",
         "dark": "Dunkel",
         "system": "System"
+      }
+    },
+    "dock": {
+      "title": "Dock-Einstellungen",
+      "description": "Passe an, welche Elemente in deinem Dock angezeigt werden",
+      "visibility": {
+        "title": "Dock-Element-Sichtbarkeit",
+        "description": "Steuere, welche Elemente im Dock sichtbar sind"
+      },
+      "timer": {
+        "description": "Timer für fokussierte Arbeitssitzungen"
+      },
+      "soundscapes": {
+        "description": "Umgebungsgeräusche zur Konzentrationssteigerung"
+      },
+      "breathing": {
+        "description": "Geführte Atemübungen"
+      },
+      "todos": {
+        "description": "Aufgabenverwaltung"
+      },
+      "site-blocker": {
+        "description": "Ablenkende Websites blockieren"
+      },
+      "tab-stash": {
+        "description": "Browser-Tabs speichern und organisieren"
+      },
+      "background": {
+        "description": "Ändere deinen Hintergrund"
       }
     },
     "account": {

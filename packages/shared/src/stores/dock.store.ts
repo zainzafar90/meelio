@@ -9,6 +9,13 @@ interface DockState {
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
+  isTimerIconVisible: boolean;
+  isBreathingIconVisible: boolean;
+  isSoundscapesIconVisible: boolean;
+  isTodosIconVisible: boolean;
+  isSiteBlockerIconVisible: boolean;
+  isTabStashIconVisible: boolean;
+  isBackgroundsIconVisible: boolean;
   currentOnboardingStep: number;
   toggleTimer: () => void;
   toggleBreathing: () => void;
@@ -26,6 +33,13 @@ interface DockState {
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
+  setTimerIconVisible: (visible: boolean) => void;
+  setBreathingIconVisible: (visible: boolean) => void;
+  setSoundscapesIconVisible: (visible: boolean) => void;
+  setTodosIconVisible: (visible: boolean) => void;
+  setSiteBlockerIconVisible: (visible: boolean) => void;
+  setTabStashIconVisible: (visible: boolean) => void;
+  setBackgroundsIconVisible: (visible: boolean) => void;
   setCurrentOnboardingStep: (step: number) => void;
   reset: () => void;
 }
@@ -39,6 +53,13 @@ export const useDockStore = create<DockState>()((set) => ({
   isBackgroundsVisible: false,
   isSiteBlockerVisible: false,
   isTabStashVisible: false,
+  isTimerIconVisible: true,
+  isBreathingIconVisible: true,
+  isSoundscapesIconVisible: true,
+  isTodosIconVisible: true,
+  isSiteBlockerIconVisible: true,
+  isTabStashIconVisible: true,
+  isBackgroundsIconVisible: true,
   currentOnboardingStep: -1,
 
   toggleTimer: () => {
@@ -109,6 +130,34 @@ export const useDockStore = create<DockState>()((set) => ({
 
   setTabStashVisible: (visible: boolean) => {
     set({ isTabStashVisible: visible });
+  },
+
+  setTimerIconVisible: (visible: boolean) => {
+    set({ isTimerIconVisible: visible });
+  },
+
+  setBreathingIconVisible: (visible: boolean) => {
+    set({ isBreathingIconVisible: visible });
+  },
+
+  setSoundscapesIconVisible: (visible: boolean) => {
+    set({ isSoundscapesIconVisible: visible });
+  },
+
+  setTodosIconVisible: (visible: boolean) => {
+    set({ isTodosIconVisible: visible });
+  },
+
+  setSiteBlockerIconVisible: (visible: boolean) => {
+    set({ isSiteBlockerIconVisible: visible });
+  },
+
+  setTabStashIconVisible: (visible: boolean) => {
+    set({ isTabStashIconVisible: visible });
+  },
+
+  setBackgroundsIconVisible: (visible: boolean) => {
+    set({ isBackgroundsIconVisible: visible });
   },
 
   setCurrentOnboardingStep: (step: number) => {

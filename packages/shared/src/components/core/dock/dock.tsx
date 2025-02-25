@@ -72,6 +72,13 @@ export const Dock = () => {
     toggleBackgrounds,
     toggleTabStash,
     resetDock,
+    isTimerIconVisible,
+    isBreathingIconVisible,
+    isSoundscapesIconVisible,
+    isTodosIconVisible,
+    isSiteBlockerIconVisible,
+    isTabStashIconVisible,
+    isBackgroundsIconVisible,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
     isBreathingVisible: state.isBreathingVisible,
@@ -89,11 +96,18 @@ export const Dock = () => {
     toggleSiteBlocker: state.toggleSiteBlocker,
     toggleBackgrounds: state.toggleBackgrounds,
     toggleTabStash: state.toggleTabStash,
+    isTimerIconVisible: state.isTimerIconVisible,
+    isBreathingIconVisible: state.isBreathingIconVisible,
+    isSoundscapesIconVisible: state.isSoundscapesIconVisible,
+    isTodosIconVisible: state.isTodosIconVisible,
+    isSiteBlockerIconVisible: state.isSiteBlockerIconVisible,
+    isTabStashIconVisible: state.isTabStashIconVisible,
+    isBackgroundsIconVisible: state.isBackgroundsIconVisible,
   }));
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
-  const mainDockItems: DockItem[] = useMemo(
+  const items = useMemo(
     () => [
       {
         id: "home",
@@ -102,61 +116,106 @@ export const Dock = () => {
         activeIcon: Logo,
         onClick: () => resetDock(),
       },
-      {
-        id: "timer",
-        name: t("common.pomodoro"),
-        icon: Icons.worldClock,
-        activeIcon: Icons.worldClockActive,
-        onClick: () => toggleTimer(),
-      },
-      {
-        id: "soundscapes",
-        name: t("common.soundscapes"),
-        icon: Icons.soundscapes,
-        activeIcon: Icons.soundscapesActive,
-        onClick: () => toggleSoundscapes(),
-      },
-      {
-        id: "breathepod",
-        name: t("common.breathing"),
-        icon: Icons.breathing,
-        activeIcon: Icons.breathingActive,
-        onClick: () => toggleBreathing(),
-      },
-      {
-        id: "todos",
-        name: t("common.todo"),
-        icon: Icons.todoList,
-        activeIcon: Icons.todoListActive,
-        onClick: () => toggleTodos(),
-      },
-      {
-        id: "site-blocker",
-        name: t("common.site-blocker"),
-        icon: Icons.siteBlocker,
-        activeIcon: Icons.siteBlockerActive,
-        onClick: () => toggleSiteBlocker(),
-      },
-      {
-        id: "tab-stash",
-        name: t("common.tab-stash"),
-        icon: Icons.tabStash,
-        activeIcon: Icons.tabStashActive,
-        onClick: () => toggleTabStash(),
-      },
-      {
-        id: "background",
-        name: t("common.background"),
-        icon: Icons.background,
-        activeIcon: Icons.background,
-        onClick: () => toggleBackgrounds(),
-      },
+      ...(isTimerIconVisible
+        ? [
+            {
+              id: "timer",
+              name: t("common.pomodoro"),
+              icon: Icons.worldClock,
+              activeIcon: Icons.worldClockActive,
+              onClick: toggleTimer,
+            },
+          ]
+        : []),
+      ...(isSoundscapesIconVisible
+        ? [
+            {
+              id: "soundscapes",
+              name: t("common.soundscapes"),
+              icon: Icons.soundscapes,
+              activeIcon: Icons.soundscapesActive,
+              onClick: toggleSoundscapes,
+            },
+          ]
+        : []),
+      ...(isBreathingIconVisible
+        ? [
+            {
+              id: "breathepod",
+              name: t("common.breathing"),
+              icon: Icons.breathing,
+              activeIcon: Icons.breathingActive,
+              onClick: toggleBreathing,
+            },
+          ]
+        : []),
+      ...(isTodosIconVisible
+        ? [
+            {
+              id: "todos",
+              name: t("common.todo"),
+              icon: Icons.todoList,
+              activeIcon: Icons.todoListActive,
+              onClick: toggleTodos,
+            },
+          ]
+        : []),
+      ...(isSiteBlockerIconVisible
+        ? [
+            {
+              id: "site-blocker",
+              name: t("common.site-blocker"),
+              icon: Icons.siteBlocker,
+              activeIcon: Icons.siteBlockerActive,
+              onClick: toggleSiteBlocker,
+            },
+          ]
+        : []),
+      ...(isTabStashIconVisible
+        ? [
+            {
+              id: "tab-stash",
+              name: t("common.tab-stash"),
+              icon: Icons.tabStash,
+              activeIcon: Icons.tabStashActive,
+              onClick: toggleTabStash,
+            },
+          ]
+        : []),
+      ...(isBackgroundsIconVisible
+        ? [
+            {
+              id: "background",
+              name: t("common.background"),
+              icon: Icons.background,
+              activeIcon: Icons.background,
+              onClick: toggleBackgrounds,
+            },
+          ]
+        : []),
     ],
-    [t, resetDock, toggleTimer, toggleSoundscapes, toggleBreathing]
+    [
+      t,
+      resetDock,
+      toggleTimer,
+      toggleSoundscapes,
+      toggleBreathing,
+      toggleTodos,
+      toggleSiteBlocker,
+      toggleTabStash,
+      toggleBackgrounds,
+      isTimerIconVisible,
+      isSoundscapesIconVisible,
+      isBreathingIconVisible,
+      isTodosIconVisible,
+      isSiteBlockerIconVisible,
+      isTabStashIconVisible,
+      isBackgroundsIconVisible,
+    ]
   );
 
   const getVisibleItemCount = (width: number) => {
-    if (width >= 1280) return Math.min(mainDockItems.length, 14);
+    if (width >= 1280) return Math.min(items.length, 14);
     if (width >= 1024) return 10;
     if (width >= 768) return 8;
     if (width >= 640) return 4;
@@ -167,14 +226,14 @@ export const Dock = () => {
     const handleResize = () => {
       if (!dockRef.current) return;
       const visibleCount = getVisibleItemCount(window.innerWidth);
-      setVisibleItems(mainDockItems.slice(0, visibleCount));
-      setDropdownItems(mainDockItems.slice(visibleCount));
+      setVisibleItems(items.slice(0, visibleCount));
+      setDropdownItems(items.slice(visibleCount));
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [mainDockItems]);
+  }, [items]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

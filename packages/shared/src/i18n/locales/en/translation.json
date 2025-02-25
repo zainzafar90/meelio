@@ -42,7 +42,8 @@
       "skip": "Skip",
       "previous": "Previous",
       "next": "Next",
-      "finish": "Finish"
+      "finish": "Finish",
+      "toggle": "Toggle"
     },
     "close": "Close",
     "weekdays": {
@@ -282,7 +283,8 @@
       "billing": "Billing",
       "privacy": "Privacy & visibility",
       "advanced": "Advanced",
-      "language": "Language"
+      "language": "Language",
+      "dock": "Dock"
     },
     "appearance": {
       "title": "Appearance",
@@ -294,6 +296,35 @@
         "light": "Light",
         "dark": "Dark",
         "system": "System"
+      }
+    },
+    "dock": {
+      "title": "Dock Settings",
+      "description": "Customize which items appear in your dock",
+      "visibility": {
+        "title": "Dock Items Visibility",
+        "description": "Control which items are visible in the dock"
+      },
+      "timer": {
+        "description": "Timer for focused work sessions"
+      },
+      "soundscapes": {
+        "description": "Ambient sounds to help you focus"
+      },
+      "breathing": {
+        "description": "Guided breathing exercises"
+      },
+      "todos": {
+        "description": "Task management"
+      },
+      "site-blocker": {
+        "description": "Block distracting websites"
+      },
+      "tab-stash": {
+        "description": "Save and organize browser tabs"
+      },
+      "background": {
+        "description": "Change your background"
       }
     },
     "account": {

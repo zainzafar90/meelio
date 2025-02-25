@@ -16,7 +16,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@repo/ui/components/ui/sidebar";
-import { CreditCard, Home, Paintbrush, User, Languages } from "lucide-react";
+import {
+  CreditCard,
+  Home,
+  Paintbrush,
+  User,
+  Languages,
+  Anchor,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { ProfileDropdown } from "./components/user-profile/profile-dropdown";
@@ -25,6 +32,7 @@ import { AppearanceSettings } from "./tabs/appearance-settings";
 import { BillingSettings } from "./tabs/billing-settings";
 import { GeneralSettings } from "./tabs/general-settings";
 import { LanguageSettings } from "./tabs/language-settings";
+import { DockSettings } from "./tabs/dock-settings";
 import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
@@ -40,6 +48,7 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "general", name: "general", icon: Home },
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
+  { id: "dock", name: "dock", icon: Anchor },
   { id: "account", name: "account", icon: User },
   { id: "billing", name: "billing", icon: CreditCard },
 ] as const;
@@ -63,6 +72,8 @@ export function SettingsDialog() {
         return <AppearanceSettings />;
       case "language":
         return <LanguageSettings />;
+      case "dock":
+        return <DockSettings />;
       case "account":
         return <AccountSettings />;
       case "billing":

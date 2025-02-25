@@ -5,7 +5,8 @@ export type SettingsTab =
   | "appearance"
   | "account"
   | "billing"
-  | "language";
+  | "language"
+  | "dock";
 
 interface SettingsState {
   isOpen: boolean;
