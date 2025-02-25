@@ -7,6 +7,7 @@ import docsRoute from "./swagger.routes";
 import userRoute from "./user.routes";
 import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
+import syncRoute from "./sync.routes";
 
 const router: express.Router = express.Router();
 
@@ -31,6 +32,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/subscriptions",
     route: subscriptionRoute,
+  },
+  {
+    path: "/sync",
+    route: syncRoute,
   },
 ];
 

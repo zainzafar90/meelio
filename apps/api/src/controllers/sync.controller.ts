@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { SyncService, SyncRequest } from "@/services/sync.service";
 
+interface AuthenticatedRequest extends Request {
+  user?: {
+    email: string;
+  };
+}
+
 export class SyncController {
   private syncService: SyncService;
 
@@ -8,9 +14,9 @@ export class SyncController {
     this.syncService = new SyncService();
   }
 
-  async bulkSync(req: Request, res: Response) {
+  async bulkSync(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.email;
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }
@@ -31,9 +37,9 @@ export class SyncController {
     }
   }
 
-  async getSyncStatus(req: Request, res: Response) {
+  async getSyncStatus(req: AuthenticatedRequest, res: Response) {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.email;
       if (!userId) {
         return res.status(401).json({ message: "Unauthorized" });
       }

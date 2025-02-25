@@ -79,6 +79,11 @@ export class SyncService {
       try {
         const table = this.getTableForEntity(operation.entity);
 
+        // Skip user table for special handling if needed
+        if (operation.entity === "users") {
+          continue;
+        }
+
         switch (operation.operation) {
           case "create":
             await db.insert(table).values({
@@ -99,7 +104,7 @@ export class SyncService {
               .where(
                 and(
                   eq(table.id as any, operation.data.id),
-                  eq(table.userId as any, userId)
+                  eq((table as any).userId, userId)
                 )
               );
             break;
@@ -110,7 +115,7 @@ export class SyncService {
               .where(
                 and(
                   eq(table.id as any, operation.data.id),
-                  eq(table.userId as any, userId)
+                  eq((table as any).userId, userId)
                 )
               );
             break;
@@ -141,7 +146,7 @@ export class SyncService {
           .from(table)
           .where(
             and(
-              eq(table.userId as any, userId),
+              eq((table as any).userId, userId),
               gt(table.updatedAt as any, lastSyncTimestamp)
             )
           );
