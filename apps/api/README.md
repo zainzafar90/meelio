@@ -32,13 +32,13 @@ This document outlines the plan for implementing offline-first capabilities in t
 - [x] Implement soundscape routes
 - [x] Implement mantra routes
 - [x] Implement task routes
-- [ ] Implement pomodoro settings routes
-- [ ] Implement site blocker routes
-- [ ] Implement tab stash routes
-- [ ] Implement note routes
-- [ ] Implement weather cache routes
-- [ ] Implement breathepod routes
-- [ ] Implement focus session routes
+- [x] Implement pomodoro settings routes
+- [x] Implement site blocker routes
+- [x] Implement tab stash routes
+- [x] Implement note routes
+- [x] Implement weather cache routes
+- [x] Implement breathepod routes
+- [x] Implement focus session routes
 
 ## Frontend Implementation
 
