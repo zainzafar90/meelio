@@ -1,12 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  pgTable,
-  text,
-  jsonb,
-  timestamp,
-  index,
-  customType,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, jsonb, index, customType } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
@@ -14,6 +7,13 @@ import { users } from "./user.schema";
 export enum BackgroundType {
   STATIC = "static",
   LIVE = "live",
+}
+
+export interface BackgroundMetadata {
+  name: string;
+  category: string;
+  tags: string[];
+  thumbnailUrl: string;
 }
 
 const EnumBackgroundType = customType<{
@@ -26,11 +26,10 @@ export const backgrounds = pgTable(
   "backgrounds",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     type: EnumBackgroundType("type").notNull(),
     url: text("url").notNull(),
+    metadata: jsonb("metadata").$type<BackgroundMetadata>(),
     schedule: jsonb("schedule"),
     createdAt,
     updatedAt,

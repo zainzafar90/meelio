@@ -2,13 +2,17 @@
   "name": "@repo/shared",
   "version": "0.0.0",
   "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "lint": "eslint ."
   },
   "peerDependencies": {
-    "react": "^18.2.0"
+    "react": "^18.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/uuid": "^9.0.0"
+  },
   "dependencies": {
     "@number-flow/react": "^0.3.0",
     "@repo/eslint-config": "*",
@@ -19,7 +23,7 @@
     "blurhash": "^2.0.5",
     "clsx": "^2.1.1",
     "date-fns-tz": "^3.2.0",
-    "dexie": "^4.0.10",
+    "dexie": "^3.2.4",
     "framer-motion": "^11.13.4",
     "i18next": "^24.0.5",
     "i18next-browser-languagedetector": "^8.0.2",
@@ -33,7 +37,10 @@
     "typescript": "^5.3.3",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.24.0",
-    "zustand": "^4.4.1"
+    "zustand": "^4.4.1",
+    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query-persist-client": "^5.0.0",
+    "uuid": "^9.0.0"
   },
   "exports": {
     ".": "./src/index.tsx",

@@ -8,10 +8,7 @@ export const weatherCache = pgTable(
   "weather_cache",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id)
-      .unique(),
+    userId: text("user_id").notNull(),
     weatherData: jsonb("weather_data"),
     createdAt,
     updatedAt,

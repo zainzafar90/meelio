@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740330394033,
-      "tag": "0000_strong_adam_destine",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1740330881570,
-      "tag": "0001_strange_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1740331026547,
-      "tag": "0002_redundant_felicia_hardy",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1740333894725,
-      "tag": "0003_wet_bedlam",
+      "when": 1740504463825,
+      "tag": "0000_slippery_silvermane",
       "breakpoints": true
     }
   ]

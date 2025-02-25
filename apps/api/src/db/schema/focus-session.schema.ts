@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, integer, index, text } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
@@ -8,9 +8,7 @@ export const focusSessions = pgTable(
   "focus_sessions",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     sessionStart: timestamp("session_start", { withTimezone: true }).notNull(),
     sessionEnd: timestamp("session_end", { withTimezone: true }).notNull(),
     duration: integer("duration").notNull(), // duration in minutes

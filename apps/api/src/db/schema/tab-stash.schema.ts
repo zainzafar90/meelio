@@ -8,9 +8,7 @@ export const tabStashes = pgTable(
   "tab_stashes",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     windowId: text("window_id").notNull(),
     urls: text("urls").array().notNull(),
     createdAt,

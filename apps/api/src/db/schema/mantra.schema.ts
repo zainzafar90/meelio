@@ -25,9 +25,7 @@ export const mantras = pgTable(
   "mantras",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     text: text("text").notNull(),
     type: EnumMantraType("type").notNull(),
     date: timestamp("date", { withTimezone: true }),

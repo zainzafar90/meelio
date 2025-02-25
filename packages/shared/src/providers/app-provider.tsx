@@ -12,6 +12,7 @@ import { ThemeProvider } from "../components/common/theme-provider";
 import { ConnectionWarning } from "../components/common/connection-warning";
 import { SoundPlayer } from "../components/core/soundscapes/components/sound-player/sound-player";
 import { AuthProvider } from "./auth-provider";
+import { QueryProvider } from "./query-client.provider";
 // import { env } from "../utils/env.utils";
 import { i18n } from "../i18n";
 // import { TelemetryProvider } from "./telemetry-provider";
@@ -45,26 +46,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({
 
   return (
     <I18nextProvider i18n={i18n}>
-      <BrowserRouter
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
-        <AuthProvider>
-          {/* <TelemetryProvider> */}
-          <ThemeProvider storageKey="ui-theme" defaultTheme="system">
-            <TooltipProvider>
-              <BackgroundProvider>
-                <PomodoroProvider>
-                  {children}
-                  {hasPlayingSounds && <SoundPlayer />}
-                  <Toaster richColors />
-                  <ConnectionWarning />
-                </PomodoroProvider>
-              </BackgroundProvider>
-            </TooltipProvider>
-          </ThemeProvider>
-          {/* </TelemetryProvider> */}
-        </AuthProvider>
-      </BrowserRouter>
+      <QueryProvider>
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <AuthProvider>
+            {/* <TelemetryProvider> */}
+            <ThemeProvider storageKey="ui-theme" defaultTheme="system">
+              <TooltipProvider>
+                <BackgroundProvider>
+                  <PomodoroProvider>
+                    {children}
+                    {hasPlayingSounds && <SoundPlayer />}
+                    <Toaster richColors />
+                    <ConnectionWarning />
+                  </PomodoroProvider>
+                </BackgroundProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+            {/* </TelemetryProvider> */}
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryProvider>
     </I18nextProvider>
   );
 };

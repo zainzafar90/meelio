@@ -28,9 +28,7 @@ export const tasks = pgTable(
   "tasks",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     title: text("title").notNull(),
     description: text("description"),
     category: text("category"),

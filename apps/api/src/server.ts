@@ -52,14 +52,14 @@ export const createServer = (): Express => {
     .get("/", (_, res) => {
       res.status(200).json({ message: "Meelio API" });
     })
+    .get("/health", (_, res) => {
+      res.status(200).json({ status: "ok" });
+    })
     .use((req, res, next) => {
       next(new ApiError(httpStatus.NOT_FOUND, "Not found"));
     })
     .use(errorConverter)
-    .use(errorHandler)
-    .get("/status", (_, res) => {
-      return res.json({ ok: true });
-    });
+    .use(errorHandler);
 
   passport.use("jwt", jwtStrategy);
   passport.use("google", googleStrategy);

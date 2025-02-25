@@ -8,9 +8,7 @@ export const soundscapes = pgTable(
   "soundscapes",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     name: text("name").notNull(),
     config: jsonb("config"),
     shareable: boolean("shareable").default(false),

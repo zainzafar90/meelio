@@ -8,10 +8,7 @@ export const breathepod = pgTable(
   "breathepod",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id)
-      .unique(),
+    userId: text("user_id").notNull(),
     config: jsonb("config"),
     createdAt,
     updatedAt,

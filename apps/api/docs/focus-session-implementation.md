@@ -15,9 +15,7 @@ export const focusSessions = pgTable(
   "focus_sessions",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     sessionStart: timestamp("session_start", { withTimezone: true }).notNull(),
     sessionEnd: timestamp("session_end", { withTimezone: true }).notNull(),
     duration: integer("duration").notNull(), // duration in minutes

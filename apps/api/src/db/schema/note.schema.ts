@@ -8,9 +8,7 @@ export const notes = pgTable(
   "notes",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     title: text("title").notNull(),
     content: text("content"),
     createdAt,

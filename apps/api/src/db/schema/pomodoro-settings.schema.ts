@@ -8,10 +8,7 @@ export const pomodoroSettings = pgTable(
   "pomodoro_settings",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id)
-      .unique(),
+    userId: text("user_id").notNull(),
     workDuration: integer("work_duration").notNull().default(25),
     breakDuration: integer("break_duration").notNull().default(5),
     autoStart: boolean("auto_start").default(false),

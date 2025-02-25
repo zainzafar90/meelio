@@ -8,9 +8,7 @@ export const siteBlockers = pgTable(
   "site_blockers",
   {
     id,
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
+    userId: text("user_id").notNull(),
     category: text("category"),
     url: text("url").notNull(),
     createdAt,
