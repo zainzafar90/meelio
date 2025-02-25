@@ -39,7 +39,10 @@
       "reset": "Reset",
       "start": "Start",
       "stop": "Stop",
-      "skip": "Skip"
+      "skip": "Skip",
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish"
     },
     "close": "Close",
     "weekdays": {
@@ -52,6 +55,44 @@
         "saturday": "Sat",
         "sunday": "Sun"
       }
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Welcome to Meelio!",
+      "description": "Let's take a quick tour of your productivity dock."
+    },
+    "timer": {
+      "title": "Pomodoro Timer",
+      "description": "Stay focused with our Pomodoro timer. Break your work into focused sessions."
+    },
+    "soundscapes": {
+      "title": "Soundscapes",
+      "description": "Immerse yourself in calming ambient sounds to boost your productivity."
+    },
+    "breathing": {
+      "title": "Breathing Exercises",
+      "description": "Take mindful breaks with guided breathing exercises."
+    },
+    "todos": {
+      "title": "Todo List",
+      "description": "Keep track of your tasks and stay organized."
+    },
+    "site-blocker": {
+      "title": "Site Blocker",
+      "description": "Block distracting websites during your focus sessions."
+    },
+    "tab-stash": {
+      "title": "Tab Stash",
+      "description": "Declutter your browser by stashing away tabs for later."
+    },
+    "background": {
+      "title": "Backgrounds",
+      "description": "Personalize your workspace with beautiful backgrounds."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Customize Meelio to match your preferences and workflow."
     }
   },
   "soundscapes": {

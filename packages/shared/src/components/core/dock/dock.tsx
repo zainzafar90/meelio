@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
+import { useAuthStore } from "../../../stores/auth.store";
 
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
@@ -15,6 +16,7 @@ import { ClockDock } from "./components/clock.dock";
 import { LanguageSwitcherDock } from "./components/language-switcher.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
+import { DockOnboarding } from "./components/dock-onboarding";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
@@ -95,6 +97,7 @@ export const Dock = () => {
     toggleTabStash: state.toggleTabStash,
   }));
   const { t } = useTranslation();
+  const { user } = useAuthStore();
 
   const mainDockItems: DockItem[] = useMemo(
     () => [
@@ -273,6 +276,8 @@ export const Dock = () => {
           })}
         </div>
       )}
+
+      {user && <DockOnboarding />}
     </div>
   );
 };
