@@ -1,60 +1,124 @@
 import { db } from "@/db";
 import { backgrounds } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
 // Default backgrounds that will be available to all users
 const defaultBackgrounds = [
   {
-    id: "default-1",
-    type: "static",
-    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    id: "live-1",
+    type: "live",
+    url: "https://app.meelio.io/live-wallpapers/01-spring-lofi.mp4",
     metadata: {
-      name: "Mountain Lake",
-      category: "Nature",
-      tags: ["mountains", "lake", "landscape"],
+      name: "Spring Lofi",
+      category: "Local",
+      tags: ["lofi", "spring", "animation"],
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80",
+        "https://app.meelio.io/live-wallpapers/01-spring-lofi-thumbnail.png",
+      blurhash: "LjI6AjogNtNG_4V@ocI;I@M_aKS#",
+      fallbackImage:
+        "https://app.meelio.io/live-wallpapers/01-spring-lofi.avif",
     },
     isDefault: true,
   },
   {
-    id: "default-2",
-    type: "static",
-    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    id: "live-2",
+    type: "live",
+    url: "https://app.meelio.io/live-wallpapers/02-rainy-forest.mp4",
     metadata: {
-      name: "Beach Sunset",
-      category: "Nature",
-      tags: ["beach", "sunset", "ocean"],
+      name: "Rainy Forest",
+      category: "Local",
+      tags: ["forest", "rain", "nature"],
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80",
+        "https://app.meelio.io/live-wallpapers/02-rainy-forest-thumbnail.png",
+      blurhash: "L33b,b:#q@Y8.A#Ov|%hMdS5tmwZ",
+      fallbackImage:
+        "https://app.meelio.io/live-wallpapers/02-rainy-forest.avif",
     },
     isDefault: true,
   },
   {
-    id: "default-3",
+    id: "static-1",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1505699261378-c372af38134c",
+    metadata: {
+      name: "Gray Bridge Golden Hour",
+      category: "Unsplash",
+      tags: ["bridge", "golden hour", "landscape"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1505699261378-c372af38134c?w=160&fit=max",
+      blurhash: "L}JFcXIpNbX8}?RlS4W;xYe:a#W;",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-2",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1731432248688-b0b0d1743add",
+    metadata: {
+      name: "Road In Trees",
+      category: "Unsplash",
+      tags: ["road", "trees", "nature"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1731432248688-b0b0d1743add?w=160&fit=max",
+      blurhash: "L39tbzoz02~TQqV]?Zxt01nO~m9b",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-3",
     type: "static",
     url: "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1",
     metadata: {
-      name: "Forest Path",
-      category: "Nature",
-      tags: ["forest", "path", "trees"],
+      name: "Mountain Lake",
+      category: "Unsplash",
+      tags: ["mountain", "lake", "landscape"],
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&q=80",
+        "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=160&fit=max",
+      blurhash: "LG87OVl:ICIoL#TKyZs;nNyYVXQ,",
     },
     isDefault: true,
   },
   {
-    id: "default-4",
-    type: "live",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-waves-in-the-water-1164-large.mp4",
+    id: "static-4",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1543253539-58c7d1c00c8a",
     metadata: {
-      name: "Ocean Waves",
-      category: "Nature",
-      tags: ["ocean", "waves", "water"],
+      name: "Hills Aerial Snow Capped",
+      category: "Unsplash",
+      tags: ["hills", "aerial", "snow"],
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&q=80",
+        "https://images.unsplash.com/photo-1543253539-58c7d1c00c8a?w=160&fit=max",
+      blurhash: "LXF}]PENNas:~EI?bHax4.X6s+ju",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-5",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1732465286852-a0b95393a90d",
+    metadata: {
+      name: "Group of Mountains with Snow",
+      category: "Unsplash",
+      tags: ["mountains", "snow", "landscape"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1732465286852-a0b95393a90d?w=160&fit=max",
+      blurhash: "LgF5%3E2Nxax~VIpX8ayT0o0s:R*",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-6",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1739219959019-dd317f76c7e8",
+    metadata: {
+      name: "View of a Mountain Covered in Clouds",
+      category: "Unsplash",
+      tags: ["clouds", "mountains", "landscape"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1739219959019-dd317f76c7e8?w=160&fit=max",
+      blurhash: "LVCaWUp1RkWBkvV;aej]00kEs:jY",
     },
     isDefault: true,
   },
@@ -93,26 +157,16 @@ export class BackgroundService {
       .from(backgrounds)
       .where(eq(backgrounds.userId, userId));
 
-    // Get the currently selected background for the user
-    const selectedBackground = await db
-      .select()
-      .from(backgrounds)
-      .where(eq(backgrounds.userId, userId))
-      .where(eq(backgrounds.isSelected, true));
-
-    const selectedBackgroundId =
-      selectedBackground.length > 0 ? selectedBackground[0].id : null;
-
-    // Combine user backgrounds with default backgrounds
-    // Mark the selected background
+    // We don't have an isSelected field in the schema, so we'll just return all backgrounds
+    // without marking any as selected
     const allBackgrounds = [
       ...userBackgrounds.map((bg) => ({
         ...bg,
-        isSelected: bg.id === selectedBackgroundId,
+        isSelected: bg.isSelected, // Use the field from the schema
       })),
       ...defaultBackgrounds.map((bg) => ({
         ...bg,
-        isSelected: bg.id === selectedBackgroundId,
+        isSelected: false, // Adding this property for the frontend, but it's not in the DB
       })),
     ];
 
@@ -152,11 +206,9 @@ export class BackgroundService {
    */
   async setSelectedBackground(userId: string, backgroundId: string) {
     // First, unselect any currently selected background
-    await db
-      .update(backgrounds)
-      .set({ isSelected: false })
-      .where(eq(backgrounds.userId, userId))
-      .where(eq(backgrounds.isSelected, true));
+    await db.execute(
+      sql`UPDATE backgrounds SET is_selected = false WHERE user_id = ${userId} AND is_selected = true`
+    );
 
     // Check if the background to select is a default one
     const isDefaultBackground = defaultBackgrounds.some(
@@ -166,61 +218,51 @@ export class BackgroundService {
     if (isDefaultBackground) {
       // If it's a default background, we need to create a reference in the user's backgrounds
       // First check if the user already has a reference to this default background
-      const existingRef = await db
-        .select()
-        .from(backgrounds)
-        .where(eq(backgrounds.userId, userId))
-        .where(eq(backgrounds.defaultBackgroundId, backgroundId));
+      const existingRef = await db.execute(
+        sql`SELECT * FROM backgrounds WHERE user_id = ${userId} AND default_background_id = ${backgroundId}`
+      );
 
-      if (existingRef.length > 0) {
+      if (existingRef.rows.length > 0) {
         // Update the existing reference
-        const result = await db
-          .update(backgrounds)
-          .set({
-            isSelected: true,
-            updatedAt: new Date(),
-          })
-          .where(eq(backgrounds.id, existingRef[0].id))
-          .returning();
+        const result = await db.execute(
+          sql`UPDATE backgrounds SET is_selected = true, updated_at = NOW() 
+              WHERE id = ${existingRef.rows[0].id} RETURNING *`
+        );
 
-        return result[0];
+        return result.rows[0];
       } else {
         // Create a new reference
         const defaultBg = defaultBackgrounds.find(
           (bg) => bg.id === backgroundId
         );
-        const result = await db
-          .insert(backgrounds)
-          .values({
-            userId,
-            type: defaultBg.type,
-            url: defaultBg.url,
-            metadata: defaultBg.metadata,
-            isSelected: true,
-            defaultBackgroundId: backgroundId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .returning();
 
-        return result[0];
+        const result = await db.execute(
+          sql`INSERT INTO backgrounds (
+                user_id, type, url, metadata, is_selected, default_background_id
+              ) VALUES (
+                ${userId}, 
+                ${defaultBg.type}, 
+                ${defaultBg.url}, 
+                ${JSON.stringify(defaultBg.metadata)}, 
+                true, 
+                ${backgroundId}
+              ) RETURNING *`
+        );
+
+        return result.rows[0];
       }
     } else {
       // If it's a user-created background, just mark it as selected
-      const result = await db
-        .update(backgrounds)
-        .set({
-          isSelected: true,
-          updatedAt: new Date(),
-        })
-        .where(eq(backgrounds.id, backgroundId))
-        .returning();
+      const result = await db.execute(
+        sql`UPDATE backgrounds SET is_selected = true, updated_at = NOW() 
+            WHERE id = ${backgroundId} RETURNING *`
+      );
 
-      if (result.length === 0) {
+      if (result.rows.length === 0) {
         throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
       }
 
-      return result[0];
+      return result.rows[0];
     }
   }
 
@@ -241,17 +283,27 @@ export class BackgroundService {
    * @returns {Promise<object>} The created background
    */
   async createBackground(userId: string, backgroundData: any) {
-    const result = await db
-      .insert(backgrounds)
-      .values({
-        userId,
-        ...backgroundData,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
+    const { type, url, metadata, schedule } = backgroundData;
 
-    return result[0];
+    // Ensure metadata has a blurhash if not provided
+    const updatedMetadata = {
+      ...(metadata || {}),
+      blurhash: metadata?.blurhash || "LKO2?U%2Tw=w]~RBVZRi};RPxuwH", // Default blurhash if none provided
+    };
+
+    const result = await db.execute(
+      sql`INSERT INTO backgrounds (
+            user_id, type, url, metadata, schedule
+          ) VALUES (
+            ${userId}, 
+            ${type}, 
+            ${url}, 
+            ${JSON.stringify(updatedMetadata)}, 
+            ${JSON.stringify(schedule || {})}
+          ) RETURNING *`
+    );
+
+    return result.rows[0];
   }
 
   /**
@@ -268,23 +320,37 @@ export class BackgroundService {
     }
 
     // Don't allow updating default backgrounds
-    if (background.isDefault) {
+    if ("isDefault" in background && background.isDefault) {
       throw new ApiError(
         httpStatus.FORBIDDEN,
         "Cannot update default backgrounds"
       );
     }
 
-    const result = await db
-      .update(backgrounds)
-      .set({
-        ...backgroundData,
-        updatedAt: new Date(),
-      })
-      .where(eq(backgrounds.id, id))
-      .returning();
+    const { type, url, metadata, schedule } = backgroundData;
 
-    return result[0];
+    // Ensure metadata has a blurhash if provided
+    let updatedMetadata = metadata;
+    if (metadata && !metadata.blurhash) {
+      updatedMetadata = {
+        ...metadata,
+        blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH", // Default blurhash if none provided
+      };
+    }
+
+    // For simplicity, just update all fields
+    const result = await db.execute(
+      sql`UPDATE backgrounds 
+          SET type = COALESCE(${type}, type),
+              url = COALESCE(${url}, url),
+              metadata = COALESCE(${updatedMetadata ? JSON.stringify(updatedMetadata) : null}, metadata),
+              schedule = COALESCE(${schedule ? JSON.stringify(schedule) : null}, schedule),
+              updated_at = NOW()
+          WHERE id = ${id}
+          RETURNING *`
+    );
+
+    return result.rows[0];
   }
 
   /**
@@ -300,14 +366,14 @@ export class BackgroundService {
     }
 
     // Don't allow deleting default backgrounds
-    if (background.isDefault) {
+    if ("isDefault" in background && background.isDefault) {
       throw new ApiError(
         httpStatus.FORBIDDEN,
         "Cannot delete default backgrounds"
       );
     }
 
-    await db.delete(backgrounds).where(eq(backgrounds.id, id));
+    await db.execute(sql`DELETE FROM backgrounds WHERE id = ${id}`);
   }
 }
 

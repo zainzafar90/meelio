@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, jsonb, index, customType } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  jsonb,
+  index,
+  customType,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
@@ -31,6 +38,8 @@ export const backgrounds = pgTable(
     url: text("url").notNull(),
     metadata: jsonb("metadata").$type<BackgroundMetadata>(),
     schedule: jsonb("schedule"),
+    isSelected: boolean("is_selected").default(false),
+    defaultBackgroundId: text("default_background_id"),
     createdAt,
     updatedAt,
   },

@@ -33,3 +33,13 @@ export function updateBackground(
 export function deleteBackground(id: string): Promise<AxiosResponse<void>> {
   return axios.delete(`/v1/backgrounds/${id}`);
 }
+
+export function setSelectedBackground(
+  backgroundId: string
+): Promise<AxiosResponse<Background>> {
+  return axios.post("/v1/backgrounds/selected", { backgroundId });
+}
+
+export function getRandomBackground(): Promise<AxiosResponse<Background>> {
+  return axios.get("/v1/backgrounds/random");
+}
