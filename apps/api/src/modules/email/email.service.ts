@@ -134,7 +134,7 @@ export const sendMagicLinkEmail = async (
   const subject = "Magic Link for Secure Login";
   const clientUrl =
     config.env === "production" ? config.clientUrl : `${config.clientUrl}`;
-  const magicLinkUrl = `${clientUrl}/verify-magic-link?token=${token}`;
+  const magicLinkUrl = `${clientUrl}?token=${token}`;
   const text = `Hi ${email},
   Click on this link to log in: ${magicLinkUrl}
   If you did not request this magic link, then ignore this email.`;
