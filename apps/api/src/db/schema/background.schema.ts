@@ -1,0 +1,52 @@
+import { relations } from "drizzle-orm";
+import {
+  pgTable,
+  text,
+  jsonb,
+  timestamp,
+  index,
+  customType,
+} from "drizzle-orm/pg-core";
+
+import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { users } from "./user.schema";
+
+export enum BackgroundType {
+  STATIC = "static",
+  LIVE = "live",
+}
+
+const EnumBackgroundType = customType<{
+  data: BackgroundType;
+}>({
+  dataType: () => "text",
+});
+
+export const backgrounds = pgTable(
+  "backgrounds",
+  {
+    id,
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    type: EnumBackgroundType("type").notNull(),
+    url: text("url").notNull(),
+    schedule: jsonb("schedule"),
+    createdAt,
+    updatedAt,
+  },
+  (table) => ({
+    userIdIdx: index("idx_backgrounds_user_id").on(table.userId),
+    typeIdx: index("idx_backgrounds_type").on(table.type),
+  })
+);
+
+export type Background = typeof backgrounds.$inferSelect;
+export type BackgroundInsert = typeof backgrounds.$inferInsert;
+
+export const backgroundsRelations = relations(backgrounds, ({ one }) => ({
+  user: one(users, {
+    fields: [backgrounds.userId],
+    references: [users.id],
+  }),
+}));
