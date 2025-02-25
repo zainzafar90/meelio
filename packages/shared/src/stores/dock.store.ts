@@ -9,6 +9,7 @@ interface DockState {
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
+  currentOnboardingStep: number;
   toggleTimer: () => void;
   toggleBreathing: () => void;
   toggleGreetings: () => void;
@@ -25,6 +26,7 @@ interface DockState {
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
+  setCurrentOnboardingStep: (step: number) => void;
   reset: () => void;
 }
 
@@ -37,6 +39,7 @@ export const useDockStore = create<DockState>()((set) => ({
   isBackgroundsVisible: false,
   isSiteBlockerVisible: false,
   isTabStashVisible: false,
+  currentOnboardingStep: -1,
 
   toggleTimer: () => {
     set((state) => {
@@ -108,6 +111,10 @@ export const useDockStore = create<DockState>()((set) => ({
     set({ isTabStashVisible: visible });
   },
 
+  setCurrentOnboardingStep: (step: number) => {
+    set({ currentOnboardingStep: step });
+  },
+
   reset: () => {
     set({
       isTimerVisible: false,
@@ -118,6 +125,7 @@ export const useDockStore = create<DockState>()((set) => ({
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
+      currentOnboardingStep: -1,
     });
   },
 }));

@@ -71,6 +71,7 @@ export const Dock = () => {
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
+    currentOnboardingStep,
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
@@ -81,12 +82,13 @@ export const Dock = () => {
     resetDock,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
-    isSoundscapesVisible: state.isSoundscapesVisible,
     isBreathingVisible: state.isBreathingVisible,
+    isSoundscapesVisible: state.isSoundscapesVisible,
     isTodosVisible: state.isTodosVisible,
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     isBackgroundsVisible: state.isBackgroundsVisible,
     isTabStashVisible: state.isTabStashVisible,
+    currentOnboardingStep: state.currentOnboardingStep,
     resetDock: state.reset,
     toggleTimer: state.toggleTimer,
     toggleSoundscapes: state.toggleSoundscapes,
@@ -202,14 +204,32 @@ export const Dock = () => {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 pr-1">
             {visibleItems.map((item, index) => (
-              <DockButton key={index} item={item} />
+              <div
+                key={index}
+                className={cn(
+                  "relative",
+                  currentOnboardingStep === index &&
+                    "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
+                )}
+              >
+                <DockButton item={item} />
+              </div>
             ))}
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-            {STATIC_DOCK_ITEMS.map((item) => (
-              <div key={item.id} className="flex items-center justify-center">
-                <item.icon />
+            {STATIC_DOCK_ITEMS.map((item, index) => (
+              <div
+                key={item.id}
+                className={cn(
+                  "relative",
+                  currentOnboardingStep === (item.id === "settings" ? 8 : -1) &&
+                    "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
+                )}
+              >
+                <div className="flex items-center justify-center">
+                  <item.icon />
+                </div>
               </div>
             ))}
 

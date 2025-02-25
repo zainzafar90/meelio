@@ -17,6 +17,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-blue-500/20 to-purple-500/20",
     iconClass: "text-blue-400",
     action: null,
+    position: 0, // Home
   },
   {
     id: "timer",
@@ -26,6 +27,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-orange-500/20 to-amber-500/20",
     iconClass: "text-orange-400",
     action: "toggleTimer",
+    position: 1, // Timer
   },
   {
     id: "soundscapes",
@@ -35,6 +37,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-green-500/20 to-emerald-500/20",
     iconClass: "text-green-400",
     action: null,
+    position: 2, // Soundscapes
   },
   {
     id: "breathing",
@@ -44,6 +47,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-blue-500/20 to-cyan-500/20",
     iconClass: "text-blue-400",
     action: "toggleBreathing",
+    position: 3, // Breathing
   },
   {
     id: "todos",
@@ -52,8 +56,8 @@ const ONBOARDING_STEPS = [
     icon: Icons.todoListActive,
     gradient: "from-indigo-500/20 to-violet-500/20",
     iconClass: "text-indigo-400",
-
     action: null,
+    position: 4, // Todos
   },
   {
     id: "site-blocker",
@@ -63,6 +67,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-purple-500/20 to-pink-500/20",
     iconClass: "text-purple-400",
     action: null,
+    position: 5, // Site Blocker
   },
   {
     id: "tab-stash",
@@ -72,6 +77,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-sky-500/20 to-cyan-500/20",
     iconClass: "text-sky-400",
     action: null,
+    position: 6, // Tab Stash
   },
   {
     id: "background",
@@ -81,6 +87,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-teal-500/20 to-emerald-500/20",
     iconClass: "text-teal-400",
     action: null,
+    position: 7, // Background
   },
   {
     id: "settings",
@@ -90,6 +97,7 @@ const ONBOARDING_STEPS = [
     gradient: "from-gray-500/20 to-zinc-500/20",
     iconClass: "text-gray-400",
     action: null,
+    position: 8, // Settings
   },
 ];
 
@@ -106,7 +114,13 @@ export const DockOnboarding = () => {
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
+    setCurrentOnboardingStep,
   } = useDockStore();
+
+  useEffect(() => {
+    setCurrentOnboardingStep(currentStep);
+    return () => setCurrentOnboardingStep(-1); // Reset when unmounted
+  }, [currentStep, setCurrentOnboardingStep]);
 
   const handleNext = useCallback(() => {
     if (currentStep === ONBOARDING_STEPS.length - 1) {
@@ -227,7 +241,8 @@ export const DockOnboarding = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" />
+      <div className="fixed inset-x-0 top-0 bottom-28 z-40 bg-black/20 backdrop-blur-sm" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
