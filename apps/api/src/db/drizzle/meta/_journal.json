@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740504463825,
-      "tag": "0000_slippery_silvermane",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1740507135208,
-      "tag": "0001_complete_sleepwalker",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1740515229759,
-      "tag": "0002_rare_joseph",
+      "when": 1740518304996,
+      "tag": "0000_useful_nitro",
       "breakpoints": true
     }
   ]

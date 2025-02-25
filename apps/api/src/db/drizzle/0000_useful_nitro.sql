@@ -78,7 +78,10 @@ CREATE TABLE "backgrounds" (
 	"user_id" text NOT NULL,
 	"type" text NOT NULL,
 	"url" text NOT NULL,
+	"metadata" jsonb,
 	"schedule" jsonb,
+	"is_selected" boolean DEFAULT false,
+	"default_background_id" text,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -161,8 +164,7 @@ CREATE TABLE "weather_cache" (
 	"user_id" text NOT NULL,
 	"weather_data" jsonb,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "weather_cache_user_id_unique" UNIQUE("user_id")
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "breathepod" (
@@ -183,7 +185,6 @@ CREATE TABLE "focus_sessions" (
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "weather_cache" ADD CONSTRAINT "weather_cache_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "idx_users_name" ON "users" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "idx_users_email" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "idx_users_role" ON "users" USING btree ("role");--> statement-breakpoint
