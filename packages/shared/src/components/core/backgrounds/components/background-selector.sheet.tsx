@@ -8,7 +8,6 @@ import {
 } from "@repo/ui/components/ui/sheet";
 import { Play, RefreshCw, Upload, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState, useRef } from "react";
 
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons/icons";
@@ -17,9 +16,9 @@ import { useAuthStore } from "../../../../stores/auth.store";
 import {
   useBackgroundStore,
   Wallpaper,
-  WallpaperSource,
+  // WallpaperSource,
 } from "../../../../stores/background.store";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import * as backgroundsApi from "../../../../api/backgrounds.api";
 
 export const BackgroundSelectorSheet = () => {
@@ -31,20 +30,13 @@ export const BackgroundSelectorSheet = () => {
     currentWallpaper,
     setCurrentWallpaper,
     resetToDefault,
-    addWallpaper,
+    // addWallpaper,
     initializeWallpapers,
     isLoading,
   } = useBackgroundStore();
 
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Fetch backgrounds from API when the sheet is opened
-  useEffect(() => {
-    if (isBackgroundsVisible && user) {
-      initializeWallpapers();
-    }
-  }, [isBackgroundsVisible, user]);
+  // const [uploadingImage, setUploadingImage] = useState(false);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter wallpapers by type
   const liveWallpapers = wallpapers.filter((w) => w.type === "live");
@@ -94,68 +86,68 @@ export const BackgroundSelectorSheet = () => {
     resetToDefault();
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  // const handleUploadClick = () => {
+  //   fileInputRef.current?.click();
+  // };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file) return;
 
-    setUploadingImage(true);
+  //   setUploadingImage(true);
 
-    try {
-      // Create a local URL for the file
-      const imageUrl = URL.createObjectURL(file);
-      const fileName = file.name.split(".")[0] || "Custom Background";
+  //   try {
+  //     // Create a local URL for the file
+  //     const imageUrl = URL.createObjectURL(file);
+  //     const fileName = file.name.split(".")[0] || "Custom Background";
 
-      // Create a new wallpaper
-      const newWallpaper: Wallpaper = {
-        id: uuidv4(),
-        type: "static",
-        title: fileName,
-        author: "You",
-        thumbnail: imageUrl,
-        blurhash: "",
-        source: "custom" as WallpaperSource,
-        url: imageUrl,
-      };
+  //     // Create a new wallpaper
+  //     const newWallpaper: Wallpaper = {
+  //       id: uuidv4(),
+  //       type: "static",
+  //       title: fileName,
+  //       author: "You",
+  //       thumbnail: imageUrl,
+  //       blurhash: "",
+  //       source: "custom" as WallpaperSource,
+  //       url: imageUrl,
+  //     };
 
-      // Add to local store
-      addWallpaper(newWallpaper);
+  //     // Add to local store
+  //     addWallpaper(newWallpaper);
 
-      // If user is logged in, also upload to API
-      if (user) {
-        try {
-          await backgroundsApi.createBackground({
-            type: "static",
-            url: imageUrl,
-            metadata: {
-              name: fileName,
-              category: "Custom",
-              tags: ["custom"],
-              thumbnailUrl: imageUrl,
-            },
-          });
-          // Refresh backgrounds
-          initializeWallpapers();
-        } catch (uploadError) {
-          console.error("Error uploading to API:", uploadError);
-        }
-      }
+  //     // If user is logged in, also upload to API
+  //     if (user) {
+  //       try {
+  //         await backgroundsApi.createBackground({
+  //           type: "static",
+  //           url: imageUrl,
+  //           metadata: {
+  //             name: fileName,
+  //             category: "Custom",
+  //             tags: ["custom"],
+  //             thumbnailUrl: imageUrl,
+  //           },
+  //         });
+  //         // Refresh backgrounds
+  //         initializeWallpapers();
+  //       } catch (uploadError) {
+  //         console.error("Error uploading to API:", uploadError);
+  //       }
+  //     }
 
-      // Set as current background
-      handleSetBackground(newWallpaper);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    } finally {
-      setUploadingImage(false);
-      // Reset the file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
+  //     // Set as current background
+  //     handleSetBackground(newWallpaper);
+  //   } catch (error) {
+  //     console.error("Error uploading image:", error);
+  //   } finally {
+  //     setUploadingImage(false);
+  //     // Reset the file input
+  //     if (fileInputRef.current) {
+  //       fileInputRef.current.value = "";
+  //     }
+  //   }
+  // };
 
   if (isLoading) {
     return (
@@ -184,6 +176,53 @@ export const BackgroundSelectorSheet = () => {
           <SheetTitle>{t("backgrounds.title")}</SheetTitle>
           <SheetDescription>{t("backgrounds.description")}</SheetDescription>
         </SheetHeader>
+
+        <div className="mt-6 flex gap-2">
+          {/* <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
+
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleUploadClick}
+              disabled={uploadingImage}
+            >
+              {uploadingImage ? (
+                <>
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                  {t("backgrounds.uploading")}
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  {t("backgrounds.uploadCustom")}
+                </>
+              )}
+            </Button> */}
+
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleRandomBackground}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            {t("backgrounds.randomBackground")}
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleResetToDefault}
+          >
+            <Icons.reset className="mr-2 h-4 w-4" />
+            {t("backgrounds.resetToDefault")}
+          </Button>
+        </div>
 
         <div className="flex flex-col gap-4 overflow-y-auto flex-1 pr-2">
           <div className="mt-8 space-y-8">
@@ -297,53 +336,6 @@ export const BackgroundSelectorSheet = () => {
                 ))}
               </div>
             </div>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-2 mb-4">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleUploadClick}
-              disabled={uploadingImage}
-            >
-              {uploadingImage ? (
-                <>
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                  {t("backgrounds.uploading")}
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  {t("backgrounds.uploadCustom")}
-                </>
-              )}
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleRandomBackground}
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              {t("backgrounds.randomBackground")}
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleResetToDefault}
-            >
-              <Icons.reset className="mr-2 h-4 w-4" />
-              {t("backgrounds.resetToDefault")}
-            </Button>
           </div>
         </div>
       </SheetContent>

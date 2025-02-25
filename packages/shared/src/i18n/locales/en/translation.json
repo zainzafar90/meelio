@@ -369,7 +369,8 @@
     "author": "Author",
     "liveWallpapers": "Live Wallpapers",
     "staticWallpapers": "Static Wallpapers",
-    "resetToDefault": "Reset to Default"
+    "resetToDefault": "Reset to Default",
+    "randomBackground": "Random Background"
   },
   "site-blocker": {
     "title": "Site Blocker",

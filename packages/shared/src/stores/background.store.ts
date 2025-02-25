@@ -56,14 +56,11 @@ interface BackgroundState {
   isLoading: boolean;
 }
 
-// Default wallpapers as fallback if API fails
-const DEFAULT_WALLPAPERS: Wallpaper[] = [];
-
 export const useBackgroundStore = create<BackgroundState>()(
   persist(
     (set, get) => ({
-      wallpapers: DEFAULT_WALLPAPERS,
-      currentWallpaper: DEFAULT_WALLPAPERS[1],
+      wallpapers: [],
+      currentWallpaper: null,
       isLoading: false,
 
       addWallpaper: (wallpaper) =>
@@ -83,8 +80,7 @@ export const useBackgroundStore = create<BackgroundState>()(
 
       resetToDefault: () =>
         set({
-          wallpapers: DEFAULT_WALLPAPERS,
-          currentWallpaper: DEFAULT_WALLPAPERS[1],
+          currentWallpaper: null,
         }),
 
       initializeWallpapers: async () => {
@@ -92,6 +88,7 @@ export const useBackgroundStore = create<BackgroundState>()(
 
         try {
           const response = await getBackgrounds();
+          console.log("response", response);
 
           if (
             response.data &&

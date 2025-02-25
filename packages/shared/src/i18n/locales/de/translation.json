@@ -370,7 +370,8 @@
     "author": "Autor",
     "liveWallpapers": "Lebende Hintergründe",
     "staticWallpapers": "Statische Hintergründe",
-    "resetToDefault": "Zurücksetzen auf Standard"
+    "resetToDefault": "Zurücksetzen auf Standard",
+    "randomBackground": "Zufälliger Hintergrund"
   },
   "site-blocker": {
     "title": "Seitenblocker",
