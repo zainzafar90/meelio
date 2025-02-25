@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-
-import { UserAuthForm } from "@repo/shared";
+import { GuestAuthForm } from "@repo/shared";
 import { Logo } from "@repo/shared";
 import { AuthLayout } from "@/layouts/auth-layout";
 
-const Login = () => {
+const GuestLogin = () => {
   return (
     <AuthLayout>
       <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
@@ -14,29 +13,24 @@ const Login = () => {
           </Link>
           <div className="mx-auto flex w-full flex-col justify-center space-y-6">
             <div className="flex flex-col space-y-2 text-center">
-              <h1 className="font-heading text-2xl font-semibold">
-                Welcome back
+              <h1 className="font-heading text-2xl font-semibold tracking-tight">
+                Hello! What's your name?
               </h1>
-              <p className="text-sm text-foreground">
-                Sign in to your Meelio Account
+              <p className="text-sm text-muted-foreground">
+                Please enter your first name or the name you prefer to be called.
               </p>
             </div>
-            <UserAuthForm />
 
-            <div className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
+            <GuestAuthForm />
+
+            <p className="px-8 text-center text-sm text-muted-foreground">
               <Link
-                to="/register"
+                to="/login"
                 className="hover:text-brand underline underline-offset-4"
               >
-                Don&apos;t have an account? Sign Up
+                Have an account? Sign in
               </Link>
-              <Link
-                to="/guest"
-                className="hover:text-brand underline underline-offset-4"
-              >
-                Continue as Guest
-              </Link>
-            </div>
+            </p>
           </div>
         </div>
       </div>
@@ -44,4 +38,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default GuestLogin; 

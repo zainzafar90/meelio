@@ -20,6 +20,12 @@ const register = {
   body: Joi.object().keys(registerBody),
 };
 
+const registerGuest = {
+  body: Joi.object().keys({
+    name: Joi.string().required(),
+  }),
+};
+
 const login = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -69,6 +75,7 @@ const verifyProvider = {
 
 export const accountValidation = {
   register,
+  registerGuest,
   login,
   forgotPassword,
   resetPassword,

@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import { ErrorPage } from "@/routes/errors/error";
 
@@ -10,6 +10,7 @@ const Home = React.lazy(() => import("@/routes/home/home"));
 const Login = React.lazy(() => import("@/routes/auth/login"));
 const Register = React.lazy(() => import("@/routes/auth/register"));
 const VerifyMagicLink = React.lazy(() => import("@/routes/auth/verify-magic-link"));
+const GuestLogin = React.lazy(() => import("@/routes/auth/guest-login"));
 
 export const Router = () => {
   return (
@@ -33,7 +34,15 @@ export const Router = () => {
           }
           errorElement={<ErrorPage />}
         />
-
+        <Route
+          path="/guest"
+          element={
+            <React.Suspense fallback={<PageSkeleton />}>
+              <GuestLogin />
+            </React.Suspense>
+          }
+          errorElement={<ErrorPage />}
+        />
         <Route
           path="/verify-magic-link"
           element={
@@ -56,7 +65,7 @@ export const Router = () => {
         errorElement={<ErrorPage />}
       />
 
-      <Route path="*" element={<Home />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

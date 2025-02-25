@@ -1,4 +1,5 @@
 // ------------- AUTH COMPONENTS -------------
+export * from "./auth/guest-auth-form";
 export * from "./auth/star-field";
 export * from "./auth/user-auth-form";
 

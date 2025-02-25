@@ -18,6 +18,11 @@ router.post(
   accountController.login
 );
 router.post(
+  "/guest",
+  validate(accountValidation.registerGuest),
+  accountController.registerGuest
+);
+router.post(
   "/forgot-password",
   validate(accountValidation.forgotPassword),
   accountController.forgotPassword

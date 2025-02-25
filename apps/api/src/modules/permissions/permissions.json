@@ -10,7 +10,7 @@
           "effect": "EFFECT_ALLOW"
         },
         {
-          "actions": ["view", "update"],
+          "actions": [],
           "roles": ["guest"],
           "effect": "EFFECT_ALLOW"
         }
