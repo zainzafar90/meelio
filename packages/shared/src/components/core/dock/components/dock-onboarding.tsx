@@ -251,9 +251,13 @@ export const DockOnboarding = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-x-0 top-0 bottom-28 z-40 bg-black/20 backdrop-blur-sm" />
+      <div
+        key="backdrop"
+        className="fixed inset-x-0 top-0 bottom-28 z-40 bg-black/20 backdrop-blur-sm"
+      />
 
       <motion.div
+        key="onboarding-modal"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}

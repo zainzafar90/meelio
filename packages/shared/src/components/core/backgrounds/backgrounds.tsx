@@ -22,6 +22,7 @@ const LiveWallpaperComponent = ({
       <AnimatePresence>
         {!isLoaded && (
           <motion.div
+            key="blurhash-loader"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -73,6 +74,7 @@ const StaticWallpaperComponent = ({
       <AnimatePresence>
         {!isLoaded && (
           <motion.div
+            key="static-blurhash-loader"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
