@@ -72,13 +72,7 @@ export const Dock = () => {
     toggleBackgrounds,
     toggleTabStash,
     resetDock,
-    isTimerIconVisible,
-    isBreathingIconVisible,
-    isSoundscapesIconVisible,
-    isTodosIconVisible,
-    isSiteBlockerIconVisible,
-    isTabStashIconVisible,
-    isBackgroundsIconVisible,
+    dockIconsVisible,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
     isBreathingVisible: state.isBreathingVisible,
@@ -96,13 +90,7 @@ export const Dock = () => {
     toggleSiteBlocker: state.toggleSiteBlocker,
     toggleBackgrounds: state.toggleBackgrounds,
     toggleTabStash: state.toggleTabStash,
-    isTimerIconVisible: state.isTimerIconVisible,
-    isBreathingIconVisible: state.isBreathingIconVisible,
-    isSoundscapesIconVisible: state.isSoundscapesIconVisible,
-    isTodosIconVisible: state.isTodosIconVisible,
-    isSiteBlockerIconVisible: state.isSiteBlockerIconVisible,
-    isTabStashIconVisible: state.isTabStashIconVisible,
-    isBackgroundsIconVisible: state.isBackgroundsIconVisible,
+    dockIconsVisible: state.dockIconsVisible,
   }));
   const { t } = useTranslation();
   const { user } = useAuthStore();
@@ -116,7 +104,7 @@ export const Dock = () => {
         activeIcon: Logo,
         onClick: () => resetDock(),
       },
-      ...(isTimerIconVisible
+      ...(dockIconsVisible.timer
         ? [
             {
               id: "timer",
@@ -127,7 +115,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isSoundscapesIconVisible
+      ...(dockIconsVisible.soundscapes
         ? [
             {
               id: "soundscapes",
@@ -138,7 +126,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isBreathingIconVisible
+      ...(dockIconsVisible.breathing
         ? [
             {
               id: "breathepod",
@@ -149,7 +137,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isTodosIconVisible
+      ...(dockIconsVisible.todos
         ? [
             {
               id: "todos",
@@ -160,7 +148,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isSiteBlockerIconVisible
+      ...(dockIconsVisible.siteBlocker
         ? [
             {
               id: "site-blocker",
@@ -171,7 +159,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isTabStashIconVisible
+      ...(dockIconsVisible.tabStash
         ? [
             {
               id: "tab-stash",
@@ -182,7 +170,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(isBackgroundsIconVisible
+      ...(dockIconsVisible.backgrounds
         ? [
             {
               id: "background",
@@ -204,13 +192,7 @@ export const Dock = () => {
       toggleSiteBlocker,
       toggleTabStash,
       toggleBackgrounds,
-      isTimerIconVisible,
-      isSoundscapesIconVisible,
-      isBreathingIconVisible,
-      isTodosIconVisible,
-      isSiteBlockerIconVisible,
-      isTabStashIconVisible,
-      isBackgroundsIconVisible,
+      dockIconsVisible,
     ]
   );
 
@@ -271,22 +253,31 @@ export const Dock = () => {
           </div>
 
           <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-            {STATIC_DOCK_ITEMS.map((item, index) => (
-              <div
-                key={item.id}
-                className={cn(
-                  "relative",
-                  currentOnboardingStep >= 0 &&
-                    ONBOARDING_STEPS[currentOnboardingStep].position === 8 &&
-                    item.id === "settings" &&
-                    "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
-                )}
-              >
-                <div className="flex items-center justify-center">
-                  <item.icon />
+            {STATIC_DOCK_ITEMS.map((item, index) => {
+              if (
+                (item.id === "clock" && !dockIconsVisible.clock) ||
+                (item.id === "calendar" && !dockIconsVisible.calendar)
+              ) {
+                return null;
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  className={cn(
+                    "relative",
+                    currentOnboardingStep >= 0 &&
+                      ONBOARDING_STEPS[currentOnboardingStep].position === 8 &&
+                      item.id === "settings" &&
+                      "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
+                  )}
+                >
+                  <div className="flex items-center justify-center">
+                    <item.icon />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {dropdownItems.length > 0 && (
               <div className="group relative flex items-center justify-center">

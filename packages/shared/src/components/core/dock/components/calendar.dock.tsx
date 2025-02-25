@@ -13,7 +13,7 @@ export const CalendarDock = () => {
   }, []);
 
   const month = t(
-    `common.calendar.months.short.${date
+    `common.calendarData.months.short.${date
       .toLocaleString("default", { month: "short" })
       .toLowerCase()}`
   );

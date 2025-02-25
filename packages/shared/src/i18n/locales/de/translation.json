@@ -9,7 +9,9 @@
     "site-blocker": "Seitenblocker",
     "background": "Hintergrund",
     "tab-stash": "Tab-Stash",
-    "calendar": {
+    "clock": "Uhr",
+    "calendar": "Kalender",
+    "calendarData": {
       "months": {
         "short": {
           "jan": "Jan",
@@ -326,6 +328,12 @@
       },
       "background": {
         "description": "Ändere deinen Hintergrund"
+      },
+      "clock": {
+        "description": "Systemzeit und Datum"
+      },
+      "calendar": {
+        "description": "Kalenderansicht und Ereignisse"
       }
     },
     "account": {

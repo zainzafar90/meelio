@@ -1,6 +1,19 @@
 import { create } from "zustand";
 
+interface DockIconsVisibility {
+  timer: boolean;
+  breathing: boolean;
+  soundscapes: boolean;
+  todos: boolean;
+  siteBlocker: boolean;
+  tabStash: boolean;
+  backgrounds: boolean;
+  clock: boolean;
+  calendar: boolean;
+}
+
 interface DockState {
+  // Feature modal visibility state
   isTimerVisible: boolean;
   isBreathingVisible: boolean;
   isGreetingsVisible: boolean;
@@ -9,14 +22,13 @@ interface DockState {
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
-  isTimerIconVisible: boolean;
-  isBreathingIconVisible: boolean;
-  isSoundscapesIconVisible: boolean;
-  isTodosIconVisible: boolean;
-  isSiteBlockerIconVisible: boolean;
-  isTabStashIconVisible: boolean;
-  isBackgroundsIconVisible: boolean;
+
+  // Icon visibility in dock (as a single object)
+  dockIconsVisible: DockIconsVisibility;
+
   currentOnboardingStep: number;
+
+  // Modal toggle functions
   toggleTimer: () => void;
   toggleBreathing: () => void;
   toggleGreetings: () => void;
@@ -25,6 +37,8 @@ interface DockState {
   toggleBackgrounds: () => void;
   toggleSiteBlocker: () => void;
   toggleTabStash: () => void;
+
+  // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
@@ -33,18 +47,19 @@ interface DockState {
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
-  setTimerIconVisible: (visible: boolean) => void;
-  setBreathingIconVisible: (visible: boolean) => void;
-  setSoundscapesIconVisible: (visible: boolean) => void;
-  setTodosIconVisible: (visible: boolean) => void;
-  setSiteBlockerIconVisible: (visible: boolean) => void;
-  setTabStashIconVisible: (visible: boolean) => void;
-  setBackgroundsIconVisible: (visible: boolean) => void;
+
+  // Icon visibility setters
+  setDockIconVisible: (
+    iconId: keyof DockIconsVisibility,
+    visible: boolean
+  ) => void;
+
   setCurrentOnboardingStep: (step: number) => void;
   reset: () => void;
 }
 
 export const useDockStore = create<DockState>()((set) => ({
+  // Feature modal visibility state
   isTimerVisible: false,
   isBreathingVisible: false,
   isGreetingsVisible: true,
@@ -53,15 +68,23 @@ export const useDockStore = create<DockState>()((set) => ({
   isBackgroundsVisible: false,
   isSiteBlockerVisible: false,
   isTabStashVisible: false,
-  isTimerIconVisible: true,
-  isBreathingIconVisible: true,
-  isSoundscapesIconVisible: true,
-  isTodosIconVisible: true,
-  isSiteBlockerIconVisible: true,
-  isTabStashIconVisible: true,
-  isBackgroundsIconVisible: true,
+
+  // Icon visibility in dock - all visible by default
+  dockIconsVisible: {
+    timer: true,
+    breathing: true,
+    soundscapes: true,
+    todos: true,
+    siteBlocker: true,
+    tabStash: true,
+    backgrounds: true,
+    clock: true,
+    calendar: true,
+  },
+
   currentOnboardingStep: -1,
 
+  // Modal toggle functions
   toggleTimer: () => {
     set((state) => {
       return { isTimerVisible: !state.isTimerVisible };
@@ -100,6 +123,7 @@ export const useDockStore = create<DockState>()((set) => ({
     set((state) => ({ isTabStashVisible: !state.isTabStashVisible }));
   },
 
+  // Modal visibility setters
   setTimerVisible: (visible: boolean) => {
     set({ isTimerVisible: visible });
   },
@@ -132,32 +156,14 @@ export const useDockStore = create<DockState>()((set) => ({
     set({ isTabStashVisible: visible });
   },
 
-  setTimerIconVisible: (visible: boolean) => {
-    set({ isTimerIconVisible: visible });
-  },
-
-  setBreathingIconVisible: (visible: boolean) => {
-    set({ isBreathingIconVisible: visible });
-  },
-
-  setSoundscapesIconVisible: (visible: boolean) => {
-    set({ isSoundscapesIconVisible: visible });
-  },
-
-  setTodosIconVisible: (visible: boolean) => {
-    set({ isTodosIconVisible: visible });
-  },
-
-  setSiteBlockerIconVisible: (visible: boolean) => {
-    set({ isSiteBlockerIconVisible: visible });
-  },
-
-  setTabStashIconVisible: (visible: boolean) => {
-    set({ isTabStashIconVisible: visible });
-  },
-
-  setBackgroundsIconVisible: (visible: boolean) => {
-    set({ isBackgroundsIconVisible: visible });
+  // Icon visibility setter
+  setDockIconVisible: (iconId: keyof DockIconsVisibility, visible: boolean) => {
+    set((state) => ({
+      dockIconsVisible: {
+        ...state.dockIconsVisible,
+        [iconId]: visible,
+      },
+    }));
   },
 
   setCurrentOnboardingStep: (step: number) => {
@@ -166,6 +172,7 @@ export const useDockStore = create<DockState>()((set) => ({
 
   reset: () => {
     set({
+      // Reset modal visibility
       isTimerVisible: false,
       isBreathingVisible: false,
       isGreetingsVisible: true,
@@ -174,6 +181,8 @@ export const useDockStore = create<DockState>()((set) => ({
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
+
+      // Don't reset icon visibility on reset
       currentOnboardingStep: -1,
     });
   },

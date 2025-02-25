@@ -11,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/ui/card";
+import { ClockDock } from "../../dock/components/clock.dock";
+import { CalendarDock } from "../../dock/components/calendar.dock";
 
 interface DockItemConfig {
   id: string;
@@ -18,28 +20,11 @@ interface DockItemConfig {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   isVisible: boolean;
-  setVisible: (visible: boolean) => void;
 }
 
 export const DockSettings = () => {
   const { t } = useTranslation();
-  const {
-    isTimerIconVisible,
-    isSoundscapesIconVisible,
-    isBreathingIconVisible,
-    isTodosIconVisible,
-    isSiteBlockerIconVisible,
-    isTabStashIconVisible,
-    isBackgroundsIconVisible,
-    setTimerIconVisible,
-    setSoundscapesIconVisible,
-    setBreathingIconVisible,
-    setTodosIconVisible,
-    setSiteBlockerIconVisible,
-    setTabStashIconVisible,
-    setBackgroundsIconVisible,
-  } = useDockStore();
-
+  const { dockIconsVisible, setDockIconVisible } = useDockStore();
   const [dockItems, setDockItems] = useState<DockItemConfig[]>([]);
 
   useEffect(() => {
@@ -49,78 +34,70 @@ export const DockSettings = () => {
         name: t("common.pomodoro"),
         description: t("settings.dock.timer.description"),
         icon: Icons.worldClock,
-        isVisible: isTimerIconVisible,
-        setVisible: setTimerIconVisible,
+        isVisible: dockIconsVisible.timer,
       },
       {
         id: "soundscapes",
         name: t("common.soundscapes"),
         description: t("settings.dock.soundscapes.description"),
         icon: Icons.soundscapes,
-        isVisible: isSoundscapesIconVisible,
-        setVisible: setSoundscapesIconVisible,
+        isVisible: dockIconsVisible.soundscapes,
       },
       {
         id: "breathing",
         name: t("common.breathing"),
         description: t("settings.dock.breathing.description"),
         icon: Icons.breathing,
-        isVisible: isBreathingIconVisible,
-        setVisible: setBreathingIconVisible,
+        isVisible: dockIconsVisible.breathing,
       },
       {
         id: "todos",
         name: t("common.todo"),
         description: t("settings.dock.todos.description"),
         icon: Icons.todoList,
-        isVisible: isTodosIconVisible,
-        setVisible: setTodosIconVisible,
+        isVisible: dockIconsVisible.todos,
       },
       {
-        id: "site-blocker",
+        id: "siteBlocker",
         name: t("common.site-blocker"),
         description: t("settings.dock.site-blocker.description"),
         icon: Icons.siteBlocker,
-        isVisible: isSiteBlockerIconVisible,
-        setVisible: setSiteBlockerIconVisible,
+        isVisible: dockIconsVisible.siteBlocker,
       },
       {
-        id: "tab-stash",
+        id: "tabStash",
         name: t("common.tab-stash"),
         description: t("settings.dock.tab-stash.description"),
         icon: Icons.tabStash,
-        isVisible: isTabStashIconVisible,
-        setVisible: setTabStashIconVisible,
+        isVisible: dockIconsVisible.tabStash,
       },
       {
-        id: "background",
+        id: "backgrounds",
         name: t("common.background"),
         description: t("settings.dock.background.description"),
         icon: Icons.background,
-        isVisible: isBackgroundsIconVisible,
-        setVisible: setBackgroundsIconVisible,
+        isVisible: dockIconsVisible.backgrounds,
+      },
+      {
+        id: "clock",
+        name: t("common.clock"),
+        description: t("settings.dock.clock.description", "System clock"),
+        icon: ClockDock,
+        isVisible: dockIconsVisible.clock,
+      },
+      {
+        id: "calendar",
+        name: t("common.calendar"),
+        description: t("settings.dock.calendar.description", "Calendar view"),
+        icon: CalendarDock,
+        isVisible: dockIconsVisible.calendar,
       },
     ]);
-  }, [
-    t,
-    isTimerIconVisible,
-    isSoundscapesIconVisible,
-    isBreathingIconVisible,
-    isTodosIconVisible,
-    isSiteBlockerIconVisible,
-    isTabStashIconVisible,
-    isBackgroundsIconVisible,
-    setTimerIconVisible,
-    setSoundscapesIconVisible,
-    setBreathingIconVisible,
-    setTodosIconVisible,
-    setSiteBlockerIconVisible,
-    setTabStashIconVisible,
-    setBackgroundsIconVisible,
-  ]);
+  }, [t, dockIconsVisible]);
 
   const handleToggleItem = (item: DockItemConfig, value: boolean) => {
-    item.setVisible(value);
+    // Type assertion to ensure the id is a valid key
+    setDockIconVisible(item.id as keyof typeof dockIconsVisible, value);
   };
 
   return (
@@ -132,49 +109,37 @@ export const DockSettings = () => {
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("settings.dock.visibility.title")}</CardTitle>
-          <CardDescription>
-            {t("settings.dock.visibility.description")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {dockItems.map((item) => (
+      <div className="space-y-4">
+        {dockItems.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center space-x-4">
               <div
-                key={item.id}
-                className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+                className={cn(
+                  "flex size-10 items-center justify-center rounded-lg",
+                  "bg-gradient-to-b from-zinc-800 to-zinc-900",
+                  !item.isVisible && "opacity-50"
+                )}
               >
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={cn(
-                      "flex size-10 items-center justify-center rounded-lg",
-                      "bg-gradient-to-b from-zinc-800 to-zinc-900",
-                      !item.isVisible && "opacity-50"
-                    )}
-                  >
-                    <item.icon className="size-6 text-white" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={item.isVisible}
-                  onCheckedChange={(value) => handleToggleItem(item, value)}
-                  aria-label={`${t("common.actions.toggle")} ${item.name}`}
-                />
+                <item.icon className="size-6 text-white" />
               </div>
-            ))}
+              <div className="space-y-1">
+                <p className="text-sm font-medium leading-none">{item.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={item.isVisible}
+              onCheckedChange={(value) => handleToggleItem(item, value)}
+              aria-label={`${t("common.actions.toggle")} ${item.name}`}
+            />
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
     </div>
   );
 };
