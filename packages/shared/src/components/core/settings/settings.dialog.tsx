@@ -49,6 +49,7 @@ export function SettingsDialog() {
 
   const signOut = async () => {
     logout();
+    closeSettings();
     await api.auth.logoutAccount();
   };
 
