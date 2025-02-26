@@ -17,7 +17,7 @@ import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Bar, BarChart, XAxis } from "recharts";
 
-import { getWeeklySummary } from "../../../../lib/db/pomodoro-db";
+import { getWeeklySummary } from "../../../../lib/db/pomodoro.dexie";
 import { MINUTE_IN_SECONDS } from "../../../../utils/common.utils";
 
 const chartConfig = {

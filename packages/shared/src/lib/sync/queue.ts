@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { BaseModel } from "../db/models";
+import { BaseModel } from "../db/models.dexie";
 import { api } from "../../api";
 import { axios } from "../../api/axios";
 

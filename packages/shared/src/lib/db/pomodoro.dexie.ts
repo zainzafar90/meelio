@@ -1,60 +1,5 @@
-import Dexie, { Table } from "dexie";
 import { PomodoroStage } from "../../types/pomodoro";
-
-export interface PomodoroState {
-  id: number;
-  stats: {
-    todaysFocusSessions: number;
-    todaysBreaks: number;
-    todaysFocusTime: number;
-    todaysBreakTime: number;
-  };
-  activeStage: PomodoroStage;
-  isRunning: boolean;
-  endTimestamp: number | null;
-  sessionCount: number;
-  stageDurations: {
-    [key in PomodoroStage]: number;
-  };
-  lastUpdated: number;
-  autoStartTimers: boolean;
-  enableSound: boolean;
-  pausedRemaining: number | null;
-}
-
-export interface PomodoroSession {
-  id?: number;
-  timestamp: number;
-  stage: number;
-  duration: number;
-  completed: boolean;
-}
-
-export interface DailySummary {
-  id?: number;
-  date: string; // YYYY-MM-DD format
-  focusSessions: number;
-  breaks: number;
-  totalFocusTime: number; // in seconds
-  totalBreakTime: number; // in seconds
-}
-
-export class PomodoroDB extends Dexie {
-  state!: Table<PomodoroState, number>;
-  sessions!: Table<PomodoroSession>;
-  dailySummaries!: Table<DailySummary>;
-
-  constructor() {
-    super("meelio:pomodoro");
-    this.version(1).stores({
-      state: "++id, lastUpdated",
-      sessions: "++id, timestamp",
-      dailySummaries: "++id, date",
-    });
-  }
-}
-
-export const db = new PomodoroDB();
+import { db, PomodoroSession, DailySummary } from "./meelio.dexie";
 
 export const getTodaysSummary = async (): Promise<DailySummary> => {
   const today = new Date().toISOString().split("T")[0];
@@ -105,7 +50,7 @@ export const getWeeklySummary = async (): Promise<DailySummary[]> => {
 export const addPomodoroSession = async (
   session: PomodoroSession
 ): Promise<number> => {
-  return db.sessions.add(session);
+  return db.pomodoroSessions.add(session);
 };
 
 export const addPomodoroSummary = async (

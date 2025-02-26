@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { db } from "../db";
-import type { Background } from "../db/models";
+import { db } from "../db/meelio.dexie";
+import type { Background } from "../db/models.dexie";
 import {
   getBackgrounds,
   getBackground,

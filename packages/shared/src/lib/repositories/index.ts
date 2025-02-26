@@ -5,8 +5,8 @@ export const siteBlockerRepository = new SiteBlockerRepository();
 export { BackgroundRepository, SiteBlockerRepository };
 
 // Database
-export * from "../db";
-export * from "../db/models";
+export * from "../db/meelio.dexie";
+export * from "../db/models.dexie";
 
 // Sync
 export * from "../sync/queue";

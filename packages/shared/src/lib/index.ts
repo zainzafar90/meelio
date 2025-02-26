@@ -1,5 +1,4 @@
-export * from "./db/pomodoro-db";
-export * from "./db/todo-db";
+export * from "./db";
 
 // export * from "./telemetry/use-telemetry";
 export * from "./utils";

@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { Background } from "../lib/db/models";
+import { Background } from "../lib/db/models.dexie";
 import { axios } from "./axios";
 
 export function getBackgrounds(): Promise<AxiosResponse<Background[]>> {

@@ -1,4 +1,4 @@
-import type { Background } from "../db/models";
+import type { Background } from "../db/models.dexie";
 
 const now = Date.now();
 

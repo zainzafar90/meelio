@@ -1,14 +1,6 @@
 import { AxiosResponse } from "axios";
-import { BaseModel } from "../lib/db/models";
+import { FocusSession } from "../lib/db/models.dexie";
 import { axios } from "./axios";
-
-// Define the FocusSession interface extending BaseModel
-export interface FocusSession extends BaseModel {
-  userId: string;
-  sessionStart: string;
-  sessionEnd: string;
-  duration: number; // duration in minutes
-}
 
 export function getFocusSessions(): Promise<AxiosResponse<FocusSession[]>> {
   return axios.get("/v1/focus-sessions");

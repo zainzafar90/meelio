@@ -1,4 +1,4 @@
-import { BaseModel } from "../db/models";
+import { BaseModel } from "../db/models.dexie";
 
 export class ConflictResolver {
   resolveConflict<T extends BaseModel>(local: T, remote: T): T {

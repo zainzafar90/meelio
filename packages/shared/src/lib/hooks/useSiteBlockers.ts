@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { SiteBlocker } from "../db/models";
+import type { SiteBlocker } from "../db/models.dexie";
 import { siteBlockerRepository } from "../repositories";
 
 const SITE_BLOCKERS_QUERY_KEY = "site-blockers";

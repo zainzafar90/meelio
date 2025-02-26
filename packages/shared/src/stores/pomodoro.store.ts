@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { PomodoroStage, PomodoroTimer } from "../types";
-import { db, getTodaysSummary } from "../lib/db/pomodoro-db";
+import { db, getTodaysSummary } from "../lib/db/pomodoro.dexie";
 import { MINUTE_IN_SECONDS } from "../utils/common.utils";
 
 type PomodoroStore = {

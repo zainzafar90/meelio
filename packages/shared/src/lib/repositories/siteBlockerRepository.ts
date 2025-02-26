@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../db";
-import { BaseModel, SiteBlocker } from "../db/models";
+import { db } from "../db/meelio.dexie";
+import { BaseModel, SiteBlocker } from "../db/models.dexie";
 import { SyncQueue } from "../sync/queue";
 import { ConflictResolver } from "../sync/conflictResolver";
 
