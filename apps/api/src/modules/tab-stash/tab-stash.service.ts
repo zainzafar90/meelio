@@ -1,99 +1,100 @@
 import { db } from "@/db";
-import { tabStashes, type TabStashInsert } from "@/db/schema";
+import { TabStash, TabStashInsert, tabStashes } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
-/**
- * Get tab stashes for a user
- * @param {string} userId - The user ID
- * @returns {Promise<object[]>} The tab stashes
- */
-export const getTabStashes = async (userId: string) => {
-  return await db
-    .select()
-    .from(tabStashes)
-    .where(eq(tabStashes.userId, userId));
-};
+interface CreateTabStashData {
+  windowId: string;
+  urls: string[];
+}
 
-/**
- * Get a tab stash by ID
- * @param {string} id - The tab stash ID
- * @param {string} userId - The user ID
- * @returns {Promise<object>} The tab stash
- */
-export const getTabStashById = async (id: string, userId: string) => {
-  const result = await db
-    .select()
-    .from(tabStashes)
-    .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
+type UpdateTabStashData = Partial<CreateTabStashData>;
 
-  if (result.length === 0) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Tab stash not found");
-  }
+export const tabStashService = {
+  /**
+   * Get tab stashes for a user
+   */
+  getTabStashes: async (userId: string): Promise<TabStash[]> => {
+    return await db
+      .select()
+      .from(tabStashes)
+      .where(eq(tabStashes.userId, userId));
+  },
 
-  return result[0];
-};
+  /**
+   * Get a tab stash by ID
+   */
+  getTabStashById: async (id: string, userId: string): Promise<TabStash> => {
+    const result = await db
+      .select()
+      .from(tabStashes)
+      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
 
-/**
- * Create a tab stash
- * @param {string} userId - The user ID
- * @param {object} data - The tab stash data
- * @returns {Promise<object>} The created tab stash
- */
-export const createTabStash = async (userId: string, data: any) => {
-  const tabStashData: TabStashInsert = {
-    userId,
-    windowId: data.windowId,
-    urls: data.urls,
-  };
+    if (result.length === 0) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Tab stash not found");
+    }
 
-  const result = await db.insert(tabStashes).values(tabStashData).returning();
+    return result[0];
+  },
 
-  return result[0];
-};
+  /**
+   * Create a tab stash
+   */
+  createTabStash: async (
+    userId: string,
+    data: CreateTabStashData
+  ): Promise<TabStash> => {
+    const tabStashData: TabStashInsert = {
+      userId,
+      windowId: data.windowId,
+      urls: data.urls,
+    };
 
-/**
- * Update a tab stash
- * @param {string} id - The tab stash ID
- * @param {string} userId - The user ID
- * @param {object} data - The tab stash data
- * @returns {Promise<object>} The updated tab stash
- */
-export const updateTabStash = async (id: string, userId: string, data: any) => {
-  // Check if tab stash exists
-  await getTabStashById(id, userId);
+    const result = await db.insert(tabStashes).values(tabStashData).returning();
 
-  const updateData: Partial<TabStashInsert> = {};
+    return result[0];
+  },
 
-  if (data.windowId) {
-    updateData.windowId = data.windowId;
-  }
+  /**
+   * Update a tab stash
+   */
+  updateTabStash: async (
+    id: string,
+    userId: string,
+    data: UpdateTabStashData
+  ): Promise<TabStash> => {
+    // Check if tab stash exists
+    await tabStashService.getTabStashById(id, userId);
 
-  if (data.urls) {
-    updateData.urls = data.urls;
-  }
+    const updateData: Partial<TabStashInsert> = {};
 
-  const result = await db
-    .update(tabStashes)
-    .set(updateData)
-    .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)))
-    .returning();
+    if (data.windowId) {
+      updateData.windowId = data.windowId;
+    }
 
-  return result[0];
-};
+    if (data.urls) {
+      updateData.urls = data.urls;
+    }
 
-/**
- * Delete a tab stash
- * @param {string} id - The tab stash ID
- * @param {string} userId - The user ID
- * @returns {Promise<void>}
- */
-export const deleteTabStash = async (id: string, userId: string) => {
-  // Check if tab stash exists
-  await getTabStashById(id, userId);
+    const result = await db
+      .update(tabStashes)
+      .set(updateData)
+      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)))
+      .returning();
 
-  await db
-    .delete(tabStashes)
-    .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
+    return result[0];
+  },
+
+  /**
+   * Delete a tab stash
+   */
+  deleteTabStash: async (id: string, userId: string): Promise<void> => {
+    // Check if tab stash exists
+    await tabStashService.getTabStashById(id, userId);
+
+    await db
+      .delete(tabStashes)
+      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
+  },
 };
