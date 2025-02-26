@@ -16,17 +16,6 @@ export class MeelioDB extends Dexie {
       backgrounds: "++id, userId, type, *tags",
       queryCache: "id,timestamp",
     });
-
-    // Convert boolean fields to numbers for indexing
-    this.backgrounds.hook("creating", (primKey, obj) => {
-      if (obj.isSelected !== undefined) obj.isSelected = obj.isSelected ? 1 : 0;
-      if (obj.isDefault !== undefined) obj.isDefault = obj.isDefault ? 1 : 0;
-    });
-
-    this.backgrounds.hook("reading", (obj) => {
-      if (obj.isSelected !== undefined) obj.isSelected = obj.isSelected === 1;
-      if (obj.isDefault !== undefined) obj.isDefault = obj.isDefault === 1;
-    });
   }
 
   async getSelectedBackground(): Promise<Background | undefined> {
