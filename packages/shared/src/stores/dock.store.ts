@@ -78,7 +78,7 @@ export const useDockStore = create<DockState>()((set) => ({
     siteBlocker: true,
     tabStash: true,
     backgrounds: true,
-    clock: true,
+    clock: false,
     calendar: true,
   },
 
