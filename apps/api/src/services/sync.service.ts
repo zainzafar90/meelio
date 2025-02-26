@@ -134,7 +134,6 @@ export class SyncService {
         "tabStashes",
         "notes",
         "weatherCache",
-        "breathepod",
         "focusSessions",
       ]) {
         const table = this.getTableForEntity(entityName);

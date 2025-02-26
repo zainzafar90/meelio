@@ -88,7 +88,7 @@ export const ExtensionTimer = () => {
         
         // Add to sync queue
         timerSyncQueue.addOperation({
-          entity: "focusSessions",
+          entity: "focus-sessions",
           operation: "create",
           data: focusSessionData,
           version: 1
