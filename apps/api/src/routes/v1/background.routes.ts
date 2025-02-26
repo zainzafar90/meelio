@@ -1,221 +1,48 @@
 import { Router } from "express";
 import { auth } from "@/modules/auth";
-import { backgroundController } from "@/modules/background";
+import {
+  backgroundController,
+  backgroundValidation,
+} from "@/modules/background";
+import { validate } from "@/common/validate";
 
 const router = Router();
 
-/**
- * @swagger
- * /api/v1/backgrounds:
- *   get:
- *     summary: Get all backgrounds for the user
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of backgrounds
- *       401:
- *         description: Unauthorized
- */
-router.get(
-  "/",
-  auth(),
-  backgroundController.getBackgrounds.bind(backgroundController)
-);
+router.get("/", auth(), backgroundController.getBackgrounds);
 
-/**
- * @swagger
- * /api/v1/backgrounds/random:
- *   get:
- *     summary: Get a random background
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Random background
- *       401:
- *         description: Unauthorized
- */
-router.get(
-  "/random",
-  auth(),
-  backgroundController.getRandomBackground.bind(backgroundController)
-);
-
-/**
- * @swagger
- * /api/v1/backgrounds/selected:
- *   post:
- *     summary: Set a background as selected
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - backgroundId
- *             properties:
- *               backgroundId:
- *                 type: string
- *     responses:
- *       200:
- *         description: Background set as selected
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- */
 router.post(
   "/selected",
   auth(),
-  backgroundController.setSelectedBackground.bind(backgroundController)
+  validate(backgroundValidation.setSelectedBackground),
+  backgroundController.setSelectedBackground
 );
 
-/**
- * @swagger
- * /api/v1/backgrounds/{id}:
- *   get:
- *     summary: Get a specific background
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Background details
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- */
 router.get(
   "/:id",
   auth(),
-  backgroundController.getBackgroundById.bind(backgroundController)
+  validate(backgroundValidation.getBackground),
+  backgroundController.getBackgroundById
 );
 
-/**
- * @swagger
- * /api/v1/backgrounds:
- *   post:
- *     summary: Create a new background
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - type
- *               - url
- *             properties:
- *               type:
- *                 type: string
- *                 enum: [static, live]
- *               url:
- *                 type: string
- *               schedule:
- *                 type: object
- *     responses:
- *       201:
- *         description: Background created
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- */
 router.post(
   "/",
   auth(),
-  backgroundController.createBackground.bind(backgroundController)
+  validate(backgroundValidation.createBackground),
+  backgroundController.createBackground
 );
 
-/**
- * @swagger
- * /api/v1/backgrounds/{id}:
- *   put:
- *     summary: Update a background
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               type:
- *                 type: string
- *                 enum: [static, live]
- *               url:
- *                 type: string
- *               schedule:
- *                 type: object
- *     responses:
- *       200:
- *         description: Background updated
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- */
 router.put(
   "/:id",
   auth(),
-  backgroundController.updateBackground.bind(backgroundController)
+  validate(backgroundValidation.updateBackground),
+  backgroundController.updateBackground
 );
 
-/**
- * @swagger
- * /api/v1/backgrounds/{id}:
- *   delete:
- *     summary: Delete a background
- *     tags: [Backgrounds]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       204:
- *         description: Background deleted
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Background not found
- */
 router.delete(
   "/:id",
   auth(),
-  backgroundController.deleteBackground.bind(backgroundController)
+  validate(backgroundValidation.deleteBackground),
+  backgroundController.deleteBackground
 );
 
 export default router;

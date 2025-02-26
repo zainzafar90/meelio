@@ -9,165 +9,146 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-/**
- * Get all backgrounds for the authenticated user
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const getBackgrounds = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
+export const backgroundController = {
+  /**
+   * Get all backgrounds for the authenticated user
+   */
+  getBackgrounds: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
+
+      const backgrounds = await backgroundService.getBackgrounds(userId);
+      return res.status(httpStatus.OK).json(backgrounds);
     }
+  ),
 
-    const backgrounds = await backgroundService.getBackgrounds(userId);
-    return res.status(httpStatus.OK).json(backgrounds);
-  }
-);
+  /**
+   * Get a background by ID
+   */
+  getBackgroundById: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
 
-/**
- * Get a background by ID
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const getBackgroundById = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
+      const { id } = req.params;
+      const background = await backgroundService.getBackgroundById(id);
+
+      if (!background) {
+        return res.status(httpStatus.NOT_FOUND).json({
+          message: "Background not found",
+        });
+      }
+
+      return res.status(httpStatus.OK).json(background);
     }
+  ),
 
-    const { id } = req.params;
-    const background = await backgroundService.getBackgroundById(id);
+  /**
+   * Set a background as selected for the authenticated user
+   */
+  setSelectedBackground: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
 
-    if (!background) {
-      return res.status(httpStatus.NOT_FOUND).json({
-        message: "Background not found",
-      });
+      const { backgroundId } = req.body;
+      if (!backgroundId) {
+        return res.status(httpStatus.BAD_REQUEST).json({
+          message: "Background ID is required",
+        });
+      }
+
+      const background = await backgroundService.setSelectedBackground(
+        userId,
+        backgroundId
+      );
+      return res.status(httpStatus.OK).json(background);
     }
+  ),
 
-    return res.status(httpStatus.OK).json(background);
-  }
-);
+  /**
+   * Get a random background (for daily rotation)
+   */
+  getRandomBackground: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
 
-/**
- * Set a background as selected for the authenticated user
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const setSelectedBackground = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
+      const background = await backgroundService.getRandomBackground();
+      return res.status(httpStatus.OK).json(background);
     }
+  ),
 
-    const { backgroundId } = req.body;
-    if (!backgroundId) {
-      return res.status(httpStatus.BAD_REQUEST).json({
-        message: "Background ID is required",
-      });
+  /**
+   * Create a new background
+   */
+  createBackground: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
+
+      const background = await backgroundService.createBackground(
+        userId,
+        req.body
+      );
+      return res.status(httpStatus.CREATED).json(background);
     }
+  ),
 
-    const background = await backgroundService.setSelectedBackground(
-      userId,
-      backgroundId
-    );
-    return res.status(httpStatus.OK).json(background);
-  }
-);
+  /**
+   * Update a background
+   */
+  updateBackground: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
 
-/**
- * Get a random background (for daily rotation)
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const getRandomBackground = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
+      const { id } = req.params;
+      const background = await backgroundService.updateBackground(id, req.body);
+      return res.status(httpStatus.OK).json(background);
     }
+  ),
 
-    const background = await backgroundService.getRandomBackground();
-    return res.status(httpStatus.OK).json(background);
-  }
-);
+  /**
+   * Delete a background
+   */
+  deleteBackground: catchAsync(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user?.email;
+      if (!userId) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          message: "Unauthorized",
+        });
+      }
 
-/**
- * Create a new background
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const createBackground = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
+      const { id } = req.params;
+      await backgroundService.deleteBackground(id);
+      return res.status(httpStatus.NO_CONTENT).send();
     }
-
-    const background = await backgroundService.createBackground(
-      userId,
-      req.body
-    );
-    return res.status(httpStatus.CREATED).json(background);
-  }
-);
-
-/**
- * Update a background
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const updateBackground = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
-
-    const { id } = req.params;
-    const background = await backgroundService.updateBackground(id, req.body);
-    return res.status(httpStatus.OK).json(background);
-  }
-);
-
-/**
- * Delete a background
- * @param {AuthenticatedRequest} req - The request object
- * @param {Response} res - The response object
- * @returns {Promise<void>}
- */
-export const deleteBackground = catchAsync(
-  async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
-
-    const { id } = req.params;
-    await backgroundService.deleteBackground(id);
-    return res.status(httpStatus.NO_CONTENT).send();
-  }
-);
+  ),
+};

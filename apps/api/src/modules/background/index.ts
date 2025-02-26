@@ -1,5 +1,3 @@
-import * as backgroundController from "./background.controller";
-import { backgroundService } from "./background.service";
-import { backgroundValidation } from "./background.validation";
-
-export { backgroundController, backgroundService, backgroundValidation };
+export * from "./background.controller";
+export * from "./background.service";
+export * from "./background.validation";
