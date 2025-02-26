@@ -1,9 +1,20 @@
 import express from "express";
-import noteRoutes from "@/modules/note/note.routes";
+import { validate } from "@/common/validate";
+import auth from "@/modules/auth/auth.middleware";
+import { noteController } from "@/modules/note/index";
+import { noteValidation } from "@/modules/note/note.validation";
 
 const router = express.Router();
 
-// Use the note module routes
-router.use("/", noteRoutes);
+router
+  .route("/")
+  .get(auth(), noteController.getNotes)
+  .post(auth(), validate(noteValidation.createNote), noteController.createNote);
+
+router
+  .route("/:id")
+  .get(auth(), noteController.getNote)
+  .patch(auth(), validate(noteValidation.updateNote), noteController.updateNote)
+  .delete(auth(), noteController.deleteNote);
 
 export default router;
