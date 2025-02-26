@@ -12,6 +12,16 @@ interface PremiumFeatureTooltipProps {
   className?: string;
 }
 
+interface Plan {
+  id: string;
+  title: string;
+  price: string;
+  period: string;
+  description: string;
+  discount?: string;
+  trial?: string;
+}
+
 /**
  * A sleek, modern tooltip component for premium features
  *
@@ -42,7 +52,7 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="w-full max-w-md md:max-w-3xl border-0 shadow-xl p-0 overflow-hidden bg-transparent max-h-[95vh]">
+        <DialogContent className="w-full max-w-md md:max-w-4xl border-0 shadow-xl p-0 overflow-hidden bg-transparent max-h-[95vh]">
           {/* Wrapper with rounded corners for everything */}
           <div className="bg-white rounded-lg overflow-hidden w-full max-h-full flex flex-col md:flex-row">
             {/* Close button */}
@@ -54,7 +64,7 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
             </button>
 
             {/* Left section with starry background - hidden on small screens */}
-            <div className="hidden md:block md:flex-1 relative overflow-hidden bg-gray-950">
+            <div className="hidden md:block md:flex-1 relative overflow-hidden bg-gray-950/50 backdrop-blur-sm">
               <PremiumGlow />
               <div className="relative flex flex-col items-start justify-center w-full h-full p-8 md:p-12">
                 <div className="relative z-10">
@@ -65,7 +75,7 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
             </div>
 
             {/* Right section with pricing cards - full width on small screens */}
-            <div className="flex-1 w-full overflow-y-auto">
+            <div className="flex-1 w-full overflow-y-auto max-w-full md:max-w-sm">
               <PricingSection featureName={featureName} benefits={benefits} />
             </div>
           </div>
@@ -74,20 +84,6 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
     </>
   );
 };
-
-// const PremiumSidebar = () => {
-//   return (
-//     <div className="flex-1 relative overflow-hidden">
-//       <PremiumGlow />
-//       <div className="relative flex flex-col items-start justify-center w-full h-full p-8 md:p-12">
-//         <div className="relative z-10">
-//           <StarField />
-//           <PremiumIntro />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const PremiumGlow = () => {
   const id = useId();
@@ -129,6 +125,13 @@ const PremiumGlow = () => {
 };
 
 const PremiumIntro = () => {
+  const features = [
+    "Unlimited focus-time & analytics",
+    "Site blocking and tab stashing",
+    "Unlock premium soundscapes",
+    "Priority support & much more",
+  ];
+
   return (
     <div className="py-12 px-6">
       <div className="text-amber-400 uppercase tracking-wider text-sm font-light mb-2">
@@ -140,30 +143,14 @@ const PremiumIntro = () => {
       </h1>
 
       <div className="flex flex-col space-y-6 my-12">
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
-            <Icons.check className="h-5 w-5 text-white" />
+        {features.map((feature, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
+              <Icons.check className="h-3 w-3 text-white" />
+            </div>
+            <span className="text-white text-sm">{feature}</span>
           </div>
-          <span className="text-white text-sm">
-            Unlock premium soundscapes and environments
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
-            <Icons.check className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-white text-sm">
-            Advanced focus tools and productivity features
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
-            <Icons.check className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-white text-sm">
-            Premium support from our dedicated team
-          </span>
-        </div>
+        ))}
       </div>
 
       <div className="mt-auto">
@@ -172,11 +159,14 @@ const PremiumIntro = () => {
           changer for me.
         </div>
         <div className="flex items-center gap-1">
-          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
-          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
-          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
-          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
-          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+          {Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <Icons.star
+                key={i}
+                className="h-5 w-5 text-amber-400 fill-amber-400"
+              />
+            ))}
         </div>
       </div>
     </div>
@@ -192,7 +182,7 @@ const PricingSection = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>("yearly");
 
-  const plans = [
+  const plans: Plan[] = [
     {
       id: "monthly",
       title: "Monthly",
@@ -218,6 +208,50 @@ const PricingSection = ({
     },
   ];
 
+  const renderBenefitItem = (benefit: string, index: number) => (
+    <div key={index} className="flex items-center gap-2">
+      <div className="flex-shrink-0 rounded-full bg-sky-100 p-1">
+        <Icons.check className="h-3 w-3 text-sky-600" />
+      </div>
+      <span className="text-sm text-gray-600">{benefit}</span>
+    </div>
+  );
+
+  const renderPlanCard = (plan: Plan) => (
+    <div
+      key={plan.id}
+      className={`relative rounded-md transition-all cursor-pointer ${
+        selectedPlan === plan.id
+          ? "ring-1 ring-sky-500 bg-sky-50 border border-sky-500"
+          : "hover:bg-gray-50 border border-gray-200"
+      }`}
+      onClick={() => setSelectedPlan(plan.id)}
+    >
+      {plan.discount && (
+        <div className="absolute top-0 right-0 bg-sky-500 text-white text-xs px-1.5 py-0.5 rounded-bl-sm">
+          {plan.discount}
+        </div>
+      )}
+
+      <div className="p-3 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">{plan.title}</h3>
+          <p className="text-xs text-gray-500">{plan.description}</p>
+          {plan.trial && (
+            <div className="text-sky-600 text-xs font-medium">{plan.trial}</div>
+          )}
+        </div>
+
+        <div className="text-right flex items-center gap-2">
+          <div className="text-base font-semibold text-gray-900 flex items-baseline">
+            {plan.price}
+            <span className="text-xs text-gray-500 ml-0.5">{plan.period}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="p-6 flex flex-col justify-center h-full">
       {/* Mobile-only feature info */}
@@ -225,14 +259,7 @@ const PricingSection = ({
         <h2 className="text-xl font-semibold text-gray-900">{featureName}</h2>
         {benefits.length > 0 && (
           <div className="mt-3 space-y-2">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="flex-shrink-0 rounded-full bg-sky-100 p-1">
-                  <Icons.check className="h-3 w-3 text-sky-600" />
-                </div>
-                <span className="text-sm text-gray-600">{benefit}</span>
-              </div>
-            ))}
+            {benefits.map(renderBenefitItem)}
           </div>
         )}
       </div>
@@ -241,55 +268,10 @@ const PricingSection = ({
         Choose your plan
       </h2>
 
-      <div className="space-y-2 mb-4">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`relative rounded-md transition-all cursor-pointer ${
-              selectedPlan === plan.id
-                ? "ring-1 ring-sky-500 bg-sky-50 border border-sky-500"
-                : "hover:bg-gray-50 border border-gray-200"
-            }`}
-            onClick={() => setSelectedPlan(plan.id)}
-          >
-            {plan.discount && (
-              <div className="absolute top-0 right-0 bg-sky-500 text-white text-xs px-1.5 py-0.5 rounded-bl-sm">
-                {plan.discount}
-              </div>
-            )}
-
-            <div className="p-3 flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-medium text-gray-900">
-                  {plan.title}
-                </h3>
-                <p className="text-xs text-gray-500">{plan.description}</p>
-                {plan.trial && (
-                  <div className="text-sky-600 text-xs font-medium">
-                    {plan.trial}
-                  </div>
-                )}
-              </div>
-
-              <div className="text-right flex items-center gap-2">
-                <div className="text-base font-semibold text-gray-900 flex items-baseline">
-                  {plan.price}
-                  <span className="text-xs text-gray-500 ml-0.5">
-                    {plan.period}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="space-y-2 mb-4">{plans.map(renderPlanCard)}</div>
 
       <Button className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4">
-        {selectedPlan === "yearly"
-          ? "Start Free Trial"
-          : selectedPlan === "lifetime"
-            ? "Buy Now"
-            : "Subscribe"}
+        Subscribe
       </Button>
 
       <div className="flex justify-center gap-3 pt-3 text-xs text-gray-500 border-t border-gray-100">
