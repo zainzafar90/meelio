@@ -7,7 +7,7 @@ import { subscriptionService } from "./subscription.service";
 
 import { cookieService } from "@/modules/cookies";
 import { accountService } from "@/modules/auth/auth.service";
-import { lemonSqueezyService } from "@/lemon-squeezy/lemon-squeezy.service";
+import { lemonSqueezyService } from "@/modules/lemon-squeezy/lemon-squeezy.service";
 
 const getSubscription = catchAsync(async (req: Request, res: Response) => {
   const subscription = await subscriptionService.getSubscriptionById(

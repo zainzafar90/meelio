@@ -1,7 +1,5 @@
-import { BackgroundRepository } from "./backgroundRepository";
 import { SiteBlockerRepository } from "./siteBlockerRepository";
 
-export const backgroundRepository = new BackgroundRepository();
 export const siteBlockerRepository = new SiteBlockerRepository();
 
 export { BackgroundRepository, SiteBlockerRepository };
@@ -15,7 +13,6 @@ export * from "../sync/queue";
 export * from "../sync/conflictResolver";
 
 // Repositories
-export * from "./backgroundRepository";
 export * from "./siteBlockerRepository";
 
 // Hooks

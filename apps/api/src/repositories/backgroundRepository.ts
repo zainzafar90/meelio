@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../db";
 import { backgrounds } from "../db/schema/background.schema";
-import { defaultBackgrounds } from "../db/data/defaultBackgrounds";
+import { defaultBackgrounds } from "../modules/background/data/default-backgrounds";
 
 export class BackgroundRepository {
   async getBackgroundsForUser(userId: string) {
