@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { weatherCache } from "@/db/schema";
 import { eq } from "drizzle-orm";
-
+import { WeatherCache } from "@/db/schema/weather-cache.schema";
 /**
  * Get weather cache for a user
  * @param {string} userId - The user ID
@@ -37,7 +37,7 @@ export const createOrUpdateWeatherCache = async (userId: string, data: any) => {
       .set({
         weatherData: data.weatherData,
         updatedAt: new Date(),
-      })
+      } as WeatherCache)
       .where(eq(weatherCache.userId, userId))
       .returning();
 
@@ -49,7 +49,7 @@ export const createOrUpdateWeatherCache = async (userId: string, data: any) => {
       .values({
         userId,
         weatherData: data.weatherData,
-      })
+      } as WeatherCache)
       .returning();
 
     return result[0];

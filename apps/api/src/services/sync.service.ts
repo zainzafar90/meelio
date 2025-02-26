@@ -10,7 +10,6 @@ import {
   tabStashes,
   notes,
   weatherCache,
-  breathepod,
   focusSessions,
 } from "@/db/schema";
 import { eq, and, gt } from "drizzle-orm";
@@ -59,8 +58,6 @@ export class SyncService {
         return notes;
       case "weatherCache":
         return weatherCache;
-      case "breathepod":
-        return breathepod;
       case "focusSessions":
         return focusSessions;
       default:

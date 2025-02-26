@@ -1,5 +1,3 @@
-import * as siteBlockerController from "./site-blocker.controller";
-import * as siteBlockerService from "./site-blocker.service";
-import { siteBlockerValidation } from "./site-blocker.validation";
-
-export { siteBlockerController, siteBlockerService, siteBlockerValidation };
+export * from "./site-blocker.controller";
+export * from "./site-blocker.service";
+export * from "./site-blocker.validation";
