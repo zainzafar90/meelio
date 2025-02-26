@@ -14,6 +14,7 @@ import { User, UserInsert, users } from "@/db/schema";
 import { getPaginationConfig } from "../paginate/pagination";
 import { userUtils, SafeUser } from "./user.utils";
 import { IOptions } from "@/types/interfaces/pagination";
+import { IUser } from "@/types";
 
 type OrderDirection = "asc" | "desc";
 type OrderField = keyof (typeof users)["_"]["columns"];
@@ -138,7 +139,7 @@ export const userService = {
     return userService.userDTO(user);
   },
 
-  getUserByEmail: async (email: string) => {
+  getUserByEmail: async (email: string): Promise<IUser | null> => {
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
@@ -153,7 +154,7 @@ export const userService = {
   updateUserById: async (
     userId: string,
     updateBody: UpdateUserReq
-  ): Promise<SafeUser> => {
+  ): Promise<IUser> => {
     const user = await userService.getUserById(userId);
 
     if (!user) {
