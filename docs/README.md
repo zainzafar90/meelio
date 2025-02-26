@@ -1,44 +1,59 @@
 # Meelio Documentation
 
-This folder contains documentation for the Meelio application, focusing on architecture, implementation details, and development guides.
+## Architecture & Design
+- [Frontend Offline-First Architecture](./frontend-offline-first-architecture.md) - Core architecture design for offline-first functionality
+- [Offline-First Architecture](./offline-first-architecture.md) - Overall system architecture for offline capabilities
+- [IndexedDB Schema](./indexeddb-schema.md) - Database schema for client-side storage
 
-## Offline-First Implementation
+## Implementation Guides
+### Frontend
+- [Frontend Offline-First Implementation Guide](./frontend-offline-first-implementation-guide.md) - Detailed guide for implementing offline-first features
+- [Frontend Offline-First Implementation Plan](./frontend-offline-first-implementation-plan.md) - Step-by-step plan for frontend implementation
+- [Chrome Extension Implementation](./chrome-extension-implementation.md) - Guide for Chrome extension features
 
-The Meelio application follows an offline-first architecture, allowing users to continue using the application even when offline. Data is synchronized with the server when connectivity is restored.
+### Backend
+- [Focus Session Implementation](./focus-session-implementation.md) - Implementation details for focus session feature
+- [Implementation Summary](./implementation-summary.md) - Overview of implemented features and components
 
-### Key Documents
+### Sync & Data Management
+- [Sync Implementation](./sync-implementation.md) - Core sync mechanism implementation
+- [Sync Verification Guide](./sync-verification-guide.md) - Guide for verifying sync functionality
 
-- [Frontend Offline-First Implementation Plan](./frontend-offline-first-implementation-plan.md): A checklist of tasks for implementing offline-first capabilities in the frontend applications.
-- [Frontend Offline-First Architecture](./frontend-offline-first-architecture.md): Detailed architecture and implementation guide for the frontend offline-first approach.
+## Module Organization
+- [Module Standardization Plan](./module-standardization-plan.md) - Plan for standardizing module structure
+- [Module Analysis](./analyze-modules.js) - Script for analyzing module patterns
 
-### Backend Documentation
+## Documentation Structure
+```
+docs/
+├── Architecture/              # System architecture documents
+├── Implementation/           # Implementation guides and plans
+│   ├── Frontend/            # Frontend-specific guides
+│   ├── Backend/             # Backend-specific guides
+│   └── Sync/                # Sync-related documentation
+└── Module/                  # Module organization and standards
+```
 
-The backend implementation details can be found in the `apps/api/docs` folder:
+## Documentation Standards
+1. Each document should:
+   - Begin with a clear purpose statement
+   - Include a table of contents for documents > 100 lines
+   - Use consistent markdown formatting
+   - Include relevant code examples where needed
 
-- [Offline-First Architecture](../apps/api/docs/offline-first-architecture.md): Overview of the offline-first architecture.
-- [IndexedDB Schema](../apps/api/docs/indexeddb-schema.md): Details of the IndexedDB schema used for local storage.
-- [Sync Implementation](../apps/api/docs/sync-implementation.md): Implementation details for the sync mechanism.
-- [Sync Verification Guide](../apps/api/docs/sync-verification-guide.md): Guide for verifying the sync functionality.
-- [Implementation Summary](../apps/api/docs/implementation-summary.md): Summary of the implementation approach.
-- [Chrome Extension Implementation](../apps/api/docs/chrome-extension-implementation.md): Implementation details for the Chrome extension.
-- [Focus Session Implementation](../apps/api/docs/focus-session-implementation.md): Implementation details for focus sessions.
+2. Naming conventions:
+   - Use kebab-case for filenames
+   - End all docs with `.md` extension
+   - Use descriptive, feature-focused names
 
-## Development Process
+3. Organization:
+   - Keep related documents together
+   - Cross-reference related docs using relative links
+   - Maintain a clear hierarchy of information
 
-When implementing new features or making changes to the codebase, follow these steps:
-
-1. Review the relevant documentation to understand the architecture and implementation details.
-2. Check the implementation plan to see what tasks need to be completed.
-3. Mark tasks as completed in the implementation plan as you progress.
-4. Update the documentation as needed to reflect changes or new insights.
-5. Add new documentation for new features or significant changes.
-
-## Contributing to Documentation
-
-When contributing to the documentation:
-
-1. Use Markdown for all documentation files.
-2. Include code examples where appropriate.
-3. Keep the documentation up-to-date with the codebase.
-4. Use diagrams to illustrate complex concepts (ASCII diagrams are preferred for version control compatibility).
-5. Link to related documentation to help readers navigate the documentation. 
+## Contributing
+When adding new documentation:
+1. Update this README.md with the new document
+2. Follow the established structure and standards
+3. Include necessary cross-references
+4. Update any related implementation guides 
