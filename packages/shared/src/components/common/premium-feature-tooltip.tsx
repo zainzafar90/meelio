@@ -1,0 +1,304 @@
+import React, { useState, useId } from "react";
+import { Icons } from "../icons/icons";
+import { Dialog, DialogContent } from "@repo/ui/components/ui/dialog";
+import { Button } from "@repo/ui/components/ui/button";
+import { StarField } from "../auth/star-field";
+
+interface PremiumFeatureTooltipProps {
+  featureName: string;
+  description?: string;
+  benefits?: string[];
+  inline?: boolean;
+  className?: string;
+}
+
+/**
+ * A sleek, modern tooltip component for premium features
+ *
+ * @param featureName The name of the premium feature
+ * @param description Optional description of the premium feature
+ * @param benefits Optional list of benefits for the premium feature
+ * @param inline Whether to display the tooltip trigger inline (default: false)
+ * @param className Optional additional classes for the tooltip trigger
+ */
+export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
+  featureName,
+  description,
+  benefits = [],
+  inline = false,
+  className = "",
+}) => {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <div
+        className={`${inline ? "inline-flex" : "flex"} items-center cursor-pointer ${className}`}
+        onClick={() => setShowModal(true)}
+      >
+        <span className="bg-zinc-800 text-[8px] font-bold uppercase tracking-wider text-white/90 px-1.5 py-0.5 rounded border border-white/10">
+          Pro
+        </span>
+      </div>
+
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="w-full max-w-md md:max-w-3xl border-0 shadow-xl p-0 overflow-hidden bg-transparent max-h-[95vh]">
+          {/* Wrapper with rounded corners for everything */}
+          <div className="bg-white rounded-lg overflow-hidden w-full max-h-full flex flex-col md:flex-row">
+            {/* Close button */}
+            <button
+              className="absolute top-4 right-4 z-10 rounded-full bg-zinc-800/50 p-2 hover:bg-zinc-800"
+              onClick={() => setShowModal(false)}
+            >
+              <Icons.close className="h-4 w-4 text-white/80" />
+            </button>
+
+            {/* Left section with starry background - hidden on small screens */}
+            <div className="hidden md:block md:flex-1 relative overflow-hidden bg-gray-950">
+              <PremiumGlow />
+              <div className="relative flex flex-col items-start justify-center w-full h-full p-8 md:p-12">
+                <div className="relative z-10">
+                  <StarField />
+                  <PremiumIntro />
+                </div>
+              </div>
+            </div>
+
+            {/* Right section with pricing cards - full width on small screens */}
+            <div className="flex-1 w-full overflow-y-auto">
+              <PricingSection featureName={featureName} benefits={benefits} />
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+// const PremiumSidebar = () => {
+//   return (
+//     <div className="flex-1 relative overflow-hidden">
+//       <PremiumGlow />
+//       <div className="relative flex flex-col items-start justify-center w-full h-full p-8 md:p-12">
+//         <div className="relative z-10">
+//           <StarField />
+//           <PremiumIntro />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+const PremiumGlow = () => {
+  const id = useId();
+
+  return (
+    <div className="absolute inset-0 -z-10 overflow-hidden bg-gray-950">
+      <svg
+        className="absolute -bottom-48 left-[-40%] h-[80rem] w-[180%] lg:-right-40 lg:bottom-auto lg:left-auto lg:top-[-40%] lg:h-[180%] lg:w-[80rem]"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id={`${id}-desktop`} cx="100%">
+            <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
+            <stop offset="53.95%" stopColor="rgba(0, 71, 255, 0.09)" />
+            <stop offset="100%" stopColor="rgba(10, 14, 23, 0)" />
+          </radialGradient>
+          <radialGradient id={`${id}-mobile`} cy="100%">
+            <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
+            <stop offset="53.95%" stopColor="rgba(0, 71, 255, 0.09)" />
+            <stop offset="100%" stopColor="rgba(10, 14, 23, 0)" />
+          </radialGradient>
+        </defs>
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-desktop)`}
+          className="hidden lg:block"
+        />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-mobile)`}
+          className="lg:hidden"
+        />
+      </svg>
+      <div className="absolute inset-x-0 bottom-0 right-0 h-px bg-white mix-blend-overlay lg:left-auto lg:top-0 lg:h-auto lg:w-px" />
+    </div>
+  );
+};
+
+const PremiumIntro = () => {
+  return (
+    <div className="py-12 px-6">
+      <div className="text-amber-400 uppercase tracking-wider text-sm font-light mb-2">
+        MEELIO PREMIUM
+      </div>
+      <h1 className="mt-4 font-display text-3xl/tight font-light text-white">
+        Elevate Focus, <br />
+        <span className="text-sky-300">Boost Productivity</span>
+      </h1>
+
+      <div className="flex flex-col space-y-6 my-12">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
+            <Icons.check className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-white text-sm">
+            Unlock premium soundscapes and environments
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
+            <Icons.check className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-white text-sm">
+            Advanced focus tools and productivity features
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 rounded-full bg-white/10 p-1">
+            <Icons.check className="h-5 w-5 text-white" />
+          </div>
+          <span className="text-white text-sm">
+            Premium support from our dedicated team
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-auto">
+        <div className="italic text-white/70 mb-4 font-light">
+          I've been using Meelio for a few months now and it's been a game
+          changer for me.
+        </div>
+        <div className="flex items-center gap-1">
+          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+          <Icons.star className="h-5 w-5 text-amber-400 fill-amber-400" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PricingSection = ({
+  featureName,
+  benefits = [],
+}: {
+  featureName: string;
+  benefits?: string[];
+}) => {
+  const [selectedPlan, setSelectedPlan] = useState<string>("yearly");
+
+  const plans = [
+    {
+      id: "monthly",
+      title: "Monthly",
+      price: "$3",
+      period: "/ mo",
+      description: "Billed Monthly",
+    },
+    {
+      id: "yearly",
+      title: "Annual",
+      price: "$30",
+      period: "/ yr",
+      description: "Billed Yearly",
+      discount: "20% off",
+      trial: "Free for 7 days",
+    },
+    {
+      id: "lifetime",
+      title: "Lifetime",
+      price: "$60",
+      period: "",
+      description: "One-time payment",
+    },
+  ];
+
+  return (
+    <div className="p-6 flex flex-col justify-center h-full">
+      {/* Mobile-only feature info */}
+      <div className="md:hidden mb-4">
+        <h2 className="text-xl font-semibold text-gray-900">{featureName}</h2>
+        {benefits.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="flex-shrink-0 rounded-full bg-sky-100 p-1">
+                  <Icons.check className="h-3 w-3 text-sky-600" />
+                </div>
+                <span className="text-sm text-gray-600">{benefit}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <h2 className="text-lg font-medium text-gray-900 mb-4">
+        Choose your plan
+      </h2>
+
+      <div className="space-y-2 mb-4">
+        {plans.map((plan) => (
+          <div
+            key={plan.id}
+            className={`relative rounded-md transition-all cursor-pointer ${
+              selectedPlan === plan.id
+                ? "ring-1 ring-sky-500 bg-sky-50 border border-sky-500"
+                : "hover:bg-gray-50 border border-gray-200"
+            }`}
+            onClick={() => setSelectedPlan(plan.id)}
+          >
+            {plan.discount && (
+              <div className="absolute top-0 right-0 bg-sky-500 text-white text-xs px-1.5 py-0.5 rounded-bl-sm">
+                {plan.discount}
+              </div>
+            )}
+
+            <div className="p-3 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-900">
+                  {plan.title}
+                </h3>
+                <p className="text-xs text-gray-500">{plan.description}</p>
+                {plan.trial && (
+                  <div className="text-sky-600 text-xs font-medium">
+                    {plan.trial}
+                  </div>
+                )}
+              </div>
+
+              <div className="text-right flex items-center gap-2">
+                <div className="text-base font-semibold text-gray-900 flex items-baseline">
+                  {plan.price}
+                  <span className="text-xs text-gray-500 ml-0.5">
+                    {plan.period}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Button className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4">
+        {selectedPlan === "yearly"
+          ? "Start Free Trial"
+          : selectedPlan === "lifetime"
+            ? "Buy Now"
+            : "Subscribe"}
+      </Button>
+
+      <div className="flex justify-center gap-3 pt-3 text-xs text-gray-500 border-t border-gray-100">
+        <button className="hover:text-gray-900">Restore</button>
+        <span>•</span>
+        <button className="hover:text-gray-900">Support</button>
+        <span>•</span>
+        <button className="hover:text-gray-900">Terms</button>
+      </div>
+    </div>
+  );
+};
