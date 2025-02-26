@@ -19,4 +19,11 @@ router.get(
   syncController.getSyncStatus
 );
 
+router.get(
+  "/feed/bulk",
+  auth(),
+  validate(syncValidation.getBulkFeed),
+  syncController.getBulkFeed
+);
+
 export default router;

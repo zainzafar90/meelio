@@ -15,6 +15,8 @@ import {
 import { eq, and, gt } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
+import { Mantra } from "@/db/schema/mantra.schema";
+import { Background } from "@/db/schema/background.schema";
 
 export interface SyncOperation {
   entity: string;
@@ -35,6 +37,21 @@ export interface SyncResponse {
   timestamp: Date;
   conflicts: SyncOperation[];
   serverChanges: SyncOperation[];
+}
+
+export interface BulkFeedOptions {
+  syncTypes?: string;
+  localDate?: string;
+  has?: string;
+  legacyBackground?: string;
+}
+
+export interface BulkFeedResponse {
+  backgrounds?: Background[];
+  mantras?: Mantra[];
+  ts_backgrounds?: number;
+  ts_mantras?: number;
+  ts_quotes?: number;
 }
 
 export const syncService = {
@@ -175,4 +192,118 @@ export const syncService = {
       timestamp: new Date(),
     };
   },
+
+  /**
+   * Get bulk data for the feed similar to Momentum Dash
+   */
+  getBulkFeed: async (
+    userId: string,
+    options: BulkFeedOptions
+  ): Promise<BulkFeedResponse> => {
+    const result: BulkFeedResponse = {};
+
+    const syncTypes = options.syncTypes
+      ? options.syncTypes.split(",")
+      : ["all"];
+
+    const includeAll = syncTypes.includes("all");
+    const localDate = options.localDate
+      ? new Date(options.localDate)
+      : new Date();
+
+    const promises = [];
+
+    if (includeAll || syncTypes.includes("backgrounds")) {
+      promises.push(
+        getBackgroundsForFeed(userId)
+          .then(({ backgrounds, timestamp }) => {
+            result.backgrounds = backgrounds;
+            result.ts_backgrounds = timestamp;
+          })
+          .catch((error) => {
+            console.error("Error fetching backgrounds:", error);
+          })
+      );
+    }
+
+    if (includeAll || syncTypes.includes("mantras")) {
+      promises.push(
+        getMantrasForFeed(userId)
+          .then(({ mantras, timestamp }) => {
+            result.mantras = mantras;
+            result.ts_mantras = timestamp;
+          })
+          .catch((error) => {
+            console.error("Error fetching mantras:", error);
+          })
+      );
+    }
+
+    await Promise.all(promises);
+
+    return result;
+  },
 };
+
+/**
+ * Helper function to format dates for feed items
+ */
+function formatDates(localDate: Date): {
+  dateStr: string;
+  nextDateStr: string;
+} {
+  const dateStr = localDate.toISOString().split("T")[0];
+  const nextDay = new Date(localDate);
+  nextDay.setDate(nextDay.getDate() + 1);
+  const nextDateStr = nextDay.toISOString().split("T")[0];
+
+  return { dateStr, nextDateStr };
+}
+
+/**
+ * Helper function to get mantras for the feed
+ */
+async function getMantrasForFeed(
+  userId: string
+): Promise<{ mantras: Mantra[]; timestamp: number }> {
+  const now = new Date();
+
+  try {
+    const userMantras = await db
+      .select()
+      .from(mantras)
+      .where(eq(mantras.userId, userId));
+
+    return { mantras: userMantras, timestamp: now.getTime() };
+  } catch (error) {
+    console.error("Error in getMantrasForFeed:", error);
+    return {
+      mantras: [],
+      timestamp: now.getTime(),
+    };
+  }
+}
+
+/**
+ * Helper function to get backgrounds for the feed
+ */
+async function getBackgroundsForFeed(
+  userId: string
+): Promise<{ backgrounds: Background[]; timestamp: number }> {
+  const now = new Date();
+
+  try {
+    const userBackgrounds = await db
+      .select()
+      .from(backgrounds)
+      .where(eq(backgrounds.userId, userId));
+
+    return { backgrounds: userBackgrounds, timestamp: now.getTime() };
+  } catch (error) {
+    console.error("Error in getBackgroundsForFeed:", error);
+    return {
+      backgrounds: [],
+      timestamp: now.getTime(),
+    };
+  }
+}
