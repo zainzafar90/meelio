@@ -1,5 +1,3 @@
-import * as focusSessionController from "./focus-session.controller";
-import * as focusSessionService from "./focus-session.service";
-import { focusSessionValidation } from "./focus-session.validation";
-
-export { focusSessionController, focusSessionService, focusSessionValidation };
+export * from "./focus-session.controller";
+export * from "./focus-session.service";
+export * from "./focus-session.validation";
