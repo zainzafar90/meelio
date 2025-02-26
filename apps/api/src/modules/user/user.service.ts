@@ -45,7 +45,7 @@ export const userService = {
     return !!user;
   },
 
-  createUser: async (userBody: CreateUserReq): Promise<SafeUser> => {
+  createUser: async (userBody: CreateUserReq) => {
     if (await userService.isEmailTaken(userBody.email)) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
     }
@@ -60,7 +60,7 @@ export const userService = {
       } as UserInsert)
       .returning();
 
-    return userService.userDTO(user);
+    return user;
   },
 
   registerUser: async (userBody: RegisterUserReq) => {
@@ -79,7 +79,7 @@ export const userService = {
       } as UserInsert)
       .returning();
 
-    return userService.userDTO(user);
+    return userUtils.sanitizeUser(user);
   },
 
   queryUsers: async (filter: Record<string, any>, options: IOptions) => {

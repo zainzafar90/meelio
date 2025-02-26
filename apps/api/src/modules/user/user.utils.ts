@@ -16,7 +16,7 @@ export const userUtils = {
     return bcrypt.compare(password, hashedPassword);
   },
 
-  sanitizeUser: (user: User): SafeUser => {
+  sanitizeUser: (user: User) => {
     const { password, ...safeUser } = user;
     return safeUser;
   },
