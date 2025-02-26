@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 
-import { billingController } from "../../modules/billing/billing.controller";
-import { verifySignatureMiddleware } from "../../modules/billing/billing.middleware";
+import { billingController } from "@/modules/billing";
+import { verifySignatureMiddleware } from "@/modules/billing";
 
 const router: Router = express.Router();
 
