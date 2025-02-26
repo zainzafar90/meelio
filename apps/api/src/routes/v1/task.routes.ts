@@ -1,23 +1,30 @@
-import express from "express";
-import { TaskController } from "@/controllers/task.controller";
-import auth from "@/modules/auth/auth.middleware";
+import { Router } from "express";
+import { tasksController } from "@/modules/tasks";
+import { tasksValidation } from "@/modules/tasks";
+import { auth } from "@/modules/auth";
+import { validate } from "@/common/validate";
 
-const router = express.Router();
-const taskController = new TaskController();
+const router = Router();
 
 router
   .route("/")
-  .get(auth(), taskController.getTasks.bind(taskController))
-  .post(auth(), taskController.createTask.bind(taskController));
+  .get(auth(), tasksController.getTasks)
+  .post(
+    auth(),
+    validate(tasksValidation.createTask),
+    tasksController.createTask
+  );
 
-router
-  .route("/focus")
-  .get(auth(), taskController.getFocusTask.bind(taskController));
+router.route("/focus").get(auth(), tasksController.getFocusTask);
 
 router
   .route("/:id")
-  .get(auth(), taskController.getTask.bind(taskController))
-  .patch(auth(), taskController.updateTask.bind(taskController))
-  .delete(auth(), taskController.deleteTask.bind(taskController));
+  .get(auth(), tasksController.getTask)
+  .patch(
+    auth(),
+    validate(tasksValidation.updateTask),
+    tasksController.updateTask
+  )
+  .delete(auth(), tasksController.deleteTask);
 
 export default router;
