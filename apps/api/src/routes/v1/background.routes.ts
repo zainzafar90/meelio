@@ -10,6 +10,8 @@ const router = Router();
 
 router.get("/", auth(), backgroundController.getBackgrounds);
 
+router.get("/random", auth(), backgroundController.getRandomBackground);
+
 router.post(
   "/selected",
   auth(),

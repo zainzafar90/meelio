@@ -16,11 +16,6 @@ export const backgroundController = {
   getBackgrounds: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const backgrounds = await backgroundService.getBackgrounds(userId);
       return res.status(httpStatus.OK).json(backgrounds);
@@ -33,11 +28,6 @@ export const backgroundController = {
   getBackgroundById: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const { id } = req.params;
       const background = await backgroundService.getBackgroundById(id);
@@ -58,11 +48,6 @@ export const backgroundController = {
   setSelectedBackground: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const { backgroundId } = req.body;
       if (!backgroundId) {
@@ -85,11 +70,6 @@ export const backgroundController = {
   getRandomBackground: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const background = await backgroundService.getRandomBackground();
       return res.status(httpStatus.OK).json(background);
@@ -102,11 +82,6 @@ export const backgroundController = {
   createBackground: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const background = await backgroundService.createBackground(
         userId,
@@ -122,11 +97,6 @@ export const backgroundController = {
   updateBackground: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const { id } = req.params;
       const background = await backgroundService.updateBackground(id, req.body);
@@ -140,11 +110,6 @@ export const backgroundController = {
   deleteBackground: catchAsync(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user?.email;
-      if (!userId) {
-        return res.status(httpStatus.UNAUTHORIZED).json({
-          message: "Unauthorized",
-        });
-      }
 
       const { id } = req.params;
       await backgroundService.deleteBackground(id);
