@@ -16,7 +16,6 @@ import pomodoroRoute from "./pomodoro.routes";
 import siteBlockerRoute from "./site-blocker.routes";
 import tabStashRoute from "./tab-stash.routes";
 import noteRoute from "./note.routes";
-import weatherCacheRoute from "./weather-cache.routes";
 import focusSessionRoute from "./focus-session.routes";
 
 const router: express.Router = express.Router();
@@ -78,10 +77,6 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/notes",
     route: noteRoute,
-  },
-  {
-    path: "/weather-cache",
-    route: weatherCacheRoute,
   },
   {
     path: "/focus-sessions",

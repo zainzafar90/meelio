@@ -96,14 +96,6 @@ const dbSchema = {
       ]
     },
     {
-      name: 'weatherCache',
-      keyPath: 'id',
-      indexes: [
-        { name: 'userId', keyPath: 'userId', unique: true },
-        { name: 'syncStatus', keyPath: '_syncStatus' }
-      ]
-    },
-    {
       name: 'breathepod',
       keyPath: 'id',
       indexes: [

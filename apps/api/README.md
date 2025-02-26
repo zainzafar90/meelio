@@ -21,7 +21,6 @@ This document outlines the plan for implementing offline-first capabilities in t
 - [x] Create schema for site blockers
 - [x] Create schema for tab stashes
 - [x] Create schema for notes
-- [x] Create schema for weather cache
 - [x] Create schema for breathepod
 - [x] Create schema for focus sessions
 
@@ -36,7 +35,6 @@ This document outlines the plan for implementing offline-first capabilities in t
 - [x] Implement site blocker routes
 - [x] Implement tab stash routes
 - [x] Implement note routes
-- [x] Implement weather cache routes
 - [x] Implement breathepod routes
 - [x] Implement focus session routes
 

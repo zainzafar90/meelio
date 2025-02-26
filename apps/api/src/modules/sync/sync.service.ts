@@ -9,7 +9,6 @@ import {
   siteBlockers,
   tabStashes,
   notes,
-  weatherCache,
   focusSessions,
 } from "@/db/schema";
 import { eq, and, gt } from "drizzle-orm";
@@ -75,8 +74,6 @@ export const syncService = {
         return tabStashes;
       case "notes":
         return notes;
-      case "weatherCache":
-        return weatherCache;
       case "focusSessions":
         return focusSessions;
       default:
@@ -152,7 +149,6 @@ export const syncService = {
         "siteBlockers",
         "tabStashes",
         "notes",
-        "weatherCache",
         "focusSessions",
       ]) {
         const table = syncService.getTableForEntity(entityName);

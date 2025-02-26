@@ -221,7 +221,6 @@ The new tab page will be the main interface for the extension, displaying:
 - Custom backgrounds
 - Daily mantras
 - Tasks and focus task
-- Weather information
 - Quick access to other features
 
 ```typescript

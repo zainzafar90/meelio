@@ -2,76 +2,61 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "@/utils/catch-async";
 import { focusSessionService } from "./focus-session.service";
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-  };
-}
+import { IUser } from "@/types/interfaces/resources";
 
 export const focusSessionController = {
   /**
    * Get focus sessions for the authenticated user
    */
-  getFocusSessions: catchAsync(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.user?.id;
-      const sessions = await focusSessionService.getFocusSessions(userId);
-      return res.status(httpStatus.OK).json(sessions);
-    }
-  ),
+  getFocusSessions: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const sessions = await focusSessionService.getFocusSessions(user.id);
+    return res.status(httpStatus.OK).json(sessions);
+  }),
 
   /**
    * Get a focus session by ID
    */
-  getFocusSession: catchAsync(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.user?.id;
-      const { id } = req.params;
-      const session = await focusSessionService.getFocusSessionById(id, userId);
-      return res.status(httpStatus.OK).json(session);
-    }
-  ),
+  getFocusSession: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { id } = req.params;
+    const session = await focusSessionService.getFocusSessionById(id, user.id);
+    return res.status(httpStatus.OK).json(session);
+  }),
 
   /**
    * Create a focus session
    */
-  createFocusSession: catchAsync(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.user?.id;
-      const session = await focusSessionService.createFocusSession(
-        userId,
-        req.body
-      );
-      return res.status(httpStatus.CREATED).json(session);
-    }
-  ),
+  createFocusSession: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const session = await focusSessionService.createFocusSession(
+      user.id,
+      req.body
+    );
+    return res.status(httpStatus.CREATED).json(session);
+  }),
 
   /**
    * Update a focus session
    */
-  updateFocusSession: catchAsync(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.user?.id;
-      const { id } = req.params;
-      const session = await focusSessionService.updateFocusSession(
-        id,
-        userId,
-        req.body
-      );
-      return res.status(httpStatus.OK).json(session);
-    }
-  ),
+  updateFocusSession: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { id } = req.params;
+    const session = await focusSessionService.updateFocusSession(
+      id,
+      user.id,
+      req.body
+    );
+    return res.status(httpStatus.OK).json(session);
+  }),
 
   /**
    * Delete a focus session
    */
-  deleteFocusSession: catchAsync(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const userId = req.user?.id;
-      const { id } = req.params;
-      await focusSessionService.deleteFocusSession(id, userId);
-      return res.status(httpStatus.NO_CONTENT).send();
-    }
-  ),
+  deleteFocusSession: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { id } = req.params;
+    await focusSessionService.deleteFocusSession(id, user.id);
+    return res.status(httpStatus.NO_CONTENT).send();
+  }),
 };

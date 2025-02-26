@@ -50,7 +50,6 @@ This document outlines the plan for implementing offline-first capabilities in t
 - [ ] Implement Site blocker repository
 - [ ] Implement Tab stash repository
 - [ ] Implement Note repository
-- [ ] Implement Weather cache repository
 - [ ] Implement Breathepod repository
 - [ ] Implement Focus session repository
 

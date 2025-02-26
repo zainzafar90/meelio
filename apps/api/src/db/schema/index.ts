@@ -11,5 +11,4 @@ export * from "./pomodoro-settings.schema";
 export * from "./site-blocker.schema";
 export * from "./tab-stash.schema";
 export * from "./note.schema";
-export * from "./weather-cache.schema";
 export * from "./focus-session.schema";

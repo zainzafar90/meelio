@@ -2,74 +2,44 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "@/utils/catch-async";
 import { noteService } from "./note.service";
-
-interface AuthenticatedRequest extends Request {
-  user?: {
-    email: string;
-  };
-}
+import { IUser } from "@/types/interfaces/resources";
 
 export const noteController = {
-  getNotes: catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
+  getNotes: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
 
-    const notes = await noteService.getNotes(userId);
+    const notes = await noteService.getNotes(user.id);
     return res.status(httpStatus.OK).json(notes);
   }),
 
-  getNote: catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
-
+  getNote: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
     const { id } = req.params;
-    const note = await noteService.getNoteById(id, userId);
+
+    const note = await noteService.getNoteById(id, user.id);
     return res.status(httpStatus.OK).json(note);
   }),
 
-  createNote: catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
+  createNote: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
 
-    const note = await noteService.createNote(userId, req.body);
+    const note = await noteService.createNote(user.id, req.body);
     return res.status(httpStatus.CREATED).json(note);
   }),
 
-  updateNote: catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
+  updateNote: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
 
     const { id } = req.params;
-    const note = await noteService.updateNote(id, userId, req.body);
+    const note = await noteService.updateNote(id, user.id, req.body);
     return res.status(httpStatus.OK).json(note);
   }),
 
-  deleteNote: catchAsync(async (req: AuthenticatedRequest, res: Response) => {
-    const userId = req.user?.email;
-    if (!userId) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        message: "Unauthorized",
-      });
-    }
+  deleteNote: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
 
     const { id } = req.params;
-    await noteService.deleteNote(id, userId);
+    await noteService.deleteNote(id, user.id);
     return res.status(httpStatus.NO_CONTENT).send();
   }),
 };

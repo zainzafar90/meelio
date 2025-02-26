@@ -21,7 +21,6 @@ This document provides a summary of the offline-first implementation for the Mee
   - Site Blockers
   - Tab Stashes
   - Notes
-  - Weather Cache
   - Breathepod
   - Focus Sessions
 
@@ -47,7 +46,6 @@ This document provides a summary of the offline-first implementation for the Mee
    - Site Blockers
    - Tab Stashes
    - Notes
-   - Weather Cache
    - Breathepod
    - Focus Sessions
 
@@ -116,7 +114,6 @@ This document provides a summary of the offline-first implementation for the Mee
 | Site Blocker | Basic | Advanced + Categories |
 | Tab Stashes | Limited | Unlimited |
 | Notes | Limited | Unlimited |
-| Weather | Basic | Detailed + Forecast |
 | Breathepod | Basic | Advanced |
 | Focus Sessions | Limited | Unlimited + Analytics |
 | Offline Sync | Limited | Priority + Unlimited |
