@@ -148,3 +148,8 @@ Focus sessions integrate with:
 - Pomodoro module: Focus sessions can be automatically created from pomodoro sessions
 - Task module: Focus sessions can be associated with specific tasks
 - Analytics: Focus data contributes to productivity insights 
+
+## Related Documentation
+- [Implementation Summary](./implementation-summary.md)
+- [Offline-First Architecture](../../Architecture/offline-first-architecture.md)
+- [Sync Implementation](../Sync/sync-implementation.md) 

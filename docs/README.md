@@ -1,27 +1,27 @@
 # Meelio Documentation
 
 ## Architecture & Design
-- [Frontend Offline-First Architecture](./frontend-offline-first-architecture.md) - Core architecture design for offline-first functionality
-- [Offline-First Architecture](./offline-first-architecture.md) - Overall system architecture for offline capabilities
-- [IndexedDB Schema](./indexeddb-schema.md) - Database schema for client-side storage
+- [Frontend Offline-First Architecture](./Architecture/frontend-offline-first-architecture.md) - Core architecture design for offline-first functionality
+- [Offline-First Architecture](./Architecture/offline-first-architecture.md) - Overall system architecture for offline capabilities
+- [IndexedDB Schema](./Architecture/indexeddb-schema.md) - Database schema for client-side storage
 
 ## Implementation Guides
 ### Frontend
-- [Frontend Offline-First Implementation Guide](./frontend-offline-first-implementation-guide.md) - Detailed guide for implementing offline-first features
-- [Frontend Offline-First Implementation Plan](./frontend-offline-first-implementation-plan.md) - Step-by-step plan for frontend implementation
-- [Chrome Extension Implementation](./chrome-extension-implementation.md) - Guide for Chrome extension features
+- [Frontend Offline-First Implementation Guide](./Implementation/Frontend/frontend-offline-first-implementation-guide.md) - Detailed guide for implementing offline-first features
+- [Frontend Offline-First Implementation Plan](./Implementation/Frontend/frontend-offline-first-implementation-plan.md) - Step-by-step plan for frontend implementation
+- [Chrome Extension Implementation](./Implementation/Frontend/chrome-extension-implementation.md) - Guide for Chrome extension features
 
 ### Backend
-- [Focus Session Implementation](./focus-session-implementation.md) - Implementation details for focus session feature
-- [Implementation Summary](./implementation-summary.md) - Overview of implemented features and components
+- [Focus Session Implementation](./Implementation/Backend/focus-session-implementation.md) - Implementation details for focus session feature
+- [Implementation Summary](./Implementation/Backend/implementation-summary.md) - Overview of implemented features and components
 
 ### Sync & Data Management
-- [Sync Implementation](./sync-implementation.md) - Core sync mechanism implementation
-- [Sync Verification Guide](./sync-verification-guide.md) - Guide for verifying sync functionality
+- [Sync Implementation](./Implementation/Sync/sync-implementation.md) - Core sync mechanism implementation
+- [Sync Verification Guide](./Implementation/Sync/sync-verification-guide.md) - Guide for verifying sync functionality
 
 ## Module Organization
-- [Module Standardization Plan](./module-standardization-plan.md) - Plan for standardizing module structure
-- [Module Analysis](./analyze-modules.js) - Script for analyzing module patterns
+- [Module Standardization Plan](./Module/module-standardization-plan.md) - Plan for standardizing module structure
+- [Module Analysis](./Module/analyze-modules.js) - Script for analyzing module patterns
 
 ## Documentation Structure
 ```

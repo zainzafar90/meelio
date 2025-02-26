@@ -107,4 +107,11 @@ The IndexedDB database will mirror our PostgreSQL schema with additional fields 
 - Free users: Limited storage and sync frequency
 - Premium users: Unlimited storage and priority sync
 - Feature flags to control access to premium features
-- Graceful degradation for free users when limits are reached 
+- Graceful degradation for free users when limits are reached
+
+## Related Documentation
+- [Frontend Offline-First Architecture](./frontend-offline-first-architecture.md)
+- [IndexedDB Schema](./indexeddb-schema.md)
+- [Sync Implementation](../Implementation/Sync/sync-implementation.md)
+- [Sync Verification Guide](../Implementation/Sync/sync-verification-guide.md)
+- [Implementation Summary](../Implementation/Backend/implementation-summary.md) 

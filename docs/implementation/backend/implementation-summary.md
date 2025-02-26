@@ -159,6 +159,12 @@ The focus session module allows users to:
 
 API endpoints are available at `/focus-sessions` and follow RESTful conventions.
 
+## Related Documentation
+- [Offline-First Architecture](../../Architecture/offline-first-architecture.md)
+- [Sync Implementation](../Sync/sync-implementation.md)
+- [Frontend Implementation Guide](../Frontend/frontend-offline-first-implementation-guide.md)
+- [Focus Session Implementation](./focus-session-implementation.md)
+
 ## Conclusion
 
 The offline-first implementation for Meelio provides a robust foundation for a seamless user experience regardless of network connectivity. The architecture allows for efficient data synchronization while minimizing conflicts and data loss.

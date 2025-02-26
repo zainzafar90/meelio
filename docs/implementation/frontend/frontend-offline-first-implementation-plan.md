@@ -146,4 +146,10 @@ This document outlines the plan for implementing offline-first capabilities in t
 - [ ] Implement feature flags for premium offline capabilities
 - [ ] Create upgrade path for offline users
 - [ ] Implement storage limits for free users
-- [ ] Add premium sync features (priority sync, etc.) 
+- [ ] Add premium sync features (priority sync, etc.)
+
+## Related Documentation
+- [Frontend Offline-First Architecture](../../Architecture/frontend-offline-first-architecture.md)
+- [Implementation Guide](./frontend-offline-first-implementation-guide.md)
+- [IndexedDB Schema](../../Architecture/indexeddb-schema.md)
+- [Sync Implementation](../Sync/sync-implementation.md) 

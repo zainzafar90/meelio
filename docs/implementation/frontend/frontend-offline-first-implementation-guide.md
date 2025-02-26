@@ -680,3 +680,10 @@ Here's how the shared offline-first functionality is used in both apps:
    ```
 
 This shared approach ensures that both the web app and extension have identical offline capabilities, sync behavior, and data management. 
+
+## Related Documentation
+- [Frontend Offline-First Architecture](../../Architecture/frontend-offline-first-architecture.md)
+- [Offline-First Architecture](../../Architecture/offline-first-architecture.md)
+- [IndexedDB Schema](../../Architecture/indexeddb-schema.md)
+- [Implementation Plan](./frontend-offline-first-implementation-plan.md)
+- [Sync Implementation](../Sync/sync-implementation.md) 

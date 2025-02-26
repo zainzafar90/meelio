@@ -4,7 +4,7 @@ This document outlines the implementation of the sync functionality for the Meel
 
 ## Architecture
 
-The sync implementation follows the offline-first architecture described in the [offline-first-architecture.md](./offline-first-architecture.md) document. It provides a way for clients to synchronize their local data with the server.
+The sync implementation follows the offline-first architecture described in the [Offline-First Architecture](../../Architecture/offline-first-architecture.md) document. It provides a way for clients to synchronize their local data with the server.
 
 ### Key Components
 
@@ -115,4 +115,11 @@ Common issues:
 1. **Pagination**: Add pagination for large datasets
 2. **Compression**: Compress data to reduce bandwidth usage
 3. **Selective Sync**: Allow clients to sync only specific entities
-4. **Conflict Resolution UI**: Provide a UI for resolving conflicts 
+4. **Conflict Resolution UI**: Provide a UI for resolving conflicts
+
+## Related Documentation
+- [Offline-First Architecture](../../Architecture/offline-first-architecture.md)
+- [IndexedDB Schema](../../Architecture/indexeddb-schema.md)
+- [Frontend Implementation Guide](../Frontend/frontend-offline-first-implementation-guide.md)
+- [Sync Verification Guide](./sync-verification-guide.md)
+- [Implementation Summary](../Backend/implementation-summary.md) 
