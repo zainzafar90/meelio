@@ -1,5 +1,3 @@
-import * as pomodoroController from "./pomodoro.controller";
-import * as pomodoroService from "./pomodoro.service";
-import { pomodoroValidation } from "./pomodoro.validation";
-
-export { pomodoroController, pomodoroService, pomodoroValidation };
+export * from "./pomodoro.controller";
+export * from "./pomodoro.service";
+export * from "./pomodoro.validation";
