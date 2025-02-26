@@ -13,59 +13,61 @@ const createUserBody: Record<keyof CreateUserReq, any> = {
   role: Joi.string().valid(RoleType.User, RoleType.Guest).required(),
 };
 
-export const createUser = {
-  body: Joi.object().keys(createUserBody),
-};
+export const userValidation = {
+  createUser: {
+    body: Joi.object().keys(createUserBody),
+  },
 
-export const getUsers = {
-  query: Joi.object().keys({
-    name: Joi.string(),
-    role: Joi.string(),
-    sortBy: Joi.string(),
-    sortOrder: Joi.string().valid("asc", "desc"),
-    projectBy: Joi.string(),
-    limit: Joi.number().integer(),
-    offset: Joi.number().integer(),
-  }),
-};
-
-export const getUser = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(uuid),
-  }),
-};
-
-export const updateUser = {
-  params: Joi.object().keys({
-    userId: Joi.required().custom(uuid),
-  }),
-  body: Joi.object()
-    .keys({
-      email: Joi.string().email(),
-      password: Joi.string().custom(password),
+  getUsers: {
+    query: Joi.object().keys({
       name: Joi.string(),
-    })
-    .min(1),
-};
+      role: Joi.string(),
+      sortBy: Joi.string(),
+      sortOrder: Joi.string().valid("asc", "desc"),
+      projectBy: Joi.string(),
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+    }),
+  },
 
-export const deleteUser = {
-  params: Joi.object().keys({
-    userId: Joi.string().custom(uuid),
-  }),
-};
+  getUser: {
+    params: Joi.object().keys({
+      userId: Joi.string().custom(uuid),
+    }),
+  },
 
-export const createGuestUser = {
-  body: Joi.object().keys({
-    name: Joi.string().required(),
-  }),
-};
+  updateUser: {
+    params: Joi.object().keys({
+      userId: Joi.required().custom(uuid),
+    }),
+    body: Joi.object()
+      .keys({
+        email: Joi.string().email(),
+        password: Joi.string().custom(password),
+        name: Joi.string(),
+      })
+      .min(1),
+  },
 
-export const convertGuestToRegular = {
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-  params: Joi.object().keys({
-    userId: Joi.string().required(),
-  }),
+  deleteUser: {
+    params: Joi.object().keys({
+      userId: Joi.string().custom(uuid),
+    }),
+  },
+
+  createGuestUser: {
+    body: Joi.object().keys({
+      name: Joi.string().required(),
+    }),
+  },
+
+  convertGuestToRegular: {
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required().min(8),
+    }),
+    params: Joi.object().keys({
+      userId: Joi.string().required(),
+    }),
+  },
 };

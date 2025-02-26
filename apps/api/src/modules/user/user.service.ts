@@ -12,7 +12,7 @@ import { db } from "@/db";
 import { User, UserInsert, users } from "@/db/schema";
 
 import { getPaginationConfig } from "../paginate/pagination";
-import { hashPassword, sanitizeUser } from "./user.utils";
+import { userUtils, SafeUser } from "./user.utils";
 import { IOptions } from "@/types/interfaces/pagination";
 
 type OrderDirection = "asc" | "desc";
@@ -23,232 +23,231 @@ interface OrderParams {
   direction: OrderDirection;
 }
 
-const userDTO = (user: User) => {
-  const sanitizedUser = sanitizeUser(user);
-  return {
-    ...sanitizedUser,
-  };
-};
+export const userService = {
+  userDTO: (user: User) => {
+    const sanitizedUser = userUtils.sanitizeUser(user);
+    return {
+      ...sanitizedUser,
+    };
+  },
 
-export const isEmailTaken = async (email: string, excludeUserId?: string) => {
-  if (excludeUserId) {
+  isEmailTaken: async (email: string, excludeUserId?: string) => {
+    if (excludeUserId) {
+      const user = await db.query.users.findFirst({
+        where: and(eq(users.email, email), ne(users.id, excludeUserId)),
+      });
+      return !!user;
+    }
+
     const user = await db.query.users.findFirst({
-      where: and(eq(users.email, email), ne(users.id, excludeUserId)),
+      where: eq(users.email, email),
     });
     return !!user;
-  }
+  },
 
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-  return !!user;
-};
+  createUser: async (userBody: CreateUserReq): Promise<SafeUser> => {
+    if (await userService.isEmailTaken(userBody.email)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    }
 
-export const createUser = async (userBody: CreateUserReq) => {
-  const isEmailAlreadyTaken = await isEmailTaken(userBody.email);
-  if (isEmailAlreadyTaken) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-  }
+    const hashedPassword = await userUtils.hashPassword(userBody.password);
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userBody,
+        role: RoleType.User,
+        password: hashedPassword,
+      } as UserInsert)
+      .returning();
 
-  const hashedPassword = await hashPassword(userBody.password);
-  const [user] = await db
-    .insert(users)
-    .values({
-      ...userBody,
-      role: RoleType.User,
-      password: hashedPassword,
-    } as UserInsert)
-    .returning();
+    return userService.userDTO(user);
+  },
 
-  return userDTO(user);
-};
+  registerUser: async (userBody: RegisterUserReq) => {
+    const isEmailAlreadyTaken = await userService.isEmailTaken(userBody.email);
+    if (isEmailAlreadyTaken) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    }
 
-export const registerUser = async (userBody: RegisterUserReq) => {
-  const isEmailAlreadyTaken = await isEmailTaken(userBody.email);
-  if (isEmailAlreadyTaken) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-  }
+    const hashedPassword = await userUtils.hashPassword(userBody.password);
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userBody,
+        role: RoleType.User,
+        password: hashedPassword,
+      } as UserInsert)
+      .returning();
 
-  const hashedPassword = await hashPassword(userBody.password);
-  const [user] = await db
-    .insert(users)
-    .values({
-      ...userBody,
-      role: RoleType.User,
-      password: hashedPassword,
-    } as UserInsert)
-    .returning();
+    return userService.userDTO(user);
+  },
 
-  return userDTO(user);
-};
+  queryUsers: async (filter: Record<string, any>, options: IOptions) => {
+    const { limit, offset } = getPaginationConfig(options);
 
-export const queryUsers = async (
-  filter: Record<string, any>,
-  options: IOptions
-) => {
-  const { limit, offset } = getPaginationConfig(options);
+    const conditions = [];
+    if (filter.name) {
+      conditions.push(eq(users.name, filter.name));
+    }
 
-  const conditions = [];
-  if (filter.name) {
-    conditions.push(eq(users.name, filter.name));
-  }
+    const whereClause = and(...conditions);
 
-  const whereClause = and(...conditions);
+    const orderParams: OrderParams = {
+      field: (options.sortBy as OrderField) || "createdAt",
+      direction: (options.sortOrder as OrderDirection) || "desc",
+    };
 
-  const orderParams: OrderParams = {
-    field: (options.sortBy as OrderField) || "createdAt",
-    direction: (options.sortOrder as OrderDirection) || "desc",
-  };
+    const orderBy =
+      orderParams.direction === "asc"
+        ? asc(users[orderParams.field])
+        : desc(users[orderParams.field]);
 
-  const orderFn = orderParams.direction === "asc" ? asc : desc;
-  const orderByClause = orderFn(
-    users[orderParams.field as keyof (typeof users)["_"]["columns"]]
-  );
+    const [result, total] = await Promise.all([
+      db.query.users.findMany({
+        where: whereClause,
+        limit,
+        offset,
+        orderBy: [orderBy],
+      }),
+      db
+        .select({ count: count() })
+        .from(users)
+        .where(whereClause)
+        .then((result) => result[0].count),
+    ]);
 
-  const [usersCount] = await db
-    .select({ count: count(users.id) })
-    .from(users)
-    .where(whereClause);
+    return {
+      results: result.map(userService.userDTO),
+      total,
+      limit,
+      offset,
+      pages: Math.ceil(total / limit),
+      count: result.length,
+    };
+  },
 
-  const results = await db.query.users.findMany({
-    where: whereClause,
-    limit,
-    offset,
-    orderBy: orderByClause,
-  });
+  getUserById: async (id: string) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
 
-  return {
-    results: results.map((user) => userDTO(user)),
-    limit,
-    offset,
-    pages: Math.ceil(usersCount.count / limit),
-    count: usersCount.count,
-  };
-};
+    if (!user) {
+      return null;
+    }
 
-export const updateUserById = async (id: string, userBody: UpdateUserReq) => {
-  if (userBody.password) {
-    userBody.password = await hashPassword(userBody.password);
-  }
+    return userService.userDTO(user);
+  },
 
-  const [updatedUser] = await db
-    .update(users)
-    .set(userBody)
-    .where(eq(users.id, id))
-    .returning();
+  getUserByEmail: async (email: string) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
 
-  return userDTO(updatedUser);
-};
+    if (!user) {
+      return null;
+    }
 
-export const updateUserPassword = async (
-  userId: string,
-  updatedPassword: string
-) => {
-  const conditions = [eq(users.id, userId)];
-  const whereClause = and(...conditions);
-  const user = await db.query.users.findFirst({
-    where: whereClause,
-  });
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  }
-  const newHashedPassword = await hashPassword(updatedPassword);
-  await db
-    .update(users)
-    .set({ password: newHashedPassword } as User)
-    .where(whereClause);
-  return userDTO(user);
-};
+    return user;
+  },
 
-export const deleteUserById = async (id: string) => {
-  const [deletedUser] = await db
-    .delete(users)
-    .where(eq(users.id, id))
-    .returning();
+  updateUserById: async (
+    userId: string,
+    updateBody: UpdateUserReq
+  ): Promise<SafeUser> => {
+    const user = await userService.getUserById(userId);
 
-  return userDTO(deletedUser);
-};
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
 
-export const getUserById = async (id: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, id),
-  });
+    if (
+      updateBody.email &&
+      (await userService.isEmailTaken(updateBody.email, userId))
+    ) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    }
 
-  if (!user) return null;
+    const updatedUser = { ...updateBody };
 
-  return userDTO(user);
-};
+    if (updateBody.password) {
+      updatedUser.password = await userUtils.hashPassword(updateBody.password);
+    }
 
-export const getMe = async (id: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, id),
-  });
+    const [updatedUserResult] = await db
+      .update(users)
+      .set(updatedUser)
+      .where(eq(users.id, userId))
+      .returning();
 
-  if (!user) return null;
+    return userService.userDTO(updatedUserResult);
+  },
 
-  return userDTO(user);
-};
+  deleteUserById: async (userId: string) => {
+    const user = await userService.getUserById(userId);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
 
-export const getUserByEmail = async (email: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
+    await db.delete(users).where(eq(users.id, userId));
+    return user;
+  },
 
-  if (!user) return null;
+  getMe: async (userId: string) => {
+    const user = await userService.getUserById(userId);
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
 
-  return userDTO(user);
-};
+    return user;
+  },
 
-export const getUserByEmailAndPassword = async (email: string) => {
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
+  createGuestUser: async (name: string) => {
+    const [user] = await db
+      .insert(users)
+      .values({
+        name: name || "Guest",
+        email: `guest-${Date.now()}@meelio.com`,
+        role: RoleType.Guest,
+        isGuest: true,
+      } as UserInsert)
+      .returning();
 
-  if (!user) return null;
+    return userService.userDTO(user);
+  },
 
-  return user;
-};
+  updateGuestToRegular: async (
+    userId: string,
+    { email, password }: { email: string; password: string }
+  ): Promise<SafeUser> => {
+    const user = await userService.getUserById(userId);
 
-export const createGuestUser = async (name: string) => {
-  const [user] = await db
-    .insert(users)
-    .values({
-      name,
-      role: RoleType.Guest,
-    } as UserInsert)
-    .returning();
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
 
-  return userDTO(user);
-};
+    if (user.role !== RoleType.Guest) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "User is already a regular user"
+      );
+    }
 
-export const updateGuestToRegular = async (
-  userId: string,
-  email: string,
-  password: string
-) => {
-  const user = await getUserById(userId);
-  if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  }
-  if (user.role !== RoleType.Guest) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User is not a guest");
-  }
+    if (await userService.isEmailTaken(email)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
+    }
 
-  const isEmailAlreadyTaken = await isEmailTaken(email);
-  if (isEmailAlreadyTaken) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-  }
+    const hashedPassword = await userUtils.hashPassword(password);
 
-  const hashedPassword = await hashPassword(password);
-  const [updatedUser] = await db
-    .update(users)
-    .set({
-      email,
-      password: hashedPassword,
-      role: RoleType.User,
-    } as Partial<User>)
-    .where(eq(users.id, userId))
-    .returning();
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        email,
+        password: hashedPassword,
+        role: RoleType.User,
+      } as User)
+      .where(eq(users.id, userId))
+      .returning();
 
-  return userDTO(updatedUser);
+    return userService.userDTO(updatedUser);
+  },
 };

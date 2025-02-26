@@ -6,7 +6,7 @@ import { pick } from "@/utils/pick";
 import { ApiError } from "@/common/errors/api-error";
 
 import { permissionService } from "../permissions/permission.service";
-import * as userService from "./user.service";
+import { userService } from "./user.service";
 import {
   UserDeleteResponse,
   UserListResponse,
@@ -16,8 +16,8 @@ import {
 import { IUser } from "@/types/interfaces/resources";
 import { IOptions } from "@/types/interfaces/pagination";
 
-export const createUser = catchAsync(
-  async (req: Request, res: Response<UserResponse>) => {
+export const userController = {
+  createUser: catchAsync(async (req: Request, res: Response<UserResponse>) => {
     const user = req.user as IUser;
 
     const isAllowed = permissionService.checkPermissions(
@@ -34,105 +34,100 @@ export const createUser = catchAsync(
 
     const createdUser = await userService.createUser(req.body);
     res.status(httpStatus.CREATED).send(createdUser as IUser);
-  }
-);
+  }),
 
-export const getUsers = catchAsync(
-  async (req: Request, res: Response<UserListResponse>) => {
-    const user = req.user as IUser;
-    const filter = pick(req.query, ["name", "roles"]);
-    const options: IOptions = pick(req.query, [
-      "sortBy",
-      "sortOrder",
-      "limit",
-      "offset",
-      "projectBy",
-    ]);
-    const isAllowed = permissionService.checkPermissions(
-      user.role,
-      "list",
-      "users"
-    );
-    if (!isAllowed) {
-      throw new ApiError(
-        httpStatus.FORBIDDEN,
-        "You do not have permission to list users"
-      );
-    }
-
-    const result = await userService.queryUsers(filter, options);
-    res.send(result as UserListResponse);
-  }
-);
-
-export const getMe = catchAsync(
-  async (req: Request, res: Response<UserProfileResponse>) => {
-    const user = await userService.getMe(req.user["id"]);
-
-    if (!user) {
-      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-    }
-
-    if (req.user["id"] !== user["id"]) {
-      throw new ApiError(
-        httpStatus.FORBIDDEN,
-        "You can only get your own profile"
-      );
-    }
-
-    res.send(user as UserProfileResponse);
-  }
-);
-
-export const getUser = catchAsync(
-  async (req: Request, res: Response<UserResponse>) => {
-    if (typeof req.params["userId"] === "string") {
-      const user = await userService.getUserById(req.params["userId"]);
-      if (!user) {
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-      }
-      res.send(user as UserResponse);
-    }
-  }
-);
-
-export const updateUser = catchAsync(
-  async (req: Request, res: Response<UserResponse>) => {
-    if (typeof req.params["userId"] === "string") {
-      const userId = req.params["userId"];
-      const currentUser = req.user as IUser;
+  getUsers: catchAsync(
+    async (req: Request, res: Response<UserListResponse>) => {
+      const user = req.user as IUser;
+      const filter = pick(req.query, ["name", "roles"]);
+      const options: IOptions = pick(req.query, [
+        "sortBy",
+        "sortOrder",
+        "limit",
+        "offset",
+        "projectBy",
+      ]);
 
       const isAllowed = permissionService.checkPermissions(
-        currentUser.role,
-        "update",
+        user.role,
+        "read",
         "users"
       );
       if (!isAllowed) {
         throw new ApiError(
           httpStatus.FORBIDDEN,
-          "You do not have permission to update users"
+          "You do not have permission to view users"
         );
       }
 
-      if (userId !== currentUser["id"]) {
-        throw new ApiError(
-          httpStatus.FORBIDDEN,
-          "You can only update your own profile"
-        );
-      }
-
-      const user = await userService.updateUserById(userId, req.body);
-      res.send(user as UserResponse);
+      const result = await userService.queryUsers(filter, options);
+      res.send(result);
     }
-  }
-);
+  ),
 
-export const deleteUser = catchAsync(
-  async (req: Request, res: Response<UserDeleteResponse>) => {
-    if (typeof req.params["userId"] === "string") {
-      const currentUser = req.user as IUser;
+  getUser: catchAsync(async (req: Request, res: Response<UserResponse>) => {
+    const user = req.user as IUser;
+    const isAllowed = permissionService.checkPermissions(
+      user.role,
+      "read",
+      "users"
+    );
+    if (!isAllowed) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to view users"
+      );
+    }
+
+    const targetUser = await userService.getUserById(req.params.userId);
+    if (!targetUser) {
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+    res.send(targetUser);
+  }),
+
+  getMe: catchAsync(
+    async (req: Request, res: Response<UserProfileResponse>) => {
+      const user = req.user as IUser;
+      const result = await userService.getMe(user.id);
+      res.send(result);
+    }
+  ),
+
+  updateUser: catchAsync(async (req: Request, res: Response<UserResponse>) => {
+    const user = req.user as IUser;
+    const isAllowed = permissionService.checkPermissions(
+      user.role,
+      "update",
+      "users"
+    );
+    if (!isAllowed) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        "You do not have permission to update users"
+      );
+    }
+
+    const updatedUser = await userService.updateUserById(
+      req.params.userId,
+      req.body
+    );
+    res.send(updatedUser);
+  }),
+
+  updateMe: catchAsync(
+    async (req: Request, res: Response<UserProfileResponse>) => {
+      const user = req.user as IUser;
+      const updatedUser = await userService.updateUserById(user.id, req.body);
+      res.send(updatedUser);
+    }
+  ),
+
+  deleteUser: catchAsync(
+    async (req: Request, res: Response<UserDeleteResponse>) => {
+      const user = req.user as IUser;
       const isAllowed = permissionService.checkPermissions(
-        currentUser.role,
+        user.role,
         "delete",
         "users"
       );
@@ -143,26 +138,29 @@ export const deleteUser = catchAsync(
         );
       }
 
-      await userService.deleteUserById(req.params["userId"]);
+      await userService.deleteUserById(req.params.userId);
       res.status(httpStatus.NO_CONTENT).send();
     }
-  }
-);
+  ),
 
-export const createGuestUser = catchAsync(
-  async (req: Request, res: Response) => {
+  deleteMe: catchAsync(
+    async (req: Request, res: Response<UserDeleteResponse>) => {
+      const user = req.user as IUser;
+      await userService.deleteUserById(user.id);
+      res.status(httpStatus.NO_CONTENT).send();
+    }
+  ),
+
+  createGuestUser: catchAsync(async (req: Request, res: Response) => {
     const user = await userService.createGuestUser(req.body.name);
     res.status(httpStatus.CREATED).send(user);
-  }
-);
+  }),
 
-export const convertGuestToRegular = catchAsync(
-  async (req: Request, res: Response) => {
-    const user = await userService.updateGuestToRegular(
-      req.params.userId,
-      req.body.email,
-      req.body.password
-    );
+  convertGuestToRegular: catchAsync(async (req: Request, res: Response) => {
+    const user = await userService.updateGuestToRegular(req.params.userId, {
+      email: req.body.email,
+      password: req.body.password,
+    });
     res.status(httpStatus.OK).send(user);
-  }
-);
+  }),
+};
