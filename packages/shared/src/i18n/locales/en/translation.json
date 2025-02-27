@@ -376,7 +376,10 @@
     "title": "Site Blocker",
     "description": "Block websites to help you stay focused",
     "extension-only": "Site blocking functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "get-extension": "Get the Extension",
+    "upgrade": "Upgrade to Pro",
+    "premium-feature-title": "Premium Site Blocker",
+    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused."
   },
   "tab-stash": {
     "title": "Tab Stash",

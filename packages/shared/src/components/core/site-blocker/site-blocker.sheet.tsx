@@ -83,10 +83,7 @@ export const SiteBlockerSheet = () => {
                     )}
                   </div>
                   <div className="text-white/70 max-w-md mb-6">
-                    {t(
-                      "site-blocker.premium-feature",
-                      "Upgrade to Pro to block unlimited distracting websites and stay focused."
-                    )}
+                    {t("site-blocker.premium-feature")}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md mb-6">
@@ -113,7 +110,7 @@ export const SiteBlockerSheet = () => {
                   className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
                   onClick={() => navigate("/settings/billing")}
                 >
-                  {t("site-blocker.upgrade", "Upgrade to Pro")}
+                  {t("site-blocker.upgrade")}
                 </Button>
               </div>
             }

@@ -40,19 +40,19 @@ broadcastChannel.onmessage = async (event) => {
   }
 };
 
-/**
- * Persist state to DB and broadcast to other tabs
- */
-usePomodoroStore.subscribe(async (state) => {
-  await db.state.put({ ...state, id: 1 });
-  broadcastChannel.postMessage({ type: 'STATE_UPDATE', state });
-});
+// /**
+//  * Persist state to DB and broadcast to other tabs
+//  */
+// usePomodoroStore.subscribe(async (state) => {
+//   await db.state.put({ ...state, id: 1 });
+//   broadcastChannel.postMessage({ type: 'STATE_UPDATE', state });
+// });
 
-/**
- * Initialize store from DB
- */
-db.state.get(1).then((savedState) => {
-  if (savedState) {
-    usePomodoroStore.setState(savedState);
-  }
-});
+// /**
+//  * Initialize store from DB
+//  */
+// db.state.get(1).then((savedState) => {
+//   if (savedState) {
+//     usePomodoroStore.setState(savedState);
+//   }
+// });
