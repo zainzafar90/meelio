@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
 import { PomodoroStage, PomodoroTimer } from "../types";
-import { db, getTodaysSummary } from "../lib/db/pomodoro.dexie";
+import { db } from "../lib/db/meelio.dexie";
+import { getTodaysSummary } from "../lib/db/pomodoro.dexie";
 import { MINUTE_IN_SECONDS } from "../utils/common.utils";
 
 type PomodoroStore = {
@@ -170,7 +171,7 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       completed: true,
     };
 
-    await db.sessions.add(session);
+    await db.focusSessions.add(session);
 
     const summary = await getTodaysSummary();
 
@@ -182,7 +183,7 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
       summary.totalBreakTime += timer.stageSeconds[timer.activeStage];
     }
 
-    await db.dailySummaries.put(summary);
+    await db.focusStats.put(summary);
 
     await get().loadTodayStats();
   },

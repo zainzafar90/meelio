@@ -1,9 +1,9 @@
 import { PomodoroStage } from "../../types/pomodoro";
-import { db, PomodoroSession, DailySummary } from "./meelio.dexie";
-
+import { db } from "./meelio.dexie";
+import { PomodoroSession, DailySummary } from "./models.dexie";
 export const getTodaysSummary = async (): Promise<DailySummary> => {
   const today = new Date().toISOString().split("T")[0];
-  const summary = await db.dailySummaries.where("date").equals(today).first();
+  const summary = await db.focusStats.where("date").equals(today).first();
 
   if (!summary) {
     return {
@@ -28,10 +28,7 @@ export const getWeeklySummary = async (): Promise<DailySummary[]> => {
 
   const summaries = await Promise.all(
     dates.map(async (date) => {
-      const summary = await db.dailySummaries
-        .where("date")
-        .equals(date)
-        .first();
+      const summary = await db.focusStats.where("date").equals(date).first();
       return (
         summary || {
           date,
@@ -50,7 +47,7 @@ export const getWeeklySummary = async (): Promise<DailySummary[]> => {
 export const addPomodoroSession = async (
   session: PomodoroSession
 ): Promise<number> => {
-  return db.pomodoroSessions.add(session);
+  return db.focusSessions.add(session);
 };
 
 export const addPomodoroSummary = async (
@@ -67,5 +64,5 @@ export const addPomodoroSummary = async (
     todaysSummary.totalBreakTime += duration;
   }
 
-  return db.dailySummaries.put(todaysSummary);
+  return db.focusStats.put(todaysSummary);
 };

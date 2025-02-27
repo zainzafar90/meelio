@@ -69,8 +69,8 @@ export class MeelioDB extends Dexie {
 
   // PomodoroDB tables
   pomodoroState!: Table<PomodoroState, number>;
-  pomodoroSessions!: Table<PomodoroSession>;
-  dailySummaries!: Table<DailySummary>;
+  focusSessions!: Table<PomodoroSession>;
+  focusStats!: Table<DailySummary>;
 
   constructor() {
     super("meelio");
@@ -88,8 +88,8 @@ export class MeelioDB extends Dexie {
 
       // PomodoroDB tables
       pomodoroState: "++id, lastUpdated",
-      pomodoroSessions: "++id, timestamp",
-      dailySummaries: "++id, date",
+      focusSessions: "++id, timestamp",
+      focusStats: "++id, date",
     });
 
     // Initialize Todo lists
