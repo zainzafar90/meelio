@@ -21,6 +21,7 @@ import { AppProvider, AuthContainer, Clock, TabStashSheet, useAuthStore, useDock
 import { ExtensionTimer } from "./components/extension-timer";
 
 import "./style.css";
+import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 
 const Home = () => {
   const { user, guestUser } = useAuthStore();
@@ -127,8 +128,10 @@ const BottomBar = () => {
 };
 
 export const NewTab = () => {
+  useAppStore.getState().setPlatform("extension");
+
   return (
-    <AppProvider platform="extension">
+    <AppProvider>
       <Home />
     </AppProvider>
   );

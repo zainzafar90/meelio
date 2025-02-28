@@ -9,7 +9,7 @@ import {
 } from "@repo/ui/components/ui/sheet";
 import { Button } from "@repo/ui/components/ui/button";
 import { useDockStore } from "../../../stores/dock.store";
-import { useTabStashStore } from "./store/tab-stash.store";
+import { useTabStashStore } from "../../../stores/tab-stash.store";
 import { useTabStash } from "./hooks/use-tab-stash";
 import { TabSession } from "../../../types/tab-stash.types";
 import { PermissionBanner } from "./components/permission-banner";

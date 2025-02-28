@@ -31,13 +31,9 @@ import { i18n } from "../i18n";
 
 type AppProviderProps = {
   children: React.ReactNode;
-  platform: "extension" | "web";
 };
 
-export const AppProvider: React.FC<AppProviderProps> = ({
-  children,
-  platform,
-}) => {
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const sounds = useSoundscapesStore((state) => state.sounds);
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
 

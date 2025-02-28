@@ -43,8 +43,6 @@ export const UserAuthForm = ({
 
   const handleGoogleClick = async () => {
     setIsGoogleLoading(true);
-    // Store the name before redirecting
-    localStorage.setItem("pendingUserName", userName);
     window.location.href = `${env.serverUrl}/v1/account/google`;
   };
 
