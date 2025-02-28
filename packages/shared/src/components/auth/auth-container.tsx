@@ -55,9 +55,11 @@ export const AuthContainer = (props: AuthContainerProps) => {
 
       authenticateGuest(guestUser);
 
-      toast.success(`Welcome, ${name}!`, {
+      toast.info(`Welcome, ${name}!`, {
         description:
-          "You're using Meelio as a guest. Your data will be stored locally.",
+          "As a guest, your data will be stored locally, and won't be synced across devices.",
+        duration: 15000,
+        position: "top-center",
       });
     } catch (error) {
       toast.error("Something went wrong", {
