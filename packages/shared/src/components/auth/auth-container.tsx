@@ -22,12 +22,14 @@ interface AuthContainerProps {
 
 export const AuthContainer = (props: AuthContainerProps) => {
   const { defaultMode = "name" } = props;
-  const { authenticateGuest } = useAuthStore((state) => ({
+  const { user, guestUser, authenticateGuest } = useAuthStore((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
     authenticateGuest: state.authenticateGuest,
   }));
 
   const [mode, setMode] = useState<AuthMode>(defaultMode);
-  const [name, setName] = useState<string>("");
+  const [name, setName] = useState<string>(user?.name || guestUser?.name || "");
   const [nameError, setNameError] = useState<string>("");
 
   const handleNameSubmit = (e: React.FormEvent) => {

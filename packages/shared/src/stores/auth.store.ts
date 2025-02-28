@@ -20,15 +20,14 @@ export const useAuthStore = create<AuthState>()(
       guestUser: null,
       loading: true,
       authenticate: (user: AuthUser) =>
-        set((state) => ({ ...state, user, guestUser: null, loading: false })),
+        set((state) => ({ ...state, user, loading: false })),
       authenticateGuest: (user: GuestUser) =>
         set((state) => ({
           ...state,
           guestUser: user,
-          user: null,
           loading: false,
         })),
-      logout: () => set(() => ({ user: null })),
+      logout: () => set(() => ({ user: null, guestUser: null })),
     }),
     {
       name: "meelio:local:user",

@@ -36,7 +36,7 @@ const Home = () => {
   }
 
   return (
-    <AppProvider platform="extension">
+    <>
       <Background />
       <BackgroundOverlay />
       <AppLayout>
@@ -44,7 +44,7 @@ const Home = () => {
         <Content />
         <BottomBar />
       </AppLayout>
-    </AppProvider>
+    </>
   );
 };
 
@@ -126,5 +126,12 @@ const BottomBar = () => {
   );
 };
 
-export default Home;
+export const NewTab = () => {
+  return (
+    <AppProvider platform="extension">
+      <Home />
+    </AppProvider>
+  );
+};
 
+export default NewTab;
