@@ -150,11 +150,13 @@ export const WebTimer = () => {
       isRunning: false,
       endTimestamp: null,
       sessionCount: 0,
-      activeStage: PomodoroStage.Focus,
+      activeStage,
       lastUpdated: Date.now()
     });
     setHasStarted(false);
+    setRemaining(stageDurations[PomodoroStage.Focus]);
   };
+
 
   const handleSwitch = () => {
     const nextStage = getNextStage(usePomodoroStore.getState());
@@ -192,12 +194,15 @@ export const WebTimer = () => {
           });
           break;
         case 'RESET_COMPLETE':
-          setRemaining(stageDurations[activeStage]);
           usePomodoroStore.setState({
             isRunning: false,
             endTimestamp: null,
+            sessionCount: 0,
+            activeStage,
             lastUpdated: Date.now()
           });
+          setHasStarted(false);
+          setRemaining(stageDurations[activeStage]);
           break;
       }
     };

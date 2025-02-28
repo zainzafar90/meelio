@@ -146,10 +146,11 @@ export const ExtensionTimer = () => {
       isRunning: false,
       endTimestamp: null,
       sessionCount: 0,
-      activeStage: PomodoroStage.Focus,
+      activeStage,
       lastUpdated: Date.now()
     });
     setHasStarted(false);
+    setRemaining(stageDurations[activeStage]);
   };
 
   const handleSwitch = () => {
@@ -183,12 +184,15 @@ export const ExtensionTimer = () => {
           });
           break;
         case 'RESET_COMPLETE':
-          setRemaining(stageDurations[activeStage]);
           usePomodoroStore.setState({
             isRunning: false,
             endTimestamp: null,
+            sessionCount: 0,
+            activeStage,
             lastUpdated: Date.now()
           });
+          setHasStarted(false);
+          setRemaining(stageDurations[activeStage]);
           break;
       }
     };
