@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import mantras from "../data/mantras.json";
+import { persist } from "zustand/middleware";
 
 /**
  * ------------
@@ -54,12 +55,19 @@ const getGreeting = (hour: number, t: (key: string) => string) => {
   else return t("home.greetings.night");
 };
 
-export const useGreetingStore = create<GreetingStore>((set) => ({
-  greeting: "",
-  updateGreeting: (time, t) => {
-    const hour = time.getHours();
-    const newGreeting = getGreeting(hour, t);
+export const useGreetingStore = create<GreetingStore>()(
+  persist(
+    (set) => ({
+      greeting: "",
+      updateGreeting: (time, t) => {
+        const hour = time.getHours();
+        const newGreeting = getGreeting(hour, t);
 
-    set({ greeting: newGreeting });
-  },
-}));
+        set({ greeting: newGreeting });
+      },
+    }),
+    {
+      name: "meelio:local:greeting",
+    }
+  )
+);

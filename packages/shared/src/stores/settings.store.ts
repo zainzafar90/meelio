@@ -1,5 +1,5 @@
 import { create } from "zustand";
-
+import { persist } from "zustand/middleware";
 export type SettingsTab =
   | "general"
   | "appearance"
@@ -16,10 +16,17 @@ interface SettingsState {
   setTab: (tab: SettingsTab) => void;
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
-  isOpen: false,
-  currentTab: "general",
-  openSettings: () => set({ isOpen: true }),
-  closeSettings: () => set({ isOpen: false }),
-  setTab: (tab) => set({ currentTab: tab }),
-}));
+export const useSettingsStore = create<SettingsState>()(
+  persist(
+    (set) => ({
+      isOpen: false,
+      currentTab: "general",
+      openSettings: () => set({ isOpen: true }),
+      closeSettings: () => set({ isOpen: false }),
+      setTab: (tab) => set({ currentTab: tab }),
+    }),
+    {
+      name: "meelio:local:settings",
+    }
+  )
+);

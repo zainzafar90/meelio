@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set(() => ({ user: null })),
     }),
     {
-      name: "auth-storage",
+      name: "meelio:local:user",
       storage: createJSONStorage(() => localStorage),
       version: 1,
     }

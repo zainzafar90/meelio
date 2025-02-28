@@ -16,7 +16,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       resetOnboarding: () => set({ hasDockOnboardingCompleted: false }),
     }),
     {
-      name: "meelio-onboarding",
+      name: "meelio:local:onboarding",
     }
   )
 );

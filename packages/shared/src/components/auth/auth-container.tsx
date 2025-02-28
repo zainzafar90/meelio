@@ -8,7 +8,10 @@ import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "../../lib/utils";
 import { buttonVariants } from "@repo/ui/components/ui/button";
 
-import { GuestAuthForm } from "./guest-auth-form";
+import { toast } from "sonner";
+import { GuestUser } from "../../types/auth";
+import { useAuthStore } from "../../stores/auth.store";
+
 type AuthMode = "name" | "login" | "guest";
 
 interface AuthContainerProps {
@@ -19,6 +22,7 @@ export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [name, setName] = useState<string>("");
   const [nameError, setNameError] = useState<string>("");
+  const authenticateGuest = useAuthStore((state) => state.authenticateGuest);
 
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +33,29 @@ export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
     setMode("login");
   };
 
-  const handleContinueAsGuest = () => {
-    // Store the name in IndexedDB
-    localStorage.setItem("guestName", name);
-    setMode("guest");
+  const handleContinueAsGuest = async () => {
+    try {
+      setMode("guest");
+      localStorage.setItem("meelio:local:name", JSON.stringify(name));
+
+      const guestUser: GuestUser = {
+        id: `guest-${Date.now()}`,
+        name,
+        role: "guest",
+        createdAt: new Date().toISOString(),
+      };
+
+      authenticateGuest(guestUser);
+
+      toast.success(`Welcome, ${name}!`, {
+        description:
+          "You're using Meelio as a guest. Your data will be stored locally.",
+      });
+    } catch (error) {
+      toast.error("Something went wrong", {
+        description: "Unable to create guest account. Please try again.",
+      });
+    }
   };
 
   const renderNameForm = () => {
@@ -83,8 +106,6 @@ export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
             onGuestContinue={handleContinueAsGuest}
           />
         );
-      case "guest":
-        return <GuestAuthForm initialName={name} />;
     }
   };
 
