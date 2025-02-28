@@ -70,13 +70,11 @@ export const WebTimer = () => {
     try {
         await addPomodoroSession(sessionData);
       
-      // If it's a focus session, also create a focus session record for syncing
       if (isFocus) {
         const now = new Date();
         const sessionEndTime = now;
         const sessionStartTime = new Date(now.getTime() - (state.stageDurations[PomodoroStage.Focus] * 1000));
         
-        // Create focus session data for syncing
         const focusSessionData = {
           id: crypto.randomUUID(),
           sessionStart: sessionStartTime.toISOString(),
@@ -87,10 +85,9 @@ export const WebTimer = () => {
           _version: 1,
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          userId: 'web-user' // We'll need to replace this with the actual user ID if available
+          userId: 'web-user' 
         };
         
-        // Add to sync queue
         timerSyncQueue.addOperation({
           entity: "focus-sessions",
           operation: "create",
@@ -194,6 +191,14 @@ export const WebTimer = () => {
             lastUpdated: Date.now()
           });
           break;
+        case 'RESET_COMPLETE':
+          setRemaining(stageDurations[activeStage]);
+          usePomodoroStore.setState({
+            isRunning: false,
+            endTimestamp: null,
+            lastUpdated: Date.now()
+          });
+          break;
       }
     };
 
@@ -222,22 +227,6 @@ export const WebTimer = () => {
 
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
-
-  // useEffect(() => {
-  //   return usePomodoroStore.subscribe(
-  //     (state) => {
-  //       if (state.lastUpdated > Date.now() - 100) {
-  //         if (!state.isRunning && state.pausedRemaining !== null) {
-  //           workerRef.current?.postMessage({
-  //             type: 'FORCE_SYNC',
-  //             payload: { duration: state.pausedRemaining }
-  //           });
-  //           setRemaining(state.pausedRemaining);
-  //         }
-  //       }
-  //     }
-  //   );
-  // }, []);
 
   return (
     <div className="relative">

@@ -66,13 +66,11 @@ export const ExtensionTimer = () => {
     try {
       await addPomodoroSession(sessionData);
       
-      // If it's a focus session, also create a focus session record for syncing
       if (isFocus) {
         const now = new Date();
         const sessionEndTime = now;
         const sessionStartTime = new Date(now.getTime() - (state.stageDurations[PomodoroStage.Focus] * 1000));
         
-        // Create focus session data for syncing
         const focusSessionData = {
           id: crypto.randomUUID(),
           sessionStart: sessionStartTime.toISOString(),
@@ -83,10 +81,9 @@ export const ExtensionTimer = () => {
           _version: 1,
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          userId: 'extension-user' // We'll need to replace this with the actual user ID if available
+          userId: 'extension-user'
         };
         
-        // Add to sync queue
         timerSyncQueue.addOperation({
           entity: "focus-sessions",
           operation: "create",
@@ -179,6 +176,14 @@ export const ExtensionTimer = () => {
           break;
         case 'PAUSED':
           setRemaining(msg.remaining);
+          usePomodoroStore.setState({
+            isRunning: false,
+            endTimestamp: null,
+            lastUpdated: Date.now()
+          });
+          break;
+        case 'RESET_COMPLETE':
+          setRemaining(stageDurations[activeStage]);
           usePomodoroStore.setState({
             isRunning: false,
             endTimestamp: null,

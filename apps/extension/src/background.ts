@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       interval = null;
       endTime = 0;
       currentDuration = 0;
+      chrome.runtime.sendMessage({ type: 'RESET_COMPLETE' });
       break;
 
     case 'UPDATE_DURATION':
