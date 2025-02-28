@@ -33,7 +33,7 @@ export const DockSettings = () => {
         id: "timer",
         name: t("common.pomodoro"),
         description: t("settings.dock.timer.description"),
-        icon: Icons.worldClock,
+        icon: Icons.pomodoro,
         isVisible: dockIconsVisible.timer,
       },
       {

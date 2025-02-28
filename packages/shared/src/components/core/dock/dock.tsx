@@ -113,8 +113,8 @@ export const Dock = () => {
             {
               id: "timer",
               name: t("common.pomodoro"),
-              icon: Icons.worldClock,
-              activeIcon: Icons.worldClockActive,
+              icon: Icons.pomodoro,
+              activeIcon: Icons.pomodoroActive,
               onClick: toggleTimer,
             },
           ]
