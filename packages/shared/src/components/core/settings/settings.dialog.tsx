@@ -110,7 +110,13 @@ export function SettingsDialog() {
               {!user && guestUser && (
                 <SidebarGroup>
                   <LoginButton className="w-full">
-                    <button className="flex w-full items-center gap-2 px-3 py-2 rounded-md bg-sky-500/90 hover:bg-sky-600/90 text-white font-medium shadow-sm transition-colors backdrop-blur-sm animate-pulse">
+                    <button
+                      className={cn(
+                        "flex w-full items-center gap-2 px-3 py-2 rounded-md",
+                        "bg-gradient-to-r from-blue-500 to-sky-500",
+                        "text-white font-medium shadow-sm transition-colors backdrop-blur-sm animate-pulse duration-1000"
+                      )}
+                    >
                       <div className="flex flex-col w-full text-left text-sm">
                         Login
                         <small className="opacity-80 text-xs">

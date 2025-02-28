@@ -307,6 +307,10 @@
         "title": "Dock Items Visibility",
         "description": "Control which items are visible in the dock"
       },
+      "show-icon-labels": {
+        "title": "Show Icon Labels",
+        "description": "Show the labels for the icons in the dock"
+      },
       "timer": {
         "description": "Timer for focused work sessions"
       },

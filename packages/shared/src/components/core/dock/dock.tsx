@@ -239,7 +239,7 @@ export const Dock = () => {
     <div className="relative z-50" ref={dockRef}>
       <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 pr-1">
+          <div className="flex items-center gap-4 pr-1">
             {visibleItems.map((item, index) => (
               <div
                 key={index}

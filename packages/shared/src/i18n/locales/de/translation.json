@@ -308,6 +308,10 @@
         "title": "Dock-Element-Sichtbarkeit",
         "description": "Steuere, welche Elemente im Dock sichtbar sind"
       },
+      "show-icon-labels": {
+        "title": "Icon-Labels anzeigen",
+        "description": "Zeige die Labels für die Icons im Dock an"
+      },
       "timer": {
         "description": "Timer für fokussierte Arbeitssitzungen"
       },

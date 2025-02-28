@@ -29,6 +29,8 @@ interface DockState {
 
   currentOnboardingStep: number;
 
+  showIconLabels: boolean;
+
   // Modal toggle functions
   toggleTimer: () => void;
   toggleBreathing: () => void;
@@ -56,6 +58,7 @@ interface DockState {
   ) => void;
 
   setCurrentOnboardingStep: (step: number) => void;
+  setShowIconLabels: (visible: boolean) => void;
   reset: () => void;
 }
 
@@ -84,6 +87,8 @@ export const useDockStore = create<DockState>()(
         clock: false,
         calendar: true,
       },
+
+      showIconLabels: false,
 
       currentOnboardingStep: -1,
 
@@ -178,6 +183,10 @@ export const useDockStore = create<DockState>()(
 
       setCurrentOnboardingStep: (step: number) => {
         set({ currentOnboardingStep: step });
+      },
+
+      setShowIconLabels: (visible: boolean) => {
+        set({ showIconLabels: visible });
       },
 
       reset: () => {
