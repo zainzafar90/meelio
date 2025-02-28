@@ -41,8 +41,8 @@ export const Greeting = () => {
 
   const getFirstName = () => {
     if (!user && !guestUser) return "";
-    if (user) return user.name.split(" ")[0];
-    if (guestUser) return guestUser.name.split(" ")[0];
+    if (user) return user?.name?.split(" ")[0];
+    if (guestUser) return guestUser?.name?.split(" ")[0];
   };
 
   const handleClick = () => {

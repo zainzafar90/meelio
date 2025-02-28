@@ -1,13 +1,14 @@
 import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
-import { PomodoroStage, PomodoroState, db } from '@repo/shared';
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
+import { PomodoroStage, PomodoroState, } from '@repo/shared';
 
-const broadcastChannel = new BroadcastChannel('meelio:broadcast:pomodoro-sync');
+// const broadcastChannel = new BroadcastChannel('meelio:broadcast:pomodoro-sync');
 
 export const usePomodoroStore = create(
-  subscribeWithSelector<PomodoroState>(() => ({
-    id: 1,
-    stats: {
+  persist(
+    subscribeWithSelector<PomodoroState>(() => ({
+      id: 1,
+      stats: {
       todaysFocusSessions: 0,
       todaysBreaks: 0,
       todaysFocusTime: 0,
@@ -25,20 +26,26 @@ export const usePomodoroStore = create(
     enableSound: false,
     pausedRemaining: null,
     lastUpdated: Date.now()
-  }))
+  })),
+    {
+      name: 'meelio:local:pomodoro',
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+    }
+  )
 );
 
 // Sync between tabs
-broadcastChannel.onmessage = async (event) => {
-  if (event.data.type === 'STATE_UPDATE') {
-    const remoteState = event.data.state;
-    const localState = usePomodoroStore.getState();
+// broadcastChannel.onmessage = async (event) => {
+//   if (event.data.type === 'STATE_UPDATE') {
+//     const remoteState = event.data.state;
+//     const localState = usePomodoroStore.getState();
 
-    if (remoteState.lastUpdated > localState.lastUpdated) {
-      usePomodoroStore.setState(remoteState);
-    }
-  }
-};
+//     if (remoteState.lastUpdated > localState.lastUpdated) {
+//       usePomodoroStore.setState(remoteState);
+//     }
+//   }
+// };
 
 // /**
 //  * Persist state to DB and broadcast to other tabs
