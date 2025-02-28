@@ -112,7 +112,10 @@ export const DockSettings = () => {
         </p>
       </div>
 
-      <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">
+      <div
+        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+        onClick={() => setShowIconLabels(!showIconLabels)}
+      >
         <div className="flex items-center space-x-4">
           <div className="space-y-1">
             <p className="text-sm text-muted-foreground">
