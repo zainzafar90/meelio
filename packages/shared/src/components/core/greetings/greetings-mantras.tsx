@@ -11,7 +11,10 @@ import {
 import { useInterval } from "../../../hooks";
 
 export const Greeting = () => {
-  const { user } = useAuthStore();
+  const { user, guestUser } = useAuthStore((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+  }));
   const { t } = useTranslation();
   const { greeting, updateGreeting } = useGreetingStore();
   const { currentMantra, updateMantra } = useMantraStore();
@@ -37,8 +40,9 @@ export const Greeting = () => {
   );
 
   const getFirstName = () => {
-    if (!user || !user.name) return "";
-    return user.name.split(" ")[0];
+    if (!user && !guestUser) return "";
+    if (user) return user.name.split(" ")[0];
+    if (guestUser) return guestUser.name.split(" ")[0];
   };
 
   const handleClick = () => {

@@ -22,7 +22,7 @@ import { SiteBlockerSheet } from "@repo/shared";
 import { toast } from "sonner";
 
 const Home = () => {
-  const { user, loading, authenticate } = useAuthStore();
+  const { user, guestUser, loading, authenticate } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -68,7 +68,8 @@ const Home = () => {
     );
   }
 
-  if (!user) {
+
+  if (!user && !guestUser) {
     return (
       <>
         <Background />

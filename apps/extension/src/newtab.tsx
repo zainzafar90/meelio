@@ -23,9 +23,9 @@ import { ExtensionTimer } from "./components/extension-timer";
 import "./style.css";
 
 const Home = () => {
-  const { user } = useAuthStore();
+  const { user, guestUser } = useAuthStore();
 
-  if (!user) {
+  if (!user && !guestUser) {
     return (
       <>
         <Background />

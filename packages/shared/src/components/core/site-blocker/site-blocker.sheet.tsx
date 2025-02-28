@@ -17,7 +17,6 @@ import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
 import { PremiumFeatureTooltip } from "../../../components/common/premium-feature-tooltip";
 import { Icons } from "../../../components/icons";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../stores/auth.store";
 
 const isExtension =
@@ -30,7 +29,6 @@ export const SiteBlockerSheet = () => {
     toggleSiteBlocker: state.toggleSiteBlocker,
   }));
   const { user } = useAuthStore();
-  const navigate = useNavigate();
 
   return (
     <Sheet open={isSiteBlockerVisible} onOpenChange={toggleSiteBlocker}>
@@ -108,7 +106,7 @@ export const SiteBlockerSheet = () => {
                 <Button
                   variant="default"
                   className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
-                  onClick={() => navigate("/settings/billing")}
+                  onClick={() => console.log("/settings/billing")}
                 >
                   {t("site-blocker.upgrade")}
                 </Button>

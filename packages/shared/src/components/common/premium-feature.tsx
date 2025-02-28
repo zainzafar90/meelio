@@ -2,7 +2,6 @@ import React from "react";
 import { useAuthStore } from "../../stores/auth.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../icons/icons";
-import { useNavigate } from "react-router-dom";
 
 interface PremiumFeatureProps {
   children: React.ReactNode;
@@ -27,19 +26,15 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   requirePro = false,
 }) => {
   const { user } = useAuthStore();
-  const navigate = useNavigate();
 
-  // If authentication is not required or user is authenticated and pro status matches requirement
   if (!requireAuth || (user && (!requirePro || user.isPro))) {
     return <>{children}</>;
   }
 
-  // If a custom fallback is provided, use it
   if (fallback) {
     return <>{fallback}</>;
   }
 
-  // Default fallback UI
   return (
     <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center border rounded-lg bg-muted/30">
       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
@@ -55,9 +50,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
       </div>
       <div className="flex flex-col sm:flex-row gap-2">
         {!user ? (
-          <Button onClick={() => navigate("/auth?mode=login")}>Sign In</Button>
+          <Button onClick={() => console.log("/auth?mode=login")}>
+            Sign In
+          </Button>
         ) : (
-          <Button onClick={() => navigate("/settings/billing")}>
+          <Button onClick={() => console.log("/settings/billing")}>
             Upgrade to Pro
           </Button>
         )}

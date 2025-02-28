@@ -1,53 +1,90 @@
 import { useState } from "react";
 import { Logomark } from "../common/logo";
 import { UserAuthForm } from "./user-auth-form";
-import { GuestAuthForm } from "./guest-auth-form";
 import { AuthLayout } from "./auth-layout";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import { Button } from "@repo/ui/components/ui/button";
+import { cn } from "../../lib/utils";
+import { buttonVariants } from "@repo/ui/components/ui/button";
 
-type AuthMode = "login" | "register" | "guest";
+import { GuestAuthForm } from "./guest-auth-form";
+type AuthMode = "name" | "login" | "guest";
 
 interface AuthContainerProps {
   defaultMode?: AuthMode;
 }
 
-export const AuthContainer = ({
-  defaultMode = "login",
-}: AuthContainerProps) => {
+export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
   const [mode, setMode] = useState<AuthMode>(defaultMode);
+  const [name, setName] = useState<string>("");
+  const [nameError, setNameError] = useState<string>("");
+
+  const handleNameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setNameError("Please enter your name");
+      return;
+    }
+    setMode("login");
+  };
+
+  const handleContinueAsGuest = () => {
+    // Store the name in IndexedDB
+    localStorage.setItem("guestName", name);
+    setMode("guest");
+  };
+
+  const renderNameForm = () => {
+    return (
+      <form onSubmit={handleNameSubmit} className="grid gap-4">
+        <div className="grid gap-2">
+          <div className="grid gap-1">
+            <Label className="sr-only" htmlFor="name">
+              Name
+            </Label>
+            <Input
+              id="name"
+              placeholder="Enter your name"
+              type="text"
+              autoCapitalize="words"
+              autoComplete="name"
+              autoCorrect="off"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => {
+                if (!name.trim()) {
+                  setNameError("Name is required");
+                } else {
+                  setNameError("");
+                }
+              }}
+            />
+            {nameError && (
+              <p className="px-1 text-xs text-red-600">{nameError}</p>
+            )}
+          </div>
+          <Button className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
+            Continue
+          </Button>
+        </div>
+      </form>
+    );
+  };
 
   const renderForm = () => {
     switch (mode) {
-      case "login":
-        return <UserAuthForm />;
-      case "guest":
-        return <GuestAuthForm />;
-    }
-  };
-
-  const renderLinks = () => {
-    switch (mode) {
+      case "name":
+        return renderNameForm();
       case "login":
         return (
-          <div className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
-            <button
-              onClick={() => setMode("guest")}
-              className="hover:text-brand underline underline-offset-4"
-            >
-              Continue as Guest
-            </button>
-          </div>
+          <UserAuthForm
+            userName={name}
+            onGuestContinue={handleContinueAsGuest}
+          />
         );
       case "guest":
-        return (
-          <div className="text-center text-sm text-muted-foreground">
-            <button
-              onClick={() => setMode("login")}
-              className="hover:text-brand underline underline-offset-4"
-            >
-              Have an account? Sign in
-            </button>
-          </div>
-        );
+        return <GuestAuthForm initialName={name} />;
     }
   };
 
@@ -67,8 +104,6 @@ export const AuthContainer = ({
               </p>
 
               {renderForm()}
-
-              {renderLinks()}
             </div>
           </div>
         </div>

@@ -23,10 +23,16 @@ export function loginAccount({
 
 export function sendMagicLink({
   email,
+  name,
 }: {
   email: string;
+  name?: string;
 }): Promise<AxiosResponse> {
-  return axios.post("/v1/account/send-magic-link", {}, { params: { email } });
+  return axios.post(
+    "/v1/account/send-magic-link",
+    {},
+    { params: { email, name } }
+  );
 }
 
 export function verifyMagicLink({

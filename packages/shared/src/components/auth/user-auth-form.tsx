@@ -16,7 +16,15 @@ import { userAuthSchema } from "../../lib/validations/auth";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
-export const UserAuthForm = () => {
+interface UserAuthFormProps {
+  userName: string;
+  onGuestContinue: () => void;
+}
+
+export const UserAuthForm = ({
+  userName,
+  onGuestContinue,
+}: UserAuthFormProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
 
@@ -30,6 +38,8 @@ export const UserAuthForm = () => {
 
   const handleGoogleClick = async () => {
     setIsGoogleLoading(true);
+    // Store the name before redirecting
+    localStorage.setItem("pendingUserName", userName);
     window.location.href = `${env.serverUrl}/v1/account/google`;
   };
 
@@ -38,6 +48,7 @@ export const UserAuthForm = () => {
     try {
       await api.auth.sendMagicLink({
         email: data.email,
+        // name: userName, // Pass the name to the magic link API
       });
       toast("We sent you a magic link.", {
         description:
@@ -55,6 +66,13 @@ export const UserAuthForm = () => {
 
   return (
     <>
+      <div className="text-center mb-4">
+        <p className="text-muted-foreground">
+          Hello{" "}
+          <span className="font-semibold text-foreground">{userName}</span>, how
+          would you like to continue?
+        </p>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
@@ -95,18 +113,31 @@ export const UserAuthForm = () => {
           </span>
         </div>
       </div>
-      <Button
-        type="button"
-        onClick={handleGoogleClick}
-        className={cn(buttonVariants({ size: "lg", variant: "default" }))}
-      >
-        {isGoogleLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.google className="mr-2 h-4 w-4" />
-        )}{" "}
-        Google
-      </Button>
+      <div className="grid gap-6">
+        <Button
+          type="button"
+          onClick={handleGoogleClick}
+          className={cn(buttonVariants({ size: "lg", variant: "default" }))}
+          disabled={isGoogleLoading}
+        >
+          {isGoogleLoading ? (
+            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Icons.google className="mr-2 h-4 w-4" />
+          )}{" "}
+          Google
+        </Button>
+        <Button
+          type="button"
+          onClick={onGuestContinue}
+          className={cn(
+            buttonVariants({ size: "lg", variant: "default" }),
+            "bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white shadow-sm"
+          )}
+        >
+          Guest Mode
+        </Button>
+      </div>
     </>
   );
 };

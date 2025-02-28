@@ -57,6 +57,7 @@ const verifyEmail = {
 const magicLinkEmail = {
   query: Joi.object().keys({
     email: Joi.string().email().required(),
+    name: Joi.string().optional(),
   }),
 };
 

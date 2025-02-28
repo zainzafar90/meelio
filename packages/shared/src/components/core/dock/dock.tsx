@@ -93,7 +93,10 @@ export const Dock = () => {
     dockIconsVisible: state.dockIconsVisible,
   }));
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user, guestUser } = useAuthStore((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+  }));
 
   const items = useMemo(
     () => [
@@ -343,7 +346,7 @@ export const Dock = () => {
         </div>
       )}
 
-      {user && <DockOnboarding />}
+      {(user || guestUser) && <DockOnboarding />}
     </div>
   );
 };

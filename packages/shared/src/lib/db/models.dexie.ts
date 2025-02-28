@@ -103,10 +103,3 @@ export interface DailySummary {
   totalFocusTime: number; // in seconds
   totalBreakTime: number; // in seconds
 }
-
-export interface FocusSession extends BaseModel {
-  userId: string;
-  sessionStart: string;
-  sessionEnd: string;
-  duration: number;
-}

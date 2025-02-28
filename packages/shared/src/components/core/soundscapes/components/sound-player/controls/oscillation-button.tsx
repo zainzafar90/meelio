@@ -1,8 +1,3 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/ui/tooltip";
 import gsap from "gsap";
 
 import { cn } from "../../../../../../lib";
