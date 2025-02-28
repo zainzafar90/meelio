@@ -13,6 +13,7 @@ import { cn } from "../../lib/utils";
 import { api } from "../../api";
 import { env } from "../../utils";
 import { userAuthSchema } from "../../lib/validations/auth";
+import { useAuthStore } from "../../stores/auth.store";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
@@ -25,6 +26,10 @@ export const UserAuthForm = ({
   userName,
   onGuestContinue,
 }: UserAuthFormProps) => {
+  const { guestUser } = useAuthStore((state) => ({
+    guestUser: state.guestUser,
+  }));
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
 
@@ -127,16 +132,18 @@ export const UserAuthForm = ({
           )}{" "}
           Google
         </Button>
-        <Button
-          type="button"
-          onClick={onGuestContinue}
-          className={cn(
-            buttonVariants({ size: "lg", variant: "default" }),
-            "bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white shadow-sm"
-          )}
-        >
-          Guest Mode
-        </Button>
+        {!guestUser && (
+          <Button
+            type="button"
+            onClick={onGuestContinue}
+            className={cn(
+              buttonVariants({ size: "lg", variant: "default" }),
+              "bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white shadow-sm"
+            )}
+          >
+            Guest Mode
+          </Button>
+        )}
       </div>
     </>
   );

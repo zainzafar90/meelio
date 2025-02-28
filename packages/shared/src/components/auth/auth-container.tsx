@@ -11,18 +11,24 @@ import { buttonVariants } from "@repo/ui/components/ui/button";
 import { toast } from "sonner";
 import { GuestUser } from "../../types/auth";
 import { useAuthStore } from "../../stores/auth.store";
+import { Icons } from "../icons";
 
 type AuthMode = "name" | "login" | "guest";
 
 interface AuthContainerProps {
   defaultMode?: AuthMode;
+  onClose?: () => void;
 }
 
-export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
+export const AuthContainer = (props: AuthContainerProps) => {
+  const { defaultMode = "name" } = props;
+  const { authenticateGuest } = useAuthStore((state) => ({
+    authenticateGuest: state.authenticateGuest,
+  }));
+
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [name, setName] = useState<string>("");
   const [nameError, setNameError] = useState<string>("");
-  const authenticateGuest = useAuthStore((state) => state.authenticateGuest);
 
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +118,14 @@ export const AuthContainer = ({ defaultMode = "name" }: AuthContainerProps) => {
   return (
     <div className="dark z-10 m-16 fixed inset-0 max-w-4xl mx-auto overflow-hidden">
       <AuthLayout>
+        {props.onClose && (
+          <button
+            className="absolute top-4 right-4 z-10 rounded-full bg-zinc-800/50 p-2 hover:bg-zinc-800"
+            onClick={() => props.onClose?.()}
+          >
+            <Icons.close className="h-4 w-4 text-white/80" />
+          </button>
+        )}
         <div className="flex items-center justify-center">
           <div className="flex flex-col justify-center items-center gap-y-8 max-w-96 w-full">
             <Logomark className="text-background dark:text-foreground inline-block w-32" />
