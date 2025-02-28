@@ -17,6 +17,7 @@ export class SyncQueue {
   private queue: SyncOperation[] = [];
   private isProcessing = false;
   private maxRetries = 3;
+  private SYNC_KEY = "meelio:sync-queue";
 
   constructor() {
     this.loadQueueFromStorage();
@@ -24,14 +25,14 @@ export class SyncQueue {
   }
 
   private loadQueueFromStorage() {
-    const savedQueue = localStorage.getItem("syncQueue");
+    const savedQueue = localStorage.getItem(this.SYNC_KEY);
     if (savedQueue) {
       this.queue = JSON.parse(savedQueue);
     }
   }
 
   private saveQueueToStorage() {
-    localStorage.setItem("syncQueue", JSON.stringify(this.queue));
+    localStorage.setItem(this.SYNC_KEY, JSON.stringify(this.queue));
   }
 
   addOperation(operation: Omit<SyncOperation, "id" | "timestamp" | "retries">) {
