@@ -6,11 +6,14 @@ import { useAuthStore } from "../../../../../stores/auth.store";
 import { useAppStore } from "../../../../../stores/app.store";
 
 export function ProfileDropdown() {
-  const { user } = useAuthStore();
+  const { t } = useTranslation();
+
   const appVersion = useAppStore((state) => state.version);
+  const { user } = useAuthStore((state) => ({
+    user: state.user,
+  }));
   const profileImage = user?.image;
   const isProMember = user?.isPro;
-  const { t } = useTranslation();
 
   return (
     <SidebarMenuButton size="lg" asChild>
