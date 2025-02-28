@@ -111,7 +111,7 @@ export function SettingsDialog() {
                 <SidebarGroup>
                   <LoginButton className="w-full">
                     <div className="relative">
-                      <button
+                      <div
                         className={cn(
                           "flex w-full items-center gap-2 px-3 py-2 rounded-md",
                           "bg-gradient-to-r from-blue-500 to-sky-500",
@@ -125,7 +125,7 @@ export function SettingsDialog() {
                           </small>
                         </div>
                         <LogoMonochrome className="h-6 w-6 text-white" />
-                      </button>
+                      </div>
                       <span className="absolute -top-1 -left-1 h-3 w-3 isolate">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 -top-1 right-0 bg-blue-500"></span>

@@ -58,5 +58,12 @@ self.onmessage = function (e) {
         endTime = Date.now() + (currentDuration * 1000);
       }
       break;
+
+    case 'SKIP_TO_NEXT_STAGE':
+      if (interval) clearInterval(interval);
+      interval = null;
+      endTime = 0;
+      currentDuration = 0;
+      break;
   }
 };

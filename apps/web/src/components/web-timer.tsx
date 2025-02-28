@@ -173,6 +173,21 @@ export const WebTimer = () => {
     setRemaining(stageDurations[nextStage]);
   };
 
+  const handleSkipToNextStage = () => {
+    const nextStage = getNextStage(usePomodoroStore.getState());
+    workerRef.current?.postMessage({
+      type: 'SKIP_TO_NEXT_STAGE',
+      payload: { duration: stageDurations[nextStage] }
+    });
+    usePomodoroStore.setState({
+      activeStage: nextStage,
+      isRunning: false,
+      endTimestamp: null,
+      lastUpdated: Date.now()
+    });
+    setRemaining(stageDurations[nextStage]);
+  }
+
   useEffect(() => {
     workerRef.current = new TimerWorker();
 
@@ -289,12 +304,12 @@ export const WebTimer = () => {
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleSwitch}
-                title="Switch timer"
+                onClick={handleSkipToNextStage}
+                title="Skip to next timer"
                 role="button"
               >
                 <Icons.forward className="size-4 text-white/90" />
-                <span className="sr-only">Switch to next timer</span>
+                <span className="sr-only">Skip to next timer</span>
               </button>
 
               <button

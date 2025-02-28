@@ -53,14 +53,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       break;
 
-    // case 'FORCE_SYNC':
-    //   currentDuration = message.duration;
-    //   endTime = Date.now() + (message.duration * 1000);
-    //   if (interval) {
-    //     clearInterval(interval);
-    //     interval = null;
-    //   }
-    //   break;
+      case 'SKIP_TO_NEXT_STAGE':
+        if (interval) clearInterval(interval);
+        interval = null;
+        endTime = 0;
+        currentDuration = 0;
+        break;
       
   }
 }); 
