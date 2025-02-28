@@ -131,15 +131,15 @@ export const AuthContainer = (props: AuthContainerProps) => {
         <div className="flex items-center justify-center">
           <div className="flex flex-col justify-center items-center gap-y-8 max-w-96 w-full">
             <Logomark className="text-background dark:text-foreground inline-block w-32" />
-            <div className="mx-auto flex w-full flex-col justify-center space-y-6">
+            <div className="mx-auto flex w-full flex-col justify-center space-y-2">
               <h1 className="mt-4 font-heading text-xl/relaxed font-light bg-gradient-to-r from-red-400 via-orange-300 to-yellow-200 inline-block text-transparent bg-clip-text text-center">
                 Elevate Focus, Boost Productivity
               </h1>
-              <p className="mt-4 text-sm/6 text-gray-300 text-center">
-                Meelio is a minimalist app built for productivity. Its calm
-                design helps you focus and work efficiently.
+              <p className="mt-4 text-lg text-gray-300 text-center mb-6">
+                Focus and get more done with every new tab
               </p>
-
+            </div>
+            <div className="mx-auto flex w-full flex-col justify-center space-y-4">
               {renderForm()}
             </div>
           </div>

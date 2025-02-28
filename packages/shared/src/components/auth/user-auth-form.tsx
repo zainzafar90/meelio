@@ -70,7 +70,7 @@ export const UserAuthForm = ({
   return (
     <>
       <div className="text-center mb-4">
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-base">
           Hello{" "}
           <span className="font-semibold text-foreground">{userName}</span>, how
           would you like to continue?
