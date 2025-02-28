@@ -27,7 +27,7 @@ self.onmessage = function (e) {
           } else {
             self.postMessage({ type: 'TICK', remaining });
           }
-        }, 1000);
+        }, 250);
       }
       break;
 

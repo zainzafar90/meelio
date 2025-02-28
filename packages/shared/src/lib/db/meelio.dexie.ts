@@ -4,7 +4,6 @@ import type {
   Backgrounds,
   TodoList,
   Task,
-  PomodoroState,
   PomodoroSession,
   DailySummary,
 } from "./models.dexie";
@@ -68,7 +67,6 @@ export class MeelioDB extends Dexie {
   lists!: Table<TodoList>;
 
   // PomodoroDB tables
-  pomodoroState!: Table<PomodoroState, number>;
   focusSessions!: Table<PomodoroSession>;
   focusStats!: Table<DailySummary>;
 

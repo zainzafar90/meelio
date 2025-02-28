@@ -27,15 +27,15 @@ export const usePomodoroStore = create(
   }))
 );
 
-// Sync with chrome storage
-usePomodoroStore.subscribe((state) => {
-  chrome.storage.local.set({ pomodoroState: state });
-});
+// // Sync with chrome storage
+// usePomodoroStore.subscribe((state) => {
+//   chrome.storage.local.set({ pomodoroState: state });
+// });
 
-// Initialize from chrome storage
-chrome.storage.local.get('pomodoroState').then((result) => {
-  if (result.pomodoroState) {
-    usePomodoroStore.setState(result.pomodoroState);
-  }
-});
+// // Initialize from chrome storage
+// chrome.storage.local.get('pomodoroState').then((result) => {
+//   if (result.pomodoroState) {
+//     usePomodoroStore.setState(result.pomodoroState);
+//   }
+// });
 

@@ -37,3 +37,24 @@ export const PomodoroStageMap = {
   [PomodoroStage.Focus]: t("timer.stages.focus"),
   [PomodoroStage.Break]: t("timer.stages.shortBreak"),
 };
+
+export interface PomodoroState {
+  id: number;
+  stats: {
+    todaysFocusSessions: number;
+    todaysBreaks: number;
+    todaysFocusTime: number;
+    todaysBreakTime: number;
+  };
+  activeStage: PomodoroStage;
+  isRunning: boolean;
+  endTimestamp: number | null;
+  sessionCount: number;
+  stageDurations: {
+    [key in PomodoroStage]: number;
+  };
+  lastUpdated: number;
+  autoStartTimers: boolean;
+  enableSound: boolean;
+  pausedRemaining: number | null;
+}

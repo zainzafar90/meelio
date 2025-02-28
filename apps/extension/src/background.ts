@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           } else {
             chrome.runtime.sendMessage({ type: 'TICK', remaining });
           }
-        }, 1000);
+        }, 250);
       }
       break;
 
