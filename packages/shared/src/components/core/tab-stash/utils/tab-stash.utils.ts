@@ -76,7 +76,7 @@ export const restoreTabsToWindow = async (tabs: TabInfo[]): Promise<void> => {
 export const checkTabPermissions = async (): Promise<boolean> => {
   const platform = useAppStore.getState().platform;
 
-  if (platform === "web") {
+  if (platform === "web" || !chrome?.permissions) {
     return false;
   }
 
@@ -88,7 +88,7 @@ export const checkTabPermissions = async (): Promise<boolean> => {
 export const requestTabPermissions = async (): Promise<boolean> => {
   const platform = useAppStore.getState().platform;
 
-  if (platform === "web") {
+  if (platform === "web" || !chrome?.permissions) {
     return false;
   }
 

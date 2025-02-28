@@ -92,6 +92,7 @@ export const Dock = () => {
     toggleTabStash: state.toggleTabStash,
     dockIconsVisible: state.dockIconsVisible,
   }));
+
   const { t } = useTranslation();
   const { user, guestUser } = useAuthStore((state) => ({
     user: state.user,

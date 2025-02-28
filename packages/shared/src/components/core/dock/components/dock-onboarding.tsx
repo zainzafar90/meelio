@@ -129,77 +129,15 @@ export const DockOnboarding = () => {
       setCurrentOnboardingStep(-1); // Reset highlight
       setDockOnboardingCompleted();
     } else {
-      // Reset previous feature if it was toggled
-      const currentAction = ONBOARDING_STEPS[currentStep].action;
-      if (currentAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleBreathing,
-        }[currentAction];
-        actionFn?.();
-      }
-
       setCurrentStep((prev) => prev + 1);
-
-      const nextAction = ONBOARDING_STEPS[currentStep + 1]?.action;
-      if (nextAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleBreathing,
-        }[nextAction];
-        actionFn?.();
-      }
     }
-  }, [
-    currentStep,
-    setDockOnboardingCompleted,
-    setCurrentOnboardingStep,
-    toggleTimer,
-    toggleBreathing,
-  ]);
+  }, [currentStep, setDockOnboardingCompleted, setCurrentOnboardingStep]);
 
   const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
-      const currentAction = ONBOARDING_STEPS[currentStep].action;
-      if (currentAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleSoundscapes,
-          toggleBreathing,
-          toggleTodos,
-          toggleSiteBlocker,
-          toggleBackgrounds,
-          toggleTabStash,
-        }[currentAction];
-        actionFn?.();
-      }
-
       setCurrentStep((prev) => prev - 1);
-
-      const prevAction = ONBOARDING_STEPS[currentStep - 1]?.action;
-      if (prevAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleSoundscapes,
-          toggleBreathing,
-          toggleTodos,
-          toggleSiteBlocker,
-          toggleBackgrounds,
-          toggleTabStash,
-        }[prevAction];
-        actionFn?.();
-      }
     }
-  }, [
-    currentStep,
-    toggleTimer,
-    toggleSoundscapes,
-    toggleBreathing,
-    toggleTodos,
-    toggleSiteBlocker,
-    toggleBackgrounds,
-    toggleTabStash,
-  ]);
+  }, [currentStep]);
 
   const handleSkip = () => {
     // Reset any active features

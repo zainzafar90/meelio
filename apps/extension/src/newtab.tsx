@@ -51,9 +51,10 @@ const Home = () => {
 
 const Content = () => {
   const { t } = useTranslation();
-  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
+    isTimerVisible: state.isTimerVisible,
   }));
 
   return (
@@ -61,7 +62,7 @@ const Content = () => {
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
-      {isGreetingsVisible && <GreetingsContent />}
+      {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TodoListSheet />
