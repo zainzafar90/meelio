@@ -37,6 +37,8 @@ import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore, useAuthStore } from "../../../stores";
+import { LogoMonochrome } from "../../../components/common/logo";
+import { LoginButton } from "./components/common/login-protected";
 
 type SettingsNavItem = {
   id: SettingsTab;
@@ -56,7 +58,7 @@ const SETTINGS_NAV: SettingsNavItem[] = [
 export function SettingsDialog() {
   const { t } = useTranslation();
   const { isOpen, closeSettings, currentTab, setTab } = useSettingsStore();
-  const { user, logout } = useAuthStore((state) => state);
+  const { user, guestUser, logout } = useAuthStore((state) => state);
 
   const signOut = async () => {
     logout();
@@ -105,6 +107,21 @@ export function SettingsDialog() {
 
             {/* Sidebar Navigation Items */}
             <SidebarContent>
+              {!user && guestUser && (
+                <SidebarGroup>
+                  <LoginButton className="w-full">
+                    <button className="flex w-full items-center gap-2 px-3 py-2 rounded-md bg-sky-500/90 hover:bg-sky-600/90 text-white font-medium shadow-sm transition-colors backdrop-blur-sm animate-pulse">
+                      <div className="flex flex-col w-full text-left text-sm">
+                        Login
+                        <small className="opacity-80 text-xs">
+                          to save and sync your data
+                        </small>
+                      </div>
+                      <LogoMonochrome className="h-6 w-6 text-white" />
+                    </button>
+                  </LoginButton>
+                </SidebarGroup>
+              )}
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
