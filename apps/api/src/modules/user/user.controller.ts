@@ -151,10 +151,10 @@ export const userController = {
     }
   ),
 
-  createGuestUser: catchAsync(async (req: Request, res: Response) => {
-    const user = await userService.createGuestUser(req.body.name);
-    res.status(httpStatus.CREATED).send(user);
-  }),
+  // createGuestUser: catchAsync(async (req: Request, res: Response) => {
+  //   const user = await userService.createGuestUser(req.body.name);
+  //   res.status(httpStatus.CREATED).send(user);
+  // }),
 
   convertGuestToRegular: catchAsync(async (req: Request, res: Response) => {
     const user = await userService.updateGuestToRegular(req.params.userId, {

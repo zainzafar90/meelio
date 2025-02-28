@@ -52,7 +52,7 @@ export const AuthContainer = ({
   };
 
   return (
-    <div className="z-10 m-16 fixed inset-0 max-w-4xl mx-auto overflow-hidden">
+    <div className="dark z-10 m-16 fixed inset-0 max-w-4xl mx-auto overflow-hidden">
       <AuthLayout>
         <div className="flex items-center justify-center">
           <div className="flex flex-col justify-center items-center gap-y-8 max-w-96 w-full">

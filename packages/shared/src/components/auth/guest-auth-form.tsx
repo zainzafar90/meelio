@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../icons/icons";
 import { cn } from "@repo/ui/lib/utils";
 import { buttonVariants } from "@repo/ui/components/ui/button";
-import { createGuestUser } from "../../api/auth.api";
+// import { createGuestUser } from "../../api/auth.api";
 import { useAuthStore } from "../../stores/auth.store";
 import { toast } from "sonner";
 
 export const GuestAuthForm = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const authenticate = useAuthStore((state) => state.authenticate);
 
   const [name, setName] = useState("");
@@ -26,20 +26,20 @@ export const GuestAuthForm = () => {
     }
 
     setIsLoading(true);
-    try {
-      const { data: user } = await createGuestUser({
-        name: name.trim(),
-      });
-      authenticate(user);
-      toast.success("Welcome to Meelio!");
-      navigate("/");
-    } catch (error) {
-      toast.error("Something went wrong", {
-        description: "Unable to create guest account. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    // try {
+    //   const { data: user } = await createGuestUser({
+    //     name: name.trim(),
+    //   });
+    //   authenticate(user);
+    //   toast.success("Welcome to Meelio!");
+    //   navigate("/");
+    // } catch (error) {
+    //   toast.error("Something went wrong", {
+    //     description: "Unable to create guest account. Please try again.",
+    //   });
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   return (

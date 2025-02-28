@@ -55,11 +55,11 @@ export const userValidation = {
     }),
   },
 
-  createGuestUser: {
-    body: Joi.object().keys({
-      name: Joi.string().required(),
-    }),
-  },
+  // createGuestUser: {
+  //   body: Joi.object().keys({
+  //     name: Joi.string().required(),
+  //   }),
+  // },
 
   convertGuestToRegular: {
     body: Joi.object().keys({

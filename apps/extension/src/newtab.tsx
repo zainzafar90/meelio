@@ -2,9 +2,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, TabStashSheet, useDockStore } from "@repo/shared";
+import { AppProvider, AuthContainer, Clock, TabStashSheet, useAuthStore, useDockStore,
 
-import {
   TodoListSheet,
   Background,
   BackgroundOverlay,
@@ -16,13 +15,25 @@ import {
   SoundscapesSheet,
   Dock,
   SiteBlockerSheet
-} from "@repo/shared";
+ } from "@repo/shared";
+
 
 import { ExtensionTimer } from "./components/extension-timer";
 
 import "./style.css";
 
 const Home = () => {
+  const { user } = useAuthStore();
+
+  if (!user) {
+    return (
+      <>
+        <Background />
+        <BackgroundOverlay />
+        <AuthContainer />
+      </>
+    );
+  }
 
   return (
     <AppProvider platform="extension">

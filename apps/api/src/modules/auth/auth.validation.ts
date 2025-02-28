@@ -20,11 +20,11 @@ const register = {
   body: Joi.object().keys(registerBody),
 };
 
-const registerGuest = {
-  body: Joi.object().keys({
-    name: Joi.string().required(),
-  }),
-};
+// const registerGuest = {
+//   body: Joi.object().keys({
+//     name: Joi.string().required(),
+//   }),
+// };
 
 const login = {
   body: Joi.object().keys({
@@ -75,7 +75,7 @@ const verifyProvider = {
 
 export const accountValidation = {
   register,
-  registerGuest,
+  // registerGuest,
   login,
   forgotPassword,
   resetPassword,

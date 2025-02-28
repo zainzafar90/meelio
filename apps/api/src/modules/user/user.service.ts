@@ -202,19 +202,19 @@ export const userService = {
     return user;
   },
 
-  createGuestUser: async (name: string) => {
-    const [user] = await db
-      .insert(users)
-      .values({
-        name: name || "Guest",
-        email: `guest-${Date.now()}@meelio.com`,
-        role: RoleType.Guest,
-        isGuest: true,
-      } as UserInsert)
-      .returning();
+  // createGuestUser: async (name: string) => {
+  //   const [user] = await db
+  //     .insert(users)
+  //     .values({
+  //       name: name || "Guest",
+  //       email: `guest-${Date.now()}@meelio.com`,
+  //       role: RoleType.Guest,
+  //       isGuest: true,
+  //     } as UserInsert)
+  //     .returning();
 
-    return userService.userDTO(user);
-  },
+  //   return userService.userDTO(user);
+  // },
 
   updateGuestToRegular: async (
     userId: string,

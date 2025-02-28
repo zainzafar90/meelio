@@ -8,11 +8,11 @@ export type CreateUserReq = Omit<IUser, "id" | "isEmailVerified">;
 export type UpdateUserReq = Partial<IUser>;
 export type RegisterUserReq = Omit<IUser, "id" | "role" | "isEmailVerified">;
 
-export type CreateGuestUserReq = {
-  name: string;
-};
+// export type CreateGuestUserReq = {
+//   name: string;
+// };
 
-export type ConvertGuestToRegularReq = {
-  email: string;
-  password: string;
-};
+// export type ConvertGuestToRegularReq = {
+//   email: string;
+//   password: string;
+// };
