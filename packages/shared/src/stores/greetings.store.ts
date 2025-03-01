@@ -26,9 +26,13 @@ const getDayOfYear = (): number => {
 };
 
 export const useMantraStore = create<MantraStore>((set) => ({
-  currentMantra: "",
+  currentMantra: mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
   mantras,
   updateMantra: () =>
+    set((state) => ({
+      currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
+    })),
+  resetToDefault: () =>
     set((state) => ({
       currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
     })),
