@@ -215,12 +215,12 @@ const BrowserSiteBlockerContent = () => {
         className="mt-4"
         onClick={() =>
           window.open(
-            "https://chrome.google.com/webstore/detail/your-extension-id",
+            "https://chrome.google.com/webstore/detail/cancicbkedcabkimkihabdmcaaaikcie",
             "_blank"
           )
         }
       >
-        {t("site-blocker.get-extension", "Get the Extension")}
+        {t("site-blocker.get-extension")}
       </Button>
     </div>
   );

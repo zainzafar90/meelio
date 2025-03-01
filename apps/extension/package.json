@@ -93,6 +93,7 @@
     "typescript": "^5.3.3"
   },
   "manifest": {
+    "key": "$CRX_KEY",
     "web_accessible_resources": [
       {
         "resources": [

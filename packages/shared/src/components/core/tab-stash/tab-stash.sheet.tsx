@@ -152,13 +152,13 @@ const BrowserTabStashContent = () => {
         className="mt-4"
         onClick={() =>
           window.open(
-            "https://chrome.google.com/webstore/detail/your-extension-id",
+            "https://chrome.google.com/webstore/detail/cancicbkedcabkimkihabdmcaaaikcie",
             "_blank",
             "noopener,noreferrer"
           )
         }
       >
-        {t("tab-stash.get-extension", "Get the Extension")}
+        {t("tab-stash.get-extension")}
       </Button>
     </div>
   );
