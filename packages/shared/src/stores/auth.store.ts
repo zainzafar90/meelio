@@ -2,7 +2,12 @@ import { create } from "zustand";
 
 import { AuthUser } from "../types";
 import { GuestUser } from "../types";
-import { createJSONStorage, persist } from "zustand/middleware";
+import {
+  createJSONStorage,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
+import { useBackgroundStore } from "./background.store";
 
 export type AuthState = {
   user: AuthUser | null;
@@ -15,7 +20,7 @@ export type AuthState = {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    subscribeWithSelector((set) => ({
       user: null,
       guestUser: null,
       loading: true,
@@ -28,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
           loading: false,
         })),
       logout: () => set(() => ({ user: null, guestUser: null })),
-    }),
+    })),
     {
       name: "meelio:local:user",
       storage: createJSONStorage(() => localStorage),
@@ -36,3 +41,9 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+useAuthStore.subscribe((state) => {
+  if (!state.user && !state.guestUser) {
+    useBackgroundStore.getState().resetToDefault();
+  }
+});

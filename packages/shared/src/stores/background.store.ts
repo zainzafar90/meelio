@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getBackgrounds } from "../api/backgrounds.api";
 import { getAssetPath } from "../utils/path.utils";
+import { useAuthStore } from "./auth.store";
 
 export type WallpaperType = "static" | "live";
 export type WallpaperSource =
@@ -199,7 +200,6 @@ export const useBackgroundStore = create<BackgroundState>()(
 
       initializeWallpapers: async () => {
         set({ isLoading: true });
-
         try {
           const response = await getBackgrounds();
           if (
@@ -243,7 +243,6 @@ export const useBackgroundStore = create<BackgroundState>()(
               }
             });
 
-            // Replace defaults with API data
             set({
               wallpapers: apiWallpapers,
               currentWallpaper:
@@ -258,11 +257,6 @@ export const useBackgroundStore = create<BackgroundState>()(
           }
         } catch (error) {
           console.error("Failed to fetch backgrounds from API:", error);
-          // Keep using defaults if API fails
-          set({
-            wallpapers: DEFAULT_WALLPAPERS,
-            currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
-          });
         } finally {
           set({ isLoading: false });
         }
