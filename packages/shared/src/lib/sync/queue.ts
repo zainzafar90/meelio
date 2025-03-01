@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { BaseModel } from "../db/models.dexie";
 import { api } from "../../api";
 import { axios } from "../../api/axios";
+import { useAuthStore } from "../../stores/auth.store";
 
 export type SyncOperation = {
   id: string;
@@ -50,6 +51,15 @@ export class SyncQueue {
   }
 
   async processQueue() {
+    if (
+      !useAuthStore.getState().guestUser?.name &&
+      !useAuthStore.getState().user?.name
+    ) {
+      this.queue = [];
+      this.saveQueueToStorage();
+      return;
+    }
+
     if (this.isProcessing || this.queue.length === 0 || !navigator.onLine) {
       return;
     }
@@ -60,6 +70,7 @@ export class SyncQueue {
       // If we have multiple operations, use the bulk sync endpoint
       if (this.queue.length > 1) {
         await this.processBulkSync();
+        // No need to shift or modify queue here as processBulkSync handles that
       } else {
         // Otherwise process a single operation
         const operation = this.queue[0];
@@ -69,21 +80,22 @@ export class SyncQueue {
       this.saveQueueToStorage();
     } catch (error) {
       console.error("Sync error:", error);
-      const operation = this.queue[0];
-      if (operation) {
-        operation.retries++;
-
-        if (operation.retries >= this.maxRetries) {
-          this.queue.shift();
-          // TODO: Handle failed operation (e.g., add to error log)
+      if (this.queue.length === 1) {
+        const operation = this.queue[0];
+        if (operation) {
+          operation.retries++;
+          if (operation.retries >= this.maxRetries) {
+            this.queue.shift();
+            // TODO: Handle failed operation (e.g., add to error log)
+          }
         }
       }
       this.saveQueueToStorage();
     } finally {
       this.isProcessing = false;
+      // Only continue processing if there are still items in the queue
       if (this.queue.length > 0) {
-        // Continue processing the queue if there are more operations
-        setTimeout(() => this.processQueue(), 1000); // Add a small delay
+        setTimeout(() => this.processQueue(), 1000);
       }
     }
   }
