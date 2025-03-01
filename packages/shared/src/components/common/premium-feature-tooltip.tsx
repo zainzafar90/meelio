@@ -1,8 +1,15 @@
 import React, { useState, useId } from "react";
 import { Icons } from "../icons/icons";
-import { Dialog, DialogContent } from "@repo/ui/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogHeader,
+  DialogDescription,
+} from "@repo/ui/components/ui/dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { StarField } from "../auth/star-field";
+import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 
 interface PremiumFeatureTooltipProps {
   featureName: string;
@@ -53,6 +60,12 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="w-full max-w-md md:max-w-4xl border-0 shadow-xl p-0 overflow-hidden bg-transparent max-h-[95vh]">
+          <VisuallyHidden>
+            <DialogHeader>
+              <DialogTitle>{featureName}</DialogTitle>
+              <DialogDescription>{description}</DialogDescription>
+            </DialogHeader>
+          </VisuallyHidden>
           {/* Wrapper with rounded corners for everything */}
           <div className="bg-white rounded-lg overflow-hidden w-full max-h-full flex flex-col md:flex-row">
             {/* Close button */}
