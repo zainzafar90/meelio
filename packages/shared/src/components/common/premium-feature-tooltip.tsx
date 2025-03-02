@@ -11,6 +11,10 @@ import { Button } from "@repo/ui/components/ui/button";
 import { StarField } from "../auth/star-field";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { cn } from "@repo/ui/lib/utils";
+import { api } from "../../api";
+import { PlanInterval } from "../../types/subscription";
+import { env } from "../../utils/env.utils";
+import { toast } from "sonner";
 
 interface PremiumFeatureTooltipProps {
   featureName?: string;
@@ -201,19 +205,20 @@ const PricingSection = ({
   benefits?: string[];
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>("yearly");
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
   const plans: Plan[] = [
     {
       id: "monthly",
       title: "Monthly",
-      price: "$3",
+      price: "$5",
       period: "/ mo",
       description: "Billed Monthly",
     },
     {
       id: "yearly",
       title: "Annual",
-      price: "$30",
+      price: "$40",
       period: "/ yr",
       description: "Billed Yearly",
       discount: "20% off",
@@ -222,7 +227,7 @@ const PricingSection = ({
     {
       id: "lifetime",
       title: "Lifetime",
-      price: "$60",
+      price: "$89",
       period: "",
       description: "One-time payment",
     },
@@ -272,6 +277,38 @@ const PricingSection = ({
     </div>
   );
 
+  const onOpenCheckout = async (plan: PlanInterval) => {
+    setIsLoadingPortal(true);
+
+    try {
+      const allPlanIds: {
+        [key in PlanInterval]: string;
+      } = {
+        monthly: env.lemonSqueezyMonthlyVariantId,
+        yearly: env.lemonSqueezyYearlyVariantId,
+        lifetime: env.lemonSqueezyLifetimeVariantId,
+      };
+
+      const planId: string = allPlanIds[plan as PlanInterval];
+
+      const checkout = await api.billing.getLemonSqeezyCheckoutUrl({
+        variantId: planId,
+      });
+
+      if (checkout?.data?.url) {
+        window.open(checkout.data.url, "_blank");
+      }
+    } catch (error) {
+      return toast.error("Something went wrong.", {
+        description:
+          (error as any)?.message ||
+          "Checkout portal not working. Please try again.",
+      });
+    } finally {
+      setIsLoadingPortal(false);
+    }
+  };
+
   return (
     <div className="p-6 flex flex-col justify-center h-full">
       {/* Mobile-only feature info */}
@@ -290,13 +327,15 @@ const PricingSection = ({
 
       <div className="space-y-2 mb-4">{plans.map(renderPlanCard)}</div>
 
-      <Button className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4">
+      <Button
+        disabled={isLoadingPortal}
+        className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4"
+        onClick={() => onOpenCheckout(selectedPlan as PlanInterval)}
+      >
         Subscribe
       </Button>
 
       <div className="flex justify-center gap-3 pt-3 text-xs text-gray-500 border-t border-gray-100">
-        <button className="hover:text-gray-900">Restore</button>
-        <span>•</span>
         <button className="hover:text-gray-900">Support</button>
         <span>•</span>
         <button className="hover:text-gray-900">Terms</button>
