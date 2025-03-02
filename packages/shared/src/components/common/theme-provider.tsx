@@ -14,7 +14,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: "system",
+  theme: "dark",
   setTheme: () => null,
 };
 
@@ -22,7 +22,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "ui-theme",
   ...props
 }: ThemeProviderProps) {
@@ -43,7 +43,7 @@ export function ThemeProvider({
       } else {
         root.classList.add(theme);
       }
-    }
+    };
 
     applyTheme(theme);
 
@@ -51,7 +51,7 @@ export function ThemeProvider({
       if (theme === "system") {
         applyTheme("system");
       }
-    }
+    };
 
     mediaQuery.addEventListener("change", handleChange);
 

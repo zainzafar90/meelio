@@ -44,7 +44,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       >
         <AuthProvider>
           {/* <TelemetryProvider> */}
-          <ThemeProvider storageKey="ui-theme" defaultTheme="system">
+          <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
             <TooltipProvider>
               {children}
               {hasPlayingSounds && <SoundPlayer />}
