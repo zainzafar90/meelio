@@ -20,11 +20,13 @@ type FormData = z.infer<typeof userAuthSchema>;
 interface UserAuthFormProps {
   userName: string;
   onGuestContinue: () => void;
+  mode?: "default" | "inverted";
 }
 
 export const UserAuthForm = ({
   userName,
   onGuestContinue,
+  mode = "default",
 }: UserAuthFormProps) => {
   const { guestUser } = useAuthStore((state) => ({
     guestUser: state.guestUser,
@@ -70,10 +72,14 @@ export const UserAuthForm = ({
   return (
     <>
       <div className="text-center mb-4">
-        <p className="text-muted-foreground text-base">
-          Hello{" "}
-          <span className="font-semibold text-foreground">{userName}</span>, how
-          would you like to continue?
+        <p
+          className={cn(
+            "text-gray-300 text-base",
+            mode === "inverted" && "text-gray-900"
+          )}
+        >
+          Hello <span className="font-semibold">{userName}</span>, how would you
+          like to continue?
         </p>
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -98,7 +104,14 @@ export const UserAuthForm = ({
               </p>
             )}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
+          <button
+            className={cn(
+              buttonVariants({ size: "lg", variant: "default" }),
+              mode === "inverted" &&
+                "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+            )}
+            disabled={isLoading}
+          >
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
@@ -111,7 +124,12 @@ export const UserAuthForm = ({
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span
+            className={cn(
+              "px-2 text-muted-foreground bg-gray-900",
+              mode === "inverted" && "text-gray-900 bg-white"
+            )}
+          >
             Or continue with
           </span>
         </div>
@@ -120,7 +138,11 @@ export const UserAuthForm = ({
         <Button
           type="button"
           onClick={handleGoogleClick}
-          className={cn(buttonVariants({ size: "lg", variant: "default" }))}
+          className={cn(
+            buttonVariants({ size: "lg", variant: "default" }),
+            mode === "inverted" &&
+              "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+          )}
           disabled={isGoogleLoading}
         >
           {isGoogleLoading ? (

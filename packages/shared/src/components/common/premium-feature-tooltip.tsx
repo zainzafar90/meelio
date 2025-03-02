@@ -57,7 +57,11 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const { user } = useAuthStore();
+
+  const { user, guestUser } = useAuthStore((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+  }));
 
   return (
     <>
@@ -86,14 +90,6 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
           </VisuallyHidden>
           {/* Wrapper with rounded corners for everything */}
           <div className="bg-white rounded-lg overflow-hidden w-full max-h-full flex flex-col md:flex-row">
-            {/* Close button */}
-            <button
-              className="absolute top-4 right-4 z-10 rounded-full bg-zinc-800/50 p-2 hover:bg-zinc-800"
-              onClick={() => setShowModal(false)}
-            >
-              <Icons.close className="h-4 w-4 text-white/80" />
-            </button>
-
             {/* Left section with starry background - hidden on small screens */}
             <div className="hidden md:block md:flex-1 relative overflow-hidden bg-gray-950/50 backdrop-blur-sm">
               <PremiumGlow />
@@ -108,13 +104,16 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
             {/* Right section with pricing cards or auth form - full width on small screens */}
             <div className="flex-1 w-full overflow-y-auto max-w-full md:max-w-sm">
               {showAuthForm ? (
-                <div className="p-6">
-                  <UserAuthForm
-                    userName={user?.name || "there"}
-                    onGuestContinue={() => setShowAuthForm(false)}
-                  />
+                <div className="px-6 h-full flex flex-col justify-center">
+                  <div className="mx-auto flex flex-col justify-center space-y-4">
+                    <UserAuthForm
+                      userName={user?.name || guestUser?.name || "there"}
+                      onGuestContinue={() => setShowAuthForm(false)}
+                      mode="inverted"
+                    />
+                  </div>
                   <Button
-                    className="w-full mt-4"
+                    className="w-full mt-4 bg-white text-gray-900 hover:bg-gray-100 hover:text-gray-900"
                     variant="outline"
                     onClick={() => setShowAuthForm(false)}
                   >
