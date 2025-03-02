@@ -1,4 +1,4 @@
-import React, { useState, useId } from "react";
+import React, { useState, useId, useEffect } from "react";
 import { Icons } from "../icons/icons";
 import {
   Dialog,
@@ -15,6 +15,8 @@ import { api } from "../../api";
 import { PlanInterval } from "../../types/subscription";
 import { env } from "../../utils/env.utils";
 import { toast } from "sonner";
+import { useAuthStore } from "../../stores/auth.store";
+import { UserAuthForm } from "../auth/user-auth-form";
 
 interface PremiumFeatureTooltipProps {
   featureName?: string;
@@ -54,6 +56,8 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
   children,
 }) => {
   const [showModal, setShowModal] = useState(false);
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const { user } = useAuthStore();
 
   return (
     <>
@@ -101,9 +105,29 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
               </div>
             </div>
 
-            {/* Right section with pricing cards - full width on small screens */}
+            {/* Right section with pricing cards or auth form - full width on small screens */}
             <div className="flex-1 w-full overflow-y-auto max-w-full md:max-w-sm">
-              <PricingSection featureName={featureName} benefits={benefits} />
+              {showAuthForm ? (
+                <div className="p-6">
+                  <UserAuthForm
+                    userName={user?.name || "there"}
+                    onGuestContinue={() => setShowAuthForm(false)}
+                  />
+                  <Button
+                    className="w-full mt-4"
+                    variant="outline"
+                    onClick={() => setShowAuthForm(false)}
+                  >
+                    Back to Plans
+                  </Button>
+                </div>
+              ) : (
+                <PricingSection
+                  featureName={featureName}
+                  benefits={benefits}
+                  onNeedAuth={() => setShowAuthForm(true)}
+                />
+              )}
             </div>
           </div>
         </DialogContent>
@@ -200,10 +224,13 @@ const PremiumIntro = () => {
 const PricingSection = ({
   featureName,
   benefits = [],
+  onNeedAuth,
 }: {
   featureName: string;
   benefits?: string[];
+  onNeedAuth: () => void;
 }) => {
+  const { user } = useAuthStore();
   const [selectedPlan, setSelectedPlan] = useState<string>("yearly");
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
@@ -278,6 +305,12 @@ const PricingSection = ({
   );
 
   const onOpenCheckout = async (plan: PlanInterval) => {
+    // If no user, show auth form
+    if (!user) {
+      onNeedAuth();
+      return;
+    }
+
     setIsLoadingPortal(true);
 
     try {
@@ -332,7 +365,7 @@ const PricingSection = ({
         className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4"
         onClick={() => onOpenCheckout(selectedPlan as PlanInterval)}
       >
-        Subscribe
+        {isLoadingPortal ? "Loading..." : "Upgrade to Pro"}
       </Button>
 
       <div className="flex justify-center gap-3 pt-3 text-xs text-gray-500 border-t border-gray-100">
