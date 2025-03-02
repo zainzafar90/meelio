@@ -345,6 +345,33 @@ export const Dock = () => {
               );
             }
 
+            if (item.requirePro) {
+              return (
+                <PremiumFeature
+                  requirePro={item.requirePro}
+                  tooltipClassName="top-2 right-2"
+                  fallback={
+                    <button
+                      key={`${index}-fallback`}
+                      className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      <IconComponent className="size-5" />
+                      <span className="text-xs">{item.name}</span>
+                    </button>
+                  }
+                >
+                  <button
+                    key={index}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                    onClick={item.onClick}
+                  >
+                    <IconComponent className="size-5" />
+                    <span className="text-xs">{item.name}</span>
+                  </button>
+                </PremiumFeature>
+              );
+            }
+
             return (
               <button
                 key={index}

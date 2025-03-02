@@ -18,6 +18,7 @@ interface PremiumFeatureTooltipProps {
   benefits?: string[];
   inline?: boolean;
   className?: string;
+  tooltipClassName?: string;
   children: React.ReactNode;
 }
 
@@ -45,6 +46,7 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
   description,
   benefits = [],
   className = "",
+  tooltipClassName = "",
   children,
 }) => {
   const [showModal, setShowModal] = useState(false);
@@ -55,7 +57,12 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
         className={cn("relative cursor-pointer", className)}
         onClick={() => setShowModal(true)}
       >
-        <span className="absolute -top-1 -right-2 z-10 bg-sky-600 text-[6px] font-bold uppercase tracking-wider text-white/90 px-1 py-0.5 rounded border border-white/10">
+        <span
+          className={cn(
+            "absolute -top-1 -right-2 z-10 bg-sky-600 text-[6px] font-bold uppercase tracking-wider text-white/90 px-1 py-0.5 rounded border border-white/10",
+            tooltipClassName
+          )}
+        >
           Pro
         </span>
         {children}

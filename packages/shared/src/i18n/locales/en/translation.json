@@ -393,7 +393,7 @@
     "get-extension": "Get the Extension",
     "stash-all": "Stash All Windows",
     "stash-current": "Stash Current Window",
-    "needs-permissions": "Please grant the necessary permissions to use the extension.",
+    "needs-permission": "Please grant the necessary permissions to use the extension.",
     "grant-permission": "Grant Permission",
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"

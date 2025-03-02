@@ -8,6 +8,7 @@ interface PremiumFeatureProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   requirePro?: boolean;
+  tooltipClassName?: string;
 }
 
 /**
@@ -22,6 +23,7 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   children,
   fallback,
   requirePro = false,
+  tooltipClassName,
 }) => {
   const { user } = useAuthStore();
 
@@ -30,7 +32,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   }
 
   if (fallback) {
-    return <PremiumFeatureTooltip>{fallback}</PremiumFeatureTooltip>;
+    return (
+      <PremiumFeatureTooltip tooltipClassName={tooltipClassName}>
+        {fallback}
+      </PremiumFeatureTooltip>
+    );
   }
 
   return (
