@@ -2,8 +2,8 @@
   "name": "extension",
   "version": "0.0.1",
   "private": true,
-  "displayName": "Extension",
-  "description": "Meelio - focus, calm, & productivity",
+  "displayName": "Meelio",
+  "description": "Focus, calm & productivity with every new tab",
   "author": "zainzafar90@gmail.com",
   "scripts": {
     "dev": "plasmo dev",
@@ -93,7 +93,6 @@
     "typescript": "^5.3.3"
   },
   "manifest": {
-    "key": "$CRX_KEY",
     "web_accessible_resources": [
       {
         "resources": [
