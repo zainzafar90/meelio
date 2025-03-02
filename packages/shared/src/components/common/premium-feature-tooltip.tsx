@@ -248,7 +248,7 @@ const PricingSection = ({
       period: "/ yr",
       description: "Billed Yearly",
       discount: "20% off",
-      trial: "Free for 7 days",
+      // trial: "Free for 7 days",
     },
     {
       id: "lifetime",
