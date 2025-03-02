@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 export type SettingsTab =
   | "general"
   | "appearance"
@@ -27,6 +27,11 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "meelio:local:settings",
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        currentTab: state.currentTab,
+      }),
     }
   )
 );

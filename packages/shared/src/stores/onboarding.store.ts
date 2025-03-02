@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface OnboardingState {
   hasDockOnboardingCompleted: boolean;
@@ -17,6 +17,8 @@ export const useOnboardingStore = create<OnboardingState>()(
     }),
     {
       name: "meelio:local:onboarding",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
     }
   )
 );

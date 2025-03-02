@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import mantras from "../data/mantras.json";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 /**
  * ------------
@@ -72,6 +72,8 @@ export const useGreetingStore = create<GreetingStore>()(
     }),
     {
       name: "meelio:local:greeting",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
     }
   )
 );
