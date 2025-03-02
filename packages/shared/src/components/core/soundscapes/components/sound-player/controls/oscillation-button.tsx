@@ -5,8 +5,6 @@ import { Icons } from "../../../../../../components/icons";
 import { useInterval } from "../../../../../../hooks/use-interval";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
 import { PremiumFeature } from "../../../../../../components/common/premium-feature";
-import { PremiumFeatureTooltip } from "../../../../../../components/common/premium-feature-tooltip";
-import { useAuthStore } from "../../../../../../stores/auth.store";
 import {
   generateNextVolumeForOscillation,
   OSCILLATION_INTERVAL_MS,
@@ -15,7 +13,6 @@ import {
 export const OscillationButton = () => {
   const { sounds, isOscillating, toggleOscillation, setVolumeForSound } =
     useSoundscapesStore();
-  const { user } = useAuthStore();
 
   useInterval(() => {
     if (!isOscillating) return;
@@ -63,27 +60,12 @@ export const OscillationButton = () => {
 
   return (
     <div className="relative">
-      {!user?.isPro && (
-        <div className="absolute -top-2 -right-2 z-10">
-          <PremiumFeatureTooltip
-            featureName="Sound Oscillation"
-            description="Natural volume variations"
-            benefits={[
-              "More immersive experience",
-              "Prevents sound monotony",
-              "Creates organic soundscapes",
-            ]}
-          />
-        </div>
-      )}
-
       <PremiumFeature
         requirePro={true}
         fallback={
           <button
             type="button"
-            className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 cursor-not-allowed"
-            disabled
+            className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 "
             aria-label="Premium Feature: Oscillation"
           >
             <div className="absolute -inset-4 md:hidden" />

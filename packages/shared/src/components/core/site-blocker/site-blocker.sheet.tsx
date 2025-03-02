@@ -50,18 +50,6 @@ export const SiteBlockerSheet = () => {
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {t("site-blocker.title")}
-            {!user?.isPro && (
-              <PremiumFeatureTooltip
-                featureName="Site Blocker"
-                description="Block distracting websites"
-                benefits={[
-                  "Block unlimited sites",
-                  "Block entire categories",
-                  "Custom site blocking",
-                ]}
-                className="ml-2"
-              />
-            )}
           </h2>
         </div>
 

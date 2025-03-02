@@ -210,6 +210,14 @@ export const useDockStore = create<DockState>()(
       name: "meelio:local:dock",
       storage: createJSONStorage(() => localStorage),
       version: 1,
+      partialize: (state) => ({
+        isTimerVisible: state.isTimerVisible,
+        isBreathingVisible: state.isBreathingVisible,
+        isGreetingsVisible: state.isGreetingsVisible,
+        dockIconsVisible: state.dockIconsVisible,
+        currentOnboardingStep: state.currentOnboardingStep,
+        showIconLabels: state.isTimerVisible,
+      }),
     }
   )
 );

@@ -16,6 +16,7 @@ import { ClockDock } from "./components/clock.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
+import { PremiumFeature } from "../../../components/common/premium-feature";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
@@ -160,6 +161,7 @@ export const Dock = () => {
               icon: Icons.siteBlocker,
               activeIcon: Icons.siteBlockerActive,
               onClick: toggleSiteBlocker,
+              requirePro: true,
             },
           ]
         : []),
@@ -171,6 +173,7 @@ export const Dock = () => {
               icon: Icons.tabStash,
               activeIcon: Icons.tabStashActive,
               onClick: toggleTabStash,
+              requirePro: true,
             },
           ]
         : []),
@@ -251,7 +254,16 @@ export const Dock = () => {
                     "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                 )}
               >
-                <DockButton item={item} />
+                {item.requirePro ? (
+                  <PremiumFeature
+                    requirePro={item.requirePro}
+                    fallback={<DockButton item={item} isDisabled={true} />}
+                  >
+                    <DockButton item={item} />
+                  </PremiumFeature>
+                ) : (
+                  <DockButton item={item} />
+                )}
               </div>
             ))}
           </div>

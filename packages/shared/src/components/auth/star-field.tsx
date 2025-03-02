@@ -182,7 +182,6 @@ export function StarField() {
     <svg
       viewBox="0 0 881 211"
       fill="white"
-      aria-hidden="true"
       className="pointer-events-none absolute -right-44 top-14 w-[55.0625rem] origin-top-right rotate-[30deg] overflow-visible opacity-70"
     >
       <defs>

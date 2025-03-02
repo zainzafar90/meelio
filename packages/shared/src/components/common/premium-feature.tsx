@@ -2,11 +2,11 @@ import React from "react";
 import { useAuthStore } from "../../stores/auth.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../icons/icons";
+import { PremiumFeatureTooltip } from "./premium-feature-tooltip";
 
 interface PremiumFeatureProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  requireAuth?: boolean;
   requirePro?: boolean;
 }
 
@@ -16,23 +16,21 @@ interface PremiumFeatureProps {
  *
  * @param children The premium feature content
  * @param fallback Optional custom UI to show when access is blocked
- * @param requireAuth Whether authentication is required (default: true)
  * @param requirePro Whether a premium subscription is required (default: false)
  */
 export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   children,
   fallback,
-  requireAuth = true,
   requirePro = false,
 }) => {
   const { user } = useAuthStore();
 
-  if (!requireAuth || (user && (!requirePro || user.isPro))) {
+  if (user && (!requirePro || user?.isPro)) {
     return <>{children}</>;
   }
 
   if (fallback) {
-    return <>{fallback}</>;
+    return <PremiumFeatureTooltip>{fallback}</PremiumFeatureTooltip>;
   }
 
   return (

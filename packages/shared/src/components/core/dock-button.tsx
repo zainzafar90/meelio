@@ -11,13 +11,16 @@ export interface DockItem {
   isActive?: boolean;
   onClick?: () => void;
   isStatic?: boolean;
+  requirePro?: boolean;
 }
 
 export const DockButton = ({
   item,
+  isDisabled,
   className,
 }: {
   item: DockItem;
+  isDisabled?: boolean;
   className?: string;
 }) => {
   const {
@@ -52,6 +55,8 @@ export const DockButton = ({
   const IconComponent = isActive ? item.activeIcon : item.icon;
 
   const handleClick = () => {
+    if (isDisabled) return;
+
     if (item.onClick) {
       item.onClick();
     }

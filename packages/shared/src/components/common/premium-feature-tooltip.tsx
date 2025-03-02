@@ -10,13 +10,15 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 import { StarField } from "../auth/star-field";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
+import { cn } from "@repo/ui/lib/utils";
 
 interface PremiumFeatureTooltipProps {
-  featureName: string;
+  featureName?: string;
   description?: string;
   benefits?: string[];
   inline?: boolean;
   className?: string;
+  children: React.ReactNode;
 }
 
 interface Plan {
@@ -42,20 +44,21 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
   featureName,
   description,
   benefits = [],
-  inline = false,
   className = "",
+  children,
 }) => {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
       <div
-        className={`${inline ? "inline-flex" : "flex"} items-center cursor-pointer ${className}`}
+        className={cn("relative cursor-pointer", className)}
         onClick={() => setShowModal(true)}
       >
-        <span className="bg-zinc-800 text-[8px] font-bold uppercase tracking-wider text-white/90 px-1.5 py-0.5 rounded border border-white/10">
+        <span className="absolute -top-1 -right-2 z-10 bg-sky-600 text-[6px] font-bold uppercase tracking-wider text-white/90 px-1 py-0.5 rounded border border-white/10">
           Pro
         </span>
+        {children}
       </div>
 
       <Dialog open={showModal} onOpenChange={setShowModal}>
@@ -103,10 +106,7 @@ const PremiumGlow = () => {
 
   return (
     <div className="absolute inset-0 -z-10 overflow-hidden bg-gray-950">
-      <svg
-        className="absolute -bottom-48 left-[-40%] h-[80rem] w-[180%] lg:-right-40 lg:bottom-auto lg:left-auto lg:top-[-40%] lg:h-[180%] lg:w-[80rem]"
-        aria-hidden="true"
-      >
+      <svg className="absolute -bottom-48 left-[-40%] h-[80rem] w-[180%] lg:-right-40 lg:bottom-auto lg:left-auto lg:top-[-40%] lg:h-[180%] lg:w-[80rem]">
         <defs>
           <radialGradient id={`${id}-desktop`} cx="100%">
             <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
