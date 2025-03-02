@@ -1,5 +1,4 @@
-import * as userController from './user.controller';
-import * as userService from './user.service';
-import * as userValidation from './user.validation';
-
-export { userController, userService, userValidation };
+export * from "./user.controller";
+export * from "./user.service";
+export * from "./user.validation";
+export * from "./user.utils";

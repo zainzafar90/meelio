@@ -12,6 +12,7 @@ import { userService } from "../../user";
 import { AccountInsert, accounts, User, UserInsert, users } from "@/db/schema";
 import { db } from "@/db";
 import { and, eq } from "drizzle-orm";
+import { IUser } from "@/types";
 
 const isProduction = config.env === "production";
 

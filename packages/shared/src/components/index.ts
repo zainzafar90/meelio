@@ -1,6 +1,5 @@
 // ------------- AUTH COMPONENTS -------------
 export * from "./auth/auth-container";
-export * from "./auth/guest-auth-form";
 export * from "./auth/star-field";
 export * from "./auth/user-auth-form";
 
@@ -9,6 +8,8 @@ export * from "./common/blurhash";
 export * from "./common/connection-warning";
 export * from "./common/container";
 export * from "./common/logo";
+export * from "./common/premium-feature";
+export * from "./common/premium-feature-tooltip";
 export * from "./common/ripple-effects";
 export * from "./common/theme-provider";
 

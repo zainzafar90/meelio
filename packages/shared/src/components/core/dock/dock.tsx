@@ -16,6 +16,7 @@ import { ClockDock } from "./components/clock.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
+import { PremiumFeature } from "../../../components/common/premium-feature";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
@@ -92,8 +93,12 @@ export const Dock = () => {
     toggleTabStash: state.toggleTabStash,
     dockIconsVisible: state.dockIconsVisible,
   }));
+
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user, guestUser } = useAuthStore((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+  }));
 
   const items = useMemo(
     () => [
@@ -109,8 +114,8 @@ export const Dock = () => {
             {
               id: "timer",
               name: t("common.pomodoro"),
-              icon: Icons.worldClock,
-              activeIcon: Icons.worldClockActive,
+              icon: Icons.pomodoro,
+              activeIcon: Icons.pomodoroActive,
               onClick: toggleTimer,
             },
           ]
@@ -156,6 +161,7 @@ export const Dock = () => {
               icon: Icons.siteBlocker,
               activeIcon: Icons.siteBlockerActive,
               onClick: toggleSiteBlocker,
+              requirePro: true,
             },
           ]
         : []),
@@ -167,6 +173,7 @@ export const Dock = () => {
               icon: Icons.tabStash,
               activeIcon: Icons.tabStashActive,
               onClick: toggleTabStash,
+              requirePro: true,
             },
           ]
         : []),
@@ -232,10 +239,10 @@ export const Dock = () => {
   }, []);
 
   return (
-    <div className="relative" ref={dockRef}>
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/10 p-3 shadow-2xl backdrop-blur-xl">
+    <div className="relative z-50" ref={dockRef}>
+      <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 pr-1">
+          <div className="flex items-center gap-3 pr-1">
             {visibleItems.map((item, index) => (
               <div
                 key={index}
@@ -247,7 +254,16 @@ export const Dock = () => {
                     "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                 )}
               >
-                <DockButton item={item} />
+                {item.requirePro ? (
+                  <PremiumFeature
+                    requirePro={item.requirePro}
+                    fallback={<DockButton item={item} isDisabled={true} />}
+                  >
+                    <DockButton item={item} />
+                  </PremiumFeature>
+                ) : (
+                  <DockButton item={item} />
+                )}
               </div>
             ))}
           </div>
@@ -329,6 +345,33 @@ export const Dock = () => {
               );
             }
 
+            if (item.requirePro) {
+              return (
+                <PremiumFeature
+                  requirePro={item.requirePro}
+                  tooltipClassName="top-2 right-2"
+                  fallback={
+                    <button
+                      key={`${index}-fallback`}
+                      className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                      <IconComponent className="size-5" />
+                      <span className="text-xs">{item.name}</span>
+                    </button>
+                  }
+                >
+                  <button
+                    key={index}
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                    onClick={item.onClick}
+                  >
+                    <IconComponent className="size-5" />
+                    <span className="text-xs">{item.name}</span>
+                  </button>
+                </PremiumFeature>
+              );
+            }
+
             return (
               <button
                 key={index}
@@ -343,7 +386,7 @@ export const Dock = () => {
         </div>
       )}
 
-      {user && <DockOnboarding />}
+      {(user || guestUser) && <DockOnboarding />}
     </div>
   );
 };

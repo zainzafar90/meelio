@@ -13,10 +13,25 @@ import { cn } from "../../lib/utils";
 import { api } from "../../api";
 import { env } from "../../utils";
 import { userAuthSchema } from "../../lib/validations/auth";
+import { useAuthStore } from "../../stores/auth.store";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
-export const UserAuthForm = () => {
+interface UserAuthFormProps {
+  userName: string;
+  onGuestContinue: () => void;
+  mode?: "default" | "inverted";
+}
+
+export const UserAuthForm = ({
+  userName,
+  onGuestContinue,
+  mode = "default",
+}: UserAuthFormProps) => {
+  const { guestUser } = useAuthStore((state) => ({
+    guestUser: state.guestUser,
+  }));
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
 
@@ -38,6 +53,7 @@ export const UserAuthForm = () => {
     try {
       await api.auth.sendMagicLink({
         email: data.email,
+        // name: userName, // Pass the name to the magic link API
       });
       toast("We sent you a magic link.", {
         description:
@@ -55,6 +71,17 @@ export const UserAuthForm = () => {
 
   return (
     <>
+      <div className="text-center mb-4">
+        <p
+          className={cn(
+            "text-gray-300 text-base",
+            mode === "inverted" && "text-gray-900"
+          )}
+        >
+          Hello <span className="font-semibold">{userName}</span>, how would you
+          like to continue?
+        </p>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
@@ -77,7 +104,14 @@ export const UserAuthForm = () => {
               </p>
             )}
           </div>
-          <button className={cn(buttonVariants())} disabled={isLoading}>
+          <button
+            className={cn(
+              buttonVariants({ size: "lg", variant: "default" }),
+              mode === "inverted" &&
+                "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+            )}
+            disabled={isLoading}
+          >
             {isLoading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
@@ -90,23 +124,47 @@ export const UserAuthForm = () => {
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+          <span
+            className={cn(
+              "px-2 text-muted-foreground bg-gray-900",
+              mode === "inverted" && "text-gray-900 bg-white"
+            )}
+          >
             Or continue with
           </span>
         </div>
       </div>
-      <Button
-        type="button"
-        onClick={handleGoogleClick}
-        className={cn(buttonVariants({ size: "lg", variant: "default" }))}
-      >
-        {isGoogleLoading ? (
-          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-        ) : (
-          <Icons.google className="mr-2 h-4 w-4" />
-        )}{" "}
-        Google
-      </Button>
+      <div className="grid gap-6">
+        <Button
+          type="button"
+          onClick={handleGoogleClick}
+          className={cn(
+            buttonVariants({ size: "lg", variant: "default" }),
+            mode === "inverted" &&
+              "bg-gray-900 text-white hover:bg-gray-800 hover:text-white"
+          )}
+          disabled={isGoogleLoading}
+        >
+          {isGoogleLoading ? (
+            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Icons.google className="mr-2 h-4 w-4" />
+          )}{" "}
+          Google
+        </Button>
+        {!guestUser && (
+          <Button
+            type="button"
+            onClick={onGuestContinue}
+            className={cn(
+              buttonVariants({ size: "lg", variant: "default" }),
+              "bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white shadow-sm"
+            )}
+          >
+            Guest Mode
+          </Button>
+        )}
+      </div>
     </>
   );
 };

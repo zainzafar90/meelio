@@ -2,9 +2,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, Clock, TabStashSheet, useDockStore } from "@repo/shared";
+import { AppProvider, AuthContainer, Clock, TabStashSheet, useAuthStore, useDockStore,
 
-import {
   TodoListSheet,
   Background,
   BackgroundOverlay,
@@ -16,16 +15,29 @@ import {
   SoundscapesSheet,
   Dock,
   SiteBlockerSheet
-} from "@repo/shared";
+ } from "@repo/shared";
+
 
 import { ExtensionTimer } from "./components/extension-timer";
 
 import "./style.css";
+import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 
 const Home = () => {
+  const { user, guestUser } = useAuthStore();
+
+  if (!user && !guestUser) {
+    return (
+      <>
+        <Background />
+        <BackgroundOverlay />
+        <AuthContainer />
+      </>
+    );
+  }
 
   return (
-    <AppProvider platform="extension">
+    <>
       <Background />
       <BackgroundOverlay />
       <AppLayout>
@@ -33,15 +45,16 @@ const Home = () => {
         <Content />
         <BottomBar />
       </AppLayout>
-    </AppProvider>
+    </>
   );
 };
 
 const Content = () => {
   const { t } = useTranslation();
-  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
+    isTimerVisible: state.isTimerVisible,
   }));
 
   return (
@@ -49,7 +62,7 @@ const Content = () => {
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
-      {isGreetingsVisible && <GreetingsContent />}
+      {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TodoListSheet />
@@ -115,5 +128,14 @@ const BottomBar = () => {
   );
 };
 
-export default Home;
+export const NewTab = () => {
+  useAppStore.getState().setPlatform("extension");
 
+  return (
+    <AppProvider>
+      <Home />
+    </AppProvider>
+  );
+};
+
+export default NewTab;

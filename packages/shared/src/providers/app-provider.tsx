@@ -6,8 +6,6 @@ import { Toaster } from "sonner";
 
 import { useSoundscapesStore } from "../stores/soundscapes.store";
 
-import { BackgroundProvider } from "./background-provider";
-import { PomodoroProvider } from "./pomodoro-provider";
 import { ThemeProvider } from "../components/common/theme-provider";
 import { ConnectionWarning } from "../components/common/connection-warning";
 import { SoundPlayer } from "../components/core/soundscapes/components/sound-player/sound-player";
@@ -33,13 +31,9 @@ import { i18n } from "../i18n";
 
 type AppProviderProps = {
   children: React.ReactNode;
-  platform: "extension" | "web";
 };
 
-export const AppProvider: React.FC<AppProviderProps> = ({
-  children,
-  platform,
-}) => {
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const sounds = useSoundscapesStore((state) => state.sounds);
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
 
@@ -50,16 +44,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({
       >
         <AuthProvider>
           {/* <TelemetryProvider> */}
-          <ThemeProvider storageKey="ui-theme" defaultTheme="system">
+          <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
             <TooltipProvider>
-              <BackgroundProvider>
-                <PomodoroProvider>
-                  {children}
-                  {hasPlayingSounds && <SoundPlayer />}
-                  <Toaster richColors />
-                  <ConnectionWarning />
-                </PomodoroProvider>
-              </BackgroundProvider>
+              {children}
+              {hasPlayingSounds && <SoundPlayer />}
+              <Toaster richColors />
+              <ConnectionWarning />
             </TooltipProvider>
           </ThemeProvider>
           {/* </TelemetryProvider> */}

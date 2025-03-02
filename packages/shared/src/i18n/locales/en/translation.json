@@ -45,7 +45,8 @@
       "previous": "Previous",
       "next": "Next",
       "finish": "Finish",
-      "toggle": "Toggle"
+      "toggle": "Toggle",
+      "dismiss": "Dismiss"
     },
     "close": "Close",
     "weekdays": {
@@ -307,6 +308,10 @@
         "title": "Dock Items Visibility",
         "description": "Control which items are visible in the dock"
       },
+      "show-icon-labels": {
+        "title": "Show Icon Labels",
+        "description": "Show the labels for the icons in the dock"
+      },
       "timer": {
         "description": "Timer for focused work sessions"
       },
@@ -369,18 +374,28 @@
     "author": "Author",
     "liveWallpapers": "Live Wallpapers",
     "staticWallpapers": "Static Wallpapers",
-    "resetToDefault": "Reset to Default"
+    "resetToDefault": "Reset to Default",
+    "randomBackground": "Random Background"
   },
   "site-blocker": {
     "title": "Site Blocker",
     "description": "Block websites to help you stay focused",
     "extension-only": "Site blocking functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "get-extension": "Get the Extension",
+    "upgrade": "Upgrade to Pro",
+    "premium-feature-title": "Premium Site Blocker",
+    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused."
   },
   "tab-stash": {
     "title": "Tab Stash",
     "description": "Stash your tabs for later",
     "extension-only": "Tab stash functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "get-extension": "Get the Extension",
+    "stash-all": "Stash All Windows",
+    "stash-current": "Stash Current Window",
+    "needs-permission": "Please grant the necessary permissions to use the extension.",
+    "grant-permission": "Grant Permission",
+    "permissions-needed": "Additional permissions required",
+    "permissions-description": "We need permission to manage your tabs to use this feature"
   }
 }

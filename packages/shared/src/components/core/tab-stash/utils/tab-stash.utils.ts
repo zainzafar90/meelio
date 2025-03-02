@@ -1,3 +1,4 @@
+import { useAppStore } from "../../../../stores/app.store";
 import { TabInfo } from "../../../../types/tab-stash.types";
 
 export const groupTabsByWindow = (
@@ -73,12 +74,24 @@ export const restoreTabsToWindow = async (tabs: TabInfo[]): Promise<void> => {
 };
 
 export const checkTabPermissions = async (): Promise<boolean> => {
+  const platform = useAppStore.getState().platform;
+
+  if (platform === "web" || !chrome?.permissions) {
+    return false;
+  }
+
   return await chrome.permissions.contains({
     permissions: ["tabs"],
   });
 };
 
 export const requestTabPermissions = async (): Promise<boolean> => {
+  const platform = useAppStore.getState().platform;
+
+  if (platform === "web" || !chrome?.permissions) {
+    return false;
+  }
+
   return await chrome.permissions.request({
     permissions: ["tabs"],
   });

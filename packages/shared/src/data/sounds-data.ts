@@ -5,8 +5,6 @@ import { getAssetPath } from "../utils/path.utils";
 const SOUND_FILES_EXTENSION = ".mp3";
 const SOUND_FILES_BASE_URL = getAssetPath("/public/sounds/yT3sxTz");
 
-export const emptySoundUrl = getAssetPath("/public/sounds/common/empty.mp3");
-
 export const allSounds: Sound[] = [
   {
     id: SoundType.RainOnTent,

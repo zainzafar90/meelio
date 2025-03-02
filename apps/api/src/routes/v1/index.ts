@@ -7,6 +7,16 @@ import docsRoute from "./swagger.routes";
 import userRoute from "./user.routes";
 import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
+import syncRoute from "./sync.routes";
+import backgroundRoute from "./background.routes";
+import soundscapeRoute from "./soundscape.routes";
+import mantraRoute from "./mantra.routes";
+import taskRoute from "./task.routes";
+import pomodoroRoute from "./pomodoro.routes";
+import siteBlockerRoute from "./site-blocker.routes";
+import tabStashRoute from "./tab-stash.routes";
+import noteRoute from "./note.routes";
+import focusSessionRoute from "./focus-session.routes";
 
 const router: express.Router = express.Router();
 
@@ -31,6 +41,46 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/subscriptions",
     route: subscriptionRoute,
+  },
+  {
+    path: "/sync",
+    route: syncRoute,
+  },
+  {
+    path: "/backgrounds",
+    route: backgroundRoute,
+  },
+  {
+    path: "/soundscapes",
+    route: soundscapeRoute,
+  },
+  {
+    path: "/mantras",
+    route: mantraRoute,
+  },
+  {
+    path: "/tasks",
+    route: taskRoute,
+  },
+  {
+    path: "/pomodoro",
+    route: pomodoroRoute,
+  },
+  {
+    path: "/site-blockers",
+    route: siteBlockerRoute,
+  },
+  {
+    path: "/tab-stashes",
+    route: tabStashRoute,
+  },
+  {
+    path: "/notes",
+    route: noteRoute,
+  },
+  {
+    path: "/focus-sessions",
+    route: focusSessionRoute,
   },
 ];
 

@@ -45,7 +45,8 @@
       "previous": "Vorherige",
       "next": "Nächste",
       "finish": "Fertig",
-      "toggle": "Umschalten"
+      "toggle": "Umschalten",
+      "dismiss": "Schließen"
     },
     "weekdays": {
       "short": {
@@ -66,7 +67,7 @@
     },
     "timer": {
       "title": "Pomodoro Timer",
-      "description": "Bleib konzentriert mit unserem Pomodoro Timer. Teile deine Arbeit in konzentrierte Sitzungen auf."
+      "description": "Bleib konzentriert mit unserem Pomodoro timer. Teile deine Arbeit in konzentrierte Sitzungen auf."
     },
     "soundscapes": {
       "title": "Soundscapes",
@@ -308,6 +309,10 @@
         "title": "Dock-Element-Sichtbarkeit",
         "description": "Steuere, welche Elemente im Dock sichtbar sind"
       },
+      "show-icon-labels": {
+        "title": "Icon-Labels anzeigen",
+        "description": "Zeige die Labels für die Icons im Dock an"
+      },
       "timer": {
         "description": "Timer für fokussierte Arbeitssitzungen"
       },
@@ -370,18 +375,28 @@
     "author": "Autor",
     "liveWallpapers": "Lebende Hintergründe",
     "staticWallpapers": "Statische Hintergründe",
-    "resetToDefault": "Zurücksetzen auf Standard"
+    "resetToDefault": "Zurücksetzen auf Standard",
+    "randomBackground": "Zufälliger Hintergrund"
   },
   "site-blocker": {
     "title": "Seitenblocker",
     "description": "Block websites to help you stay focused",
     "extension-only": "Site blocking functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "get-extension": "Get the Extension",
+    "upgrade": "Upgrade to Pro",
+    "premium-feature-title": "Premium Site Blocker",
+    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused."
   },
   "tab-stash": {
     "title": "Tab-Stash",
-    "description": "Stash your tabs for later",
-    "extension-only": "Tab stash functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "description": "Stacke deine Tabs für später",
+    "extension-only": "Tab stash Funktionalität ist nur in der Browser-Erweiterung verfügbar.",
+    "get-extension": "Erweiterung bekommen",
+    "stash-all": "Alle Fenster staken",
+    "stash-current": "Aktuelles Fenster staken",
+    "needs-permission": "Bitte gewähren Sie die notwendigen Berechtigungen, um die Erweiterung zu verwenden.",
+    "grant-permission": "Berechtigung gewähren",
+    "permissions-needed": "Zusätzliche Berechtigungen erforderlich",
+    "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden"
   }
 }

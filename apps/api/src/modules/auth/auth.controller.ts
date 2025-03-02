@@ -23,14 +23,14 @@ export const register = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.CREATED).send({ user });
 });
 
-export const registerGuest = catchAsync(async (req: Request, res: Response) => {
-  const { name } = req.body;
-  const user = await userService.createGuestUser(name);
-  const tokens = await accountService.generateAuthTokens(user as IUser);
-  await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
-  cookieService.setResponseCookie(res, tokens);
-  res.status(httpStatus.CREATED).send({ user });
-});
+// export const registerGuest = catchAsync(async (req: Request, res: Response) => {
+//   const { name } = req.body;
+//   const user = await userService.createGuestUser(name);
+//   const tokens = await accountService.generateAuthTokens(user as IUser);
+//   await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
+//   cookieService.setResponseCookie(res, tokens);
+//   res.status(httpStatus.CREATED).send({ user });
+// });
 
 export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -216,7 +216,7 @@ export const accountController = {
   updateAccount,
   logout,
   register,
-  registerGuest,
+  // registerGuest,
   login,
   forgotPassword,
   resetPassword,

@@ -7,4 +7,3 @@ export * from "./quotes.store";
 export * from "./settings.store";
 export * from "./soundscapes.store";
 export * from "./todo.store";
-export * from "./update-alert-store";

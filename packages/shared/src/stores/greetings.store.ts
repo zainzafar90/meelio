@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import mantras from "../data/mantras.json";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 /**
  * ------------
@@ -25,9 +26,13 @@ const getDayOfYear = (): number => {
 };
 
 export const useMantraStore = create<MantraStore>((set) => ({
-  currentMantra: "",
+  currentMantra: mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
   mantras,
   updateMantra: () =>
+    set((state) => ({
+      currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
+    })),
+  resetToDefault: () =>
     set((state) => ({
       currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
     })),
@@ -54,12 +59,21 @@ const getGreeting = (hour: number, t: (key: string) => string) => {
   else return t("home.greetings.night");
 };
 
-export const useGreetingStore = create<GreetingStore>((set) => ({
-  greeting: "",
-  updateGreeting: (time, t) => {
-    const hour = time.getHours();
-    const newGreeting = getGreeting(hour, t);
+export const useGreetingStore = create<GreetingStore>()(
+  persist(
+    (set) => ({
+      greeting: "",
+      updateGreeting: (time, t) => {
+        const hour = time.getHours();
+        const newGreeting = getGreeting(hour, t);
 
-    set({ greeting: newGreeting });
-  },
-}));
+        set({ greeting: newGreeting });
+      },
+    }),
+    {
+      name: "meelio:local:greeting",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+    }
+  )
+);

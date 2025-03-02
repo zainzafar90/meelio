@@ -1,16 +1,17 @@
 import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import {  PomodoroStage, PomodoroState } from '@repo/shared';
 
 
 export const usePomodoroStore = create(
-  subscribeWithSelector<PomodoroState>(() => ({
-    id: 1,
-    stats: {
-      todaysFocusSessions: 0,
-      todaysBreaks: 0,
-      todaysFocusTime: 0,
-      todaysBreakTime: 0,
+  persist(
+    subscribeWithSelector<PomodoroState>(() => ({
+      id: 1,
+      stats: {
+        todaysFocusSessions: 0,
+        todaysBreaks: 0,
+        todaysFocusTime: 0,
+        todaysBreakTime: 0,
     },
     activeStage: PomodoroStage.Focus,
     isRunning: false,
@@ -24,18 +25,20 @@ export const usePomodoroStore = create(
     enableSound: false,
     pausedRemaining: null,
     lastUpdated: Date.now()
-  }))
+    })),
+    {
+      name: 'meelio:local:pomodoro',
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+      partialize: (state) => ({
+        id: state.id,
+        stats: state.stats,
+        activeStage: state.activeStage,
+        isRunning: state.isRunning,
+        autoStartTimers: state.autoStartTimers,
+        endTimestamp: state.endTimestamp,
+      }),
+    }
+  )
 );
-
-// Sync with chrome storage
-usePomodoroStore.subscribe((state) => {
-  chrome.storage.local.set({ pomodoroState: state });
-});
-
-// Initialize from chrome storage
-chrome.storage.local.get('pomodoroState').then((result) => {
-  if (result.pomodoroState) {
-    usePomodoroStore.setState(result.pomodoroState);
-  }
-});
 

@@ -21,7 +21,7 @@ const Login = () => {
                 Sign in to your Meelio Account
               </p>
             </div>
-            <UserAuthForm />
+            <UserAuthForm userName="" onGuestContinue={() => {}} />
 
             <div className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
               <Link

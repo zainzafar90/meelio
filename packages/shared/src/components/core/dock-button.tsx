@@ -11,13 +11,16 @@ export interface DockItem {
   isActive?: boolean;
   onClick?: () => void;
   isStatic?: boolean;
+  requirePro?: boolean;
 }
 
 export const DockButton = ({
   item,
+  isDisabled,
   className,
 }: {
   item: DockItem;
+  isDisabled?: boolean;
   className?: string;
 }) => {
   const {
@@ -28,6 +31,7 @@ export const DockButton = ({
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
+    showIconLabels,
   } = useDockStore((state) => ({
     isTimerVisible: state.isTimerVisible,
     isSoundscapesVisible: state.isSoundscapesVisible,
@@ -36,6 +40,7 @@ export const DockButton = ({
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     isBackgroundsVisible: state.isBackgroundsVisible,
     isTabStashVisible: state.isTabStashVisible,
+    showIconLabels: state.showIconLabels,
   }));
 
   const isActive =
@@ -50,6 +55,8 @@ export const DockButton = ({
   const IconComponent = isActive ? item.activeIcon : item.icon;
 
   const handleClick = () => {
+    if (isDisabled) return;
+
     if (item.onClick) {
       item.onClick();
     }
@@ -69,7 +76,12 @@ export const DockButton = ({
     >
       <IconComponent className="size-6 text-white" />
       {isActive && (
-        <div className="absolute -bottom-2 h-1 w-1 rounded-full bg-zinc-500" />
+        <div className="absolute -bottom-3 h-1 w-1 rounded-full bg-zinc-500" />
+      )}
+      {showIconLabels && (
+        <span className="absolute -bottom-3 text-muted-foreground">
+          <span className="text-[7px] leading-none">{item.name}</span>
+        </span>
       )}
     </button>
   );

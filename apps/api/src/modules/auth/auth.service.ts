@@ -21,10 +21,9 @@ import {
   subscriptions,
   users,
 } from "@/db/schema";
-import { sanitizeUser, verifyPassword } from "../user/user.utils";
+import { userUtils } from "../user/user.utils";
 import { verificationTokenService } from "../verification-token";
 import { userService } from "../user";
-import { updateUserById } from "../user/user.service";
 import { RoleType } from "@/types/enums.types";
 /**
  * Generate token
@@ -222,7 +221,7 @@ const getUserAccount = async (
 
   const { isPro, subscriptionId } = await checkSubscription(user.email);
 
-  const safeUser = sanitizeUser(user);
+  const safeUser = userUtils.sanitizeUser(user);
   return {
     user: safeUser,
     isPro,
@@ -259,7 +258,7 @@ const updateUserAccount = async (
 
   const { isPro, subscriptionId } = await checkSubscription(user.email);
 
-  const safeUser = sanitizeUser(user);
+  const safeUser = userUtils.sanitizeUser(user);
   return {
     user: safeUser,
     isPro,
@@ -295,7 +294,7 @@ const loginUserWithEmailAndPassword = async (
     );
   }
 
-  if (!user || !(await verifyPassword(password, user.password))) {
+  if (!user || !(await userUtils.verifyPassword(password, user.password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Incorrect email or password");
   }
 
@@ -322,7 +321,7 @@ const resetPassword = async (
     if (!user) {
       throw new Error();
     }
-    await updateUserById(user.id, { password: newPassword });
+    await userService.updateUserById(user.id, { password: newPassword });
 
     await verificationTokenService.deleteMany(
       user.email,
@@ -354,7 +353,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
       user.email,
       VerificationTokenType.VERIFY_EMAIL
     );
-    const updatedUser = await updateUserById(user.id, {
+    const updatedUser = await userService.updateUserById(user.id, {
       isEmailVerified: true,
     });
     return updatedUser as IUser;
@@ -403,7 +402,7 @@ const verifyMagicLink = async (
       } as AccountInsert);
     }
 
-    return user as IUser;
+    return user;
   } catch (error) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,

@@ -27,7 +27,7 @@ self.onmessage = function (e) {
           } else {
             self.postMessage({ type: 'TICK', remaining });
           }
-        }, 1000);
+        }, 250);
       }
       break;
 
@@ -49,6 +49,7 @@ self.onmessage = function (e) {
       interval = null;
       endTime = 0;
       currentDuration = 0;
+      self.postMessage({ type: 'RESET_COMPLETE' });
       break;
 
     case 'UPDATE_DURATION':
@@ -58,13 +59,11 @@ self.onmessage = function (e) {
       }
       break;
 
-    // case 'FORCE_SYNC':
-    //   currentDuration = payload.duration;
-    //   endTime = Date.now() + (payload.duration * 1000);
-    //   if (interval) {
-    //     clearInterval(interval);
-    //     interval = null;
-    //   }
-    //   break;
+    case 'SKIP_TO_NEXT_STAGE':
+      if (interval) clearInterval(interval);
+      interval = null;
+      endTime = 0;
+      currentDuration = 0;
+      break;
   }
 };

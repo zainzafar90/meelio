@@ -22,7 +22,7 @@ import { SiteBlockerSheet } from "@repo/shared";
 import { toast } from "sonner";
 
 const Home = () => {
-  const { user, loading, authenticate } = useAuthStore();
+  const { user, guestUser, loading, authenticate } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -68,7 +68,8 @@ const Home = () => {
     );
   }
 
-  if (!user) {
+
+  if (!user && !guestUser) {
     return (
       <>
         <Background />
@@ -92,9 +93,10 @@ const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible } = useDockStore((state) => ({
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
+    isTimerVisible: state.isTimerVisible,
   }));
   const { t } = useTranslation();
 
@@ -103,7 +105,7 @@ const Content = () => {
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
-      {isGreetingsVisible && <GreetingsContent />}
+      {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TodoListSheet />

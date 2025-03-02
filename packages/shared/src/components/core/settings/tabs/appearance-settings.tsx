@@ -28,6 +28,7 @@ type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 export const AppearanceSettings = () => {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+  const THEME_CHANGE_DISABLED = true;
 
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema as any),
@@ -37,6 +38,11 @@ export const AppearanceSettings = () => {
   });
 
   function onSubmit(data: AppearanceFormValues) {
+    if (THEME_CHANGE_DISABLED) {
+      toast.warning("This feature is work in progress.");
+      return;
+    }
+
     setTheme(data.theme);
     toast.success(t("settings.appearance.themeUpdated"));
   }

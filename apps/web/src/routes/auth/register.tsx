@@ -22,7 +22,7 @@ const Register = () => {
               </p>
             </div>
 
-            <UserAuthForm />
+            <UserAuthForm userName="" onGuestContinue={() => {}} />
 
             <p className="px-8 text-center text-sm text-muted-foreground">
               <Link

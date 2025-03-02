@@ -12,7 +12,7 @@ import {
   TodoList,
   updateList,
   updateTask,
-} from "../lib/db/todo-db";
+} from "../lib/db";
 
 interface TodoState {
   lists: TodoList[];

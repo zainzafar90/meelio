@@ -1,7 +1,7 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTranslation } from "react-i18next";
 
-import { Task } from "../../../../lib/db/todo-db";
+import { Task } from "../../../../lib/db/todo.dexie";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
 import { useTodoStore } from "../../../../stores/todo.store";

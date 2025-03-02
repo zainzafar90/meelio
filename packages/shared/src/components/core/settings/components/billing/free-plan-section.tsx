@@ -20,7 +20,7 @@ export function FreePlanSection({
 }: FreePlanSectionProps) {
   const [selectedPlan, setSelectedPlan] = useState<PlanInterval>();
   const [showError, setShowError] = useState(false);
-  const IS_PAYMENTS_ENABLED = false;
+  const IS_PAYMENTS_ENABLED = true;
 
   return (
     <div className="space-y-6">

@@ -32,3 +32,32 @@ export function Logo(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function LogoMonochrome(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 193 241"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <rect
+        x={75}
+        y={41}
+        width={43}
+        height={159}
+        rx="21.5"
+        className="fill-foreground"
+      />
+      <rect
+        x={150}
+        y={61}
+        width={43}
+        height={118}
+        rx="21.5"
+        className="fill-foreground"
+      />
+      <rect width={43} height={241} rx="21.5" className="fill-foreground" />
+    </svg>
+  );
+}

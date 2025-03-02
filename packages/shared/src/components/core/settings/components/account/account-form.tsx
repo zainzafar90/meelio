@@ -37,9 +37,11 @@ type AccountFormValues = z.infer<typeof accountFormSchema>;
 
 export const AccountForm = ({ user }: { user: AuthUser }) => {
   const { t } = useTranslation();
-  const { authenticate } = useAuthStore();
+
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  console.log(user);
+  const { authenticate } = useAuthStore((state) => ({
+    authenticate: state.authenticate,
+  }));
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema as any),

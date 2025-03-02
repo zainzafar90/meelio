@@ -11,11 +11,11 @@ router
   .post(auth(), validate(userValidation.createUser), userController.createUser)
   .get(auth(), validate(userValidation.getUsers), userController.getUsers);
 
-router.post(
-  "/guest",
-  validate(userValidation.createGuestUser),
-  userController.createGuestUser
-);
+// router.post(
+//   "/guest",
+//   validate(userValidation.createGuestUser),
+//   userController.createGuestUser
+// );
 
 router.post(
   "/:userId/convert-guest",

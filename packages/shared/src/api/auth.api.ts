@@ -13,20 +13,26 @@ export function loginAccount({
   return axios.post("/v1/account/login", { email, password });
 }
 
-export function createGuestUser({
-  name,
-}: {
-  name: string;
-}): Promise<AxiosResponse<AuthUser>> {
-  return axios.post("/v1/account/guest", { name });
-}
+// export function createGuestUser({
+//   name,
+// }: {
+//   name: string;
+// }): Promise<AxiosResponse<AuthUser>> {
+//   return axios.post("/v1/account/guest", { name });
+// }
 
 export function sendMagicLink({
   email,
+  name,
 }: {
   email: string;
+  name?: string;
 }): Promise<AxiosResponse> {
-  return axios.post("/v1/account/send-magic-link", {}, { params: { email } });
+  return axios.post(
+    "/v1/account/send-magic-link",
+    {},
+    { params: { email, name } }
+  );
 }
 
 export function verifyMagicLink({

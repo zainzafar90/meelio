@@ -3,14 +3,17 @@ import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../../../components/icons/icons";
 import { useAuthStore } from "../../../../../stores/auth.store";
-
-const VERSION = "0.0.1";
+import { useAppStore } from "../../../../../stores/app.store";
 
 export function ProfileDropdown() {
-  const { user } = useAuthStore();
+  const { t } = useTranslation();
+
+  const appVersion = useAppStore((state) => state.version);
+  const { user } = useAuthStore((state) => ({
+    user: state.user,
+  }));
   const profileImage = user?.image;
   const isProMember = user?.isPro;
-  const { t } = useTranslation();
 
   return (
     <SidebarMenuButton size="lg" asChild>
@@ -34,17 +37,17 @@ export function ProfileDropdown() {
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="truncate font-semibold">{user?.email}</span>
-            <span className="opacity-50">v{VERSION}</span>
+            <span className="opacity-50">v{appVersion}</span>
           </div>
         </a>
       ) : (
         <a className="cursor-pointer">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Icons.user className="size-4" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
             <span className="font-semibold">Guest</span>
-            <span className="opacity-50">v{VERSION}</span>
+            <span className="opacity-50">v{appVersion}</span>
           </div>
         </a>
       )}

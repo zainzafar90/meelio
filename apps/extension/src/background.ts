@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           } else {
             chrome.runtime.sendMessage({ type: 'TICK', remaining });
           }
-        }, 1000);
+        }, 250);
       }
       break;
 
@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       interval = null;
       endTime = 0;
       currentDuration = 0;
+      chrome.runtime.sendMessage({ type: 'RESET_COMPLETE' });
       break;
 
     case 'UPDATE_DURATION':
@@ -52,14 +53,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
       break;
 
-    // case 'FORCE_SYNC':
-    //   currentDuration = message.duration;
-    //   endTime = Date.now() + (message.duration * 1000);
-    //   if (interval) {
-    //     clearInterval(interval);
-    //     interval = null;
-    //   }
-    //   break;
+      case 'SKIP_TO_NEXT_STAGE':
+        if (interval) clearInterval(interval);
+        interval = null;
+        endTime = 0;
+        currentDuration = 0;
+        break;
       
   }
 }); 

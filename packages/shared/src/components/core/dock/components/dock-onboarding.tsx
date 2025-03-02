@@ -23,9 +23,9 @@ export const ONBOARDING_STEPS = [
     id: "timer",
     titleKey: "onboarding.timer.title",
     descriptionKey: "onboarding.timer.description",
-    icon: Icons.worldClockActive,
-    gradient: "from-orange-500/20 to-amber-500/20",
-    iconClass: "text-orange-400",
+    icon: Icons.pomodoroActive,
+    gradient: "from-red-600/20 to-orange-500/20",
+    iconClass: "text-red-500",
     action: "toggleTimer",
     position: 1, // Timer
   },
@@ -84,8 +84,8 @@ export const ONBOARDING_STEPS = [
     titleKey: "onboarding.background.title",
     descriptionKey: "onboarding.background.description",
     icon: Icons.background,
-    gradient: "from-teal-500/20 to-emerald-500/20",
-    iconClass: "text-teal-400",
+    gradient: "from-emerald-500/20 to-lime-500/20",
+    iconClass: "text-emerald-400",
     action: null,
     position: 7, // Background
   },
@@ -94,8 +94,8 @@ export const ONBOARDING_STEPS = [
     titleKey: "onboarding.settings.title",
     descriptionKey: "onboarding.settings.description",
     icon: Icons.settings,
-    gradient: "from-gray-500/20 to-zinc-500/20",
-    iconClass: "text-gray-400",
+    gradient: "from-slate-600/20 to-stone-400/20",
+    iconClass: "text-slate-400",
     action: null,
     position: 8, // Settings
   },
@@ -129,77 +129,15 @@ export const DockOnboarding = () => {
       setCurrentOnboardingStep(-1); // Reset highlight
       setDockOnboardingCompleted();
     } else {
-      // Reset previous feature if it was toggled
-      const currentAction = ONBOARDING_STEPS[currentStep].action;
-      if (currentAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleBreathing,
-        }[currentAction];
-        actionFn?.();
-      }
-
       setCurrentStep((prev) => prev + 1);
-
-      const nextAction = ONBOARDING_STEPS[currentStep + 1]?.action;
-      if (nextAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleBreathing,
-        }[nextAction];
-        actionFn?.();
-      }
     }
-  }, [
-    currentStep,
-    setDockOnboardingCompleted,
-    setCurrentOnboardingStep,
-    toggleTimer,
-    toggleBreathing,
-  ]);
+  }, [currentStep, setDockOnboardingCompleted, setCurrentOnboardingStep]);
 
   const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
-      const currentAction = ONBOARDING_STEPS[currentStep].action;
-      if (currentAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleSoundscapes,
-          toggleBreathing,
-          toggleTodos,
-          toggleSiteBlocker,
-          toggleBackgrounds,
-          toggleTabStash,
-        }[currentAction];
-        actionFn?.();
-      }
-
       setCurrentStep((prev) => prev - 1);
-
-      const prevAction = ONBOARDING_STEPS[currentStep - 1]?.action;
-      if (prevAction) {
-        const actionFn = {
-          toggleTimer,
-          toggleSoundscapes,
-          toggleBreathing,
-          toggleTodos,
-          toggleSiteBlocker,
-          toggleBackgrounds,
-          toggleTabStash,
-        }[prevAction];
-        actionFn?.();
-      }
     }
-  }, [
-    currentStep,
-    toggleTimer,
-    toggleSoundscapes,
-    toggleBreathing,
-    toggleTodos,
-    toggleSiteBlocker,
-    toggleBackgrounds,
-    toggleTabStash,
-  ]);
+  }, [currentStep]);
 
   const handleSkip = () => {
     // Reset any active features
@@ -251,9 +189,13 @@ export const DockOnboarding = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-x-0 top-0 bottom-28 z-40 bg-black/20 backdrop-blur-sm" />
+      <div
+        key="backdrop"
+        className="fixed inset-x-0 top-0 bottom-20 z-40 bg-black/20 backdrop-blur-sm"
+      />
 
       <motion.div
+        key="onboarding-modal"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
@@ -315,9 +257,9 @@ export const DockOnboarding = () => {
 
           <div className="flex flex-col gap-4 mt-4">
             <div className="flex justify-center gap-1">
-              {ONBOARDING_STEPS.map((_, index) => (
+              {ONBOARDING_STEPS.map((step, index) => (
                 <motion.div
-                  key={index}
+                  key={step.id}
                   className={cn(
                     "h-1 rounded-full transition-all duration-300",
                     index === currentStep ? "w-8 bg-white" : "w-4 bg-white/20"

@@ -17,11 +17,11 @@ router.post(
   validate(accountValidation.login),
   accountController.login
 );
-router.post(
-  "/guest",
-  validate(accountValidation.registerGuest),
-  accountController.registerGuest
-);
+// router.post(
+//   "/guest",
+//   validate(accountValidation.registerGuest),
+//   accountController.registerGuest
+// );
 router.post(
   "/forgot-password",
   validate(accountValidation.forgotPassword),

@@ -14,6 +14,10 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
+import { PremiumFeature } from "../../../components/common/premium-feature";
+import { PremiumFeatureTooltip } from "../../../components/common/premium-feature-tooltip";
+import { Icons } from "../../../components/icons";
+import { useAuthStore } from "../../../stores/auth.store";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -24,6 +28,7 @@ export const SiteBlockerSheet = () => {
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     toggleSiteBlocker: state.toggleSiteBlocker,
   }));
+  const { user } = useAuthStore();
 
   return (
     <Sheet open={isSiteBlockerVisible} onOpenChange={toggleSiteBlocker}>
@@ -43,13 +48,61 @@ export const SiteBlockerSheet = () => {
         </VisuallyHidden>
 
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {t("site-blocker.title")}
           </h2>
         </div>
 
         {isExtension ? (
-          <ExtensionSiteBlockerContent />
+          <PremiumFeature
+            requirePro={true}
+            fallback={
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4 border border-white/10">
+                    <Icons.proMember className="w-8 h-8 text-white/80" />
+                  </div>
+                  <div className="text-lg text-white font-medium mb-2">
+                    {t(
+                      "site-blocker.premium-feature-title",
+                      "Premium Site Blocker"
+                    )}
+                  </div>
+                  <div className="text-white/70 max-w-md mb-6">
+                    {t("site-blocker.premium-feature")}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md mb-6">
+                    <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/10">
+                      <div className="text-sm font-medium text-white mb-2">
+                        Free
+                      </div>
+                      <div className="text-xs text-white/70">
+                        Block up to 3 sites
+                      </div>
+                    </div>
+                    <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/20">
+                      <div className="text-sm font-medium text-white mb-2">
+                        Pro
+                      </div>
+                      <div className="text-xs text-white/70">
+                        Unlimited blocking
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="default"
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                  onClick={() => console.log("/settings/billing")}
+                >
+                  {t("site-blocker.upgrade")}
+                </Button>
+              </div>
+            }
+          >
+            <ExtensionSiteBlockerContent />
+          </PremiumFeature>
         ) : (
           <BrowserSiteBlockerContent />
         )}
@@ -150,12 +203,12 @@ const BrowserSiteBlockerContent = () => {
         className="mt-4"
         onClick={() =>
           window.open(
-            "https://chrome.google.com/webstore/detail/your-extension-id",
+            "https://chrome.google.com/webstore/detail/cancicbkedcabkimkihabdmcaaaikcie",
             "_blank"
           )
         }
       >
-        {t("site-blocker.get-extension", "Get the Extension")}
+        {t("site-blocker.get-extension")}
       </Button>
     </div>
   );

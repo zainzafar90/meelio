@@ -37,10 +37,13 @@ import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore, useAuthStore } from "../../../stores";
+import { LogoMonochrome } from "../../../components/common/logo";
+import { LoginButton } from "./components/common/login-protected";
 
 type SettingsNavItem = {
   id: SettingsTab;
   name: string;
+  requiresLogin?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 };
 
@@ -49,14 +52,14 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
   { id: "dock", name: "dock", icon: Anchor },
-  { id: "account", name: "account", icon: User },
-  { id: "billing", name: "billing", icon: CreditCard },
+  { id: "account", name: "account", icon: User, requiresLogin: true },
+  { id: "billing", name: "billing", icon: CreditCard, requiresLogin: true },
 ] as const;
 
 export function SettingsDialog() {
   const { t } = useTranslation();
   const { isOpen, closeSettings, currentTab, setTab } = useSettingsStore();
-  const { user, logout } = useAuthStore((state) => state);
+  const { user, guestUser, logout } = useAuthStore((state) => state);
 
   const signOut = async () => {
     logout();
@@ -105,10 +108,39 @@ export function SettingsDialog() {
 
             {/* Sidebar Navigation Items */}
             <SidebarContent>
+              {!user && guestUser && (
+                <SidebarGroup>
+                  <LoginButton className="w-full">
+                    <div className="relative">
+                      <div
+                        className={cn(
+                          "flex w-full items-center gap-2 px-3 py-2 rounded-md",
+                          "bg-gradient-to-r from-blue-500 to-sky-500",
+                          "text-white font-medium shadow-sm transition-colors backdrop-blur-sm"
+                        )}
+                      >
+                        <div className="flex flex-col w-full text-left text-sm">
+                          Login
+                          <small className="opacity-80 text-xs">
+                            to save and sync your data
+                          </small>
+                        </div>
+                        <LogoMonochrome className="h-6 w-6 text-white" />
+                      </div>
+                      <span className="absolute -top-1 -left-1 h-3 w-3 isolate">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 -top-1 right-0 bg-blue-500"></span>
+                      </span>
+                    </div>
+                  </LoginButton>
+                </SidebarGroup>
+              )}
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {SETTINGS_NAV.map((item) => (
+                    {SETTINGS_NAV.filter(
+                      (item) => !item.requiresLogin || user
+                    ).map((item) => (
                       <SidebarMenuItem key={item.id}>
                         <SidebarMenuButton
                           onClick={() => setTab(item.id)}

@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState, SyncQueue } from "@repo/shared";
 
 import { usePomodoroStore } from "../lib/pomodoro-store";
 
 import TimerWorker from '../workers/timer-worker?worker';
+
+// Create a sync queue instance for timer sessions
+const timerSyncQueue = new SyncQueue();
 
 export const WebTimer = () => {
   const workerRef = useRef<Worker>();
@@ -56,18 +59,50 @@ export const WebTimer = () => {
       });
     }
 
-    addPomodoroSession( {
+    // Create a session object to store in IndexedDB
+    const sessionData = {
       timestamp: Date.now(),
       stage: completedStage,
       duration: state.stageDurations[completedStage],
       completed: true,
-    }).catch((error) =>
-      console.error("Failed to record session stat:", error)
-    );
+    };
 
-    addPomodoroSummary(state.stageDurations[completedStage], completedStage).catch((error) =>
-      console.error("Failed to record summary stat:", error)
-    );
+    try {
+        await addPomodoroSession(sessionData);
+      
+      if (isFocus) {
+        const now = new Date();
+        const sessionEndTime = now;
+        const sessionStartTime = new Date(now.getTime() - (state.stageDurations[PomodoroStage.Focus] * 1000));
+        
+        const focusSessionData = {
+          id: crypto.randomUUID(),
+          sessionStart: sessionStartTime.toISOString(),
+          sessionEnd: sessionEndTime.toISOString(),
+          duration: Math.floor(state.stageDurations[PomodoroStage.Focus] / 60), // Convert seconds to minutes
+          _syncStatus: 'pending' as "pending" | "synced" | "error",
+          _lastModified: Date.now(),
+          _version: 1,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          userId: 'web-user' 
+        };
+        
+        timerSyncQueue.addOperation({
+          entity: "focus-sessions",
+          operation: "create",
+          data: focusSessionData,
+          version: 1
+        });
+        
+        console.log("Focus session added to sync queue:", focusSessionData);
+      }
+      
+      // Add summary stats
+      await addPomodoroSummary(state.stageDurations[completedStage], completedStage);
+    } catch (error) {
+      console.error("Failed to record session or add to sync queue:", error);
+    }
   };
 
   const getNextStage = (state: PomodoroState) => {
@@ -115,11 +150,13 @@ export const WebTimer = () => {
       isRunning: false,
       endTimestamp: null,
       sessionCount: 0,
-      activeStage: PomodoroStage.Focus,
+      activeStage,
       lastUpdated: Date.now()
     });
     setHasStarted(false);
+    setRemaining(stageDurations[PomodoroStage.Focus]);
   };
+
 
   const handleSwitch = () => {
     const nextStage = getNextStage(usePomodoroStore.getState());
@@ -135,6 +172,21 @@ export const WebTimer = () => {
     });
     setRemaining(stageDurations[nextStage]);
   };
+
+  const handleSkipToNextStage = () => {
+    const nextStage = getNextStage(usePomodoroStore.getState());
+    workerRef.current?.postMessage({
+      type: 'SKIP_TO_NEXT_STAGE',
+      payload: { duration: stageDurations[nextStage] }
+    });
+    usePomodoroStore.setState({
+      activeStage: nextStage,
+      isRunning: false,
+      endTimestamp: null,
+      lastUpdated: Date.now()
+    });
+    setRemaining(stageDurations[nextStage]);
+  }
 
   useEffect(() => {
     workerRef.current = new TimerWorker();
@@ -155,6 +207,17 @@ export const WebTimer = () => {
             endTimestamp: null,
             lastUpdated: Date.now()
           });
+          break;
+        case 'RESET_COMPLETE':
+          usePomodoroStore.setState({
+            isRunning: false,
+            endTimestamp: null,
+            sessionCount: 0,
+            activeStage,
+            lastUpdated: Date.now()
+          });
+          setHasStarted(false);
+          setRemaining(stageDurations[activeStage]);
           break;
       }
     };
@@ -184,22 +247,6 @@ export const WebTimer = () => {
 
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
-
-  // useEffect(() => {
-  //   return usePomodoroStore.subscribe(
-  //     (state) => {
-  //       if (state.lastUpdated > Date.now() - 100) {
-  //         if (!state.isRunning && state.pausedRemaining !== null) {
-  //           workerRef.current?.postMessage({
-  //             type: 'FORCE_SYNC',
-  //             payload: { duration: state.pausedRemaining }
-  //           });
-  //           setRemaining(state.pausedRemaining);
-  //         }
-  //       }
-  //     }
-  //   );
-  // }, []);
 
   return (
     <div className="relative">
@@ -257,12 +304,12 @@ export const WebTimer = () => {
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleSwitch}
-                title="Switch timer"
+                onClick={handleSkipToNextStage}
+                title="Skip to next timer"
                 role="button"
               >
                 <Icons.forward className="size-4 text-white/90" />
-                <span className="sr-only">Switch to next timer</span>
+                <span className="sr-only">Skip to next timer</span>
               </button>
 
               <button

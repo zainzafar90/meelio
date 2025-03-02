@@ -33,7 +33,7 @@ export const DockSettings = () => {
         id: "timer",
         name: t("common.pomodoro"),
         description: t("settings.dock.timer.description"),
-        icon: Icons.worldClock,
+        icon: Icons.pomodoro,
         isVisible: dockIconsVisible.timer,
       },
       {
@@ -82,23 +82,27 @@ export const DockSettings = () => {
         id: "clock",
         name: t("common.clock"),
         description: t("settings.dock.clock.description", "System clock"),
-        icon: ClockDock,
+        icon: Icons.worldClock,
         isVisible: dockIconsVisible.clock,
       },
       {
         id: "calendar",
         name: t("common.calendar"),
         description: t("settings.dock.calendar.description", "Calendar view"),
-        icon: CalendarDock,
+        icon: Icons.moodTracker,
         isVisible: dockIconsVisible.calendar,
       },
     ]);
   }, [t, dockIconsVisible]);
 
   const handleToggleItem = (item: DockItemConfig, value: boolean) => {
-    // Type assertion to ensure the id is a valid key
     setDockIconVisible(item.id as keyof typeof dockIconsVisible, value);
   };
+
+  const { showIconLabels, setShowIconLabels } = useDockStore((state) => ({
+    showIconLabels: state.showIconLabels,
+    setShowIconLabels: state.setShowIconLabels,
+  }));
 
   return (
     <div className="space-y-6">
@@ -108,30 +112,53 @@ export const DockSettings = () => {
         </p>
       </div>
 
-      <div className="space-y-4">
-        {dockItems.map((item) => (
+      <div
+        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+        onClick={() => setShowIconLabels(!showIconLabels)}
+      >
+        <div className="flex items-center space-x-4">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              {t("settings.dock.show-icon-labels.description")}
+            </p>
+          </div>
+        </div>
+        <Switch
+          size="sm"
+          checked={showIconLabels}
+          onCheckedChange={(value) => setShowIconLabels(value)}
+          aria-label={`${t("common.actions.toggle")} ${t("settings.dock.show-icon-labels.title")}`}
+        />
+      </div>
+
+      <div className="overflow-hidden shadow-sm ring-1 ring-gray-100/10 rounded-xl">
+        {dockItems.map((item, index) => (
           <div
             key={item.id}
-            className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+            onClick={() => handleToggleItem(item, !item.isVisible)}
+            className={cn(
+              "flex items-center justify-between px-6 py-5 transition-colors hover:bg-muted/50 cursor-pointer",
+              index !== dockItems.length - 1 && "border-b border-gray-800"
+            )}
           >
             <div className="flex items-center space-x-4">
               <div
                 className={cn(
-                  "flex size-10 items-center justify-center rounded-lg",
+                  "flex size-6 items-center justify-center rounded-lg",
                   "bg-gradient-to-b from-zinc-800 to-zinc-900",
                   !item.isVisible && "opacity-50"
                 )}
               >
-                <item.icon className="size-6 text-white" />
+                <item.icon className="size-4 text-white" />
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">{item.name}</p>
                 <p className="text-sm text-muted-foreground">
                   {item.description}
                 </p>
               </div>
             </div>
             <Switch
+              size="sm"
               checked={item.isVisible}
               onCheckedChange={(value) => handleToggleItem(item, value)}
               aria-label={`${t("common.actions.toggle")} ${item.name}`}
