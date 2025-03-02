@@ -43,6 +43,7 @@ import { LoginButton } from "./components/common/login-protected";
 type SettingsNavItem = {
   id: SettingsTab;
   name: string;
+  requiresLogin?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 };
 
@@ -51,8 +52,8 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
   { id: "dock", name: "dock", icon: Anchor },
-  { id: "account", name: "account", icon: User },
-  { id: "billing", name: "billing", icon: CreditCard },
+  { id: "account", name: "account", icon: User, requiresLogin: true },
+  { id: "billing", name: "billing", icon: CreditCard, requiresLogin: true },
 ] as const;
 
 export function SettingsDialog() {
@@ -137,7 +138,9 @@ export function SettingsDialog() {
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {SETTINGS_NAV.map((item) => (
+                    {SETTINGS_NAV.filter(
+                      (item) => !item.requiresLogin || user
+                    ).map((item) => (
                       <SidebarMenuItem key={item.id}>
                         <SidebarMenuButton
                           onClick={() => setTab(item.id)}

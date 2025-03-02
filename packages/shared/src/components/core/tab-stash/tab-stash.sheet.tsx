@@ -25,7 +25,6 @@ export const TabStashSheet = () => {
     isTabStashVisible: state.isTabStashVisible,
     toggleTabStash: state.toggleTabStash,
   }));
-  console.log(isTabStashVisible);
 
   return (
     <Sheet open={isTabStashVisible} onOpenChange={toggleTabStash}>

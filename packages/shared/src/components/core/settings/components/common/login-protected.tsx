@@ -3,10 +3,8 @@ import { AuthContainer } from "../../../../auth/auth-container";
 import { useState } from "react";
 
 export const LoginProtected = ({
-  children,
   message = "This feature is only available to non-guest users.",
 }: {
-  children: React.ReactNode;
   message?: string;
 }) => {
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
@@ -23,7 +21,6 @@ export const LoginProtected = ({
           onClose={() => setIsAuthOpen(false)}
         />
       )}
-      {children}
     </div>
   );
 };
