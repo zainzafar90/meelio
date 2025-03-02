@@ -4,30 +4,7 @@ import { Label } from "@repo/ui/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
 import { PlanInterval } from "../../../../../types/subscription";
-
-const allPlans = [
-  {
-    value: "monthly",
-    label: "Monthly",
-    price: 5,
-    priceLabel: "/ mo",
-    description: "Billed Montly",
-  },
-  {
-    value: "yearly",
-    label: "Yearly",
-    price: 40,
-    priceLabel: "/ yr",
-    description: "Billed Yearly",
-  },
-  {
-    value: "lifetime",
-    label: "Lifetime",
-    price: 89,
-    priceLabel: "/ Lifetime",
-    description: "Use Forever",
-  },
-];
+import { plansData } from "../../../../../data";
 
 export const Plans = ({
   onPlanChange,
@@ -46,7 +23,7 @@ export const Plans = ({
       }}
       className="no-scrollbar flex flex-wrap gap-x-4 gap-y-6 overflow-x-scroll px-1 py-4 pr-24"
     >
-      {allPlans.map((plan) => (
+      {plansData.map((plan) => (
         <div key={plan.value}>
           <Label
             htmlFor={plan.value}
@@ -71,10 +48,10 @@ export const Plans = ({
               </div>
             </div>
 
-            {plan.value === "yearly" && (
+            {plan.value === PlanInterval.Yearly && plan.discount && (
               <div className="absolute -inset-x-[1px] -top-2">
                 <div className="flex w-full items-start justify-center rounded-t-md bg-accent py-1 text-center text-xs uppercase text-background">
-                  20% off
+                  {plan.discount}
                 </div>
               </div>
             )}

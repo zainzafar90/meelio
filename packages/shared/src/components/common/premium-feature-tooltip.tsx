@@ -13,6 +13,7 @@ import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { cn } from "@repo/ui/lib/utils";
 import { api } from "../../api";
 import { PlanInterval } from "../../types/subscription";
+import { plansData } from "../../data";
 import { env } from "../../utils/env.utils";
 import { toast } from "sonner";
 import { useAuthStore } from "../../stores/auth.store";
@@ -26,16 +27,6 @@ interface PremiumFeatureTooltipProps {
   className?: string;
   tooltipClassName?: string;
   children: React.ReactNode;
-}
-
-interface Plan {
-  id: string;
-  title: string;
-  price: string;
-  period: string;
-  description: string;
-  discount?: string;
-  trial?: string;
 }
 
 /**
@@ -230,34 +221,10 @@ const PricingSection = ({
   onNeedAuth: () => void;
 }) => {
   const { user } = useAuthStore();
-  const [selectedPlan, setSelectedPlan] = useState<string>("yearly");
+  const [selectedPlan, setSelectedPlan] = useState<PlanInterval>(
+    PlanInterval.Yearly
+  );
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
-
-  const plans: Plan[] = [
-    {
-      id: "monthly",
-      title: "Monthly",
-      price: "$5",
-      period: "/ mo",
-      description: "Billed Monthly",
-    },
-    {
-      id: "yearly",
-      title: "Annual",
-      price: "$40",
-      period: "/ yr",
-      description: "Billed Yearly",
-      discount: "20% off",
-      // trial: "Free for 7 days",
-    },
-    {
-      id: "lifetime",
-      title: "Lifetime",
-      price: "$89",
-      period: "",
-      description: "One-time payment",
-    },
-  ];
 
   const renderBenefitItem = (benefit: string, index: number) => (
     <div key={index} className="flex items-center gap-2">
@@ -268,7 +235,7 @@ const PricingSection = ({
     </div>
   );
 
-  const renderPlanCard = (plan: Plan) => (
+  const renderPlanCard = (plan) => (
     <div
       key={plan.id}
       className={`relative rounded-md transition-all cursor-pointer ${
@@ -295,8 +262,10 @@ const PricingSection = ({
 
         <div className="text-right flex items-center gap-2">
           <div className="text-base font-semibold text-gray-900 flex items-baseline">
-            {plan.price}
-            <span className="text-xs text-gray-500 ml-0.5">{plan.period}</span>
+            {plan.priceDisplay}
+            <span className="text-xs text-gray-500 ml-0.5">
+              {plan.priceLabel}
+            </span>
           </div>
         </div>
       </div>
@@ -357,12 +326,12 @@ const PricingSection = ({
         Choose your plan
       </h2>
 
-      <div className="space-y-2 mb-4">{plans.map(renderPlanCard)}</div>
+      <div className="space-y-2 mb-4">{plansData.map(renderPlanCard)}</div>
 
       <Button
         disabled={isLoadingPortal}
         className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4"
-        onClick={() => onOpenCheckout(selectedPlan as PlanInterval)}
+        onClick={() => onOpenCheckout(selectedPlan)}
       >
         {isLoadingPortal ? "Loading..." : "Upgrade to Pro"}
       </Button>
