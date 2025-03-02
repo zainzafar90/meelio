@@ -15,16 +15,10 @@ export const PermissionBanner = () => {
         <Icons.warning className="size-5 text-yellow-500" />
         <div className="flex-1">
           <h3 className="font-medium text-yellow-200">
-            {t(
-              "tab-stash.permissions-needed",
-              "Additional permissions required"
-            )}
+            {t("tab-stash.permissions-needed")}
           </h3>
           <p className="text-sm text-yellow-400/80 mt-1">
-            {t(
-              "tab-stash.permissions-description",
-              "We need permission to manage your tabs to use this feature"
-            )}
+            {t("tab-stash.permissions-description")}
           </p>
         </div>
         <Button
@@ -33,7 +27,7 @@ export const PermissionBanner = () => {
           className="text-yellow-200 border-yellow-700 hover:bg-yellow-900/20"
           onClick={() => requestPermissions()}
         >
-          {t("common.grant-permission", "Grant Permission")}
+          {t("tab-stash.grant-permission")}
         </Button>
       </div>
     </div>

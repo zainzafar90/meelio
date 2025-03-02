@@ -45,7 +45,8 @@
       "previous": "Previous",
       "next": "Next",
       "finish": "Finish",
-      "toggle": "Toggle"
+      "toggle": "Toggle",
+      "dismiss": "Dismiss"
     },
     "close": "Close",
     "weekdays": {
@@ -389,6 +390,12 @@
     "title": "Tab Stash",
     "description": "Stash your tabs for later",
     "extension-only": "Tab stash functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension"
+    "get-extension": "Get the Extension",
+    "stash-all": "Stash All Windows",
+    "stash-current": "Stash Current Window",
+    "needs-permissions": "Please grant the necessary permissions to use the extension.",
+    "grant-permission": "Grant Permission",
+    "permissions-needed": "Additional permissions required",
+    "permissions-description": "We need permission to manage your tabs to use this feature"
   }
 }

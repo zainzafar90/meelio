@@ -93,7 +93,7 @@ const ExtensionTabStashContent = () => {
             onClick={() => stashTabs("all")}
             disabled={!hasPermissions || isStashing}
           >
-            {t("tab-stash.stash-all", "Stash All Windows")}
+            {t("tab-stash.stash-all")}
           </Button>
           <Button
             variant="outline"
@@ -101,7 +101,7 @@ const ExtensionTabStashContent = () => {
             onClick={() => stashTabs("current")}
             disabled={!hasPermissions || isStashing}
           >
-            {t("tab-stash.stash-current", "Stash Current Window")}
+            {t("tab-stash.stash-current")}
           </Button>
         </div>
         {error && (
@@ -116,7 +116,7 @@ const ExtensionTabStashContent = () => {
                 className="text-yellow-200 hover:bg-yellow-900/20"
                 onClick={clearError}
               >
-                {t("common.dismiss", "Dismiss")}
+                {t("common.actions.dismiss")}
               </Button>
             </div>
           </div>
@@ -127,10 +127,7 @@ const ExtensionTabStashContent = () => {
         <SessionList sessions={sessions} onSelectSession={setSelectedSession} />
       ) : (
         <div className="flex-1 flex items-center justify-center p-6 text-center text-white/60">
-          {t(
-            "tab-stash.needs-permission",
-            "Grant permissions to view stashed sessions"
-          )}
+          {t("tab-stash.needs-permission")}
         </div>
       )}
     </div>
@@ -141,12 +138,7 @@ const BrowserTabStashContent = () => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-      <div className="text-lg text-white">
-        {t(
-          "tab-stash.extension-only",
-          "Tab stash functionality is only available in the browser extension."
-        )}
-      </div>
+      <div className="text-lg text-white">{t("tab-stash.extension-only")}</div>
       <Button
         variant="outline"
         className="mt-4"
