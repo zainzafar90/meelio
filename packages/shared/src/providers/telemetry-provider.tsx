@@ -11,7 +11,6 @@ export const TelemetryProvider = ({ children }: TelemetryProviderProps) => {
 
   const options: Partial<PostHogConfig> = {
     api_host: env.posthogHost,
-    persistence: "localStorage",
     autocapture: true,
     debug: env.dev === true,
     loaded: (posthog: any) => {
