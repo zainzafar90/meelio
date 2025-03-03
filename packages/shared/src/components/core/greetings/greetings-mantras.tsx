@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import { useAuthStore } from "../../../stores/auth.store";
+import { useAppStore } from "../../../stores/app.store";
 import {
   useGreetingStore,
   useMantraStore,
@@ -16,9 +17,13 @@ export const Greeting = () => {
     guestUser: state.guestUser,
   }));
   const { t } = useTranslation();
+  const { mantraRotationCount, mantraRotationEnabled } = useAppStore();
   const { greeting, updateGreeting } = useGreetingStore();
-  const { currentMantra, updateMantra } = useMantraStore();
-  const [showMantra, setShowMantra] = useState(false);
+  const { currentMantra, updateMantra, isMantraVisible, setIsMantraVisible } =
+    useMantraStore();
+  const showMantra = mantraRotationEnabled
+    ? mantraRotationCount % 2 === 0
+    : isMantraVisible;
 
   useEffect(() => {
     updateGreeting(new Date(), t);
@@ -48,7 +53,7 @@ export const Greeting = () => {
   const handleClick = () => {
     updateGreeting(new Date(), t);
     updateMantra();
-    setShowMantra(!showMantra);
+    setIsMantraVisible(!isMantraVisible);
   };
 
   return (
@@ -63,7 +68,11 @@ export const Greeting = () => {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
           className="relative font-semibold text-xl sm:text-2xl md:text-4xl lg:text-4xl mb-8 mt-2 md:mb-12 lg:mb-16 [text-shadow:_0_1px_2px_rgba(0,0,0,0.1)]"
-          key={showMantra ? currentMantra : greeting}
+          key={
+            showMantra
+              ? "mantra" + mantraRotationCount
+              : "greeting" + mantraRotationCount
+          }
         >
           {showMantra ? currentMantra : greeting}
           {getFirstName() && ` — ${getFirstName()}`}

@@ -12,9 +12,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
  *
  */
 interface MantraStore {
+  isMantraVisible: boolean;
   currentMantra: string;
   mantras: string[];
   updateMantra: () => void;
+  setIsMantraVisible: (isVisible: boolean) => void;
 }
 
 const getDayOfYear = (): number => {
@@ -25,19 +27,33 @@ const getDayOfYear = (): number => {
   return Math.floor(diff / oneDay);
 };
 
-export const useMantraStore = create<MantraStore>((set) => ({
-  currentMantra: mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
-  mantras,
-  updateMantra: () =>
-    set((state) => ({
-      currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
-    })),
-  resetToDefault: () =>
-    set((state) => ({
-      currentMantra: state.mantras[(getDayOfYear() % state.mantras.length) + 1],
-    })),
-}));
-
+export const useMantraStore = create<MantraStore>()(
+  persist(
+    (set) => ({
+      currentMantra:
+        mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
+      mantras,
+      isMantraVisible: false,
+      updateMantra: () =>
+        set((state) => ({
+          currentMantra:
+            state.mantras[(getDayOfYear() % state.mantras.length) + 1],
+        })),
+      setIsMantraVisible: (isVisible: boolean) =>
+        set({ isMantraVisible: isVisible }),
+      resetToDefault: () =>
+        set((state) => ({
+          currentMantra:
+            state.mantras[(getDayOfYear() % state.mantras.length) + 1],
+        })),
+    }),
+    {
+      name: "meelio:local:mantra",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+    }
+  )
+);
 /**
  * --------------
  * GREETING STORE

@@ -290,6 +290,14 @@
       "language": "Sprache",
       "dock": "Dock"
     },
+    "general": {
+      "title": "Allgemein",
+      "description": "Konfiguriere die allgemeinen Einstellungen",
+      "mantraRotation": {
+        "title": "Mantra Rotation",
+        "description": "Rotiere Mantras mit Begrüßungen beim Seitenladen"
+      }
+    },
     "appearance": {
       "title": "Erscheinungsbild",
       "description": "Konfiguriere das Erscheinungsbild der Anwendung",

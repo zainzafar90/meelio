@@ -289,6 +289,14 @@
       "language": "Language",
       "dock": "Dock"
     },
+    "general": {
+      "title": "General",
+      "description": "Configure the general settings",
+      "mantraRotation": {
+        "title": "Mantra Rotation",
+        "description": "Rotate mantras with greetings on page load"
+      }
+    },
     "appearance": {
       "title": "Appearance",
       "description": "Configure the appearance settings",
