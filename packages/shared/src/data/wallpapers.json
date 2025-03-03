@@ -84,5 +84,65 @@
     "blurhash": "LMK]7mL3sD}rYR%KNaSh.T-nk8JU",
     "author": "Stephen Crane",
     "source": "https://unsplash.com/photos/a-canyon-with-a-river-in-the-middle-of-it-6RXjlCI95YU"
+  },
+  {
+    "id": "static-7",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1455463640095-c56c5f258548?q=80&w=3540&auto=format",
+    "title": "Dubai Coastline",
+    "thumbnail": "https://images.unsplash.com/photo-1455463640095-c56c5f258548?q=100&w=160&auto=format",
+    "blurhash": "LlE#dJIUV@oM_NgNRjoen3s:bvof",
+    "author": "Tim Guow",
+    "source": "https://unsplash.com/photos/aerial-photography-of-sea-at-daytime-S4QAzzXPaRs"
+  },
+  {
+    "id": "static-8",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1739543682798-9abc12646485?q=100&w=3474&auto=format",
+    "title": "Rocky Mountain Corno Bianco",
+    "thumbnail": "https://images.unsplash.com/photo-1739543682798-9abc12646485?q=100&w=160&auto=format",
+    "blurhash": "L~HVe#t6ayoe?woLoLfQkER+ofay",
+    "author": "Madlen Seibert",
+    "source": "https://unsplash.com/photos/a-small-house-in-a-field-with-mountains-in-the-background-C0_TDRpDKP8"
+  },
+  {
+    "id": "static-9",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1681046190916-86e550beee9a?q=100&w=3474&auto=format",
+    "title": "Nature and bridge in Korinth, Greece",
+    "thumbnail": "https://images.unsplash.com/photo-1681046190916-86e550beee9a?q=80&w=160&auto=format",
+    "blurhash": "Lx9le2V[WDfkXraej?ayMxoKj?js",
+    "author": "Pavle Đurakić",
+    "source": "https://unsplash.com/photos/a-green-field-with-trees-and-mountains-in-the-background-7rxpEMJl_24"
+  },
+  {
+    "id": "static-10",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1700573230526-d39bb131312c?q=100&w=3264&auto=format",
+    "title": "Paddy Field Green Landscape View",
+    "thumbnail": "https://images.unsplash.com/photo-1700573230526-d39bb131312c?q=100&w=160&auto=format",
+    "blurhash": "LoF6j{%0s.j[?dxroeoeRrj[j[fR",
+    "author": "Md. Abdullah Al Mamun",
+    "source": "https://unsplash.com/photos/a-field-of-green-grass-with-a-blue-sky-in-the-background-RCcvzocJgvg"
+  },
+  {
+    "id": "static-11",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a?q=80&w=3540&auto=format",
+    "title": "Field Full of Hay Bales",
+    "thumbnail": "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a?q=100&w=160&auto=format",
+    "blurhash": "L~HL-,odWVayyZoea#azxbj[j[jt",
+    "author": "Ingemar Johnsson",
+    "source": "https://unsplash.com/photos/a-field-full-of-hay-bales-under-a-cloudy-blue-sky-lsfnw3MEmtA"
+  },
+  {
+    "id": "static-12",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6?q=100&w=3628&auto=format",
+    "title": "Large Body of Water Surrounded by Mountains",
+    "thumbnail": "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6?q=100&w=160&auto=format",
+    "blurhash": "LtAxi]bbaJRjk]X9kBbJE9ofozof",
+    "author": "Takashi Miyazaki",
+    "source": "https://unsplash.com/photos/a-large-body-of-water-surrounded-by-mountains-tdAQLLJNoZs"
   }
 ]
