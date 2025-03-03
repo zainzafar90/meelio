@@ -2,8 +2,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { AppProvider, AuthContainer, Clock, TabStashSheet, useAuthStore, useDockStore,
-
+import { 
+  AppProvider, 
+  AuthContainer, 
+  Clock, 
+  TabStashSheet, 
+  useAuthStore, 
+  useDockStore,
   TodoListSheet,
   Background,
   BackgroundOverlay,
