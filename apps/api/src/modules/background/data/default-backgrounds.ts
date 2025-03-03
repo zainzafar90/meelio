@@ -1,6 +1,6 @@
 export const defaultBackgrounds = [
   {
-    id: "live-1",
+    id: "static-a7f3b9c2",
     type: "live",
     url: "https://app.meelio.io/live-wallpapers/01-spring-lofi.mp4",
     metadata: {
@@ -16,7 +16,7 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "live-2",
+    id: "static-b1e5d8f4",
     type: "live",
     url: "https://app.meelio.io/live-wallpapers/02-rainy-forest.mp4",
     metadata: {
@@ -32,11 +32,11 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-1",
+    id: "static-c9e2a7b6",
     type: "static",
-    url: "https://images.unsplash.com/photo-1505699261378-c372af38134c",
+    url: "https://images.unsplash.com/photo-1505699261378-c372af38134c?q=100&w=3540",
     metadata: {
-      name: "Gray Bridge Golden Hour",
+      name: "Xinghai Bridge",
       category: "Unsplash",
       tags: ["bridge", "golden hour", "landscape"],
       thumbnailUrl:
@@ -46,9 +46,9 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-2",
+    id: "static-d4f8e3c1",
     type: "static",
-    url: "https://images.unsplash.com/photo-1731432248688-b0b0d1743add",
+    url: "https://images.unsplash.com/photo-1731432248688-b0b0d1743add?q=100&w=3540",
     metadata: {
       name: "Road In Trees",
       category: "Unsplash",
@@ -60,11 +60,11 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-3",
+    id: "static-e7d2c5b9",
     type: "static",
-    url: "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1",
+    url: "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?q=100&w=3540",
     metadata: {
-      name: "Mountain Lake",
+      name: "Blue lake and green shore",
       category: "Unsplash",
       tags: ["mountain", "lake", "landscape"],
       thumbnailUrl:
@@ -74,9 +74,9 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-4",
+    id: "static-f3a8b1e5",
     type: "static",
-    url: "https://images.unsplash.com/photo-1543253539-58c7d1c00c8a",
+    url: "https://images.unsplash.com/photo-1543253539-58c7d1c00c8a?q=100&w=3540",
     metadata: {
       name: "Hills Aerial Snow Capped",
       category: "Unsplash",
@@ -88,9 +88,9 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-5",
+    id: "static-g9c4d7e2",
     type: "static",
-    url: "https://images.unsplash.com/photo-1732465286852-a0b95393a90d",
+    url: "https://images.unsplash.com/photo-1732465286852-a0b95393a90d?q=100&w=3540",
     metadata: {
       name: "Group of Mountains with Snow",
       category: "Unsplash",
@@ -102,16 +102,100 @@ export const defaultBackgrounds = [
     isDefault: true,
   },
   {
-    id: "static-6",
+    id: "static-h5b2a9f7",
     type: "static",
-    url: "https://images.unsplash.com/photo-1739219959019-dd317f76c7e8",
+    url: "https://images.unsplash.com/photo-1676223020538-1cb6ce562a4a?q=100&w=3540&auto=format",
     metadata: {
-      name: "View of a Mountain Covered in Clouds",
+      name: "Sunset Over Horseshoe Bend Arizona",
       category: "Unsplash",
-      tags: ["clouds", "mountains", "landscape"],
+      tags: ["canyon", "sunset", "landscape"],
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1739219959019-dd317f76c7e8?w=160&fit=max",
-      blurhash: "LVCaWUp1RkWBkvV;aej]00kEs:jY",
+        "https://images.unsplash.com/photo-1676223020538-1cb6ce562a4a?q=100&w=160&auto=format",
+      blurhash: "LMK]7mL3sD}rYR%KNaSh.T-nk8JU",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-i6d1c4e8",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1455463640095-c56c5f258548?q=80&w=3540&auto=format",
+    metadata: {
+      name: "Dubai Coastline",
+      category: "Unsplash",
+      tags: ["coastline", "aerial", "urban"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1455463640095-c56c5f258548?q=100&w=160&auto=format",
+      blurhash: "LlE#dJIUV@oM_NgNRjoen3s:bvof",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-j2f8e3d5",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1739543682798-9abc12646485?q=100&w=3474&auto=format",
+    metadata: {
+      name: "Rocky Mountain Corno Bianco",
+      category: "Unsplash",
+      tags: ["mountains", "valley", "nature"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1739543682798-9abc12646485?q=100&w=160&auto=format",
+      blurhash: "L~HVe#t6ayoe?woLoLfQkER+ofay",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-k8c3b5a1",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1681046190916-86e550beee9a?q=100&w=3474&auto=format",
+    metadata: {
+      name: "Nature and bridge in Korinth, Greece",
+      category: "Unsplash",
+      tags: ["bridge", "greece", "landscape"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1681046190916-86e550beee9a?q=80&w=160&auto=format",
+      blurhash: "Lx9le2V[WDfkXraej?ayMxoKj?js",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-l4d9a7c2",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1700573230526-d39bb131312c?q=100&w=3264&auto=format",
+    metadata: {
+      name: "Paddy Field Green Landscape View",
+      category: "Unsplash",
+      tags: ["field", "paddy", "green"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1700573230526-d39bb131312c?q=100&w=160&auto=format",
+      blurhash: "LoF6j{%0s.j[?dxroeoeRrj[j[fR",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-m7e1b5f9",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a?q=80&w=3540&auto=format",
+    metadata: {
+      name: "Field Full of Hay Bales",
+      category: "Unsplash",
+      tags: ["field", "hay", "rural"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a?q=100&w=160&auto=format",
+      blurhash: "L~HL-,odWVayyZoea#azxbj[j[jt",
+    },
+    isDefault: true,
+  },
+  {
+    id: "static-n3c8d2a6",
+    type: "static",
+    url: "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6?q=100&w=3628&auto=format",
+    metadata: {
+      name: "Large Body of Water Surrounded by Mountains",
+      category: "Unsplash",
+      tags: ["water", "mountains", "landscape"],
+      thumbnailUrl:
+        "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6?q=100&w=160&auto=format",
+      blurhash: "LtAxi]bbaJRjk]X9kBbJE9ofozof",
     },
     isDefault: true,
   },
