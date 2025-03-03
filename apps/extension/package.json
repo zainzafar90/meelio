@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "displayName": "Meelio",
   "description": "Focus, calm & productivity with every new tab",
@@ -93,23 +93,6 @@
     "typescript": "^5.3.3"
   },
   "manifest": {
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "public/**/*.svg",
-          "public/**/*.png",
-          "public/**/*.jpg",
-          "public/**/*.webp",
-          "public/**/*.avif",
-          "public/**/*.mp4",
-          "public/**/*.mp3",
-          "public/**/*.json"
-        ],
-        "matches": [
-          "https://www.plasmo.com/*"
-        ]
-      }
-    ],
     "host_permissions": [
       "https://*/*"
     ],
