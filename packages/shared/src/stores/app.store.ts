@@ -17,7 +17,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: "0.1.0",
+      version: "0.1.1",
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
