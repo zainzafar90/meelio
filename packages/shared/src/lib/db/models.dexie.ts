@@ -1,5 +1,3 @@
-import { PomodoroStage } from "src/types/pomodoro";
-
 export interface BaseModel {
   id: string;
   _syncStatus: "pending" | "synced" | "error";

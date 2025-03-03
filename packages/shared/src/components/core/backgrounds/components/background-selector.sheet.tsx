@@ -43,10 +43,8 @@ export const BackgroundSelectorSheet = () => {
   const staticWallpapers = wallpapers.filter((w) => w.type === "static");
 
   const handleSetBackground = async (background: Wallpaper) => {
-    // Set in local store
     setCurrentWallpaper(background);
 
-    // If user is logged in, also set in API
     if (user && background.id) {
       try {
         await backgroundsApi.setSelectedBackground(background.id);
@@ -61,22 +59,18 @@ export const BackgroundSelectorSheet = () => {
       try {
         const response = await backgroundsApi.getRandomBackground();
 
-        // After getting random background, refresh all backgrounds
         initializeWallpapers();
 
-        // Set the random background as selected
         if (response.data && response.data.id) {
           await backgroundsApi.setSelectedBackground(response.data.id);
-          initializeWallpapers(); // Refresh again to get the updated selection
+          initializeWallpapers();
         }
       } catch (error) {
         console.error("Error getting random background:", error);
-        // Fallback to local random background
         const randomIndex = Math.floor(Math.random() * wallpapers.length);
         handleSetBackground(wallpapers[randomIndex]);
       }
     } else {
-      // If not logged in, use local random background
       const randomIndex = Math.floor(Math.random() * wallpapers.length);
       handleSetBackground(wallpapers[randomIndex]);
     }
