@@ -50,7 +50,6 @@ interface ExtendedMetadata {
 interface BackgroundState {
   wallpapers: Wallpaper[];
   currentWallpaper: Wallpaper | null;
-  addWallpaper: (wallpaper: Wallpaper) => void;
   removeWallpaper: (id: string) => void;
   setCurrentWallpaper: (wallpaper: Wallpaper) => void;
   resetToDefault: () => void;
@@ -159,11 +158,6 @@ export const useBackgroundStore = create<BackgroundState>()(
       wallpapers: DEFAULT_WALLPAPERS,
       currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
       isLoading: false,
-
-      addWallpaper: (wallpaper) =>
-        set((state) => ({
-          wallpapers: [...state.wallpapers, wallpaper],
-        })),
 
       removeWallpaper: (id) =>
         set((state) => ({

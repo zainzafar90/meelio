@@ -10,8 +10,9 @@ import {
   tabStashes,
   notes,
   focusSessions,
+  userBackgroundViews,
 } from "@/db/schema";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, desc } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 import { Mantra } from "@/db/schema/mantra.schema";
@@ -282,23 +283,34 @@ async function getMantrasForFeed(
 /**
  * Helper function to get backgrounds for the feed
  */
-async function getBackgroundsForFeed(
-  userId: string
-): Promise<{ backgrounds: Background[]; timestamp: number }> {
-  const now = new Date();
-
+async function getBackgroundsForFeed(userId: string) {
   try {
-    const userBackgrounds = await db
+    const now = new Date();
+
+    // Get all backgrounds
+    const allBackgrounds = await db
       .select()
       .from(backgrounds)
-      .where(eq(backgrounds.userId, userId));
+      .orderBy(desc(backgrounds.createdAt));
+
+    // Get the user's views to determine which backgrounds they've seen
+    const userViews = await db
+      .select()
+      .from(userBackgroundViews)
+      .where(eq(userBackgroundViews.userId, userId));
+
+    // Enrich backgrounds with user-specific data
+    const userBackgrounds = allBackgrounds.map((bg) => {
+      const view = userViews.find((v) => v.backgroundId === bg.id);
+      return {
+        ...bg,
+        isSelected: view?.isSelected || false,
+      };
+    });
 
     return { backgrounds: userBackgrounds, timestamp: now.getTime() };
   } catch (error) {
     console.error("Error in getBackgroundsForFeed:", error);
-    return {
-      backgrounds: [],
-      timestamp: now.getTime(),
-    };
+    return { backgrounds: [], timestamp: new Date().getTime() };
   }
 }

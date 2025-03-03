@@ -16,9 +16,7 @@ import { useAuthStore } from "../../../../stores/auth.store";
 import {
   useBackgroundStore,
   Wallpaper,
-  // WallpaperSource,
 } from "../../../../stores/background.store";
-// import { v4 as uuidv4 } from "uuid";
 import * as backgroundsApi from "../../../../api/backgrounds.api";
 
 export const BackgroundSelectorSheet = () => {
@@ -30,15 +28,10 @@ export const BackgroundSelectorSheet = () => {
     currentWallpaper,
     setCurrentWallpaper,
     resetToDefault,
-    // addWallpaper,
     initializeWallpapers,
     isLoading,
   } = useBackgroundStore();
 
-  // const [uploadingImage, setUploadingImage] = useState(false);
-  // const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Filter wallpapers by type
   const liveWallpapers = wallpapers.filter((w) => w.type === "live");
   const staticWallpapers = wallpapers.filter((w) => w.type === "static");
 
@@ -59,7 +52,7 @@ export const BackgroundSelectorSheet = () => {
     }
   };
 
-  const handleRandomBackground = async () => {
+  const handleRandomBackground = () => {
     const randomIndex = Math.floor(Math.random() * wallpapers.length);
     const randomWallpaper = wallpapers[randomIndex];
     setCurrentWallpaper(randomWallpaper);
@@ -68,69 +61,6 @@ export const BackgroundSelectorSheet = () => {
   const handleResetToDefault = () => {
     resetToDefault();
   };
-
-  // const handleUploadClick = () => {
-  //   fileInputRef.current?.click();
-  // };
-
-  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file) return;
-
-  //   setUploadingImage(true);
-
-  //   try {
-  //     // Create a local URL for the file
-  //     const imageUrl = URL.createObjectURL(file);
-  //     const fileName = file.name.split(".")[0] || "Custom Background";
-
-  //     // Create a new wallpaper
-  //     const newWallpaper: Wallpaper = {
-  //       id: uuidv4(),
-  //       type: "static",
-  //       title: fileName,
-  //       author: "You",
-  //       thumbnail: imageUrl,
-  //       blurhash: "",
-  //       source: "custom" as WallpaperSource,
-  //       url: imageUrl,
-  //     };
-
-  //     // Add to local store
-  //     addWallpaper(newWallpaper);
-
-  //     // If user is logged in, also upload to API
-  //     if (user) {
-  //       try {
-  //         await backgroundsApi.createBackground({
-  //           type: "static",
-  //           url: imageUrl,
-  //           metadata: {
-  //             name: fileName,
-  //             category: "Custom",
-  //             tags: ["custom"],
-  //             thumbnailUrl: imageUrl,
-  //           },
-  //         });
-  //         // Refresh backgrounds
-  //         initializeWallpapers();
-  //       } catch (uploadError) {
-  //         console.error("Error uploading to API:", uploadError);
-  //       }
-  //     }
-
-  //     // Set as current background
-  //     handleSetBackground(newWallpaper);
-  //   } catch (error) {
-  //     console.error("Error uploading image:", error);
-  //   } finally {
-  //     setUploadingImage(false);
-  //     // Reset the file input
-  //     if (fileInputRef.current) {
-  //       fileInputRef.current.value = "";
-  //     }
-  //   }
-  // };
 
   if (isLoading) {
     return (
@@ -161,33 +91,6 @@ export const BackgroundSelectorSheet = () => {
         </SheetHeader>
 
         <div className="mt-6 flex gap-2">
-          {/* <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={handleUploadClick}
-              disabled={uploadingImage}
-            >
-              {uploadingImage ? (
-                <>
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                  {t("backgrounds.uploading")}
-                </>
-              ) : (
-                <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  {t("backgrounds.uploadCustom")}
-                </>
-              )}
-            </Button> */}
-
           <Button
             variant="outline"
             className="w-full"
