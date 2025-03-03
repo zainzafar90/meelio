@@ -36,7 +36,9 @@ export function deleteBackground(id: string): Promise<AxiosResponse<void>> {
 
 export function setSelectedBackground(
   backgroundId: string
-): Promise<AxiosResponse<Backgrounds>> {
+): Promise<
+  AxiosResponse<{ backgrounds: Backgrounds[]; selectedBackgroundId: string }>
+> {
   return axios.post("/v1/backgrounds/selected", { backgroundId });
 }
 

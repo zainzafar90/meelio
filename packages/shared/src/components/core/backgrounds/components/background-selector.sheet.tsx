@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/ui/sheet";
-import { Play, RefreshCw, Upload, Plus } from "lucide-react";
+import { Play, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { cn } from "../../../../lib";
@@ -47,7 +47,12 @@ export const BackgroundSelectorSheet = () => {
 
     if (user && background.id) {
       try {
-        await backgroundsApi.setSelectedBackground(background.id);
+        const response = await backgroundsApi.setSelectedBackground(
+          background.id
+        );
+        if (response.data && response.data.backgrounds) {
+          initializeWallpapers();
+        }
       } catch (error) {
         console.error("Error setting background in API:", error);
       }
@@ -55,25 +60,9 @@ export const BackgroundSelectorSheet = () => {
   };
 
   const handleRandomBackground = async () => {
-    if (user) {
-      try {
-        const response = await backgroundsApi.getRandomBackground();
-
-        initializeWallpapers();
-
-        if (response.data && response.data.id) {
-          await backgroundsApi.setSelectedBackground(response.data.id);
-          initializeWallpapers();
-        }
-      } catch (error) {
-        console.error("Error getting random background:", error);
-        const randomIndex = Math.floor(Math.random() * wallpapers.length);
-        handleSetBackground(wallpapers[randomIndex]);
-      }
-    } else {
-      const randomIndex = Math.floor(Math.random() * wallpapers.length);
-      handleSetBackground(wallpapers[randomIndex]);
-    }
+    const randomIndex = Math.floor(Math.random() * wallpapers.length);
+    const randomWallpaper = wallpapers[randomIndex];
+    setCurrentWallpaper(randomWallpaper);
   };
 
   const handleResetToDefault = () => {

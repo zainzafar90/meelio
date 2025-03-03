@@ -1,6 +1,13 @@
 import { db } from "@/db";
-import { Background, BackgroundInsert, backgrounds } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import {
+  Background,
+  BackgroundInsert,
+  backgrounds,
+  UserBackgroundView,
+  UserBackgroundViewInsert,
+  userBackgroundViews,
+} from "@/db/schema";
+import { eq, and, not, inArray } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
@@ -9,33 +16,60 @@ import { defaultBackgrounds } from "./data/default-backgrounds";
 export const backgroundService = {
   /**
    * Get all backgrounds for a user, including default backgrounds
+   * Returns backgrounds the user hasn't seen yet, plus previously seen backgrounds
    */
   getBackgrounds: async (userId: string) => {
-    const userBackgrounds = await db
+    const viewedBackgroundIds = await db
+      .select({ id: userBackgroundViews.backgroundId })
+      .from(userBackgroundViews)
+      .where(eq(userBackgroundViews.userId, userId));
+
+    const viewedIds = viewedBackgroundIds.map((b) => b.id);
+
+    const allBackgrounds = await db.select().from(backgrounds);
+
+    const selectedView = await db
       .select()
-      .from(backgrounds)
-      .where(eq(backgrounds.userId, userId));
+      .from(userBackgroundViews)
+      .where(
+        and(
+          eq(userBackgroundViews.userId, userId),
+          eq(userBackgroundViews.isSelected, true)
+        )
+      )
+      .limit(1);
 
-    const allBackgrounds = [
-      ...userBackgrounds,
-      ...defaultBackgrounds.map((bg) => ({
-        ...bg,
-        isSelected: false,
-      })),
-    ];
+    const selectedBackgroundId =
+      selectedView.length > 0 ? selectedView[0].backgroundId : null;
 
-    return allBackgrounds;
+    const unseenBackgrounds = allBackgrounds.filter(
+      (bg) => !viewedIds.includes(bg.id)
+    );
+
+    if (unseenBackgrounds.length > 0) {
+      const viewsToInsert: UserBackgroundViewInsert[] = unseenBackgrounds.map(
+        (bg) => ({
+          userId,
+          backgroundId: bg.id,
+          isSelected: false,
+        })
+      );
+
+      await db.insert(userBackgroundViews).values(viewsToInsert);
+    }
+
+    const enrichedBackgrounds = allBackgrounds.map((bg) => ({
+      ...bg,
+      isSelected: bg.id === selectedBackgroundId,
+    }));
+
+    return enrichedBackgrounds;
   },
 
   /**
    * Get a background by ID (user-specific or default)
    */
   getBackgroundById: async (id: string) => {
-    const defaultBackground = defaultBackgrounds.find((bg) => bg.id === id);
-    if (defaultBackground) {
-      return defaultBackground;
-    }
-
     const background = await db
       .select()
       .from(backgrounds)
@@ -53,74 +87,52 @@ export const backgroundService = {
    * Set a background as selected for a user
    */
   setSelectedBackground: async (userId: string, backgroundId: string) => {
+    // First, verify the background exists
+    const background = await backgroundService.getBackgroundById(backgroundId);
+    if (!background) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
+    }
+
     await db
-      .update(backgrounds)
-      .set({ isSelected: false } as Background)
+      .update(userBackgroundViews)
+      .set({ isSelected: false } as UserBackgroundView)
       .where(
-        and(eq(backgrounds.userId, userId), eq(backgrounds.isSelected, true))
+        and(
+          eq(userBackgroundViews.userId, userId),
+          eq(userBackgroundViews.isSelected, true)
+        )
       );
 
-    const isDefaultBackground = defaultBackgrounds.some(
-      (bg) => bg.id === backgroundId
-    );
-
-    if (isDefaultBackground) {
-      const existingRef = await db
-        .select()
-        .from(backgrounds)
-        .where(
-          and(
-            eq(backgrounds.userId, userId),
-            eq(backgrounds.defaultBackgroundId, backgroundId)
-          )
+    const existingView = await db
+      .select()
+      .from(userBackgroundViews)
+      .where(
+        and(
+          eq(userBackgroundViews.userId, userId),
+          eq(userBackgroundViews.backgroundId, backgroundId)
         )
-        .limit(1);
+      )
+      .limit(1);
 
-      if (existingRef.length > 0) {
-        const updatedBackground = await db
-          .update(backgrounds)
-          .set({
-            isSelected: true,
-            updatedAt: new Date(),
-          } as Background)
-          .where(eq(backgrounds.id, existingRef[0].id))
-          .returning();
-
-        return updatedBackground[0];
-      } else {
-        const defaultBg = defaultBackgrounds.find(
-          (bg) => bg.id === backgroundId
-        );
-
-        const newBackground = await db
-          .insert(backgrounds)
-          .values({
-            userId,
-            type: defaultBg.type,
-            url: defaultBg.url,
-            metadata: defaultBg.metadata,
-            isSelected: true,
-            defaultBackgroundId: backgroundId,
-          } as BackgroundInsert)
-          .returning();
-
-        return newBackground[0];
-      }
-    } else {
-      const updatedBackground = await db
-        .update(backgrounds)
+    if (existingView.length > 0) {
+      const updatedView = await db
+        .update(userBackgroundViews)
         .set({
           isSelected: true,
           updatedAt: new Date(),
-        } as Background)
-        .where(eq(backgrounds.id, backgroundId))
+        } as UserBackgroundView)
+        .where(eq(userBackgroundViews.id, existingView[0].id))
         .returning();
 
-      if (updatedBackground.length === 0) {
-        throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
-      }
+      return { ...background, isSelected: true };
+    } else {
+      await db.insert(userBackgroundViews).values({
+        userId,
+        backgroundId,
+        isSelected: true,
+      } as UserBackgroundViewInsert);
 
-      return updatedBackground[0];
+      return { ...background, isSelected: true };
     }
   },
 
@@ -128,15 +140,21 @@ export const backgroundService = {
    * Get a random background (for daily rotation)
    */
   getRandomBackground: async () => {
-    const randomIndex = Math.floor(Math.random() * defaultBackgrounds.length);
-    return defaultBackgrounds[randomIndex];
+    const allBackgrounds = await db.select().from(backgrounds);
+
+    if (allBackgrounds.length === 0) {
+      return null;
+    }
+
+    const randomIndex = Math.floor(Math.random() * allBackgrounds.length);
+    return allBackgrounds[randomIndex];
   },
 
   /**
-   * Create a new background
+   * Create a new background (global)
    */
-  createBackground: async (userId: string, backgroundData: any) => {
-    const { type, url, metadata, schedule } = backgroundData;
+  createBackground: async (backgroundData: any) => {
+    const { type, url, metadata, schedule, isDefault } = backgroundData;
 
     const updatedMetadata = {
       ...(metadata || {}),
@@ -146,11 +164,11 @@ export const backgroundService = {
     const newBackground = await db
       .insert(backgrounds)
       .values({
-        userId,
         type,
         url,
         metadata: updatedMetadata,
         schedule: schedule || {},
+        isDefault: isDefault || false,
       } as BackgroundInsert)
       .returning();
 
@@ -167,14 +185,7 @@ export const backgroundService = {
       throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
     }
 
-    if ("isDefault" in background && background.isDefault) {
-      throw new ApiError(
-        httpStatus.FORBIDDEN,
-        "Cannot update default backgrounds"
-      );
-    }
-
-    const { type, url, metadata, schedule } = backgroundData;
+    const { type, url, metadata, schedule, isDefault } = backgroundData;
 
     let updatedMetadata = metadata;
     if (metadata && !metadata.blurhash) {
@@ -189,6 +200,7 @@ export const backgroundService = {
     if (url !== undefined) updateData.url = url;
     if (updatedMetadata !== undefined) updateData.metadata = updatedMetadata;
     if (schedule !== undefined) updateData.schedule = schedule;
+    if (isDefault !== undefined) updateData.isDefault = isDefault;
 
     const updatedBackground = await db
       .update(backgrounds)
@@ -209,12 +221,9 @@ export const backgroundService = {
       throw new ApiError(httpStatus.NOT_FOUND, "Background not found");
     }
 
-    if ("isDefault" in background && background.isDefault) {
-      throw new ApiError(
-        httpStatus.FORBIDDEN,
-        "Cannot delete default backgrounds"
-      );
-    }
+    await db
+      .delete(userBackgroundViews)
+      .where(eq(userBackgroundViews.backgroundId, id));
 
     await db.delete(backgrounds).where(eq(backgrounds.id, id));
   },

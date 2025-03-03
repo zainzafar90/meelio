@@ -33,28 +33,59 @@ export const backgrounds = pgTable(
   "backgrounds",
   {
     id,
-    userId: text("user_id").notNull(),
     type: EnumBackgroundType("type").notNull(),
     url: text("url").notNull(),
     metadata: jsonb("metadata").$type<BackgroundMetadata>(),
     schedule: jsonb("schedule"),
-    isSelected: boolean("is_selected").default(false),
-    defaultBackgroundId: text("default_background_id"),
+    isDefault: boolean("is_default").default(false),
     createdAt,
     updatedAt,
   },
   (table) => ({
-    userIdIdx: index("idx_backgrounds_user_id").on(table.userId),
     typeIdx: index("idx_backgrounds_type").on(table.type),
+  })
+);
+
+export const userBackgroundViews = pgTable(
+  "user_background_views",
+  {
+    id,
+    userId: text("user_id").notNull(),
+    backgroundId: text("background_id").notNull(),
+    isSelected: boolean("is_selected").default(false),
+    createdAt,
+    updatedAt,
+  },
+  (table) => ({
+    userIdIdx: index("idx_user_bg_views_user_id").on(table.userId),
+    backgroundIdIdx: index("idx_user_bg_views_bg_id").on(table.backgroundId),
+    uniqueIdx: index("idx_user_bg_views_unique").on(
+      table.userId,
+      table.backgroundId
+    ),
   })
 );
 
 export type Background = typeof backgrounds.$inferSelect;
 export type BackgroundInsert = typeof backgrounds.$inferInsert;
 
-export const backgroundsRelations = relations(backgrounds, ({ one }) => ({
-  user: one(users, {
-    fields: [backgrounds.userId],
-    references: [users.id],
-  }),
+export type UserBackgroundView = typeof userBackgroundViews.$inferSelect;
+export type UserBackgroundViewInsert = typeof userBackgroundViews.$inferInsert;
+
+export const backgroundsRelations = relations(backgrounds, ({ many }) => ({
+  userViews: many(userBackgroundViews),
 }));
+
+export const userBackgroundViewsRelations = relations(
+  userBackgroundViews,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [userBackgroundViews.userId],
+      references: [users.id],
+    }),
+    background: one(backgrounds, {
+      fields: [userBackgroundViews.backgroundId],
+      references: [backgrounds.id],
+    }),
+  })
+);

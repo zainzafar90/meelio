@@ -19,8 +19,6 @@ export const backgroundController = {
    * Get a background by ID
    */
   getBackgroundById: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-
     const { id } = req.params;
     const background = await backgroundService.getBackgroundById(id);
 
@@ -46,11 +44,17 @@ export const backgroundController = {
       });
     }
 
-    const background = await backgroundService.setSelectedBackground(
+    const selectedBackground = await backgroundService.setSelectedBackground(
       user.id,
       backgroundId
     );
-    return res.status(httpStatus.OK).json(background);
+
+    const backgrounds = await backgroundService.getBackgrounds(user.id);
+
+    return res.status(httpStatus.OK).json({
+      backgrounds,
+      selectedBackground,
+    });
   }),
 
   /**
@@ -58,19 +62,21 @@ export const backgroundController = {
    */
   getRandomBackground: catchAsync(async (req: Request, res: Response) => {
     const background = await backgroundService.getRandomBackground();
+    if (!background) {
+      return res.status(httpStatus.NOT_FOUND).json({
+        message: "No backgrounds available",
+      });
+    }
     return res.status(httpStatus.OK).json(background);
   }),
 
   /**
-   * Create a new background
+   * Create a new background (globally available)
    */
   createBackground: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
+    // Check for admin permission if needed
 
-    const background = await backgroundService.createBackground(
-      user.id,
-      req.body
-    );
+    const background = await backgroundService.createBackground(req.body);
     return res.status(httpStatus.CREATED).json(background);
   }),
 
@@ -78,6 +84,8 @@ export const backgroundController = {
    * Update a background
    */
   updateBackground: catchAsync(async (req: Request, res: Response) => {
+    // Check for admin permission if needed
+
     const { id } = req.params;
     const background = await backgroundService.updateBackground(id, req.body);
     return res.status(httpStatus.OK).json(background);
@@ -87,6 +95,8 @@ export const backgroundController = {
    * Delete a background
    */
   deleteBackground: catchAsync(async (req: Request, res: Response) => {
+    // Check for admin permission if needed
+
     const { id } = req.params;
     await backgroundService.deleteBackground(id);
     return res.status(httpStatus.NO_CONTENT).send();
