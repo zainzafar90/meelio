@@ -7,7 +7,8 @@ type TelemetryProviderProps = {
 };
 
 export const TelemetryProvider = ({ children }: TelemetryProviderProps) => {
-  console.log("Posthog key", env.posthogKey);
+  console.log("Initializing PostHog");
+
   const options: Partial<PostHogConfig> = {
     api_host: env.posthogHost,
     persistence: "localStorage",
