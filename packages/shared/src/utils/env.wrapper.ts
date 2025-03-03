@@ -40,9 +40,9 @@ export class EnvWrapper {
         import.meta.env.VITE_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
       posthogKey:
         // @ts-ignore - Vite specific
-        import.meta.env.VITE_POSTHOG_KEY || "",
+        import.meta.env.VITE_APP_PUBLIC_POSTHOG_KEY || "",
       // @ts-ignore - Vite specific
-      posthogHost: import.meta.env.VITE_POSTHOG_HOST || "",
+      posthogHost: import.meta.env.VITE_APP_PUBLIC_POSTHOG_HOST || "",
       // @ts-ignore - Vite specific
       dev: import.meta.env.DEV || false,
     };

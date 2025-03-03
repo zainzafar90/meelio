@@ -10,24 +10,8 @@ import { ThemeProvider } from "../components/common/theme-provider";
 import { ConnectionWarning } from "../components/common/connection-warning";
 import { SoundPlayer } from "../components/core/soundscapes/components/sound-player/sound-player";
 import { AuthProvider } from "./auth-provider";
-// import { env } from "../utils/env.utils";
 import { i18n } from "../i18n";
-// import { TelemetryProvider } from "./telemetry-provider";
-
-// import posthog from "posthog-js/dist/module.full.no-external";
-
-// posthog.init(env.posthogKey, {
-//   api_host: "https://app.posthog.com",
-//   persistence: "localStorage",
-//   autocapture: true,
-//   debug: env.dev === true,
-//   loaded: (posthog) => {
-//     posthog.register({
-//       full_url: window.location.href,
-//       domain: window.location.hostname,
-//     });
-//   },
-// });
+import { TelemetryProvider } from "./telemetry-provider";
 
 type AppProviderProps = {
   children: React.ReactNode;
@@ -43,16 +27,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <AuthProvider>
-          {/* <TelemetryProvider> */}
-          <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
-            <TooltipProvider>
-              {children}
-              {hasPlayingSounds && <SoundPlayer />}
-              <Toaster richColors />
-              <ConnectionWarning />
-            </TooltipProvider>
-          </ThemeProvider>
-          {/* </TelemetryProvider> */}
+          <TelemetryProvider>
+            <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
+              <TooltipProvider>
+                {children}
+                {hasPlayingSounds && <SoundPlayer />}
+                <Toaster richColors />
+                <ConnectionWarning />
+              </TooltipProvider>
+            </ThemeProvider>
+          </TelemetryProvider>
         </AuthProvider>
       </BrowserRouter>
     </I18nextProvider>
