@@ -62,7 +62,7 @@ export const Greeting = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
-          className="text-shadow-lg mb-8 mt-2 text-xl font-medium sm:text-2xl md:mb-12 md:text-4xl lg:mb-16"
+          className="relative font-semibold text-xl sm:text-2xl md:text-4xl lg:text-4xl mb-8 mt-2 md:mb-12 lg:mb-16 [text-shadow:_0_1px_2px_rgba(0,0,0,0.1)]"
           key={showMantra ? currentMantra : greeting}
         >
           {showMantra ? currentMantra : greeting}
