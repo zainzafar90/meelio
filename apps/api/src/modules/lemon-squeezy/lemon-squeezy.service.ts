@@ -69,7 +69,7 @@ const createCheckoutLS = async (
           },
           // TODO: Remove this before going to production
           // test_mode: env.NODE_ENV !== "production",
-          test_mode: true,
+          test_mode: env.NODE_ENV !== "production",
         },
         relationships: {
           store: {
