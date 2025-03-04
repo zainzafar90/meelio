@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "displayName": "Meelio",
   "description": "Focus, calm & productivity with every new tab",
@@ -109,6 +109,9 @@
           "https://www.plasmo.com/*"
         ]
       }
+    ],
+    "host_permissions": [
+      "https://*/*"
     ],
     "permissions": [
       "cookies",
