@@ -10,7 +10,6 @@ import { getCustomBlockerMessage } from "./utils/blocker.utils";
 import { pauseAllVideos } from "./utils/video.utils";
 
 export const config: PlasmoCSConfig = {
-  matches: ["<all_urls>"],
   run_at: "document_start",
 };
 

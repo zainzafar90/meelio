@@ -15,9 +15,7 @@ import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
-import { PremiumFeatureTooltip } from "../../../components/common/premium-feature-tooltip";
 import { Icons } from "../../../components/icons";
-import { useAuthStore } from "../../../stores/auth.store";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -28,7 +26,6 @@ export const SiteBlockerSheet = () => {
     isSiteBlockerVisible: state.isSiteBlockerVisible,
     toggleSiteBlocker: state.toggleSiteBlocker,
   }));
-  const { user } = useAuthStore();
 
   return (
     <Sheet open={isSiteBlockerVisible} onOpenChange={toggleSiteBlocker}>

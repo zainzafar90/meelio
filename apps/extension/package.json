@@ -110,12 +110,10 @@
         ]
       }
     ],
-    "host_permissions": [
-      "https://*/*"
-    ],
     "permissions": [
       "cookies",
-      "storage"
+      "storage",
+      "activeTab"
     ],
     "optional_permissions": [
       "tabs"
