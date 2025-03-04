@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           }
         }, 250);
       }
-      break;
+    break;
 
     case 'PAUSE':
       if (interval) {
@@ -36,7 +36,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const remaining = calculateRemaining();
         chrome.runtime.sendMessage({ type: 'PAUSED', remaining });
       } 
-      break;
+    break;
 
     case 'RESET':
       if (interval) clearInterval(interval);
@@ -44,21 +44,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       endTime = 0;
       currentDuration = 0;
       chrome.runtime.sendMessage({ type: 'RESET_COMPLETE' });
-      break;
+    break;
 
     case 'UPDATE_DURATION':
       currentDuration = message.duration;
       if (interval) {
         endTime = Date.now() + (currentDuration * 1000);
       }
-      break;
+    break;
 
-      case 'SKIP_TO_NEXT_STAGE':
+    case 'SKIP_TO_NEXT_STAGE':
         if (interval) clearInterval(interval);
         interval = null;
         endTime = 0;
         currentDuration = 0;
-        break;
+    break;
       
   }
 }); 
