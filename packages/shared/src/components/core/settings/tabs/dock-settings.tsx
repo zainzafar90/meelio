@@ -4,15 +4,6 @@ import { useDockStore } from "../../../../stores/dock.store";
 import { Icons } from "../../../../components/icons/icons";
 import { cn } from "@repo/ui/lib/utils";
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
-import { ClockDock } from "../../dock/components/clock.dock";
-import { CalendarDock } from "../../dock/components/calendar.dock";
 
 interface DockItemConfig {
   id: string;
