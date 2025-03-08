@@ -22,7 +22,7 @@ export const NotFoundPage = () => {
             Go back home
           </Link>
           <a
-            href="mailto:info@meelio.io"
+            href="mailto:support@meelio.io"
             className="text-sm font-semibold text-foreground"
           >
             Contact support <span aria-hidden="true">&rarr;</span>
