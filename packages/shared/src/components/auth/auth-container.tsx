@@ -13,7 +13,7 @@ import { GuestUser } from "../../types/auth";
 import { useAuthStore } from "../../stores/auth.store";
 import { Icons } from "../icons";
 
-type AuthMode = "name" | "login" | "guest";
+type AuthMode = "login" | "guest";
 
 interface AuthContainerProps {
   defaultMode?: AuthMode;
@@ -21,7 +21,7 @@ interface AuthContainerProps {
 }
 
 export const AuthContainer = (props: AuthContainerProps) => {
-  const { defaultMode = "name" } = props;
+  const { defaultMode = "login" } = props;
   const { user, guestUser, authenticateGuest } = useAuthStore((state) => ({
     user: state.user,
     guestUser: state.guestUser,
@@ -29,33 +29,35 @@ export const AuthContainer = (props: AuthContainerProps) => {
   }));
 
   const [mode, setMode] = useState<AuthMode>(defaultMode);
-  const [name, setName] = useState<string>(user?.name || guestUser?.name || "");
-  const [nameError, setNameError] = useState<string>("");
+  const [guestName, setGuestName] = useState<string>(
+    user?.name || guestUser?.name || ""
+  );
+  const [guestNameError, setGuestNameError] = useState<string>("");
 
-  const handleNameSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) {
-      setNameError("Please enter your name");
-      return;
-    }
-    setMode("login");
+  const handleSwitchToGuestMode = () => {
+    setMode("guest");
   };
 
-  const handleContinueAsGuest = async () => {
+  const handleGuestSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!guestName.trim()) {
+      setGuestNameError("Please enter your name");
+      return;
+    }
+
     try {
-      setMode("guest");
-      localStorage.setItem("meelio:local:name", JSON.stringify(name));
+      localStorage.setItem("meelio:local:name", JSON.stringify(guestName));
 
       const guestUser: GuestUser = {
         id: `guest-${Date.now()}`,
-        name,
+        name: guestName,
         role: "guest",
         createdAt: new Date().toISOString(),
       };
 
       authenticateGuest(guestUser);
 
-      toast.info(`Welcome, ${name}!`, {
+      toast.info(`Welcome, ${guestName}!`, {
         description:
           "As a guest, your data will be stored locally, and won't be synced across devices.",
         duration: 10000,
@@ -68,40 +70,48 @@ export const AuthContainer = (props: AuthContainerProps) => {
     }
   };
 
-  const renderNameForm = () => {
+  const renderGuestForm = () => {
     return (
-      <form onSubmit={handleNameSubmit} className="grid gap-4">
+      <form onSubmit={handleGuestSubmit} className="grid gap-4">
         <div className="grid gap-2">
           <div className="grid gap-1">
             <p className="text-sm text-gray-300 mb-2">
               What should we call you?
             </p>
-            <Label className="sr-only" htmlFor="name">
-              Name
+            <Label className="sr-only" htmlFor="guestName">
+              Guest Name
             </Label>
             <Input
-              id="name"
+              id="guestName"
               placeholder="First name or nickname"
               type="text"
               autoCapitalize="words"
               autoComplete="name"
               autoCorrect="off"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
               onBlur={() => {
-                if (!name.trim()) {
-                  setNameError("Name is required");
+                if (!guestName.trim()) {
+                  setGuestNameError("Name is required");
                 } else {
-                  setNameError("");
+                  setGuestNameError("");
                 }
               }}
             />
-            {nameError && (
-              <p className="px-1 text-xs text-red-600">{nameError}</p>
+            {guestNameError && (
+              <p className="px-1 text-xs text-red-600">{guestNameError}</p>
             )}
           </div>
           <Button className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
-            Continue
+            Continue as Guest
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="text-gray-300 hover:text-white"
+            onClick={() => setMode("login")}
+          >
+            Back
           </Button>
         </div>
       </form>
@@ -110,15 +120,12 @@ export const AuthContainer = (props: AuthContainerProps) => {
 
   const renderForm = () => {
     switch (mode) {
-      case "name":
-        return renderNameForm();
       case "login":
-        return (
-          <UserAuthForm
-            userName={name}
-            onGuestContinue={handleContinueAsGuest}
-          />
-        );
+        return <UserAuthForm onGuestContinue={handleSwitchToGuestMode} />;
+      case "guest":
+        return renderGuestForm();
+      default:
+        return null;
     }
   };
 

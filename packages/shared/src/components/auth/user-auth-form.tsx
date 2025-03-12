@@ -18,7 +18,7 @@ import { useAuthStore } from "../../stores/auth.store";
 type FormData = z.infer<typeof userAuthSchema>;
 
 interface UserAuthFormProps {
-  userName: string;
+  userName?: string;
   onGuestContinue: () => void;
   mode?: "default" | "inverted";
 }
@@ -71,17 +71,31 @@ export const UserAuthForm = ({
 
   return (
     <>
-      <div className="text-center mb-4">
-        <p
-          className={cn(
-            "text-gray-300 text-base",
-            mode === "inverted" && "text-gray-900"
-          )}
-        >
-          Hello <span className="font-semibold">{userName}</span>, how would you
-          like to continue?
-        </p>
-      </div>
+      {userName && (
+        <div className="text-center mb-4">
+          <p
+            className={cn(
+              "text-gray-300 text-base",
+              mode === "inverted" && "text-gray-900"
+            )}
+          >
+            Hello <span className="font-semibold">{userName}</span>, how would
+            you like to continue?
+          </p>
+        </div>
+      )}
+      {!userName && (
+        <div className="text-center mb-4">
+          <p
+            className={cn(
+              "text-gray-300 text-base",
+              mode === "inverted" && "text-gray-900"
+            )}
+          >
+            How would you like to continue?
+          </p>
+        </div>
+      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
