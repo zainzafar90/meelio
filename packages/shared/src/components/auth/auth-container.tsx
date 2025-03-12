@@ -132,7 +132,7 @@ export const AuthContainer = (props: AuthContainerProps) => {
           <Icons.close className="h-4 w-4 text-white/80" />
         </button>
       )}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center py-4">
         <div className="flex flex-col justify-center items-center gap-y-8 max-w-96 w-full">
           <Logomark className="text-background dark:text-foreground inline-block w-32" />
           <div className="mx-auto flex w-full flex-col justify-center space-y-2">
