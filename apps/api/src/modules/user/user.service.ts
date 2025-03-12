@@ -64,6 +64,18 @@ export const userService = {
     return user;
   },
 
+  createUserFromMagicLink: async (userBody: CreateUserReq) => {
+    const [user] = await db
+      .insert(users)
+      .values({
+        ...userBody,
+        role: RoleType.User,
+      } as UserInsert)
+      .returning();
+
+    return user;
+  },
+
   registerUser: async (userBody: RegisterUserReq) => {
     const isEmailAlreadyTaken = await userService.isEmailTaken(userBody.email);
     if (isEmailAlreadyTaken) {

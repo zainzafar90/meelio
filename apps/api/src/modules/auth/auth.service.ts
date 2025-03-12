@@ -383,23 +383,56 @@ const verifyMagicLink = async (
       );
     }
 
-    // Create user if not exists and create account as well
-    let user = await userService.getUserByEmail(verifyMagicLinkTokenDoc.email);
+    const email = verifyMagicLinkTokenDoc.email.toLowerCase();
+    let user = await userService.getUserByEmail(email);
 
     if (!user) {
-      user = await userService.createUser({
-        email: verifyMagicLinkTokenDoc.email,
-        name: "",
-        image: "",
-        role: RoleType.User,
-      });
+      try {
+        user = await userService.createUserFromMagicLink({
+          email,
+          name: "",
+          image: "",
+          role: RoleType.User,
+        });
+      } catch (userError) {
+        // Handle race condition with duplicate email
+        // Faced it on local when there's duplicate call to createUserFromMagicLink, still want to be cautious
+        if (userError.message?.includes("users_email_unique")) {
+          user = await userService.getUserByEmail(email);
+          if (!user) {
+            throw new ApiError(
+              httpStatus.INTERNAL_SERVER_ERROR,
+              "Failed to retrieve existing user"
+            );
+          }
+        } else {
+          throw userError;
+        }
+      }
+    }
 
-      await db.insert(accounts).values({
-        providerAccountId: user.id,
-        provider: Provider.MAGIC_LINK,
-        userId: user.id,
-        role: RoleType.User,
-      } as AccountInsert);
+    const existingAccount = await db.query.accounts.findFirst({
+      where: and(
+        eq(accounts.userId, user.id),
+        eq(accounts.provider, Provider.MAGIC_LINK)
+      ),
+    });
+
+    if (!existingAccount && user.id) {
+      try {
+        const tokens = await generateAuthTokens(user);
+        await db.insert(accounts).values({
+          providerAccountId: user.id,
+          provider: Provider.MAGIC_LINK,
+          userId: user.id,
+          accessToken: tokens.access.token,
+          accessTokenExpires: tokens.access.expires,
+          refreshToken: tokens.refresh.token,
+          refreshTokenExpires: tokens.refresh.expires,
+        } as AccountInsert);
+      } catch (accountError) {
+        // Continue even if account creation fails - the user was created successfully
+      }
     }
 
     return user;
