@@ -71,7 +71,6 @@
     "@repo/prettier-config": "*",
     "@repo/tailwind-config": "*",
     "@repo/typescript-config": "*",
-    "@repo/ui": "*",
     "@types/chrome": "0.0.258",
     "@types/node": "^20.11.24",
     "@types/prettier": "^3.0.0",

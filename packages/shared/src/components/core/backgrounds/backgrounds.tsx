@@ -136,7 +136,7 @@ export const Background = () => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
         className={cn(
-          "absolute inset-0 bg-transparent",
+          "fixed inset-0 bg-transparent",
           "m-0 p-0 transition-transform duration-300 ease-out"
         )}
       >
