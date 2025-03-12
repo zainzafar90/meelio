@@ -98,23 +98,23 @@ export class MeelioDB extends Dexie {
 
   // MeelioDB methods
   async getSelectedBackground(): Promise<Backgrounds | undefined> {
-    return this.backgrounds.filter((bg) => bg.isSelected).first();
+    return this.backgrounds.filter((bg) => bg.isFavourite).first();
   }
 
-  async setSelectedBackground(backgroundId: string): Promise<void> {
+  async setFavouriteBackground(backgroundId: string): Promise<void> {
     await this.transaction("rw", this.backgrounds, async () => {
       // Clear previous selection
       await this.backgrounds
-        .filter((bg) => bg.isSelected)
+        .filter((bg) => bg.isFavourite)
         .modify((bg) => {
-          bg.isSelected = false;
+          bg.isFavourite = false;
         });
       // Set new selection
       await this.backgrounds
         .where("id")
         .equals(backgroundId)
         .modify((bg) => {
-          bg.isSelected = true;
+          bg.isFavourite = true;
         });
     });
   }
@@ -126,12 +126,11 @@ export const db = new MeelioDB();
 db.on("ready", async () => {
   const selected = await db.getSelectedBackground();
   if (!selected) {
-    const defaultBackground = await db.backgrounds
-      .filter((bg) => bg.isDefault)
-      .first();
+    const allBackgrounds = await db.backgrounds.toArray();
+    const defaultBackground = allBackgrounds[0];
 
     if (defaultBackground) {
-      await db.setSelectedBackground(defaultBackground.id);
+      await db.setFavouriteBackground(defaultBackground.id);
     }
   }
 

@@ -7,8 +7,6 @@ type TelemetryProviderProps = {
 };
 
 export const TelemetryProvider = ({ children }: TelemetryProviderProps) => {
-  console.info("Initializing PostHog");
-
   const options: Partial<PostHogConfig> = {
     api_host: env.posthogHost,
     autocapture: true,

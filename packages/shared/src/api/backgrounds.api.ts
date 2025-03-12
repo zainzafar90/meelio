@@ -11,13 +11,13 @@ export function getBackgrounds(): Promise<AxiosResponse<Backgrounds[]>> {
 }
 
 /**
- * Set a background as the selected background for the current user
- * @param backgroundId The ID of the background to set as selected
+ * Set a background as the favourite background for the current user
+ * @param backgroundId The ID of the background to set as favourite
  */
-export function setSelectedBackground(
+export function setFavouriteBackground(
   backgroundId: string
 ): Promise<
   AxiosResponse<{ backgrounds: Backgrounds[]; selectedBackgroundId: string }>
 > {
-  return axios.post("/v1/backgrounds/selected", { backgroundId });
+  return axios.post("/v1/backgrounds/favourite", { backgroundId });
 }

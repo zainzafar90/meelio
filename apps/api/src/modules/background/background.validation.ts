@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 export const backgroundValidation = {
-  setSelectedBackground: {
+  setFavouriteBackground: {
     body: Joi.object().keys({
       backgroundId: Joi.string().required(),
     }),

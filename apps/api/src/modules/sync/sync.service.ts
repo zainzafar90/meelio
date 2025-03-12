@@ -304,7 +304,7 @@ async function getBackgroundsForFeed(userId: string) {
       const view = userViews.find((v) => v.backgroundId === bg.id);
       return {
         ...bg,
-        isSelected: view?.isSelected || false,
+        isFavourite: view?.isFavourite || false,
       };
     });
 

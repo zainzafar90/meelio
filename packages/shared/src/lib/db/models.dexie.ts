@@ -35,8 +35,7 @@ export interface Backgrounds extends BaseModel {
     startTime?: string;
     endTime?: string;
   };
-  isSelected?: boolean;
-  isDefault?: boolean;
+  isFavourite?: boolean;
 }
 
 // Todo interfaces

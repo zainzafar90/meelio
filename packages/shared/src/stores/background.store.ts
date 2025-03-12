@@ -133,7 +133,7 @@ export const useBackgroundStore = create<BackgroundState>()(
         set((state) => {
           const updatedWallpapers = state.wallpapers.map((wp) => ({
             ...wp,
-            isSelected: wp.id === wallpaper.id,
+            isFavourite: wp.id === wallpaper.id,
           }));
 
           return {
@@ -148,7 +148,7 @@ export const useBackgroundStore = create<BackgroundState>()(
           currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
           wallpapers: DEFAULT_WALLPAPERS.map((wp) => ({
             ...wp,
-            isSelected: wp.id === CURRENT_DEFAULT_WALLPAPER.id,
+            isFavourite: wp.id === CURRENT_DEFAULT_WALLPAPER.id,
           })),
         }),
 
@@ -164,9 +164,7 @@ export const useBackgroundStore = create<BackgroundState>()(
             // Convert API backgrounds to Wallpaper format
             const apiWallpapers = response.data.map((bg) => {
               const metadata = bg.metadata as ExtendedMetadata;
-              const source = (
-                bg.isDefault ? "api-default" : "api-custom"
-              ) as WallpaperSource;
+              const source = "api-custom" as WallpaperSource;
 
               if (bg.type === "live") {
                 return {
@@ -204,7 +202,7 @@ export const useBackgroundStore = create<BackgroundState>()(
                   (bg) => bg.id === get().currentWallpaper?.id
                 ) ||
                 apiWallpapers.find(
-                  (bg) => "isSelected" in bg && bg.isSelected
+                  (bg) => "isFavourite" in bg && bg.isFavourite
                 ) ||
                 apiWallpapers[0],
             });

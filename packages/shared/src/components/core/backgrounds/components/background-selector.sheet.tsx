@@ -40,7 +40,7 @@ export const BackgroundSelectorSheet = () => {
 
     if (user && background.id) {
       try {
-        const response = await backgroundsApi.setSelectedBackground(
+        const response = await backgroundsApi.setFavouriteBackground(
           background.id
         );
         if (response.data && response.data.backgrounds) {

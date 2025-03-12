@@ -11,10 +11,10 @@ const router = Router();
 router.get("/", auth(), backgroundController.getBackgrounds);
 
 router.post(
-  "/selected",
+  "/favourite",
   auth(),
-  validate(backgroundValidation.setSelectedBackground),
-  backgroundController.setSelectedBackground
+  validate(backgroundValidation.setFavouriteBackground),
+  backgroundController.setFavouriteBackground
 );
 
 export default router;

@@ -20,7 +20,6 @@ type AppProviderProps = {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const sounds = useSoundscapesStore((state) => state.sounds);
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
-  console.info("AppProvider");
 
   return (
     <I18nextProvider i18n={i18n}>

@@ -18,7 +18,7 @@ export const backgroundController = {
   /**
    * Set a background as selected for the authenticated user
    */
-  setSelectedBackground: catchAsync(async (req: Request, res: Response) => {
+  setFavouriteBackground: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
 
     const { backgroundId } = req.body;
@@ -28,7 +28,7 @@ export const backgroundController = {
       });
     }
 
-    const selectedBackground = await backgroundService.setSelectedBackground(
+    const selectedBackground = await backgroundService.setFavouriteBackground(
       user.id,
       backgroundId
     );

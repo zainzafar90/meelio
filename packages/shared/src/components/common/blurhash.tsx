@@ -23,10 +23,11 @@ export function Blurhash({
 
   useEffect(() => {
     let isMounted = true;
+    const fallbackHash = "L~HL-,odWVayyZoea#azxbj[j[jt";
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
-    const pixels = decode(hash, width, height, punch);
+    const pixels = decode(hash || fallbackHash, width, height, punch);
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
