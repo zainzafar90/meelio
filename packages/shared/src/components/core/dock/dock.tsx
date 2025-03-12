@@ -239,154 +239,156 @@ export const Dock = () => {
   }, []);
 
   return (
-    <div className="relative z-50" ref={dockRef}>
-      <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-3 pr-1">
-            {visibleItems.map((item, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "relative",
-                  currentOnboardingStep >= 0 &&
-                    ONBOARDING_STEPS[currentOnboardingStep].position ===
-                      index &&
-                    "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
-                )}
-              >
-                {item.requirePro ? (
-                  <PremiumFeature
-                    requirePro={item.requirePro}
-                    fallback={<DockButton item={item} isDisabled={true} />}
-                  >
-                    <DockButton item={item} />
-                  </PremiumFeature>
-                ) : (
-                  <DockButton item={item} />
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-            {STATIC_DOCK_ITEMS.map((item, index) => {
-              if (
-                (item.id === "clock" && !dockIconsVisible.clock) ||
-                (item.id === "calendar" && !dockIconsVisible.calendar)
-              ) {
-                return null;
-              }
-
-              return (
+    <>
+      {(user || guestUser) && <DockOnboarding />}
+      <div className="relative z-50" ref={dockRef}>
+        <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 pr-1">
+              {visibleItems.map((item, index) => (
                 <div
-                  key={item.id}
+                  key={index}
                   className={cn(
                     "relative",
                     currentOnboardingStep >= 0 &&
-                      ONBOARDING_STEPS[currentOnboardingStep].position === 8 &&
-                      item.id === "settings" &&
+                      ONBOARDING_STEPS[currentOnboardingStep].position ===
+                        index &&
                       "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                   )}
                 >
-                  <div className="flex items-center justify-center">
-                    <item.icon />
+                  {item.requirePro ? (
+                    <PremiumFeature
+                      requirePro={item.requirePro}
+                      fallback={<DockButton item={item} isDisabled={true} />}
+                    >
+                      <DockButton item={item} />
+                    </PremiumFeature>
+                  ) : (
+                    <DockButton item={item} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+              {STATIC_DOCK_ITEMS.map((item, index) => {
+                if (
+                  (item.id === "clock" && !dockIconsVisible.clock) ||
+                  (item.id === "calendar" && !dockIconsVisible.calendar)
+                ) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "relative",
+                      currentOnboardingStep >= 0 &&
+                        ONBOARDING_STEPS[currentOnboardingStep].position ===
+                          8 &&
+                        item.id === "settings" &&
+                        "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
+                    )}
+                  >
+                    <div className="flex items-center justify-center">
+                      <item.icon />
+                    </div>
+                  </div>
+                );
+              })}
+
+              {dropdownItems.length > 0 && (
+                <div className="group relative flex items-center justify-center">
+                  <div
+                    className={cn(
+                      "flex size-10 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
+                      "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
+                    )}
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    title="More Options"
+                  >
+                    <MoreHorizontal className="size-6 text-white" />
                   </div>
                 </div>
-              );
-            })}
-
-            {dropdownItems.length > 0 && (
-              <div className="group relative flex items-center justify-center">
-                <div
-                  className={cn(
-                    "flex size-10 items-center justify-center rounded-xl shadow-lg transition-all duration-200 group-hover:translate-y-0 group-hover:scale-105",
-                    "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900"
-                  )}
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  title="More Options"
-                >
-                  <MoreHorizontal className="size-6 text-white" />
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {isDropdownOpen && dropdownItems.length > 0 && (
-        <div
-          ref={dropdownRef}
-          className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
-        >
-          {dropdownItems.map((item, index) => {
-            const isActive =
-              (item.id === "timer" && isTimerVisible) ||
-              (item.id === "soundscapes" && isSoundscapesVisible) ||
-              (item.id === "breathepod" && isBreathingVisible) ||
-              (item.id === "todos" && isTodosVisible) ||
-              (item.id === "site-blocker" && isSiteBlockerVisible) ||
-              (item.id === "background" && isBackgroundsVisible) ||
-              (item.id === "tab-stash" && isTabStashVisible);
+        {isDropdownOpen && dropdownItems.length > 0 && (
+          <div
+            ref={dropdownRef}
+            className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
+          >
+            {dropdownItems.map((item, index) => {
+              const isActive =
+                (item.id === "timer" && isTimerVisible) ||
+                (item.id === "soundscapes" && isSoundscapesVisible) ||
+                (item.id === "breathepod" && isBreathingVisible) ||
+                (item.id === "todos" && isTodosVisible) ||
+                (item.id === "site-blocker" && isSiteBlockerVisible) ||
+                (item.id === "background" && isBackgroundsVisible) ||
+                (item.id === "tab-stash" && isTabStashVisible);
 
-            const IconComponent = (
-              isActive ? item.activeIcon : item.icon
-            ) as DockIconComponent;
+              const IconComponent = (
+                isActive ? item.activeIcon : item.icon
+              ) as DockIconComponent;
 
-            if (item.id === "settings") {
-              return (
-                <SidebarTrigger
-                  key={index}
-                  title="Toggle Sidebar"
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                >
-                  <IconComponent className="size-5" />
-                  <span className="text-xs">{item.name}</span>
-                </SidebarTrigger>
-              );
-            }
+              if (item.id === "settings") {
+                return (
+                  <SidebarTrigger
+                    key={index}
+                    title="Toggle Sidebar"
+                    className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <IconComponent className="size-5" />
+                    <span className="text-xs">{item.name}</span>
+                  </SidebarTrigger>
+                );
+              }
 
-            if (item.requirePro) {
-              return (
-                <PremiumFeature
-                  requirePro={item.requirePro}
-                  tooltipClassName="top-2 right-2"
-                  fallback={
+              if (item.requirePro) {
+                return (
+                  <PremiumFeature
+                    requirePro={item.requirePro}
+                    tooltipClassName="top-2 right-2"
+                    fallback={
+                      <button
+                        key={`${index}-fallback`}
+                        className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                      >
+                        <IconComponent className="size-5" />
+                        <span className="text-xs">{item.name}</span>
+                      </button>
+                    }
+                  >
                     <button
-                      key={`${index}-fallback`}
+                      key={index}
                       className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                      onClick={item.onClick}
                     >
                       <IconComponent className="size-5" />
                       <span className="text-xs">{item.name}</span>
                     </button>
-                  }
+                  </PremiumFeature>
+                );
+              }
+
+              return (
+                <button
+                  key={index}
+                  className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  onClick={item.onClick}
                 >
-                  <button
-                    key={index}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                    onClick={item.onClick}
-                  >
-                    <IconComponent className="size-5" />
-                    <span className="text-xs">{item.name}</span>
-                  </button>
-                </PremiumFeature>
+                  <IconComponent className="size-5" />
+                  <span className="text-xs">{item.name}</span>
+                </button>
               );
-            }
-
-            return (
-              <button
-                key={index}
-                className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                onClick={item.onClick}
-              >
-                <IconComponent className="size-5" />
-                <span className="text-xs">{item.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {(user || guestUser) && <DockOnboarding />}
-    </div>
+            })}
+          </div>
+        )}
+      </div>
+    </>
   );
 };

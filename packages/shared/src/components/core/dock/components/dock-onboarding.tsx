@@ -191,7 +191,7 @@ export const DockOnboarding = () => {
     <AnimatePresence>
       <div
         key="backdrop"
-        className="fixed inset-x-0 top-0 bottom-20 z-40 bg-black/20 backdrop-blur-sm"
+        className="fixed inset-x-0 top-0 bottom-0 z-40 bg-black/20 backdrop-blur-sm"
       />
 
       <motion.div

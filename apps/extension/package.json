@@ -113,9 +113,7 @@
       "https://*/*"
     ],
     "permissions": [
-      "cookies",
-      "storage",
-      "activeTab"
+      "storage"
     ],
     "optional_permissions": [
       "tabs"
