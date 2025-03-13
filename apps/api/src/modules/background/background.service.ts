@@ -53,9 +53,8 @@ export const backgroundService = {
     );
     const seenWallpapers = wallpapers.filter((bg) => viewedIds.includes(bg.id));
 
-    let wallpaperList = [...unseenWallpapers, ...seenWallpapers].slice(0, 10);
+    const wallpaperList = [...unseenWallpapers, ...seenWallpapers];
 
-    // Transform wallpapers to match the expected API format
     const result: BackgroundApiResponse[] = wallpaperList.map((bg: any) => {
       const transformed: BackgroundApiResponse = {
         id: bg.id,
@@ -70,7 +69,6 @@ export const backgroundService = {
         },
       };
 
-      // Add fallbackImage for live wallpapers
       if (bg.type === "live" && bg.video) {
         transformed.metadata.fallbackImage = bg.video.fallbackImage;
       }
