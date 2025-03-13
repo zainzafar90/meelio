@@ -27,9 +27,6 @@ interface SiteListProps {
   onUnblockSites: (sites: string[]) => void;
 }
 
-// Maximum number of sites that can be blocked in the free version
-const FREE_TIER_MAX_BLOCKED_SITES = 3;
-
 const isGroupBlocked = (categoryKey: string, blockedSites: string[]) => {
   const groupSites = SITE_LIST[categoryKey] || [];
   return groupSites.every((site) => blockedSites.includes(site.url));
@@ -65,20 +62,9 @@ export function SiteList({
     }
   };
 
-  const canBlockMoreSites =
-    isPro || blockedSites.length < FREE_TIER_MAX_BLOCKED_SITES;
-
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-white">Popular Sites</h2>
-
-      {!isPro && blockedSites.length >= FREE_TIER_MAX_BLOCKED_SITES && (
-        <div className="rounded-md bg-amber-500/10 p-3 text-amber-200 text-sm mb-4">
-          You've reached the maximum number of sites (
-          {FREE_TIER_MAX_BLOCKED_SITES}) that can be blocked with a free
-          account. Upgrade to Pro to block unlimited sites.
-        </div>
-      )}
 
       <div className="space-y-2">
         {SITE_CATEGORIES.filter((cat) => cat.enabled).map((category) => (
@@ -115,10 +101,7 @@ export function SiteList({
                 </button>
               ) : (
                 <PremiumFeature
-                  requirePro={
-                    SITE_LIST[category.key]?.length >
-                    FREE_TIER_MAX_BLOCKED_SITES
-                  }
+                  requirePro={true}
                   fallback={
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -131,10 +114,7 @@ export function SiteList({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>
-                          Blocking all sites in this category requires a Pro
-                          subscription.
-                        </p>
+                        <p>Site blocking requires a Pro subscription.</p>
                       </TooltipContent>
                     </Tooltip>
                   }
@@ -161,17 +141,11 @@ export function SiteList({
                     site={site}
                     isBlocked={blockedSites.includes(site.url)}
                     onToggle={(siteUrl) => {
-                      // If the site is already blocked, allow unblocking
-                      if (blockedSites.includes(siteUrl)) {
-                        onToggleSite(siteUrl);
-                      } else if (canBlockMoreSites) {
-                        // Only allow blocking if under the limit or Pro
+                      if (blockedSites.includes(siteUrl) || isPro) {
                         onToggleSite(siteUrl);
                       }
                     }}
-                    disabled={
-                      !blockedSites.includes(site.url) && !canBlockMoreSites
-                    }
+                    disabled={!blockedSites.includes(site.url) && !isPro}
                   />
                 ))}
               </div>

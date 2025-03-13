@@ -69,22 +69,12 @@ export const SiteBlockerSheet = () => {
                     {t("site-blocker.premium-feature")}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-md mb-6">
-                    <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/10">
-                      <div className="text-sm font-medium text-white mb-2">
-                        Free
-                      </div>
-                      <div className="text-xs text-white/70">
-                        Block up to 3 sites
-                      </div>
+                  <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/10 w-full max-w-md mb-6">
+                    <div className="text-sm font-medium text-white mb-2">
+                      Pro Feature
                     </div>
-                    <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/20">
-                      <div className="text-sm font-medium text-white mb-2">
-                        Pro
-                      </div>
-                      <div className="text-xs text-white/70">
-                        Unlimited blocking
-                      </div>
+                    <div className="text-xs text-white/70">
+                      Site blocking is available for Pro users
                     </div>
                   </div>
                 </div>
