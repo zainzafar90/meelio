@@ -16,10 +16,12 @@ export const LoginProtected = ({
         <Button>Login</Button>
       </LoginButton>
       {isAuthOpen && (
-        <AuthContainer
-          defaultMode="login"
-          onClose={() => setIsAuthOpen(false)}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <AuthContainer
+            defaultMode="login"
+            onClose={() => setIsAuthOpen(false)}
+          />
+        </div>
       )}
     </div>
   );
@@ -40,10 +42,12 @@ export const LoginButton = ({
         {children}
       </button>
       {isAuthOpen && (
-        <AuthContainer
-          defaultMode="login"
-          onClose={() => setIsAuthOpen(false)}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <AuthContainer
+            defaultMode="login"
+            onClose={() => setIsAuthOpen(false)}
+          />
+        </div>
       )}
     </>
   );
