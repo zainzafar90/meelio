@@ -23,6 +23,7 @@ import {
   User,
   Languages,
   Anchor,
+  MessageCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -39,6 +40,7 @@ import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore, useAuthStore } from "../../../stores";
 import { LogoMonochrome } from "../../../components/common/logo";
 import { LoginButton } from "./components/common/login-protected";
+import { FeedbackSettings } from "./tabs/feedback-settings";
 
 type SettingsNavItem = {
   id: SettingsTab;
@@ -52,6 +54,7 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
   { id: "dock", name: "dock", icon: Anchor },
+  { id: "feedback", name: "feedback", icon: MessageCircle },
   { id: "account", name: "account", icon: User, requiresLogin: true },
   { id: "billing", name: "billing", icon: CreditCard, requiresLogin: true },
 ] as const;
@@ -81,6 +84,8 @@ export function SettingsDialog() {
         return <AccountSettings />;
       case "billing":
         return <BillingSettings />;
+      case "feedback":
+        return <FeedbackSettings />;
       default:
         return null;
     }

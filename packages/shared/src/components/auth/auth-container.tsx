@@ -60,7 +60,7 @@ export const AuthContainer = (props: AuthContainerProps) => {
       toast.info(`Welcome, ${guestName}!`, {
         description:
           "As a guest, your data will be stored locally, and won't be synced across devices.",
-        duration: 10000,
+        duration: 5000,
         position: "top-center",
       });
     } catch (error) {

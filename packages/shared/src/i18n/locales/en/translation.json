@@ -287,7 +287,8 @@
       "privacy": "Privacy & visibility",
       "advanced": "Advanced",
       "language": "Language",
-      "dock": "Dock"
+      "dock": "Dock",
+      "feedback": "Feedback"
     },
     "general": {
       "title": "General",
@@ -357,6 +358,11 @@
         "description": "Please enter your name",
         "placeholder": "John Doe"
       }
+    },
+    "feedback": {
+      "title": "Feedback",
+      "description": "Share your feedback with us",
+      "button": "Share Feedback"
     },
     "billing": {
       "title": "Billing",

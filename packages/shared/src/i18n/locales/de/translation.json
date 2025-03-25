@@ -288,7 +288,8 @@
       "privacy": "Datenschutz & Sichtbarkeit",
       "advanced": "Erweitert",
       "language": "Sprache",
-      "dock": "Dock"
+      "dock": "Dock",
+      "feedback": "Feedback"
     },
     "general": {
       "title": "Allgemein",
@@ -358,6 +359,11 @@
         "description": "Bitte gib deinen Namen ein",
         "placeholder": "John Doe"
       }
+    },
+    "feedback": {
+      "title": "Feedback",
+      "description": "Teile deine Meinung mit uns",
+      "button": "Feedback geben"
     },
     "billing": {
       "title": "Abrechnung",
