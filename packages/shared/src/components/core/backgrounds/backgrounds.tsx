@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Blurhash } from "../../../components";
 import {
   LiveWallpaper,
@@ -61,34 +61,6 @@ const StaticWallpaperComponent = ({
 }: {
   wallpaper: StaticWallpaper;
 }) => {
-  // const [isLoaded, setIsLoaded] = useState(false);
-  // const [cachedSrc, setCachedSrc] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   const cacheKey = `/wallpaper-${wallpaper.id}`;
-
-  //   const checkCache = async () => {
-  //     try {
-  //       const cache = await caches.open("wallpapers");
-  //       const response = await cache.match(cacheKey);
-  //       if (response) {
-  //         const blob = await response.blob();
-  //         const objectUrl = URL.createObjectURL(blob);
-  //         if (isMounted) setCachedSrc(objectUrl);
-  //       }
-  //     } catch (error) {
-  //       console.error("Cache access error:", error);
-  //     }
-  //   };
-
-  //   checkCache();
-  //   return () => {
-  //     isMounted = false;
-  //     if (cachedSrc) URL.revokeObjectURL(cachedSrc);
-  //   };
-  // }, [wallpaper.id]);
-
   return (
     <div className="relative h-full w-full">
       <motion.div
@@ -142,22 +114,24 @@ export const Background = () => {
   if (!currentWallpaper) return null;
 
   return (
-    <motion.div
-      key={currentWallpaper.id}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: "easeIn" }}
-      className={cn(
-        "fixed inset-0 bg-transparent",
-        "m-0 p-0 transition-transform duration-300 ease-out"
-      )}
-    >
-      {currentWallpaper.type === "live" ? (
-        <LiveWallpaperComponent wallpaper={currentWallpaper} />
-      ) : (
-        <StaticWallpaperComponent wallpaper={currentWallpaper} />
-      )}
-    </motion.div>
+    <AnimatePresence mode="sync">
+      <motion.div
+        key={currentWallpaper.id}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5, ease: "easeIn" }}
+        className={cn(
+          "fixed inset-0 bg-transparent",
+          "m-0 p-0 transition-transform duration-300 ease-out"
+        )}
+      >
+        {currentWallpaper.type === "live" ? (
+          <LiveWallpaperComponent wallpaper={currentWallpaper} />
+        ) : (
+          <StaticWallpaperComponent wallpaper={currentWallpaper} />
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 };
