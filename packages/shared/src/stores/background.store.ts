@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getBackgrounds } from "../api/backgrounds.api";
 import { getAssetPath } from "../utils/path.utils";
-import { useAuthStore } from "./auth.store";
 import wallpapersData from "../data/wallpapers.json";
 
 export type WallpaperType = "static" | "live";
@@ -217,7 +216,7 @@ export const useBackgroundStore = create<BackgroundState>()(
     {
       name: "meelio:local:background",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.initializeWallpapers();

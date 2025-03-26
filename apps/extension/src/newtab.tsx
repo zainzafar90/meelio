@@ -31,11 +31,17 @@ import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 const Home = () => {
   const { user, guestUser } = useAuthStore();
 
+  const renderBackground = () => (
+    <>
+      <Background />
+      <BackgroundOverlay />
+    </>
+  );
+
   if (!user && !guestUser) {
     return (
       <>
-        <Background />
-        <BackgroundOverlay />
+        {renderBackground()}
         <AuthContainer />
       </>
     );
@@ -43,8 +49,7 @@ const Home = () => {
 
   return (
     <>
-      <Background />
-      <BackgroundOverlay />
+      {renderBackground()}
       <AppLayout>
         <TopBar />
         <Content />
