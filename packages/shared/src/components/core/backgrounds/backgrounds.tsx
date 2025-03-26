@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@repo/ui/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Blurhash } from "../../../components";
 import {
   LiveWallpaper,
@@ -142,24 +142,22 @@ export const Background = () => {
   if (!currentWallpaper) return null;
 
   return (
-    <AnimatePresence mode="sync">
-      <motion.div
-        key={currentWallpaper.id}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5, ease: "easeIn" }}
-        className={cn(
-          "fixed inset-0 bg-transparent",
-          "m-0 p-0 transition-transform duration-300 ease-out"
-        )}
-      >
-        {currentWallpaper.type === "live" ? (
-          <LiveWallpaperComponent wallpaper={currentWallpaper} />
-        ) : (
-          <StaticWallpaperComponent wallpaper={currentWallpaper} />
-        )}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={currentWallpaper.id}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: "easeIn" }}
+      className={cn(
+        "fixed inset-0 bg-transparent",
+        "m-0 p-0 transition-transform duration-300 ease-out"
+      )}
+    >
+      {currentWallpaper.type === "live" ? (
+        <LiveWallpaperComponent wallpaper={currentWallpaper} />
+      ) : (
+        <StaticWallpaperComponent wallpaper={currentWallpaper} />
+      )}
+    </motion.div>
   );
 };
