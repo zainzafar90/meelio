@@ -220,9 +220,7 @@ export const useBackgroundStore = create<BackgroundState>()(
       version: 1,
       onRehydrateStorage: () => (state) => {
         if (state) {
-          setTimeout(() => {
-            state.initializeWallpapers();
-          }, 0);
+          state.initializeWallpapers();
         }
       },
     }

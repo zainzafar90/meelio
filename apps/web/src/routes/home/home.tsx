@@ -54,11 +54,17 @@ const Home = () => {
     verifyToken();
   }, [searchParams, authenticate]);
 
+  const renderBackground = () => (
+    <>
+      <Background />
+      <BackgroundOverlay />
+    </>
+  );
+
   if (loading || isVerifying) {
     return (
       <>
-        <Background />
-        <BackgroundOverlay />
+        {renderBackground()}
         <PageSkeleton>
           <h3 className="text-foreground font-medium">
             {isVerifying ? "Verifying your account..." : "Loading..."}
@@ -72,8 +78,7 @@ const Home = () => {
   if (!user && !guestUser) {
     return (
       <>
-        <Background />
-        <BackgroundOverlay />
+        {renderBackground()}
         <AuthContainer />
       </>
     );
@@ -81,8 +86,7 @@ const Home = () => {
 
   return (
     <>
-      <Background />
-      <BackgroundOverlay />
+      {renderBackground()}
       <AppLayout>
         <TopBar />
         <Content />
