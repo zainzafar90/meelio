@@ -24,23 +24,36 @@ export const DockButton = ({
   isDisabled?: boolean;
   className?: string;
 }) => {
-  const { dockIconsVisible, showIconLabels } = useDockStore(
+  const {
+    isTimerVisible,
+    isSoundscapesVisible,
+    isBreathingVisible,
+    isTodosVisible,
+    isSiteBlockerVisible,
+    isBackgroundsVisible,
+    isTabStashVisible,
+    showIconLabels,
+  } = useDockStore(
     useShallow((state) => ({
-      dockIconsVisible: state.dockIconsVisible,
+      isTimerVisible: state.isTimerVisible,
+      isSoundscapesVisible: state.isSoundscapesVisible,
+      isBreathingVisible: state.isBreathingVisible,
+      isTodosVisible: state.isTodosVisible,
+      isSiteBlockerVisible: state.isSiteBlockerVisible,
+      isBackgroundsVisible: state.isBackgroundsVisible,
+      isTabStashVisible: state.isTabStashVisible,
       showIconLabels: state.showIconLabels,
     }))
   );
 
-  const isVisible = dockIconsVisible[item.id];
-
   const isActive =
-    (item.id === "timer" && dockIconsVisible.timer) ||
-    (item.id === "soundscapes" && dockIconsVisible.soundscapes) ||
-    (item.id === "breathepod" && dockIconsVisible.breathing) ||
-    (item.id === "todos" && dockIconsVisible.todos) ||
-    (item.id === "site-blocker" && dockIconsVisible.siteBlocker) ||
-    (item.id === "background" && dockIconsVisible.backgrounds) ||
-    (item.id === "tab-stash" && dockIconsVisible.tabStash);
+    (item.id === "timer" && isTimerVisible) ||
+    (item.id === "soundscapes" && isSoundscapesVisible) ||
+    (item.id === "breathepod" && isBreathingVisible) ||
+    (item.id === "todos" && isTodosVisible) ||
+    (item.id === "site-blocker" && isSiteBlockerVisible) ||
+    (item.id === "background" && isBackgroundsVisible) ||
+    (item.id === "tab-stash" && isTabStashVisible);
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 
