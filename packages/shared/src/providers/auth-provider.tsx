@@ -16,11 +16,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       authenticateGuest: state.authenticateGuest,
       loading: state.loading,
       logout: state.logout,
+      _hasHydrated: state._hasHydrated,
+      setHasHydrated: state.setHasHydrated,
     }))
   );
 
   useEffect(() => {
     (async () => {
+      const DELAY = authStore.user ? 3000 : 0;
       setTimeout(async () => {
         try {
           const response = await api.auth.getAuthenticatedAccount();
@@ -30,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (error) {
           authStore.authenticate(null as any);
         }
-      }, 3000);
+      }, DELAY);
     })();
   }, []);
 
