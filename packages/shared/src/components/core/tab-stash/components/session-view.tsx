@@ -4,6 +4,8 @@ import { ChevronLeft } from "lucide-react";
 import { TabSession } from "../../../../types/tab-stash.types";
 import { useTabStashStore } from "../../../../stores/tab-stash.store";
 import { groupTabsByWindow } from "../utils/tab-stash.utils";
+import { toast } from "sonner";
+import { useShallow } from "zustand/shallow";
 
 interface SessionViewProps {
   session: TabSession;
@@ -12,7 +14,12 @@ interface SessionViewProps {
 
 export const SessionView = ({ session, onBack }: SessionViewProps) => {
   const { t } = useTranslation();
-  const { restoreSession, removeSession } = useTabStashStore();
+  const { restoreSession, removeSession } = useTabStashStore(
+    useShallow((state) => ({
+      restoreSession: state.restoreSession,
+      removeSession: state.removeSession,
+    }))
+  );
 
   const handleDelete = () => {
     removeSession(session.id);

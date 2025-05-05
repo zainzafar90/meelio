@@ -4,14 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Icons } from "../../../../../components/icons/icons";
 import { useAuthStore } from "../../../../../stores/auth.store";
 import { useAppStore } from "../../../../../stores/app.store";
-
+import { useShallow } from "zustand/shallow";
 export function ProfileDropdown() {
   const { t } = useTranslation();
 
   const appVersion = useAppStore((state) => state.version);
-  const { user } = useAuthStore((state) => ({
-    user: state.user,
-  }));
+  const user = useAuthStore(useShallow((state) => state.user));
   const profileImage = user?.image;
   const isProMember = user?.isPro;
 

@@ -9,10 +9,17 @@ import {
   generateNextVolumeForOscillation,
   OSCILLATION_INTERVAL_MS,
 } from "../../../../../../utils/sound.utils";
+import { useShallow } from "zustand/shallow";
 
 export const OscillationButton = () => {
-  const { sounds, isOscillating, toggleOscillation, setVolumeForSound } =
-    useSoundscapesStore();
+  const { isOscillating, toggleOscillation } = useSoundscapesStore(
+    useShallow((state) => ({
+      isOscillating: state.isOscillating,
+      toggleOscillation: state.toggleOscillation,
+    }))
+  );
+
+  const { sounds, setVolumeForSound } = useSoundscapesStore();
 
   useInterval(() => {
     if (!isOscillating) return;

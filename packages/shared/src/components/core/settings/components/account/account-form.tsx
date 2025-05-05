@@ -21,6 +21,7 @@ import * as z from "zod";
 import { AuthUser } from "../../../../../types/auth";
 import { Icons } from "../../../../../components/icons/icons";
 import { useAuthStore } from "../../../../../stores/auth.store";
+import { useShallow } from "zustand/shallow";
 
 const accountFormSchema = z.object({
   name: z
@@ -37,11 +38,9 @@ type AccountFormValues = z.infer<typeof accountFormSchema>;
 
 export const AccountForm = ({ user }: { user: AuthUser }) => {
   const { t } = useTranslation();
+  const authenticate = useAuthStore(useShallow((state) => state.authenticate));
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const { authenticate } = useAuthStore((state) => ({
-    authenticate: state.authenticate,
-  }));
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema as any),

@@ -20,9 +20,22 @@ import { AnimatePresence, motion } from "framer-motion";
 import { WebTimer } from "@/components/web-timer";
 import { SiteBlockerSheet } from "@repo/shared";
 import { toast } from "sonner";
+import { useShallow } from "zustand/shallow";
 
 const Home = () => {
-  const { user, guestUser, loading, authenticate } = useAuthStore();
+  const {
+    user,
+    guestUser,
+    loading,
+    authenticate,
+  } = useAuthStore(useShallow((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+    loading: state.loading,
+    authenticate: state.authenticate,
+    authenticateGuest: state.authenticateGuest,
+    logout: state.logout,
+  })));
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -97,11 +110,11 @@ const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore((state) => ({
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(useShallow((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
     isTimerVisible: state.isTimerVisible,
-  }));
+  })));
   const { t } = useTranslation();
 
   return (

@@ -16,15 +16,19 @@ import { PermissionBanner } from "./components/permission-banner";
 import { SessionList } from "./components/session-list";
 import { SessionView } from "./components/session-view";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
+import { cn } from "../../../lib";
+import { useShallow } from "zustand/shallow";
 
 const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
 
-export const TabStashSheet = () => {
+export function TabStashSheet() {
   const { t } = useTranslation();
-  const { isTabStashVisible, toggleTabStash } = useDockStore((state) => ({
-    isTabStashVisible: state.isTabStashVisible,
-    toggleTabStash: state.toggleTabStash,
-  }));
+  const { isTabStashVisible, toggleTabStash } = useDockStore(
+    useShallow((state) => ({
+      isTabStashVisible: state.isTabStashVisible,
+      toggleTabStash: state.toggleTabStash,
+    }))
+  );
 
   return (
     <Sheet open={isTabStashVisible} onOpenChange={toggleTabStash}>
@@ -52,14 +56,20 @@ export const TabStashSheet = () => {
       </SheetContent>
     </Sheet>
   );
-};
+}
 
 const ExtensionTabStashContent = () => {
   const { t } = useTranslation();
   const [selectedSession, setSelectedSession] = useState<TabSession | null>(
     null
   );
-  const { sessions, hasPermissions, checkPermissions } = useTabStashStore();
+  const { sessions, hasPermissions, checkPermissions } = useTabStashStore(
+    useShallow((state) => ({
+      sessions: state.sessions,
+      hasPermissions: state.hasPermissions,
+      checkPermissions: state.checkPermissions,
+    }))
+  );
   const { isStashing, error, stashTabs, clearError } = useTabStash();
 
   useEffect(() => {

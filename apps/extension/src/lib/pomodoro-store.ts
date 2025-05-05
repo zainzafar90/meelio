@@ -29,7 +29,8 @@ export const usePomodoroStore = create(
     {
       name: 'meelio:local:pomodoro',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      skipHydration: false,
       partialize: (state) => ({
         id: state.id,
         stats: state.stats,

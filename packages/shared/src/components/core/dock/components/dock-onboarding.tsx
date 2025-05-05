@@ -7,6 +7,7 @@ import { Icons } from "../../../../components/icons/icons";
 import { cn } from "@repo/ui/lib/utils";
 import { Logo } from "../../../../components/common/logo";
 import { useDockStore } from "../../../../stores/dock.store";
+import { useShallow } from "zustand/shallow";
 
 export const ONBOARDING_STEPS = [
   {
@@ -105,7 +106,12 @@ export const DockOnboarding = () => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const { hasDockOnboardingCompleted, setDockOnboardingCompleted } =
-    useOnboardingStore();
+    useOnboardingStore(
+      useShallow((state) => ({
+        hasDockOnboardingCompleted: state.hasDockOnboardingCompleted,
+        setDockOnboardingCompleted: state.setDockOnboardingCompleted,
+      }))
+    );
   const {
     toggleTimer,
     toggleSoundscapes,
@@ -115,7 +121,18 @@ export const DockOnboarding = () => {
     toggleBackgrounds,
     toggleTabStash,
     setCurrentOnboardingStep,
-  } = useDockStore();
+  } = useDockStore(
+    useShallow((state) => ({
+      toggleTimer: state.toggleTimer,
+      toggleSoundscapes: state.toggleSoundscapes,
+      toggleBreathing: state.toggleBreathing,
+      toggleTodos: state.toggleTodos,
+      toggleSiteBlocker: state.toggleSiteBlocker,
+      toggleBackgrounds: state.toggleBackgrounds,
+      toggleTabStash: state.toggleTabStash,
+      setCurrentOnboardingStep: state.setCurrentOnboardingStep,
+    }))
+  );
 
   useEffect(() => {
     if (!hasDockOnboardingCompleted) {

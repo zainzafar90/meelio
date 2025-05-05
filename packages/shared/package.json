@@ -36,10 +36,11 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.3.3",
+    "use-sync-external-store": "^1.5.0",
     "usehooks-ts": "^3.1.0",
     "uuid": "^9.0.0",
     "zod": "^3.24.0",
-    "zustand": "^4.4.1"
+    "zustand": "^5"
   },
   "exports": {
     ".": "./src/index.tsx",

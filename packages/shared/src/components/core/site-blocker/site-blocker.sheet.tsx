@@ -16,16 +16,20 @@ import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
 import { Icons } from "../../../components/icons";
+import { cn } from "../../../lib";
+import { useShallow } from "zustand/shallow";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
 
-export const SiteBlockerSheet = () => {
+export function SiteBlockerSheet() {
   const { t } = useTranslation();
-  const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore((state) => ({
-    isSiteBlockerVisible: state.isSiteBlockerVisible,
-    toggleSiteBlocker: state.toggleSiteBlocker,
-  }));
+  const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore(
+    useShallow((state) => ({
+      isSiteBlockerVisible: state.isSiteBlockerVisible,
+      toggleSiteBlocker: state.toggleSiteBlocker,
+    }))
+  );
 
   return (
     <Sheet open={isSiteBlockerVisible} onOpenChange={toggleSiteBlocker}>
@@ -96,7 +100,7 @@ export const SiteBlockerSheet = () => {
       </SheetContent>
     </Sheet>
   );
-};
+}
 
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();

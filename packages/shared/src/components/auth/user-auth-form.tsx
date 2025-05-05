@@ -14,6 +14,8 @@ import { api } from "../../api";
 import { env } from "../../utils";
 import { userAuthSchema } from "../../lib/validations/auth";
 import { useAuthStore } from "../../stores/auth.store";
+import { useShallow } from "zustand/shallow";
+import { useTranslation } from "react-i18next";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
@@ -21,16 +23,21 @@ interface UserAuthFormProps {
   userName?: string;
   onGuestContinue: () => void;
   mode?: "default" | "inverted";
+  className?: string;
 }
 
 export const UserAuthForm = ({
   userName,
   onGuestContinue,
   mode = "default",
+  className,
 }: UserAuthFormProps) => {
-  const { guestUser } = useAuthStore((state) => ({
-    guestUser: state.guestUser,
-  }));
+  const { t } = useTranslation();
+  const { guestUser } = useAuthStore(
+    useShallow((state) => ({
+      guestUser: state.guestUser,
+    }))
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);

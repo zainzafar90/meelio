@@ -4,6 +4,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { motion } from "framer-motion";
+import { useShallow } from "zustand/shallow";
 
 import { PomodoroStage } from "../../../../types/pomodoro";
 import { cn } from "../../../../lib";
@@ -23,9 +24,11 @@ export const TimerControls = ({
   onToggle: () => void;
   onReset: () => void;
 }) => {
-  const { timer } = usePomodoroStore((state) => ({
-    timer: state.timer,
-  }));
+  const { timer } = usePomodoroStore(
+    useShallow((state) => ({
+      timer: state.timer,
+    }))
+  );
 
   const isBreak = timer.activeStage === PomodoroStage.Break;
 

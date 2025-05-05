@@ -14,16 +14,16 @@ import {
   updateTask,
 } from "../lib/db";
 
-interface TodoState {
+export interface TodoState {
   lists: TodoList[];
   tasks: Task[];
-  activeListId: string;
+  activeListId: string | null;
   addTask: (task: Omit<Task, "createdAt" | "updatedAt">) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   addList: (list: Omit<TodoList, "createdAt" | "updatedAt">) => Promise<void>;
   deleteList: (listId: string) => Promise<void>;
-  setActiveList: (listId: string) => void;
+  setActiveList: (listId: string | null) => void;
   updateListEmoji: (listId: string, emoji: string) => Promise<void>;
   initializeStore: () => Promise<void>;
 }

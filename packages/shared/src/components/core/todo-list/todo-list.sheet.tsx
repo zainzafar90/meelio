@@ -16,18 +16,32 @@ import {
 } from "@repo/ui/components/ui/sheet";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
 import { useTodoStore } from "../../../stores/todo.store";
+import { cn } from "../../../lib/utils";
 
 import { CreateList } from "./components/create-list";
 import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
 
-export const TodoListSheet = () => {
+export function TodoListSheet() {
   const { t } = useTranslation();
-  const { isTodosVisible, setTodosVisible } = useDockStore();
-  const { lists, tasks, activeListId, setActiveList } = useTodoStore();
+  const { isTodosVisible, setTodosVisible } = useDockStore(
+    useShallow((state) => ({
+      isTodosVisible: state.isTodosVisible,
+      setTodosVisible: state.setTodosVisible,
+    }))
+  );
+  const { lists, tasks, activeListId, setActiveList } = useTodoStore(
+    useShallow((state) => ({
+      lists: state.lists,
+      tasks: state.tasks,
+      activeListId: state.activeListId,
+      setActiveList: state.setActiveList,
+    }))
+  );
   const activeList = lists.find((list) => list.id === activeListId);
 
   const filteredTasks = tasks.filter((task) => {
@@ -111,4 +125,4 @@ export const TodoListSheet = () => {
       </SheetContent>
     </Sheet>
   );
-};
+}

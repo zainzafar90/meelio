@@ -2,16 +2,19 @@ import { useEffect } from "react";
 import { AuthUser } from "../types/auth";
 import { PomodoroStage } from "../types/pomodoro";
 import { usePomodoroStore } from "../stores/pomodoro.store";
+import { useShallow } from "zustand/shallow";
 import { changeFavicon } from "../utils/favicon.utils";
 import { playPomodoroSound } from "../utils/sound.utils";
 
 export const usePomodoroTimer = ({ user }: { user: AuthUser | null }) => {
   const timerService = null as any;
-  const { timer, updateTimer, advanceTimer } = usePomodoroStore((state) => ({
-    timer: state.timer,
-    updateTimer: state.updateTimer,
-    advanceTimer: state.advanceTimer,
-  }));
+  const { timer, updateTimer, advanceTimer } = usePomodoroStore(
+    useShallow((state) => ({
+      timer: state.timer,
+      updateTimer: state.updateTimer,
+      advanceTimer: state.advanceTimer,
+    }))
+  );
 
   const resetAppTitle = () => {
     document.title = "Meelio - focus, calm, & productivity";

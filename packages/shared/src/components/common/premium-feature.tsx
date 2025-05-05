@@ -3,6 +3,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../icons/icons";
 import { PremiumFeatureTooltip } from "./premium-feature-tooltip";
+import { useShallow } from "zustand/shallow";
 
 interface PremiumFeatureProps {
   children: React.ReactNode;
@@ -25,7 +26,11 @@ export const PremiumFeature: React.FC<PremiumFeatureProps> = ({
   requirePro = false,
   tooltipClassName,
 }) => {
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
 
   if (user && (!requirePro || user?.isPro)) {
     return <>{children}</>;

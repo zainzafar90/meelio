@@ -1,10 +1,17 @@
+import { useState } from "react";
 import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
 
 import { Icons } from "../../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 
 export const GlobalVolumeControl = () => {
-  const { globalVolume, setGlobalVolume } = useSoundscapesStore();
+  const { globalVolume, setGlobalVolume } = useSoundscapesStore(
+    useShallow((state) => ({
+      globalVolume: state.globalVolume,
+      setGlobalVolume: state.setGlobalVolume,
+    }))
+  );
 
   return (
     <>

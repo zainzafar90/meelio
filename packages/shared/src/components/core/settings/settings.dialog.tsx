@@ -37,7 +37,9 @@ import { DockSettings } from "./tabs/dock-settings";
 import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
-import { SettingsTab, useSettingsStore, useAuthStore } from "../../../stores";
+import { SettingsTab, useSettingsStore } from "../../../stores/settings.store";
+import { useAuthStore } from "../../../stores/auth.store";
+import { useShallow } from "zustand/shallow";
 import { LogoMonochrome } from "../../../components/common/logo";
 import { LoginButton } from "./components/common/login-protected";
 import { FeedbackSettings } from "./tabs/feedback-settings";
@@ -61,8 +63,17 @@ const SETTINGS_NAV: SettingsNavItem[] = [
 
 export function SettingsDialog() {
   const { t } = useTranslation();
-  const { isOpen, closeSettings, currentTab, setTab } = useSettingsStore();
-  const { user, guestUser, logout } = useAuthStore((state) => state);
+  const { isOpen, closeSettings, currentTab, setTab } = useSettingsStore(
+    useShallow((state) => ({
+      isOpen: state.isOpen,
+      closeSettings: state.closeSettings,
+      currentTab: state.currentTab,
+      setTab: state.setTab,
+    }))
+  );
+  const { user, guestUser, logout } = useAuthStore(
+    useShallow((state) => state)
+  );
 
   const signOut = async () => {
     logout();

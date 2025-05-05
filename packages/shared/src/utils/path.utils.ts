@@ -10,5 +10,5 @@ export const getAssetPath = (path: string): string => {
     return path;
   }
 
-  return path.replace(/^\/public/, ".");
+  return path.replace(/^\/public/, "");
 };

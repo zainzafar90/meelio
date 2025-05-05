@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // import NumberFlow from "@number-flow/react";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Category } from "../../../types";
+import { Category, PomodoroStage } from "../../../types";
 import { cn } from "../../../lib";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { getTime } from "../../../utils/timer.utils";
+import { useShallow } from "zustand/shallow";
 
 import { TimerControls } from "./components/timer-controls";
 import { TimerSettingsDialog } from "./dialog/timer-settings.dialog";
@@ -60,10 +61,13 @@ export const TimerOld = () => {
     cycleCount: 1,
   });
 
-  const { playCategory, pausePlayingSounds } = useSoundscapesStore((state) => ({
-    playCategory: state.playCategory,
-    pausePlayingSounds: state.pausePlayingSounds,
-  }));
+  const timerControlsRef = useRef<HTMLDivElement>(null);
+  const { playCategory, pausePlayingSounds } = useSoundscapesStore(
+    useShallow((state) => ({
+      playCategory: state.playCategory,
+      pausePlayingSounds: state.pausePlayingSounds,
+    }))
+  );
 
   // Initialize worker and set up listeners
   useEffect(() => {

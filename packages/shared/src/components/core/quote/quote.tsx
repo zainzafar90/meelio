@@ -5,9 +5,15 @@ import { QuoteIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useQuoteStore } from "../../../stores/quotes.store";
+import { useShallow } from "zustand/shallow";
 
 export const Quote = () => {
-  const { currentQuote, updateQuote } = useQuoteStore();
+  const { currentQuote, updateQuote } = useQuoteStore(
+    useShallow((state) => ({
+      currentQuote: state.currentQuote,
+      updateQuote: state.updateQuote,
+    }))
+  );
   const { t } = useTranslation();
 
   useEffect(() => {

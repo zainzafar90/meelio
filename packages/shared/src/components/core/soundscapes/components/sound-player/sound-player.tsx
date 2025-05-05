@@ -1,10 +1,15 @@
 import ReactPlayer from "react-player";
-
+import { Sound } from "../../../../../types/sound";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 
 export const SoundPlayer = () => {
   const { sounds, globalVolume, setSoundLoading } = useSoundscapesStore(
-    (state) => state
+    useShallow((state) => ({
+      sounds: state.sounds,
+      globalVolume: state.globalVolume,
+      setSoundLoading: state.setSoundLoading,
+    }))
   );
 
   const playingSounds = sounds.filter((sound) => sound.playing);

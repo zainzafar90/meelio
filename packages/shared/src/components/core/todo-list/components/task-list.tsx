@@ -1,10 +1,12 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { useTodoStore } from "../../../../stores/todo.store";
+import { useShallow } from "zustand/shallow";
 
 import { Task } from "../../../../lib/db/todo.dexie";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
-import { useTodoStore } from "../../../../stores/todo.store";
 
 interface TaskListProps {
   title: string;
@@ -84,7 +86,13 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const { toggleTask, deleteTask } = useTodoStore();
+  const [isHovering, setIsHovering] = useState(false);
+  const { toggleTask, deleteTask } = useTodoStore(
+    useShallow((state) => ({
+      toggleTask: state.toggleTask,
+      deleteTask: state.deleteTask,
+    }))
+  );
 
   return (
     <div

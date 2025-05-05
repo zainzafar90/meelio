@@ -12,6 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/components/ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+import { cn } from "../../../../lib";
+import { useShallow } from "zustand/shallow";
 
 interface SessionListProps {
   sessions: TabSession[];
@@ -25,7 +27,13 @@ export const SessionList = ({
   const { t } = useTranslation();
   const [sessionNameInput, setSessionNameInput] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
-  const { renameSession, removeSession, clearAllSessions } = useTabStashStore();
+  const { renameSession, removeSession, clearAllSessions } = useTabStashStore(
+    useShallow((state) => ({
+      renameSession: state.renameSession,
+      removeSession: state.removeSession,
+      clearAllSessions: state.clearAllSessions,
+    }))
+  );
 
   const handleRenameSession = (sessionId: string) => {
     if (sessionNameInput.trim()) {

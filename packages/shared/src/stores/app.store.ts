@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 
@@ -12,12 +13,14 @@ interface AppState {
   incrementMantraRotationCount: () => void;
   setMantraRotation: (enabled: boolean) => void;
   initializeApp: () => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: "0.1.2",
+      version: "0.3.0",
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
@@ -34,11 +37,18 @@ export const useAppStore = create<AppState>()(
           set({ version });
         }
       },
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
     }),
     {
       name: "meelio:local:app",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      skipHydration: false,
       onRehydrateStorage: () => (state) => {
         if (state && state.mantraRotationEnabled) {
           state.incrementMantraRotationCount();
@@ -46,6 +56,7 @@ export const useAppStore = create<AppState>()(
         if (state) {
           state.initializeApp();
         }
+        state?.setHasHydrated(true);
       },
     }
   )

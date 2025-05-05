@@ -1,11 +1,17 @@
 import { useTranslation } from "react-i18next";
 import { Switch } from "@repo/ui/components/ui/switch";
-
+import { cn } from "../../../../lib";
 import { useAppStore } from "../../../../stores/app.store";
+import { useShallow } from "zustand/shallow";
 
 export function GeneralSettings() {
   const { t } = useTranslation();
-  const { mantraRotationEnabled, setMantraRotation } = useAppStore();
+  const { mantraRotationEnabled, setMantraRotation } = useAppStore(
+    useShallow((state) => ({
+      mantraRotationEnabled: state.mantraRotationEnabled,
+      setMantraRotation: state.setMantraRotation,
+    }))
+  );
 
   return (
     <div className="space-y-6">
