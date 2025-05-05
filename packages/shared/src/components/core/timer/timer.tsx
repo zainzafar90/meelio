@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 // import NumberFlow from "@number-flow/react";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Category, PomodoroStage } from "../../../types";
+import { Category } from "../../../types";
 import { cn } from "../../../lib";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { getTime } from "../../../utils/timer.utils";
@@ -61,7 +61,6 @@ export const TimerOld = () => {
     cycleCount: 1,
   });
 
-  const timerControlsRef = useRef<HTMLDivElement>(null);
   const { playCategory, pausePlayingSounds } = useSoundscapesStore(
     useShallow((state) => ({
       playCategory: state.playCategory,

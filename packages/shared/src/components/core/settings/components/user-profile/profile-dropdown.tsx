@@ -8,7 +8,7 @@ import { useShallow } from "zustand/shallow";
 export function ProfileDropdown() {
   const { t } = useTranslation();
 
-  const appVersion = useAppStore((state) => state.version);
+  const appVersion = useAppStore(useShallow((state) => state.version));
   const user = useAuthStore(useShallow((state) => state.user));
   const profileImage = user?.image;
   const isProMember = user?.isPro;

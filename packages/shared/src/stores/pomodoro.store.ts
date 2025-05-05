@@ -1,4 +1,4 @@
-import { createWithEqualityFn as create } from "zustand/traditional";
+import { create } from "zustand";
 
 import { PomodoroStage, PomodoroTimer } from "../types";
 import { db } from "../lib/db/meelio.dexie";

@@ -14,7 +14,7 @@ import {
   updateTask,
 } from "../lib/db";
 
-export interface TodoState {
+interface TodoState {
   lists: TodoList[];
   tasks: Task[];
   activeListId: string | null;
