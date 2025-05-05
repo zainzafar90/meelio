@@ -3,10 +3,15 @@ import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../../../stores/auth.store";
 import { AccountForm } from "../components/account/account-form";
 import { LoginProtected } from "../components/common/login-protected";
+import { useShallow } from "zustand/shallow";
 
 export const AccountSettings = () => {
   const { t } = useTranslation();
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
 
   if (!user) return <LoginProtected />;
 

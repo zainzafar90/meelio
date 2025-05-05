@@ -2,12 +2,8 @@ import { create } from "zustand";
 
 import { AuthUser } from "../types";
 import { GuestUser } from "../types";
-import {
-  createJSONStorage,
-  persist,
-  subscribeWithSelector,
-} from "zustand/middleware";
-import { useBackgroundStore } from "./background.store";
+import { createJSONStorage, persist } from "zustand/middleware";
+// import { useBackgroundStore } from "./background.store";
 
 export type AuthState = {
   user: AuthUser | null;
@@ -16,14 +12,22 @@ export type AuthState = {
   authenticate: (user: AuthUser) => void;
   authenticateGuest: (user: GuestUser) => void;
   logout: () => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    subscribeWithSelector((set) => ({
+    (set) => ({
       user: null,
       guestUser: null,
       loading: true,
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
       authenticate: (user: AuthUser) =>
         set((state) => ({ ...state, user, loading: false })),
       authenticateGuest: (user: GuestUser) =>
@@ -33,17 +37,21 @@ export const useAuthStore = create<AuthState>()(
           loading: false,
         })),
       logout: () => set(() => ({ user: null, guestUser: null })),
-    })),
+    }),
     {
       name: "meelio:local:user",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      skipHydration: false,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
 
-useAuthStore.subscribe((state) => {
-  if (!state.user && !state.guestUser) {
-    useBackgroundStore.getState().resetToDefault();
-  }
-});
+// useAuthStore.subscribe((state) => {
+//   if (!state.user && !state.guestUser) {
+//     useBackgroundStore.getState().resetToDefault();
+//   }
+// });

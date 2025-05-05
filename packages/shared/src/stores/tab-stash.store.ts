@@ -1,6 +1,7 @@
 import { create } from "zustand";
+
 import { persist, createJSONStorage } from "zustand/middleware";
-import { TabStashState } from "../types/tab-stash.types";
+import { TabSession, TabStashState } from "../types/tab-stash.types";
 import {
   checkTabPermissions,
   groupTabsByWindow,
@@ -12,14 +13,20 @@ export const useTabStashStore = create<TabStashState>()(
     (set, get) => ({
       sessions: [],
       hasPermissions: false,
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
 
-      addSession: (session) => {
+      addSession: (session: TabSession) => {
         set((state) => ({
           sessions: [session, ...state.sessions],
         }));
       },
 
-      removeSession: (sessionId) => {
+      removeSession: (sessionId: string) => {
         set((state) => ({
           sessions: state.sessions.filter(
             (session) => session.id !== sessionId
@@ -27,7 +34,16 @@ export const useTabStashStore = create<TabStashState>()(
         }));
       },
 
-      renameSession: (sessionId, newName) => {
+      updateSession: (session: TabSession) => {
+        console.warn("updateSession not implemented", session);
+        set((state) => ({
+          sessions: state.sessions.map((s) =>
+            s.id === session.id ? session : s
+          ),
+        }));
+      },
+
+      renameSession: (sessionId: string, newName: string) => {
         set((state) => ({
           sessions: state.sessions.map((session) =>
             session.id === sessionId ? { ...session, name: newName } : session
@@ -35,7 +51,7 @@ export const useTabStashStore = create<TabStashState>()(
         }));
       },
 
-      restoreSession: async (sessionId) => {
+      restoreSession: async (sessionId: string) => {
         const session = get().sessions.find((s) => s.id === sessionId);
         if (!session) return;
 
@@ -61,6 +77,20 @@ export const useTabStashStore = create<TabStashState>()(
           console.error("Error restoring session:", error);
           throw error;
         }
+      },
+
+      removeTabFromSession: (sessionId: string, tabId: number) => {
+        console.warn("removeTabFromSession not implemented", sessionId, tabId);
+        set((state) => ({
+          sessions: state.sessions.map((session) =>
+            session.id === sessionId
+              ? {
+                  ...session,
+                  tabs: session.tabs.filter((tab) => tab.id !== tabId),
+                }
+              : session
+          ),
+        }));
       },
 
       clearAllSessions: () => {
@@ -117,12 +147,13 @@ export const useTabStashStore = create<TabStashState>()(
           }
         },
       })),
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         sessions: state.sessions,
         hasPermissions: state.hasPermissions,
       }),
       onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
         if (state) {
           state.checkPermissions();
         }

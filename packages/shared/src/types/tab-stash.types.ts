@@ -26,4 +26,6 @@ export interface TabStashState {
   loadSessions: () => Promise<void>;
   checkPermissions: () => Promise<boolean>;
   requestPermissions: () => Promise<boolean>;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }

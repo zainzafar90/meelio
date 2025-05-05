@@ -10,6 +10,8 @@ import {
   generateNextVolumeForShuffle,
   SHUFFLE_SOUNDS_INTERVAL_MS,
 } from "../../../../../../utils/sound.utils";
+import { useTelemetry } from "../../../../../../hooks/use-telemetry";
+import { useShallow } from "zustand/shallow";
 
 export const ShuffleButton = () => {
   const {
@@ -19,7 +21,9 @@ export const ShuffleButton = () => {
     pauseSound,
     isShuffling,
     toggleShuffle,
-  } = useSoundscapesStore((state) => state);
+    pausePlayingSounds,
+    resumePausedSounds,
+  } = useSoundscapesStore(useShallow((state) => state));
 
   useInterval(() => {
     if (!isShuffling) return;

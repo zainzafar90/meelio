@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { GuestUser } from "../../types/auth";
 import { useAuthStore } from "../../stores/auth.store";
 import { Icons } from "../icons";
+import { useShallow } from "zustand/shallow";
 
 type AuthMode = "login" | "guest";
 
@@ -22,11 +23,17 @@ interface AuthContainerProps {
 
 export const AuthContainer = (props: AuthContainerProps) => {
   const { defaultMode = "login" } = props;
-  const { user, guestUser, authenticateGuest } = useAuthStore((state) => ({
-    user: state.user,
-    guestUser: state.guestUser,
-    authenticateGuest: state.authenticateGuest,
-  }));
+  const { user, guestUser, authenticateGuest, loading, authenticate, logout } =
+    useAuthStore(
+      useShallow((state) => ({
+        user: state.user,
+        guestUser: state.guestUser,
+        authenticateGuest: state.authenticateGuest,
+        loading: state.loading,
+        authenticate: state.authenticate,
+        logout: state.logout,
+      }))
+    );
 
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [guestName, setGuestName] = useState<string>(

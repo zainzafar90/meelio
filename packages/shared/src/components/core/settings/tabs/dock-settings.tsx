@@ -4,6 +4,7 @@ import { useDockStore } from "../../../../stores/dock.store";
 import { Icons } from "../../../../components/icons/icons";
 import { cn } from "@repo/ui/lib/utils";
 import { useState, useEffect } from "react";
+import { useShallow } from "zustand/shallow";
 
 interface DockItemConfig {
   id: string;
@@ -15,7 +16,12 @@ interface DockItemConfig {
 
 export const DockSettings = () => {
   const { t } = useTranslation();
-  const { dockIconsVisible, setDockIconVisible } = useDockStore();
+  const { dockIconsVisible, setDockIconVisible } = useDockStore(
+    useShallow((state) => ({
+      dockIconsVisible: state.dockIconsVisible,
+      setDockIconVisible: state.setDockIconVisible,
+    }))
+  );
   const [dockItems, setDockItems] = useState<DockItemConfig[]>([]);
 
   useEffect(() => {
@@ -90,10 +96,12 @@ export const DockSettings = () => {
     setDockIconVisible(item.id as keyof typeof dockIconsVisible, value);
   };
 
-  const { showIconLabels, setShowIconLabels } = useDockStore((state) => ({
-    showIconLabels: state.showIconLabels,
-    setShowIconLabels: state.setShowIconLabels,
-  }));
+  const { showIconLabels, setShowIconLabels } = useDockStore(
+    useShallow((state) => ({
+      showIconLabels: state.showIconLabels,
+      setShowIconLabels: state.setShowIconLabels,
+    }))
+  );
 
   return (
     <div className="space-y-6">

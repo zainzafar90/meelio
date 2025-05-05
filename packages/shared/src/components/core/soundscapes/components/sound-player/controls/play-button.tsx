@@ -1,13 +1,19 @@
 import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 
 interface Props {
   isPlayButtonActive?: boolean;
 }
 
 export const PlayButton = (props: Props) => {
-  const { pausePlayingSounds, resumePausedSounds } = useSoundscapesStore();
+  const { pausePlayingSounds, resumePausedSounds } = useSoundscapesStore(
+    useShallow((state) => ({
+      pausePlayingSounds: state.pausePlayingSounds,
+      resumePausedSounds: state.resumePausedSounds,
+    }))
+  );
 
   const isAnySoundPlaying = useSoundscapesStore((state) =>
     state.sounds.some((sound) => sound.playing)

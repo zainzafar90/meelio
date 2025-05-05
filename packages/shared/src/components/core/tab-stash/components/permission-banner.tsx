@@ -2,10 +2,16 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@repo/ui/components/ui/button";
 import { Icons } from "../../../icons/icons";
 import { useTabStashStore } from "../../../../stores/tab-stash.store";
+import { useShallow } from "zustand/shallow";
 
 export const PermissionBanner = () => {
   const { t } = useTranslation();
-  const { requestPermissions, hasPermissions } = useTabStashStore();
+  const { requestPermissions, hasPermissions } = useTabStashStore(
+    useShallow((state) => ({
+      requestPermissions: state.requestPermissions,
+      hasPermissions: state.hasPermissions,
+    }))
+  );
 
   if (hasPermissions) return null;
 

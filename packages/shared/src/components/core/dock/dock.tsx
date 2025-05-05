@@ -9,6 +9,7 @@ import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useShallow } from "zustand/shallow";
 
 import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
@@ -74,31 +75,35 @@ export const Dock = () => {
     toggleTabStash,
     resetDock,
     dockIconsVisible,
-  } = useDockStore((state) => ({
-    isTimerVisible: state.isTimerVisible,
-    isBreathingVisible: state.isBreathingVisible,
-    isSoundscapesVisible: state.isSoundscapesVisible,
-    isTodosVisible: state.isTodosVisible,
-    isSiteBlockerVisible: state.isSiteBlockerVisible,
-    isBackgroundsVisible: state.isBackgroundsVisible,
-    isTabStashVisible: state.isTabStashVisible,
-    currentOnboardingStep: state.currentOnboardingStep,
-    resetDock: state.reset,
-    toggleTimer: state.toggleTimer,
-    toggleSoundscapes: state.toggleSoundscapes,
-    toggleBreathing: state.toggleBreathing,
-    toggleTodos: state.toggleTodos,
-    toggleSiteBlocker: state.toggleSiteBlocker,
-    toggleBackgrounds: state.toggleBackgrounds,
-    toggleTabStash: state.toggleTabStash,
-    dockIconsVisible: state.dockIconsVisible,
-  }));
+  } = useDockStore(
+    useShallow((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      isBreathingVisible: state.isBreathingVisible,
+      isSoundscapesVisible: state.isSoundscapesVisible,
+      isTodosVisible: state.isTodosVisible,
+      isSiteBlockerVisible: state.isSiteBlockerVisible,
+      isBackgroundsVisible: state.isBackgroundsVisible,
+      isTabStashVisible: state.isTabStashVisible,
+      currentOnboardingStep: state.currentOnboardingStep,
+      resetDock: state.reset,
+      toggleTimer: state.toggleTimer,
+      toggleSoundscapes: state.toggleSoundscapes,
+      toggleBreathing: state.toggleBreathing,
+      toggleTodos: state.toggleTodos,
+      toggleSiteBlocker: state.toggleSiteBlocker,
+      toggleBackgrounds: state.toggleBackgrounds,
+      toggleTabStash: state.toggleTabStash,
+      dockIconsVisible: state.dockIconsVisible,
+    }))
+  );
 
   const { t } = useTranslation();
-  const { user, guestUser } = useAuthStore((state) => ({
-    user: state.user,
-    guestUser: state.guestUser,
-  }));
+  const { user, guestUser } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+    }))
+  );
 
   const items = useMemo(
     () => [

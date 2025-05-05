@@ -1,6 +1,7 @@
 import { cn } from "@repo/ui/lib/utils";
 import { useDockStore } from "../../stores/dock.store";
 import { ComponentType } from "react";
+import { useShallow } from "zustand/shallow";
 
 export interface DockItem {
   id: string;
@@ -25,23 +26,25 @@ export const DockButton = ({
 }) => {
   const {
     isTimerVisible,
-    isBreathingVisible,
     isSoundscapesVisible,
+    isBreathingVisible,
     isTodosVisible,
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
     showIconLabels,
-  } = useDockStore((state) => ({
-    isTimerVisible: state.isTimerVisible,
-    isSoundscapesVisible: state.isSoundscapesVisible,
-    isBreathingVisible: state.isBreathingVisible,
-    isTodosVisible: state.isTodosVisible,
-    isSiteBlockerVisible: state.isSiteBlockerVisible,
-    isBackgroundsVisible: state.isBackgroundsVisible,
-    isTabStashVisible: state.isTabStashVisible,
-    showIconLabels: state.showIconLabels,
-  }));
+  } = useDockStore(
+    useShallow((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      isSoundscapesVisible: state.isSoundscapesVisible,
+      isBreathingVisible: state.isBreathingVisible,
+      isTodosVisible: state.isTodosVisible,
+      isSiteBlockerVisible: state.isSiteBlockerVisible,
+      isBackgroundsVisible: state.isBackgroundsVisible,
+      isTabStashVisible: state.isTabStashVisible,
+      showIconLabels: state.showIconLabels,
+    }))
+  );
 
   const isActive =
     (item.id === "timer" && isTimerVisible) ||

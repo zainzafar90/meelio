@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { useAuthStore } from "../../../../stores/auth.store";
+import { useShallow } from "zustand/shallow";
 
 export interface Site {
   id: string;
@@ -39,7 +40,11 @@ export function SiteList({
   onUnblockSites,
 }: SiteListProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
   const isPro = user?.isPro || false;
 
   const toggleCategory = (categoryKey: string) => {

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getBackgrounds } from "../api/backgrounds.api";
 import { getAssetPath } from "../utils/path.utils";
@@ -55,6 +56,8 @@ interface BackgroundState {
   resetToDefault: () => void;
   initializeWallpapers: () => void;
   isLoading: boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 type WallpaperData = {
@@ -98,6 +101,11 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as WallpaperData[]).map(
     if (wallpaper.type === "live" && wallpaper.video) {
       return {
         ...wallpaper,
+        thumbnail: getAssetPath(wallpaper.thumbnail),
+        video: {
+          src: getAssetPath(wallpaper.video.src),
+          fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
+        },
         type: "live" as const,
       } as LiveWallpaper;
     } else {
@@ -117,6 +125,12 @@ export const useBackgroundStore = create<BackgroundState>()(
       wallpapers: DEFAULT_WALLPAPERS,
       currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
       isLoading: false,
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
 
       removeWallpaper: (id) =>
         set((state) => ({
@@ -175,9 +189,10 @@ export const useBackgroundStore = create<BackgroundState>()(
                   blurhash: metadata?.blurhash || "",
                   source,
                   video: {
-                    src: bg.url || "",
-                    fallbackImage:
-                      metadata?.fallbackImage || metadata?.thumbnailUrl || "",
+                    src: getAssetPath(bg.url || ""),
+                    fallbackImage: getAssetPath(
+                      metadata?.fallbackImage || metadata?.thumbnailUrl || ""
+                    ),
                   },
                 } as LiveWallpaper;
               } else {
@@ -218,9 +233,7 @@ export const useBackgroundStore = create<BackgroundState>()(
       storage: createJSONStorage(() => localStorage),
       version: 2,
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.initializeWallpapers();
-        }
+        state?.setHasHydrated(true);
       },
     }
   )

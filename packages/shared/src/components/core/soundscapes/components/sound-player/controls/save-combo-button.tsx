@@ -8,9 +8,10 @@ import { SoundState } from "../../../../../../types";
 import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 
 export const SaveComboButton = () => {
-  const { addCombo } = useSoundscapesStore((state) => state);
+  const { addCombo } = useSoundscapesStore(useShallow((state) => state));
   const currentlyPlayingSounds = useSoundscapesStore((state) =>
     state.sounds.filter((sound) => sound.playing)
   );

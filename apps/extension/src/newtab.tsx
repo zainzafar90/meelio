@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/shallow";
 
 import { 
   AppProvider, 
@@ -22,14 +23,16 @@ import {
   SiteBlockerSheet
  } from "@repo/shared";
 
-
 import { ExtensionTimer } from "./components/extension-timer";
 
 import "./style.css";
 import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 
 const Home = () => {
-  const { user, guestUser } = useAuthStore();
+  const { user, guestUser } = useAuthStore(useShallow((state) => ({
+    user: state.user,
+    guestUser: state.guestUser,
+  })));
 
   const renderBackground = () => (
     <>
@@ -61,11 +64,11 @@ const Home = () => {
 
 const Content = () => {
   const { t } = useTranslation();
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore((state) => ({
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(useShallow((state) => ({
     isBreathingVisible: state.isBreathingVisible,
     isGreetingsVisible: state.isGreetingsVisible,
     isTimerVisible: state.isTimerVisible,
-  }));
+  })));
 
   return (
     <main

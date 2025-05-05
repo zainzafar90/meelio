@@ -17,6 +17,8 @@ interface MantraStore {
   mantras: string[];
   updateMantra: () => void;
   setIsMantraVisible: (isVisible: boolean) => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 const getDayOfYear = (): number => {
@@ -34,6 +36,12 @@ export const useMantraStore = create<MantraStore>()(
         mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
       mantras,
       isMantraVisible: false,
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
       updateMantra: () =>
         set((state) => ({
           currentMantra:
@@ -50,7 +58,10 @@ export const useMantraStore = create<MantraStore>()(
     {
       name: "meelio:local:mantra",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
@@ -66,6 +77,8 @@ export const useMantraStore = create<MantraStore>()(
 interface GreetingStore {
   greeting: string;
   updateGreeting: (time: Date, t: (key: string) => string) => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 const getGreeting = (hour: number, t: (key: string) => string) => {
@@ -79,6 +92,12 @@ export const useGreetingStore = create<GreetingStore>()(
   persist(
     (set) => ({
       greeting: "",
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
       updateGreeting: (time, t) => {
         const hour = time.getHours();
         const newGreeting = getGreeting(hour, t);
@@ -87,9 +106,13 @@ export const useGreetingStore = create<GreetingStore>()(
       },
     }),
     {
-      name: "meelio:local:greeting",
+      name: "meelio:local:greetings",
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      version: 2,
+      skipHydration: false,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

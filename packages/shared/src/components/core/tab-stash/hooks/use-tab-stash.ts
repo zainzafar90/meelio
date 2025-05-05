@@ -6,6 +6,8 @@ import {
   filterValidTabs,
   requestTabPermissions,
 } from "../utils/tab-stash.utils";
+import { useShallow } from "zustand/shallow";
+import { useTranslation } from "react-i18next";
 
 const formatSessionName = (date: Date): string => {
   try {
@@ -17,9 +19,16 @@ const formatSessionName = (date: Date): string => {
 };
 
 export const useTabStash = () => {
+  const { t } = useTranslation();
   const [isStashing, setIsStashing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addSession, hasPermissions, checkPermissions } = useTabStashStore();
+  const { addSession, hasPermissions, checkPermissions } = useTabStashStore(
+    useShallow((state) => ({
+      addSession: state.addSession,
+      hasPermissions: state.hasPermissions,
+      checkPermissions: state.checkPermissions,
+    }))
+  );
 
   const mapChromeTabToTabInfo = (tab: chrome.tabs.Tab): TabInfo => ({
     id: tab.id,

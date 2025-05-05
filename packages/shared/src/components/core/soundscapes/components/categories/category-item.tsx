@@ -4,13 +4,20 @@ import { useTelemetry } from "../../../../../lib/telemetry/use-telemetry";
 import { CategoryIcons } from "../../../../../components/icons/category-icons";
 import { Icons } from "../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 
 interface CategoryItemProps {
   category: CategoryType;
 }
 export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
   const { categoryPlayed, categoryStopped } = useTelemetry();
-  const { playCategory, playRandom, activeCategoryId } = useSoundscapesStore();
+  const { playCategory, playRandom, activeCategoryId } = useSoundscapesStore(
+    useShallow((state) => ({
+      playCategory: state.playCategory,
+      playRandom: state.playRandom,
+      activeCategoryId: state.activeCategoryId,
+    }))
+  );
 
   const isActiveCategory = (category: Category) => {
     return activeCategoryId === category;

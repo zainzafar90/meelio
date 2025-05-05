@@ -18,19 +18,36 @@ import {
   Wallpaper,
 } from "../../../../stores/background.store";
 import * as backgroundsApi from "../../../../api/backgrounds.api";
+import { useShallow } from "zustand/shallow";
 
-export const BackgroundSelectorSheet = () => {
+export function BackgroundSelectorSheet() {
   const { t } = useTranslation();
-  const { user } = useAuthStore();
-  const { isBackgroundsVisible, toggleBackgrounds } = useDockStore();
-  const {
-    wallpapers,
-    currentWallpaper,
-    setCurrentWallpaper,
-    resetToDefault,
-    initializeWallpapers,
-    isLoading,
-  } = useBackgroundStore();
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+  const { isBackgroundsVisible, toggleBackgrounds } = useDockStore(
+    useShallow((state) => ({
+      isBackgroundsVisible: state.isBackgroundsVisible,
+      toggleBackgrounds: state.toggleBackgrounds,
+    }))
+  );
+  const { setCurrentWallpaper, currentWallpaper } = useBackgroundStore(
+    useShallow((state) => ({
+      setCurrentWallpaper: state.setCurrentWallpaper,
+      currentWallpaper: state.currentWallpaper,
+    }))
+  );
+  const { wallpapers, resetToDefault, initializeWallpapers, isLoading } =
+    useBackgroundStore(
+      useShallow((state) => ({
+        wallpapers: state.wallpapers,
+        resetToDefault: state.resetToDefault,
+        initializeWallpapers: state.initializeWallpapers,
+        isLoading: state.isLoading,
+      }))
+    );
 
   const liveWallpapers = wallpapers.filter((w) => w.type === "live");
   const staticWallpapers = wallpapers.filter((w) => w.type === "static");
@@ -227,4 +244,4 @@ export const BackgroundSelectorSheet = () => {
       </SheetContent>
     </Sheet>
   );
-};
+}

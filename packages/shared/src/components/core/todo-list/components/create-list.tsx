@@ -21,6 +21,8 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTodoStore } from "../../../../stores/todo.store";
+import { cn } from "../../../../lib";
+import { useShallow } from "zustand/shallow";
 
 const emojis = [
   "📝",
@@ -53,13 +55,19 @@ export function CreateList({ children }: CreateListProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
-  const { addList, setActiveList } = useTodoStore();
   const { t } = useTranslation();
 
   const handleCreate = () => {
     if (!name.trim()) return;
 
     const newListId = crypto.randomUUID();
+
+    const { addList, setActiveList } = useTodoStore(
+      useShallow((state) => ({
+        addList: state.addList,
+        setActiveList: state.setActiveList,
+      }))
+    );
 
     addList({
       id: newListId,

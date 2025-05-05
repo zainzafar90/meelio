@@ -10,6 +10,8 @@ import {
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useTranslation } from "react-i18next";
 import { useDockStore } from "../../../stores/dock.store";
+import { useSoundscapesStore } from "../../../stores/soundscapes.store";
+import { useShallow } from "zustand/shallow";
 import { SoundList } from "./components/sound-list/sound-list";
 import { CategoryList } from "./components/categories/category-list";
 import { SoundControlsBar } from "./components/sound-player/controls/sound-control-bar";
@@ -18,10 +20,10 @@ export const SoundscapesSheet: React.FC = () => {
   const { t } = useTranslation();
 
   const { isSoundscapesVisible, setSoundscapesVisible } = useDockStore(
-    (state) => ({
+    useShallow((state) => ({
       isSoundscapesVisible: state.isSoundscapesVisible,
       setSoundscapesVisible: state.setSoundscapesVisible,
-    })
+    }))
   );
 
   return (

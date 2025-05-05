@@ -4,6 +4,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { toast } from "sonner";
+import { Button } from "@repo/ui/components/ui/button";
 
 import { SoundState } from "../../../../../../types";
 import { cn } from "../../../../../../lib";
@@ -11,9 +12,10 @@ import { Icons } from "../../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
 import { copyToClipboard } from "../../../../../../utils/common.utils";
 import { encodeSoundState } from "../../../../../../utils/router.utils";
+import { useShallow } from "zustand/shallow";
 
 export const ShareButton = () => {
-  const { sounds } = useSoundscapesStore((state) => state);
+  const { sounds } = useSoundscapesStore(useShallow((state) => state));
 
   // Encode the sound state and generate the shareable link
   const generateShareableLink = () => {

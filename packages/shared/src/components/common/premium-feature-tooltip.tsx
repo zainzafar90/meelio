@@ -18,6 +18,8 @@ import { env } from "../../utils/env.utils";
 import { toast } from "sonner";
 import { useAuthStore } from "../../stores/auth.store";
 import { UserAuthForm } from "../auth/user-auth-form";
+import { AuthUser } from "../../types";
+import { useShallow } from "zustand/shallow";
 
 interface PremiumFeatureTooltipProps {
   featureName?: string;
@@ -49,10 +51,12 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
   const [showModal, setShowModal] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
 
-  const { user, guestUser } = useAuthStore((state) => ({
-    user: state.user,
-    guestUser: state.guestUser,
-  }));
+  const { user, guestUser } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+    }))
+  );
 
   return (
     <>
@@ -220,7 +224,11 @@ const PricingSection = ({
   benefits?: string[];
   onNeedAuth: () => void;
 }) => {
-  const { user } = useAuthStore();
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
   const [selectedPlan, setSelectedPlan] = useState<PlanInterval>(
     PlanInterval.Yearly
   );

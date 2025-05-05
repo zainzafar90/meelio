@@ -1,5 +1,7 @@
 import { create } from "zustand";
+
 import { createJSONStorage, persist } from "zustand/middleware";
+
 export type SettingsTab =
   | "general"
   | "appearance"
@@ -15,6 +17,8 @@ interface SettingsState {
   openSettings: () => void;
   closeSettings: () => void;
   setTab: (tab: SettingsTab) => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -25,14 +29,23 @@ export const useSettingsStore = create<SettingsState>()(
       openSettings: () => set({ isOpen: true }),
       closeSettings: () => set({ isOpen: false }),
       setTab: (tab) => set({ currentTab: tab }),
+      _hasHydrated: false,
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
     }),
     {
       name: "meelio:local:settings",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         currentTab: state.currentTab,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

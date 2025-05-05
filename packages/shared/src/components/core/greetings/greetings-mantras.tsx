@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAuthStore } from "../../../stores/auth.store";
 import { useAppStore } from "../../../stores/app.store";
+import { useShallow } from "zustand/shallow";
 import {
   useGreetingStore,
   useMantraStore,
@@ -12,15 +13,34 @@ import {
 import { useInterval } from "../../../hooks";
 
 export const Greeting = () => {
-  const { user, guestUser } = useAuthStore((state) => ({
-    user: state.user,
-    guestUser: state.guestUser,
-  }));
+  const { user, guestUser } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+    }))
+  );
   const { t } = useTranslation();
-  const { mantraRotationCount, mantraRotationEnabled } = useAppStore();
-  const { greeting, updateGreeting } = useGreetingStore();
+  const { mantraRotationCount, mantraRotationEnabled } = useAppStore(
+    useShallow((state) => ({
+      mantraRotationCount: state.mantraRotationCount,
+      mantraRotationEnabled: state.mantraRotationEnabled,
+    }))
+  );
+  const { greeting, updateGreeting } = useGreetingStore(
+    useShallow((state) => ({
+      greeting: state.greeting,
+      updateGreeting: state.updateGreeting,
+    }))
+  );
   const { currentMantra, updateMantra, isMantraVisible, setIsMantraVisible } =
-    useMantraStore();
+    useMantraStore(
+      useShallow((state) => ({
+        currentMantra: state.currentMantra,
+        updateMantra: state.updateMantra,
+        isMantraVisible: state.isMantraVisible,
+        setIsMantraVisible: state.setIsMantraVisible,
+      }))
+    );
   const showMantra = mantraRotationEnabled
     ? mantraRotationCount % 2 === 0
     : isMantraVisible;
