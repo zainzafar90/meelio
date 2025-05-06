@@ -134,41 +134,56 @@ const logout = catchAsync(async (_req: Request, res: Response) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
-const googleAuth = googleAuthenticatePassport;
+const googleAuth = (state: string) => googleAuthenticatePassport(state);
 
 const googleAuthCallback = catchAsync(
   async (req: Request, res: Response, next: any) => {
-    return passport.authenticate("google", async (err: any, user: IUser) => {
-      if (err) return next(err);
-      if (!user) res.redirect("/v1/account/google/failure");
+    const state = req.query.state as string | undefined;
+    const origin = state === "extension" ? "extension" : "web";
 
-      const tokens = await accountService.generateAuthTokens(user);
-      await accountService.updateAccountTokens(
-        user.id,
-        Provider.GOOGLE,
-        tokens
-      );
-      cookieService.setResponseCookie(res, tokens);
-      const redirectCallbackURL =
-        config.env === "production" ? config.clientUrl : `${config.clientUrl}`;
-      return res.redirect(redirectCallbackURL);
-    })(req, res, next);
+    return passport.authenticate(
+      "google",
+      { failureRedirect: `/v1/account/google/failure?origin=${origin}` },
+      async (err: any, user: IUser) => {
+        if (err) return next(err);
+
+        const tokens = await accountService.generateAuthTokens(user);
+        await accountService.updateAccountTokens(
+          user.id,
+          Provider.GOOGLE,
+          tokens
+        );
+        cookieService.setResponseCookie(res, tokens);
+
+        const baseUrl =
+          config.env === "production"
+            ? config.clientUrl
+            : `${config.clientUrl}`;
+        const redirectUrl = new URL(baseUrl);
+        if (origin === "extension") {
+          redirectUrl.searchParams.set("auth_origin", origin);
+        }
+        return res.redirect(redirectUrl.toString());
+      }
+    )(req, res, next);
   }
 );
 
 const googleAuthCallbackFailure = catchAsync(
-  async (_: Request, res: Response) => {
+  async (req: Request, res: Response) => {
+    const origin = req.query.origin || "web";
     return res.status(httpStatus.BAD_REQUEST).json({
       message: "Login Error",
-      details: `Something went wrong when you tried to log in just now. Please try again later. If you're experiencing a critical issue, please email support@meelio.io`,
+      details: `Something went wrong when you tried to log in just now (Origin: ${origin}). Please try again later. If you're experiencing a critical issue, please email support@meelio.io`,
     });
   }
 );
 
 const googleAuthCallbackSuccess = catchAsync(
-  async (_: Request, res: Response) => {
+  async (req: Request, res: Response) => {
+    const origin = req.query.origin || "web";
     return res.status(httpStatus.OK).json({
-      message: "Login Success",
+      message: `Login Success (Origin: ${origin})`,
     });
   }
 );

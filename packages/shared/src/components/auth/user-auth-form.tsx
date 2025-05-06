@@ -16,6 +16,7 @@ import { userAuthSchema } from "../../lib/validations/auth";
 import { useAuthStore } from "../../stores/auth.store";
 import { useShallow } from "zustand/shallow";
 import { useTranslation } from "react-i18next";
+import { useAppStore } from "../../stores/app.store";
 
 type FormData = z.infer<typeof userAuthSchema>;
 
@@ -38,6 +39,11 @@ export const UserAuthForm = ({
       guestUser: state.guestUser,
     }))
   );
+  const { platform } = useAppStore(
+    useShallow((state) => ({
+      platform: state.platform,
+    }))
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState<boolean>(false);
@@ -52,7 +58,7 @@ export const UserAuthForm = ({
 
   const handleGoogleClick = async () => {
     setIsGoogleLoading(true);
-    window.location.href = `${env.serverUrl}/v1/account/google`;
+    window.location.href = `${env.serverUrl}/v1/account/google?state=${platform}`;
   };
 
   async function onSubmit(data: FormData) {

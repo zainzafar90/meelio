@@ -53,7 +53,10 @@ router.post(
   accountController.verifyMagicLinkEmail
 );
 
-router.get("/google", accountController.googleAuth);
+router.get("/google", (req, res, next) => {
+  const state = req.query.state as string | undefined;
+  return accountController.googleAuth(state)(req, res, next);
+});
 router.get("/callback/google", accountController.googleAuthCallback);
 router.get("/google/success", accountController.googleAuthCallbackSuccess);
 router.get("/google/failure", accountController.googleAuthCallbackFailure);
