@@ -1,4 +1,3 @@
-import { usePostHog } from "posthog-js/react";
 import { Sound } from "../../types/sound";
 
 export enum TelemetryEvent {
@@ -10,35 +9,33 @@ export enum TelemetryEvent {
 }
 
 export const useTelemetry = () => {
-  const posthog = usePostHog();
-
   return {
     track: (event: string, properties?: Record<string, unknown>) => {
-      posthog?.capture(event, properties);
+      console.log(event, properties);
     },
 
     identify: (id: string) => {
-      posthog?.identify(id);
+      console.log(id);
     },
 
     pageView: () => {
-      posthog?.capture(TelemetryEvent.PageView);
+      console.log(TelemetryEvent.PageView);
     },
 
     soundPlayed: (sound: Sound) => {
-      posthog?.capture(TelemetryEvent.SoundPlayed, { sound });
+      console.log(TelemetryEvent.SoundPlayed, { sound });
     },
 
     soundStopped: (sound: Sound) => {
-      posthog?.capture(TelemetryEvent.SoundStopped, { sound });
+      console.log(TelemetryEvent.SoundStopped, { sound });
     },
 
     categoryPlayed: (category: string) => {
-      posthog?.capture(TelemetryEvent.CategoryPlayed, { category });
+      console.log(TelemetryEvent.CategoryPlayed, { category });
     },
 
     categoryStopped: (category: string) => {
-      posthog?.capture(TelemetryEvent.CategoryStopped, { category });
+      console.log(TelemetryEvent.CategoryStopped, { category });
     },
   };
 };

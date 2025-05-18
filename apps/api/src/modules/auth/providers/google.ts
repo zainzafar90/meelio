@@ -124,10 +124,12 @@ passport.deserializeUser(async (id, done) => {
 });
 
 const googleStrategy = new GoogleStrategy(googleOptions, googleVerify);
-const googleAuthenticatePassport = passport.authenticate("google", {
-  scope: ["profile", "email", "openid"],
-  accessType: "offline",
-  prompt: "consent",
-});
+const googleAuthenticatePassport = (state: string) =>
+  passport.authenticate("google", {
+    scope: ["profile", "email", "openid"],
+    accessType: "offline",
+    prompt: "consent",
+    state: state,
+  });
 
 export { googleStrategy, googleAuthenticatePassport };

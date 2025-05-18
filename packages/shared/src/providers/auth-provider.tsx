@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { api } from "../api";
 import { AuthContext } from "../context/auth-context";
 import { useShallow } from "zustand/shallow";
+import { ExtensionRedirectDialog } from "../components/auth/extension-redirect-dialog";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = new QueryClient();
@@ -38,6 +39,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={authStore}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={authStore}>
+      {children}
+      <ExtensionRedirectDialog />
+    </AuthContext.Provider>
   );
 };
