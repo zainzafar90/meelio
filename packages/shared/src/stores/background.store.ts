@@ -120,11 +120,27 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as WallpaperData[]).map(
 
 const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
 
+// Read wallpaper directly from localStorage before Zustand hydration
+const STORAGE_KEY = "meelio:local:background";
+let INITIAL_WALLPAPER = CURRENT_DEFAULT_WALLPAPER;
+
+try {
+  const storedData = localStorage.getItem(STORAGE_KEY);
+  if (storedData) {
+    const parsedData = JSON.parse(storedData);
+    if (parsedData.state?.currentWallpaper) {
+      INITIAL_WALLPAPER = parsedData.state.currentWallpaper;
+    }
+  }
+} catch (error) {
+  console.error("Failed to read wallpaper from localStorage:", error);
+}
+
 export const useBackgroundStore = create<BackgroundState>()(
   persist(
     (set, get) => ({
       wallpapers: DEFAULT_WALLPAPERS,
-      currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
+      currentWallpaper: INITIAL_WALLPAPER,
       isLoading: false,
       _hasHydrated: false,
       setHasHydrated: (state) => {
@@ -136,7 +152,7 @@ export const useBackgroundStore = create<BackgroundState>()(
       getWallpaper: () => {
         return get()._hasHydrated
           ? get().currentWallpaper || CURRENT_DEFAULT_WALLPAPER
-          : CURRENT_DEFAULT_WALLPAPER;
+          : INITIAL_WALLPAPER;
       },
 
       removeWallpaper: (id) =>
@@ -238,7 +254,7 @@ export const useBackgroundStore = create<BackgroundState>()(
     {
       name: "meelio:local:background",
       storage: createJSONStorage(() => localStorage),
-      version: 2.1,
+      version: 2.2,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
