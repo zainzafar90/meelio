@@ -109,14 +109,15 @@ const StaticWallpaperComponent = ({
 };
 
 export const Background = () => {
-  const { currentWallpaper } = useBackgroundStore();
+  const { getWallpaper } = useBackgroundStore();
+  const wallpaper = getWallpaper();
 
-  if (!currentWallpaper) return null;
+  if (!wallpaper) return null;
 
   return (
     <AnimatePresence mode="sync">
       <motion.div
-        key={currentWallpaper.id}
+        key={wallpaper.id}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -126,10 +127,10 @@ export const Background = () => {
           "m-0 p-0 transition-transform duration-300 ease-out"
         )}
       >
-        {currentWallpaper.type === "live" ? (
-          <LiveWallpaperComponent wallpaper={currentWallpaper} />
+        {wallpaper.type === "live" ? (
+          <LiveWallpaperComponent wallpaper={wallpaper} />
         ) : (
-          <StaticWallpaperComponent wallpaper={currentWallpaper} />
+          <StaticWallpaperComponent wallpaper={wallpaper} />
         )}
       </motion.div>
     </AnimatePresence>

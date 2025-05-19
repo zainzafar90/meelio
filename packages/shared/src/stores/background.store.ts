@@ -58,6 +58,7 @@ interface BackgroundState {
   isLoading: boolean;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
+  getWallpaper: () => Wallpaper;
 }
 
 type WallpaperData = {
@@ -130,6 +131,12 @@ export const useBackgroundStore = create<BackgroundState>()(
         set({
           _hasHydrated: state,
         });
+      },
+
+      getWallpaper: () => {
+        return get()._hasHydrated
+          ? get().currentWallpaper || CURRENT_DEFAULT_WALLPAPER
+          : CURRENT_DEFAULT_WALLPAPER;
       },
 
       removeWallpaper: (id) =>
