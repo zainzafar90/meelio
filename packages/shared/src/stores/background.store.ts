@@ -254,7 +254,7 @@ export const useBackgroundStore = create<BackgroundState>()(
     {
       name: "meelio:local:background",
       storage: createJSONStorage(() => localStorage),
-      version: 2.2,
+      version: 3,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
