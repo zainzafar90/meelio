@@ -30,8 +30,8 @@ export interface StaticWallpaper extends BaseWallpaper {
 
 export interface LiveWallpaper extends BaseWallpaper {
   type: "live";
+  url: string;
   video: {
-    src: string;
     fallbackImage: string;
   };
 }
@@ -69,9 +69,8 @@ type WallpaperData = {
   thumbnail: string;
   blurhash: string;
   source: WallpaperSource;
-  url?: string;
+  url: string;
   video?: {
-    src: string;
     fallbackImage: string;
   };
 };
@@ -84,8 +83,8 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as WallpaperData[]).map(
           ...wallpaper,
           type: "live" as const,
           thumbnail: getAssetPath(wallpaper.thumbnail),
+          url: getAssetPath(wallpaper.url || ""),
           video: {
-            src: getAssetPath(wallpaper.video.src),
             fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
           },
         } as LiveWallpaper;
@@ -103,8 +102,8 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as WallpaperData[]).map(
       return {
         ...wallpaper,
         thumbnail: getAssetPath(wallpaper.thumbnail),
+        url: getAssetPath(wallpaper.url || ""),
         video: {
-          src: getAssetPath(wallpaper.video.src),
           fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
         },
         type: "live" as const,
@@ -211,8 +210,8 @@ export const useBackgroundStore = create<BackgroundState>()(
                   thumbnail: metadata?.thumbnailUrl || "",
                   blurhash: metadata?.blurhash || "",
                   source,
+                  url: getAssetPath(bg.url || ""),
                   video: {
-                    src: getAssetPath(bg.url || ""),
                     fallbackImage: getAssetPath(
                       metadata?.fallbackImage || metadata?.thumbnailUrl || ""
                     ),
@@ -254,7 +253,7 @@ export const useBackgroundStore = create<BackgroundState>()(
     {
       name: "meelio:local:background",
       storage: createJSONStorage(() => localStorage),
-      version: 3,
+      version: 4,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

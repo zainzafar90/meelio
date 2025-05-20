@@ -7,8 +7,8 @@
     "blurhash": "LjI6AjogNtNG_4V@ocI;I@M_aKS#",
     "author": "Local",
     "source": "local",
+    "url": "/public/live-wallpapers/01-spring-lofi.mp4",
     "video": {
-      "src": "/public/live-wallpapers/01-spring-lofi.mp4",
       "fallbackImage": "/public/live-wallpapers/01-spring-lofi.avif"
     }
   },
@@ -20,8 +20,8 @@
     "blurhash": "L33b,b:#q@Y8.A#Ov|%hMdS5tmwZ",
     "author": "Local",
     "source": "local",
+    "url": "/public/live-wallpapers/02-rainy-forest.mp4",
     "video": {
-      "src": "/public/live-wallpapers/02-rainy-forest.mp4",
       "fallbackImage": "/public/live-wallpapers/02-rainy-forest.avif"
     }
   },

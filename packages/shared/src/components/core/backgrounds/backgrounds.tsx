@@ -33,7 +33,7 @@ const LiveWallpaperComponent = ({
       </motion.div>
 
       <motion.video
-        key={wallpaper.video.src}
+        key={wallpaper.url}
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoaded ? 1 : 0 }}
         transition={{ duration: 0.5, ease: "easeIn" }}
@@ -45,7 +45,7 @@ const LiveWallpaperComponent = ({
         poster={wallpaper.video.fallbackImage}
         onLoadedData={() => setIsLoaded(true)}
       >
-        <source src={wallpaper.video.src} type="video/mp4" />
+        <source src={wallpaper.url} type="video/mp4" />
         <img
           src={wallpaper.video.fallbackImage}
           alt={wallpaper.title}
