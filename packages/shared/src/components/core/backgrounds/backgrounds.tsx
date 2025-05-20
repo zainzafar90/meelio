@@ -5,9 +5,8 @@ import { Blurhash } from "../../../components";
 import {
   LiveWallpaper,
   StaticWallpaper,
-  DEFAULT_WALLPAPERS,
+  useBackgroundStore,
 } from "../../../stores";
-import { getSeedIndexByDate } from "../../../utils/common.utils";
 
 const LiveWallpaperComponent = ({
   wallpaper,
@@ -115,8 +114,10 @@ const StaticWallpaperComponent = ({
 };
 
 export const Background = () => {
-  const wallpapers = DEFAULT_WALLPAPERS.slice(0, 100);
-  const wallpaper = wallpapers[getSeedIndexByDate(91)];
+  const { getWallpaper } = useBackgroundStore();
+  const wallpaper = getWallpaper();
+
+  if (!wallpaper) return null;
 
   return (
     <AnimatePresence mode="sync">
