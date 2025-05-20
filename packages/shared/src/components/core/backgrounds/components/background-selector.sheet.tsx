@@ -123,7 +123,7 @@ export function BackgroundSelectorSheet() {
             onClick={handleResetToDefault}
           >
             <Icons.reset className="mr-2 h-4 w-4" />
-            {t("backgrounds.resetToDefault")}
+            {t("backgrounds.resetToDefault")} Hello
           </Button>
         </div>
 
