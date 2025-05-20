@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getAssetPath } from "../utils/path.utils";
+import { getSeedIndexByDate } from "../utils/common.utils";
+
 import wallpapersData from "../data/wallpapers.json";
 
 export type WallpaperType = "static" | "live";
@@ -39,6 +41,8 @@ interface BackgroundState {
   resetToDefault: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
+  wallpaperRotationEnabled: boolean;
+  setWallpaperRotationEnabled: (enabled: boolean) => void;
   getWallpaper: () => Wallpaper;
 }
 
@@ -67,18 +71,21 @@ const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
 const STORAGE_KEY = "meelio:local:background";
 
 let INITIAL_WALLPAPER = CURRENT_DEFAULT_WALLPAPER;
-
-try {
-  const storedData = localStorage.getItem(STORAGE_KEY);
-  if (storedData) {
-    const parsedData = JSON.parse(storedData);
-    if (parsedData.state?.currentWallpaper) {
-      INITIAL_WALLPAPER = parsedData.state.currentWallpaper;
+const loadInitialWallpaper = () => {
+  try {
+    const storedData = localStorage.getItem(STORAGE_KEY);
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      if (parsedData.state?.currentWallpaper) {
+        INITIAL_WALLPAPER = parsedData.state.currentWallpaper;
+      }
     }
+  } catch (error) {
+    console.error("Failed to read wallpaper from localStorage:", error);
   }
-} catch (error) {
-  console.error("Failed to read wallpaper from localStorage:", error);
-}
+};
+
+loadInitialWallpaper();
 
 export const useBackgroundStore = create<BackgroundState>()(
   persist(
@@ -86,7 +93,14 @@ export const useBackgroundStore = create<BackgroundState>()(
       wallpapers: DEFAULT_WALLPAPERS,
       currentWallpaper: INITIAL_WALLPAPER,
       _hasHydrated: false,
-      setHasHydrated: (state) => set({ _hasHydrated: state }),
+      wallpaperRotationEnabled: true,
+      setHasHydrated: (state) => {
+        set({ _hasHydrated: state });
+        if (state && get().wallpaperRotationEnabled) {
+          const index = getSeedIndexByDate(DEFAULT_WALLPAPERS.length);
+          set({ currentWallpaper: DEFAULT_WALLPAPERS[index] });
+        }
+      },
       getWallpaper: () =>
         get()._hasHydrated
           ? get().currentWallpaper || CURRENT_DEFAULT_WALLPAPER
@@ -109,6 +123,13 @@ export const useBackgroundStore = create<BackgroundState>()(
           })),
         }));
       },
+      setWallpaperRotationEnabled: (enabled) => {
+        set({ wallpaperRotationEnabled: enabled });
+        if (enabled) {
+          const index = getSeedIndexByDate(DEFAULT_WALLPAPERS.length);
+          set({ currentWallpaper: DEFAULT_WALLPAPERS[index] });
+        }
+      },
       resetToDefault: () =>
         set({
           currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
@@ -121,10 +142,8 @@ export const useBackgroundStore = create<BackgroundState>()(
     {
       name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      version: 5,
+      version: 6,
       onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
     }
   )
 );
-
-console.log(useBackgroundStore.persist.getOptions().version);
