@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getAssetPath } from "../utils/path.utils";
 import wallpapersData from "../data/wallpapers.json";
+import { useAppStore } from "./app.store";
+import { getSeedIndexByDate } from "../utils";
 
 export type WallpaperType = "static" | "live";
 export type WallpaperSource = "unsplash" | "custom" | "local";
@@ -125,7 +127,12 @@ export const useBackgroundStore = create<BackgroundState>()(
       partialize: (state) => ({
         currentWallpaper: state.currentWallpaper,
       }),
-      onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+        if (useAppStore.getState().wallpaperRotationEnabled) {
+          state.setCurrentWallpaper(state.wallpapers[getSeedIndexByDate(91)]);
+        }
+      },
     }
   )
 );
