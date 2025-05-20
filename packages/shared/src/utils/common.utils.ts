@@ -47,29 +47,34 @@ export const isChromeExtension = () => {
 };
 
 /**
+ * Get the day of the year (1-366)
+ * @returns {number} The day of the year
+ */
+export const getDayOfYear = (): number => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - start.getTime();
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay);
+};
+
+/**
  * Get a seed value based on the user's ID to be used for random number generation for wallpapers, mantras & quotes
- *
- * This function retrieves the user's ID from the authentication store.
- * If the user is authenticated, it uses the user's ID as the seed.
- * If the user is not authenticated, it uses a guest's ID as see otherwise  "default" seed value.
- *
- * @returns {number} The seed value.
+ * @returns {number} The seed value
  */
 export const getSeedByUser = () => {
   const { user, guestUser } = useAuthStore.getState();
   const seed = user?.id || guestUser?.id || "default";
-
   return seed.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
 };
 
+/**
+ * Get a seeded index based on the day of year and user seed
+ * @param totalItems {number} Total number of items to choose from
+ * @returns {number} The seeded index
+ */
 export const getSeedIndexByDate = (totalItems: number) => {
-  const today = new Date();
-  const startOfYear = new Date(today.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor(
-    (today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)
-  );
-
+  const dayOfYear = getDayOfYear();
   const seed = getSeedByUser();
-
   return (dayOfYear + seed) % totalItems;
 };

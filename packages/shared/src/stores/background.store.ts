@@ -67,10 +67,12 @@ const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as Wallpaper[]).map(
   }
 );
 
-const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
 const STORAGE_KEY = "meelio:local:background";
 
+const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
+
 let INITIAL_WALLPAPER = CURRENT_DEFAULT_WALLPAPER;
+
 const loadInitialWallpaper = () => {
   try {
     const storedData = localStorage.getItem(STORAGE_KEY);
