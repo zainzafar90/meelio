@@ -42,26 +42,26 @@ interface BackgroundState {
   getWallpaper: () => Wallpaper;
 }
 
-const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as Wallpaper[]).map(
-  (wallpaper) => {
-    const baseWallpaper = {
-      ...wallpaper,
-      thumbnail: getAssetPath(wallpaper.thumbnail),
-    };
+export const DEFAULT_WALLPAPERS: Wallpaper[] = (
+  wallpapersData as Wallpaper[]
+).map((wallpaper) => {
+  const baseWallpaper = {
+    ...wallpaper,
+    thumbnail: getAssetPath(wallpaper.thumbnail),
+  };
 
-    if (wallpaper.type === "live" && wallpaper.video) {
-      return {
-        ...baseWallpaper,
-        url: getAssetPath(wallpaper.url || ""),
-        video: {
-          fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
-        },
-      } as LiveWallpaper;
-    }
-
-    return baseWallpaper as StaticWallpaper;
+  if (wallpaper.type === "live" && wallpaper.video) {
+    return {
+      ...baseWallpaper,
+      url: getAssetPath(wallpaper.url || ""),
+      video: {
+        fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
+      },
+    } as LiveWallpaper;
   }
-);
+
+  return baseWallpaper as StaticWallpaper;
+});
 
 const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
 const STORAGE_KEY = "meelio:local:background";

@@ -8,10 +8,12 @@ interface AppState {
   platform: "extension" | "web";
   mantraRotationCount: number;
   mantraRotationEnabled: boolean;
+  wallpaperRotationEnabled: boolean;
   setPlatform: (platform: "extension" | "web") => void;
   setVersion: (version: string) => void;
   incrementMantraRotationCount: () => void;
   setMantraRotation: (enabled: boolean) => void;
+  setWallpaperRotationEnabled: (enabled: boolean) => void;
   initializeApp: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -24,6 +26,7 @@ export const useAppStore = create<AppState>()(
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
+      wallpaperRotationEnabled: true,
       setPlatform: (platform) => set({ platform }),
       setVersion: (version) => set({ version }),
       incrementMantraRotationCount: () =>
@@ -31,6 +34,8 @@ export const useAppStore = create<AppState>()(
           mantraRotationCount: state.mantraRotationCount + 1,
         })),
       setMantraRotation: (enabled) => set({ mantraRotationEnabled: enabled }),
+      setWallpaperRotationEnabled: (enabled) =>
+        set({ wallpaperRotationEnabled: enabled }),
       initializeApp: () => {
         const version = localStorage.getItem("meelio:local:version");
         if (version) {

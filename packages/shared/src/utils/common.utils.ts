@@ -50,7 +50,7 @@ export const isChromeExtension = () => {
  * Get the day of the year (1-366)
  * @returns {number} The day of the year
  */
-export const getDayOfYear = (): number => {
+const getDayOfYear = (): number => {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const diff = now.getTime() - start.getTime();

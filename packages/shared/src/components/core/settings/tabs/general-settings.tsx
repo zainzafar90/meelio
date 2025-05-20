@@ -7,19 +7,19 @@ import { useBackgroundStore } from "../../../../stores/background.store";
 
 export function GeneralSettings() {
   const { t } = useTranslation();
-  const { mantraRotationEnabled, setMantraRotation } = useAppStore(
+  const {
+    mantraRotationEnabled,
+    setMantraRotation,
+    wallpaperRotationEnabled,
+    setWallpaperRotationEnabled,
+  } = useAppStore(
     useShallow((state) => ({
       mantraRotationEnabled: state.mantraRotationEnabled,
       setMantraRotation: state.setMantraRotation,
+      wallpaperRotationEnabled: state.wallpaperRotationEnabled,
+      setWallpaperRotationEnabled: state.setWallpaperRotationEnabled,
     }))
   );
-  const { wallpaperRotationEnabled, setWallpaperRotationEnabled } =
-    useBackgroundStore(
-      useShallow((state) => ({
-        wallpaperRotationEnabled: state.wallpaperRotationEnabled,
-        setWallpaperRotationEnabled: state.setWallpaperRotationEnabled,
-      }))
-    );
 
   return (
     <div className="space-y-6">

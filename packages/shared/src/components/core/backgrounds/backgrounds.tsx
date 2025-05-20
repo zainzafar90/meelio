@@ -5,8 +5,9 @@ import { Blurhash } from "../../../components";
 import {
   LiveWallpaper,
   StaticWallpaper,
-  useBackgroundStore,
+  DEFAULT_WALLPAPERS,
 } from "../../../stores";
+import { getSeedIndexByDate } from "../../../utils/common.utils";
 
 const LiveWallpaperComponent = ({
   wallpaper,
@@ -97,6 +98,11 @@ const StaticWallpaperComponent = ({
             srcSet={`${wallpaper.url}?w=3840&q=80&auto=format`}
           />
           <motion.img
+            key={wallpaper.url}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeIn" }}
             src={`${wallpaper.url}`}
             alt={wallpaper.title}
             className="h-full w-full object-cover"
@@ -109,10 +115,8 @@ const StaticWallpaperComponent = ({
 };
 
 export const Background = () => {
-  const { getWallpaper } = useBackgroundStore();
-  const wallpaper = getWallpaper();
-
-  if (!wallpaper) return null;
+  const wallpapers = DEFAULT_WALLPAPERS.slice(0, 100);
+  const wallpaper = wallpapers[getSeedIndexByDate(91)];
 
   return (
     <AnimatePresence mode="sync">
@@ -123,7 +127,7 @@ export const Background = () => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5, ease: "easeIn" }}
         className={cn(
-          "fixed inset-0 bg-transparent",
+          "fixed inset-0 bg-blue-300",
           "m-0 p-0 transition-transform duration-300 ease-out"
         )}
       >
