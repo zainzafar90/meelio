@@ -297,6 +297,10 @@
       "mantraRotation": {
         "title": "Mantra Rotation",
         "description": "Rotiere Mantras mit Begrüßungen beim Seitenladen"
+      },
+      "wallpaperRotation": {
+        "title": "Hintergrund Rotation",
+        "description": "Rotiere neue Hintergründe jeden Tag"
       }
     },
     "appearance": {
