@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import mantras from "../data/mantras.json";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { getSeedIndexByDate } from "../utils/common.utils";
 
 /**
  * ------------
@@ -21,19 +22,10 @@ interface MantraStore {
   setHasHydrated: (state: boolean) => void;
 }
 
-const getDayOfYear = (): number => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
-};
-
 export const useMantraStore = create<MantraStore>()(
   persist(
     (set) => ({
-      currentMantra:
-        mantras[(getDayOfYear() % mantras.length) + 1] || mantras[0],
+      currentMantra: mantras[0],
       mantras,
       isMantraVisible: false,
       _hasHydrated: false,
@@ -41,30 +33,29 @@ export const useMantraStore = create<MantraStore>()(
         set({
           _hasHydrated: state,
         });
+        if (state) {
+          const index = getSeedIndexByDate(mantras.length);
+          set({ currentMantra: mantras[index] });
+        }
       },
-      updateMantra: () =>
-        set((state) => ({
-          currentMantra:
-            state.mantras[(getDayOfYear() % state.mantras.length) + 1],
-        })),
+      updateMantra: () => {
+        const index = getSeedIndexByDate(mantras.length);
+        set({ currentMantra: mantras[index] });
+      },
       setIsMantraVisible: (isVisible: boolean) =>
         set({ isMantraVisible: isVisible }),
-      resetToDefault: () =>
-        set((state) => ({
-          currentMantra:
-            state.mantras[(getDayOfYear() % state.mantras.length) + 1],
-        })),
     }),
     {
       name: "meelio:local:mantra",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
     }
   )
 );
+
 /**
  * --------------
  * GREETING STORE

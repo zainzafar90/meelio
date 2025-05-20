@@ -1,17 +1,12 @@
 import { create } from "zustand";
-
 import { createJSONStorage, persist } from "zustand/middleware";
-import { getBackgrounds } from "../api/backgrounds.api";
 import { getAssetPath } from "../utils/path.utils";
 import wallpapersData from "../data/wallpapers.json";
+import { useAppStore } from "./app.store";
+import { getSeedIndexByDate } from "../utils";
 
 export type WallpaperType = "static" | "live";
-export type WallpaperSource =
-  | "unsplash"
-  | "custom"
-  | "local"
-  | "api-default"
-  | "api-custom";
+export type WallpaperSource = "unsplash" | "custom" | "local";
 
 export interface BaseWallpaper {
   id: string;
@@ -30,23 +25,13 @@ export interface StaticWallpaper extends BaseWallpaper {
 
 export interface LiveWallpaper extends BaseWallpaper {
   type: "live";
+  url: string;
   video: {
-    src: string;
     fallbackImage: string;
   };
 }
 
 export type Wallpaper = StaticWallpaper | LiveWallpaper;
-
-// Extended metadata type to handle API response
-interface ExtendedMetadata {
-  name?: string;
-  category?: string;
-  tags?: string[];
-  thumbnailUrl?: string;
-  blurhash?: string;
-  fallbackImage?: string;
-}
 
 interface BackgroundState {
   wallpapers: Wallpaper[];
@@ -54,74 +39,35 @@ interface BackgroundState {
   removeWallpaper: (id: string) => void;
   setCurrentWallpaper: (wallpaper: Wallpaper) => void;
   resetToDefault: () => void;
-  initializeWallpapers: () => void;
-  isLoading: boolean;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
   getWallpaper: () => Wallpaper;
 }
 
-type WallpaperData = {
-  id: string;
-  type: "static" | "live";
-  title: string;
-  author: string;
-  thumbnail: string;
-  blurhash: string;
-  source: WallpaperSource;
-  url?: string;
-  video?: {
-    src: string;
-    fallbackImage: string;
+export const DEFAULT_WALLPAPERS: Wallpaper[] = (
+  wallpapersData as Wallpaper[]
+).map((wallpaper) => {
+  const baseWallpaper = {
+    ...wallpaper,
+    thumbnail: getAssetPath(wallpaper.thumbnail),
   };
-};
 
-const DEFAULT_WALLPAPERS: Wallpaper[] = (wallpapersData as WallpaperData[]).map(
-  (wallpaper) => {
-    if (wallpaper.source === "local") {
-      if (wallpaper.type === "live" && wallpaper.video) {
-        return {
-          ...wallpaper,
-          type: "live" as const,
-          thumbnail: getAssetPath(wallpaper.thumbnail),
-          video: {
-            src: getAssetPath(wallpaper.video.src),
-            fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
-          },
-        } as LiveWallpaper;
-      } else if (wallpaper.type === "static") {
-        return {
-          ...wallpaper,
-          type: "static" as const,
-          thumbnail: getAssetPath(wallpaper.thumbnail),
-        } as StaticWallpaper;
-      }
-    }
-
-    // For non-local wallpapers
-    if (wallpaper.type === "live" && wallpaper.video) {
-      return {
-        ...wallpaper,
-        thumbnail: getAssetPath(wallpaper.thumbnail),
-        video: {
-          src: getAssetPath(wallpaper.video.src),
-          fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
-        },
-        type: "live" as const,
-      } as LiveWallpaper;
-    } else {
-      return {
-        ...wallpaper,
-        type: "static" as const,
-      } as StaticWallpaper;
-    }
+  if (wallpaper.type === "live" && wallpaper.video) {
+    return {
+      ...baseWallpaper,
+      url: getAssetPath(wallpaper.url || ""),
+      video: {
+        fallbackImage: getAssetPath(wallpaper.video.fallbackImage),
+      },
+    } as LiveWallpaper;
   }
-);
+
+  return baseWallpaper as StaticWallpaper;
+});
 
 const CURRENT_DEFAULT_WALLPAPER = DEFAULT_WALLPAPERS[3];
-
-// Read wallpaper directly from localStorage before Zustand hydration
 const STORAGE_KEY = "meelio:local:background";
+
 let INITIAL_WALLPAPER = CURRENT_DEFAULT_WALLPAPER;
 
 try {
@@ -141,44 +87,30 @@ export const useBackgroundStore = create<BackgroundState>()(
     (set, get) => ({
       wallpapers: DEFAULT_WALLPAPERS,
       currentWallpaper: INITIAL_WALLPAPER,
-      isLoading: false,
       _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
-
-      getWallpaper: () => {
-        return get()._hasHydrated
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+      getWallpaper: () =>
+        get()._hasHydrated
           ? get().currentWallpaper || CURRENT_DEFAULT_WALLPAPER
-          : INITIAL_WALLPAPER;
-      },
-
+          : INITIAL_WALLPAPER,
       removeWallpaper: (id) =>
         set((state) => ({
           wallpapers: state.wallpapers.filter((bg) => bg.id !== id),
         })),
-
       setCurrentWallpaper: (wallpaper) => {
         if (!wallpaper) {
           set({ currentWallpaper: CURRENT_DEFAULT_WALLPAPER });
           return;
         }
 
-        set((state) => {
-          const updatedWallpapers = state.wallpapers.map((wp) => ({
+        set((state) => ({
+          currentWallpaper: wallpaper,
+          wallpapers: state.wallpapers.map((wp) => ({
             ...wp,
             isFavourite: wp.id === wallpaper.id,
-          }));
-
-          return {
-            currentWallpaper: wallpaper,
-            wallpapers: updatedWallpapers,
-          };
-        });
+          })),
+        }));
       },
-
       resetToDefault: () =>
         set({
           currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
@@ -187,76 +119,19 @@ export const useBackgroundStore = create<BackgroundState>()(
             isFavourite: wp.id === CURRENT_DEFAULT_WALLPAPER.id,
           })),
         }),
-
-      initializeWallpapers: async () => {
-        set({ isLoading: true });
-        try {
-          const response = await getBackgrounds();
-          if (
-            response.data &&
-            Array.isArray(response.data) &&
-            response.data.length > 0
-          ) {
-            // Convert API backgrounds to Wallpaper format
-            const apiWallpapers = response.data.map((bg) => {
-              const metadata = bg.metadata as ExtendedMetadata;
-              const source = "api-custom" as WallpaperSource;
-
-              if (bg.type === "live") {
-                return {
-                  id: bg.id,
-                  type: "live" as const,
-                  title: metadata?.name || "Live Background",
-                  author: metadata?.category || "Unknown",
-                  thumbnail: metadata?.thumbnailUrl || "",
-                  blurhash: metadata?.blurhash || "",
-                  source,
-                  video: {
-                    src: getAssetPath(bg.url || ""),
-                    fallbackImage: getAssetPath(
-                      metadata?.fallbackImage || metadata?.thumbnailUrl || ""
-                    ),
-                  },
-                } as LiveWallpaper;
-              } else {
-                return {
-                  id: bg.id,
-                  type: "static" as const,
-                  title: metadata?.name || "Static Background",
-                  author: metadata?.category || "Unknown",
-                  thumbnail: metadata?.thumbnailUrl || bg.url || "",
-                  blurhash: metadata?.blurhash || "",
-                  source,
-                  url: bg.url || "",
-                } as StaticWallpaper;
-              }
-            });
-
-            set({
-              wallpapers: apiWallpapers,
-              currentWallpaper:
-                apiWallpapers.find(
-                  (bg) => bg.id === get().currentWallpaper?.id
-                ) ||
-                apiWallpapers.find(
-                  (bg) => "isFavourite" in bg && bg.isFavourite
-                ) ||
-                apiWallpapers[0],
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch backgrounds from API:", error);
-        } finally {
-          set({ isLoading: false });
-        }
-      },
     }),
     {
-      name: "meelio:local:background",
+      name: STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      version: 3,
+      version: 8,
+      partialize: (state) => ({
+        currentWallpaper: state.currentWallpaper,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
+        if (useAppStore.getState().wallpaperRotationEnabled) {
+          state.setCurrentWallpaper(state.wallpapers[getSeedIndexByDate(91)]);
+        }
       },
     }
   )

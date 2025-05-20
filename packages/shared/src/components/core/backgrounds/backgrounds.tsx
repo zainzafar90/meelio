@@ -33,7 +33,7 @@ const LiveWallpaperComponent = ({
       </motion.div>
 
       <motion.video
-        key={wallpaper.video.src}
+        key={wallpaper.url}
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoaded ? 1 : 0 }}
         transition={{ duration: 0.5, ease: "easeIn" }}
@@ -45,7 +45,7 @@ const LiveWallpaperComponent = ({
         poster={wallpaper.video.fallbackImage}
         onLoadedData={() => setIsLoaded(true)}
       >
-        <source src={wallpaper.video.src} type="video/mp4" />
+        <source src={wallpaper.url} type="video/mp4" />
         <img
           src={wallpaper.video.fallbackImage}
           alt={wallpaper.title}
@@ -97,6 +97,11 @@ const StaticWallpaperComponent = ({
             srcSet={`${wallpaper.url}?w=3840&q=80&auto=format`}
           />
           <motion.img
+            key={wallpaper.url}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeIn" }}
             src={`${wallpaper.url}`}
             alt={wallpaper.title}
             className="h-full w-full object-cover"
@@ -123,7 +128,7 @@ export const Background = () => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5, ease: "easeIn" }}
         className={cn(
-          "fixed inset-0 bg-transparent",
+          "fixed inset-0 bg-blue-300",
           "m-0 p-0 transition-transform duration-300 ease-out"
         )}
       >

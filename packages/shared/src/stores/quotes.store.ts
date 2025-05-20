@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import quotes from "../data/quotes.json";
+import { getSeedIndexByDate } from "../utils/common.utils";
 
 interface Quote {
   quote: string;
@@ -13,19 +14,11 @@ interface QuoteStore {
   updateQuote: () => void;
 }
 
-const getDayOfYear = (): number => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  const oneDay = 24 * 60 * 60 * 1000;
-  return Math.floor(diff / oneDay);
-};
-
 export const useQuoteStore = create<QuoteStore>((set) => ({
   currentQuote: quotes[0],
   quotes,
-  updateQuote: () =>
-    set((state) => ({
-      currentQuote: state.quotes[getDayOfYear() % state.quotes.length],
-    })),
+  updateQuote: () => {
+    const index = getSeedIndexByDate(quotes.length);
+    set({ currentQuote: quotes[index] });
+  },
 }));

@@ -1,6 +1,8 @@
 import { PomodoroStage } from "../../types/pomodoro";
 import { db } from "./meelio.dexie";
 import { PomodoroSession, DailySummary } from "./models.dexie";
+import { IndexableType } from "dexie";
+
 export const getTodaysSummary = async (): Promise<DailySummary> => {
   const today = new Date().toISOString().split("T")[0];
   const summary = await db.focusStats.where("date").equals(today).first();
@@ -46,14 +48,14 @@ export const getWeeklySummary = async (): Promise<DailySummary[]> => {
 
 export const addPomodoroSession = async (
   session: PomodoroSession
-): Promise<number> => {
+): Promise<IndexableType> => {
   return db.focusSessions.add(session);
 };
 
 export const addPomodoroSummary = async (
   duration: number,
   stage: PomodoroStage
-): Promise<number> => {
+): Promise<IndexableType> => {
   const todaysSummary = await getTodaysSummary();
 
   if (stage === PomodoroStage.Focus) {

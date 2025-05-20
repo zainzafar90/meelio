@@ -6,13 +6,12 @@ import deTranslation from "./locales/de/translation.json";
 import enTranslation from "./locales/en/translation.json";
 import { env } from "../utils/env.utils";
 
-console.log(env.dev);
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     fallbackLng: "en",
-    debug: env.dev === "true",
+    debug: env.dev == true,
     interpolation: {
       escapeValue: false,
     },
