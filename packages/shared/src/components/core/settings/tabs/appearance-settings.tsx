@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@repo/ui/components/ui/button";
 import {
   Form,
   FormControl,
@@ -28,7 +27,6 @@ type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 export const AppearanceSettings = () => {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const THEME_CHANGE_DISABLED = true;
 
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema as any),
@@ -37,19 +35,14 @@ export const AppearanceSettings = () => {
     },
   });
 
-  function onSubmit(data: AppearanceFormValues) {
-    if (THEME_CHANGE_DISABLED) {
-      toast.warning("This feature is work in progress.");
-      return;
-    }
-
-    setTheme(data.theme);
+  const handleThemeChange = (value: string) => {
+    setTheme(value as "light" | "dark" | "system");
     toast.success(t("settings.appearance.themeUpdated"));
-  }
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <div className="space-y-8">
         <p className="text-sm text-muted-foreground">
           {t("settings.appearance.description")}
         </p>
@@ -66,7 +59,7 @@ export const AppearanceSettings = () => {
               <FormMessage />
               <div className="flex flex-col gap-4">
                 <RadioGroup
-                  onValueChange={field.onChange}
+                  onValueChange={handleThemeChange}
                   defaultValue={field.value}
                   className="flex gap-4 pb-4"
                 >
@@ -147,9 +140,7 @@ export const AppearanceSettings = () => {
             </FormItem>
           )}
         />
-
-        <Button type="submit">{t("common.actions.save")}</Button>
-      </form>
+      </div>
     </Form>
   );
 };

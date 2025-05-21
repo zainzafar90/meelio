@@ -23,70 +23,42 @@ export const LanguageSettings = () => {
       <div className="flex items-center gap-4">
         <button
           className={cn(
-            "cursor-pointer",
-            "w-40 h-24 rounded-xl shadow-lg",
-            "flex flex-col items-center justify-center gap-1",
-            "transition-colors duration-200",
-            "bg-gradient-to-b",
+            "cursor-pointer w-40 h-24 rounded-xl flex flex-col items-center justify-center gap-1 transition-colors duration-200",
             currentLang === "en"
-              ? "from-blue-500/20 to-purple-500/20 ring-2 ring-white/50"
-              : "from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800"
+              ? "border-2 border-blue-500 bg-white text-black dark:bg-black dark:text-white"
+              : "border border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
           )}
           onClick={() => handleLanguageChange("en")}
           title="Switch to English"
           role="button"
         >
           <motion.span
-            className={cn(
-              "text-2xl font-medium uppercase",
-              currentLang === "en" ? "text-white" : "text-white/70"
-            )}
+            className={cn("text-2xl font-medium uppercase")}
             whileTap={{ scale: 0.95 }}
           >
             en
           </motion.span>
-          <span
-            className={cn(
-              "text-sm",
-              currentLang === "en" ? "text-white/90" : "text-white/50"
-            )}
-          >
-            English
-          </span>
+          <span className={cn("text-sm")}>English</span>
         </button>
 
         <button
           className={cn(
-            "cursor-pointer",
-            "w-40 h-24 rounded-xl shadow-lg",
-            "flex flex-col items-center justify-center gap-1",
-            "transition-colors duration-200",
-            "bg-gradient-to-b",
+            "cursor-pointer w-40 h-24 rounded-xl flex flex-col items-center justify-center gap-1 transition-colors duration-200",
             currentLang === "de"
-              ? "from-blue-500/20 to-purple-500/20 ring-2 ring-white/50"
-              : "from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800"
+              ? "border-2 border-blue-500 bg-white text-black dark:bg-black dark:text-white"
+              : "border border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800"
           )}
           onClick={() => handleLanguageChange("de")}
           title="Switch to German"
           role="button"
         >
           <motion.span
-            className={cn(
-              "text-2xl font-medium uppercase",
-              currentLang === "de" ? "text-white" : "text-white/70"
-            )}
+            className={cn("text-2xl font-medium uppercase")}
             whileTap={{ scale: 0.95 }}
           >
             de
           </motion.span>
-          <span
-            className={cn(
-              "text-sm",
-              currentLang === "de" ? "text-white/90" : "text-white/50"
-            )}
-          >
-            Deutsch
-          </span>
+          <span className={cn("text-sm")}>Deutsch</span>
         </button>
       </div>
     </div>

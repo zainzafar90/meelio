@@ -6,9 +6,7 @@ export const FeedbackSettings = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-gray-300 mb-2">
-        {t("settings.feedback.description")}
-      </p>
+      <p className="text-sm mb-2">{t("settings.feedback.description")}</p>
       <div>
         <Button
           variant="default"

@@ -32,7 +32,7 @@ export const SoundscapesSheet: React.FC = () => {
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
       >
-        <div className="absolute inset-0 bg-black opacity-10" />
+        <div className="absolute inset-0 bg-white dark:bg-black dark:opacity-10" />
         <VisuallyHidden>
           <SheetHeader>
             <SheetTitle>{t("soundscapes.dialog.title")}</SheetTitle>

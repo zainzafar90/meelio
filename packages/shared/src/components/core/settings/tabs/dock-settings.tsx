@@ -112,7 +112,7 @@ export const DockSettings = () => {
       </div>
 
       <div
-        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+        className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-800 p-4 transition-colors hover:bg-muted/50 cursor-pointer"
         onClick={() => setShowIconLabels(!showIconLabels)}
       >
         <div className="flex items-center space-x-4">
@@ -130,14 +130,15 @@ export const DockSettings = () => {
         />
       </div>
 
-      <div className="overflow-hidden shadow-sm ring-1 ring-gray-100/10 rounded-xl">
+      <div className="overflow-hidden shadow-sm ring-1 ring-gray-100/10 rounded-xl border border-gray-200 dark:border-gray-800">
         {dockItems.map((item, index) => (
           <div
             key={item.id}
             onClick={() => handleToggleItem(item, !item.isVisible)}
             className={cn(
               "flex items-center justify-between px-6 py-5 transition-colors hover:bg-muted/50 cursor-pointer",
-              index !== dockItems.length - 1 && "border-b border-gray-800"
+              index !== dockItems.length - 1 &&
+                "border-b border-gray-200 dark:border-gray-800"
             )}
           >
             <div className="flex items-center space-x-4">
