@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.1.2",
+  "version": "0.3.5",
   "private": true,
   "scripts": {
     "dev": "vite --port=4000",

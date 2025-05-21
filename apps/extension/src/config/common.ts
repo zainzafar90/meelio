@@ -1,21 +1,9 @@
-import { env } from "@/utils/env.utils";
-
 const getSoundFileUrl = () => {
-  if (env.dev) {
-    return "/sounds/yT3sxTz";
-  }
-
-  // if not in development, return the path to the sound files on cloud
-  return "https://cdn.meelio.io/file/meelio/sounds";
+  return "/sounds/yT3sxTz";
 };
 
 const getSoundFileExtension = () => {
-  if (env.dev) {
-    return ".mp3";
-  }
-
-  // if not in development, return the path to the sound files on cloud
-  return ".m3u8";
+  return ".mp3";
 };
 
 export const SOUND_FILES_BASE_URL = getSoundFileUrl();

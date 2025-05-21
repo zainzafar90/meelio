@@ -1,4 +1,4 @@
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/file";
 import { Sound } from "../../../../../types/sound";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
 import { useShallow } from "zustand/shallow";

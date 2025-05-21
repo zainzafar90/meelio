@@ -154,7 +154,7 @@ const BrowserTabStashContent = () => {
         className="mt-4"
         onClick={() =>
           window.open(
-            "https://chrome.google.com/webstore/detail/cancicbkedcabkimkihabdmcaaaikcie",
+            "https://chromewebstore.google.com/detail/meelio/cjcgnlglboofgepielbmjcepcdohipaj",
             "_blank",
             "noopener,noreferrer"
           )

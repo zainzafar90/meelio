@@ -16,7 +16,6 @@ import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
 import { Icons } from "../../../components/icons";
-import { cn } from "../../../lib";
 import { useShallow } from "zustand/shallow";
 
 const isExtension =
@@ -194,7 +193,7 @@ const BrowserSiteBlockerContent = () => {
         className="mt-4"
         onClick={() =>
           window.open(
-            "https://chrome.google.com/webstore/detail/cancicbkedcabkimkihabdmcaaaikcie",
+            "https://chromewebstore.google.com/detail/meelio/cjcgnlglboofgepielbmjcepcdohipaj",
             "_blank"
           )
         }
