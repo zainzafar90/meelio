@@ -1,13 +1,12 @@
 import { db } from "@/db";
-import { Task, TaskInsert, TaskStatus, tasks } from "@/db/schema";
-import { eq, and, desc, asc, isNull, isNotNull, or, ne } from "drizzle-orm";
+import { Task, TaskInsert, tasks } from "@/db/schema";
+import { eq, and, desc, asc, isNull, isNotNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
 interface TaskFilters {
-  status?: TaskStatus;
+  completed?: boolean;
   category?: string;
-  isFocus?: boolean;
   dueDate?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
@@ -20,16 +19,12 @@ export const tasksService = {
   async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
     const conditions = [eq(tasks.userId, userId)];
 
-    if (filters.status && Object.values(TaskStatus).includes(filters.status)) {
-      conditions.push(eq(tasks.status, filters.status));
+    if (filters.completed !== undefined) {
+      conditions.push(eq(tasks.completed, filters.completed));
     }
 
     if (filters.category) {
       conditions.push(eq(tasks.category, filters.category));
-    }
-
-    if (filters.isFocus !== undefined) {
-      conditions.push(eq(tasks.isFocus, filters.isFocus));
     }
 
     if (filters.dueDate) {
@@ -63,8 +58,8 @@ export const tasksService = {
         case "dueDate":
           orderColumn = tasks.dueDate;
           break;
-        case "status":
-          orderColumn = tasks.status;
+        case "completed":
+          orderColumn = tasks.completed;
           break;
         case "category":
           orderColumn = tasks.category;
@@ -99,28 +94,15 @@ export const tasksService = {
   },
 
   /**
-   * Get the current focus task
+   * Get task categories for a user
    */
-  async getFocusTask(userId: string): Promise<Task> {
-    const task = await db
-      .select()
+  async getCategories(userId: string): Promise<string[]> {
+    const result = await db
+      .selectDistinct({ category: tasks.category })
       .from(tasks)
-      .where(
-        and(
-          eq(tasks.userId, userId),
-          eq(tasks.isFocus, true),
-          or(
-            eq(tasks.status, TaskStatus.PENDING),
-            eq(tasks.status, TaskStatus.IN_PROGRESS)
-          )
-        )
-      );
+      .where(and(eq(tasks.userId, userId), isNotNull(tasks.category)));
 
-    if (!task.length) {
-      throw new ApiError(httpStatus.NOT_FOUND, "No focus task found");
-    }
-
-    return task[0];
+    return result.map((r) => r.category).filter((c): c is string => c !== null);
   },
 
   /**
@@ -129,16 +111,6 @@ export const tasksService = {
   async createTask(userId: string, taskData: any): Promise<Task> {
     if (!taskData.title) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Title is required");
-    }
-
-    if (
-      taskData.status &&
-      !Object.values(TaskStatus).includes(taskData.status)
-    ) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        `Status must be one of: ${Object.values(TaskStatus).join(", ")}`
-      );
     }
 
     let dueDateObj;
@@ -150,20 +122,11 @@ export const tasksService = {
       }
     }
 
-    if (taskData.isFocus) {
-      await db
-        .update(tasks)
-        .set({ isFocus: false } as Task)
-        .where(and(eq(tasks.userId, userId), eq(tasks.isFocus, true)));
-    }
-
     const insertData = {
       userId,
       title: taskData.title,
-      description: taskData.description ?? null,
+      completed: taskData.completed ?? false,
       category: taskData.category ?? null,
-      isFocus: taskData.isFocus ?? false,
-      status: taskData.status ?? TaskStatus.PENDING,
       dueDate: dueDateObj || null,
     };
 
@@ -181,16 +144,6 @@ export const tasksService = {
   ): Promise<Task> {
     const existingTask = await this.getTaskById(userId, taskId);
 
-    if (
-      updateData.status &&
-      !Object.values(TaskStatus).includes(updateData.status)
-    ) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        `Status must be one of: ${Object.values(TaskStatus).join(", ")}`
-      );
-    }
-
     let dueDateObj;
     if (updateData.dueDate !== undefined) {
       if (updateData.dueDate === null) {
@@ -204,27 +157,12 @@ export const tasksService = {
       }
     }
 
-    if (updateData.isFocus) {
-      await db
-        .update(tasks)
-        .set({ isFocus: false } as Task)
-        .where(
-          and(
-            eq(tasks.userId, userId),
-            eq(tasks.isFocus, true),
-            ne(tasks.id, taskId)
-          )
-        );
-    }
-
     const data: Partial<Task> = {};
 
     if (updateData.title !== undefined) data.title = updateData.title;
-    if (updateData.description !== undefined)
-      data.description = updateData.description;
+    if (updateData.completed !== undefined)
+      data.completed = updateData.completed;
     if (updateData.category !== undefined) data.category = updateData.category;
-    if (updateData.isFocus !== undefined) data.isFocus = updateData.isFocus;
-    if (updateData.status !== undefined) data.status = updateData.status;
     if (updateData.dueDate !== undefined) data.dueDate = dueDateObj;
 
     const result = await db
@@ -245,5 +183,14 @@ export const tasksService = {
     await db
       .delete(tasks)
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+  },
+
+  /**
+   * Delete all tasks for a user in a category
+   */
+  async deleteTasksByCategory(userId: string, category: string): Promise<void> {
+    await db
+      .delete(tasks)
+      .where(and(eq(tasks.userId, userId), eq(tasks.category, category)));
   },
 };

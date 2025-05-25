@@ -7,7 +7,6 @@ import docsRoute from "./swagger.routes";
 import userRoute from "./user.routes";
 import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
-import syncRoute from "./sync.routes";
 import backgroundRoute from "./background.routes";
 import soundscapeRoute from "./soundscape.routes";
 import mantraRoute from "./mantra.routes";
@@ -41,10 +40,6 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/subscriptions",
     route: subscriptionRoute,
-  },
-  {
-    path: "/sync",
-    route: syncRoute,
   },
   {
     path: "/backgrounds",
