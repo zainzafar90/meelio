@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState, SyncQueue } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
 
 import { usePomodoroStore } from "../lib/pomodoro-store";
 
 import TimerWorker from '../workers/timer-worker?worker';
 
-// Create a sync queue instance for timer sessions
-const timerSyncQueue = new SyncQueue();
 
 export const WebTimer = () => {
   const workerRef = useRef<Worker>();
@@ -71,37 +69,13 @@ export const WebTimer = () => {
         await addPomodoroSession(sessionData);
       
       if (isFocus) {
-        const now = new Date();
-        const sessionEndTime = now;
-        const sessionStartTime = new Date(now.getTime() - (state.stageDurations[PomodoroStage.Focus] * 1000));
-        
-        const focusSessionData = {
-          id: crypto.randomUUID(),
-          sessionStart: sessionStartTime.toISOString(),
-          sessionEnd: sessionEndTime.toISOString(),
-          duration: Math.floor(state.stageDurations[PomodoroStage.Focus] / 60), // Convert seconds to minutes
-          _syncStatus: 'pending' as "pending" | "synced" | "error",
-          _lastModified: Date.now(),
-          _version: 1,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          userId: 'web-user' 
-        };
-        
-        timerSyncQueue.addOperation({
-          entity: "focus-sessions",
-          operation: "create",
-          data: focusSessionData,
-          version: 1
-        });
-        
-        console.log("Focus session added to sync queue:", focusSessionData);
+        // TODO: Add focus session tracking when needed
       }
       
       // Add summary stats
       await addPomodoroSummary(state.stageDurations[completedStage], completedStage);
     } catch (error) {
-      console.error("Failed to record session or add to sync queue:", error);
+      console.error("Failed to record session:", error);
     }
   };
 

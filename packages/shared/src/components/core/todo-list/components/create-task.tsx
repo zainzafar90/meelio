@@ -11,9 +11,9 @@ import { Icons } from "../../../../components/icons";
 export function CreateTask() {
   const [title, setTitle] = useState("");
   const { t } = useTranslation();
-  const { activeListId, addTask } = useTodoStore(
+  const { activeCategory, addTask } = useTodoStore(
     useShallow((state) => ({
-      activeListId: state.activeListId,
+      activeCategory: state.activeCategory,
       addTask: state.addTask,
     }))
   );
@@ -22,10 +22,10 @@ export function CreateTask() {
     if (e.key === "Enter" && title.trim()) {
       addTask({
         id: crypto.randomUUID(),
+        userId: "user", // TODO: get actual user ID
         title: title.trim(),
-        completed: activeListId === "completed",
-        date: "Today",
-        listId: activeListId === "completed" ? "today" : activeListId,
+        completed: activeCategory === "completed",
+        category: activeCategory === "completed" || activeCategory === "all" || !activeCategory ? undefined : activeCategory,
       });
       setTitle("");
     }
@@ -40,7 +40,7 @@ export function CreateTask() {
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder={
-          activeListId === "completed"
+          activeCategory === "completed"
             ? t("todo.list.task.add.completed")
             : t("todo.list.task.add.normal")
         }

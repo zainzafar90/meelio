@@ -1,4 +1,3 @@
-import { Button } from "@repo/ui/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,15 +13,12 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/ui/sheet";
-import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
 import { useTodoStore } from "../../../stores/todo.store";
-import { cn } from "../../../lib/utils";
 
-import { CreateList } from "./components/create-list";
 import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
 
@@ -34,21 +30,19 @@ export function TodoListSheet() {
       setTodosVisible: state.setTodosVisible,
     }))
   );
-  const { lists, tasks, activeListId, setActiveList } = useTodoStore(
+  const { categories, tasks, activeCategory, setActiveCategory } = useTodoStore(
     useShallow((state) => ({
-      lists: state.lists,
+      categories: state.categories,
       tasks: state.tasks,
-      activeListId: state.activeListId,
-      setActiveList: state.setActiveList,
+      activeCategory: state.activeCategory,
+      setActiveCategory: state.setActiveCategory,
     }))
   );
-  const activeList = lists.find((list) => list.id === activeListId);
 
   const filteredTasks = tasks.filter((task) => {
-    if (activeListId === "all") return true;
-    if (activeListId === "completed") return task.completed;
-    if (activeListId === "today") return task.date === "Today";
-    return task.listId === activeListId;
+    if (!activeCategory || activeCategory === "all") return true;
+    if (activeCategory === "completed") return task.completed;
+    return task.category === activeCategory;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -78,43 +72,39 @@ export function TodoListSheet() {
         <main className="flex-1 overflow-auto p-4">
           <div className="flex items-center gap-2">
             <Select
-              value={activeListId}
-              onValueChange={(value) => setActiveList(value)}
+              value={activeCategory || "all"}
+              onValueChange={(value) => setActiveCategory(value === "all" ? null : value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue>
                   <span className="flex items-center gap-2">
-                    <span>{activeList?.emoji}</span>
-                    <span>{activeList?.name}</span>
+                    <span>{activeCategory || "All Tasks"}</span>
                   </span>
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {lists.map((list) => (
-                  <SelectItem key={list.id} value={list.id}>
-                    <span className="flex items-center gap-2">
-                      <span>{list.emoji}</span>
-                      <span>{list.name}</span>
-                    </span>
+                <SelectItem value="all">
+                  <span>All Tasks</span>
+                </SelectItem>
+                <SelectItem value="completed">
+                  <span>Completed</span>
+                </SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    <span>{category}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <CreateList>
-              <Button variant="outline">
-                <Plus className="h-4 w-4" />
-                {t("todo.sheet.add")}
-              </Button>
-            </CreateList>
           </div>
 
           <div className="space-y-8">
             <TaskList
-              activeListId={activeListId}
-              title={activeList?.name || ""}
+              activeListId={activeCategory || "all"}
+              title={activeCategory || "All Tasks"}
               tasks={sortedTasks}
               count={sortedTasks.length}
-              icon={activeList?.icon}
+              icon={undefined}
             />
           </div>
         </main>

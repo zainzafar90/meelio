@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTodoStore } from "../../../../stores/todo.store";
 import { useShallow } from "zustand/shallow";
 
-import { Task } from "../../../../lib/db/todo.dexie";
+import { Task } from "../../../../lib/db/models.dexie";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
 
@@ -23,7 +23,11 @@ export function TaskList({
   icon,
   activeListId,
 }: TaskListProps) {
-  const { lists } = useTodoStore();
+  const { categories } = useTodoStore(
+    useShallow((state) => ({
+      categories: state.categories,
+    }))
+  );
   const { t } = useTranslation();
 
   if (tasks.length === 0)
@@ -34,12 +38,13 @@ export function TaskList({
     );
 
   if (activeListId === "all") {
-    const tasksByList = tasks.reduce(
+    const tasksByCategory = tasks.reduce(
       (acc, task) => {
-        if (!acc[task.listId]) {
-          acc[task.listId] = [];
+        const category = task.category || "Uncategorized";
+        if (!acc[category]) {
+          acc[category] = [];
         }
-        acc[task.listId].push(task);
+        acc[category].push(task);
         return acc;
       },
       {} as Record<string, Task[]>
@@ -47,23 +52,19 @@ export function TaskList({
 
     return (
       <div className="mt-4 space-y-8">
-        {Object.entries(tasksByList).map(([listId, listTasks]) => {
-          const list = lists.find((l) => l.id === listId);
-          if (!list) return null;
-
+        {Object.entries(tasksByCategory).map(([category, categoryTasks]) => {
           return (
-            <div key={listId} className="space-y-2">
+            <div key={category} className="space-y-2">
               <div className="flex items-center justify-between px-2 py-1">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{list.emoji}</span>
-                  <span>{list.name}</span>
+                  <span>{category}</span>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {listTasks.length}
+                  {categoryTasks.length}
                 </Badge>
               </div>
               <div className="space-y-2">
-                {listTasks.map((task) => (
+                {categoryTasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
                 ))}
               </div>
@@ -123,18 +124,14 @@ const TaskItem = ({ task }: { task: Task }) => {
         </span>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <Badge
-          className="uppercase"
-          variant={
-            task.date === "Today"
-              ? "secondary"
-              : task.date === "Tomorrow"
-                ? "outline"
-                : "secondary"
-          }
-        >
-          {task.date}
-        </Badge>
+        {task.dueDate && (
+          <Badge
+            className="uppercase"
+            variant="secondary"
+          >
+            {task.dueDate}
+          </Badge>
+        )}
         <button
           className="invisible text-muted-foreground group-hover:visible"
           onClick={(e) => {
