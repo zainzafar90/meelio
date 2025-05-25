@@ -21,10 +21,7 @@ export function CreateTask() {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && title.trim()) {
       addTask({
-        id: crypto.randomUUID(),
-        userId: "user", // TODO: get actual user ID
         title: title.trim(),
-        completed: activeCategory === "completed",
         category: activeCategory === "completed" || activeCategory === "all" || !activeCategory ? undefined : activeCategory,
       });
       setTitle("");

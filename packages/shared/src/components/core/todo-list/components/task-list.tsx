@@ -1,6 +1,5 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
 import { useTodoStore } from "../../../../stores/todo.store";
 import { useShallow } from "zustand/shallow";
 
@@ -14,6 +13,7 @@ interface TaskListProps {
   count: number;
   icon?: string;
   activeListId: string;
+  isLoading?: boolean;
 }
 
 export function TaskList({
@@ -22,6 +22,7 @@ export function TaskList({
   count,
   icon,
   activeListId,
+  isLoading = false,
 }: TaskListProps) {
   const { categories } = useTodoStore(
     useShallow((state) => ({
@@ -29,6 +30,17 @@ export function TaskList({
     }))
   );
   const { t } = useTranslation();
+
+  // Show skeleton loaders when loading
+  if (isLoading) {
+    return (
+      <div className="mt-4 space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <TaskSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   if (tasks.length === 0)
     return (
@@ -87,7 +99,6 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const [isHovering, setIsHovering] = useState(false);
   const { toggleTask, deleteTask } = useTodoStore(
     useShallow((state) => ({
       toggleTask: state.toggleTask,
@@ -125,10 +136,7 @@ const TaskItem = ({ task }: { task: Task }) => {
       </div>
       <div className="ml-auto flex items-center gap-2">
         {task.dueDate && (
-          <Badge
-            className="uppercase"
-            variant="secondary"
-          >
+          <Badge className="uppercase" variant="secondary">
             {task.dueDate}
           </Badge>
         )}
@@ -144,6 +152,18 @@ const TaskItem = ({ task }: { task: Task }) => {
           <Icons.close className="h-4 w-4" />
         </button>
       </div>
+    </div>
+  );
+};
+
+const TaskSkeleton = () => {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border bg-card p-3 animate-pulse">
+      <div className="h-4 w-4 rounded-full bg-muted" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-muted rounded w-3/4" />
+      </div>
+      <div className="h-4 w-4 bg-muted rounded" />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -30,14 +31,23 @@ export function TodoListSheet() {
       setTodosVisible: state.setTodosVisible,
     }))
   );
-  const { categories, tasks, activeCategory, setActiveCategory } = useTodoStore(
+  const { categories, tasks, activeCategory, setActiveCategory, initializeStore, isLoading, error } = useTodoStore(
     useShallow((state) => ({
       categories: state.categories,
       tasks: state.tasks,
       activeCategory: state.activeCategory,
       setActiveCategory: state.setActiveCategory,
+      initializeStore: state.initializeStore,
+      isLoading: state.isLoading,
+      error: state.error,
     }))
   );
+
+  useEffect(() => {
+    if (isTodosVisible) {
+      initializeStore();
+    }
+  }, [isTodosVisible, initializeStore]);
 
   const filteredTasks = tasks.filter((task) => {
     if (!activeCategory || activeCategory === "all") return true;
@@ -70,6 +80,11 @@ export function TodoListSheet() {
         </SheetHeader>
 
         <main className="flex-1 overflow-auto p-4">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Select
               value={activeCategory || "all"}
@@ -105,6 +120,7 @@ export function TodoListSheet() {
               tasks={sortedTasks}
               count={sortedTasks.length}
               icon={undefined}
+              isLoading={isLoading}
             />
           </div>
         </main>
