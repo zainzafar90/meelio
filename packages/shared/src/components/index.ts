@@ -110,3 +110,4 @@ export * from "./skeletons/page-skeleton";
 // ------------- UTILITY COMPONENTS -------------
 export * from "./core/dock-button";
 export * from "./core/layout";
+export * from "./sync-status";

@@ -19,9 +19,11 @@ import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
 import { useTodoStore } from "../../../stores/todo.store";
+import { useSimpleSyncStore } from "../../../stores/simple-sync.store";
 
 import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
+import { SyncStatus } from "../../sync-status";
 
 export function TodoListSheet() {
   const { t } = useTranslation();
@@ -31,7 +33,15 @@ export function TodoListSheet() {
       setTodosVisible: state.setTodosVisible,
     }))
   );
-  const { categories, tasks, activeCategory, setActiveCategory, initializeStore, isLoading, error } = useTodoStore(
+  const {
+    categories,
+    tasks,
+    activeCategory,
+    setActiveCategory,
+    initializeStore,
+    isLoading,
+    error,
+  } = useTodoStore(
     useShallow((state) => ({
       categories: state.categories,
       tasks: state.tasks,
@@ -42,6 +52,10 @@ export function TodoListSheet() {
       error: state.error,
     }))
   );
+
+  const syncStore = useSimpleSyncStore();
+  const isOnline = syncStore.isOnline;
+  const syncErrors = syncStore.queues.task?.filter(op => op.retries >= 3) || [];
 
   useEffect(() => {
     if (isTodosVisible) {
@@ -73,6 +87,7 @@ export function TodoListSheet() {
         <SheetHeader className="px-6 pt-6">
           <div className="flex items-center justify-between">
             <SheetTitle>{t("todo.sheet.title")}</SheetTitle>
+            <SyncStatus entityType="task" />
           </div>
           <SheetDescription>
             <span className="mb-2 block">{t("todo.sheet.description")}</span>
@@ -85,10 +100,25 @@ export function TodoListSheet() {
               {error}
             </div>
           )}
+
+          {!isOnline && (
+            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-md text-sm">
+              You're offline. Changes will sync when you're back online.
+            </div>
+          )}
+
+          {syncErrors.length > 0 && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
+              Some tasks failed to sync. They'll retry automatically.
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <Select
               value={activeCategory || "all"}
-              onValueChange={(value) => setActiveCategory(value === "all" ? null : value)}
+              onValueChange={(value) =>
+                setActiveCategory(value === "all" ? null : value)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue>

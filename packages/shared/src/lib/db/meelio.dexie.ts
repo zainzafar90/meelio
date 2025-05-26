@@ -23,34 +23,54 @@ export class MeelioDB extends Dexie {
     super("meelio");
 
     this.version(1).stores({
-      // MeelioDB tables
       siteBlocker: "id, userId, url",
       backgrounds: "id, userId, type, *tags",
 
-      // Task table with simplified schema
-      tasks: "id, userId, completed, category, dueDate, createdAt",
+      tasks: "id, userId, category, dueDate, createdAt",
 
-      // PomodoroDB tables
       pomodoroState: "++id, lastUpdated",
       focusSessions: "++id, timestamp",
       focusStats: "++id, date",
     });
+
+    this.version(2)
+      .stores({
+        siteBlocker: "id, userId, url",
+        backgrounds: "id, userId, type, *tags",
+
+        tasks: "id, userId, completed, category, dueDate, createdAt",
+
+        pomodoroState: "++id, lastUpdated",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+      })
+      .upgrade(async (trans) => {
+        await trans
+          .table("tasks")
+          .toCollection()
+          .modify((task: any) => {
+            delete task.description;
+            delete task.is_focus;
+            delete task.status;
+
+            if (task.completed === undefined) {
+              task.completed = false;
+            }
+          });
+      });
   }
 
-  // MeelioDB methods
   async getSelectedBackground(): Promise<Backgrounds | undefined> {
     return this.backgrounds.filter((bg) => bg.isFavourite).first();
   }
 
   async setFavouriteBackground(backgroundId: string): Promise<void> {
     await this.transaction("rw", this.backgrounds, async () => {
-      // Clear previous selection
       await this.backgrounds
         .filter((bg) => bg.isFavourite)
         .modify((bg) => {
           bg.isFavourite = false;
         });
-      // Set new selection
       await this.backgrounds
         .where("id")
         .equals(backgroundId)
@@ -63,7 +83,18 @@ export class MeelioDB extends Dexie {
 
 export const db = new MeelioDB();
 
-// Initialize with default selected background if none exists
+export async function resetDatabase() {
+  try {
+    await db.delete();
+    console.log("Database deleted successfully");
+    await db.open();
+    console.log("Database recreated with latest schema");
+  } catch (error) {
+    console.error("Failed to reset database:", error);
+    throw error;
+  }
+}
+
 db.on("ready", async () => {
   const selected = await db.getSelectedBackground();
   if (!selected) {

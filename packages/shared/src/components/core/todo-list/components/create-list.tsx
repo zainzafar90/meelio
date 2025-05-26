@@ -21,7 +21,7 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTodoStore } from "../../../../stores/todo.store";
-import { cn } from "../../../../lib";
+
 import { useShallow } from "zustand/shallow";
 
 const emojis = [

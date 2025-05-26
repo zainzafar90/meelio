@@ -5,5 +5,6 @@ export * from "./greetings.store";
 export * from "./pomodoro.store";
 export * from "./quotes.store";
 export * from "./settings.store";
+export * from "./simple-sync.store";
 export * from "./soundscapes.store";
 export * from "./todo.store";

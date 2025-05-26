@@ -1,0 +1,128 @@
+import { create } from "zustand";
+
+export type EntityType = "task" | "pomodoro";
+
+export interface SyncOperation {
+  id: string;
+  entityType: EntityType;
+  type: "create" | "update" | "delete";
+  entityId: string;
+  data?: any;
+  retries: number;
+}
+
+interface SimpleSyncState {
+  queues: Record<string, SyncOperation[]>;
+  isOnline: boolean;
+  syncingEntities: Set<string>;
+  lastSyncTimes: Record<string, number>;
+
+  addToQueue: (
+    entityType: EntityType,
+    operation: Omit<SyncOperation, "id" | "retries" | "entityType">
+  ) => void;
+  removeFromQueue: (entityType: EntityType, operationId: string) => void;
+  getQueue: (entityType: string) => SyncOperation[];
+  setOnlineStatus: (isOnline: boolean) => void;
+  setSyncing: (entityType: string, isSyncing: boolean) => void;
+  setLastSyncTime: (entityType: string, time: number) => void;
+  incrementRetry: (entityType: string, operationId: string) => void;
+  clearQueue: (entityType: string) => void;
+}
+
+export const useSimpleSyncStore = create<SimpleSyncState>((set, get) => ({
+  queues: {},
+  isOnline: navigator.onLine,
+  syncingEntities: new Set(),
+  lastSyncTimes: {},
+
+  addToQueue: (entityType, operation) => {
+    set((state) => ({
+      queues: {
+        ...state.queues,
+        [entityType]: [
+          ...(state.queues[entityType] || []),
+          {
+            ...operation,
+            entityType,
+            id: crypto.randomUUID(),
+            retries: 0,
+          },
+        ],
+      },
+    }));
+  },
+
+  removeFromQueue: (entityType, operationId) => {
+    set((state) => ({
+      queues: {
+        ...state.queues,
+        [entityType]: (state.queues[entityType] || []).filter(
+          (op) => op.id !== operationId
+        ),
+      },
+    }));
+  },
+
+  getQueue: (entityType) => {
+    return get().queues[entityType] || [];
+  },
+
+  setOnlineStatus: (isOnline) => {
+    set({ isOnline });
+  },
+
+  setSyncing: (entityType, isSyncing) => {
+    set((state) => {
+      const newSyncingEntities = new Set(state.syncingEntities);
+      if (isSyncing) {
+        newSyncingEntities.add(entityType);
+      } else {
+        newSyncingEntities.delete(entityType);
+      }
+      return { syncingEntities: newSyncingEntities };
+    });
+  },
+
+  setLastSyncTime: (entityType, time) => {
+    set((state) => ({
+      lastSyncTimes: {
+        ...state.lastSyncTimes,
+        [entityType]: time,
+      },
+    }));
+  },
+
+  incrementRetry: (entityType, operationId) => {
+    set((state) => ({
+      queues: {
+        ...state.queues,
+        [entityType]: (state.queues[entityType] || []).map((op) =>
+          op.id === operationId ? { ...op, retries: op.retries + 1 } : op
+        ),
+      },
+    }));
+  },
+
+  clearQueue: (entityType) => {
+    set((state) => ({
+      queues: {
+        ...state.queues,
+        [entityType]: [],
+      },
+    }));
+  },
+}));
+
+/**
+ * Listen for online/offline events
+ */
+if (typeof window !== "undefined") {
+  window.addEventListener("online", () => {
+    useSimpleSyncStore.getState().setOnlineStatus(true);
+  });
+
+  window.addEventListener("offline", () => {
+    useSimpleSyncStore.getState().setOnlineStatus(false);
+  });
+}
