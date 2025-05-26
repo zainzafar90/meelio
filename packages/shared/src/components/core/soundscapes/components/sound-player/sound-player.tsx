@@ -1,5 +1,4 @@
-import ReactPlayer from "react-player/file";
-import { Sound } from "../../../../../types/sound";
+import { Player, AudioElement } from "./react-player";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
 import { useShallow } from "zustand/shallow";
 
@@ -17,16 +16,21 @@ export const SoundPlayer = () => {
   return (
     <div>
       {playingSounds.map((sound) => (
-        <ReactPlayer
+        <Player
           key={sound.id}
-          url={sound.url}
+          activePlayer={AudioElement}
+          src={sound.url}
           playing={sound.playing}
           volume={sound.volume * globalVolume}
           loop={true}
           height={0}
           width={0}
-          playsinline
           muted={false}
+          playsInline
+          style={{ display: "none" }}
+          onReady={() => {
+            setSoundLoading(sound.id, false);
+          }}
           onBuffer={() => {
             setSoundLoading(sound.id, true);
           }}
