@@ -57,17 +57,17 @@ export function CreateList({ children }: CreateListProps) {
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { t } = useTranslation();
 
+  const { addList, setActiveList } = useTodoStore(
+    useShallow((state) => ({
+      addList: state.addList,
+      setActiveList: state.setActiveList,
+    }))
+  );
+
   const handleCreate = () => {
     if (!name.trim()) return;
 
-    const newListId = crypto.randomUUID();
-
-    const { addList, setActiveList } = useTodoStore(
-      useShallow((state) => ({
-        addList: state.addList,
-        setActiveList: state.setActiveList,
-      }))
-    );
+    const newListId = name.trim().toLowerCase().replace(/\s+/g, '-');
 
     addList({
       id: newListId,

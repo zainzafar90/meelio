@@ -24,6 +24,9 @@ import { useSimpleSyncStore } from "../../../stores/simple-sync.store";
 import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
 import { SyncStatus } from "../../sync-status";
+import { CreateList } from "./components/create-list";
+import { Plus } from "lucide-react";
+import { Button } from "@repo/ui/components/ui/button";
 
 export function TodoListSheet() {
   const { t } = useTranslation();
@@ -34,19 +37,19 @@ export function TodoListSheet() {
     }))
   );
   const {
-    categories,
+    lists,
     tasks,
-    activeCategory,
-    setActiveCategory,
+    activeListId,
+    setActiveList,
     initializeStore,
     isLoading,
     error,
   } = useTodoStore(
     useShallow((state) => ({
-      categories: state.categories,
+      lists: state.lists,
       tasks: state.tasks,
-      activeCategory: state.activeCategory,
-      setActiveCategory: state.setActiveCategory,
+      activeListId: state.activeListId,
+      setActiveList: state.setActiveList,
       initializeStore: state.initializeStore,
       isLoading: state.isLoading,
       error: state.error,
@@ -63,10 +66,25 @@ export function TodoListSheet() {
     }
   }, [isTodosVisible, initializeStore]);
 
+  const activeList = lists.find((list) => list.id === activeListId);
+  
   const filteredTasks = tasks.filter((task) => {
-    if (!activeCategory || activeCategory === "all") return true;
-    if (activeCategory === "completed") return task.completed;
-    return task.category === activeCategory;
+    if (!activeListId || activeListId === "all") return true;
+    if (activeListId === "completed") return task.completed;
+    if (activeListId === "today") {
+      // Filter tasks for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      if (task.dueDate) {
+        const dueDate = new Date(task.dueDate);
+        return dueDate >= today && dueDate < tomorrow;
+      }
+      return false;
+    }
+    return task.category === activeListId;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -115,38 +133,39 @@ export function TodoListSheet() {
 
           <div className="flex items-center gap-2">
             <Select
-              value={activeCategory || "all"}
-              onValueChange={(value) =>
-                setActiveCategory(value === "all" ? null : value)
-              }
+              value={activeListId || "all"}
+              onValueChange={(value) => setActiveList(value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue>
                   <span className="flex items-center gap-2">
-                    <span>{activeCategory || "All Tasks"}</span>
+                    {activeList?.emoji && <span>{activeList.emoji}</span>}
+                    <span>{activeList?.name || "All Tasks"}</span>
                   </span>
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  <span>All Tasks</span>
-                </SelectItem>
-                <SelectItem value="completed">
-                  <span>Completed</span>
-                </SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    <span>{category}</span>
+                {lists.map((list) => (
+                  <SelectItem key={list.id} value={list.id}>
+                    <span className="flex items-center gap-2">
+                      {list.emoji && <span>{list.emoji}</span>}
+                      <span>{list.name}</span>
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            <CreateList>
+              <Button variant="ghost" size="icon">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </CreateList>
           </div>
 
           <div className="space-y-8">
             <TaskList
-              activeListId={activeCategory || "all"}
-              title={activeCategory || "All Tasks"}
+              activeListId={activeListId || "all"}
+              title={activeList?.name || "All Tasks"}
               tasks={sortedTasks}
               count={sortedTasks.length}
               icon={undefined}

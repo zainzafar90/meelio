@@ -6,21 +6,28 @@ import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { useSimpleSyncStore } from "./simple-sync.store";
 
-const DEFAULT_CATEGORIES = [
-  "Personal",
-  "Work",
-  "Shopping",
-  "Health",
-  "Learning",
-  "Projects",
-  "Ideas",
-  "Urgent",
+export interface TodoList {
+  id: string;
+  name: string;
+  type: "system" | "custom";
+  emoji?: string;
+}
+
+const SYSTEM_LISTS: TodoList[] = [
+  { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
+  { id: "completed", name: "Completed", type: "system", emoji: "✅" },
+  { id: "today", name: "Today", type: "system", emoji: "📅" },
+];
+
+const DEFAULT_LISTS: TodoList[] = [
+  { id: "personal", name: "Personal", type: "custom", emoji: "👤" },
+  { id: "work", name: "Work", type: "custom", emoji: "💼" },
 ];
 
 interface TodoState {
-  categories: string[];
+  lists: TodoList[];
   tasks: Task[];
-  activeCategory: string | null;
+  activeListId: string | null;
   isLoading: boolean;
   error: string | null;
 
@@ -32,13 +39,40 @@ interface TodoState {
   toggleTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   deleteTasksByCategory: (category: string) => Promise<void>;
-  setActiveCategory: (category: string | null) => void;
+  
+  addList: (list: Omit<TodoList, "id"> & { id?: string }) => void;
+  deleteList: (listId: string) => void;
+  setActiveList: (listId: string | null) => void;
+  
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
 }
 
 const generateId = () => crypto.randomUUID();
+
+// Local storage key for custom lists
+const CUSTOM_LISTS_KEY = "meelio_custom_lists";
+
+// Load custom lists from localStorage
+function loadCustomLists(): TodoList[] {
+  try {
+    const stored = localStorage.getItem(CUSTOM_LISTS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+// Save custom lists to localStorage
+function saveCustomLists(lists: TodoList[]) {
+  try {
+    const customLists = lists.filter(l => l.type === "custom" && !DEFAULT_LISTS.some(d => d.id === l.id));
+    localStorage.setItem(CUSTOM_LISTS_KEY, JSON.stringify(customLists));
+  } catch (error) {
+    console.error("Failed to save custom lists:", error);
+  }
+}
 
 async function processSyncQueue() {
   const syncStore = useSimpleSyncStore.getState();
@@ -93,9 +127,9 @@ function startAutoSync() {
 
 export const useTodoStore = create<TodoState>()(
   subscribeWithSelector((set, get) => ({
-    categories: DEFAULT_CATEGORIES,
+    lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...loadCustomLists()],
     tasks: [],
-    activeCategory: null,
+    activeListId: "all",
     isLoading: false,
     error: null,
 
@@ -216,8 +250,34 @@ export const useTodoStore = create<TodoState>()(
       }
     },
 
-    setActiveCategory: (category) => {
-      set({ activeCategory: category });
+    addList: (list) => {
+      const newList: TodoList = {
+        ...list,
+        id: list.id || generateId(),
+      };
+      
+      set((state) => {
+        const updatedLists = [...state.lists, newList];
+        // Save custom lists to localStorage
+        saveCustomLists(updatedLists);
+        return { lists: updatedLists };
+      });
+    },
+
+    deleteList: (listId) => {
+      set((state) => {
+        const updatedLists = state.lists.filter((l) => l.id !== listId && l.type !== "system");
+        // Save custom lists to localStorage
+        saveCustomLists(updatedLists);
+        return {
+          lists: updatedLists,
+          activeListId: state.activeListId === listId ? "all" : state.activeListId,
+        };
+      });
+    },
+
+    setActiveList: (listId) => {
+      set({ activeListId: listId });
     },
 
     initializeStore: async () => {
@@ -250,16 +310,35 @@ export const useTodoStore = create<TodoState>()(
         .equals(user.id)
         .toArray();
 
-      const localCategories = new Set<string>();
+      // Extract categories from tasks
+      const taskCategories = new Set<string>();
       localTasks.forEach((task) => {
-        if (task.category) localCategories.add(task.category);
+        if (task.category && 
+            !SYSTEM_LISTS.some(l => l.id === task.category) &&
+            !DEFAULT_LISTS.some(l => l.id === task.category)) {
+          taskCategories.add(task.category);
+        }
       });
 
+      // Load custom lists from localStorage
+      const storedCustomLists = loadCustomLists();
+      
+      // Create lists for categories that exist in tasks but not in stored lists
+      const newCategoryLists: TodoList[] = Array.from(taskCategories)
+        .filter(cat => !storedCustomLists.some(l => l.id === cat.toLowerCase()))
+        .map(cat => ({
+          id: cat.toLowerCase(),
+          name: cat,
+          type: "custom" as const,
+          emoji: "📝",
+        }));
+
+      // Merge all lists
+      const allCustomLists = [...storedCustomLists, ...newCategoryLists];
+      
       set({
         tasks: localTasks,
-        categories: [
-          ...new Set([...DEFAULT_CATEGORIES, ...Array.from(localCategories)]),
-        ],
+        lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...allCustomLists],
       });
     },
 
@@ -283,9 +362,27 @@ export const useTodoStore = create<TodoState>()(
           await db.tasks.bulkAdd(serverTasks);
         });
 
+        // Load custom lists from localStorage
+        const storedCustomLists = loadCustomLists();
+        
+        // Convert API categories to lists
+        const serverCategoryLists: TodoList[] = apiCategories
+          .filter(cat => !SYSTEM_LISTS.some(l => l.id === cat.toLowerCase()) &&
+                         !DEFAULT_LISTS.some(l => l.id === cat.toLowerCase()) &&
+                         !storedCustomLists.some(l => l.id === cat.toLowerCase()))
+          .map(cat => ({
+            id: cat.toLowerCase(),
+            name: cat,
+            type: "custom" as const,
+            emoji: "📝",
+          }));
+
+        // Merge stored custom lists with server categories
+        const allCustomLists = [...storedCustomLists, ...serverCategoryLists];
+
         set({
           tasks: serverTasks,
-          categories: [...new Set([...DEFAULT_CATEGORIES, ...apiCategories])],
+          lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...allCustomLists],
         });
 
         syncStore.setSyncing("task", false);

@@ -136,5 +136,3 @@ export const useBackgroundStore = create<BackgroundState>()(
     }
   )
 );
-
-console.log(useBackgroundStore.persist.getOptions().version);

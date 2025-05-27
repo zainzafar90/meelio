@@ -11,18 +11,20 @@ import { Icons } from "../../../../components/icons";
 export function CreateTask() {
   const [title, setTitle] = useState("");
   const { t } = useTranslation();
-  const { activeCategory, addTask } = useTodoStore(
+  const { activeListId, addTask } = useTodoStore(
     useShallow((state) => ({
-      activeCategory: state.activeCategory,
+      activeListId: state.activeListId,
       addTask: state.addTask,
     }))
   );
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && title.trim()) {
+      const isSystemList = ["all", "completed", "today"].includes(activeListId || "");
       addTask({
         title: title.trim(),
-        category: activeCategory === "completed" || activeCategory === "all" || !activeCategory ? undefined : activeCategory,
+        category: isSystemList ? undefined : activeListId,
+        dueDate: activeListId === "today" ? new Date().toISOString() : undefined,
       });
       setTitle("");
     }
@@ -37,7 +39,7 @@ export function CreateTask() {
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder={
-          activeCategory === "completed"
+          activeListId === "completed"
             ? t("todo.list.task.add.completed")
             : t("todo.list.task.add.normal")
         }
