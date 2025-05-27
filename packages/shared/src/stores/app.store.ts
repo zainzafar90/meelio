@@ -66,3 +66,5 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+
+export const isExtension = useAppStore.getState().platform === "extension";

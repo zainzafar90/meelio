@@ -9,7 +9,9 @@ import {
 import { useDockStore } from "../../../stores/dock.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { useTranslation } from "react-i18next";
+// @ts-ignore
 import { Storage } from "@plasmohq/storage";
+// @ts-ignore
 import { useStorage } from "@plasmohq/storage/hook";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";

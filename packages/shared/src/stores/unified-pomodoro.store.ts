@@ -1,19 +1,37 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
-import { PomodoroStage, PomodoroState } from '../types/pomodoro';
-import { db } from '../lib/db/meelio.dexie';
-import { useSyncStore } from './sync.store';
-import { generateUUID } from '../utils/common.utils';
+import { create } from "zustand";
+import {
+  createJSONStorage,
+  persist,
+  subscribeWithSelector,
+} from "zustand/middleware";
+import { PomodoroStage, PomodoroState } from "../types/pomodoro";
+import { db } from "../lib/db/meelio.dexie";
+import { useSyncStore } from "./sync.store";
+import { generateUUID } from "../utils/common.utils";
+import { getTodaysSummary } from "../lib/db/pomodoro.dexie";
+import { useAppStore } from "./app.store";
 
-// Check if we're in a Chrome extension environment
-const isExtension = typeof window !== 'undefined' && 
-  typeof (window as any).chrome !== 'undefined' && 
-  typeof (window as any).chrome.runtime !== 'undefined' &&
-  typeof (window as any).chrome.runtime.id !== 'undefined';
+const isExtension = useAppStore.getState().platform === "extension";
 
 interface PomodoroStateWithSync extends PomodoroState {
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resumeTimer: () => void;
+  resetTimer: () => void;
+  updateTimer: (remaining: number) => void;
+  advanceTimer: () => void;
+  changeStage: (stage: PomodoroStage) => void;
+  changeTimerSettings: (stage: PomodoroStage, minutes: number) => void;
+  sessionCompleted: () => void;
+  toggleAutoStartBreaks: () => void;
+  setTimerDuration: (duration: number) => void;
+  toggleTimerSound: () => void;
+  isTimerRunning: () => boolean;
+
+  // Sync methods
   completeSession: () => Promise<void>;
   syncSessions: () => Promise<void>;
+  loadTodayStats: () => Promise<void>;
 }
 
 export const usePomodoroStore = create(
@@ -38,11 +56,85 @@ export const usePomodoroStore = create(
       enableSound: false,
       pausedRemaining: null,
       lastUpdated: Date.now(),
-      
+
+      // Timer control methods
+      startTimer: () => set({ isRunning: true }),
+
+      pauseTimer: () => set({ isRunning: false }),
+
+      resumeTimer: () => set({ isRunning: true }),
+
+      resetTimer: () =>
+        set((state) => ({
+          isRunning: false,
+          activeStage: PomodoroStage.Focus,
+          sessionCount: 0,
+          pausedRemaining: null,
+        })),
+
+      updateTimer: (remaining: number) => set({ pausedRemaining: remaining }),
+
+      advanceTimer: () =>
+        set((state) => {
+          let nextStage: PomodoroStage;
+          let newSessionCount = state.sessionCount;
+
+          if (state.activeStage === PomodoroStage.Focus) {
+            newSessionCount++;
+            nextStage = PomodoroStage.Break;
+          } else {
+            nextStage = PomodoroStage.Focus;
+          }
+
+          return {
+            activeStage: nextStage,
+            sessionCount: newSessionCount,
+            isRunning:
+              state.autoStartTimers || nextStage === PomodoroStage.Focus,
+            pausedRemaining: null,
+          };
+        }),
+
+      changeStage: (stage: PomodoroStage) =>
+        set({
+          activeStage: stage,
+          isRunning: false,
+          pausedRemaining: null,
+        }),
+
+      changeTimerSettings: (stage: PomodoroStage, minutes: number) =>
+        set((state) => ({
+          stageDurations: {
+            ...state.stageDurations,
+            [stage]: minutes * 60,
+          },
+        })),
+
+      sessionCompleted: () =>
+        set({
+          sessionCount: 0,
+          isRunning: false,
+        }),
+
+      toggleAutoStartBreaks: () =>
+        set((state) => ({
+          autoStartTimers: !state.autoStartTimers,
+        })),
+
+      setTimerDuration: (duration: number) =>
+        set({ pausedRemaining: duration }),
+
+      toggleTimerSound: () =>
+        set((state) => ({
+          enableSound: !state.enableSound,
+        })),
+
+      isTimerRunning: () => get().isRunning,
+
       completeSession: async () => {
         const state = get();
         const syncStore = useSyncStore.getState();
-        
+
         const sessionId = generateUUID();
         const session = {
           id: sessionId,
@@ -51,15 +143,14 @@ export const usePomodoroStore = create(
           duration: state.stageDurations[state.activeStage],
           completed: true,
         };
-        
-        // Store in IndexedDB with proper ID handling
+
         await db.focusSessions.add({
           timestamp: session.timestamp,
           stage: session.stage,
           duration: session.duration,
           completed: session.completed,
         });
-        
+
         const newStats = { ...state.stats };
         if (state.activeStage === PomodoroStage.Focus) {
           newStats.todaysFocusSessions++;
@@ -68,9 +159,9 @@ export const usePomodoroStore = create(
           newStats.todaysBreaks++;
           newStats.todaysBreakTime += state.stageDurations[state.activeStage];
         }
-        
+
         set({ stats: newStats });
-        
+
         syncStore.addToQueue("pomodoro", {
           type: "create",
           entityId: sessionId,
@@ -81,27 +172,27 @@ export const usePomodoroStore = create(
           get().syncSessions();
         }
       },
-      
+
       syncSessions: async () => {
         const syncStore = useSyncStore.getState();
-        
-        if (!syncStore.isOnline || syncStore.syncingEntities.has("pomodoro")) return;
-        
+
+        if (!syncStore.isOnline || syncStore.syncingEntities.has("pomodoro"))
+          return;
+
         syncStore.setSyncing("pomodoro", true);
-        
+
         try {
           const queue = syncStore.getQueue("pomodoro");
-          
+
           for (const op of queue) {
             if (op.retries >= 3) {
               syncStore.removeFromQueue("pomodoro", op.id);
               continue;
             }
-            
+
             try {
               if (op.type === "create") {
                 // TODO: Replace with actual API call
-                console.log("Syncing pomodoro session:", op.data);
                 // await pomodoroApi.createSession(op.data);
                 syncStore.removeFromQueue("pomodoro", op.id);
               }
@@ -110,40 +201,56 @@ export const usePomodoroStore = create(
               syncStore.incrementRetry("pomodoro", op.id);
             }
           }
-          
+
           syncStore.setLastSyncTime("pomodoro", Date.now());
         } finally {
           syncStore.setSyncing("pomodoro", false);
         }
       },
+
+      loadTodayStats: async () => {
+        const summary = await getTodaysSummary();
+        set({
+          sessionCount: summary.focusSessions,
+          stats: {
+            todaysFocusSessions: summary.focusSessions,
+            todaysBreaks: summary.breaks,
+            todaysFocusTime: summary.totalFocusTime,
+            todaysBreakTime: summary.totalBreakTime,
+          },
+        });
+      },
     })),
     {
-      name: 'meelio:local:pomodoro',
+      name: "meelio:local:pomodoro",
       storage: createJSONStorage(() => localStorage),
       version: 2,
       skipHydration: false,
-      // Conditionally include partialize based on platform
-      ...(isExtension ? {
-        // Extension-specific: partialize to save specific fields
-        partialize: (state) => ({
-          id: state.id,
-          stats: state.stats,
-          activeStage: state.activeStage,
-          isRunning: state.isRunning,
-          autoStartTimers: state.autoStartTimers,
-          endTimestamp: state.endTimestamp,
-        }),
-      } : {})
+      ...(isExtension
+        ? {
+            partialize: (state) => ({
+              id: state.id,
+              stats: state.stats,
+              activeStage: state.activeStage,
+              isRunning: state.isRunning,
+              autoStartTimers: state.autoStartTimers,
+              endTimestamp: state.endTimestamp,
+            }),
+          }
+        : {}),
     }
   )
 );
 
 // Auto-sync every 10 minutes
-if (typeof window !== "undefined") {
-  setInterval(() => {
-    const syncStore = useSyncStore.getState();
-    if (syncStore.isOnline && !syncStore.syncingEntities.has("pomodoro")) {
-      usePomodoroStore.getState().syncSessions();
-    }
-  }, 10 * 60 * 1000);
+if (typeof window !== "undefined" && !isExtension) {
+  setInterval(
+    () => {
+      const syncStore = useSyncStore.getState();
+      if (syncStore.isOnline && !syncStore.syncingEntities.has("pomodoro")) {
+        usePomodoroStore.getState().syncSessions();
+      }
+    },
+    10 * 60 * 1000
+  );
 }

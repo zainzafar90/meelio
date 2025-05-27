@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons,  TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons,  TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog } from "@repo/shared";
 
 import { usePomodoroStore } from "../lib/pomodoro-store";
 
@@ -310,10 +310,10 @@ export const ExtensionTimer = () => {
         onSettingsClick={toggleSettingsDialog}
       />
 
-      {/* <TimerSettingsDialog
-        isOpen={isSettingsDialogOpen}
-        onClose={toggleSettingsDialog}
-      /> */}
+        <TimerSettingsDialog
+          isOpen={isSettingsDialogOpen}
+          onClose={toggleSettingsDialog}
+        />
     </div>
   );
 };

@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { PomodoroStage } from "../../../../types/pomodoro";
-import { usePomodoroStore } from "../../../../stores/pomodoro.store";
+import { usePomodoroStore } from "../../../../stores/unified-pomodoro.store";
 import {
   MINUTE_IN_SECONDS,
   POMODORO_MAX_MINUTES,
@@ -41,7 +41,9 @@ export const TimerSettingsDialog = ({
   onClose: () => void;
 }) => {
   const {
-    timer,
+    stageDurations,
+    autoStartTimers,
+    enableSound,
     resetTimer,
     toggleAutoStartBreaks,
     toggleTimerSound,
@@ -49,13 +51,11 @@ export const TimerSettingsDialog = ({
   } = usePomodoroStore();
   const { t } = useTranslation();
 
-  const { stageSeconds } = timer;
-
   const form = useForm<TimerSettingsValues>({
     resolver: zodResolver(timerSettingsSchema as any),
     defaultValues: {
-      workTime: stageSeconds[PomodoroStage.Focus] / MINUTE_IN_SECONDS,
-      shortBreak: stageSeconds[PomodoroStage.Break] / MINUTE_IN_SECONDS,
+      workTime: stageDurations[PomodoroStage.Focus] / 60,
+      shortBreak: stageDurations[PomodoroStage.Break] / 60,
     },
   });
 
@@ -168,7 +168,7 @@ export const TimerSettingsDialog = ({
             </Label>
             <Switch
               id="auto-start-break"
-              checked={timer.autoStartBreaks}
+              checked={autoStartTimers}
               onCheckedChange={() => toggleAutoStartBreaks()}
             />
           </div>
@@ -182,7 +182,7 @@ export const TimerSettingsDialog = ({
             </Label>
             <Switch
               id="enable-timer-sound"
-              checked={timer.enableSound}
+              checked={enableSound}
               onCheckedChange={() => toggleTimerSound()}
             />
           </div>

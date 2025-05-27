@@ -4,12 +4,11 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 import { motion } from "framer-motion";
-import { useShallow } from "zustand/shallow";
 
 import { PomodoroStage } from "../../../../types/pomodoro";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
-import { usePomodoroStore } from "../../../../stores/pomodoro.store";
+import { usePomodoroStore } from "../../../../stores/unified-pomodoro.store";
 
 import { TimerDonutGraph } from "./timer-donut-graph";
 
@@ -24,13 +23,9 @@ export const TimerControls = ({
   onToggle: () => void;
   onReset: () => void;
 }) => {
-  const { timer } = usePomodoroStore(
-    useShallow((state) => ({
-      timer: state.timer,
-    }))
-  );
+  const activeStage = usePomodoroStore((state) => state.activeStage);
 
-  const isBreak = timer.activeStage === PomodoroStage.Break;
+  const isBreak = activeStage === PomodoroStage.Break;
 
   return (
     <div className="flex items-center justify-center gap-3">
