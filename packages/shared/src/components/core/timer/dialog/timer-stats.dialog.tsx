@@ -13,7 +13,7 @@ import { t } from "i18next";
 import { Icons } from "../../../../components/icons";
 
 import { TimerExpandedContent } from "../components/timer-expanded-content";
-import { PremiumFeature } from "src/components/common/premium-feature";
+import { PremiumFeature } from "../../../common/premium-feature";
 
 interface TimerStatsDialogProps {
   isOpen: boolean;
