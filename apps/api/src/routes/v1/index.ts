@@ -7,11 +7,8 @@ import docsRoute from "./swagger.routes";
 import userRoute from "./user.routes";
 import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
-import backgroundRoute from "./background.routes";
-import soundscapeRoute from "./soundscape.routes";
 import mantraRoute from "./mantra.routes";
 import taskRoute from "./task.routes";
-import pomodoroRoute from "./pomodoro.routes";
 import siteBlockerRoute from "./site-blocker.routes";
 import tabStashRoute from "./tab-stash.routes";
 import noteRoute from "./note.routes";
@@ -43,24 +40,12 @@ const defaultIRoute: IRoute[] = [
     route: subscriptionRoute,
   },
   {
-    path: "/backgrounds",
-    route: backgroundRoute,
-  },
-  {
-    path: "/soundscapes",
-    route: soundscapeRoute,
-  },
-  {
     path: "/mantras",
     route: mantraRoute,
   },
   {
     path: "/tasks",
     route: taskRoute,
-  },
-  {
-    path: "/pomodoro",
-    route: pomodoroRoute,
   },
   {
     path: "/site-blockers",

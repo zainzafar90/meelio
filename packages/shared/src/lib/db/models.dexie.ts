@@ -1,5 +1,3 @@
-// Simplified models without sync metadata
-
 export interface SiteBlocker {
   id: string;
   userId: string;
@@ -18,22 +16,6 @@ export interface BackgroundMetadata {
   category: string;
   tags: string[];
   thumbnailUrl: string;
-}
-
-export interface Backgrounds {
-  id: string;
-  userId: string;
-  type: "static" | "live";
-  url: string;
-  metadata: BackgroundMetadata;
-  schedule?: {
-    enabled: boolean;
-    startTime?: string;
-    endTime?: string;
-  };
-  isFavourite?: boolean;
-  createdAt: number;
-  updatedAt: number;
 }
 
 // Simplified Task model - unified with backend
