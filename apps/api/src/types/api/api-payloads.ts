@@ -4,18 +4,9 @@ import { IUser } from "../interfaces/resources";
 export type EmailPassReq = { email: string; password: string };
 
 // Users
-export type CreateUserReq = Omit<IUser, "id" | "isEmailVerified">;
+export type CreateUserReq = Omit<IUser, "id" | "isEmailVerified" | "settings">;
 export type UpdateUserReq = Partial<IUser>;
 export type RegisterUserReq = Omit<
   IUser,
   "id" | "role" | "isEmailVerified" | "settings"
 >;
-
-// export type CreateGuestUserReq = {
-//   name: string;
-// };
-
-// export type ConvertGuestToRegularReq = {
-//   email: string;
-//   password: string;
-// };

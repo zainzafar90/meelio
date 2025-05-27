@@ -73,7 +73,7 @@ export const userService = {
       } as UserInsert)
       .returning();
 
-    return user;
+    return user as IUser;
   },
 
   registerUser: async (userBody: RegisterUserReq) => {
@@ -152,9 +152,9 @@ export const userService = {
   },
 
   getUserByEmail: async (email: string): Promise<IUser | null> => {
-    const user = await db.query.users.findFirst({
+    const user = (await db.query.users.findFirst({
       where: eq(users.email, email),
-    });
+    })) as IUser;
 
     if (!user) {
       return null;
@@ -261,6 +261,6 @@ export const userService = {
       .where(eq(users.id, userId))
       .returning();
 
-    return userService.userDTO(updatedUser);
+    return userService.userDTO(updatedUser) as SafeUser;
   },
 };

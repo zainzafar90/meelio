@@ -69,14 +69,14 @@ const googleVerify = async (
 
       if (!user) {
         // User does not exist, so create a new user
-        [user] = await db
+        [user] = (await db
           .insert(users)
           .values({
             name,
             email,
             image,
           } as UserInsert)
-          .returning();
+          .returning()) as unknown as [IUser];
       } else {
         user = await userService.updateUserById(user.id, {
           name: name!,
