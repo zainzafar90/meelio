@@ -11,7 +11,7 @@ export interface SyncOperation {
   retries: number;
 }
 
-interface SimpleSyncState {
+interface SyncState {
   queues: Record<string, SyncOperation[]>;
   isOnline: boolean;
   syncingEntities: Set<string>;
@@ -30,7 +30,7 @@ interface SimpleSyncState {
   clearQueue: (entityType: string) => void;
 }
 
-export const useSimpleSyncStore = create<SimpleSyncState>((set, get) => ({
+export const useSyncStore = create<SyncState>((set, get) => ({
   queues: {},
   isOnline: navigator.onLine,
   syncingEntities: new Set(),
@@ -119,10 +119,10 @@ export const useSimpleSyncStore = create<SimpleSyncState>((set, get) => ({
  */
 if (typeof window !== "undefined") {
   window.addEventListener("online", () => {
-    useSimpleSyncStore.getState().setOnlineStatus(true);
+    useSyncStore.getState().setOnlineStatus(true);
   });
 
   window.addEventListener("offline", () => {
-    useSimpleSyncStore.getState().setOnlineStatus(false);
+    useSyncStore.getState().setOnlineStatus(false);
   });
 }

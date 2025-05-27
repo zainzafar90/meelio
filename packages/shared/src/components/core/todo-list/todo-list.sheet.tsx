@@ -19,7 +19,7 @@ import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
 import { useTodoStore } from "../../../stores/todo.store";
-import { useSimpleSyncStore } from "../../../stores/simple-sync.store";
+import { useSyncStore } from "../../../stores/sync.store";
 import { useAuthStore } from "../../../stores/auth.store";
 
 import { CreateTask } from "./components/create-task";
@@ -66,7 +66,7 @@ export function TodoListSheet() {
 
   const isGuest = !user && !!guestUser;
 
-  const syncStore = useSimpleSyncStore();
+  const syncStore = useSyncStore();
   const isOnline = syncStore.isOnline;
   const syncErrors =
     syncStore.queues.task?.filter((op) => op.retries >= 3) || [];

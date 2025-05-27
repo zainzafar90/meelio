@@ -1,6 +1,6 @@
 import { Cloud, CloudOff, Loader2 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
-import { EntityType, useSimpleSyncStore } from "../stores/simple-sync.store";
+import { EntityType, useSyncStore } from "../stores/sync.store";
 
 interface SyncStatusProps {
   entityType?: EntityType;
@@ -11,8 +11,7 @@ export function SyncStatus({
   entityType = "task",
   className,
 }: SyncStatusProps) {
-  const { isOnline, syncingEntities, getQueue, lastSyncTimes } =
-    useSimpleSyncStore();
+  const { isOnline, syncingEntities, getQueue, lastSyncTimes } = useSyncStore();
 
   const isSyncing = syncingEntities.has(entityType);
   const queue = getQueue(entityType);

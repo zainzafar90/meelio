@@ -1,7 +1,7 @@
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "../stores/auth.store";
 import { useTodoStore } from "../stores/todo.store";
-import { useSimpleSyncStore } from "../stores/simple-sync.store";
+import { useSyncStore } from "../stores/sync.store";
 
 interface MigrationResult {
   success: boolean;
@@ -35,7 +35,7 @@ const migrateGuestTasks = async (
       return { success: true, migratedCount: 0 };
     }
 
-    const syncStore = useSimpleSyncStore.getState();
+    const syncStore = useSyncStore.getState();
 
     // Update tasks locally and queue them for sync
     await db.transaction("rw", db.tasks, async () => {
@@ -60,10 +60,10 @@ const migrateGuestTasks = async (
     });
 
     const todoStore = useTodoStore.getState();
-    
+
     // Reload tasks and trigger sync
     await todoStore.loadFromLocal();
-    
+
     // If online, sync immediately
     if (syncStore.isOnline) {
       await todoStore.syncWithServer();
@@ -91,14 +91,14 @@ export const migrateGuestDataToUser = async (
 
   // Migrate tasks
   summary.tasks = await migrateGuestTasks(guestUserId, authenticatedUserId);
-  
+
   // Future migrations can be added here
   // summary.pomodoro = await migrateGuestPomodoroSessions(guestUserId, authenticatedUserId);
   // summary.settings = await migrateGuestSettings(guestUserId, authenticatedUserId);
-  
+
   // Overall success is true only if all migrations succeed
   summary.success = summary.tasks.success;
-  
+
   return summary;
 };
 

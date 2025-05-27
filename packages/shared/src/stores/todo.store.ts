@@ -4,7 +4,7 @@ import { taskApi } from "../api/task.api";
 import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
-import { useSimpleSyncStore } from "./simple-sync.store";
+import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
 
 export interface TodoList {
@@ -51,7 +51,7 @@ interface TodoState {
 }
 
 async function processSyncQueue() {
-  const syncStore = useSimpleSyncStore.getState();
+  const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("task");
 
   if (queue.length === 0 || !syncStore.isOnline) return;
@@ -120,7 +120,7 @@ export const useTodoStore = create<TodoState>()(
         return;
       }
 
-      const syncStore = useSimpleSyncStore.getState();
+      const syncStore = useSyncStore.getState();
       const newTask: Task = {
         id: generateUUID(),
         userId: userId,
@@ -163,7 +163,7 @@ export const useTodoStore = create<TodoState>()(
 
       const authState = useAuthStore.getState();
       const user = authState.user;
-      const syncStore = useSimpleSyncStore.getState();
+      const syncStore = useSyncStore.getState();
       const updatedData = {
         completed: !task.completed,
         updatedAt: Date.now(),
@@ -199,7 +199,7 @@ export const useTodoStore = create<TodoState>()(
     deleteTask: async (taskId) => {
       const authState = useAuthStore.getState();
       const user = authState.user;
-      const syncStore = useSimpleSyncStore.getState();
+      const syncStore = useSyncStore.getState();
 
       try {
         await db.tasks.delete(taskId);
@@ -228,7 +228,7 @@ export const useTodoStore = create<TodoState>()(
     deleteTasksByCategory: async (category) => {
       const authState = useAuthStore.getState();
       const user = authState.user;
-      const syncStore = useSimpleSyncStore.getState();
+      const syncStore = useSyncStore.getState();
       const tasksToDelete = get().tasks.filter((t) => t.category === category);
 
       try {
@@ -296,7 +296,7 @@ export const useTodoStore = create<TodoState>()(
 
           // Only sync for authenticated users
           if (user) {
-            const syncStore = useSimpleSyncStore.getState();
+            const syncStore = useSyncStore.getState();
             syncStore.addToQueue("task", {
               type: "create",
               entityId: welcomeTask.id,
@@ -347,7 +347,7 @@ export const useTodoStore = create<TodoState>()(
 
         // Only sync with server for authenticated users
         if (user) {
-          const syncStore = useSimpleSyncStore.getState();
+          const syncStore = useSyncStore.getState();
           if (syncStore.isOnline) {
             await get().syncWithServer();
           }
@@ -430,7 +430,7 @@ export const useTodoStore = create<TodoState>()(
       // Only authenticated users can sync with server
       if (!user) return;
 
-      const syncStore = useSimpleSyncStore.getState();
+      const syncStore = useSyncStore.getState();
 
       try {
         await processSyncQueue();

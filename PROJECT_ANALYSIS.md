@@ -169,12 +169,28 @@ apps/
 4. **Quick Notes**: Scratch pad for quick thoughts
 5. **Search Integration**: Quick web search from new tab
 
-### Premium Features (Simplified)
-1. **Cloud Backup**: Simple settings backup
-2. **Advanced Analytics**: Detailed productivity insights  
-3. **Premium Backgrounds**: Curated wallpaper collection
-4. **Priority Sync**: Faster sync for premium users
-5. **Advanced Blocking**: Smart website categorization
+### Free vs Pro Pricing Model ($5/mo)
+
+| Feature | Free Tier | Pro Tier |
+|---------|-----------|----------|
+| **Tasks** | • Single list<br>• 50 items max<br>• No due dates | • Unlimited lists<br>• Unlimited items<br>• Due dates<br>• Recurring tasks<br>• Cloud sync |
+| **Backgrounds** | • Fresh HD photo/video daily<br>• No customization | • Choose any previous shot<br>• Upload custom images<br>• Vision board gallery |
+| **Quotes/Mantras** | • Daily auto-rotate only | • Edit quotes<br>• Schedule mantras<br>• Personal library<br>• Shuffle control |
+| **Timer & Stats** | • Default 25/5/15 intervals<br>• Basic session counter | • Fully editable lengths<br>• Auto-start options<br>• Long-break rules<br>• CSV export<br>• Weekly email reports |
+| **Soundscapes** | • One default track<br>• Starts with timer only | • Full sound library<br>• Multi-track mixer<br>• Volume per track<br>• Custom combinations |
+| **Site Blocker** | • Up to 3 sites<br>• Manual toggle only | • Unlimited sites<br>• Schedule blocking<br>• Pomodoro-linked "Focus Mode" |
+| **Tab Stash** | • Stash once per day<br>• Single window only | • Unlimited stashes<br>• Named collections<br>• Full sync |
+| **Breathe Pod** | • 4-4-4-4 box breathing | • Extra patterns<br>• Custom breathing cycles |
+| **Widgets** | • Clock only | • Weather<br>• Countdowns<br>• World clocks |
+| **Integrations** | • None | • Google Calendar<br>• Todoist import<br>• ClickUp import |
+| **Analytics** | • Basic today stats | • Streaks<br>• Focus hours<br>• Trends dashboard |
+| **Support** | • Community support | • Priority support |
+
+### Premium Strategy
+- **Keep free tier sticky**: Enough features to be useful daily
+- **Make Pro feel essential**: Clear productivity gains for power users
+- **Simple upgrade path**: One-click upgrade from any premium feature
+- **Trial period**: 7-day free trial with full Pro features
 
 ## Development Priorities
 
