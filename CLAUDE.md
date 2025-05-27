@@ -284,3 +284,7 @@ sessions.forEach(session => {
 ```
 
 Both use the same sync store but handle their sync logic independently.
+
+## Project Memories
+
+- `@packages/shared/src/components/common/premium-feature.tsx` has everything we need; we don't need to do something new, and we do have a modal

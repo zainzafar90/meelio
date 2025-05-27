@@ -13,6 +13,7 @@ import { t } from "i18next";
 import { Icons } from "../../../../components/icons";
 
 import { TimerExpandedContent } from "../components/timer-expanded-content";
+import { PremiumFeature } from "src/components/common/premium-feature";
 
 interface TimerStatsDialogProps {
   isOpen: boolean;
@@ -42,17 +43,26 @@ export const TimerStatsDialog = ({
             </DialogDescription>
           </DialogHeader>
         </VisuallyHidden>
-        <TimerExpandedContent />
-        <DialogFooter className="sm:justify-between">
-          <Button variant="secondary" onClick={onSettingsClick}>
-            <Icons.settings className="size-4" />
-            <span className="sr-only">{t("common.actions.edit")}</span>
-          </Button>
+        <PremiumFeature
+          requirePro={true}
+          features={[
+            "Weekly focus statistics",
+            "Track focus vs break time patterns",
+            "And unlock more Pro features...",
+          ]}
+        >
+          <TimerExpandedContent />
+          <DialogFooter className="sm:justify-between">
+            <Button variant="secondary" onClick={onSettingsClick}>
+              <Icons.settings className="size-4" />
+              <span className="sr-only">{t("common.actions.edit")}</span>
+            </Button>
 
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.actions.close")}
-          </Button>
-        </DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              {t("common.actions.close")}
+            </Button>
+          </DialogFooter>
+        </PremiumFeature>
       </DialogContent>
     </Dialog>
   );

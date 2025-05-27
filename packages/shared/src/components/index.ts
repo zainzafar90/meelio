@@ -82,7 +82,6 @@ export * from "./core/timer/components/timer-controls";
 export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
-export * from "./core/timer/components/timer-stage-button";
 export * from "./core/timer/components/timer-stats";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-settings.dialog";
