@@ -1,14 +1,17 @@
-import { ReactNode, useEffect } from "react";
-import { QueryClient } from "@tanstack/react-query";
+import { ReactNode, useEffect, useState } from "react";
+// import { QueryClient } from "@tanstack/react-query";
 
 import { useAuthStore } from "../stores/auth.store";
 import { api } from "../api";
 import { AuthContext } from "../context/auth-context";
 import { useShallow } from "zustand/shallow";
 import { ExtensionRedirectDialog } from "../components/auth/extension-redirect-dialog";
+import { migrateGuestDataToUser } from "../utils/guest-migration.utils";
+import { toast } from "sonner";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const queryClient = new QueryClient();
+  const [mounted, setMounted] = useState(false);
+
   const authStore = useAuthStore(
     useShallow((state) => ({
       user: state.user,
@@ -23,20 +26,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    (async () => {
-      const DELAY = authStore.user ? 3000 : 0;
-      setTimeout(async () => {
-        try {
-          const response = await api.auth.getAuthenticatedAccount();
-          const user = response;
-          authStore.authenticate(user.data);
-          authStore.authenticateGuest(null as any);
-        } catch (error) {
-          authStore.authenticate(null as any);
-        }
-      }, DELAY);
-    })();
+    setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      (async () => {
+        const DELAY = authStore.user ? 3000 : 0;
+        setTimeout(async () => {
+          try {
+            const response = await api.auth.getAuthenticatedAccount();
+            const user = response;
+
+            if (authStore.guestUser && user.data) {
+              const migrationSummary = await migrateGuestDataToUser(
+                authStore.guestUser.id,
+                user.data.id
+              );
+
+              if (migrationSummary.success) {
+                const totalMigrated = migrationSummary.tasks.migratedCount;
+
+                if (totalMigrated > 0) {
+                  toast.success(
+                    `Migrated ${totalMigrated} tasks to your account`,
+                    {
+                      description:
+                        "Your guest data has been successfully transferred.",
+                      duration: 5000,
+                    }
+                  );
+                }
+              } else {
+                console.error("Some migrations failed:", migrationSummary);
+              }
+            }
+
+            authStore.authenticate(user.data);
+            authStore.authenticateGuest(null as any);
+          } catch (error) {
+            authStore.authenticate(null as any);
+          }
+        }, DELAY);
+      })();
+    }
+  }, [mounted]);
 
   return (
     <AuthContext.Provider value={authStore}>

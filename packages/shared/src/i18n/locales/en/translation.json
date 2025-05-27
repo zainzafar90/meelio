@@ -139,7 +139,7 @@
       "title": "Todo List",
       "empty": "No todos yet",
       "add": "New List",
-      "description": "A list of tasks to help you stay organized and on top of your work, projects, and goals.",
+      "description": "Stay on top of your work, projects, and goals.",
       "input": {
         "placeholder": "What needs to be done?"
       }

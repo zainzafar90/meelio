@@ -138,7 +138,7 @@
       "title": "Aufgabenliste",
       "empty": "Noch keine Aufgaben",
       "add": "Neue Liste",
-      "description": "Eine Liste von Aufgaben, die dir hilft, organisiert zu bleiben und deine Arbeit, Projekte und Ziele im Auge zu behalten.",
+      "description": "Bleib organisiert und halte deine Aufgaben im Auge.",
       "input": {
         "placeholder": "Was muss erledigt werden?"
       }

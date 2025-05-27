@@ -15,9 +15,9 @@ export interface TodoList {
 }
 
 const SYSTEM_LISTS: TodoList[] = [
+  { id: "today", name: "Today", type: "system", emoji: "📅" },
   { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
   { id: "completed", name: "Completed", type: "system", emoji: "✅" },
-  { id: "today", name: "Today", type: "system", emoji: "📅" },
 ];
 
 const DEFAULT_LISTS: TodoList[] = [
@@ -105,21 +105,25 @@ export const useTodoStore = create<TodoState>()(
   subscribeWithSelector((set, get) => ({
     lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS],
     tasks: [],
-    activeListId: "all",
+    activeListId: "today",
     isLoading: false,
     error: null,
 
     addTask: async (task) => {
-      const user = useAuthStore.getState().user;
-      if (!user) {
-        set({ error: "User not authenticated" });
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+      const guestUser = authState.guestUser;
+
+      const userId = user?.id || guestUser?.id;
+      if (!userId) {
+        set({ error: "No user session found" });
         return;
       }
 
       const syncStore = useSimpleSyncStore.getState();
       const newTask: Task = {
         id: generateUUID(),
-        userId: user.id,
+        userId: userId,
         title: task.title,
         completed: false,
         category: task.category,
@@ -136,13 +140,14 @@ export const useTodoStore = create<TodoState>()(
           error: null,
         }));
 
-        syncStore.addToQueue("task", {
-          type: "create",
-          entityId: newTask.id,
-          data: newTask,
-        });
+        // Only sync for authenticated users, not guest users
+        if (user && syncStore.isOnline) {
+          syncStore.addToQueue("task", {
+            type: "create",
+            entityId: newTask.id,
+            data: newTask,
+          });
 
-        if (syncStore.isOnline) {
           processSyncQueue().then(() => get().loadFromLocal());
         }
       } catch (error) {
@@ -156,6 +161,8 @@ export const useTodoStore = create<TodoState>()(
       const task = get().tasks.find((t) => t.id === taskId);
       if (!task) return;
 
+      const authState = useAuthStore.getState();
+      const user = authState.user;
       const syncStore = useSimpleSyncStore.getState();
       const updatedData = {
         completed: !task.completed,
@@ -171,13 +178,16 @@ export const useTodoStore = create<TodoState>()(
           ),
         }));
 
-        syncStore.addToQueue("task", {
-          type: "update",
-          entityId: taskId,
-          data: updatedData,
-        });
+        // Only sync for authenticated users
+        if (user) {
+          syncStore.addToQueue("task", {
+            type: "update",
+            entityId: taskId,
+            data: updatedData,
+          });
 
-        if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline) processSyncQueue();
+        }
       } catch (error) {
         set({
           error:
@@ -187,6 +197,8 @@ export const useTodoStore = create<TodoState>()(
     },
 
     deleteTask: async (taskId) => {
+      const authState = useAuthStore.getState();
+      const user = authState.user;
       const syncStore = useSimpleSyncStore.getState();
 
       try {
@@ -196,12 +208,15 @@ export const useTodoStore = create<TodoState>()(
           tasks: state.tasks.filter((t) => t.id !== taskId),
         }));
 
-        syncStore.addToQueue("task", {
-          type: "delete",
-          entityId: taskId,
-        });
+        // Only sync for authenticated users
+        if (user) {
+          syncStore.addToQueue("task", {
+            type: "delete",
+            entityId: taskId,
+          });
 
-        if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline) processSyncQueue();
+        }
       } catch (error) {
         set({
           error:
@@ -211,6 +226,8 @@ export const useTodoStore = create<TodoState>()(
     },
 
     deleteTasksByCategory: async (category) => {
+      const authState = useAuthStore.getState();
+      const user = authState.user;
       const syncStore = useSimpleSyncStore.getState();
       const tasksToDelete = get().tasks.filter((t) => t.category === category);
 
@@ -223,14 +240,17 @@ export const useTodoStore = create<TodoState>()(
           tasks: state.tasks.filter((t) => t.category !== category),
         }));
 
-        tasksToDelete.forEach((task) => {
-          syncStore.addToQueue("task", {
-            type: "delete",
-            entityId: task.id,
+        // Only sync for authenticated users
+        if (user) {
+          tasksToDelete.forEach((task) => {
+            syncStore.addToQueue("task", {
+              type: "delete",
+              entityId: task.id,
+            });
           });
-        });
 
-        if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline) processSyncQueue();
+        }
       } catch (error) {
         set({
           error:
@@ -240,8 +260,12 @@ export const useTodoStore = create<TodoState>()(
     },
 
     addList: async (list) => {
-      const user = useAuthStore.getState().user;
-      if (!user) return;
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+      const guestUser = authState.guestUser;
+      const userId = user?.id || guestUser?.id;
+
+      if (!userId) return;
 
       const newList: TodoList = {
         ...list,
@@ -255,7 +279,7 @@ export const useTodoStore = create<TodoState>()(
       if (list.type === "custom") {
         const welcomeTask: Task = {
           id: generateUUID(),
-          userId: user.id,
+          userId: userId,
           title: `Welcome to ${newList.name}!`,
           completed: false,
           category: newList.id,
@@ -270,15 +294,18 @@ export const useTodoStore = create<TodoState>()(
             tasks: [...state.tasks, welcomeTask],
           }));
 
-          const syncStore = useSimpleSyncStore.getState();
-          syncStore.addToQueue("task", {
-            type: "create",
-            entityId: welcomeTask.id,
-            data: welcomeTask,
-          });
+          // Only sync for authenticated users
+          if (user) {
+            const syncStore = useSimpleSyncStore.getState();
+            syncStore.addToQueue("task", {
+              type: "create",
+              entityId: welcomeTask.id,
+              data: welcomeTask,
+            });
 
-          if (syncStore.isOnline) {
-            processSyncQueue();
+            if (syncStore.isOnline) {
+              processSyncQueue();
+            }
           }
         } catch (error) {
           console.error("Failed to create welcome task:", error);
@@ -292,7 +319,7 @@ export const useTodoStore = create<TodoState>()(
           (l) => l.id !== listId && l.type !== "system"
         ),
         activeListId:
-          state.activeListId === listId ? "all" : state.activeListId,
+          state.activeListId === listId ? "today" : state.activeListId,
       }));
     },
 
@@ -301,17 +328,29 @@ export const useTodoStore = create<TodoState>()(
     },
 
     initializeStore: async () => {
-      const user = useAuthStore.getState().user;
-      if (!user) return;
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+      const guestUser = authState.guestUser;
+      const userId = user?.id || guestUser?.id;
+
+      if (!userId) return;
 
       try {
         set({ isLoading: true, error: null });
-        startAutoSync();
+
+        // Only start auto-sync for authenticated users
+        if (user) {
+          startAutoSync();
+        }
+
         await get().loadFromLocal();
 
-        const syncStore = useSimpleSyncStore.getState();
-        if (syncStore.isOnline) {
-          await get().syncWithServer();
+        // Only sync with server for authenticated users
+        if (user) {
+          const syncStore = useSimpleSyncStore.getState();
+          if (syncStore.isOnline) {
+            await get().syncWithServer();
+          }
         }
       } catch (error: any) {
         console.error("Failed to initialize todo store:", error);
@@ -322,12 +361,16 @@ export const useTodoStore = create<TodoState>()(
     },
 
     loadFromLocal: async () => {
-      const user = useAuthStore.getState().user;
-      if (!user) return;
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+      const guestUser = authState.guestUser;
+      const userId = user?.id || guestUser?.id;
+
+      if (!userId) return;
 
       const localTasks = await db.tasks
         .where("userId")
-        .equals(user.id)
+        .equals(userId)
         .toArray();
 
       // Extract categories from tasks
@@ -381,6 +424,12 @@ export const useTodoStore = create<TodoState>()(
     },
 
     syncWithServer: async () => {
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+
+      // Only authenticated users can sync with server
+      if (!user) return;
+
       const syncStore = useSimpleSyncStore.getState();
 
       try {
@@ -392,11 +441,7 @@ export const useTodoStore = create<TodoState>()(
         ]);
 
         await db.transaction("rw", db.tasks, async () => {
-          const user = useAuthStore.getState().user;
-          if (!user) return;
-
           await db.tasks.where("userId").equals(user.id).delete();
-
           await db.tasks.bulkAdd(serverTasks);
         });
 

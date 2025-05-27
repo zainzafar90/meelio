@@ -8,31 +8,19 @@ import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
 
 interface TaskListProps {
-  title: string;
   tasks: Task[];
-  count: number;
-  icon?: string;
   activeListId: string;
   isLoading?: boolean;
 }
 
 export function TaskList({
-  title,
   tasks,
-  count,
-  icon,
   activeListId,
   isLoading = false,
 }: TaskListProps) {
-  const { categories } = useTodoStore(
-    useShallow((state) => ({
-      categories: state.categories,
-    }))
-  );
   const { t } = useTranslation();
 
-  // Show skeleton loaders when loading
-  if (isLoading) {
+  if (isLoading && tasks.length === 0) {
     return (
       <div className="mt-4 space-y-3">
         {[...Array(3)].map((_, i) => (
@@ -137,7 +125,7 @@ const TaskItem = ({ task }: { task: Task }) => {
       <div className="ml-auto flex items-center gap-2">
         {task.dueDate && (
           <Badge className="uppercase" variant="secondary">
-            {task.dueDate}
+            {new Date(task.dueDate).toLocaleDateString()}
           </Badge>
         )}
         <button

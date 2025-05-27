@@ -22,9 +22,10 @@ export function CreateTask() {
       const isSystemList = ["all", "completed", "today"].includes(
         activeListId || ""
       );
+
       addTask({
         title: title.trim(),
-        category: isSystemList ? "all" : activeListId,
+        category: isSystemList ? "today" : activeListId,
         dueDate:
           activeListId === "today" ? new Date().toISOString() : undefined,
       });

@@ -20,6 +20,7 @@ import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
 import { useTodoStore } from "../../../stores/todo.store";
 import { useSimpleSyncStore } from "../../../stores/simple-sync.store";
+import { useAuthStore } from "../../../stores/auth.store";
 
 import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
@@ -56,9 +57,19 @@ export function TodoListSheet() {
     }))
   );
 
+  const { user, guestUser } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+    }))
+  );
+
+  const isGuest = !user && !!guestUser;
+
   const syncStore = useSimpleSyncStore();
   const isOnline = syncStore.isOnline;
-  const syncErrors = syncStore.queues.task?.filter(op => op.retries >= 3) || [];
+  const syncErrors =
+    syncStore.queues.task?.filter((op) => op.retries >= 3) || [];
 
   useEffect(() => {
     if (isTodosVisible) {
@@ -67,7 +78,7 @@ export function TodoListSheet() {
   }, [isTodosVisible, initializeStore]);
 
   const activeList = lists.find((list) => list.id === activeListId);
-  
+
   const filteredTasks = tasks.filter((task) => {
     if (!activeListId || activeListId === "all") return true;
     if (activeListId === "completed") return task.completed;
@@ -77,7 +88,7 @@ export function TodoListSheet() {
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       if (task.dueDate) {
         const dueDate = new Date(task.dueDate);
         return dueDate >= today && dueDate < tomorrow;
@@ -125,6 +136,15 @@ export function TodoListSheet() {
             </div>
           )}
 
+          {isGuest && (
+            <div className="mb-4 p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 rounded-md text-sm">
+              <p className="font-medium">Guest mode</p>
+              <p className="mt-1">
+                Your tasks are saved locally. Sign in to sync across devices.
+              </p>
+            </div>
+          )}
+
           {syncErrors.length > 0 && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-md text-sm">
               Some tasks failed to sync. They'll retry automatically.
@@ -165,10 +185,7 @@ export function TodoListSheet() {
           <div className="space-y-8">
             <TaskList
               activeListId={activeListId || "all"}
-              title={activeList?.name || "All Tasks"}
               tasks={sortedTasks}
-              count={sortedTasks.length}
-              icon={undefined}
               isLoading={isLoading}
             />
           </div>
