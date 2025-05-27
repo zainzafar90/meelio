@@ -12,7 +12,9 @@ import { getTodaysSummary } from "../lib/db/pomodoro.dexie";
 import { useAppStore } from "./app.store";
 import { useAuthStore } from "./auth.store";
 import { api } from "../api";
-import { PomodoroSettings } from "src/types/auth";
+import { PomodoroSettings } from "../types/auth";
+import { DEFAULT_SETTINGS } from "../data";
+import { toast } from "sonner";
 
 const isExtension = useAppStore.getState().platform === "extension";
 
@@ -75,6 +77,7 @@ export const usePomodoroStore = create(
           activeStage: PomodoroStage.Focus,
           sessionCount: 0,
           pausedRemaining: null,
+          ...DEFAULT_SETTINGS.pomodoro,
         })),
 
       updateTimer: (remaining: number) => set({ pausedRemaining: remaining }),
@@ -129,10 +132,8 @@ export const usePomodoroStore = create(
             await api.settings.settingsApi.updatePomodoroSettings(settings);
 
             if (
-              settings.workDuration ===
-                currentState.stageDurations[PomodoroStage.Focus] &&
-              settings.breakDuration ===
-                currentState.stageDurations[PomodoroStage.Break] &&
+              (settings.workDuration !== undefined ||
+                settings.breakDuration !== undefined) &&
               !currentState.isRunning
             ) {
               set({
@@ -141,11 +142,10 @@ export const usePomodoroStore = create(
               });
             }
           } catch (error) {
-            console.error("Failed to update timer settings on server:", error);
-            set(() => ({
-              ...currentState,
+            set((state) => ({
+              ...state,
+              ...DEFAULT_SETTINGS.pomodoro,
             }));
-            throw error;
           }
         }
       },
@@ -160,8 +160,8 @@ export const usePomodoroStore = create(
         const newAutoStart = !get().autoStartTimers;
         set({ autoStartTimers: newAutoStart });
 
-        // Update settings on server if user is authenticated
         const authState = useAuthStore.getState();
+
         if (authState.user) {
           try {
             await api.settings.settingsApi.updatePomodoroSettings({
@@ -172,6 +172,7 @@ export const usePomodoroStore = create(
               "Failed to update auto-start setting on server:",
               error
             );
+            toast.error("Failed to update auto-start setting on server");
           }
         }
       },
@@ -183,7 +184,6 @@ export const usePomodoroStore = create(
         const newSoundSetting = !get().enableSound;
         set({ enableSound: newSoundSetting });
 
-        // Update settings on server if user is authenticated
         const authState = useAuthStore.getState();
         if (authState.user) {
           try {
@@ -192,6 +192,7 @@ export const usePomodoroStore = create(
             });
           } catch (error) {
             console.error("Failed to update sound setting on server:", error);
+            toast.error("Failed to update sound setting on server");
           }
         }
       },
@@ -307,13 +308,11 @@ export const usePomodoroStore = create(
 
       reinitializeTimer: () => {
         const state = get();
-        // Reset timer state while preserving settings
         set({
           isRunning: false,
           pausedRemaining: null,
           lastUpdated: Date.now(),
           endTimestamp: null,
-          // Keep current stage and settings
           activeStage: state.activeStage,
           stageDurations: state.stageDurations,
           autoStartTimers: state.autoStartTimers,
@@ -361,5 +360,8 @@ if (typeof window !== "undefined" && !isExtension) {
 useAuthStore.subscribe((state) => {
   if (state.user?.settings?.pomodoro) {
     usePomodoroStore.getState().syncWithUserSettings();
+  } else if (!state.user && !state.guestUser) {
+    const store = usePomodoroStore.getState();
+    store.resetTimer();
   }
 });

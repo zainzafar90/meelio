@@ -21,6 +21,7 @@ import { usePomodoroStore } from "../../../../stores/unified-pomodoro.store";
 import { POMODORO_MAX_MINUTES } from "../../../../utils/common.utils";
 
 import { ResetTimerDialog } from "./reset-timer.dialog";
+import { useAuthStore } from "../../../../stores/auth.store";
 
 const timerSettingsSchema = z.object({
   workTime: z.number().min(1).max(POMODORO_MAX_MINUTES),
@@ -59,10 +60,14 @@ export const TimerSettingsDialog = ({
 
   const handleSave = async (data: TimerSettingsValues) => {
     try {
-      await changeTimerSettings({
-        workDuration: data.workTime,
-        breakDuration: data.shortBreak,
-      });
+      if (useAuthStore.getState().user?.isPro) {
+        await changeTimerSettings({
+          workDuration: data.workTime,
+          breakDuration: data.shortBreak,
+          autoStart: autoStartTimers,
+          soundOn: enableSound,
+        });
+      }
 
       reinitializeTimer();
 
