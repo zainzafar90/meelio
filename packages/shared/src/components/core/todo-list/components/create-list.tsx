@@ -5,18 +5,17 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/ui/popover";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@repo/ui/components/ui/popover";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -54,7 +53,6 @@ const emojis = [
   "🎁",
   "⭐️",
 ];
-
 
 interface CreateListProps {
   children: React.ReactNode;
@@ -137,16 +135,18 @@ export function CreateList({ children }: CreateListProps) {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full md:flex-row flex-col">
             <Label htmlFor="emoji" className="sr-only">
               {t("todo.list.create.emoji.label")}
             </Label>
-            <Popover>
+
+            {/* <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="emoji"
                   variant="outline"
                   className="w-[60px] text-lg"
+                  disabled={true}
                   aria-label={t("todo.list.create.emoji.selected", {
                     emoji: selectedEmoji,
                   })}
@@ -169,29 +169,38 @@ export function CreateList({ children }: CreateListProps) {
                   ))}
                 </div>
               </PopoverContent>
-            </Popover>
+            </Popover> */}
 
-            <Label htmlFor="name" className="sr-only">
-              {t("todo.list.create.name.label")}
-            </Label>
-            <Input
-              id="name"
-              placeholder={t("todo.list.create.name.placeholder")}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <div className="flex w-full items-center gap-2">
+              <Button
+                id="emoji"
+                variant="outline"
+                className="w-[40px] text-lg"
+                aria-label={t("todo.list.create.emoji.selected", {
+                  emoji: selectedEmoji,
+                })}
+              >
+                {selectedEmoji}
+              </Button>
+              <Label htmlFor="name" className="sr-only">
+                {t("todo.list.create.name.label")}
+              </Label>
+              <Input
+                id="name"
+                placeholder={t("todo.list.create.name.placeholder")}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <Button
+              className="w-full md:w-auto"
+              onClick={handleCreate}
+              disabled={!name.trim()}
+            >
+              <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
+            </Button>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button
-            onClick={handleCreate}
-            className="w-full"
-            disabled={!name.trim()}
-          >
-            <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
