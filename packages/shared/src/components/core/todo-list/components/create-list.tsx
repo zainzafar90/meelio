@@ -21,8 +21,16 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTodoStore } from "../../../../stores/todo.store";
+import { useAuthStore } from "../../../../stores/auth.store";
+import { PremiumFeature } from "../../../common/premium-feature";
 
 import { useShallow } from "zustand/shallow";
+import { generateUUID } from "../../../../utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 const emojis = [
   "📝",
@@ -57,17 +65,28 @@ export function CreateList({ children }: CreateListProps) {
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { t } = useTranslation();
 
-  const { addList, setActiveList } = useTodoStore(
+  const { lists, addList, setActiveList } = useTodoStore(
     useShallow((state) => ({
+      lists: state.lists,
       addList: state.addList,
       setActiveList: state.setActiveList,
     }))
   );
 
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
+  const customListCount = lists.filter((list) => list.type === "custom").length;
+  const freeListLimit = 0;
+  const canCreateMoreLists = user?.isPro || customListCount < freeListLimit;
+
   const handleCreate = () => {
     if (!name.trim()) return;
 
-    const newListId = name.trim().toLowerCase().replace(/\s+/g, '-');
+    const newListId = generateUUID();
 
     addList({
       id: newListId,
@@ -82,6 +101,28 @@ export function CreateList({ children }: CreateListProps) {
     setSelectedEmoji("📝");
     setOpen(false);
   };
+
+  if (!canCreateMoreLists) {
+    return (
+      <PremiumFeature
+        requirePro={true}
+        fallback={
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button className="w-full">
+                <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Create custom lists and organize your tasks your way!</p>
+            </TooltipContent>
+          </Tooltip>
+        }
+      >
+        {children}
+      </PremiumFeature>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

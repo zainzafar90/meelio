@@ -161,7 +161,8 @@
           "label": "List Name",
           "placeholder": "Enter list name"
         },
-        "button": "Create List"
+        "button": "Create List",
+        "tooltip": "Create unlimited custom todo lists and organize your tasks your way!"
       },
       "empty": "No tasks",
       "task": {

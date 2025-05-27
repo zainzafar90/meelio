@@ -160,7 +160,8 @@
           "label": "Listenname",
           "placeholder": "Listennamen eingeben"
         },
-        "button": "Liste erstellen"
+        "button": "Liste erstellen",
+        "tooltip": "Erstelle unbegrenzt benutzerdefinierte Aufgabenlisten und organisiere deine Aufgaben nach deinen Wünschen!"
       },
       "empty": "Keine Aufgaben",
       "task": {
