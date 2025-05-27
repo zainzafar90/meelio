@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons,  TimerStatsDialog, useDisclosure, PomodoroState } from "@repo/shared";
 
 import { usePomodoroStore } from "../lib/pomodoro-store";
 
@@ -319,11 +319,11 @@ export const WebTimer = () => {
         onOpenChange={toggleStatsDialog}
         onSettingsClick={toggleSettingsDialog}
       />
-
+{/* 
       <TimerSettingsDialog
         isOpen={isSettingsDialogOpen}
         onClose={toggleSettingsDialog}
-      />
+      /> */}
     </div>
   );
 };

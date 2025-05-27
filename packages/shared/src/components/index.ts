@@ -81,7 +81,7 @@ export * from "./core/soundscapes/components/sound-player/controls/sound-control
 export * from "./core/timer/timer";
 export * from "./core/timer/components/timer-controls";
 export * from "./core/timer/components/timer-donut-graph";
-export * from "./core/timer/components/timer-expanded-content";
+// export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
 export * from "./core/timer/components/timer-stage-button";
 export * from "./core/timer/components/timer-stats";

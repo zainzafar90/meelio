@@ -40,7 +40,7 @@ export function TaskList({
   if (activeListId === "all") {
     const tasksByCategory = tasks.reduce(
       (acc, task) => {
-        const category = task.category || "Uncategorized";
+        const category = task.category || "No Category";
         if (!acc[category]) {
           acc[category] = [];
         }
@@ -57,7 +57,7 @@ export function TaskList({
             <div key={category} className="space-y-2">
               <div className="flex items-center justify-between px-2 py-1">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{category}</span>
+                  <span className="capitalize">{category}</span>
                 </div>
                 <Badge variant="secondary" className="text-xs">
                   {categoryTasks.length}
