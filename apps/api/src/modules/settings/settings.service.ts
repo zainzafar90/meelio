@@ -48,17 +48,14 @@ class SettingsService {
       ...currentSettings,
     };
 
-    console.log("updates", updates);
     if (updates.pomodoro) {
       newSettings.pomodoro = {
         ...currentSettings.pomodoro,
         ...updates.pomodoro,
       };
-      console.log("newSettings", newSettings);
     }
 
     Object.assign(user, { settings: newSettings });
-    console.log("user", user);
     await db.update(users).set(user).where(eq(users.id, userId));
 
     const [updatedUser] = (await db
@@ -66,8 +63,6 @@ class SettingsService {
       .from(users)
       .where(eq(users.id, userId))
       .limit(1)) as [IUser];
-
-    console.log("updatedUser", updatedUser);
 
     return newSettings;
   }

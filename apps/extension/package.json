@@ -30,7 +30,6 @@
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
     "@plasmohq/storage": "^1.13.0",
-    "@repo/core": "*",
     "@repo/shared": "*",
     "@repo/ui": "*",
     "@tailwindcss/typography": "^0.5.9",
