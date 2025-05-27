@@ -18,17 +18,14 @@ import * as z from "zod";
 
 import { PomodoroStage } from "../../../../types/pomodoro";
 import { usePomodoroStore } from "../../../../stores/unified-pomodoro.store";
-import {
-  MINUTE_IN_SECONDS,
-  POMODORO_MAX_MINUTES,
-} from "../../../../utils/common.utils";
+import { POMODORO_MAX_MINUTES } from "../../../../utils/common.utils";
 
 import { ResetTimerDialog } from "./reset-timer.dialog";
 
 const timerSettingsSchema = z.object({
-  workTime: z.number().min(0).max(POMODORO_MAX_MINUTES),
-  shortBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
-  longBreak: z.number().min(0).max(POMODORO_MAX_MINUTES),
+  workTime: z.number().min(1).max(POMODORO_MAX_MINUTES),
+  shortBreak: z.number().min(1).max(POMODORO_MAX_MINUTES),
+  longBreak: z.number().min(1).max(POMODORO_MAX_MINUTES).optional(),
 });
 
 type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
@@ -48,6 +45,7 @@ export const TimerSettingsDialog = ({
     toggleAutoStartBreaks,
     toggleTimerSound,
     changeTimerSettings,
+    reinitializeTimer,
   } = usePomodoroStore();
   const { t } = useTranslation();
 
@@ -59,14 +57,24 @@ export const TimerSettingsDialog = ({
     },
   });
 
-  const handleSave = (data: TimerSettingsValues) => {
-    changeTimerSettings(PomodoroStage.Focus, data.workTime);
-    changeTimerSettings(PomodoroStage.Break, data.shortBreak);
+  const handleSave = async (data: TimerSettingsValues) => {
+    try {
+      await changeTimerSettings({
+        workDuration: data.workTime,
+        breakDuration: data.shortBreak,
+      });
 
-    toast.success(t("timer.settings.toast.success"), {
-      description: t("timer.settings.toast.description"),
-    });
-    onClose();
+      reinitializeTimer();
+
+      toast.success(t("timer.settings.toast.success"), {
+        description: t("timer.settings.toast.description"),
+      });
+      onClose();
+    } catch (error) {
+      toast.error(t("timer.settings.toast.error"), {
+        description: t("timer.settings.toast.errorDescription"),
+      });
+    }
   };
 
   return (
@@ -111,19 +119,29 @@ export const TimerSettingsDialog = ({
                 <Controller
                   name="workTime"
                   control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      min={0}
-                      max={POMODORO_MAX_MINUTES}
-                      type="number"
-                      id="pomodoro"
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      autoComplete="pomodoro"
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
+                  render={({ field, fieldState }) => (
+                    <>
+                      <Input
+                        {...field}
+                        min={1}
+                        max={POMODORO_MAX_MINUTES}
+                        type="number"
+                        id="pomodoro"
+                        autoCorrect="off"
+                        autoCapitalize="none"
+                        autoComplete="pomodoro"
+                        value={field.value}
+                        onChange={(e) =>
+                          field.onChange(e.target.valueAsNumber || 1)
+                        }
+                        className={fieldState.error ? "border-red-500" : ""}
+                      />
+                      {fieldState.error && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </>
                   )}
                 />
               </div>
@@ -139,19 +157,29 @@ export const TimerSettingsDialog = ({
                 <Controller
                   name="shortBreak"
                   control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      min={0}
-                      max={POMODORO_MAX_MINUTES}
-                      type="number"
-                      id="short-break"
-                      autoCorrect="off"
-                      autoCapitalize="none"
-                      autoComplete="short-break"
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
+                  render={({ field, fieldState }) => (
+                    <>
+                      <Input
+                        {...field}
+                        min={1}
+                        max={POMODORO_MAX_MINUTES}
+                        type="number"
+                        id="short-break"
+                        autoCorrect="off"
+                        autoCapitalize="none"
+                        autoComplete="short-break"
+                        value={field.value}
+                        onChange={(e) =>
+                          field.onChange(e.target.valueAsNumber || 1)
+                        }
+                        className={fieldState.error ? "border-red-500" : ""}
+                      />
+                      {fieldState.error && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </>
                   )}
                 />
               </div>
@@ -200,7 +228,11 @@ export const TimerSettingsDialog = ({
             <Button type="button" variant="secondary" onClick={() => onClose()}>
               {t("common.actions.close")}
             </Button>
-            <Button type="submit">{t("common.actions.save")}</Button>
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting
+                ? "Saving..."
+                : t("common.actions.save")}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

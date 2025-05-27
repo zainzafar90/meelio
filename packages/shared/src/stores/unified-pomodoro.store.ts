@@ -10,6 +10,9 @@ import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
 import { getTodaysSummary } from "../lib/db/pomodoro.dexie";
 import { useAppStore } from "./app.store";
+import { useAuthStore } from "./auth.store";
+import { api } from "../api";
+import { PomodoroSettings } from "src/types/auth";
 
 const isExtension = useAppStore.getState().platform === "extension";
 
@@ -21,17 +24,19 @@ interface PomodoroStateWithSync extends PomodoroState {
   updateTimer: (remaining: number) => void;
   advanceTimer: () => void;
   changeStage: (stage: PomodoroStage) => void;
-  changeTimerSettings: (stage: PomodoroStage, minutes: number) => void;
+  changeTimerSettings: (settings: Partial<PomodoroSettings>) => Promise<void>;
   sessionCompleted: () => void;
-  toggleAutoStartBreaks: () => void;
+  toggleAutoStartBreaks: () => Promise<void>;
   setTimerDuration: (duration: number) => void;
-  toggleTimerSound: () => void;
+  toggleTimerSound: () => Promise<void>;
   isTimerRunning: () => boolean;
 
   // Sync methods
   completeSession: () => Promise<void>;
   syncSessions: () => Promise<void>;
   loadTodayStats: () => Promise<void>;
+  syncWithUserSettings: () => void;
+  reinitializeTimer: () => void;
 }
 
 export const usePomodoroStore = create(
@@ -102,13 +107,48 @@ export const usePomodoroStore = create(
           pausedRemaining: null,
         }),
 
-      changeTimerSettings: (stage: PomodoroStage, minutes: number) =>
+      changeTimerSettings: async (settings: Partial<PomodoroSettings>) => {
+        const currentState = get();
+
         set((state) => ({
+          ...settings,
           stageDurations: {
             ...state.stageDurations,
-            [stage]: minutes * 60,
+            [settings.workDuration]: settings.workDuration * 60,
+            [settings.breakDuration]: settings.breakDuration * 60,
           },
-        })),
+          autoStartTimers: settings.autoStart,
+          enableSound: settings.soundOn,
+          autoBlock: settings.autoBlock,
+          dailyFocusLimit: settings.dailyFocusLimit,
+        }));
+
+        const authState = useAuthStore.getState();
+        if (authState.user) {
+          try {
+            await api.settings.settingsApi.updatePomodoroSettings(settings);
+
+            if (
+              settings.workDuration ===
+                currentState.stageDurations[PomodoroStage.Focus] &&
+              settings.breakDuration ===
+                currentState.stageDurations[PomodoroStage.Break] &&
+              !currentState.isRunning
+            ) {
+              set({
+                pausedRemaining: null,
+                lastUpdated: Date.now(),
+              });
+            }
+          } catch (error) {
+            console.error("Failed to update timer settings on server:", error);
+            set(() => ({
+              ...currentState,
+            }));
+            throw error;
+          }
+        }
+      },
 
       sessionCompleted: () =>
         set({
@@ -116,18 +156,45 @@ export const usePomodoroStore = create(
           isRunning: false,
         }),
 
-      toggleAutoStartBreaks: () =>
-        set((state) => ({
-          autoStartTimers: !state.autoStartTimers,
-        })),
+      toggleAutoStartBreaks: async () => {
+        const newAutoStart = !get().autoStartTimers;
+        set({ autoStartTimers: newAutoStart });
+
+        // Update settings on server if user is authenticated
+        const authState = useAuthStore.getState();
+        if (authState.user) {
+          try {
+            await api.settings.settingsApi.updatePomodoroSettings({
+              autoStart: newAutoStart,
+            });
+          } catch (error) {
+            console.error(
+              "Failed to update auto-start setting on server:",
+              error
+            );
+          }
+        }
+      },
 
       setTimerDuration: (duration: number) =>
         set({ pausedRemaining: duration }),
 
-      toggleTimerSound: () =>
-        set((state) => ({
-          enableSound: !state.enableSound,
-        })),
+      toggleTimerSound: async () => {
+        const newSoundSetting = !get().enableSound;
+        set({ enableSound: newSoundSetting });
+
+        // Update settings on server if user is authenticated
+        const authState = useAuthStore.getState();
+        if (authState.user) {
+          try {
+            await api.settings.settingsApi.updatePomodoroSettings({
+              soundOn: newSoundSetting,
+            });
+          } catch (error) {
+            console.error("Failed to update sound setting on server:", error);
+          }
+        }
+      },
 
       isTimerRunning: () => get().isRunning,
 
@@ -220,11 +287,46 @@ export const usePomodoroStore = create(
           },
         });
       },
+
+      syncWithUserSettings: () => {
+        const authState = useAuthStore.getState();
+        const user = authState.user;
+
+        if (user?.settings?.pomodoro) {
+          const pomodoroSettings = user.settings.pomodoro;
+          set({
+            stageDurations: {
+              [PomodoroStage.Focus]: pomodoroSettings.workDuration * 60,
+              [PomodoroStage.Break]: pomodoroSettings.breakDuration * 60,
+            },
+            autoStartTimers: pomodoroSettings.autoStart,
+            enableSound: pomodoroSettings.soundOn,
+          });
+        }
+      },
+
+      reinitializeTimer: () => {
+        const state = get();
+        // Reset timer state while preserving settings
+        set({
+          isRunning: false,
+          pausedRemaining: null,
+          lastUpdated: Date.now(),
+          endTimestamp: null,
+          // Keep current stage and settings
+          activeStage: state.activeStage,
+          stageDurations: state.stageDurations,
+          autoStartTimers: state.autoStartTimers,
+          enableSound: state.enableSound,
+          sessionCount: state.sessionCount,
+          stats: state.stats,
+        });
+      },
     })),
     {
       name: "meelio:local:pomodoro",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       skipHydration: false,
       ...(isExtension
         ? {
@@ -254,3 +356,10 @@ if (typeof window !== "undefined" && !isExtension) {
     10 * 60 * 1000
   );
 }
+
+// Subscribe to auth store changes to sync settings
+useAuthStore.subscribe((state) => {
+  if (state.user?.settings?.pomodoro) {
+    usePomodoroStore.getState().syncWithUserSettings();
+  }
+});

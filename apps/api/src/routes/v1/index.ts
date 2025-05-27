@@ -16,6 +16,7 @@ import siteBlockerRoute from "./site-blocker.routes";
 import tabStashRoute from "./tab-stash.routes";
 import noteRoute from "./note.routes";
 import focusSessionRoute from "./focus-session.routes";
+import settingsRoute from "./settings.routes";
 
 const router: express.Router = express.Router();
 
@@ -76,6 +77,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/focus-sessions",
     route: focusSessionRoute,
+  },
+  {
+    path: "/settings",
+    route: settingsRoute,
   },
 ];
 

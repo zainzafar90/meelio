@@ -6,11 +6,24 @@ import {
   timestamp,
   varchar,
   customType,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { verificationTokens } from "./verification-token.schema";
 import { RoleType } from "@/types/enums.types";
+import { IUserSettings } from "@/types/interfaces/resources";
+
+export const DEFAULT_SETTINGS: IUserSettings = {
+  pomodoro: {
+    workDuration: 25,
+    breakDuration: 5,
+    autoStart: false,
+    autoBlock: false,
+    soundOn: true,
+    dailyFocusLimit: 120,
+  },
+};
 
 const EnumUserRole = customType<{
   data: RoleType;
@@ -28,6 +41,7 @@ export const users = pgTable(
     isEmailVerified: boolean("is_email_verified").default(false),
     image: varchar("image", { length: 255 }),
     role: EnumUserRole("role").notNull().default(RoleType.User),
+    settings: jsonb("settings").default(DEFAULT_SETTINGS).notNull(),
     deletedAt: timestamp({ withTimezone: true }),
     createdAt,
     updatedAt,
