@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons,  TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog } from "@repo/shared";
 
-import { usePomodoroStore } from "../lib/pomodoro-store";
+import { usePomodoroStore } from "@repo/shared";
 
 
 export const ExtensionTimer = () => {
