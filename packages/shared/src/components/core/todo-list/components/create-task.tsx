@@ -2,7 +2,6 @@ import { KeyboardEvent, useState } from "react";
 
 import { Input } from "@repo/ui/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { Button } from "@repo/ui/components/ui/button";
 import { useTodoStore } from "../../../../stores/todo.store";
 import { useShallow } from "zustand/shallow";
 
@@ -20,11 +19,14 @@ export function CreateTask() {
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && title.trim()) {
-      const isSystemList = ["all", "completed", "today"].includes(activeListId || "");
+      const isSystemList = ["all", "completed", "today"].includes(
+        activeListId || ""
+      );
       addTask({
         title: title.trim(),
-        category: isSystemList ? undefined : activeListId,
-        dueDate: activeListId === "today" ? new Date().toISOString() : undefined,
+        category: isSystemList ? "all" : activeListId,
+        dueDate:
+          activeListId === "today" ? new Date().toISOString() : undefined,
       });
       setTitle("");
     }

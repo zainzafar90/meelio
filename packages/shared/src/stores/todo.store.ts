@@ -5,6 +5,7 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { useSimpleSyncStore } from "./simple-sync.store";
+import { generateUUID } from "../utils/common.utils";
 
 export interface TodoList {
   id: string;
@@ -39,39 +40,14 @@ interface TodoState {
   toggleTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   deleteTasksByCategory: (category: string) => Promise<void>;
-  
-  addList: (list: Omit<TodoList, "id"> & { id?: string }) => void;
+
+  addList: (list: Omit<TodoList, "id"> & { id?: string }) => Promise<void>;
   deleteList: (listId: string) => void;
   setActiveList: (listId: string | null) => void;
-  
+
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
-}
-
-const generateId = () => crypto.randomUUID();
-
-// Local storage key for custom lists
-const CUSTOM_LISTS_KEY = "meelio_custom_lists";
-
-// Load custom lists from localStorage
-function loadCustomLists(): TodoList[] {
-  try {
-    const stored = localStorage.getItem(CUSTOM_LISTS_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-}
-
-// Save custom lists to localStorage
-function saveCustomLists(lists: TodoList[]) {
-  try {
-    const customLists = lists.filter(l => l.type === "custom" && !DEFAULT_LISTS.some(d => d.id === l.id));
-    localStorage.setItem(CUSTOM_LISTS_KEY, JSON.stringify(customLists));
-  } catch (error) {
-    console.error("Failed to save custom lists:", error);
-  }
 }
 
 async function processSyncQueue() {
@@ -106,7 +82,7 @@ async function processSyncQueue() {
       syncStore.removeFromQueue("task", operation.id);
     } catch (error) {
       console.error("Sync operation failed:", error);
-      
+
       if (operation.retries >= 3) {
         syncStore.removeFromQueue("task", operation.id);
       } else {
@@ -127,7 +103,7 @@ function startAutoSync() {
 
 export const useTodoStore = create<TodoState>()(
   subscribeWithSelector((set, get) => ({
-    lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...loadCustomLists()],
+    lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS],
     tasks: [],
     activeListId: "all",
     isLoading: false,
@@ -142,7 +118,7 @@ export const useTodoStore = create<TodoState>()(
 
       const syncStore = useSimpleSyncStore.getState();
       const newTask: Task = {
-        id: generateId(),
+        id: generateUUID(),
         userId: user.id,
         title: task.title,
         completed: false,
@@ -154,7 +130,7 @@ export const useTodoStore = create<TodoState>()(
 
       try {
         await db.tasks.add(newTask);
-        
+
         set((state) => ({
           tasks: [...state.tasks, newTask],
           error: null,
@@ -170,7 +146,9 @@ export const useTodoStore = create<TodoState>()(
           processSyncQueue().then(() => get().loadFromLocal());
         }
       } catch (error) {
-        set({ error: error instanceof Error ? error.message : "Failed to add task" });
+        set({
+          error: error instanceof Error ? error.message : "Failed to add task",
+        });
       }
     },
 
@@ -186,7 +164,7 @@ export const useTodoStore = create<TodoState>()(
 
       try {
         await db.tasks.update(taskId, updatedData);
-        
+
         set((state) => ({
           tasks: state.tasks.map((t) =>
             t.id === taskId ? { ...t, ...updatedData } : t
@@ -201,7 +179,10 @@ export const useTodoStore = create<TodoState>()(
 
         if (syncStore.isOnline) processSyncQueue();
       } catch (error) {
-        set({ error: error instanceof Error ? error.message : "Failed to toggle task" });
+        set({
+          error:
+            error instanceof Error ? error.message : "Failed to toggle task",
+        });
       }
     },
 
@@ -210,7 +191,7 @@ export const useTodoStore = create<TodoState>()(
 
       try {
         await db.tasks.delete(taskId);
-        
+
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== taskId),
         }));
@@ -222,7 +203,10 @@ export const useTodoStore = create<TodoState>()(
 
         if (syncStore.isOnline) processSyncQueue();
       } catch (error) {
-        set({ error: error instanceof Error ? error.message : "Failed to delete task" });
+        set({
+          error:
+            error instanceof Error ? error.message : "Failed to delete task",
+        });
       }
     },
 
@@ -231,8 +215,10 @@ export const useTodoStore = create<TodoState>()(
       const tasksToDelete = get().tasks.filter((t) => t.category === category);
 
       try {
-        await Promise.all(tasksToDelete.map((task) => db.tasks.delete(task.id)));
-        
+        await Promise.all(
+          tasksToDelete.map((task) => db.tasks.delete(task.id))
+        );
+
         set((state) => ({
           tasks: state.tasks.filter((t) => t.category !== category),
         }));
@@ -246,34 +232,68 @@ export const useTodoStore = create<TodoState>()(
 
         if (syncStore.isOnline) processSyncQueue();
       } catch (error) {
-        set({ error: error instanceof Error ? error.message : "Failed to delete tasks" });
+        set({
+          error:
+            error instanceof Error ? error.message : "Failed to delete tasks",
+        });
       }
     },
 
-    addList: (list) => {
+    addList: async (list) => {
+      const user = useAuthStore.getState().user;
+      if (!user) return;
+
       const newList: TodoList = {
         ...list,
-        id: list.id || generateId(),
+        id: list.id || generateUUID(),
       };
-      
-      set((state) => {
-        const updatedLists = [...state.lists, newList];
-        // Save custom lists to localStorage
-        saveCustomLists(updatedLists);
-        return { lists: updatedLists };
-      });
+
+      set((state) => ({
+        lists: [...state.lists, newList],
+      }));
+
+      if (list.type === "custom") {
+        const welcomeTask: Task = {
+          id: generateUUID(),
+          userId: user.id,
+          title: `Welcome to ${newList.name}!`,
+          completed: false,
+          category: newList.id,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+
+        try {
+          await db.tasks.add(welcomeTask);
+
+          set((state) => ({
+            tasks: [...state.tasks, welcomeTask],
+          }));
+
+          const syncStore = useSimpleSyncStore.getState();
+          syncStore.addToQueue("task", {
+            type: "create",
+            entityId: welcomeTask.id,
+            data: welcomeTask,
+          });
+
+          if (syncStore.isOnline) {
+            processSyncQueue();
+          }
+        } catch (error) {
+          console.error("Failed to create welcome task:", error);
+        }
+      }
     },
 
     deleteList: (listId) => {
-      set((state) => {
-        const updatedLists = state.lists.filter((l) => l.id !== listId && l.type !== "system");
-        // Save custom lists to localStorage
-        saveCustomLists(updatedLists);
-        return {
-          lists: updatedLists,
-          activeListId: state.activeListId === listId ? "all" : state.activeListId,
-        };
-      });
+      set((state) => ({
+        lists: state.lists.filter(
+          (l) => l.id !== listId && l.type !== "system"
+        ),
+        activeListId:
+          state.activeListId === listId ? "all" : state.activeListId,
+      }));
     },
 
     setActiveList: (listId) => {
@@ -313,32 +333,50 @@ export const useTodoStore = create<TodoState>()(
       // Extract categories from tasks
       const taskCategories = new Set<string>();
       localTasks.forEach((task) => {
-        if (task.category && 
-            !SYSTEM_LISTS.some(l => l.id === task.category) &&
-            !DEFAULT_LISTS.some(l => l.id === task.category)) {
+        if (
+          task.category &&
+          !SYSTEM_LISTS.some((l) => l.id === task.category) &&
+          !DEFAULT_LISTS.some((l) => l.id === task.category)
+        ) {
           taskCategories.add(task.category);
         }
       });
 
-      // Load custom lists from localStorage
-      const storedCustomLists = loadCustomLists();
-      
-      // Create lists for categories that exist in tasks but not in stored lists
-      const newCategoryLists: TodoList[] = Array.from(taskCategories)
-        .filter(cat => !storedCustomLists.some(l => l.id === cat.toLowerCase()))
-        .map(cat => ({
-          id: cat.toLowerCase(),
-          name: cat,
-          type: "custom" as const,
-          emoji: "📝",
-        }));
+      const categoryListsMap = new Map<
+        string,
+        { list: TodoList; latestTask: number }
+      >();
 
-      // Merge all lists
-      const allCustomLists = [...storedCustomLists, ...newCategoryLists];
-      
+      localTasks.forEach((task) => {
+        if (
+          task.category &&
+          !SYSTEM_LISTS.some((l) => l.id === task.category) &&
+          !DEFAULT_LISTS.some((l) => l.id === task.category)
+        ) {
+          const existing = categoryListsMap.get(task.category.toLowerCase());
+          const taskTime = task.createdAt || 0;
+
+          if (!existing || taskTime > existing.latestTask) {
+            categoryListsMap.set(task.category.toLowerCase(), {
+              list: {
+                id: task.category.toLowerCase(),
+                name: task.category,
+                type: "custom" as const,
+                emoji: "📝",
+              },
+              latestTask: taskTime,
+            });
+          }
+        }
+      });
+
+      const sortedCategoryLists = Array.from(categoryListsMap.values())
+        .sort((a, b) => b.latestTask - a.latestTask)
+        .map((item) => item.list);
+
       set({
         tasks: localTasks,
-        lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...allCustomLists],
+        lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...sortedCategoryLists],
       });
     },
 
@@ -362,27 +400,23 @@ export const useTodoStore = create<TodoState>()(
           await db.tasks.bulkAdd(serverTasks);
         });
 
-        // Load custom lists from localStorage
-        const storedCustomLists = loadCustomLists();
-        
         // Convert API categories to lists
-        const serverCategoryLists: TodoList[] = apiCategories
-          .filter(cat => !SYSTEM_LISTS.some(l => l.id === cat.toLowerCase()) &&
-                         !DEFAULT_LISTS.some(l => l.id === cat.toLowerCase()) &&
-                         !storedCustomLists.some(l => l.id === cat.toLowerCase()))
-          .map(cat => ({
+        const categoryLists: TodoList[] = apiCategories
+          .filter(
+            (cat) =>
+              !SYSTEM_LISTS.some((l) => l.id === cat.toLowerCase()) &&
+              !DEFAULT_LISTS.some((l) => l.id === cat.toLowerCase())
+          )
+          .map((cat) => ({
             id: cat.toLowerCase(),
             name: cat,
             type: "custom" as const,
             emoji: "📝",
           }));
 
-        // Merge stored custom lists with server categories
-        const allCustomLists = [...storedCustomLists, ...serverCategoryLists];
-
         set({
           tasks: serverTasks,
-          lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...allCustomLists],
+          lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...categoryLists],
         });
 
         syncStore.setSyncing("task", false);
