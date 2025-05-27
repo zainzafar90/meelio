@@ -18,9 +18,6 @@ const SYSTEM_LISTS: TodoList[] = [
   { id: "today", name: "Today", type: "system", emoji: "📅" },
   { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
   { id: "completed", name: "Completed", type: "system", emoji: "✅" },
-];
-
-const DEFAULT_LISTS: TodoList[] = [
   { id: "personal", name: "Personal", type: "custom", emoji: "👤" },
   { id: "work", name: "Work", type: "custom", emoji: "💼" },
 ];
@@ -103,7 +100,7 @@ function startAutoSync() {
 
 export const useTodoStore = create<TodoState>()(
   subscribeWithSelector((set, get) => ({
-    lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS],
+    lists: SYSTEM_LISTS,
     tasks: [],
     activeListId: "today",
     isLoading: false,
@@ -378,8 +375,7 @@ export const useTodoStore = create<TodoState>()(
       localTasks.forEach((task) => {
         if (
           task.category &&
-          !SYSTEM_LISTS.some((l) => l.id === task.category) &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
+          !SYSTEM_LISTS.some((l) => l.id === task.category)
         ) {
           taskCategories.add(task.category);
         }
@@ -393,8 +389,7 @@ export const useTodoStore = create<TodoState>()(
       localTasks.forEach((task) => {
         if (
           task.category &&
-          !SYSTEM_LISTS.some((l) => l.id === task.category) &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
+          !SYSTEM_LISTS.some((l) => l.id === task.category)
         ) {
           const existing = categoryListsMap.get(task.category.toLowerCase());
           const taskTime = task.createdAt || 0;
@@ -419,7 +414,7 @@ export const useTodoStore = create<TodoState>()(
 
       set({
         tasks: localTasks,
-        lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...sortedCategoryLists],
+        lists: [...SYSTEM_LISTS, ...sortedCategoryLists],
       });
     },
 
@@ -448,9 +443,7 @@ export const useTodoStore = create<TodoState>()(
         // Convert API categories to lists
         const categoryLists: TodoList[] = apiCategories
           .filter(
-            (cat) =>
-              !SYSTEM_LISTS.some((l) => l.id === cat.toLowerCase()) &&
-              !DEFAULT_LISTS.some((l) => l.id === cat.toLowerCase())
+            (cat) => !SYSTEM_LISTS.some((l) => l.id === cat.toLowerCase())
           )
           .map((cat) => ({
             id: cat.toLowerCase(),
@@ -461,7 +454,7 @@ export const useTodoStore = create<TodoState>()(
 
         set({
           tasks: serverTasks,
-          lists: [...SYSTEM_LISTS, ...DEFAULT_LISTS, ...categoryLists],
+          lists: [...SYSTEM_LISTS, ...categoryLists],
         });
 
         syncStore.setSyncing("task", false);
