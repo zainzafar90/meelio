@@ -170,6 +170,7 @@ export const WebTimer = () => {
         case 'TICK':
           setIsLoading(false);
           setRemaining(data.remaining);
+          usePomodoroStore.getState().updateTimer(data.remaining);
           break;
         case 'STAGE_COMPLETE':
           completeStage();

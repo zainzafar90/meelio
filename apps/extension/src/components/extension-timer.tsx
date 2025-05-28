@@ -160,6 +160,7 @@ export const ExtensionTimer = () => {
         case 'TICK':
           setIsLoading(false);
           setRemaining(msg.remaining);
+          usePomodoroStore.getState().updateTimer(msg.remaining);
           break;
         case 'STAGE_COMPLETE':
           completeStage();
