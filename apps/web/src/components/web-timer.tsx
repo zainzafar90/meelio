@@ -58,8 +58,8 @@ export const WebTimer = () => {
       const updatedState = usePomodoroStore.getState();
       const updatedLimitStatus = updatedState.getDailyLimitStatus();
       if (updatedLimitStatus.isLimitReached && !dailyLimitStatus.isLimitReached) {
-        toast.success("Daily limit reached", {
-          description: "You've reached your daily focus time limit. It resets at midnight."
+        toast.info("Daily 90-minute limit reached!", {
+          description: "Great work today! Upgrade to Pro for unlimited time."
         });
       }
     }
@@ -95,7 +95,9 @@ export const WebTimer = () => {
 
   const handleStart = () => {
     if (dailyLimitStatus.isLimitReached) {
-      toast.error("Daily limit reached. Upgrade to Pro to continue.");
+      toast.info("Daily 90-minute limit reached!", {
+        description: "Great work today! Upgrade to Pro for unlimited time."
+      });
       return;
     }
 
@@ -124,7 +126,9 @@ export const WebTimer = () => {
 
   const handleResume = () => {
     if (dailyLimitStatus.isLimitReached) {
-      toast.error("Daily limit reached. Upgrade to Pro to continue.");
+      toast.info("Daily 90-minute limit reached!", {
+        description: "Great work today! Upgrade to Pro for unlimited time."
+      });
       return;
     }
 

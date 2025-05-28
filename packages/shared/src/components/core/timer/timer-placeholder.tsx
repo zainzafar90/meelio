@@ -13,7 +13,7 @@ export const TimerPlaceholder = ({
 }: TimerPlaceholderProps) => {
   return (
     <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-      <div className="p-6 space-y-10">
+      <div className="p-6 space-y-6">
         {/* Timer Mode Tabs */}
         <div className="w-full">
           <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
@@ -43,8 +43,13 @@ export const TimerPlaceholder = ({
           <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
             <TimerSkeletonDisplay />
           </div>
-          <div className="text-sm text-amber-400 font-medium">
-            Daily 90-minute limit reached
+          <div className="flex flex-col items-center gap-1 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+            <div className="text-sm text-amber-400 font-medium">
+              Daily 90-minute limit reached
+            </div>
+            <div className="text-xs text-amber-400/80">
+              Resets at midnight or upgrade to Pro
+            </div>
           </div>
         </div>
 
@@ -97,7 +102,7 @@ export const TimerPlaceholder = ({
           {/* Progress Bar */}
           <div className="h-1.5 bg-gray-200/20 rounded-full">
             <div
-              className="h-full bg-amber-700 rounded-full transition-all w-full"
+              className="h-full bg-gray-200/20 rounded-full transition-all w-full"
               role="progressbar"
               aria-valuenow={100}
               aria-valuemin={0}
