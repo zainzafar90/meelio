@@ -86,6 +86,7 @@ export * from "./core/timer/components/timer-stats";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-settings.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
+export * from "./core/timer/timer-placeholder";
 
 // Todos
 export * from "./core/todo-list/components/create-list";

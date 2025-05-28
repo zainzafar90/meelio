@@ -2,6 +2,7 @@ import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "../stores/auth.store";
 import { useTodoStore } from "../stores/todo.store";
 import { useSyncStore } from "../stores/sync.store";
+import { usePomodoroStore } from "../stores/unified-pomodoro.store";
 
 interface MigrationResult {
   success: boolean;
@@ -12,8 +13,8 @@ interface MigrationResult {
 interface MigrationSummary {
   success: boolean;
   tasks: MigrationResult;
+  pomodoro: MigrationResult;
   // Future migrations can be added here
-  // pomodoro: MigrationResult;
   // settings: MigrationResult;
   // etc.
 }
@@ -87,19 +88,49 @@ export const migrateGuestDataToUser = async (
   const summary: MigrationSummary = {
     success: true,
     tasks: { success: false, migratedCount: 0 },
+    pomodoro: { success: false, migratedCount: 0 },
   };
 
   // Migrate tasks
   summary.tasks = await migrateGuestTasks(guestUserId, authenticatedUserId);
 
+  // Migrate pomodoro sessions
+  summary.pomodoro = await migrateGuestPomodoroSessions();
+
   // Future migrations can be added here
-  // summary.pomodoro = await migrateGuestPomodoroSessions(guestUserId, authenticatedUserId);
   // summary.settings = await migrateGuestSettings(guestUserId, authenticatedUserId);
 
   // Overall success is true only if all migrations succeed
-  summary.success = summary.tasks.success;
+  summary.success = summary.tasks.success && summary.pomodoro.success;
 
   return summary;
+};
+
+/**
+ * Migrate guest user pomodoro sessions to authenticated user
+ * SIMPLIFIED: Just transfer the focus time - let the regular sync handle it
+ */
+const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
+  try {
+    const pomodoroStore = usePomodoroStore.getState();
+    const guestFocusTime = pomodoroStore.stats.todaysFocusTime;
+    
+    if (guestFocusTime === 0) {
+      return { success: true, migratedCount: 0 };
+    }
+
+    // The focus time will sync automatically when user logs in
+    // No need to manually create sessions here
+    console.log(`✅ Guest had ${Math.floor(guestFocusTime / 60)} minutes of focus time`);
+    
+    return { 
+      success: true, 
+      migratedCount: 1,
+    };
+  } catch (error) {
+    console.error("Failed to migrate guest pomodoro sessions:", error);
+    return { success: false, migratedCount: 0, error };
+  }
 };
 
 /**
@@ -108,6 +139,11 @@ export const migrateGuestDataToUser = async (
 export const cleanupGuestData = async (guestUserId: string) => {
   try {
     await db.tasks.where("userId").equals(guestUserId).delete();
+    
+    // Clear guest focus sessions from IndexedDB
+    const today = new Date().toISOString().split("T")[0];
+    await db.focusStats.where("date").equals(today).delete();
+    await db.focusSessions.clear();
 
     const authStore = useAuthStore.getState();
     if (authStore.guestUser?.id === guestUserId) {

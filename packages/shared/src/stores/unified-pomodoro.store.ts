@@ -46,6 +46,13 @@ interface PomodoroStateWithSync extends PomodoroState {
   trackFocusTime: (currentRemaining: number) => void;
   syncFocusTime: () => Promise<void>;
   saveFocusTimeIncrement: (elapsedSeconds: number) => Promise<void>;
+
+  // Daily limit checking - simplified
+  getDailyLimitStatus: () => {
+    isLimitReached: boolean;
+    remainingTime: number;
+    isProUser: boolean;
+  };
 }
 
 export const usePomodoroStore = create(
@@ -72,6 +79,7 @@ export const usePomodoroStore = create(
         pausedRemaining: null,
         lastUpdated: Date.now(),
         lastFocusTrackTime: 0,
+        dailyFocusLimit: 90 * 60, // 90 minutes daily limit for free users
 
         // Timer control methods
         startTimer: () => {
@@ -280,6 +288,7 @@ export const usePomodoroStore = create(
         completeSession: async () => {
           const state = get();
           const syncStore = useSyncStore.getState();
+          const authState = useAuthStore.getState();
 
           const sessionId = generateUUID();
           const session = {
@@ -308,14 +317,16 @@ export const usePomodoroStore = create(
 
           set({ stats: newStats });
 
-          syncStore.addToQueue("pomodoro", {
-            type: "create",
-            entityId: sessionId,
-            data: session,
-          });
+          if (authState.user) {
+            syncStore.addToQueue("pomodoro", {
+              type: "create",
+              entityId: sessionId,
+              data: session,
+            });
 
-          if (syncStore.isOnline) {
-            get().syncSessions();
+            if (syncStore.isOnline) {
+              get().syncSessions();
+            }
           }
         },
 
@@ -409,7 +420,6 @@ export const usePomodoroStore = create(
           try {
             await addFocusTimeMinute();
 
-            // Queue for sync (only for authenticated users)
             const authState = useAuthStore.getState();
             if (authState.user) {
               const syncStore = useSyncStore.getState();
@@ -472,9 +482,6 @@ export const usePomodoroStore = create(
                   duration: Math.floor(totalFocusTime / 60), // Convert to minutes
                 });
 
-                console.log("✅ Focus session created successfully");
-
-                // Remove processed operations
                 queue.forEach((op) => {
                   if (op.data?.date === date) {
                     syncStore.removeFromQueue("focus-time", op.id);
@@ -493,6 +500,31 @@ export const usePomodoroStore = create(
           } finally {
             syncStore.setSyncing("focus-time", false);
           }
+        },
+
+        getDailyLimitStatus: () => {
+          const state = get();
+          const authState = useAuthStore.getState();
+          const user = authState.user || authState.guestUser;
+
+          // Pro users have no limit
+          if (user && authState.user?.isPro) {
+            return {
+              isLimitReached: false,
+              remainingTime: Infinity,
+              isProUser: true,
+            };
+          }
+
+          const dailyLimit = 90 * 60;
+          const todaysFocusTime = state.stats.todaysFocusTime;
+          const remainingTime = Math.max(0, dailyLimit - todaysFocusTime);
+
+          return {
+            isLimitReached: todaysFocusTime >= dailyLimit,
+            remainingTime,
+            isProUser: false,
+          };
         },
       };
     }),
@@ -544,3 +576,21 @@ useAuthStore.subscribe((state) => {
     store.resetTimer();
   }
 });
+
+if (typeof window !== "undefined") {
+  const checkDailyReset = () => {
+    const now = new Date();
+    const todayString = now.toISOString().split("T")[0];
+    const lastResetDate = localStorage.getItem("meelio:lastDailyReset");
+
+    if (lastResetDate !== todayString) {
+      const store = usePomodoroStore.getState();
+      store.loadTodayStats();
+      localStorage.setItem("meelio:lastDailyReset", todayString);
+    }
+  };
+
+  checkDailyReset();
+
+  setInterval(checkDailyReset, 60 * 1000);
+}

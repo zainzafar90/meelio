@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons,  TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog } from "@repo/shared";
+import { toast } from "sonner";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  PremiumFeature, TimerPlaceholder } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
+import { Crown } from "lucide-react";
 
 import TimerWorker from '../workers/timer-worker?worker';
-
 
 export const WebTimer = () => {
   const workerRef = useRef<Worker>();
@@ -17,11 +18,13 @@ export const WebTimer = () => {
     endTimestamp,
     stageDurations,
     autoStartTimers,
+    getDailyLimitStatus,
   } = usePomodoroStore();
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
+  const dailyLimitStatus = getDailyLimitStatus();
 
   const completeStage = async () => {
     const state = usePomodoroStore.getState();
@@ -50,6 +53,17 @@ export const WebTimer = () => {
       lastUpdated: Date.now()
     });
 
+    // Check if daily limit was reached after this focus session
+    if (isFocus) {
+      const updatedState = usePomodoroStore.getState();
+      const updatedLimitStatus = updatedState.getDailyLimitStatus();
+      if (updatedLimitStatus.isLimitReached && !dailyLimitStatus.isLimitReached) {
+        toast.success("Daily limit reached", {
+          description: "You've reached your daily focus time limit. It resets at midnight."
+        });
+      }
+    }
+
     if (nextStage !== completedStage) {
       workerRef.current?.postMessage({
         type: 'UPDATE_DURATION',
@@ -57,7 +71,6 @@ export const WebTimer = () => {
       });
     }
 
-    // Create a session object to store in IndexedDB
     const sessionData = {
       timestamp: Date.now(),
       stage: completedStage,
@@ -66,13 +79,7 @@ export const WebTimer = () => {
     };
 
     try {
-        await addPomodoroSession(sessionData);
-      
-      if (isFocus) {
-        // TODO: Add focus session tracking when needed
-      }
-      
-      // Add summary stats
+      await addPomodoroSession(sessionData);
       await addPomodoroSummary(state.stageDurations[completedStage], completedStage);
     } catch (error) {
       console.error("Failed to record session:", error);
@@ -87,6 +94,11 @@ export const WebTimer = () => {
   };
 
   const handleStart = () => {
+    if (dailyLimitStatus.isLimitReached) {
+      toast.error("Daily limit reached. Upgrade to Pro to continue.");
+      return;
+    }
+
     setHasStarted(true);
     const duration = usePomodoroStore.getState().stageDurations[activeStage];
     workerRef.current?.postMessage({
@@ -111,6 +123,11 @@ export const WebTimer = () => {
   };
 
   const handleResume = () => {
+    if (dailyLimitStatus.isLimitReached) {
+      toast.error("Daily limit reached. Upgrade to Pro to continue.");
+      return;
+    }
+
     usePomodoroStore.setState({
       isRunning: true,
       endTimestamp: Date.now() + remaining * 1000,
@@ -223,97 +240,182 @@ export const WebTimer = () => {
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
+  // Auto-pause timer when daily limit is reached
+  useEffect(() => {
+    if (isRunning && dailyLimitStatus.isLimitReached) {
+      handlePause();
+      toast.info("Daily 90-minute limit reached!", {
+        description: "Great work today! Upgrade to Pro for unlimited time."
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dailyLimitStatus.isLimitReached, isRunning]);
+
   return (
     <div className="relative">
-      <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-        <div className="p-6 space-y-10">
-          {/* Timer Mode Tabs */}
-          <div className="w-full">
-            <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
-              <button
-                onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
+       <PremiumFeature
+          requirePro={dailyLimitStatus.isLimitReached}
+          fallback={
+            <TimerPlaceholder activeStage={activeStage} />
+          }
+        >
+
+        <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+          <div className="p-6 space-y-10">
+            {/* Timer Mode Tabs */}
+            <div className="w-full">
+              <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
+                <button
+                  onClick={() => {
+                    if (dailyLimitStatus.isLimitReached) {
+                      return;
+                    }
+                    handleSwitch();
+                  }}
+                  disabled={dailyLimitStatus.isLimitReached}
+                  className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                    activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
+                  } ${
+                    dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-              >
-                <span>Focus</span>
-              </button>
-              <button
-                onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
+                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Focus mode"}
+                >
+                  <span>Focus</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (dailyLimitStatus.isLimitReached) {
+                      return;
+                    }
+                    if (activeStage === PomodoroStage.Focus) {
+                      handleSwitch();
+                    }
+                  }}
+                  disabled={activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached}
+                  className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                    activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
+                  } ${
+                    activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-              >
-                <span>Break</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Timer Display */}
-          <div className="text-center space-y-4">
-            <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
-              {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {/* Control Buttons */}
-            <div className="flex items-center justify-between gap-4">
-              <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleReset}
-                title="Reset timer"
-                role="button"
-              >
-                <Icons.resetTimer className="size-4 text-white/90" />
-                <span className="sr-only">Reset timer</span>
-              </button>
-
-              <button
-                className="cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
-                onClick={isRunning ? handlePause : hasStarted ? handleResume : handleStart}
-                title="Switch timer"
-                role="button"
-              >
-                {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}</span>
-              </button>
-
-              <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleSkipToNextStage}
-                title="Skip to next timer"
-                role="button"
-              >
-                <Icons.forward className="size-4 text-white/90" />
-                <span className="sr-only">Skip to next timer</span>
-              </button>
-
-              <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={toggleStatsDialog}
-                title="Stats"
-                role="button"
-              >
-                <Icons.graph className="size-4 text-white/90" />
-                <span className="sr-only">Stats</span>
-              </button>
+                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Break mode"}
+                >
+                  <span>Break</span>
+                </button>
+              </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="h-1.5 bg-gray-200/20 rounded-full">
-              <div
-                className="h-full bg-gray-100 rounded-full transition-all"
-                style={{
-                  width: `${(remaining / stageDurations[activeStage]) * 100}%`
-                }}
-                role="progressbar"
-                aria-valuenow={(remaining / stageDurations[activeStage]) * 100}
-                aria-valuemin={0}
-                aria-valuemax={100}
-              />
+            {/* Timer Display */}
+            <div className="text-center space-y-4">
+              <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+                {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
+              </div>
+              
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {/* Control Buttons */}
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  className={`cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm ${
+                    dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  onClick={() => {
+                    if (dailyLimitStatus.isLimitReached) {
+                      return;
+                    }
+                    handleReset();
+                  }}
+                  disabled={dailyLimitStatus.isLimitReached}
+                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Reset timer"}
+                  role="button"
+                >
+                  <Icons.resetTimer className="size-4 text-white/90" />
+                  <span className="sr-only">Reset timer</span>
+                </button>
+
+                <button
+                  className={`cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm ${
+                    dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  onClick={() => {
+                    if (dailyLimitStatus.isLimitReached) {
+                      return;
+                    }
+                    
+                    if (isRunning) {
+                      handlePause();
+                    } else if (hasStarted) {
+                      handleResume();
+                    } else {
+                      handleStart();
+                    }
+                  }}
+                  disabled={dailyLimitStatus.isLimitReached}
+                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Start/Stop timer"}
+                  role="button"
+                >
+                  {dailyLimitStatus.isLimitReached ? (
+                    <>
+                      <Crown className="size-4" />
+                      <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">Upgrade</span>
+                    </>
+                  ) : (
+                    <>
+                      {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
+                      <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">
+                        {isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}
+                      </span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  className={`cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm ${
+                    dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  onClick={() => {
+                    if (dailyLimitStatus.isLimitReached) {
+                      return;
+                    }
+                    handleSkipToNextStage();
+                  }}
+                  disabled={dailyLimitStatus.isLimitReached}
+                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Skip to next stage"}
+                  role="button"
+                >
+                  <Icons.forward className="size-4 text-white/90" />
+                  <span className="sr-only">Skip to next timer</span>
+                </button>
+
+                <button
+                  className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                  onClick={toggleStatsDialog}
+                  title="Stats"
+                  role="button"
+                >
+                  <Icons.graph className="size-4 text-white/90" />
+                  <span className="sr-only">Stats</span>
+                </button>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="h-1.5 bg-gray-200/20 rounded-full">
+                <div
+                  className="h-full bg-gray-100 rounded-full transition-all"
+                  style={{
+                    width: `${(remaining / stageDurations[activeStage]) * 100}%`
+                  }}
+                  role="progressbar"
+                  aria-valuenow={(remaining / stageDurations[activeStage]) * 100}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+      </PremiumFeature>
 
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}
@@ -324,7 +426,7 @@ export const WebTimer = () => {
       <TimerSettingsDialog
         isOpen={isSettingsDialogOpen}
         onClose={toggleSettingsDialog}
-      /> 
+      />
     </div>
   );
 };

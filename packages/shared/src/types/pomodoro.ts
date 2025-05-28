@@ -57,4 +57,5 @@ export interface PomodoroState {
   autoStartTimers: boolean;
   enableSound: boolean;
   pausedRemaining: number | null;
+  dailyFocusLimit: number; // in minutes
 }
