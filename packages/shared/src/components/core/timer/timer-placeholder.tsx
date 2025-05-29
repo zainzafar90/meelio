@@ -44,10 +44,10 @@ export const TimerPlaceholder = ({
             <TimerSkeletonDisplay />
           </div>
           <div className="flex flex-col items-center gap-1 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
-            <div className="text-sm text-amber-400 font-medium">
+            <div className="text-sm text-white font-medium">
               Daily 90-minute limit reached
             </div>
-            <div className="text-xs text-amber-400/80">
+            <div className="text-xs text-white/80">
               Resets at midnight or upgrade to Pro
             </div>
           </div>
@@ -57,7 +57,7 @@ export const TimerPlaceholder = ({
           {/* Control Buttons */}
           <div className="flex items-center justify-between gap-4">
             <button
-              className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
+              className="relative  hidden md:flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
               title="Daily limit reached"
               role="button"
@@ -79,7 +79,7 @@ export const TimerPlaceholder = ({
             </button>
 
             <button
-              className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
+              className="relative hidden md:flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
               title="Daily limit reached"
               role="button"
@@ -89,7 +89,7 @@ export const TimerPlaceholder = ({
             </button>
 
             <button
-              className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
+              className="relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
               title="Daily limit reached"
               role="button"
