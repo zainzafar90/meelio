@@ -105,19 +105,13 @@ export const useBackgroundStore = create<BackgroundState>()(
 
         set((state) => ({
           currentWallpaper: wallpaper,
-          wallpapers: state.wallpapers.map((wp) => ({
-            ...wp,
-            isFavourite: wp.id === wallpaper.id,
-          })),
+          wallpapers: state.wallpapers,
         }));
       },
       resetToDefault: () =>
         set({
           currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
-          wallpapers: DEFAULT_WALLPAPERS.map((wp) => ({
-            ...wp,
-            isFavourite: wp.id === CURRENT_DEFAULT_WALLPAPER.id,
-          })),
+          wallpapers: DEFAULT_WALLPAPERS,
         }),
     }),
     {
