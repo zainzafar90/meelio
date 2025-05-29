@@ -591,6 +591,4 @@ if (typeof window !== "undefined") {
   };
 
   checkDailyReset();
-
-  setInterval(checkDailyReset, 60 * 1000);
 }
