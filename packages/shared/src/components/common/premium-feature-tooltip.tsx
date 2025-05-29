@@ -106,14 +106,14 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
                       onGuestContinue={() => setShowAuthForm(false)}
                       mode="inverted"
                     />
+                    <Button
+                      className="w-full mt-4 bg-white text-gray-900 hover:bg-gray-100 hover:text-gray-900"
+                      variant="outline"
+                      onClick={() => setShowAuthForm(false)}
+                    >
+                      Back to Plans
+                    </Button>
                   </div>
-                  <Button
-                    className="w-full mt-4 bg-white text-gray-900 hover:bg-gray-100 hover:text-gray-900"
-                    variant="outline"
-                    onClick={() => setShowAuthForm(false)}
-                  >
-                    Back to Plans
-                  </Button>
                 </div>
               ) : (
                 <PricingSection
