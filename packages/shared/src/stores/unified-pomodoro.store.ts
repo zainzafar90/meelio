@@ -516,7 +516,7 @@ export const usePomodoroStore = create(
             };
           }
 
-          const dailyLimit = 90 * 60;
+          const dailyLimit = state.dailyFocusLimit;
           const todaysFocusTime = state.stats.todaysFocusTime;
           const remainingTime = Math.max(0, dailyLimit - todaysFocusTime);
 
@@ -578,17 +578,37 @@ useAuthStore.subscribe((state) => {
 });
 
 if (typeof window !== "undefined") {
-  const checkDailyReset = () => {
+  const checkPeriodicReset = () => {
     const now = new Date();
     const todayString = now.toISOString().split("T")[0];
     const lastResetDate = localStorage.getItem("meelio:lastDailyReset");
+    const state = usePomodoroStore.getState();
 
-    if (lastResetDate !== todayString) {
-      const store = usePomodoroStore.getState();
-      store.loadTodayStats();
+    if (
+      lastResetDate !== todayString &&
+      state.getDailyLimitStatus().isLimitReached
+    ) {
+      // Reset stats to zero instead of loading from database
+      usePomodoroStore.setState({
+        stats: {
+          todaysFocusSessions: 0,
+          todaysBreaks: 0,
+          todaysFocusTime: 0,
+          todaysBreakTime: 0,
+        },
+        sessionCount: 0,
+      });
+
+      state.resetTimer();
+      state.trackFocusTime(0);
+      state.loadTodayStats();
       localStorage.setItem("meelio:lastDailyReset", todayString);
+
+      toast.success("Daily focus time reset");
     }
   };
 
-  checkDailyReset();
+  checkPeriodicReset();
+
+  setInterval(checkPeriodicReset, 2 * 10 * 1000);
 }

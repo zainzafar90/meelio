@@ -12,6 +12,7 @@ export type AuthState = {
   authenticate: (user: AuthUser) => void;
   authenticateGuest: (user: GuestUser) => void;
   logout: () => void;
+  logoutUser: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 };
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
           loading: false,
         })),
       logout: () => set(() => ({ user: null, guestUser: null })),
+      logoutUser: () => set(() => ({ user: null })),
     }),
     {
       name: "meelio:local:user",

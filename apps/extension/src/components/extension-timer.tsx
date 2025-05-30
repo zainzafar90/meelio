@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog, PremiumFeature, TimerPlaceholder } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog, ConditionalFeature, TimerPlaceholder } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
@@ -16,6 +16,8 @@ export const ExtensionTimer = () => {
     stageDurations,
     autoStartTimers,
     getDailyLimitStatus,
+    stats,
+    sessionCount,
   } = usePomodoroStore();
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -246,10 +248,24 @@ export const ExtensionTimer = () => {
   }, [dailyLimitStatus.isLimitReached, isRunning]);
 
 
+  useEffect(() => {
+    if (!isRunning && !hasStarted) {
+      setRemaining(stageDurations[activeStage]);
+    }
+  }, [activeStage, stageDurations, isRunning, hasStarted]);
+
+  useEffect(() => {
+    if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
+      setHasStarted(false);
+      setRemaining(stageDurations[activeStage]);
+      chrome.runtime.sendMessage({ type: 'RESET' });
+    }
+  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
+
   return (
     <div className="relative">
-      <PremiumFeature
-        requirePro={dailyLimitStatus.isLimitReached}
+      <ConditionalFeature
+        showFallback={dailyLimitStatus.isLimitReached}
         fallback={
           <TimerPlaceholder activeStage={activeStage} />
         }
@@ -328,7 +344,7 @@ export const ExtensionTimer = () => {
 
               <button
                 className={`cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm ${
-                  dailyLimitStatus.isLimitReached ? 'cursor-not-allowed from-amber-700 to-amber-900' : ''
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 onClick={() => {
                   if (dailyLimitStatus.isLimitReached) {
@@ -350,12 +366,14 @@ export const ExtensionTimer = () => {
                 {dailyLimitStatus.isLimitReached ? (
                   <>
                     <Crown className="size-4" />
-                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">Upgrade to Pro</span>
+                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">Upgrade</span>
                   </>
                 ) : (
                   <>
                     {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}</span>
+                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">
+                      {isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}
+                    </span>
                   </>
                 )}
               </button>
@@ -403,9 +421,9 @@ export const ExtensionTimer = () => {
               />
             </div>
           </div>
+          </div>
         </div>
-      </div>
-      </PremiumFeature>
+      </ConditionalFeature>
 
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}

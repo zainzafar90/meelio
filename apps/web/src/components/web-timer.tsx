@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  PremiumFeature, TimerPlaceholder } from "@repo/shared";
+import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  ConditionalFeature, TimerPlaceholder } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
@@ -19,12 +19,15 @@ export const WebTimer = () => {
     stageDurations,
     autoStartTimers,
     getDailyLimitStatus,
+    stats,
+    sessionCount,
   } = usePomodoroStore();
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
   const dailyLimitStatus = getDailyLimitStatus();
+
 
   const completeStage = async () => {
     const state = usePomodoroStore.getState();
@@ -255,10 +258,25 @@ export const WebTimer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyLimitStatus.isLimitReached, isRunning]);
 
+
+  useEffect(() => {
+    if (!isRunning && !hasStarted) {
+      setRemaining(stageDurations[activeStage]);
+    }
+  }, [activeStage, stageDurations, isRunning, hasStarted]);
+
+  useEffect(() => {
+    if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
+      setHasStarted(false);
+      setRemaining(stageDurations[activeStage]);
+      workerRef.current?.postMessage({ type: 'RESET' });
+    }
+  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
+
   return (
     <div className="relative">
-       <PremiumFeature
-          requirePro={dailyLimitStatus.isLimitReached}
+       <ConditionalFeature
+          showFallback={dailyLimitStatus.isLimitReached}
           fallback={
             <TimerPlaceholder activeStage={activeStage} />
           }
@@ -419,7 +437,7 @@ export const WebTimer = () => {
           </div>
         </div>
 
-      </PremiumFeature>
+      </ConditionalFeature>
 
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}

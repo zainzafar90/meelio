@@ -16,6 +16,23 @@ interface PremiumFeatureProps {
   features?: string[];
 }
 
+interface ConditionalFeatureProps {
+  children: React.ReactNode;
+  fallback: React.ReactNode;
+  showFallback: boolean;
+}
+
+/**
+ * A simple conditional component that shows fallback when condition is true, children when false
+ */
+export const ConditionalFeature: React.FC<ConditionalFeatureProps> = ({
+  children,
+  fallback,
+  showFallback,
+}) => {
+  return showFallback ? <>{fallback}</> : <>{children}</>;
+};
+
 /**
  * A component that wraps premium features and blocks access if the user is not authenticated
  * or doesn't have a premium subscription.

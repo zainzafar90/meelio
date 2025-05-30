@@ -1,6 +1,7 @@
 import Axios from "axios";
 
 import { env } from "../utils/env.utils";
+import { useAuthStore } from "../stores/auth.store";
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +26,8 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Show something when user isn't authenticated in the middle of a task
+      // Reset only the authenticated user, keep guest user intact
+      useAuthStore.getState().logoutUser();
     }
     return Promise.reject(error);
   }
