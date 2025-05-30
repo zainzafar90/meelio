@@ -56,6 +56,10 @@ export const WebTimer = () => {
       lastUpdated: Date.now()
     });
 
+    // Play completion sound and show notification
+    state.playCompletionSound();
+    state.showCompletionNotification(completedStage);
+
     // Check if daily limit was reached after this focus session
     if (isFocus) {
       const updatedState = usePomodoroStore.getState();
@@ -96,12 +100,18 @@ export const WebTimer = () => {
     return PomodoroStage.Focus;
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (dailyLimitStatus.isLimitReached) {
       toast.info("Daily 90-minute limit reached!", {
         description: "Great work today! Upgrade to Pro for unlimited time."
       });
       return;
+    }
+
+    // Request notification permission on first start
+    const state = usePomodoroStore.getState();
+    if (state.enableSound && Notification.permission === "default") {
+      await state.requestNotificationPermission();
     }
 
     setHasStarted(true);

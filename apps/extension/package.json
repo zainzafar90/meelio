@@ -112,7 +112,8 @@
       "https://*/*"
     ],
     "permissions": [
-      "storage"
+      "storage",
+      "notifications"
     ],
     "optional_permissions": [
       "tabs"

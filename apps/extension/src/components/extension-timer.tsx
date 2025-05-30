@@ -52,6 +52,10 @@ export const ExtensionTimer = () => {
       lastUpdated: Date.now()
     });
 
+    // Play completion sound and show notification
+    state.playCompletionSound();
+    state.showCompletionNotification(completedStage);
+
      // Check if daily limit was reached after this focus session
      if (isFocus) {
       const updatedState = usePomodoroStore.getState();

@@ -14,7 +14,7 @@ import { useAuthStore } from "./auth.store";
 import { api } from "../api";
 import * as focusSessionsApi from "../api/focus-sessions.api";
 import { PomodoroSettings } from "../types/auth";
-import { DEFAULT_SETTINGS } from "../data";
+import { DEFAULT_SETTINGS, pomodoroSounds } from "../data";
 import { toast } from "sonner";
 
 const isExtension = useAppStore.getState().platform === "extension";
@@ -32,6 +32,8 @@ interface PomodoroStateWithSync extends PomodoroState {
   toggleAutoStartBreaks: () => Promise<void>;
   setTimerDuration: (duration: number) => void;
   toggleTimerSound: () => Promise<void>;
+  updateNotificationSoundId: (soundId: string) => Promise<void>;
+  updateNotificationEnabled: (enabled: boolean) => void;
   isTimerRunning: () => boolean;
 
   // Sync methods
@@ -53,6 +55,12 @@ interface PomodoroStateWithSync extends PomodoroState {
     remainingTime: number;
     isProUser: boolean;
   };
+
+  // Notification and sound methods
+  playCompletionSound: () => void;
+  setNotificationSoundEnabled: (enabled: boolean) => void;
+  showCompletionNotification: (stage: PomodoroStage) => void;
+  requestNotificationPermission: () => Promise<boolean>;
 }
 
 export const usePomodoroStore = create(
@@ -76,6 +84,9 @@ export const usePomodoroStore = create(
         },
         autoStartTimers: true,
         enableSound: false,
+        notificationSoundId: "timeout-1-back-chime",
+        notificationEnabled: false,
+        notificationSoundEnabled: false,
         pausedRemaining: null,
         lastUpdated: Date.now(),
         lastFocusTrackTime: 0,
@@ -108,7 +119,7 @@ export const usePomodoroStore = create(
 
         resetTimer: () => {
           get().trackFocusTime(0);
-          set((state) => ({
+          set(() => ({
             isRunning: false,
             activeStage: PomodoroStage.Focus,
             sessionCount: 0,
@@ -283,6 +294,14 @@ export const usePomodoroStore = create(
           }
         },
 
+        updateNotificationSoundId: async (soundId: string) => {
+          set({ notificationSoundId: soundId });
+        },
+
+        updateNotificationEnabled: (enabled: boolean) => {
+          set({ notificationEnabled: enabled });
+        },
+
         isTimerRunning: () => get().isRunning,
 
         completeSession: async () => {
@@ -406,6 +425,8 @@ export const usePomodoroStore = create(
             stageDurations: state.stageDurations,
             autoStartTimers: state.autoStartTimers,
             enableSound: state.enableSound,
+            notificationSoundId: state.notificationSoundId,
+            notificationSoundEnabled: state.notificationSoundEnabled,
             sessionCount: state.sessionCount,
             stats: state.stats,
           });
@@ -526,6 +547,79 @@ export const usePomodoroStore = create(
             isProUser: false,
           };
         },
+
+        playCompletionSound: () => {
+          const state = get();
+
+          if (!state.notificationSoundEnabled) return;
+
+          try {
+            const sound = pomodoroSounds.find(
+              (sound) => sound.id === state.notificationSoundId
+            );
+
+            if (!sound) return;
+
+            const audio = new Audio(sound.url);
+            audio.volume = 0.5;
+            audio.play().catch((error) => {
+              console.error("Failed to play timer sound:", error);
+            });
+          } catch (error) {
+            console.error("Error playing completion sound:", error);
+          }
+        },
+
+        setNotificationSoundEnabled: (enabled: boolean) => {
+          set({ notificationSoundEnabled: enabled });
+        },
+
+        showCompletionNotification: (stage: PomodoroStage) => {
+          const useChrome =
+            isExtension && typeof chrome?.notifications !== "undefined";
+
+          const title =
+            stage === PomodoroStage.Focus
+              ? "Focus session complete! 🎯"
+              : "Break time is over! ☕";
+          const body =
+            stage === PomodoroStage.Focus
+              ? "Great work! Time for a break."
+              : "Ready to focus again?";
+
+          if (useChrome) {
+            chrome.notifications.create({
+              type: "basic",
+              title,
+              message: body,
+              iconUrl: chrome.runtime.getURL("public/icon.png"),
+              silent: true,
+            });
+          } else if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            const n = new Notification(title, {
+              body,
+              icon: "/icon.png",
+              badge: "/icon.png",
+              requireInteraction: false,
+              silent: true,
+            });
+            setTimeout(() => n.close(), 5000);
+          }
+        },
+
+        requestNotificationPermission: async () => {
+          if ("Notification" in window) {
+            if (Notification.permission === "default") {
+              const permission = await Notification.requestPermission();
+              return permission === "granted";
+            }
+            return Notification.permission === "granted";
+          }
+          return false;
+        },
       };
     }),
     {
@@ -542,6 +636,8 @@ export const usePomodoroStore = create(
               isRunning: state.isRunning,
               autoStartTimers: state.autoStartTimers,
               endTimestamp: state.endTimestamp,
+              notificationSoundId: state.notificationSoundId,
+              notificationSoundEnabled: state.notificationSoundEnabled,
             }),
           }
         : {}),

@@ -4,6 +4,7 @@ import { getAssetPath } from "../utils/path.utils";
 
 const SOUND_FILES_EXTENSION = ".mp3";
 const SOUND_FILES_BASE_URL = getAssetPath("/public/sounds/yT3sxTz");
+const POMODORO_SOUNDS_BASE_URL = getAssetPath("/public/sounds/pomodoro");
 
 export const allSounds: Sound[] = [
   {
@@ -261,5 +262,32 @@ export const allSounds: Sound[] = [
     name: "Water Stream",
     url: `${SOUND_FILES_BASE_URL}/water-stream/water-stream${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.waterStream,
+  },
+];
+
+export const pomodoroSounds: {
+  id: string;
+  name: string;
+  url: string;
+}[] = [
+  {
+    id: "timeout-1-back-chime",
+    name: "Back Chime",
+    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-1-back-chime${SOUND_FILES_EXTENSION}`,
+  },
+  {
+    id: "timeout-2-bell-chime",
+    name: "Bell Chime",
+    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-2-bell-chime${SOUND_FILES_EXTENSION}`,
+  },
+  {
+    id: "timeout-3-forward-single-chime",
+    name: "Forward Single Chime",
+    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-3-forward-single-chime${SOUND_FILES_EXTENSION}`,
+  },
+  {
+    id: "timeout-4-beep",
+    name: "Beep",
+    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-4-beep/timeout-4-beep${SOUND_FILES_EXTENSION}`,
   },
 ];

@@ -6,6 +6,9 @@ export const pomodoroSettingsSchema = z.object({
   autoStart: z.boolean().default(false),
   autoBlock: z.boolean().default(false),
   soundOn: z.boolean().default(true),
+  notificationSoundId: z.string().optional(),
+  notificationEnabled: z.boolean().default(false),
+  notificationSoundEnabled: z.boolean().default(false),
   dailyFocusLimit: z.number().min(0).max(1440).default(120),
 });
 

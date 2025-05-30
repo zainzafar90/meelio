@@ -6,6 +6,8 @@ export interface PomodoroSettings {
   autoStart: boolean;
   autoBlock: boolean;
   soundOn: boolean;
+  notificationSoundId?: string;
+  notificationSoundEnabled: boolean;
   dailyFocusLimit: number;
 }
 

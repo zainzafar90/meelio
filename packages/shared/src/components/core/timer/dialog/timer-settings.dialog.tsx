@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@repo/ui/components/ui/button";
+import { Volume2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,15 @@ import { POMODORO_MAX_MINUTES } from "../../../../utils/common.utils";
 
 import { ResetTimerDialog } from "./reset-timer.dialog";
 import { useAuthStore } from "../../../../stores/auth.store";
+import { useAppStore } from "../../../../stores/app.store";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
+import { pomodoroSounds } from "../../../../data/sounds-data";
 
 const timerSettingsSchema = z.object({
   workTime: z.number().min(1).max(POMODORO_MAX_MINUTES),
@@ -38,13 +48,20 @@ export const TimerSettingsDialog = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
+  const isExtension = useAppStore.getState().platform === "extension";
   const {
     stageDurations,
     autoStartTimers,
     enableSound,
+    notificationSoundId,
+    notificationEnabled,
+    notificationSoundEnabled,
     resetTimer,
     toggleAutoStartBreaks,
     toggleTimerSound,
+    updateNotificationSoundId,
+    updateNotificationEnabled,
+    setNotificationSoundEnabled,
     changeTimerSettings,
     reinitializeTimer,
   } = usePomodoroStore();
@@ -58,6 +75,23 @@ export const TimerSettingsDialog = ({
     },
   });
 
+  const playPreviewSound = (soundId: string) => {
+    try {
+      const soundFile = `${soundId}.mp3`;
+      const soundPath = isExtension
+        ? chrome.runtime.getURL(`public/sounds/pomodoro/${soundFile}`)
+        : `/sounds/pomodoro/${soundFile}`;
+
+      const audio = new Audio(soundPath);
+      audio.volume = 0.5;
+      audio.play().catch((error) => {
+        console.error("Failed to play preview sound:", error);
+      });
+    } catch (error) {
+      console.error("Error playing preview sound:", error);
+    }
+  };
+
   const handleSave = async (data: TimerSettingsValues) => {
     try {
       if (useAuthStore.getState().user?.isPro) {
@@ -66,6 +100,8 @@ export const TimerSettingsDialog = ({
           breakDuration: data.shortBreak,
           autoStart: autoStartTimers,
           soundOn: enableSound,
+          notificationSoundId: notificationSoundId,
+          notificationSoundEnabled: notificationSoundEnabled,
         });
       }
 
@@ -219,6 +255,81 @@ export const TimerSettingsDialog = ({
               onCheckedChange={() => toggleTimerSound()}
             />
           </div>
+
+          <div className="flex items-center justify-between space-x-4">
+            <Label htmlFor="functional" className="flex flex-col space-y-1">
+              <span className="text-md">Timer notification</span>
+              <span className="text-sm font-normal leading-snug text-foreground/70">
+                Show a notification when the timer completes
+              </span>
+            </Label>
+            <Switch
+              id="enable-timer-notification"
+              checked={notificationEnabled}
+              onCheckedChange={() =>
+                updateNotificationEnabled(!notificationEnabled)
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between space-x-4">
+            <Label htmlFor="functional" className="flex flex-col space-y-1">
+              <span className="text-md">Timer notification sound</span>
+              <span className="text-sm font-normal leading-snug text-foreground/70">
+                Play a sound when the timer completes
+              </span>
+            </Label>
+            <Switch
+              id="enable-timer-notification-sound"
+              disabled={!notificationEnabled}
+              checked={notificationSoundEnabled}
+              onCheckedChange={() =>
+                setNotificationSoundEnabled(!notificationSoundEnabled)
+              }
+            />
+          </div>
+
+          {notificationEnabled && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between space-x-4">
+                <Label
+                  htmlFor="sound-selector"
+                  className="flex flex-col space-y-1"
+                >
+                  <span className="text-md">Timer Sound</span>
+                  <span className="text-sm font-normal leading-snug text-foreground/70">
+                    Choose the sound to play when timer completes
+                  </span>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={notificationSoundId}
+                    onValueChange={(value) => updateNotificationSoundId(value)}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a sound" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {pomodoroSounds.map((sound) => (
+                        <SelectItem key={sound.id} value={sound.id}>
+                          {sound.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => playPreviewSound(notificationSoundId)}
+                    title="Preview sound"
+                  >
+                    <Volume2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-start justify-between space-x-4">
             <Label htmlFor="functional" className="flex flex-col space-y-1">
