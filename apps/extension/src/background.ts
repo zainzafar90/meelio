@@ -2,6 +2,15 @@ let interval: NodeJS.Timeout | null = null;
 let endTime = 0;
 let currentDuration = 0;
 
+function cleanup() {
+  if (interval) {
+    clearInterval(interval);
+    interval = null;
+  }
+  endTime = 0;
+  currentDuration = 0;
+}
+
 function calculateRemaining() {
   return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
 }
@@ -9,6 +18,7 @@ function calculateRemaining() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
     case 'START':
+      cleanup();
       if (!interval) {
         currentDuration = message.duration;
         endTime = Date.now() + (currentDuration * 1000);
@@ -39,10 +49,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     break;
 
     case 'RESET':
-      if (interval) clearInterval(interval);
-      interval = null;
-      endTime = 0;
-      currentDuration = 0;
+      cleanup();
       chrome.runtime.sendMessage({ type: 'RESET_COMPLETE' });
     break;
 
@@ -54,17 +61,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     break;
 
     case 'SKIP_TO_NEXT_STAGE':
-        if (interval) clearInterval(interval);
-        interval = null;
-        endTime = 0;
-        currentDuration = 0;
+      cleanup();
     break;
       
   }
 }); 
 
 chrome.runtime.onInstalled.addListener(() => {
-  interval = null;
-  endTime = 0;
-  currentDuration = 0;
+  cleanup();
+}); 
+
+// Clean up on extension startup/reload
+chrome.runtime.onStartup.addListener(() => {
+  cleanup();
+});
+
+// Clean up when extension is suspended
+chrome.runtime.onSuspend.addListener(() => {
+  cleanup();
 }); 
