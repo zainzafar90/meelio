@@ -90,7 +90,9 @@ export const usePomodoroStore = create(
         pausedRemaining: null,
         lastUpdated: Date.now(),
         lastFocusTrackTime: 0,
-        dailyFocusLimit: 90 * 60, // 90 minutes daily limit for free users
+        dailyFocusLimit:
+          DEFAULT_SETTINGS.pomodoro.dailyFocusLimit * 60,
+        // Daily limit stored in seconds
 
         // Timer control methods
         startTimer: () => {
@@ -220,7 +222,7 @@ export const usePomodoroStore = create(
             autoStartTimers: settings.autoStart,
             enableSound: settings.soundOn,
             autoBlock: settings.autoBlock,
-            dailyFocusLimit: settings.dailyFocusLimit,
+            dailyFocusLimit: settings.dailyFocusLimit * 60,
           }));
 
           const authState = useAuthStore.getState();
@@ -410,6 +412,7 @@ export const usePomodoroStore = create(
               },
               autoStartTimers: pomodoroSettings.autoStart,
               enableSound: pomodoroSettings.soundOn,
+              dailyFocusLimit: pomodoroSettings.dailyFocusLimit * 60,
             });
           }
         },
@@ -627,20 +630,20 @@ export const usePomodoroStore = create(
       storage: createJSONStorage(() => localStorage),
       version: 3,
       skipHydration: false,
-      ...(isExtension
-        ? {
-            partialize: (state) => ({
-              id: state.id,
-              stats: state.stats,
-              activeStage: state.activeStage,
-              isRunning: state.isRunning,
-              autoStartTimers: state.autoStartTimers,
-              endTimestamp: state.endTimestamp,
-              notificationSoundId: state.notificationSoundId,
-              notificationSoundEnabled: state.notificationSoundEnabled,
-            }),
-          }
-        : {}),
+      partialize: (state) => ({
+        id: state.id,
+        stats: state.stats,
+        activeStage: state.activeStage,
+        isRunning: state.isRunning,
+        endTimestamp: state.endTimestamp,
+        sessionCount: state.sessionCount,
+        stageDurations: state.stageDurations,
+        autoStartTimers: state.autoStartTimers,
+        enableSound: state.enableSound,
+        notificationSoundId: state.notificationSoundId,
+        notificationSoundEnabled: state.notificationSoundEnabled,
+        dailyFocusLimit: state.dailyFocusLimit,
+      }),
     }
   )
 );

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  ConditionalFeature, TimerPlaceholder } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  ConditionalFeature, TimerPlaceholder } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
@@ -30,66 +30,42 @@ export const WebTimer = () => {
 
 
   const completeStage = async () => {
-    const state = usePomodoroStore.getState();
-    const completedStage = state.activeStage;
-    const newStats = { ...state.stats };
-    const isFocus = completedStage === PomodoroStage.Focus;
+    const store = usePomodoroStore.getState();
+    const finishedStage = store.activeStage;
 
-    if (isFocus) {
-      newStats.todaysFocusSessions += 1;
-      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
-    } else if (completedStage === PomodoroStage.Break) {
-      newStats.todaysBreaks += 1;
-      newStats.todaysBreakTime += state.stageDurations[PomodoroStage.Break];
-    }
+    await store.completeSession();
+    store.playCompletionSound();
+    store.showCompletionNotification(finishedStage);
 
-    const nextStage = getNextStage(state);
-    const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
-    const duration = state.stageDurations[nextStage];
+    store.advanceTimer();
+    const newState = usePomodoroStore.getState();
 
-    usePomodoroStore.setState({
-      stats: newStats,
-      activeStage: nextStage,
-      sessionCount: newSessionCount,
-      isRunning: autoStartTimers ? true : false,
-      endTimestamp: autoStartTimers ? Date.now() + duration * 1000 : null,
-      lastUpdated: Date.now()
+    const duration = newState.stageDurations[newState.activeStage];
+    workerRef.current?.postMessage({
+      type: 'UPDATE_DURATION',
+      payload: { duration }
     });
 
-    // Play completion sound and show notification
-    state.playCompletionSound();
-    state.showCompletionNotification(completedStage);
-
-    // Check if daily limit was reached after this focus session
-    if (isFocus) {
-      const updatedState = usePomodoroStore.getState();
-      const updatedLimitStatus = updatedState.getDailyLimitStatus();
-      if (updatedLimitStatus.isLimitReached && !dailyLimitStatus.isLimitReached) {
-        toast.info("Daily 90-minute limit reached!", {
-          description: "Great work today! Upgrade to Pro for unlimited time."
-        });
-      }
-    }
-
-    if (nextStage !== completedStage) {
-      workerRef.current?.postMessage({
-        type: 'UPDATE_DURATION',
-        payload: { duration: state.stageDurations[nextStage] }
+    if (newState.isRunning) {
+      workerRef.current?.postMessage({ type: 'START', payload: { duration } });
+      usePomodoroStore.setState({
+        endTimestamp: Date.now() + duration * 1000,
+        lastUpdated: Date.now(),
       });
+    } else {
+      usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
+      setRemaining(duration);
     }
 
-    const sessionData = {
-      timestamp: Date.now(),
-      stage: completedStage,
-      duration: state.stageDurations[completedStage],
-      completed: true,
-    };
-
-    try {
-      await addPomodoroSession(sessionData);
-      await addPomodoroSummary(state.stageDurations[completedStage], completedStage);
-    } catch (error) {
-      console.error("Failed to record session:", error);
+    // Notify user if limit reached after completing focus session
+    if (
+      finishedStage === PomodoroStage.Focus &&
+      !dailyLimitStatus.isLimitReached &&
+      newState.getDailyLimitStatus().isLimitReached
+    ) {
+      toast.info("Daily 90-minute limit reached!", {
+        description: "Great work today! Upgrade to Pro for unlimited time."
+      });
     }
   };
 
@@ -108,33 +84,30 @@ export const WebTimer = () => {
       return;
     }
 
-    // Request notification permission on first start
-    const state = usePomodoroStore.getState();
-    if (state.enableSound && Notification.permission === "default") {
-      await state.requestNotificationPermission();
+    const store = usePomodoroStore.getState();
+    if (store.enableSound && Notification.permission === "default") {
+      await store.requestNotificationPermission();
     }
 
     setHasStarted(true);
-    const duration = usePomodoroStore.getState().stageDurations[activeStage];
+    const duration = store.stageDurations[activeStage];
     workerRef.current?.postMessage({
       type: 'START',
       payload: { duration }
     });
-    
+
+    store.startTimer();
     usePomodoroStore.setState({
-      isRunning: true,
-      endTimestamp: Date.now() + (duration * 1000),
-      lastUpdated: Date.now()
+      endTimestamp: Date.now() + duration * 1000,
+      lastUpdated: Date.now(),
     });
   };
 
   const handlePause = () => {
     workerRef.current?.postMessage({ type: 'PAUSE' });
-    usePomodoroStore.setState({
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
-    });
+    const store = usePomodoroStore.getState();
+    store.pauseTimer();
+    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
   };
 
   const handleResume = () => {
@@ -145,21 +118,23 @@ export const WebTimer = () => {
       return;
     }
 
+    const store = usePomodoroStore.getState();
+    store.resumeTimer();
     usePomodoroStore.setState({
-      isRunning: true,
       endTimestamp: Date.now() + remaining * 1000,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
   };
 
   const handleReset = () => {
     workerRef.current?.postMessage({ type: 'RESET' });
+    const store = usePomodoroStore.getState();
+    store.pauseTimer();
     usePomodoroStore.setState({
-      isRunning: false,
       endTimestamp: null,
       sessionCount: 0,
       activeStage,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
     setHasStarted(false);
     setRemaining(stageDurations[PomodoroStage.Focus]);
@@ -167,34 +142,33 @@ export const WebTimer = () => {
 
 
   const handleSwitch = () => {
-    const nextStage = getNextStage(usePomodoroStore.getState());
+    const store = usePomodoroStore.getState();
+    const nextStage = getNextStage(store);
     workerRef.current?.postMessage({
       type: 'UPDATE_DURATION',
       payload: { duration: stageDurations[nextStage] }
     });
-    usePomodoroStore.setState({
-      activeStage: nextStage,
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
-    });
+    store.changeStage(nextStage);
+    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
     setRemaining(stageDurations[nextStage]);
   };
 
   const handleSkipToNextStage = () => {
-    const nextStage = getNextStage(usePomodoroStore.getState());
+    const store = usePomodoroStore.getState();
+    workerRef.current?.postMessage({ type: 'SKIP_TO_NEXT_STAGE' });
+    store.advanceTimer();
+    const state = usePomodoroStore.getState();
+    const duration = state.stageDurations[state.activeStage];
     workerRef.current?.postMessage({
-      type: 'SKIP_TO_NEXT_STAGE',
-      payload: { duration: stageDurations[nextStage] }
+      type: 'UPDATE_DURATION',
+      payload: { duration },
     });
     usePomodoroStore.setState({
-      activeStage: nextStage,
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
+      endTimestamp: state.isRunning ? Date.now() + duration * 1000 : null,
+      lastUpdated: Date.now(),
     });
-    setRemaining(stageDurations[nextStage]);
-  }
+    setRemaining(duration);
+  };
 
   useEffect(() => {
     workerRef.current = new TimerWorker();
