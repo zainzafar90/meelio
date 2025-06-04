@@ -30,7 +30,7 @@ export function SyncStatus({
   };
 
   return (
-    <div className={cn("flex items-center gap-2 text-xs", className)}>
+    <div className={cn("flex items-center gap-2 text-xs mr-6", className)}>
       {/* Sync Status */}
       {isSyncing ? (
         <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
