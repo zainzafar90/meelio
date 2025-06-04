@@ -59,6 +59,7 @@ export * from "./core/settings/tabs/account-settings";
 export * from "./core/settings/tabs/appearance-settings";
 export * from "./core/settings/tabs/billing-settings";
 export * from "./core/settings/tabs/general-settings";
+export * from "./core/settings/tabs/timer-settings";
 
 // Soundscapes
 export * from "./core/soundscapes/soundscapes.sheet";
@@ -84,7 +85,6 @@ export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
 export * from "./core/timer/components/timer-stats";
 export * from "./core/timer/dialog/reset-timer.dialog";
-export * from "./core/timer/dialog/timer-settings.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
 

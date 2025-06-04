@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog,  ConditionalFeature, TimerPlaceholder } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState,  ConditionalFeature, TimerPlaceholder, useSettingsStore } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
@@ -11,7 +11,7 @@ import TimerWorker from '../workers/timer-worker?worker';
 export const WebTimer = () => {
   const workerRef = useRef<Worker>();
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
-  const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
+  const { openSettings, setTab } = useSettingsStore();
   const {
     activeStage,
     isRunning,
@@ -426,12 +426,11 @@ export const WebTimer = () => {
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}
         onOpenChange={toggleStatsDialog}
-        onSettingsClick={toggleSettingsDialog}
-      />
-
-      <TimerSettingsDialog
-        isOpen={isSettingsDialogOpen}
-        onClose={toggleSettingsDialog}
+        onSettingsClick={() => {
+          toggleStatsDialog();
+          setTab("timer");
+          openSettings();
+        }}
       />
     </div>
   );

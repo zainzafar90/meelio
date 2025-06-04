@@ -24,6 +24,7 @@ import {
   Languages,
   Anchor,
   MessageCircle,
+  Timer,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +35,7 @@ import { BillingSettings } from "./tabs/billing-settings";
 import { GeneralSettings } from "./tabs/general-settings";
 import { LanguageSettings } from "./tabs/language-settings";
 import { DockSettings } from "./tabs/dock-settings";
+import { TimerSettings } from "./tabs/timer-settings";
 import { api } from "../../../api";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
@@ -55,6 +57,7 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "general", name: "general", icon: Home },
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
+  { id: "timer", name: "timer", icon: Timer },
   { id: "dock", name: "dock", icon: Anchor },
   { id: "feedback", name: "feedback", icon: MessageCircle },
   { id: "account", name: "account", icon: User, requiresLogin: true },
@@ -89,6 +92,8 @@ export function SettingsDialog() {
         return <AppearanceSettings />;
       case "language":
         return <LanguageSettings />;
+      case "timer":
+        return <TimerSettings />;
       case "dock":
         return <DockSettings />;
       case "account":
