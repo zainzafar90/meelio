@@ -271,6 +271,7 @@ export const WebTimer = () => {
   return (
     <div className="relative">
        <ConditionalFeature
+          key={`timer-${stageDurations[activeStage]}-${activeStage}`}
           showFallback={dailyLimitStatus.isLimitReached}
           fallback={
             <TimerPlaceholder activeStage={activeStage} />
