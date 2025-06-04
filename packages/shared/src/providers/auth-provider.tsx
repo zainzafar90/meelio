@@ -73,7 +73,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [mounted]);
 
   return (
-    <AuthContext.Provider value={authStore}>
+    <AuthContext.Provider
+      value={{ ...authStore, logoutUser: authStore.logout }}
+    >
       {children}
       <ExtensionRedirectDialog />
     </AuthContext.Provider>
