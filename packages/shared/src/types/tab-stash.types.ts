@@ -18,8 +18,8 @@ export interface TabInfo {
 export interface TabStashState {
   sessions: TabSession[];
   hasPermissions: boolean;
-  addSession: (session: TabSession) => void;
-  removeSession: (sessionId: string) => void;
+  addSession: (session: TabSession) => Promise<void>;
+  removeSession: (sessionId: string) => Promise<void>;
   renameSession: (sessionId: string, newName: string) => void;
   restoreSession: (sessionId: string) => Promise<void>;
   clearAllSessions: () => void;
