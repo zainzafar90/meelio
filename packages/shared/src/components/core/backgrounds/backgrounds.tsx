@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@repo/ui/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Blurhash } from "../../../components";
@@ -6,7 +6,9 @@ import {
   LiveWallpaper,
   StaticWallpaper,
   useBackgroundStore,
+  useAuthStore,
 } from "../../../stores";
+import { getSeedIndexByDate } from "../../../utils";
 
 const LiveWallpaperComponent = ({
   wallpaper,
@@ -114,8 +116,25 @@ const StaticWallpaperComponent = ({
 };
 
 export const Background = () => {
-  const { getWallpaper } = useBackgroundStore();
+  const {
+    getWallpaper,
+    setCurrentWallpaper,
+    wallpapers,
+    resetToDefault,
+  } = useBackgroundStore();
+  const { user, guestUser } = useAuthStore();
   const wallpaper = getWallpaper();
+
+  useEffect(() => {
+    if (user?.id || guestUser?.id) {
+      const index = getSeedIndexByDate(wallpapers.length);
+      setCurrentWallpaper(wallpapers[index]);
+    }
+
+    if (!user?.id && !guestUser?.id) {
+      resetToDefault();
+    }
+  }, [user?.id, guestUser?.id]);
 
   if (!wallpaper) return null;
 
