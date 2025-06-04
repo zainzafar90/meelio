@@ -2,6 +2,9 @@ import { create } from "zustand";
 
 import { persist, createJSONStorage } from "zustand/middleware";
 import { TabSession, TabStashState } from "../types/tab-stash.types";
+import { useAuthStore } from "./auth.store";
+import { useSyncStore } from "./sync.store";
+import { tabStashService } from "../services/tab-stash.service";
 import {
   checkTabPermissions,
   groupTabsByWindow,
@@ -20,18 +23,45 @@ export const useTabStashStore = create<TabStashState>()(
         });
       },
 
-      addSession: (session: TabSession) => {
+      addSession: async (session: TabSession) => {
+        const authUser = useAuthStore.getState().user;
+        const isOnline = useSyncStore.getState().isOnline;
+        let storedSession = session;
+
+        if (authUser && isOnline) {
+          try {
+            const created = await tabStashService.createTabStash({
+              windowId: session.id,
+              urls: session.tabs.map((t) => t.url),
+            });
+            storedSession = { ...session, id: created.id };
+          } catch (error) {
+            console.error("Failed to sync tab stash:", error);
+          }
+        }
+
         set((state) => ({
-          sessions: [session, ...state.sessions],
+          sessions: [storedSession, ...state.sessions],
         }));
       },
 
-      removeSession: (sessionId: string) => {
+      removeSession: async (sessionId: string) => {
         set((state) => ({
           sessions: state.sessions.filter(
             (session) => session.id !== sessionId
           ),
         }));
+
+        const authUser = useAuthStore.getState().user;
+        const isOnline = useSyncStore.getState().isOnline;
+
+        if (authUser && isOnline) {
+          try {
+            await tabStashService.deleteTabStash(sessionId);
+          } catch (error) {
+            console.error("Failed to delete remote tab stash:", error);
+          }
+        }
       },
 
       updateSession: (session: TabSession) => {
@@ -113,6 +143,31 @@ export const useTabStashStore = create<TabStashState>()(
 
       loadSessions: async () => {
         await get().checkPermissions();
+
+        const authUser = useAuthStore.getState().user;
+        const isOnline = useSyncStore.getState().isOnline;
+
+        if (authUser && isOnline) {
+          try {
+            const remote = await tabStashService.getTabStashes();
+            const sessions: TabSession[] = remote.map((r) => ({
+              id: r.id,
+              name: new Date(r.createdAt).toLocaleString(),
+              timestamp: new Date(r.createdAt).getTime(),
+              windowCount: 1,
+              tabs: r.urls.map((url) => ({
+                title: url,
+                url,
+                windowId: parseInt(r.windowId) || 0,
+                pinned: false,
+              })),
+            }));
+            set({ sessions });
+            return;
+          } catch (error) {
+            console.error("Failed to load sessions from server:", error);
+          }
+        }
 
         if (!chrome?.storage?.local) return;
 
