@@ -215,8 +215,12 @@ export const usePomodoroStore = create(
             ...settings,
             stageDurations: {
               ...state.stageDurations,
-              [settings.workDuration]: settings.workDuration * 60,
-              [settings.breakDuration]: settings.breakDuration * 60,
+              ...(settings.workDuration !== undefined && {
+                [PomodoroStage.Focus]: settings.workDuration * 60,
+              }),
+              ...(settings.breakDuration !== undefined && {
+                [PomodoroStage.Break]: settings.breakDuration * 60,
+              }),
             },
             autoStartTimers: settings.autoStart,
             enableSound: settings.soundOn,

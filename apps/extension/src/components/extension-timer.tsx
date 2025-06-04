@@ -130,9 +130,11 @@ export const ExtensionTimer = () => {
   const handleSwitch = () => {
     const store = usePomodoroStore.getState();
     const nextStage = getNextStage(store);
+    chrome.runtime.sendMessage({ type: 'RESET' });
     chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: stageDurations[nextStage] });
     store.changeStage(nextStage);
     usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
+    setHasStarted(false);
     setRemaining(stageDurations[nextStage]);
   };
 
@@ -225,6 +227,13 @@ export const ExtensionTimer = () => {
       setRemaining(stageDurations[activeStage]);
     }
   }, [activeStage, stageDurations, isRunning, hasStarted]);
+
+  useEffect(() => {
+    if (!isRunning) {
+      setHasStarted(false);
+      setRemaining(stageDurations[activeStage]);
+    }
+  }, [stageDurations, activeStage, isRunning]);
 
   useEffect(() => {
     if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
