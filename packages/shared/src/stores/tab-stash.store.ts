@@ -11,6 +11,57 @@ import {
   restoreTabsToWindow,
 } from "../components/core/tab-stash/utils/tab-stash.utils";
 
+async function processSyncQueue() {
+  const syncStore = useSyncStore.getState();
+  const queue = syncStore.getQueue("tab-stash");
+
+  if (queue.length === 0 || !syncStore.isOnline) return;
+
+  syncStore.setSyncing("tab-stash", true);
+
+  for (const operation of queue) {
+    try {
+      switch (operation.type) {
+        case "create": {
+          const session = operation.data.session as TabSession;
+          const created = await tabStashService.createTabStash({
+            windowId: session.id,
+            urls: session.tabs.map((t) => t.url),
+          });
+
+          useTabStashStore.setState((state) => ({
+            sessions: state.sessions.map((s) =>
+              s.id === session.id ? { ...s, id: created.id } : s
+            ),
+          }));
+          break;
+        }
+        case "delete":
+          await tabStashService.deleteTabStash(operation.entityId);
+          break;
+      }
+
+      syncStore.removeFromQueue("tab-stash", operation.id);
+    } catch (error) {
+      console.error("Tab stash sync failed:", error);
+      if (operation.retries >= 3) {
+        syncStore.removeFromQueue("tab-stash", operation.id);
+      } else {
+        syncStore.incrementRetry("tab-stash", operation.id);
+      }
+    }
+  }
+
+  syncStore.setSyncing("tab-stash", false);
+  syncStore.setLastSyncTime("tab-stash", Date.now());
+}
+
+let autoSyncInterval: NodeJS.Timeout | null = null;
+function startAutoSync() {
+  if (autoSyncInterval) clearInterval(autoSyncInterval);
+  autoSyncInterval = setInterval(() => processSyncQueue(), 5 * 60 * 1000);
+}
+
 export const useTabStashStore = create<TabStashState>()(
   persist(
     (set, get) => ({
@@ -25,24 +76,37 @@ export const useTabStashStore = create<TabStashState>()(
 
       addSession: async (session: TabSession) => {
         const authUser = useAuthStore.getState().user;
-        const isOnline = useSyncStore.getState().isOnline;
-        let storedSession = session;
-
-        if (authUser && isOnline) {
-          try {
-            const created = await tabStashService.createTabStash({
-              windowId: session.id,
-              urls: session.tabs.map((t) => t.url),
-            });
-            storedSession = { ...session, id: created.id };
-          } catch (error) {
-            console.error("Failed to sync tab stash:", error);
-          }
-        }
+        const syncStore = useSyncStore.getState();
 
         set((state) => ({
-          sessions: [storedSession, ...state.sessions],
+          sessions: [session, ...state.sessions],
         }));
+
+        if (authUser) {
+          if (syncStore.isOnline) {
+            try {
+              const created = await tabStashService.createTabStash({
+                windowId: session.id,
+                urls: session.tabs.map((t) => t.url),
+              });
+              set((state) => ({
+                sessions: state.sessions.map((s) =>
+                  s.id === session.id ? { ...s, id: created.id } : s
+                ),
+              }));
+            } catch (error) {
+              console.error("Failed to sync tab stash:", error);
+            }
+          } else {
+            syncStore.addToQueue("tab-stash", {
+              type: "create",
+              entityId: session.id,
+              data: { session },
+            });
+          }
+
+          if (syncStore.isOnline) processSyncQueue();
+        }
       },
 
       removeSession: async (sessionId: string) => {
@@ -53,14 +117,23 @@ export const useTabStashStore = create<TabStashState>()(
         }));
 
         const authUser = useAuthStore.getState().user;
-        const isOnline = useSyncStore.getState().isOnline;
+        const syncStore = useSyncStore.getState();
 
-        if (authUser && isOnline) {
-          try {
-            await tabStashService.deleteTabStash(sessionId);
-          } catch (error) {
-            console.error("Failed to delete remote tab stash:", error);
+        if (authUser) {
+          if (syncStore.isOnline) {
+            try {
+              await tabStashService.deleteTabStash(sessionId);
+            } catch (error) {
+              console.error("Failed to delete remote tab stash:", error);
+            }
+          } else {
+            syncStore.addToQueue("tab-stash", {
+              type: "delete",
+              entityId: sessionId,
+            });
           }
+
+          if (syncStore.isOnline) processSyncQueue();
         }
       },
 
@@ -145,28 +218,35 @@ export const useTabStashStore = create<TabStashState>()(
         await get().checkPermissions();
 
         const authUser = useAuthStore.getState().user;
-        const isOnline = useSyncStore.getState().isOnline;
+        const syncStore = useSyncStore.getState();
 
-        if (authUser && isOnline) {
-          try {
-            const remote = await tabStashService.getTabStashes();
-            const sessions: TabSession[] = remote.map((r) => ({
-              id: r.id,
-              name: new Date(r.createdAt).toLocaleString(),
-              timestamp: new Date(r.createdAt).getTime(),
-              windowCount: 1,
-              tabs: r.urls.map((url) => ({
-                title: url,
-                url,
-                windowId: parseInt(r.windowId) || 0,
-                pinned: false,
-              })),
-            }));
-            set({ sessions });
-            return;
-          } catch (error) {
-            console.error("Failed to load sessions from server:", error);
+        if (authUser) {
+          if (syncStore.isOnline) {
+            await processSyncQueue();
           }
+
+          if (syncStore.isOnline) {
+            try {
+              const remote = await tabStashService.getTabStashes();
+              const sessions: TabSession[] = remote.map((r) => ({
+                id: r.id,
+                name: new Date(r.createdAt).toLocaleString(),
+                timestamp: new Date(r.createdAt).getTime(),
+                windowCount: 1,
+                tabs: r.urls.map((url) => ({
+                  title: url,
+                  url,
+                  windowId: parseInt(r.windowId) || 0,
+                  pinned: false,
+                })),
+              }));
+              set({ sessions });
+              return;
+            } catch (error) {
+              console.error("Failed to load sessions from server:", error);
+            }
+          }
+          startAutoSync();
         }
 
         if (!chrome?.storage?.local) return;
