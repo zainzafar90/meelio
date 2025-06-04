@@ -303,6 +303,12 @@
         "title": "Wallpaper Rotation",
         "description": "Rotate fresh wallpapers every day"
       },
+      "onboardingReset": {
+        "title": "Onboarding",
+        "description": "Show the dock onboarding tour again",
+        "button": "Restart",
+        "error": "Failed to reset onboarding"
+      },
       "twelveHourClock": {
         "title": "24-Hour Clock",
         "description": "Display time in 24-hour format"

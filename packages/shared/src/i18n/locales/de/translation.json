@@ -303,6 +303,12 @@
         "title": "Hintergrund Rotation",
         "description": "Rotiere neue Hintergründe jeden Tag"
       },
+      "onboardingReset": {
+        "title": "Onboarding",
+        "description": "Zeige die Dock-Onboarding-Tour erneut an",
+        "button": "Neustart",
+        "error": "Fehler beim Zurücksetzen des Onboardings"
+      },
       "twelveHourClock": {
         "title": "24-Stunden-Uhr",
         "description": "Zeit im 24-Stunden-Format anzeigen"

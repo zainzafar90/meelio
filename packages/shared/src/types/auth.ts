@@ -13,6 +13,7 @@ export interface PomodoroSettings {
 
 export interface UserSettings {
   pomodoro: PomodoroSettings;
+  onboardingCompleted: boolean;
   todo: {
     confettiOnComplete: boolean;
   };

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Button } from "@repo/ui/components/ui/button";
 import { useOnboardingStore } from "../../../../stores/onboarding.store";
+import { useAuthStore } from "../../../../stores/auth.store";
 import { Icons } from "../../../../components/icons/icons";
 import { cn } from "@repo/ui/lib/utils";
 import { Logo } from "../../../../components/common/logo";
@@ -105,11 +106,17 @@ export const ONBOARDING_STEPS = [
 export const DockOnboarding = () => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
-  const { hasDockOnboardingCompleted, setDockOnboardingCompleted } =
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+  const { hasDockOnboardingCompleted, setDockOnboardingCompletedWithSync } =
     useOnboardingStore(
       useShallow((state) => ({
         hasDockOnboardingCompleted: state.hasDockOnboardingCompleted,
-        setDockOnboardingCompleted: state.setDockOnboardingCompleted,
+        setDockOnboardingCompletedWithSync:
+          state.setDockOnboardingCompletedWithSync,
       }))
     );
   const {
@@ -134,21 +141,28 @@ export const DockOnboarding = () => {
     }))
   );
 
+  const shouldShowOnboarding =
+    !hasDockOnboardingCompleted && !user?.settings?.onboardingCompleted;
+
   useEffect(() => {
-    if (!hasDockOnboardingCompleted) {
+    if (shouldShowOnboarding) {
       setCurrentOnboardingStep(currentStep);
     }
     return () => setCurrentOnboardingStep(-1); // Reset when unmounted
-  }, [currentStep, setCurrentOnboardingStep, hasDockOnboardingCompleted]);
+  }, [currentStep, setCurrentOnboardingStep, shouldShowOnboarding]);
 
-  const handleNext = useCallback(() => {
+  const handleNext = useCallback(async () => {
     if (currentStep === ONBOARDING_STEPS.length - 1) {
       setCurrentOnboardingStep(-1); // Reset highlight
-      setDockOnboardingCompleted();
+      await setDockOnboardingCompletedWithSync();
     } else {
       setCurrentStep((prev) => prev + 1);
     }
-  }, [currentStep, setDockOnboardingCompleted, setCurrentOnboardingStep]);
+  }, [
+    currentStep,
+    setDockOnboardingCompletedWithSync,
+    setCurrentOnboardingStep,
+  ]);
 
   const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
@@ -156,7 +170,7 @@ export const DockOnboarding = () => {
     }
   }, [currentStep]);
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(async () => {
     // Reset any active features
     const currentAction = ONBOARDING_STEPS[currentStep].action;
     if (currentAction) {
@@ -172,11 +186,22 @@ export const DockOnboarding = () => {
       actionFn?.();
     }
     setCurrentOnboardingStep(-1); // Reset highlight
-    setDockOnboardingCompleted();
-  };
+    await setDockOnboardingCompletedWithSync();
+  }, [
+    currentStep,
+    setDockOnboardingCompletedWithSync,
+    setCurrentOnboardingStep,
+    toggleTimer,
+    toggleSoundscapes,
+    toggleBreathing,
+    toggleTodos,
+    toggleSiteBlocker,
+    toggleBackgrounds,
+    toggleTabStash,
+  ]);
 
   useEffect(() => {
-    if (hasDockOnboardingCompleted) return;
+    if (!shouldShowOnboarding) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
@@ -197,9 +222,9 @@ export const DockOnboarding = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hasDockOnboardingCompleted, handleNext, handlePrevious]);
+  }, [shouldShowOnboarding, handleNext, handlePrevious, handleSkip]);
 
-  if (hasDockOnboardingCompleted) return null;
+  if (!shouldShowOnboarding) return null;
 
   const currentStepData = ONBOARDING_STEPS[currentStep];
   const IconComponent = currentStepData.icon;

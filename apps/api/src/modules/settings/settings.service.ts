@@ -55,6 +55,10 @@ class SettingsService {
       };
     }
 
+    if (typeof updates.onboardingCompleted === "boolean") {
+      newSettings.onboardingCompleted = updates.onboardingCompleted;
+    }
+
     if (updates.todo) {
       newSettings.todo = {
         ...currentSettings.todo,

@@ -89,7 +89,7 @@ export function SettingsDialog() {
   const renderTabContent = () => {
     switch (currentTab) {
       case "general":
-        return <GeneralSettings />;
+        return <GeneralSettings onClose={closeSettings} />;
       case "appearance":
         return <AppearanceSettings />;
       case "language":

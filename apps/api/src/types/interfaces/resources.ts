@@ -48,6 +48,7 @@ export interface ITodoSettings {
 
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
+  onboardingCompleted: boolean;
   todo: ITodoSettings;
 }
 
