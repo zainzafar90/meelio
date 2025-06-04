@@ -84,6 +84,7 @@ export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
 export * from "./core/timer/components/timer-stats";
+export * from "./core/timer/components/next-pinned-task";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";

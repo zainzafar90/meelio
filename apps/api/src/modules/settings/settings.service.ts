@@ -55,6 +55,13 @@ class SettingsService {
       };
     }
 
+    if (updates.todo) {
+      newSettings.todo = {
+        ...currentSettings.todo,
+        ...updates.todo,
+      };
+    }
+
     Object.assign(user, { settings: newSettings });
     await db.update(users).set(user).where(eq(users.id, userId));
 
@@ -74,6 +81,15 @@ class SettingsService {
 
   async updatePomodoroSettings(userId: string, pomodoroSettings: any) {
     return this.updateSettings(userId, { pomodoro: pomodoroSettings });
+  }
+
+  async getTodoSettings(userId: string) {
+    const settings = await this.getSettings(userId);
+    return settings.todo || DEFAULT_SETTINGS.todo;
+  }
+
+  async updateTodoSettings(userId: string, todoSettings: any) {
+    return this.updateSettings(userId, { todo: todoSettings });
   }
 }
 

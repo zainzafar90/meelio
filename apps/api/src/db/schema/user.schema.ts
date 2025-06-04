@@ -23,6 +23,9 @@ export const DEFAULT_SETTINGS: IUserSettings = {
     soundOn: true,
     dailyFocusLimit: 120,
   },
+  todo: {
+    confettiOnComplete: true,
+  },
 };
 
 const EnumUserRole = customType<{

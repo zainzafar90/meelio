@@ -16,4 +16,9 @@ export const settingsApi = {
     );
     return response.data.settings;
   },
+
+  updateTodoSettings: async (todoSettings: { confettiOnComplete: boolean }) => {
+    const response = await axios.patch("/v1/settings/todo", todoSettings);
+    return response.data.settings;
+  },
 };
