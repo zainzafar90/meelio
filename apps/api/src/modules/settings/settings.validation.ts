@@ -4,7 +4,6 @@ export const pomodoroSettingsSchema = z.object({
   workDuration: z.number().min(1).max(60).default(25),
   breakDuration: z.number().min(1).max(30).default(5),
   autoStart: z.boolean().default(false),
-  autoBlock: z.boolean().default(false),
   soundOn: z.boolean().default(true),
   notificationSoundId: z.string().optional(),
   notificationEnabled: z.boolean().default(false),

@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { usePomodoroStore } from "../stores";
 import { PomodoroStage } from "../types";
 import { formatTime } from "../utils/timer.utils";
+import { useShallow } from "zustand/shallow";
 
 export function usePomodoroTimer(client: PomodoroTimerClient) {
   const { t } = useTranslation();
@@ -21,7 +22,18 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
     getDailyLimitStatus,
     stats,
     sessionCount,
-  } = usePomodoroStore();
+  } = usePomodoroStore(
+    useShallow((state) => ({
+      activeStage: state.activeStage,
+      isRunning: state.isRunning,
+      endTimestamp: state.endTimestamp,
+      stageDurations: state.stageDurations,
+      autoStartTimers: state.autoStartTimers,
+      getDailyLimitStatus: state.getDailyLimitStatus,
+      stats: state.stats,
+      sessionCount: state.sessionCount,
+    }))
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -50,7 +62,10 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
         lastUpdated: Date.now(),
       });
     } else {
-      usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
+      usePomodoroStore.setState({
+        endTimestamp: null,
+        lastUpdated: Date.now(),
+      });
       setRemaining(duration);
     }
 
@@ -128,9 +143,15 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
 
   const handleSwitch = () => {
     const store = usePomodoroStore.getState();
-    const nextStage = activeStage === PomodoroStage.Focus ? PomodoroStage.Break : PomodoroStage.Focus;
+    const nextStage =
+      activeStage === PomodoroStage.Focus
+        ? PomodoroStage.Break
+        : PomodoroStage.Focus;
     client.send({ type: "RESET" });
-    client.send({ type: "UPDATE_DURATION", duration: stageDurations[nextStage] });
+    client.send({
+      type: "UPDATE_DURATION",
+      duration: stageDurations[nextStage],
+    });
     store.changeStage(nextStage);
     usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
     setHasStarted(false);
@@ -189,7 +210,10 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
 
   useEffect(() => {
     if (isRunning && endTimestamp) {
-      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
+      const remainingTime = Math.max(
+        0,
+        Math.floor((endTimestamp - Date.now()) / 1000)
+      );
       if (remainingTime > 0) {
         client.send({ type: "START", duration: remainingTime });
       } else {
@@ -205,7 +229,9 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
     const timeStr = formatTime(remaining);
     const mode = activeStage === PomodoroStage.Focus ? "Focus" : "Break";
 
-    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : "Meelio - focus, calm, & productivity";
+    document.title = isRunning
+      ? `${emoji} ${timeStr} - ${mode}`
+      : "Meelio - focus, calm, & productivity";
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
   useEffect(() => {
@@ -241,7 +267,13 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
       setRemaining(stageDurations[activeStage]);
       client.send({ type: "RESET" });
     }
-  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
+  }, [
+    stats.todaysFocusTime,
+    stats.todaysFocusSessions,
+    sessionCount,
+    stageDurations,
+    activeStage,
+  ]);
 
   return {
     activeStage,
@@ -259,4 +291,3 @@ export function usePomodoroTimer(client: PomodoroTimerClient) {
     handleSkipToNextStage,
   };
 }
-

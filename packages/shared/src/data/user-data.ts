@@ -8,10 +8,10 @@ export const DEFAULT_SETTINGS: {
   pomodoro: {
     workDuration: 25,
     breakDuration: 5,
-    autoStart: false,
-    autoBlock: false,
     soundOn: true,
     dailyFocusLimit: 120,
+    notificationSoundEnabled: false,
+    autoStart: false,
   },
   onboardingCompleted: false,
   todo: {

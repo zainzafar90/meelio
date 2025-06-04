@@ -22,6 +22,7 @@ import { ResetTimerDialog } from "../../timer/dialog/reset-timer.dialog";
 import { useAuthStore } from "../../../../stores/auth.store";
 import { useAppStore } from "../../../../stores/app.store";
 import { pomodoroSounds } from "../../../../data/sounds-data";
+import { useShallow } from "zustand/shallow";
 
 const timerSettingsSchema = z.object({
   workTime: z.number().min(1).max(POMODORO_MAX_MINUTES),
@@ -32,6 +33,7 @@ const timerSettingsSchema = z.object({
 type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
 
 export function TimerSettings() {
+  const { t } = useTranslation();
   const isExtension = useAppStore.getState().platform === "extension";
   const {
     stageDurations,
@@ -48,8 +50,24 @@ export function TimerSettings() {
     setNotificationSoundEnabled,
     changeTimerSettings,
     reinitializeTimer,
-  } = usePomodoroStore();
-  const { t } = useTranslation();
+  } = usePomodoroStore(
+    useShallow((state) => ({
+      stageDurations: state.stageDurations,
+      autoStartTimers: state.autoStartTimers,
+      enableSound: state.enableSound,
+      notificationSoundId: state.notificationSoundId,
+      notificationEnabled: state.notificationEnabled,
+      notificationSoundEnabled: state.notificationSoundEnabled,
+      resetTimer: state.resetTimer,
+      toggleAutoStartBreaks: state.toggleAutoStartBreaks,
+      toggleTimerSound: state.toggleTimerSound,
+      updateNotificationSoundId: state.updateNotificationSoundId,
+      updateNotificationEnabled: state.updateNotificationEnabled,
+      setNotificationSoundEnabled: state.setNotificationSoundEnabled,
+      changeTimerSettings: state.changeTimerSettings,
+      reinitializeTimer: state.reinitializeTimer,
+    }))
+  );
 
   const form = useForm<TimerSettingsValues>({
     resolver: zodResolver(timerSettingsSchema as any),

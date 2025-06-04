@@ -3,11 +3,15 @@ import { useTranslation } from "react-i18next";
 import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore, usePomodoroTimer } from "@repo/shared";
 
 import { Crown } from "lucide-react";
+import { useShallow } from "zustand/shallow";
 
 export const ExtensionTimer = () => {
+  const { t } = useTranslation(); 
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
-  const { t } = useTranslation();
-  const { openSettings, setTab } = useSettingsStore();
+  const { openSettings, setTab } = useSettingsStore(useShallow((state) => ({
+    openSettings: state.openSettings,
+    setTab: state.setTab,
+  })));
   const {
     activeStage,
     isRunning,
@@ -67,15 +71,13 @@ export const ExtensionTimer = () => {
                   if (dailyLimitStatus.isLimitReached) {
                     return;
                   }
-                  if (activeStage === PomodoroStage.Focus) {
-                    handleSwitch();
-                  }
+                  handleSwitch();
                 }}
-                disabled={activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached}
+                disabled={dailyLimitStatus.isLimitReached}
                 className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                   activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
                 } ${
-                  activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.breakMode")}
               >

@@ -224,7 +224,6 @@ export const usePomodoroStore = create(
             },
             autoStartTimers: settings.autoStart,
             enableSound: settings.soundOn,
-            autoBlock: settings.autoBlock,
             dailyFocusLimit: settings.dailyFocusLimit * 60,
           }));
 

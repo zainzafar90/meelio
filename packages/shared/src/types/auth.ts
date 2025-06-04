@@ -3,9 +3,8 @@ export type AuthRole = "user" | "guest";
 export interface PomodoroSettings {
   workDuration: number;
   breakDuration: number;
-  autoStart: boolean;
-  autoBlock: boolean;
   soundOn: boolean;
+  autoStart: boolean;
   notificationSoundId?: string;
   notificationSoundEnabled: boolean;
   dailyFocusLimit: number;

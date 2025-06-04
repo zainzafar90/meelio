@@ -36,9 +36,9 @@ export interface IToken {
 export interface IPomodoroSettings {
   workDuration: number;
   breakDuration: number;
-  autoStart: boolean;
-  autoBlock: boolean;
   soundOn: boolean;
+  autoStart: boolean;
+  notificationSoundEnabled: boolean;
   dailyFocusLimit: number;
 }
 

@@ -18,10 +18,10 @@ export const DEFAULT_SETTINGS: IUserSettings = {
   pomodoro: {
     workDuration: 25,
     breakDuration: 5,
-    autoStart: false,
-    autoBlock: false,
     soundOn: true,
+    autoStart: false,
     dailyFocusLimit: 120,
+    notificationSoundEnabled: false,
   },
   onboardingCompleted: false,
   todo: {
