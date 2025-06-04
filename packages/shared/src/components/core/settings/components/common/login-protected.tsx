@@ -36,9 +36,14 @@ export const LoginButton = ({
 }) => {
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
 
+  const handleOpen = () => {
+    localStorage.setItem("meelio:migrate_guest", "true");
+    setIsAuthOpen(true);
+  };
+
   return (
     <>
-      <button onClick={() => setIsAuthOpen(true)} className={className}>
+      <button onClick={handleOpen} className={className}>
         {children}
       </button>
       {isAuthOpen && (
