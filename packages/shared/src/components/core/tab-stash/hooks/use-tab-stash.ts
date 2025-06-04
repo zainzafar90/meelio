@@ -9,6 +9,41 @@ import {
 import { useShallow } from "zustand/shallow";
 import { useTranslation } from "react-i18next";
 
+const STASH_COUNT_KEY = "meelio:tabstash:count";
+const STASH_DATE_KEY = "meelio:tabstash:date";
+const DAILY_FREE_STASH_LIMIT = 1;
+
+const getTodayString = () => new Date().toISOString().split("T")[0];
+
+export const getDailyStashCount = (): number => {
+  if (typeof window === "undefined") return 0;
+  const today = getTodayString();
+  const lastDate = localStorage.getItem(STASH_DATE_KEY);
+  if (lastDate !== today) {
+    localStorage.setItem(STASH_DATE_KEY, today);
+    localStorage.setItem(STASH_COUNT_KEY, "0");
+    return 0;
+  }
+  return parseInt(localStorage.getItem(STASH_COUNT_KEY) || "0", 10);
+};
+
+export const incrementDailyStashCount = () => {
+  if (typeof window === "undefined") return;
+  const today = getTodayString();
+  const lastDate = localStorage.getItem(STASH_DATE_KEY);
+  if (lastDate !== today) {
+    localStorage.setItem(STASH_DATE_KEY, today);
+    localStorage.setItem(STASH_COUNT_KEY, "1");
+  } else {
+    const count = getDailyStashCount() + 1;
+    localStorage.setItem(STASH_COUNT_KEY, count.toString());
+  }
+};
+
+export const hasReachedDailyStashLimit = (): boolean => {
+  return getDailyStashCount() >= DAILY_FREE_STASH_LIMIT;
+};
+
 const formatSessionName = (date: Date): string => {
   try {
     return format(date, "MMM d, yyyy h:mm a");
@@ -74,6 +109,7 @@ export const useTabStash = () => {
       };
 
       await addSession(newSession);
+      incrementDailyStashCount();
 
       // Close stashed tabs using proper tab IDs
       const tabIds = tabsToStash

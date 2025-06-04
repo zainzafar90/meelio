@@ -17,6 +17,10 @@ import { SessionList } from "./components/session-list";
 import { SessionView } from "./components/session-view";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useShallow } from "zustand/shallow";
+import { PremiumFeature } from "../../../components/common/premium-feature";
+import { Icons } from "../../../components/icons";
+import { useAuthStore } from "../../../stores/auth.store";
+import { hasReachedDailyStashLimit } from "./hooks/use-tab-stash";
 
 const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
 
@@ -28,6 +32,12 @@ export function TabStashSheet() {
       toggleTabStash: state.toggleTabStash,
     }))
   );
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+  const requirePro = !user?.isPro && hasReachedDailyStashLimit();
 
   return (
     <Sheet open={isTabStashVisible} onOpenChange={toggleTabStash}>
@@ -48,7 +58,33 @@ export function TabStashSheet() {
         </div>
 
         {isExtension ? (
-          <ExtensionTabStashContent />
+          <PremiumFeature
+            requirePro={requirePro}
+            fallback={
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4 border border-white/10">
+                    <Icons.proMember className="w-8 h-8 text-white/80" />
+                  </div>
+                  <div className="text-lg text-white font-medium mb-2">
+                    {t("tab-stash.premium-feature-title", "Premium Tab Stash")}
+                  </div>
+                  <div className="text-white/70 max-w-md mb-6">
+                    {t("tab-stash.premium-feature")}
+                  </div>
+                </div>
+                <Button
+                  variant="default"
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                  onClick={() => console.log("/settings/billing")}
+                >
+                  {t("tab-stash.upgrade", "Upgrade to Pro")}
+                </Button>
+              </div>
+            }
+          >
+            <ExtensionTabStashContent />
+          </PremiumFeature>
         ) : (
           <BrowserTabStashContent />
         )}

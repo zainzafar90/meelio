@@ -416,6 +416,9 @@
     "needs-permission": "Bitte gewähren Sie die notwendigen Berechtigungen, um die Erweiterung zu verwenden.",
     "grant-permission": "Berechtigung gewähren",
     "permissions-needed": "Zusätzliche Berechtigungen erforderlich",
-    "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden"
+    "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden",
+    "premium-feature-title": "Premium Tab-Stash",
+    "premium-feature": "Tägliches Stash-Limit erreicht. Upgrade auf Pro, um unbegrenzt Sitzungen zu speichern.",
+    "upgrade": "Upgrade auf Pro"
   }
 }
