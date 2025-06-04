@@ -114,8 +114,7 @@ const StaticWallpaperComponent = ({
 };
 
 export const Background = () => {
-  const { getWallpaper } = useBackgroundStore();
-  const wallpaper = getWallpaper();
+  const wallpaper = useBackgroundStore((state) => state.getWallpaper());
 
   if (!wallpaper) return null;
 
