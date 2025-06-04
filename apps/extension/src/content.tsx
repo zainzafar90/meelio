@@ -6,7 +6,7 @@ import { useSiteBlockerStore } from "@repo/shared";
 
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
-import { pauseAllVideos } from "./utils/video.utils";
+import { startAutoPause } from "./utils/video.utils";
 
 export const config: PlasmoCSConfig = {
   run_at: "document_start",
@@ -36,10 +36,12 @@ const PlasmoOverlay = () => {
   const isBlocked = isBlockedSite(blockedSites);
 
   React.useEffect(() => {
-    if (isBlocked) {
-      pauseAllVideos();
+    if (!isBlocked) return
+    const stop = startAutoPause()
+    return () => {
+      stop()
     }
-  }, [isBlocked]);
+  }, [isBlocked])
 
   const openAnyway = () => {
     const currentSite = getCurrentSite();
