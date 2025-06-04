@@ -15,6 +15,7 @@ export const pomodoroSettingsSchema = z.object({
 export const userSettingsSchema = z.object({
   pomodoro: pomodoroSettingsSchema.optional(),
   onboardingCompleted: z.boolean().optional(),
+  todo: z.object({ confettiOnComplete: z.boolean() }).optional(),
 });
 
 export const updateSettingsSchema = z.object({

@@ -1,12 +1,15 @@
 import { ReactNode, useEffect, useState } from "react";
-// import { QueryClient } from "@tanstack/react-query";
 
 import { useAuthStore } from "../stores/auth.store";
 import { api } from "../api";
 import { AuthContext } from "../context/auth-context";
 import { useShallow } from "zustand/shallow";
 import { ExtensionRedirectDialog } from "../components/auth/extension-redirect-dialog";
-import { migrateGuestDataToUser } from "../utils/guest-migration.utils";
+import {
+  migrateGuestDataToUser,
+  cleanupGuestData,
+} from "../utils/guest-migration.utils";
+import { clearLocalData } from "../utils/clear-data.utils";
 import { toast } from "sonner";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -38,32 +41,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const response = await api.auth.getAuthenticatedAccount();
             const user = response;
 
-            if (authStore.guestUser && user.data) {
-              const migrationSummary = await migrateGuestDataToUser(
-                authStore.guestUser.id,
-                user.data.id
-              );
+            if (user.data) {
+              const shouldMigrate =
+                localStorage.getItem("meelio:local:migrate_guest") === "true";
 
-              if (migrationSummary.success) {
-                const totalMigrated = migrationSummary.tasks.migratedCount;
-
-                if (totalMigrated > 0) {
-                  toast.success(
-                    `Migrated ${totalMigrated} tasks to your account`,
-                    {
-                      description:
-                        "Your guest data has been successfully transferred.",
-                      duration: 5000,
-                    }
+              if (authStore.guestUser) {
+                if (shouldMigrate) {
+                  const summary = await migrateGuestDataToUser(
+                    authStore.guestUser.id,
+                    user.data.id
                   );
-                }
-              } else {
-                console.error("Some migrations failed:", migrationSummary);
-              }
-            }
 
-            authStore.authenticate(user.data);
-            authStore.authenticateGuest(null as any);
+                  if (summary.success && summary.tasks.migratedCount > 0) {
+                    toast.success(
+                      `Migrated ${summary.tasks.migratedCount} tasks to your account`,
+                      {
+                        description:
+                          "Your guest data has been successfully transferred.",
+                        duration: 5000,
+                      }
+                    );
+                  }
+
+                  await cleanupGuestData(authStore.guestUser.id);
+                  localStorage.removeItem("meelio:local:migrate_guest");
+                }
+
+                await clearLocalData();
+              }
+              authStore.authenticate(user.data);
+              authStore.authenticateGuest(null as any);
+            }
           } catch (error) {
             authStore.authenticate(null as any);
           }
@@ -71,9 +79,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       })();
     }
   }, [mounted]);
-
   return (
-    <AuthContext.Provider value={authStore}>
+    <AuthContext.Provider
+      value={{ ...authStore, logoutUser: authStore.logout }}
+    >
       {children}
       <ExtensionRedirectDialog />
     </AuthContext.Provider>

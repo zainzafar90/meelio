@@ -6,6 +6,7 @@ import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
+import { launchConfetti } from "../utils/confetti.utils";
 
 export interface TodoList {
   id: string;
@@ -33,8 +34,10 @@ interface TodoState {
     title: string;
     category?: string;
     dueDate?: string;
+    pinned?: boolean;
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
+  togglePinTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   deleteTasksByCategory: (category: string) => Promise<void>;
 
@@ -45,6 +48,8 @@ interface TodoState {
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
+
+  getNextPinnedTask: () => Task | undefined;
 }
 
 async function processSyncQueue() {
@@ -123,11 +128,34 @@ export const useTodoStore = create<TodoState>()(
         userId: userId,
         title: task.title,
         completed: false,
+        pinned: task.pinned ?? false,
         category: task.category,
         dueDate: task.dueDate,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
+
+      if (newTask.pinned) {
+        const pinnedTasks = get().tasks.filter((t) => t.pinned);
+        await Promise.all(
+          pinnedTasks.map(async (t) => {
+            await db.tasks.update(t.id, { pinned: false, updatedAt: Date.now() });
+            if (user) {
+              syncStore.addToQueue("task", {
+                type: "update",
+                entityId: t.id,
+                data: { pinned: false, updatedAt: Date.now() },
+              });
+            }
+          })
+        );
+
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.pinned ? { ...t, pinned: false, updatedAt: Date.now() } : t
+          ),
+        }));
+      }
 
       try {
         await db.tasks.add(newTask);
@@ -174,6 +202,14 @@ export const useTodoStore = create<TodoState>()(
             t.id === taskId ? { ...t, ...updatedData } : t
           ),
         }));
+
+        if (updatedData.completed) {
+          const confettiEnabled =
+            authState.user?.settings?.todo?.confettiOnComplete ?? true;
+          if (confettiEnabled) {
+            launchConfetti();
+          }
+        }
 
         // Only sync for authenticated users
         if (user) {
@@ -463,6 +499,73 @@ export const useTodoStore = create<TodoState>()(
         console.error("Sync failed:", error);
         syncStore.setSyncing("task", false);
       }
+    },
+
+    togglePinTask: async (taskId) => {
+      const task = get().tasks.find((t) => t.id === taskId);
+      if (!task) return;
+
+      const authState = useAuthStore.getState();
+      const user = authState.user;
+      const syncStore = useSyncStore.getState();
+      const updatedData = { pinned: !task.pinned, updatedAt: Date.now() };
+
+      const unpinOthers = async () => {
+        const pinnedTasks = get().tasks.filter((t) => t.pinned && t.id !== taskId);
+        await Promise.all(
+          pinnedTasks.map(async (t) => {
+            await db.tasks.update(t.id, { pinned: false, updatedAt: Date.now() });
+            if (user) {
+              syncStore.addToQueue("task", {
+                type: "update",
+                entityId: t.id,
+                data: { pinned: false, updatedAt: Date.now() },
+              });
+            }
+          })
+        );
+
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.pinned && t.id !== taskId
+              ? { ...t, pinned: false, updatedAt: Date.now() }
+              : t
+          ),
+        }));
+      };
+
+      try {
+        if (updatedData.pinned) {
+          await unpinOthers();
+        }
+
+        await db.tasks.update(taskId, updatedData);
+
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.id === taskId ? { ...t, ...updatedData } : t
+          ),
+        }));
+
+        if (user) {
+          syncStore.addToQueue("task", {
+            type: "update",
+            entityId: taskId,
+            data: updatedData,
+          });
+
+          if (syncStore.isOnline) processSyncQueue();
+        }
+      } catch (error) {
+        set({
+          error: error instanceof Error ? error.message : "Failed to pin task",
+        });
+      }
+    },
+
+    getNextPinnedTask: () => {
+      const state = get();
+      return state.tasks.find((t) => t.pinned && !t.completed);
     },
   }))
 );

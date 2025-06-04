@@ -18,4 +18,8 @@ router
   .route("/pomodoro")
   .patch(auth(), settingsController.updatePomodoroSettings);
 
+router
+  .route("/todo")
+  .patch(auth(), settingsController.updateTodoSettings);
+
 export default router;

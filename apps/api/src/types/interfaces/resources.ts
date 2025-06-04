@@ -42,9 +42,14 @@ export interface IPomodoroSettings {
   dailyFocusLimit: number;
 }
 
+export interface ITodoSettings {
+  confettiOnComplete: boolean;
+}
+
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
   onboardingCompleted: boolean;
+  todo: ITodoSettings;
 }
 
 export interface IUser {

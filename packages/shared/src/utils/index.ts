@@ -5,3 +5,4 @@ export * from "./router.utils";
 export * from "./sound.utils";
 export * from "./timer.utils";
 export * from "./env.utils";
+export * from "./clear-data.utils";

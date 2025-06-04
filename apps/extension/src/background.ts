@@ -62,9 +62,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     case 'SKIP_TO_NEXT_STAGE':
       cleanup();
-    break;
-      
+    break;   
   }
+
+  return true;
 }); 
 
 chrome.runtime.onInstalled.addListener(() => {

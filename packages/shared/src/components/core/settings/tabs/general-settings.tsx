@@ -17,12 +17,16 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     setMantraRotation,
     wallpaperRotationEnabled,
     setWallpaperRotationEnabled,
+    twelveHourClock,
+    setTwelveHourClock,
   } = useAppStore(
     useShallow((state) => ({
       mantraRotationEnabled: state.mantraRotationEnabled,
       setMantraRotation: state.setMantraRotation,
       wallpaperRotationEnabled: state.wallpaperRotationEnabled,
       setWallpaperRotationEnabled: state.setWallpaperRotationEnabled,
+      twelveHourClock: state.twelveHourClock,
+      setTwelveHourClock: state.setTwelveHourClock,
     }))
   );
 
@@ -113,6 +117,25 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
           </Button>
         </div>
       )}
+
+      <div
+        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+        onClick={() => setTwelveHourClock(!twelveHourClock)}
+      >
+        <div className="flex items-center space-x-4">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              {t("settings.general.twelveHourClock.description")}
+            </p>
+          </div>
+        </div>
+        <Switch
+          size="sm"
+          checked={!twelveHourClock}
+          onCheckedChange={(value) => setTwelveHourClock(!value)}
+          aria-label={`${t("common.actions.toggle")} ${t("settings.general.twelveHourClock.title")}`}
+        />
+      </div>
     </div>
   );
 }

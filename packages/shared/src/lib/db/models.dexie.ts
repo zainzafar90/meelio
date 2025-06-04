@@ -24,6 +24,7 @@ export interface Task {
   userId: string;
   title: string;
   completed: boolean;
+  pinned: boolean;
   category?: string;
   dueDate?: string;
   createdAt: number;

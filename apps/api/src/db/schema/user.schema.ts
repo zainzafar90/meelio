@@ -24,6 +24,9 @@ export const DEFAULT_SETTINGS: IUserSettings = {
     dailyFocusLimit: 120,
   },
   onboardingCompleted: false,
+  todo: {
+    confettiOnComplete: true,
+  },
 };
 
 const EnumUserRole = customType<{
@@ -51,7 +54,7 @@ export const users = pgTable(
     nameIdx: index("idx_users_name").on(table.name),
     emailIdx: index("idx_users_email").on(table.email),
     roleIdx: index("idx_users_role").on(table.role),
-  }),
+  })
 );
 
 export type User = typeof users.$inferSelect;
