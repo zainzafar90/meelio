@@ -26,7 +26,7 @@ class SettingsService {
 
   async updateSettings(
     userId: string,
-    updates: Partial<IUserSettings>
+    updates: Partial<IUserSettings>,
   ): Promise<IUserSettings> {
     const [user] = (await db
       .select({ settings: users.settings })
@@ -53,6 +53,10 @@ class SettingsService {
         ...currentSettings.pomodoro,
         ...updates.pomodoro,
       };
+    }
+
+    if (typeof updates.onboardingCompleted === "boolean") {
+      newSettings.onboardingCompleted = updates.onboardingCompleted;
     }
 
     Object.assign(user, { settings: newSettings });

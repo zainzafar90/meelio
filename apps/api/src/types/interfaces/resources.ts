@@ -44,6 +44,7 @@ export interface IPomodoroSettings {
 
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
+  onboardingCompleted: boolean;
 }
 
 export interface IUser {
