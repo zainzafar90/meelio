@@ -302,6 +302,10 @@
       "wallpaperRotation": {
         "title": "Wallpaper Rotation",
         "description": "Rotate fresh wallpapers every day"
+      },
+      "twelveHourClock": {
+        "title": "24-Hour Clock",
+        "description": "Display time in 24-hour format"
       }
     },
     "appearance": {
