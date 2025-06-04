@@ -59,7 +59,7 @@ export const BREATHING_METHODS: BreathingMethod[] = [
   },
 ];
 
-export const SESSION_SET_OPTIONS = [20, 30, 50];
+export const SESSION_SET_OPTIONS = [5, 10, 20];
 
 interface BreathingState {
   phase: BreathPhase;
