@@ -16,6 +16,7 @@ import { PlanInterval } from "../../types/subscription";
 import { plansData } from "../../data";
 import { env } from "../../utils/env.utils";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../stores/auth.store";
 import { UserAuthForm } from "../auth/user-auth-form";
 import { AuthUser } from "../../types";
@@ -50,6 +51,7 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
+  const { t } = useTranslation();
 
   const { user, guestUser } = useAuthStore(
     useShallow((state) => ({
@@ -308,7 +310,7 @@ const PricingSection = ({
         window.open(checkout.data.url, "_blank");
       }
     } catch (error) {
-      return toast.error("Something went wrong.", {
+      return toast.error(t("common.error"), {
         description:
           (error as any)?.message ||
           "Checkout portal not working. Please try again.",
@@ -341,7 +343,7 @@ const PricingSection = ({
         className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4"
         onClick={() => onOpenCheckout(selectedPlan)}
       >
-        {isLoadingPortal ? "Loading..." : "Upgrade to Pro"}
+        {isLoadingPortal ? t("common.loading") : "Upgrade to Pro"}
       </Button>
 
       <div className="flex justify-center gap-3 pt-3 text-xs text-gray-500 border-t border-gray-100">
