@@ -67,13 +67,13 @@ export const BreathingCircle: React.FC = () => {
           <div
             key={delay}
             className={cn(
-              "absolute inset-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#86AFFF]/20 dark:border-[#86AFFF]/20",
+              "absolute inset-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ",
               {
-                "size-56 animate-concentric-ripple bg-foreground/80":
+                "size-56 animate-concentric-ripple bg-white/80":
                   index === 0 && isActive,
-                "size-64 animate-concentric-ripple bg-foreground/60":
+                "size-64 animate-concentric-ripple bg-white/60":
                   index === 1 && isActive,
-                "size-72 animate-concentric-ripple bg-foreground/40":
+                "size-72 animate-concentric-ripple bg-white/40":
                   index === 2 && isActive,
               }
             )}

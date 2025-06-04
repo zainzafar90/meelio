@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useBreathingStore } from "../store/breathing.store";
 
 export const BreathingText: React.FC = () => {
-  const { phase, isActive } = useBreathingStore();
+  const { phase, isActive, completedSets, totalSets } = useBreathingStore();
 
   const textVariants = {
     initial: { opacity: 0 },
@@ -23,7 +23,7 @@ export const BreathingText: React.FC = () => {
           animate="animate"
           variants={textVariants}
           transition={{ duration: 0.5 }}
-          className="inline-block bg-gradient-to-br from-red-600/80 to-amber-600/80 bg-clip-text text-lg font-light uppercase tracking-normal text-transparent"
+          className="relative inline-block bg-gradient-to-br from-red-600/80 to-amber-600/80 bg-clip-text text-lg font-light uppercase tracking-normal text-transparent"
         >
           {isActive
             ? phase === "inhale"
@@ -32,6 +32,19 @@ export const BreathingText: React.FC = () => {
                 ? "hold"
                 : "exhale"
             : "Tap to start"}
+
+          {isActive && totalSets > 0 && (
+            <motion.div className="relative">
+              <div className="flex flex-col text-md font-bold">
+                <span className="text-red-600/40 text-3xl">
+                  {totalSets - completedSets}
+                </span>
+                <span className="text-red-600/30 text-[6px] -mt-2">
+                  reps left
+                </span>
+              </div>
+            </motion.div>
+          )}
         </motion.span>
       </AnimatePresence>
     </div>
