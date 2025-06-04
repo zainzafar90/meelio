@@ -16,7 +16,6 @@ import { env } from "../../utils";
 import { userAuthSchema } from "../../lib/validations/auth";
 import { useAuthStore } from "../../stores/auth.store";
 import { useShallow } from "zustand/shallow";
-import { useTranslation } from "react-i18next";
 import { useAppStore } from "../../stores/app.store";
 
 type FormData = z.infer<typeof userAuthSchema>;
