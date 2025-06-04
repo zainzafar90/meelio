@@ -7,14 +7,12 @@ import { useAppStore } from "../stores/app.store";
 import { useSettingsStore } from "../stores/settings.store";
 import { useMantraStore, useGreetingStore } from "../stores/greetings.store";
 import { usePomodoroStore } from "../stores/unified-pomodoro.store";
-import { useTodoStore } from "../stores/todo.store";
 
 /**
  * Clear all persisted state and IndexedDB data.
  */
 export async function clearLocalData() {
   try {
-    // Clear Zustand persisted storage
     useAuthStore.persist?.clearStorage?.();
     useBackgroundStore.persist?.clearStorage?.();
     useDockStore.persist?.clearStorage?.();
@@ -24,10 +22,9 @@ export async function clearLocalData() {
     useMantraStore.persist?.clearStorage?.();
     useGreetingStore.persist?.clearStorage?.();
     usePomodoroStore.persist?.clearStorage?.();
-    useTodoStore.persist?.clearStorage?.();
 
     // Remove local-only keys
-    localStorage.removeItem("meelio:last_daily_reset");
+    localStorage.removeItem("meelio:local:last_daily_reset");
     localStorage.removeItem("meelio:local:name");
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("meelio:local")) {

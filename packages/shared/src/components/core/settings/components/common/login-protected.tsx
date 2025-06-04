@@ -37,7 +37,7 @@ export const LoginButton = ({
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
 
   const handleOpen = () => {
-    localStorage.setItem("meelio:migrate_guest", "true");
+    localStorage.setItem("meelio:local:migrate_guest", "true");
     setIsAuthOpen(true);
   };
 

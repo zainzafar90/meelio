@@ -1,5 +1,4 @@
 import { ReactNode, useEffect, useState } from "react";
-// import { QueryClient } from "@tanstack/react-query";
 
 import { useAuthStore } from "../stores/auth.store";
 import { api } from "../api";
@@ -44,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             if (user.data) {
               const shouldMigrate =
-                localStorage.getItem("meelio:migrate_guest") === "true";
+                localStorage.getItem("meelio:local:migrate_guest") === "true";
 
               if (authStore.guestUser) {
                 if (shouldMigrate) {
@@ -65,14 +64,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   }
 
                   await cleanupGuestData(authStore.guestUser.id);
-                  localStorage.removeItem("meelio:migrate_guest");
+                  localStorage.removeItem("meelio:local:migrate_guest");
                 }
 
                 await clearLocalData();
-              } else {
-                await clearLocalData();
               }
-
               authStore.authenticate(user.data);
               authStore.authenticateGuest(null as any);
             }
@@ -83,9 +79,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       })();
     }
   }, [mounted]);
-
   return (
-    <AuthContext.Provider value={authStore}>
+    <AuthContext.Provider
+      value={{ ...authStore, logoutUser: authStore.logout }}
+    >
       {children}
       <ExtensionRedirectDialog />
     </AuthContext.Provider>
