@@ -15,11 +15,19 @@ import { cn } from "../../../../lib/utils";
 import { Icons } from "../../../../components/icons/icons";
 import { useDisclosure } from "../../../../hooks/use-disclosure";
 
-import { BREATHING_METHODS, useBreathingStore } from "../store/breathing.store";
+import {
+  BREATHING_METHODS,
+  SESSION_SET_OPTIONS,
+  useBreathingStore,
+} from "../store/breathing.store";
 
 export const BreatheMethodSelectorDialog: React.FC = () => {
-  const { selectedMethod, setSelectedMethod: setSelectedMethod } =
-    useBreathingStore();
+  const {
+    selectedMethod,
+    setSelectedMethod: setSelectedMethod,
+    sessionSets,
+    setSessionSets,
+  } = useBreathingStore();
   const { isOpen, open, close } = useDisclosure();
   const { t } = useTranslation();
 
@@ -90,6 +98,33 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
                 </motion.button>
               );
             })}
+          </div>
+
+          {/* Session Count Selector */}
+          <div className="border-t p-6">
+            <h3 className="mb-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+              Repetitions{" "}
+              <span className="text-sm text-muted-foreground">
+                (Inhale + Exhale + Hold = 1 Rep)
+              </span>
+            </h3>
+            <div className="flex gap-3">
+              {SESSION_SET_OPTIONS.map((sets) => (
+                <motion.button
+                  key={sets}
+                  onClick={() => setSessionSets(sets)}
+                  className={cn(
+                    "flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-all",
+                    sessionSets === sets
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  )}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {sets} reps
+                </motion.button>
+              ))}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

@@ -126,9 +126,17 @@ export const tasksService = {
       userId,
       title: taskData.title,
       completed: taskData.completed ?? false,
+      pinned: taskData.pinned ?? false,
       category: taskData.category ?? null,
       dueDate: dueDateObj || null,
     };
+
+    if (insertData.pinned) {
+      await db
+        .update(tasks)
+        .set({ pinned: false })
+        .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
+    }
 
     const result = await db.insert(tasks).values(insertData).returning();
     return result[0];
@@ -162,6 +170,15 @@ export const tasksService = {
     if (updateData.title !== undefined) data.title = updateData.title;
     if (updateData.completed !== undefined)
       data.completed = updateData.completed;
+    if (updateData.pinned !== undefined) {
+      data.pinned = updateData.pinned;
+      if (updateData.pinned) {
+        await db
+          .update(tasks)
+          .set({ pinned: false })
+          .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
+      }
+    }
     if (updateData.category !== undefined) data.category = updateData.category;
     if (updateData.dueDate !== undefined) data.dueDate = dueDateObj;
 

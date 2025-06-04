@@ -117,7 +117,17 @@ const ExtensionSiteBlockerContent = () => {
   );
 
   const addCustomSite = async () => {
-    const site = siteInput.trim();
+    let site = siteInput.trim();
+    if (!site) return;
+
+    try {
+      const url = new URL(site.includes("://") ? site : `https://${site}`);
+      site = url.hostname.replace(/^www\./, "");
+    } catch {
+      const match = site.match(/([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      site = match ? match[1].replace(/^www\./, "") : "";
+    }
+
     if (!site) return;
 
     if (!blockedSites.includes(site)) {

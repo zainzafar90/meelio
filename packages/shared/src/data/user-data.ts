@@ -1,6 +1,10 @@
 import { PomodoroSettings } from "../types/auth";
 
-export const DEFAULT_SETTINGS: { pomodoro: PomodoroSettings } = {
+export const DEFAULT_SETTINGS: {
+  pomodoro: PomodoroSettings;
+  onboardingCompleted: boolean;
+  todo: { confettiOnComplete: boolean };
+} = {
   pomodoro: {
     workDuration: 25,
     breakDuration: 5,
@@ -8,5 +12,9 @@ export const DEFAULT_SETTINGS: { pomodoro: PomodoroSettings } = {
     autoBlock: false,
     soundOn: true,
     dailyFocusLimit: 120,
+  },
+  onboardingCompleted: false,
+  todo: {
+    confettiOnComplete: false,
   },
 };

@@ -16,16 +16,16 @@
         "short": {
           "jan": "Jan",
           "feb": "Feb",
-          "mär": "Mär",
+          "mar": "Mär",
           "apr": "Apr",
-          "mai": "Mai",
+          "may": "Mai",
           "jun": "Jun",
           "jul": "Jul",
           "aug": "Aug",
           "sep": "Sep",
-          "okt": "Okt",
+          "oct": "Okt",
           "nov": "Nov",
-          "dez": "Dez"
+          "dec": "Dez"
         }
       }
     },
@@ -48,6 +48,9 @@
       "toggle": "Umschalten",
       "dismiss": "Schließen"
     },
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen",
+    "close": "Schließen",
     "weekdays": {
       "short": {
         "monday": "Mo",
@@ -268,6 +271,18 @@
     "reset": {
       "title": "Timer zurücksetzen",
       "description": "Bist du sicher, dass du den Timer zurücksetzen möchtest? Der gesamte Fortschritt geht verloren."
+    },
+    "limitReached": {
+      "toast": "Tägliches 90-Minuten-Limit erreicht!",
+      "title": "Tägliches Limit erreicht",
+      "description": "Großartige Arbeit heute! Upgrade auf Pro für unbegrenzte Zeit."
+    },
+    "controls": {
+      "focusMode": "Fokusmodus",
+      "breakMode": "Pausenmodus",
+      "reset": "Timer zurücksetzen",
+      "startStop": "Timer starten/stoppen",
+      "skipStage": "Zum nächsten Abschnitt springen"
     }
   },
   "settings": {
@@ -290,7 +305,8 @@
       "advanced": "Erweitert",
       "language": "Sprache",
       "dock": "Dock",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "timer": "Timer"
     },
     "general": {
       "title": "Allgemein",
@@ -302,6 +318,21 @@
       "wallpaperRotation": {
         "title": "Hintergrund Rotation",
         "description": "Rotiere neue Hintergründe jeden Tag"
+      },
+      "onboardingReset": {
+        "title": "Onboarding",
+        "description": "Zeige die Dock-Onboarding-Tour erneut an",
+        "button": "Neustart",
+        "error": "Fehler beim Zurücksetzen des Onboardings"
+      },
+      "confettiOnComplete": {
+        "title": "Todo-Konfetti",
+        "description": "Feiere erledigte Todos mit Konfetti",
+        "error": "Fehler beim Aktualisieren der Einstellung"
+      },
+      "twelveHourClock": {
+        "title": "24-Stunden-Uhr",
+        "description": "Zeit im 24-Stunden-Format anzeigen"
       }
     },
     "appearance": {
@@ -420,5 +451,30 @@
     "premium-feature-title": "Premium Tab-Stash",
     "premium-feature": "Tägliches Stash-Limit erreicht. Upgrade auf Pro, um unbegrenzt Sitzungen zu speichern.",
     "upgrade": "Upgrade auf Pro"
+  },
+  "auth": {
+    "verify": {
+      "verifying": "Dein Konto wird verifiziert...",
+      "success": {
+        "title": "Erfolgreich verifiziert!",
+        "description": "Willkommen zurück bei Meelio."
+      },
+      "failed": {
+        "title": "Verifizierung fehlgeschlagen",
+        "description": "Dein Link sollte 10 Minuten gültig sein. Bitte versuche es erneut."
+      }
+    },
+    "login": {
+      "title": "Willkommen zurück",
+      "description": "Melde dich bei deinem Meelio-Konto an",
+      "register": "Noch kein Konto? Registrieren",
+      "guest": "Als Gast fortfahren"
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "description": "Gib deine E-Mail ein, um dein Konto zu erstellen",
+      "login": "Du hast bereits ein Konto? Anmelden",
+      "privacy": "Durch Klicken auf Weiter stimmst du unserer Datenschutzrichtlinie zu."
+    }
   }
 }

@@ -12,7 +12,7 @@ export const userUtils = {
 
   verifyPassword: async (
     password: string,
-    hashedPassword: string
+    hashedPassword: string,
   ): Promise<boolean> => {
     return bcrypt.compare(password, hashedPassword);
   },
@@ -32,6 +32,9 @@ export const userUtils = {
           ...DEFAULT_SETTINGS.pomodoro,
           ...userSettings.pomodoro,
         },
+        onboardingCompleted:
+          userSettings.onboardingCompleted ??
+          DEFAULT_SETTINGS.onboardingCompleted,
       } as typeof safeUser.settings;
     }
 

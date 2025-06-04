@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 import { AuthUser } from "../../../../../types/auth";
 import { Subscription, PlanInterval } from "../../../../../types/subscription";
@@ -16,6 +17,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
   const [subscriptionPlan, setSubscriptionPlan] = useState<Subscription | null>(
     null
   );
+  const { t } = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -50,7 +52,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         }
       }
     } catch (error) {
-      return toast.error("Something went wrong.", {
+      return toast.error(t("common.error"), {
         description: "Subscription portal can't be accessed. Please try again.",
       });
     } finally {
@@ -80,7 +82,7 @@ export const BillingForm = ({ user }: { user: AuthUser }) => {
         window.open(checkout.data.url, "_blank");
       }
     } catch (error) {
-      return toast.error("Something went wrong.", {
+      return toast.error(t("common.error"), {
         description:
           (error as any)?.message ||
           "Checkout portal not working. Please try again.",

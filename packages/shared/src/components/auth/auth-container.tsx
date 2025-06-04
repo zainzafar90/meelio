@@ -5,6 +5,7 @@ import { AuthLayout } from "./auth-layout";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import { Button } from "@repo/ui/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../lib/utils";
 import { buttonVariants } from "@repo/ui/components/ui/button";
 
@@ -34,6 +35,7 @@ export const AuthContainer = (props: AuthContainerProps) => {
         logout: state.logout,
       }))
     );
+  const { t } = useTranslation();
 
   const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [guestName, setGuestName] = useState<string>(
@@ -71,7 +73,7 @@ export const AuthContainer = (props: AuthContainerProps) => {
         position: "top-center",
       });
     } catch (error) {
-      toast.error("Something went wrong", {
+      toast.error(t("common.error"), {
         description: "Unable to create guest account. Please try again.",
       });
     }

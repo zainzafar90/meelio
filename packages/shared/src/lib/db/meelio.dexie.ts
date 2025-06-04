@@ -42,8 +42,28 @@ export class MeelioDB extends Dexie {
             delete task.is_focus;
             delete task.status;
 
-            if (task.completed === undefined) {
-              task.completed = false;
+          if (task.completed === undefined) {
+            task.completed = false;
+          }
+        });
+      });
+
+    this.version(3)
+      .stores({
+        siteBlocker: "id, userId, url",
+
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+      })
+      .upgrade(async (trans) => {
+        await trans
+          .table("tasks")
+          .toCollection()
+          .modify((task: any) => {
+            if (task.pinned === undefined) {
+              task.pinned = false;
             }
           });
       });

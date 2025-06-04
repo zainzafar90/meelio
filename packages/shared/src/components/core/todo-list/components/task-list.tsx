@@ -87,10 +87,11 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const { toggleTask, deleteTask } = useTodoStore(
+  const { toggleTask, deleteTask, togglePinTask } = useTodoStore(
     useShallow((state) => ({
       toggleTask: state.toggleTask,
       deleteTask: state.deleteTask,
+      togglePinTask: state.togglePinTask,
     }))
   );
 
@@ -123,6 +124,20 @@ const TaskItem = ({ task }: { task: Task }) => {
         </span>
       </div>
       <div className="ml-auto flex items-center gap-2">
+        <button
+          className="text-muted-foreground hover:text-yellow-500"
+          onClick={(e) => {
+            e.stopPropagation();
+            togglePinTask(task.id);
+          }}
+        >
+          <Icons.star
+            className={cn(
+              "h-4 w-4",
+              task.pinned ? "fill-yellow-400 text-yellow-400" : ""
+            )}
+          />
+        </button>
         {task.dueDate && (
           <Badge className="uppercase" variant="secondary">
             {new Date(task.dueDate).toLocaleDateString()}
