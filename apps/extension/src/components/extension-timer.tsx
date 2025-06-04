@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore, usePomodoroTimer } from "@repo/shared";
 
-import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
 
 export const ExtensionTimer = () => {
@@ -14,234 +11,25 @@ export const ExtensionTimer = () => {
   const {
     activeStage,
     isRunning,
-    endTimestamp,
+    remaining,
+    hasStarted,
+    isLoading,
     stageDurations,
-    autoStartTimers,
-    getDailyLimitStatus,
-    stats,
-    sessionCount,
-  } = usePomodoroStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
-
-  const dailyLimitStatus = getDailyLimitStatus();
-
-  const completeStage = async () => {
-    const store = usePomodoroStore.getState();
-    const finishedStage = store.activeStage;
-
-    await store.completeSession();
-    store.playCompletionSound();
-    store.showCompletionNotification(finishedStage);
-
-    store.advanceTimer();
-    const newState = usePomodoroStore.getState();
-
-    const duration = newState.stageDurations[newState.activeStage];
-    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
-
-    if (newState.isRunning) {
-      chrome.runtime.sendMessage({ type: 'START', duration });
-      usePomodoroStore.setState({
-        endTimestamp: Date.now() + duration * 1000,
-        lastUpdated: Date.now(),
-      });
-    } else {
-      usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-      setRemaining(duration);
-    }
-
-    if (
-      finishedStage === PomodoroStage.Focus &&
-      !dailyLimitStatus.isLimitReached &&
-      newState.getDailyLimitStatus().isLimitReached
-    ) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-    }
-  };
-
-  const getNextStage = (state: PomodoroState) => {
-    if (state.activeStage === PomodoroStage.Focus) {
-      return PomodoroStage.Break;
-    }
-    return PomodoroStage.Focus;
-  };
-
-  const handleStart = () => {
-    if (dailyLimitStatus.isLimitReached) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-      return;
-    }
-
-    setHasStarted(true);
-    const store = usePomodoroStore.getState();
-    const duration = store.stageDurations[activeStage];
-    chrome.runtime.sendMessage({ type: 'START', duration });
-
-    store.startTimer();
-    usePomodoroStore.setState({
-      endTimestamp: Date.now() + duration * 1000,
-      lastUpdated: Date.now(),
-    });
-  };
-
-  const handlePause = () => {
-    chrome.runtime.sendMessage({ type: 'PAUSE' });
-    const store = usePomodoroStore.getState();
-    store.pauseTimer();
-    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-  };
-
-  const handleResume = () => {
-    if (dailyLimitStatus.isLimitReached) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-      return;
-    }
-
-    const store = usePomodoroStore.getState();
-    store.resumeTimer();
-    usePomodoroStore.setState({
-      endTimestamp: Date.now() + remaining * 1000,
-      lastUpdated: Date.now(),
-    });
-  };
-
-  const handleReset = () => {
-    chrome.runtime.sendMessage({ type: 'RESET' });
-    const store = usePomodoroStore.getState();
-    store.pauseTimer();
-    usePomodoroStore.setState({
-      endTimestamp: null,
-      sessionCount: 0,
-      activeStage,
-      lastUpdated: Date.now(),
-    });
-    setHasStarted(false);
-    setRemaining(stageDurations[PomodoroStage.Focus]);
-  };
-
-  const handleSwitch = () => {
-    const store = usePomodoroStore.getState();
-    const nextStage = getNextStage(store);
-    chrome.runtime.sendMessage({ type: 'RESET' });
-    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: stageDurations[nextStage] });
-    store.changeStage(nextStage);
-    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-    setHasStarted(false);
-    setRemaining(stageDurations[nextStage]);
-  };
-
-  const handleSkipToNextStage = () => {
-    const store = usePomodoroStore.getState();
-    chrome.runtime.sendMessage({ type: 'SKIP_TO_NEXT_STAGE' });
-    store.advanceTimer();
-    const state = usePomodoroStore.getState();
-    const duration = state.stageDurations[state.activeStage];
-    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
-    usePomodoroStore.setState({
-      endTimestamp: state.isRunning ? Date.now() + duration * 1000 : null,
-      lastUpdated: Date.now(),
-    });
-    setRemaining(duration);
-  };
-
-  useEffect(() => {
-    const messageHandler = (msg: any) => {
-      switch (msg.type) {
-        case 'TICK':
-          setIsLoading(false);
-          setRemaining(msg.remaining);
-          usePomodoroStore.getState().updateTimer(msg.remaining);
-          break;
-        case 'STAGE_COMPLETE':
-          completeStage();
-          break;
-        case 'PAUSED':
-          setRemaining(msg.remaining);
-          usePomodoroStore.setState({
-            isRunning: false,
-            endTimestamp: null,
-            lastUpdated: Date.now()
-          });
-          break;
-        case 'RESET_COMPLETE':
-          usePomodoroStore.setState({
-            isRunning: false,
-            endTimestamp: null,
-            sessionCount: 0,
-            activeStage,
-            lastUpdated: Date.now()
-          });
-          setHasStarted(false);
-          setRemaining(stageDurations[activeStage]);
-          break;
-      }
-    };
-
-    chrome.runtime.onMessage.addListener(messageHandler);
-    return () => chrome.runtime.onMessage.removeListener(messageHandler);
-  }, []);
-
-  useEffect(() => {
-    if (isRunning && endTimestamp) {
-      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
-      if (remainingTime > 0) {
-        chrome.runtime.sendMessage({ type: 'START', duration: remainingTime });
-      } else {
-        chrome.runtime.sendMessage({ type: 'STAGE_COMPLETE' });
-      }
-    }
-  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers]);
-
-  useEffect(() => {
-    if (isLoading) return;
-
-    const emoji = activeStage === PomodoroStage.Focus ? '🎯' : '☕';
-    const timeStr = formatTime(remaining);
-    const mode = activeStage === PomodoroStage.Focus ? 'Focus' : 'Break';
-
-    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
-  }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
-
-  // Auto-pause timer when daily limit is reached
-  useEffect(() => {
-    if (isRunning && dailyLimitStatus.isLimitReached) {
-      handlePause();
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dailyLimitStatus.isLimitReached, isRunning]);
-
-
-  useEffect(() => {
-    if (!isRunning && !hasStarted) {
-      setRemaining(stageDurations[activeStage]);
-    }
-  }, [activeStage, stageDurations, isRunning, hasStarted]);
-
-  useEffect(() => {
-    if (!isRunning) {
-      setHasStarted(false);
-      setRemaining(stageDurations[activeStage]);
-    }
-  }, [stageDurations, activeStage, isRunning]);
-
-  useEffect(() => {
-    if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
-      setHasStarted(false);
-      setRemaining(stageDurations[activeStage]);
-      chrome.runtime.sendMessage({ type: 'RESET' });
-    }
-  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
+    dailyLimitStatus,
+    handleStart,
+    handlePause,
+    handleResume,
+    handleReset,
+    handleSwitch,
+    handleSkipToNextStage,
+  } = usePomodoroTimer({
+    send: (message) => chrome.runtime.sendMessage(message),
+    addListener: (handler) => {
+      const listener = (msg: any) => handler(msg);
+      chrome.runtime.onMessage.addListener(listener);
+      return () => chrome.runtime.onMessage.removeListener(listener);
+    },
+  });
 
   return (
     <div className="relative">

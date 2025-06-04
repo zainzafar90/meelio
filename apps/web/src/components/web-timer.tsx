@@ -1,10 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore, usePomodoroTimer } from "@repo/shared";
 
-import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
 
 import TimerWorker from '../workers/timer-worker?worker';
@@ -17,256 +15,25 @@ export const WebTimer = () => {
   const {
     activeStage,
     isRunning,
-    endTimestamp,
+    remaining,
+    hasStarted,
+    isLoading,
     stageDurations,
-    autoStartTimers,
-    getDailyLimitStatus,
-    stats,
-    sessionCount,
-  } = usePomodoroStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [remaining, setRemaining] = useState(stageDurations[activeStage]);
-
-  const dailyLimitStatus = getDailyLimitStatus();
-
-
-  const completeStage = async () => {
-    const store = usePomodoroStore.getState();
-    const finishedStage = store.activeStage;
-
-    await store.completeSession();
-    store.playCompletionSound();
-    store.showCompletionNotification(finishedStage);
-
-    store.advanceTimer();
-    const newState = usePomodoroStore.getState();
-
-    const duration = newState.stageDurations[newState.activeStage];
-    workerRef.current?.postMessage({
-      type: 'UPDATE_DURATION',
-      payload: { duration }
-    });
-
-    if (newState.isRunning) {
-      workerRef.current?.postMessage({ type: 'START', payload: { duration } });
-      usePomodoroStore.setState({
-        endTimestamp: Date.now() + duration * 1000,
-        lastUpdated: Date.now(),
-      });
-    } else {
-      usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-      setRemaining(duration);
-    }
-
-    // Notify user if limit reached after completing focus session
-    if (
-      finishedStage === PomodoroStage.Focus &&
-      !dailyLimitStatus.isLimitReached &&
-      newState.getDailyLimitStatus().isLimitReached
-    ) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-    }
-  };
-
-  const getNextStage = (state: PomodoroState) => {
-    if (state.activeStage === PomodoroStage.Focus) {
-      return PomodoroStage.Break;
-    }
-    return PomodoroStage.Focus;
-  };
-
-  const handleStart = async () => {
-    if (dailyLimitStatus.isLimitReached) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-      return;
-    }
-
-    const store = usePomodoroStore.getState();
-    if (store.enableSound && Notification.permission === "default") {
-      await store.requestNotificationPermission();
-    }
-
-    setHasStarted(true);
-    const duration = store.stageDurations[activeStage];
-    workerRef.current?.postMessage({
-      type: 'START',
-      payload: { duration }
-    });
-
-    store.startTimer();
-    usePomodoroStore.setState({
-      endTimestamp: Date.now() + duration * 1000,
-      lastUpdated: Date.now(),
-    });
-  };
-
-  const handlePause = () => {
-    workerRef.current?.postMessage({ type: 'PAUSE' });
-    const store = usePomodoroStore.getState();
-    store.pauseTimer();
-    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-  };
-
-  const handleResume = () => {
-    if (dailyLimitStatus.isLimitReached) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-      return;
-    }
-
-    const store = usePomodoroStore.getState();
-    store.resumeTimer();
-    usePomodoroStore.setState({
-      endTimestamp: Date.now() + remaining * 1000,
-      lastUpdated: Date.now(),
-    });
-  };
-
-  const handleReset = () => {
-    workerRef.current?.postMessage({ type: 'RESET' });
-    const store = usePomodoroStore.getState();
-    store.pauseTimer();
-    usePomodoroStore.setState({
-      endTimestamp: null,
-      sessionCount: 0,
-      activeStage,
-      lastUpdated: Date.now(),
-    });
-    setHasStarted(false);
-    setRemaining(stageDurations[PomodoroStage.Focus]);
-  };
-
-
-  const handleSwitch = () => {
-    const store = usePomodoroStore.getState();
-    const nextStage = getNextStage(store);
-    workerRef.current?.postMessage({ type: 'RESET' });
-    workerRef.current?.postMessage({
-      type: 'UPDATE_DURATION',
-      payload: { duration: stageDurations[nextStage] }
-    });
-    store.changeStage(nextStage);
-    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-    setHasStarted(false);
-    setRemaining(stageDurations[nextStage]);
-  };
-
-  const handleSkipToNextStage = () => {
-    const store = usePomodoroStore.getState();
-    workerRef.current?.postMessage({ type: 'SKIP_TO_NEXT_STAGE' });
-    store.advanceTimer();
-    const state = usePomodoroStore.getState();
-    const duration = state.stageDurations[state.activeStage];
-    workerRef.current?.postMessage({
-      type: 'UPDATE_DURATION',
-      payload: { duration },
-    });
-    usePomodoroStore.setState({
-      endTimestamp: state.isRunning ? Date.now() + duration * 1000 : null,
-      lastUpdated: Date.now(),
-    });
-    setRemaining(duration);
-  };
-
-  useEffect(() => {
-    workerRef.current = new TimerWorker();
-
-    const handleMessage = ({ data }: MessageEvent) => {
-      switch (data.type) {
-        case 'TICK':
-          setIsLoading(false);
-          setRemaining(data.remaining);
-          usePomodoroStore.getState().updateTimer(data.remaining);
-          break;
-        case 'STAGE_COMPLETE':
-          completeStage();
-          break;
-        case 'PAUSED':
-          setRemaining(data.remaining);
-          usePomodoroStore.setState({
-            isRunning: false,
-            endTimestamp: null,
-            lastUpdated: Date.now()
-          });
-          break;
-        case 'RESET_COMPLETE':
-          usePomodoroStore.setState({
-            isRunning: false,
-            endTimestamp: null,
-            sessionCount: 0,
-            activeStage,
-            lastUpdated: Date.now()
-          });
-          setHasStarted(false);
-          setRemaining(stageDurations[activeStage]);
-          break;
-      }
-    };
-
-    workerRef.current.onmessage = handleMessage;
-    return () => workerRef.current?.terminate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (isRunning && endTimestamp && workerRef.current) {
-      const remainingTime = Math.max(0, Math.floor((endTimestamp - Date.now()) / 1000));
-      if (remainingTime > 0) {
-        workerRef.current.postMessage({ type: 'START', payload: { duration: remainingTime } });
-      } else {
-        workerRef.current.postMessage({ type: 'STAGE_COMPLETE' });
-      }
-    }
-  }, [isRunning, endTimestamp, activeStage, stageDurations, autoStartTimers]);
-
-  useEffect(() => {
-    if (isLoading) return;
-
-    const emoji = activeStage === PomodoroStage.Focus ? '🎯' : '☕';
-    const timeStr = formatTime(remaining);
-    const mode = activeStage === PomodoroStage.Focus ? 'Focus' : 'Break';
-
-    document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
-  }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
-
-  // Auto-pause timer when daily limit is reached
-  useEffect(() => {
-    if (isRunning && dailyLimitStatus.isLimitReached) {
-      handlePause();
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dailyLimitStatus.isLimitReached, isRunning]);
-
-
-  useEffect(() => {
-    if (!isRunning && !hasStarted) {
-      setRemaining(stageDurations[activeStage]);
-    }
-  }, [activeStage, stageDurations, isRunning, hasStarted]);
-
-  useEffect(() => {
-    if (!isRunning) {
-      setHasStarted(false);
-      setRemaining(stageDurations[activeStage]);
-    }
-  }, [stageDurations, activeStage, isRunning]);
-
-  useEffect(() => {
-    if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
-      setHasStarted(false);
-      setRemaining(stageDurations[activeStage]);
-      workerRef.current?.postMessage({ type: 'RESET' });
-    }
-  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
+    dailyLimitStatus,
+    handleStart,
+    handlePause,
+    handleResume,
+    handleReset,
+    handleSwitch,
+    handleSkipToNextStage,
+  } = usePomodoroTimer({
+    send: (message) => workerRef.current?.postMessage(message),
+    addListener: (handler) => {
+      workerRef.current = new TimerWorker();
+      workerRef.current.onmessage = (e: MessageEvent) => handler(e.data);
+      return () => workerRef.current?.terminate();
+    },
+  });
 
   return (
     <div className="relative">
