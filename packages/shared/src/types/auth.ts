@@ -13,6 +13,9 @@ export interface PomodoroSettings {
 
 export interface UserSettings {
   pomodoro: PomodoroSettings;
+  todo: {
+    confettiOnComplete: boolean;
+  };
 }
 
 export type AuthUser = {

@@ -17,6 +17,7 @@ export const tasks = pgTable(
     userId: text("user_id").notNull(),
     title: text("title").notNull(),
     completed: boolean("completed").notNull().default(false),
+    pinned: boolean("pinned").notNull().default(false),
     category: text("category"),
     dueDate: timestamp("due_date", { withTimezone: true }),
     createdAt,
@@ -26,6 +27,7 @@ export const tasks = pgTable(
     userIdIdx: index("idx_tasks_user_id").on(table.userId),
     categoryIdx: index("idx_tasks_category").on(table.category),
     completedIdx: index("idx_tasks_completed").on(table.completed),
+    pinnedIdx: index("idx_tasks_pinned").on(table.pinned),
     dueDateIdx: index("idx_tasks_due_date").on(table.dueDate),
   })
 );

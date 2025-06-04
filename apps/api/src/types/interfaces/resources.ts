@@ -42,8 +42,13 @@ export interface IPomodoroSettings {
   dailyFocusLimit: number;
 }
 
+export interface ITodoSettings {
+  confettiOnComplete: boolean;
+}
+
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
+  todo: ITodoSettings;
 }
 
 export interface IUser {

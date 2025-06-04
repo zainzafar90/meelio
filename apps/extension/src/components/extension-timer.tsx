@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog, ConditionalFeature, TimerPlaceholder } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog, ConditionalFeature, TimerPlaceholder, NextPinnedTask } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
@@ -289,6 +289,7 @@ export const ExtensionTimer = () => {
             <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
               {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
             </div>
+            <NextPinnedTask />
           </div>
 
           <div className="flex flex-col gap-4">
