@@ -302,6 +302,12 @@
       "wallpaperRotation": {
         "title": "Hintergrund Rotation",
         "description": "Rotiere neue Hintergründe jeden Tag"
+      },
+      "onboardingReset": {
+        "title": "Onboarding",
+        "description": "Zeige die Dock-Onboarding-Tour erneut an",
+        "button": "Neustart",
+        "error": "Fehler beim Zurücksetzen des Onboardings"
       }
     },
     "appearance": {
