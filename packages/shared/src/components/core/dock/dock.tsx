@@ -178,7 +178,6 @@ export const Dock = () => {
               icon: Icons.tabStash,
               activeIcon: Icons.tabStashActive,
               onClick: toggleTabStash,
-              requirePro: true,
             },
           ]
         : []),
