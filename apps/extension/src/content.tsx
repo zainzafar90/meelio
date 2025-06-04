@@ -45,7 +45,9 @@ const PlasmoOverlay = () => {
     const currentSite = getCurrentSite();
     const blockedSite = blockedSites.find((site) => currentSite.includes(site));
     if (blockedSite) {
-      removeSite(blockedSite);
+      // Temporarily unblock the site without removing it from the user's
+      // account so that "open anyway" only affects the current device.
+      removeSite(blockedSite, false);
     }
   };
 

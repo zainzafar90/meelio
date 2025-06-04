@@ -7,7 +7,11 @@ interface SiteBlockerState {
   blockedSites: string[];
   idMap: Record<string, string>; // url -> id
   addSite: (url: string) => Promise<void>;
-  removeSite: (url: string) => Promise<void>;
+  /**
+   * Remove a site from the local list. If `sync` is true and the user is
+   * authenticated the entry will also be deleted from the API.
+   */
+  removeSite: (url: string, sync?: boolean) => Promise<void>;
   loadFromServer: () => Promise<void>;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -30,10 +34,12 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           }
         }
       },
-      removeSite: async (url) => {
-        set((state) => ({ blockedSites: state.blockedSites.filter((s) => s !== url) }));
+      removeSite: async (url, sync = true) => {
+        set((state) => ({
+          blockedSites: state.blockedSites.filter((s) => s !== url),
+        }));
         const user = useAuthStore.getState().user;
-        if (user) {
+        if (sync && user) {
           const id = get().idMap[url];
           if (id) {
             try {
@@ -42,12 +48,12 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
               console.error(e);
             }
           }
+          set((state) => {
+            const newMap = { ...state.idMap };
+            delete newMap[url];
+            return { idMap: newMap };
+          });
         }
-        set((state) => {
-          const newMap = { ...state.idMap };
-          delete newMap[url];
-          return { idMap: newMap };
-        });
       },
       loadFromServer: async () => {
         const user = useAuthStore.getState().user;
