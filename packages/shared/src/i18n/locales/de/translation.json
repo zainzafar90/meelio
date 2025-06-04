@@ -302,6 +302,10 @@
       "wallpaperRotation": {
         "title": "Hintergrund Rotation",
         "description": "Rotiere neue Hintergründe jeden Tag"
+      },
+      "twelveHourClock": {
+        "title": "24-Stunden-Uhr",
+        "description": "Zeit im 24-Stunden-Format anzeigen"
       }
     },
     "appearance": {

@@ -23,9 +23,13 @@ const getCurrentSite = () => {
   return new URL(window.location.href).hostname;
 };
 
+const doesHostMatch = (host: string, site: string) => {
+  return host === site || host.endsWith(`.${site}`);
+};
+
 const isBlockedSite = (blockedSites: string[]) => {
   const currentSite = getCurrentSite();
-  return blockedSites.some((site) => currentSite.includes(site));
+  return blockedSites.some((site) => doesHostMatch(currentSite, site));
 };
 
 const PlasmoOverlay = () => {
@@ -51,7 +55,9 @@ const PlasmoOverlay = () => {
 
   const openAnyway = () => {
     const currentSite = getCurrentSite();
-    const blockedSite = blockedSites.find((site) => currentSite.includes(site));
+    const blockedSite = blockedSites.find((site) =>
+      doesHostMatch(currentSite, site)
+    );
     if (blockedSite) {
       setBlockedSites(blockedSites.filter((site) => site !== blockedSite));
     }

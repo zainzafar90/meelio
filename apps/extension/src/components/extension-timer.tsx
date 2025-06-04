@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, TimerSettingsDialog, ConditionalFeature, TimerPlaceholder, NextPinnedTask } from "@repo/shared";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
 import { Crown } from "lucide-react";
 
 export const ExtensionTimer = () => {
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
-  const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
+  const { openSettings, setTab } = useSettingsStore();
   const {
     activeStage,
     isRunning,
@@ -399,12 +399,11 @@ export const ExtensionTimer = () => {
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}
         onOpenChange={toggleStatsDialog}
-        onSettingsClick={toggleSettingsDialog}
-      />
-
-      <TimerSettingsDialog
-        isOpen={isSettingsDialogOpen}
-        onClose={toggleSettingsDialog}
+        onSettingsClick={() => {
+          toggleStatsDialog();
+          setTab("timer");
+          openSettings();
+        }}
       />
 
     </div>
