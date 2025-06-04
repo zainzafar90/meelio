@@ -362,7 +362,8 @@
         "label": "Name",
         "description": "Please enter your name",
         "placeholder": "John Doe"
-      }
+      },
+      "revokeCalendar": "Revoke Google Calendar access"
     },
     "feedback": {
       "title": "Feedback",

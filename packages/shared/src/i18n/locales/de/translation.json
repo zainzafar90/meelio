@@ -363,7 +363,8 @@
         "label": "Name",
         "description": "Bitte gib deinen Namen ein",
         "placeholder": "John Doe"
-      }
+      },
+      "revokeCalendar": "Google Kalenderzugriff widerrufen"
     },
     "feedback": {
       "title": "Feedback",

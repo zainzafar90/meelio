@@ -4,6 +4,7 @@ import * as weatherApi from "./weather.api";
 import * as focusSessionsApi from "./focus-sessions.api";
 import * as taskApi from "./task.api";
 import * as settingsApi from "./settings.api";
+import * as calendarApi from "./calendar.api";
 
 const api = {
   auth: authApi,
@@ -12,6 +13,7 @@ const api = {
   focusSessions: focusSessionsApi,
   tasks: taskApi,
   settings: settingsApi,
+  calendar: calendarApi,
 };
 
 export { api };

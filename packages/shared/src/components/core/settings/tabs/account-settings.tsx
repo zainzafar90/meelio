@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAuthStore } from "../../../../stores/auth.store";
 import { AccountForm } from "../components/account/account-form";
+import { CalendarPermissions } from "../components/account/calendar-permissions";
 import { LoginProtected } from "../components/common/login-protected";
 import { useShallow } from "zustand/shallow";
 
@@ -10,7 +11,7 @@ export const AccountSettings = () => {
   const { user } = useAuthStore(
     useShallow((state) => ({
       user: state.user,
-    }))
+    })),
   );
 
   if (!user) return <LoginProtected />;
@@ -22,6 +23,7 @@ export const AccountSettings = () => {
       </p>
       <div className="flex-1 overflow-y-auto">
         <AccountForm user={user} />
+        <CalendarPermissions />
       </div>
     </div>
   );

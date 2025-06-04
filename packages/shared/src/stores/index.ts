@@ -8,3 +8,4 @@ export * from "./sync.store";
 export * from "./soundscapes.store";
 export * from "./todo.store";
 export { usePomodoroStore } from "./unified-pomodoro.store";
+export * from "./calendar.store";
