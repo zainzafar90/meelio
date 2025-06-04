@@ -1,6 +1,7 @@
 import { Crown } from "lucide-react";
 import { PomodoroStage } from "../../../types/pomodoro";
 import { Icons } from "../../icons";
+import { useTranslation } from "react-i18next";
 
 interface TimerPlaceholderProps {
   activeStage: PomodoroStage;
@@ -11,6 +12,7 @@ export const TimerPlaceholder = ({
   activeStage,
   onUpgradeClick,
 }: TimerPlaceholderProps) => {
+  const { t } = useTranslation();
   return (
     <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
       <div className="p-6 space-y-6">
@@ -22,7 +24,7 @@ export const TimerPlaceholder = ({
               className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                 activeStage === PomodoroStage.Focus ? "bg-white/50" : ""
               } opacity-50 cursor-not-allowed`}
-              title="Daily limit reached"
+              title={t("timer.limitReached.title")}
             >
               <span>Focus</span>
             </button>
@@ -31,7 +33,7 @@ export const TimerPlaceholder = ({
               className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                 activeStage === PomodoroStage.Break ? "bg-white/50" : ""
               } opacity-50 cursor-not-allowed`}
-              title="Daily limit reached"
+              title={t("timer.limitReached.title")}
             >
               <span>Break</span>
             </button>
@@ -45,7 +47,7 @@ export const TimerPlaceholder = ({
           </div>
           <div className="flex flex-col items-center gap-1 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
             <div className="text-sm text-white font-medium">
-              Daily 90-minute limit reached
+              {t("timer.limitReached.toast")}
             </div>
             <div className="text-xs text-white/80">
               Resets at midnight or upgrade to Pro
@@ -59,11 +61,11 @@ export const TimerPlaceholder = ({
             <button
               className="relative  hidden md:flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
-              title="Daily limit reached"
+              title={t("timer.limitReached.title")}
               role="button"
             >
               <Icons.resetTimer className="size-4 text-white/90" />
-              <span className="sr-only">Reset timer</span>
+              <span className="sr-only">{t("timer.controls.reset")}</span>
             </button>
 
             <button
@@ -81,21 +83,21 @@ export const TimerPlaceholder = ({
             <button
               className="relative hidden md:flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
-              title="Daily limit reached"
+              title={t("timer.limitReached.title")}
               role="button"
             >
               <Icons.forward className="size-4 text-white/90" />
-              <span className="sr-only">Skip to next timer</span>
+              <span className="sr-only">{t("timer.controls.skipStage")}</span>
             </button>
 
             <button
               className="relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm opacity-50 cursor-not-allowed"
               disabled
-              title="Daily limit reached"
+              title={t("timer.limitReached.title")}
               role="button"
             >
               <Icons.graph className="size-4 text-white/90" />
-              <span className="sr-only">Stats</span>
+              <span className="sr-only">{t("timer.stats.title")}</span>
             </button>
           </div>
 

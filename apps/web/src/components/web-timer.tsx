@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore } from "@repo/shared";
 
 import { usePomodoroStore } from "@repo/shared";
@@ -10,6 +11,7 @@ import TimerWorker from '../workers/timer-worker?worker';
 
 export const WebTimer = () => {
   const workerRef = useRef<Worker>();
+  const { t } = useTranslation();
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
   const { openSettings, setTab } = useSettingsStore();
   const {
@@ -63,8 +65,8 @@ export const WebTimer = () => {
       !dailyLimitStatus.isLimitReached &&
       newState.getDailyLimitStatus().isLimitReached
     ) {
-      toast.info("Daily 90-minute limit reached!", {
-        description: "Great work today! Upgrade to Pro for unlimited time."
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
       });
     }
   };
@@ -78,8 +80,8 @@ export const WebTimer = () => {
 
   const handleStart = async () => {
     if (dailyLimitStatus.isLimitReached) {
-      toast.info("Daily 90-minute limit reached!", {
-        description: "Great work today! Upgrade to Pro for unlimited time."
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
       });
       return;
     }
@@ -112,8 +114,8 @@ export const WebTimer = () => {
 
   const handleResume = () => {
     if (dailyLimitStatus.isLimitReached) {
-      toast.info("Daily 90-minute limit reached!", {
-        description: "Great work today! Upgrade to Pro for unlimited time."
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
       });
       return;
     }
@@ -235,8 +237,8 @@ export const WebTimer = () => {
   useEffect(() => {
     if (isRunning && dailyLimitStatus.isLimitReached) {
       handlePause();
-      toast.info("Daily 90-minute limit reached!", {
-        description: "Great work today! Upgrade to Pro for unlimited time."
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -284,7 +286,7 @@ export const WebTimer = () => {
                   } ${
                     dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Focus mode"}
+                  title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.focusMode")}
                 >
                   <span>Focus</span>
                 </button>
@@ -303,7 +305,7 @@ export const WebTimer = () => {
                   } ${
                     activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
-                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Break mode"}
+                  title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.breakMode")}
                 >
                   <span>Break</span>
                 </button>
@@ -332,11 +334,11 @@ export const WebTimer = () => {
                     handleReset();
                   }}
                   disabled={dailyLimitStatus.isLimitReached}
-                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Reset timer"}
+                  title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.reset")}
                   role="button"
                 >
                   <Icons.resetTimer className="size-4 text-white/90" />
-                  <span className="sr-only">Reset timer</span>
+                  <span className="sr-only">{t("timer.controls.reset")}</span>
                 </button>
 
                 <button
@@ -357,7 +359,7 @@ export const WebTimer = () => {
                     }
                   }}
                   disabled={dailyLimitStatus.isLimitReached}
-                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Start/Stop timer"}
+                  title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.startStop")}
                   role="button"
                 >
                   {dailyLimitStatus.isLimitReached ? (
@@ -369,7 +371,7 @@ export const WebTimer = () => {
                     <>
                       {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
                       <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">
-                        {isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}
+                        {isRunning ? t('common.actions.stop') : hasStarted ? 'Resume' : t('common.actions.start')}
                       </span>
                     </>
                   )}
@@ -386,21 +388,21 @@ export const WebTimer = () => {
                     handleSkipToNextStage();
                   }}
                   disabled={dailyLimitStatus.isLimitReached}
-                  title={dailyLimitStatus.isLimitReached ? "Daily limit reached" : "Skip to next stage"}
+                  title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.skipStage")}
                   role="button"
                 >
                   <Icons.forward className="size-4 text-white/90" />
-                  <span className="sr-only">Skip to next timer</span>
+                  <span className="sr-only">{t("timer.controls.skipStage")}</span>
                 </button>
 
                 <button
                   className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                   onClick={toggleStatsDialog}
-                  title="Stats"
+                  title={t("timer.stats.title")}
                   role="button"
                 >
                   <Icons.graph className="size-4 text-white/90" />
-                  <span className="sr-only">Stats</span>
+                  <span className="sr-only">{t("timer.stats.title")}</span>
                 </button>
               </div>
 
