@@ -1,7 +1,6 @@
 import React from "react";
 import { useAuthStore } from "../../stores/auth.store";
 import { Button } from "@repo/ui/components/ui/button";
-import { Icons } from "../icons/icons";
 import { PremiumFeatureTooltip } from "./premium-feature-tooltip";
 import { useShallow } from "zustand/shallow";
 import { motion } from "framer-motion";
