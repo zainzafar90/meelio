@@ -2,6 +2,7 @@ import Axios from "axios";
 
 import { env } from "../utils/env.utils";
 import { useAuthStore } from "../stores/auth.store";
+import { clearLocalData } from "../utils/clear-data.utils";
 
 /*
 |--------------------------------------------------------------------------
@@ -24,10 +25,13 @@ axios.defaults.headers.common["Accept"] = "application/json";
 
 axios.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
-      // Reset only the authenticated user, keep guest user intact
-      useAuthStore.getState().logoutUser();
+      const { user, logoutUser } = useAuthStore.getState();
+      logoutUser();
+      if (user) {
+        await clearLocalData();
+      }
     }
     return Promise.reject(error);
   }

@@ -41,6 +41,7 @@ import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore } from "../../../stores/settings.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { clearLocalData } from "../../../utils/clear-data.utils";
 import { useShallow } from "zustand/shallow";
 import { LogoMonochrome } from "../../../components/common/logo";
 import { LoginButton } from "./components/common/login-protected";
@@ -80,6 +81,7 @@ export function SettingsDialog() {
 
   const signOut = async () => {
     logout();
+    await clearLocalData();
     closeSettings();
     await api.auth.logoutAccount();
   };

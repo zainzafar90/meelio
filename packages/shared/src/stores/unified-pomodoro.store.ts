@@ -90,8 +90,7 @@ export const usePomodoroStore = create(
         pausedRemaining: null,
         lastUpdated: Date.now(),
         lastFocusTrackTime: 0,
-        dailyFocusLimit:
-          DEFAULT_SETTINGS.pomodoro.dailyFocusLimit * 60,
+        dailyFocusLimit: DEFAULT_SETTINGS.pomodoro.dailyFocusLimit * 60,
         // Daily limit stored in seconds
 
         // Timer control methods
@@ -679,7 +678,7 @@ useAuthStore.subscribe((state) => {
 const checkPeriodicReset = () => {
   const now = new Date();
   const todayString = now.toISOString().split("T")[0];
-  const lastResetDate = localStorage.getItem("meelio:lastDailyReset");
+  const lastResetDate = localStorage.getItem("meelio:local:last_daily_reset");
   const state = usePomodoroStore.getState();
 
   if (
@@ -700,7 +699,7 @@ const checkPeriodicReset = () => {
     state.resetTimer();
     state.trackFocusTime(0);
     state.loadTodayStats();
-    localStorage.setItem("meelio:lastDailyReset", todayString);
+    localStorage.setItem("meelio:local:last_daily_reset", todayString);
 
     toast.success("Daily focus time reset");
   }
