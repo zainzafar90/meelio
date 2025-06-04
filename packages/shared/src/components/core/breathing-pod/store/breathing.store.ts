@@ -2,6 +2,11 @@ import { create } from "zustand";
 
 import { playBreathingSound } from "../../../../utils/sound.utils";
 
+export type BreathingSounds = {
+  inhaleExhale: string;
+  hold: string;
+};
+
 export type BreathPhase = "inhale" | "hold1" | "exhale" | "hold2";
 
 export type BreathingMethod = {
@@ -13,6 +18,7 @@ export type BreathingMethod = {
   exhaleTime: number;
   hold2Time: number;
   className?: string;
+  sounds: BreathingSounds;
 };
 
 export const BREATHING_METHODS: BreathingMethod[] = [
@@ -25,6 +31,10 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 6,
     hold2Time: 0,
     className: "text-amber-400 bg-amber-900/5 dark:bg-amber-900/10",
+    sounds: {
+      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
+      hold: "/public/sounds/breathing/hold.mp3",
+    },
   },
   {
     name: "Clear the Mind",
@@ -35,6 +45,10 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 4,
     hold2Time: 0,
     className: "text-green-400 bg-green-900/5 dark:bg-green-900/10",
+    sounds: {
+      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
+      hold: "/public/sounds/breathing/hold.mp3",
+    },
   },
   {
     name: "Relax Deeply",
@@ -45,6 +59,10 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 8,
     hold2Time: 0,
     className: "text-blue-400 bg-blue-900/5 bg-blue-900/10",
+    sounds: {
+      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
+      hold: "/public/sounds/breathing/hold.mp3",
+    },
   },
   {
     name: "Relieve Stress",
@@ -56,6 +74,10 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 4,
     hold2Time: 4,
     className: "text-purple-400 bg-indigo-900/5 bg-indigo-900/10",
+    sounds: {
+      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
+      hold: "/public/sounds/breathing/hold.mp3",
+    },
   },
 ];
 
@@ -64,7 +86,13 @@ interface BreathingState {
   count: number;
   isActive: boolean;
   selectedMethod: BreathingMethod;
+  sessionLength: number;
+  totalSets: number;
+  completedSets: number;
   setPhase: (phase: BreathPhase) => void;
+  setSessionLength: (length: number) => void;
+  incrementCompletedSets: () => void;
+  stop: () => void;
   setCount: (count: number | ((prev: number) => number)) => void;
   toggleActive: () => void;
   setSelectedMethod: (method: BreathingMethod) => void;
@@ -78,8 +106,18 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
   count: 0,
   isActive: false,
   selectedMethod: BREATHING_METHODS[0],
+  sessionLength: 1,
+  totalSets: 0,
+  completedSets: 0,
 
   setPhase: (phase) => set({ phase }),
+
+  setSessionLength: (length) => set({ sessionLength: length }),
+
+  incrementCompletedSets: () =>
+    set((state) => ({ completedSets: state.completedSets + 1 })),
+
+  stop: () => set({ isActive: false, phase: "inhale", count: 0 }),
 
   setCount: (countOrUpdater) =>
     set((state) => ({
@@ -90,27 +128,41 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     })),
 
   toggleActive: () => {
-    const isCurrentlyActive = get().isActive;
-    const newIsActive = !isCurrentlyActive;
+    const state = get();
+    const newIsActive = !state.isActive;
 
-    set({
+    const updates: Partial<BreathingState> = {
       isActive: newIsActive,
       phase: "inhale",
       count: 0,
-    });
+    };
 
     if (newIsActive) {
-      playBreathingSound("inhale");
+      const cycleDuration =
+        state.selectedMethod.inhaleTime +
+        state.selectedMethod.hold1Time +
+        state.selectedMethod.exhaleTime +
+        state.selectedMethod.hold2Time;
+      updates.totalSets = Math.floor((state.sessionLength * 60) / cycleDuration);
+      updates.completedSets = 0;
+    }
+
+    set(updates as BreathingState);
+
+    if (newIsActive) {
+      playBreathingSound("inhale", state.selectedMethod.sounds);
     }
   },
 
   setSelectedMethod: (method) => {
-    set({
+    set((state) => ({
       selectedMethod: method,
       phase: "inhale",
       count: 0,
       isActive: false,
-    });
+      totalSets: 0,
+      completedSets: 0,
+    }));
   },
 
   getCurrentPhaseTime: () => {
@@ -147,6 +199,8 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
       count: 0,
       isActive: false,
       selectedMethod: BREATHING_METHODS[0],
+      totalSets: 0,
+      completedSets: 0,
     });
   },
 }));
