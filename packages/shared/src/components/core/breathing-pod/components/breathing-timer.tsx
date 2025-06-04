@@ -31,7 +31,7 @@ export const useBreathingTimer = () => {
           if (prevCount === currentPhaseTime - 1) {
             const nextPhase = getNextPhase();
             setPhase(nextPhase);
-            playBreathingSound(phase, selectedMethod.sounds);
+            playBreathingSound(nextPhase);
 
             if (nextPhase === "inhale") {
               incrementCompletedSets();
@@ -63,7 +63,7 @@ export const useBreathingTimer = () => {
     totalSets,
     incrementCompletedSets,
     stop,
-    selectedMethod.sounds,
+    selectedMethod,
   ]);
 
   return null;

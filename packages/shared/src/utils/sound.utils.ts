@@ -96,21 +96,13 @@ export const playTypewriterSound = (key: string) => {
   }
 };
 
-export type BreathingSoundMap = {
-  inhaleExhale: string;
-  hold: string;
-};
-
-export const playBreathingSound = (
-  mode: string,
-  sounds?: BreathingSoundMap
-) => {
+export const playBreathingSound = (mode: string) => {
   let path: string | null = null;
 
   if (mode === "inhale" || mode === "exhale") {
-    path = sounds?.inhaleExhale || "/public/sounds/breathing/inhale-exhale.mp3";
+    path = "/public/sounds/breathing/inhale-exhale.mp3";
   } else if (mode === "hold1" || mode === "hold2") {
-    path = sounds?.hold || "/public/sounds/breathing/hold.mp3";
+    path = "/public/sounds/breathing/hold.mp3";
   }
 
   if (!path) return;

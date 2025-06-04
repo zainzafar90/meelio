@@ -2,11 +2,6 @@ import { create } from "zustand";
 
 import { playBreathingSound } from "../../../../utils/sound.utils";
 
-export type BreathingSounds = {
-  inhaleExhale: string;
-  hold: string;
-};
-
 export type BreathPhase = "inhale" | "hold1" | "exhale" | "hold2";
 
 export type BreathingMethod = {
@@ -18,7 +13,6 @@ export type BreathingMethod = {
   exhaleTime: number;
   hold2Time: number;
   className?: string;
-  sounds: BreathingSounds;
 };
 
 export const BREATHING_METHODS: BreathingMethod[] = [
@@ -31,10 +25,6 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 6,
     hold2Time: 0,
     className: "text-amber-400 bg-amber-900/5 dark:bg-amber-900/10",
-    sounds: {
-      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
-      hold: "/public/sounds/breathing/hold.mp3",
-    },
   },
   {
     name: "Clear the Mind",
@@ -45,10 +35,6 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 4,
     hold2Time: 0,
     className: "text-green-400 bg-green-900/5 dark:bg-green-900/10",
-    sounds: {
-      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
-      hold: "/public/sounds/breathing/hold.mp3",
-    },
   },
   {
     name: "Relax Deeply",
@@ -59,10 +45,6 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 8,
     hold2Time: 0,
     className: "text-blue-400 bg-blue-900/5 bg-blue-900/10",
-    sounds: {
-      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
-      hold: "/public/sounds/breathing/hold.mp3",
-    },
   },
   {
     name: "Relieve Stress",
@@ -74,10 +56,6 @@ export const BREATHING_METHODS: BreathingMethod[] = [
     exhaleTime: 4,
     hold2Time: 4,
     className: "text-purple-400 bg-indigo-900/5 bg-indigo-900/10",
-    sounds: {
-      inhaleExhale: "/public/sounds/breathing/inhale-exhale.mp3",
-      hold: "/public/sounds/breathing/hold.mp3",
-    },
   },
 ];
 
@@ -147,7 +125,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     set(updates as BreathingState);
 
     if (newIsActive) {
-      playBreathingSound("inhale", state.selectedMethod.sounds);
+      playBreathingSound("inhale");
     }
   },
 
