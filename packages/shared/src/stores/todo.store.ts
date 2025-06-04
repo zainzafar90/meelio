@@ -205,7 +205,7 @@ export const useTodoStore = create<TodoState>()(
 
         if (updatedData.completed) {
           const confettiEnabled =
-            authState.user?.settings?.todo?.confettiOnComplete ?? true;
+            authState.user?.settings?.todo?.confettiOnComplete ?? false;
           if (confettiEnabled) {
             launchConfetti();
           }

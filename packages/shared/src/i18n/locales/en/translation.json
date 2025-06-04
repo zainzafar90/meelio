@@ -309,6 +309,11 @@
         "button": "Restart",
         "error": "Failed to reset onboarding"
       },
+      "confettiOnComplete": {
+        "title": "Todo Confetti",
+        "description": "Celebrate completed todos with confetti",
+        "error": "Failed to update setting"
+      },
       "twelveHourClock": {
         "title": "24-Hour Clock",
         "description": "Display time in 24-hour format"

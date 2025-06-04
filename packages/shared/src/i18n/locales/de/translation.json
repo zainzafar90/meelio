@@ -309,6 +309,11 @@
         "button": "Neustart",
         "error": "Fehler beim Zurücksetzen des Onboardings"
       },
+      "confettiOnComplete": {
+        "title": "Todo-Konfetti",
+        "description": "Feiere erledigte Todos mit Konfetti",
+        "error": "Fehler beim Aktualisieren der Einstellung"
+      },
       "twelveHourClock": {
         "title": "24-Stunden-Uhr",
         "description": "Zeit im 24-Stunden-Format anzeigen"
