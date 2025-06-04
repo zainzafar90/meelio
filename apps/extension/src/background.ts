@@ -1,83 +1,102 @@
+import type { TimerMessage } from "./types";
+
+interface TimerState {
+  endTime: number;
+  running: boolean;
+  duration: number;
+}
+
+const stateKey = "timer-state";
 let interval: NodeJS.Timeout | null = null;
-let endTime = 0;
-let currentDuration = 0;
+let state: TimerState = { endTime: 0, running: false, duration: 0 };
 
-function cleanup() {
-  if (interval) {
-    clearInterval(interval);
-    interval = null;
-  }
-  endTime = 0;
-  currentDuration = 0;
+function remaining(): number {
+  return Math.max(0, Math.ceil((state.endTime - Date.now()) / 1000));
 }
 
-function calculateRemaining() {
-  return Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+function clearTimer() {
+  if (interval) clearInterval(interval);
+  interval = null;
+  state.running = false;
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  switch (message.type) {
-    case 'START':
-      cleanup();
-      if (!interval) {
-        currentDuration = message.duration;
-        endTime = Date.now() + (currentDuration * 1000);
+async function persist() {
+  await chrome.storage.local.set({ [stateKey]: state });
+}
 
-        chrome.runtime.sendMessage({ type: 'TICK', remaining: currentDuration });
-        interval = setInterval(() => {
-          const remaining = calculateRemaining();
-
-          if (remaining <= 0) {
-            chrome.runtime.sendMessage({ type: 'TICK', remaining: 0 });
-            chrome.runtime.sendMessage({ type: 'STAGE_COMPLETE' });
-            clearInterval(interval!);
-            interval = null;
-          } else {
-            chrome.runtime.sendMessage({ type: 'TICK', remaining });
-          }
-        }, 250);
-      }
-    break;
-
-    case 'PAUSE':
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-        const remaining = calculateRemaining();
-        chrome.runtime.sendMessage({ type: 'PAUSED', remaining });
-      } 
-    break;
-
-    case 'RESET':
-      cleanup();
-      chrome.runtime.sendMessage({ type: 'RESET_COMPLETE' });
-    break;
-
-    case 'UPDATE_DURATION':
-      currentDuration = message.duration;
-      if (interval) {
-        endTime = Date.now() + (currentDuration * 1000);
-      }
-    break;
-
-    case 'SKIP_TO_NEXT_STAGE':
-      cleanup();
-    break;   
+function tick() {
+  const left = remaining();
+  if (left <= 0) {
+    chrome.runtime.sendMessage({ type: "TICK", remaining: 0 });
+    chrome.runtime.sendMessage({ type: "STAGE_COMPLETE" });
+    clearTimer();
+    persist();
+  } else {
+    chrome.runtime.sendMessage({ type: "TICK", remaining: left });
   }
+}
 
+async function start(duration: number) {
+  clearTimer();
+  state = { endTime: Date.now() + duration * 1000, running: true, duration };
+  await persist();
+  chrome.runtime.sendMessage({ type: "TICK", remaining: duration });
+  interval = setInterval(tick, 250);
+}
+
+async function pause() {
+  if (!state.running) return;
+  clearTimer();
+  state.duration = remaining();
+  await persist();
+  chrome.runtime.sendMessage({ type: "PAUSED", remaining: state.duration });
+}
+
+async function reset() {
+  clearTimer();
+  state = { endTime: 0, running: false, duration: 0 };
+  await persist();
+  chrome.runtime.sendMessage({ type: "RESET_COMPLETE" });
+}
+
+async function updateDuration(duration: number) {
+  state.duration = duration;
+  if (state.running) state.endTime = Date.now() + duration * 1000;
+  await persist();
+}
+
+async function restore() {
+  const saved = (await chrome.storage.local.get(stateKey))[stateKey] as
+    | TimerState
+    | undefined;
+  if (!saved) return;
+  state = saved;
+  if (state.running && remaining() > 0) {
+    interval = setInterval(tick, 250);
+  } else if (state.running) {
+    await reset();
+  }
+}
+
+chrome.runtime.onMessage.addListener((msg: TimerMessage) => {
+  switch (msg.type) {
+    case "START":
+      start(msg.duration ?? 0);
+      break;
+    case "PAUSE":
+      pause();
+      break;
+    case "RESET":
+      reset();
+      break;
+    case "UPDATE_DURATION":
+      updateDuration(msg.duration ?? 0);
+      break;
+    case "SKIP_TO_NEXT_STAGE":
+      reset();
+      break;
+  }
   return true;
-}); 
-
-chrome.runtime.onInstalled.addListener(() => {
-  cleanup();
-}); 
-
-// Clean up on extension startup/reload
-chrome.runtime.onStartup.addListener(() => {
-  cleanup();
 });
 
-// Clean up when extension is suspended
-chrome.runtime.onSuspend.addListener(() => {
-  cleanup();
-}); 
+restore();
