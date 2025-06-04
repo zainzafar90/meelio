@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS: IUserSettings = {
   },
   onboardingCompleted: false,
   todo: {
-    confettiOnComplete: true,
+    confettiOnComplete: false,
   },
 };
 
