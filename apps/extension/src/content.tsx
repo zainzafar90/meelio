@@ -2,8 +2,7 @@ import type { PlasmoCSConfig } from "plasmo";
 import React from "react";
 import cssText from "data-text:./features/content/blocker.module.css"
 
-import { Storage } from "@plasmohq/storage";
-import { useStorage } from "@plasmohq/storage/hook";
+import { useSiteBlockerStore } from "@repo/shared";
 
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
@@ -30,15 +29,8 @@ const isBlockedSite = (blockedSites: string[]) => {
 
 const PlasmoOverlay = () => {
   const currentSite = getCurrentSite();
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
-    {
-      key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
-    },
-    []
-  );
+  const blockedSites = useSiteBlockerStore((s) => s.blockedSites);
+  const removeSite = useSiteBlockerStore((s) => s.removeSite);
 
   const message = getCustomBlockerMessage();
   const isBlocked = isBlockedSite(blockedSites);
@@ -53,7 +45,7 @@ const PlasmoOverlay = () => {
     const currentSite = getCurrentSite();
     const blockedSite = blockedSites.find((site) => currentSite.includes(site));
     if (blockedSite) {
-      setBlockedSites(blockedSites.filter((site) => site !== blockedSite));
+      removeSite(blockedSite);
     }
   };
 

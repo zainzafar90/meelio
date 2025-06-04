@@ -10,9 +10,7 @@ import { useDockStore } from "../../../stores/dock.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { useTranslation } from "react-i18next";
 // @ts-ignore
-import { Storage } from "@plasmohq/storage";
-// @ts-ignore
-import { useStorage } from "@plasmohq/storage/hook";
+import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
@@ -106,42 +104,37 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
-    {
-      key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
-    },
-    []
-  );
+  const blockedSites = useSiteBlockerStore((s) => s.blockedSites);
+  const addSite = useSiteBlockerStore((s) => s.addSite);
+  const removeSite = useSiteBlockerStore((s) => s.removeSite);
 
   const addCustomSite = async () => {
     const site = siteInput.trim();
     if (!site) return;
-
     if (!blockedSites.includes(site)) {
-      setBlockedSites([...blockedSites, site]);
+      await addSite(site);
       setSiteInput("");
     }
   };
 
   const toggleSite = (site: string) => {
     if (blockedSites.includes(site)) {
-      setBlockedSites(blockedSites.filter((s) => s !== site));
+      removeSite(site);
     } else {
-      setBlockedSites([...blockedSites, site]);
+      addSite(site);
     }
   };
 
   const onBlockSites = (sites: string[]) => {
-    setBlockedSites((prev) => [...new Set([...(prev || []), ...sites])]);
+    sites.forEach((s) => {
+      if (!blockedSites.includes(s)) addSite(s);
+    });
   };
 
   const onUnblockSites = (sites: string[]) => {
-    setBlockedSites((prev) =>
-      (prev || []).filter((site) => !sites.includes(site))
-    );
+    sites.forEach((s) => {
+      if (blockedSites.includes(s)) removeSite(s);
+    });
   };
 
   return (

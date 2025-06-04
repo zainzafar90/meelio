@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useSiteBlockerStore } from "./site-blocker.store";
 
 import { AuthUser } from "../types";
 import { GuestUser } from "../types";
@@ -29,16 +30,24 @@ export const useAuthStore = create<AuthState>()(
           _hasHydrated: state,
         });
       },
-      authenticate: (user: AuthUser) =>
-        set((state) => ({ ...state, user, loading: false })),
+      authenticate: (user: AuthUser) => {
+        set((state) => ({ ...state, user, loading: false }));
+        useSiteBlockerStore.getState().loadFromServer();
+      },
       authenticateGuest: (user: GuestUser) =>
         set((state) => ({
           ...state,
           guestUser: user,
           loading: false,
         })),
-      logout: () => set(() => ({ user: null, guestUser: null })),
-      logoutUser: () => set(() => ({ user: null })),
+      logout: () => {
+        set(() => ({ user: null, guestUser: null }));
+        useSiteBlockerStore.setState({ blockedSites: [], idMap: {} });
+      },
+      logoutUser: () => {
+        set(() => ({ user: null }));
+        useSiteBlockerStore.setState({ blockedSites: [], idMap: {} });
+      },
     }),
     {
       name: "meelio:local:user",
@@ -47,6 +56,9 @@ export const useAuthStore = create<AuthState>()(
       skipHydration: false,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
+        if (state?.user) {
+          useSiteBlockerStore.getState().loadFromServer();
+        }
       },
     }
   )

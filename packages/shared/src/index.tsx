@@ -7,5 +7,6 @@ export * from "./i18n";
 export * from "./lib";
 export * from "./providers";
 export * from "./stores";
+export * from "./services";
 export * from "./types";
 export * from "./utils";
