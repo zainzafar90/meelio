@@ -16,16 +16,16 @@
         "short": {
           "jan": "Jan",
           "feb": "Feb",
-          "mär": "Mär",
+          "mar": "Mär",
           "apr": "Apr",
-          "mai": "Mai",
+          "may": "Mai",
           "jun": "Jun",
           "jul": "Jul",
           "aug": "Aug",
           "sep": "Sep",
-          "okt": "Okt",
+          "oct": "Okt",
           "nov": "Nov",
-          "dez": "Dez"
+          "dec": "Dez"
         }
       }
     },
@@ -48,6 +48,7 @@
       "toggle": "Umschalten",
       "dismiss": "Schließen"
     },
+    "close": "Schließen",
     "weekdays": {
       "short": {
         "monday": "Mo",
@@ -290,7 +291,8 @@
       "advanced": "Erweitert",
       "language": "Sprache",
       "dock": "Dock",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "timer": "Timer"
     },
     "general": {
       "title": "Allgemein",
