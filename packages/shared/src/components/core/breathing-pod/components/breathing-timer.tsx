@@ -35,11 +35,11 @@ export const useBreathingTimer = () => {
 
             if (nextPhase === "inhale") {
               incrementCompletedSets();
-              toast("Nice work!", {
-                description: "Take a moment before the next breath.",
-              });
 
               if (completedSets + 1 >= totalSets && totalSets > 0) {
+                toast("Breathing session complete!", {
+                  description: "Great job finishing your practice.",
+                });
                 stop();
               }
             }
