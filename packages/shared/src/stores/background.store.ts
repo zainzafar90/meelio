@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { getAssetPath } from "../utils/path.utils";
 import wallpapersData from "../data/wallpapers.json";
 import { useAppStore } from "./app.store";
+import { useAuthStore } from "./auth.store";
 import { getSeedIndexByDate } from "../utils";
 
 export type WallpaperType = "static" | "live";
@@ -129,4 +130,18 @@ export const useBackgroundStore = create<BackgroundState>()(
       },
     }
   )
+);
+
+useAuthStore.subscribe(
+  (state) => ({ userId: state.user?.id, guestId: state.guestUser?.id }),
+  ({ userId, guestId }) => {
+    const backgroundState = useBackgroundStore.getState();
+    if (userId || guestId) {
+      const index = getSeedIndexByDate(backgroundState.wallpapers.length);
+      const wallpaper = backgroundState.wallpapers[index];
+      backgroundState.setCurrentWallpaper(wallpaper);
+    } else {
+      backgroundState.resetToDefault();
+    }
+  }
 );
