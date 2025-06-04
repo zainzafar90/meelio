@@ -50,8 +50,8 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
   const handleResetOnboarding = async () => {
     setIsResetting(true);
     try {
-      onClose();
       await triggerOnboardingUpdate(false);
+      onClose();
     } catch (error) {
       console.error("Failed to reset onboarding:", error);
       toast.error(t("settings.general.onboardingReset.error"));
@@ -153,10 +153,7 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
       )}
 
       {(user || user?.settings) && (
-        <div
-          className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
-          onClick={handleToggleConfetti}
-        >
+        <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer">
           <div className="flex items-center space-x-4">
             <div className="space-y-1">
               <p className="text-sm font-medium">
