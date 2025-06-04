@@ -81,16 +81,18 @@ export const BREATHING_METHODS: BreathingMethod[] = [
   },
 ];
 
+export const SESSION_SET_OPTIONS = [20, 30, 50];
+
 interface BreathingState {
   phase: BreathPhase;
   count: number;
   isActive: boolean;
   selectedMethod: BreathingMethod;
-  sessionLength: number;
+  sessionSets: number;
   totalSets: number;
   completedSets: number;
   setPhase: (phase: BreathPhase) => void;
-  setSessionLength: (length: number) => void;
+  setSessionSets: (sets: number) => void;
   incrementCompletedSets: () => void;
   stop: () => void;
   setCount: (count: number | ((prev: number) => number)) => void;
@@ -106,13 +108,13 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
   count: 0,
   isActive: false,
   selectedMethod: BREATHING_METHODS[0],
-  sessionLength: 1,
+  sessionSets: 20,
   totalSets: 0,
   completedSets: 0,
 
   setPhase: (phase) => set({ phase }),
 
-  setSessionLength: (length) => set({ sessionLength: length }),
+  setSessionSets: (sets) => set({ sessionSets: sets }),
 
   incrementCompletedSets: () =>
     set((state) => ({ completedSets: state.completedSets + 1 })),
@@ -138,12 +140,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
     };
 
     if (newIsActive) {
-      const cycleDuration =
-        state.selectedMethod.inhaleTime +
-        state.selectedMethod.hold1Time +
-        state.selectedMethod.exhaleTime +
-        state.selectedMethod.hold2Time;
-      updates.totalSets = Math.floor((state.sessionLength * 60) / cycleDuration);
+      updates.totalSets = state.sessionSets;
       updates.completedSets = 0;
     }
 
@@ -160,6 +157,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
       phase: "inhale",
       count: 0,
       isActive: false,
+      sessionSets: state.sessionSets,
       totalSets: 0,
       completedSets: 0,
     }));
@@ -199,6 +197,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
       count: 0,
       isActive: false,
       selectedMethod: BREATHING_METHODS[0],
+      sessionSets: 20,
       totalSets: 0,
       completedSets: 0,
     });
