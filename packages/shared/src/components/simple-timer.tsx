@@ -1,10 +1,42 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTimerStore } from '../stores';
+import { useInterval } from '../hooks';
 import { TimerStage } from '../types/new/pomodoro-lite';
 import { formatTime } from '../utils/timer.utils';
 
+interface DurationValues {
+  focusMin: number;
+  breakMin: number;
+}
+
+interface DurationEditorProps extends DurationValues {
+  onSave: (v: DurationValues) => void;
+}
+
+const DurationEditor = ({ focusMin, breakMin, onSave }: DurationEditorProps) => {
+  const [focus, setFocus] = useState(focusMin);
+  const [brk, setBreak] = useState(breakMin);
+  return (
+    <div className="space-x-2">
+      <input
+        type="number"
+        className="w-16 text-black"
+        value={focus}
+        onChange={(e) => setFocus(Number(e.target.value))}
+      />
+      <input
+        type="number"
+        className="w-16 text-black"
+        value={brk}
+        onChange={(e) => setBreak(Number(e.target.value))}
+      />
+      <button onClick={() => onSave({ focusMin: focus, breakMin: brk })}>Save</button>
+    </div>
+  );
+};
+
 /**
- * Minimal Pomodoro timer widget.
+ * Minimal Pomodoro timer widget with editable durations.
  */
 export const SimpleTimer = () => {
   const {
@@ -16,7 +48,9 @@ export const SimpleTimer = () => {
     reset,
     skipToStage,
     updateRemaining,
+    updateDurations,
     getLimitStatus,
+    restore,
   } = useTimerStore();
 
   const remaining = useTimerStore((s) => {
@@ -26,24 +60,28 @@ export const SimpleTimer = () => {
   });
 
   useEffect(() => {
-    const id = setInterval(() => {
-      if (isRunning && useTimerStore.getState().endTimestamp) {
-        const left = Math.max(
-          0,
-          Math.ceil((useTimerStore.getState().endTimestamp! - Date.now()) / 1000)
-        );
-        updateRemaining(left);
-        if (left === 0) {
-          const next = stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
-          skipToStage(next);
-          start();
-        }
-      }
-    }, 1000);
-    return () => clearInterval(id);
-  }, [isRunning, stage, start, skipToStage, updateRemaining]);
+    restore();
+  }, [restore]);
+
+  useInterval(() => {
+    if (!isRunning || !useTimerStore.getState().endTimestamp) return;
+    const left = Math.max(
+      0,
+      Math.ceil((useTimerStore.getState().endTimestamp! - Date.now()) / 1000)
+    );
+    updateRemaining(left);
+    if (left === 0) {
+      const next = stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
+      skipToStage(next);
+      start();
+    }
+  }, 1000);
 
   const limit = getLimitStatus();
+
+  const handleDurations = (d: DurationValues) => {
+    updateDurations({ focus: d.focusMin * 60, break: d.breakMin * 60 });
+  };
 
   return (
     <div className="p-4 space-y-4 text-center text-white bg-gray-900 rounded-lg">
@@ -66,6 +104,11 @@ export const SimpleTimer = () => {
           Skip
         </button>
       </div>
+      <DurationEditor
+        focusMin={durations[TimerStage.Focus] / 60}
+        breakMin={durations[TimerStage.Break] / 60}
+        onSave={handleDurations}
+      />
     </div>
   );
 };

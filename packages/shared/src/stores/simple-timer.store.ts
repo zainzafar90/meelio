@@ -8,7 +8,21 @@ import {
   TimerSettings,
 } from '../types/new/pomodoro-lite';
 
-function initState(): Omit<TimerState, keyof TimerDeps | 'start' | 'pause' | 'reset' | 'skipToStage' | 'updateDurations' | 'toggleNotifications' | 'toggleSounds' | 'updateRemaining' | 'getLimitStatus' | 'sync'> {
+function initState(): Omit<
+  TimerState,
+  | keyof TimerDeps
+  | 'start'
+  | 'pause'
+  | 'reset'
+  | 'skipToStage'
+  | 'updateDurations'
+  | 'toggleNotifications'
+  | 'toggleSounds'
+  | 'updateRemaining'
+  | 'getLimitStatus'
+  | 'sync'
+  | 'restore'
+> {
   return {
     stage: TimerStage.Focus,
     isRunning: false,
@@ -116,6 +130,17 @@ export const createTimerStore = (deps: TimerDeps) =>
           }
         };
 
+        const restore = () => {
+          const s = get();
+          if (!s.isRunning || !s.endTimestamp) return;
+          const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
+          if (left <= 0) {
+            set({ isRunning: false, endTimestamp: null });
+          } else {
+            set({ prevRemaining: left });
+          }
+        };
+
         return {
           ...initState(),
           start,
@@ -128,6 +153,7 @@ export const createTimerStore = (deps: TimerDeps) =>
           updateRemaining,
           getLimitStatus,
           sync,
+          restore,
         } as TimerState;
       },
       {
@@ -138,6 +164,9 @@ export const createTimerStore = (deps: TimerDeps) =>
           durations: s.durations,
           settings: s.settings,
           stats: s.stats,
+          isRunning: s.isRunning,
+          endTimestamp: s.endTimestamp,
+          prevRemaining: s.prevRemaining,
         }),
       }
     )

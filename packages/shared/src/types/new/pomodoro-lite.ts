@@ -44,4 +44,5 @@ export interface TimerState {
   updateRemaining: (remaining: number) => void;
   getLimitStatus: () => { isLimitReached: boolean; remainingSec: number };
   sync: () => Promise<void>;
+  restore: () => void;
 }
