@@ -16,6 +16,7 @@ import { PremiumFeature } from "../../../components/common/premium-feature";
 import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
+import { toast } from "sonner";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -138,15 +139,38 @@ const ExtensionSiteBlockerContent = () => {
       site = match ? match[1].replace(/^www\./, "") : "";
     }
 
-    if (!site) return;
+    if (!site) {
+      toast.error(t("site-blocker.invalid-url", "Invalid URL format"));
+      return;
+    }
 
     const existingSite = Object.values(sites).find(
-      (s) => s.url === site && s.blocked
+      (s) => s.url.toLowerCase() === site.toLowerCase()
     );
 
-    if (!existingSite) {
+    if (existingSite && existingSite.blocked) {
+      toast.error(t("site-blocker.already-blocked", "Site is already blocked"), {
+        description: site,
+      });
+      return;
+    }
+
+    try {
       await addSite(site);
       setSiteInput("");
+      toast.success(t("site-blocker.site-added", "Site blocked successfully"), {
+        description: site,
+      });
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        toast.error(t("site-blocker.already-exists", "Site already exists"), {
+          description: site,
+        });
+      } else {
+        toast.error(t("site-blocker.add-failed", "Failed to add site"), {
+          description: error.message || "Please try again",
+        });
+      }
     }
   };
 

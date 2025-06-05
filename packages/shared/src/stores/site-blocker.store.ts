@@ -147,6 +147,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
               }));
             } catch (e) {
               console.error(e);
+              throw e; // Re-throw to allow UI to handle the error
             }
           } else {
             syncStore.addToQueue("site-blocker", {

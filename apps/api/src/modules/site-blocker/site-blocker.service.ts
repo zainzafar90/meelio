@@ -56,9 +56,31 @@ export const siteBlockerService = {
     userId: string,
     data: any
   ): Promise<SiteBlocker> => {
+    // Normalize URL to prevent duplicates
+    const normalizedUrl = data.url
+      .replace(/^(https?:\/\/)?(www\.)?/, "")
+      .toLowerCase();
+
+    const existingSite = await db
+      .select()
+      .from(siteBlockers)
+      .where(
+        and(
+          eq(siteBlockers.userId, userId),
+          eq(siteBlockers.url, normalizedUrl)
+        )
+      );
+
+    if (existingSite.length > 0) {
+      throw new ApiError(
+        httpStatus.CONFLICT,
+        `Site ${data.url} is already blocked`
+      );
+    }
+
     const insertData = {
       userId,
-      url: data.url,
+      url: normalizedUrl,
       category: data.category,
     };
 

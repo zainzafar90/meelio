@@ -16,7 +16,7 @@ router
   );
 
 router
-  .route("/:siteBlockerId")
+  .route("/:id")
   .get(auth(), siteBlockerController.getSiteBlocker)
   .patch(
     auth(),
