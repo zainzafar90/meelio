@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useTimerStore } from '../stores';
-import { useInterval } from '../hooks';
-import { TimerStage } from '../types/new/pomodoro-lite';
-import { formatTime } from '../utils/timer.utils';
+import { useEffect, useState } from "react";
+import { useTimerStore } from "../stores";
+import { useInterval, useDocumentTitle } from "../hooks";
+import { TimerStage } from "../types/new/pomodoro-lite";
+import { formatTime } from "../utils/timer.utils";
 
 interface DurationValues {
   focusMin: number;
@@ -13,7 +13,11 @@ interface DurationEditorProps extends DurationValues {
   onSave: (v: DurationValues) => void;
 }
 
-const DurationEditor = ({ focusMin, breakMin, onSave }: DurationEditorProps) => {
+const DurationEditor = ({
+  focusMin,
+  breakMin,
+  onSave,
+}: DurationEditorProps) => {
   const [focus, setFocus] = useState(focusMin);
   const [brk, setBreak] = useState(breakMin);
   return (
@@ -30,7 +34,9 @@ const DurationEditor = ({ focusMin, breakMin, onSave }: DurationEditorProps) => 
         value={brk}
         onChange={(e) => setBreak(Number(e.target.value))}
       />
-      <button onClick={() => onSave({ focusMin: focus, breakMin: brk })}>Save</button>
+      <button onClick={() => onSave({ focusMin: focus, breakMin: brk })}>
+        Save
+      </button>
     </div>
   );
 };
@@ -63,15 +69,18 @@ export const SimpleTimer = () => {
     restore();
   }, [restore]);
 
+  useDocumentTitle({ remaining, stage, running: isRunning });
+
   useInterval(() => {
     if (!isRunning || !useTimerStore.getState().endTimestamp) return;
     const left = Math.max(
       0,
-      Math.ceil((useTimerStore.getState().endTimestamp! - Date.now()) / 1000)
+      Math.ceil((useTimerStore.getState().endTimestamp! - Date.now()) / 1000),
     );
     updateRemaining(left);
     if (left === 0) {
-      const next = stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
+      const next =
+        stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
       skipToStage(next);
       start();
     }
@@ -90,16 +99,17 @@ export const SimpleTimer = () => {
         {isRunning ? (
           <button onClick={pause}>Pause</button>
         ) : (
-          <button
-            onClick={start}
-            disabled={limit.isLimitReached}
-          >
+          <button onClick={start} disabled={limit.isLimitReached}>
             Start
           </button>
         )}
         <button onClick={reset}>Reset</button>
         <button
-          onClick={() => skipToStage(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}
+          onClick={() =>
+            skipToStage(
+              stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus,
+            )
+          }
         >
           Skip
         </button>
