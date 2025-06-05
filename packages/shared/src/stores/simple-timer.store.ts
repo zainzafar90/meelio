@@ -1,22 +1,34 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { useAuthStore } from "./auth.store";
-import {
-  TimerStage,
-  TimerState,
-  TimerDeps,
-  TimerSettings,
-} from "../types/new/pomodoro-lite";
+/** Portion of timer state persisted between sessions. */
+interface StoredTimerState
+  extends Omit<
+    TimerState,
+    | keyof TimerDeps
+    | 'start'
+    | 'pause'
+    | 'reset'
+    | 'skipToStage'
+    | 'updateDurations'
+    | 'toggleNotifications'
+    | 'toggleSounds'
+    | 'updateRemaining'
+    | 'getLimitStatus'
+    | 'sync'
+    | 'restore'
+  > {}
 
-function initState(): Omit<
-  TimerState,
-  | keyof TimerDeps
-  | "start"
-  | "pause"
-  | "reset"
-  | "skipToStage"
-  | "updateDurations"
-          const s = get();
+function initState(): StoredTimerState {
+/** Build a Zustand store for a simple Pomodoro timer. */
+          set((s) => {
+            const nextDurations = {
+            };
+            const patch: Partial<StoredTimerState> = { durations: nextDurations };
+            const changed = d[s.stage];
+            if (s.isRunning && changed) {
+              patch.endTimestamp = deps.now() + changed * 1000;
+              patch.prevRemaining = changed;
+            }
+            return patch;
+          });
           const remaining =
             s.prevRemaining ?? s.durations[s.stage];
           const end = deps.now() + remaining * 1000;
@@ -176,6 +188,7 @@ export const createTimerStore = (deps: TimerDeps) =>
           }
         };
 
+/** Default timer store with browser-based dependencies. */
         const restore = () => {
           const s = get();
           if (!s.isRunning || !s.endTimestamp) return;
