@@ -48,8 +48,11 @@ export const createTimerStore = (deps: TimerDeps) =>
         };
 
         const pause = () => {
+          const end = get().endTimestamp;
+          const remain =
+            end !== null ? Math.max(0, Math.ceil((end - deps.now()) / 1000)) : null;
           deps.postMessage?.({ type: "PAUSE" });
-          set({ isRunning: false, endTimestamp: null, prevRemaining: null });
+          set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
         };
 
         const reset = () => {
