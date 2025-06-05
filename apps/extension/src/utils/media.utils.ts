@@ -3,7 +3,35 @@ const pauseHTML5Videos = () => {
   document.querySelectorAll('video, audio').forEach(m => (m as HTMLVideoElement | HTMLAudioElement).pause());
 }
 
-const pauseYouTubeVideos = () => {
+function pauseEmbedPlayers() {
+  /* SoundCloud widget – right host and STRINGified message */
+  document
+    .querySelectorAll('iframe[src*="w.soundcloud.com/player"]')
+    .forEach(f => {
+      /* if the SC widget script is already there → simple */
+      if ((window as any).SC?.Widget) {
+        try { (window as any).SC.Widget(f).pause(); } catch {}
+      }
+
+      /* raw postMessage fallback */
+      (f as HTMLIFrameElement).contentWindow?.postMessage(
+        JSON.stringify({ method: 'pause' }), // must be a string
+        '*',
+      );
+    });
+
+  /* Spotify embeds */
+  document
+    .querySelectorAll('iframe[src*="spotify.com/embed"]')
+    .forEach(f =>
+      (f as HTMLIFrameElement).contentWindow?.postMessage(
+        { command: 'pause' },
+        '*',
+      ),
+    );
+}
+
+const pauseYoutubeAndVimeo = () => {
   /* YouTube’s own player (normal pages + shorts) */
   document.querySelectorAll('.html5-main-video').forEach(v => (v as HTMLVideoElement).pause()); /*:contentReference[oaicite:0]{index=0}*/
 
@@ -15,29 +43,17 @@ const pauseYouTubeVideos = () => {
     )
   );
   
- 
   /* Vimeo */
   document.querySelectorAll('iframe[src*="vimeo.com"]').forEach(f =>
     (f as HTMLIFrameElement).contentWindow?.postMessage({ method: 'pause' }, '*'),
   );
 
-  /* SoundCloud widget */
-  document.querySelectorAll('iframe[src*="soundcloud.com"]').forEach(f =>
-    (f as HTMLIFrameElement).contentWindow?.postMessage({ method: 'pause' }, '*'), // SC Widget API:contentReference[oaicite:0]{index=0}
-  );
-
-  /* Spotify embed */
-  document
-    .querySelectorAll('iframe[src*="spotify.com/embed"]')
-    .forEach(f =>
-      (f as HTMLIFrameElement).contentWindow?.postMessage({ command: 'pause' }, '*'), // iFrame API:contentReference[oaicite:1]{index=1}
-    );
 };
 
 
 export const pauseAllVideos = () => {
   pauseHTML5Videos()
-  pauseYouTubeVideos()
+  pauseYoutubeAndVimeo()
 }
 
 export const startAutoPause = () => {
