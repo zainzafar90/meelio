@@ -40,7 +40,7 @@
 }
 
 .emoji {
-  animation: bounce 1s infinite;
+  animation: bounce 3s infinite;
   font-size: 30px;
 }
 
@@ -144,7 +144,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
   background-color: transparent;
   color: rgba(255, 255, 255, 0.6);
   border: 1px solid transparent;
@@ -238,7 +238,7 @@
 
   .openAnywayButton {
     font-size: 14px;
-    padding: 0.5rem 0;
+    padding: 1rem 1.5rem;
   }
 }
 

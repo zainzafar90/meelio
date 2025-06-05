@@ -1,5 +1,4 @@
 import { type Quote } from "@/config/quote";
-import { LockKeyhole } from "lucide-react";
 import React from "react";
 
 import * as style from "./blocker.module.css"
@@ -32,17 +31,17 @@ export function Blocker({ siteName, message, streak, onOpenAnyway }: BlockerProp
           <div className={style.emoji}>{message.icon}</div>
 
           {/* Title */}
-          <h1 className={style.title}>{message.title}</h1>
-
-          {/* Quote */}
-          <div className={style.quoteContainer}>
-            <p className={style.quote}>"{message.quote}"</p>
-            <p className={style.author}>- {message.author}</p>
-          </div>
+          <h1 className={style.title}>
+            {siteName.replace("www.", "")} blocked <div style={{
+              fontSize: '14px',
+              fontWeight: 400,
+              color: 'rgba(255, 255, 255, 0.6)',
+              marginTop: '4px',
+            }}>to help you focus</div>
+          </h1>
 
           {/* Stats */}
           <div className={style.stats}>
-            <p className={style.siteName}>{siteName}</p>
             <p className={style.streak}>
               <span className={style.streakEmoji}>🔥</span> Block Streak: {streak}
             </p>
@@ -50,15 +49,15 @@ export function Blocker({ siteName, message, streak, onOpenAnyway }: BlockerProp
 
           <div className={style.buttonContainer}>
             {/* Action Button */}
-            <div>
               <button onClick={handleClose} className={style.closeButton}>
-                {message.buttonText}
+                Close
               </button>
-            </div>
 
             <button onClick={onOpenAnyway} className={style.openAnywayButton}>
-              <LockKeyhole className={style.openAnywayIcon} />
-              <span className={style.openAnywayText}>Open "{siteName}" anyway</span>
+              <span className={style.openAnywayText}>
+                <span className={style.openAnywayIcon}>🔒</span>{" "}
+                Open "{siteName}" anyway
+              </span>
             </button>
           </div>
         </div>

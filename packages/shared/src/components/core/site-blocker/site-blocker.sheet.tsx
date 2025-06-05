@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -149,9 +149,12 @@ const ExtensionSiteBlockerContent = () => {
     );
 
     if (existingSite && existingSite.blocked) {
-      toast.error(t("site-blocker.already-blocked", "Site is already blocked"), {
-        description: site,
-      });
+      toast.error(
+        t("site-blocker.already-blocked", "Site is already blocked"),
+        {
+          description: site,
+        }
+      );
       return;
     }
 
