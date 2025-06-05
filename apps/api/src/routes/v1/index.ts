@@ -13,6 +13,7 @@ import siteBlockerRoute from "./site-blocker.routes";
 import tabStashRoute from "./tab-stash.routes";
 import noteRoute from "./note.routes";
 import focusSessionRoute from "./focus-session.routes";
+import calendarRoute from "./calendar.routes";
 import settingsRoute from "./settings.routes";
 
 const router: express.Router = express.Router();
@@ -50,6 +51,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/site-blockers",
     route: siteBlockerRoute,
+  },
+  {
+    path: "/calendar",
+    route: calendarRoute,
   },
   {
     path: "/tab-stashes",
