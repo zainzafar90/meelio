@@ -41,7 +41,8 @@ export const createTimerStore = (deps: TimerDeps) =>
     persist(
       (set, get) => {
         const start = () => {
-          const duration = get().durations[get().stage];
+          const state = get();
+          const duration = state.prevRemaining ?? state.durations[state.stage];
           const end = deps.now() + duration * 1000;
           deps.postMessage?.({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
@@ -50,7 +51,9 @@ export const createTimerStore = (deps: TimerDeps) =>
         const pause = () => {
           const end = get().endTimestamp;
           const remain =
-            end !== null ? Math.max(0, Math.ceil((end - deps.now()) / 1000)) : null;
+            end !== null
+              ? Math.max(0, Math.ceil((end - deps.now()) / 1000))
+              : null;
           deps.postMessage?.({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
         };

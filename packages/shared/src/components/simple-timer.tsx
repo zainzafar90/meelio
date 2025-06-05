@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
-import { useTimerStore } from '../stores'
-import { useDocumentTitle } from '../hooks'
+import { useEffect, useState } from "react";
+import { useTimerStore } from "../stores";
+import { useDocumentTitle } from "../hooks";
 import {
   TimerStage,
   TimerEvent,
   TimerDurations,
-} from '../types/new/pomodoro-lite'
-import { isChromeExtension } from '../utils/common.utils'
-import { formatTime } from '../utils/timer.utils'
+} from "../types/new/pomodoro-lite";
+import { isChromeExtension } from "../utils/common.utils";
+import { formatTime } from "../utils/timer.utils";
 
 interface DurationValues {
   focusMin: number;
@@ -58,25 +58,25 @@ const useBackgroundMessages = (
   updateRemaining: (n: number) => void,
   skipToStage: (s: TimerStage) => void,
   start: () => void,
-  getLimitStatus: () => { isLimitReached: boolean },
+  getLimitStatus: () => { isLimitReached: boolean }
 ) => {
   useEffect(() => {
     if (!isChromeExtension()) return;
     const handler = (msg: TimerEvent) => {
       switch (msg.type) {
-        case 'TICK':
+        case "TICK":
           updateRemaining(msg.remaining);
           break;
-        case 'STAGE_COMPLETE':
+        case "STAGE_COMPLETE":
           const next =
             stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
           skipToStage(next);
           if (!getLimitStatus().isLimitReached) start();
           break;
-        case 'PAUSED':
+        case "PAUSED":
           updateRemaining(msg.remaining);
           break;
-        case 'RESET_COMPLETE':
+        case "RESET_COMPLETE":
           updateRemaining(durations[stage]);
           break;
       }
@@ -111,10 +111,16 @@ const TimerControls = ({
     {running ? (
       <button onClick={pause}>Pause</button>
     ) : (
-      <button onClick={start} disabled={limitReached}>Start</button>
+      <button onClick={start} disabled={limitReached}>
+        Start
+      </button>
     )}
     <button onClick={reset}>Reset</button>
-    <button onClick={() => skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}>
+    <button
+      onClick={() =>
+        skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)
+      }
+    >
       Skip
     </button>
   </div>
@@ -170,8 +176,16 @@ const TimerView = ({
 const useSimpleTimerState = () => {
   const store = useTimerStore();
   const remaining = useTimerStore((s) => {
-    if (!s.endTimestamp) return s.durations[s.stage];
-    return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
+    // When paused, use the stored remaining time
+    if (!s.isRunning && s.prevRemaining !== null) {
+      return s.prevRemaining;
+    }
+    // When running with endTimestamp, calculate remaining
+    if (s.endTimestamp) {
+      return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
+    }
+    // Default to stage duration
+    return s.durations[s.stage];
   });
 
   useRestoreTimer(store.restore);
@@ -182,7 +196,7 @@ const useSimpleTimerState = () => {
     store.updateRemaining,
     store.skipToStage,
     store.start,
-    store.getLimitStatus,
+    store.getLimitStatus
   );
 
   const limit = store.getLimitStatus();
