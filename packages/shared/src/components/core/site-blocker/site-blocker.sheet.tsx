@@ -161,6 +161,11 @@ const ExtensionSiteBlockerContent = () => {
           type="text"
           value={siteInput}
           onChange={(e) => setSiteInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              addCustomSite();
+            }
+          }}
           placeholder={t(
             "site-blocker.input-placeholder",
             "Enter custom site URL (e.g., example.com)"
