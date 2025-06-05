@@ -21,8 +21,7 @@ export const ExtensionTimer = () => {
     stats,
     sessionCount,
   } = usePomodoroStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
   const dailyLimitStatus = getDailyLimitStatus();
@@ -41,7 +40,8 @@ export const ExtensionTimer = () => {
     const duration = newState.stageDurations[newState.activeStage];
     chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
 
-    if (newState.isRunning) {
+    // Auto-start the next stage
+    if (!dailyLimitStatus.isLimitReached) {
       chrome.runtime.sendMessage({ type: 'START', duration });
       usePomodoroStore.setState({
         endTimestamp: Date.now() + duration * 1000,
@@ -70,15 +70,11 @@ export const ExtensionTimer = () => {
     return PomodoroStage.Focus;
   };
 
-  const handleStart = () => {
+  const autoStartTimer = () => {
     if (dailyLimitStatus.isLimitReached) {
-      toast.info(t("timer.limitReached.toast"), {
-        description: t("timer.limitReached.description")
-      });
       return;
     }
 
-    setHasStarted(true);
     const store = usePomodoroStore.getState();
     const duration = store.stageDurations[activeStage];
     chrome.runtime.sendMessage({ type: 'START', duration });
@@ -123,8 +119,13 @@ export const ExtensionTimer = () => {
       activeStage,
       lastUpdated: Date.now(),
     });
-    setHasStarted(false);
     setRemaining(stageDurations[PomodoroStage.Focus]);
+    // Auto-start after reset
+    setTimeout(() => {
+      if (!dailyLimitStatus.isLimitReached) {
+        autoStartTimer();
+      }
+    }, 100);
   };
 
   const handleSwitch = () => {
@@ -134,8 +135,19 @@ export const ExtensionTimer = () => {
     chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: stageDurations[nextStage] });
     store.changeStage(nextStage);
     usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
-    setHasStarted(false);
     setRemaining(stageDurations[nextStage]);
+    // Auto-start the new stage
+    setTimeout(() => {
+      if (!dailyLimitStatus.isLimitReached) {
+        const duration = stageDurations[nextStage];
+        chrome.runtime.sendMessage({ type: 'START', duration });
+        store.startTimer();
+        usePomodoroStore.setState({
+          endTimestamp: Date.now() + duration * 1000,
+          lastUpdated: Date.now(),
+        });
+      }
+    }, 100);
   };
 
   const handleSkipToNextStage = () => {
@@ -145,10 +157,20 @@ export const ExtensionTimer = () => {
     const state = usePomodoroStore.getState();
     const duration = state.stageDurations[state.activeStage];
     chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
-    usePomodoroStore.setState({
-      endTimestamp: state.isRunning ? Date.now() + duration * 1000 : null,
-      lastUpdated: Date.now(),
-    });
+    
+    // Auto-start the next stage
+    if (!dailyLimitStatus.isLimitReached) {
+      chrome.runtime.sendMessage({ type: 'START', duration });
+      usePomodoroStore.setState({
+        endTimestamp: Date.now() + duration * 1000,
+        lastUpdated: Date.now(),
+      });
+    } else {
+      usePomodoroStore.setState({
+        endTimestamp: null,
+        lastUpdated: Date.now(),
+      });
+    }
     setRemaining(duration);
   };
 
@@ -179,7 +201,6 @@ export const ExtensionTimer = () => {
             activeStage,
             lastUpdated: Date.now()
           });
-          setHasStarted(false);
           setRemaining(stageDurations[activeStage]);
           break;
       }
@@ -187,6 +208,11 @@ export const ExtensionTimer = () => {
 
     chrome.runtime.onMessage.addListener(messageHandler);
     return () => chrome.runtime.onMessage.removeListener(messageHandler);
+  }, []);
+
+  // Simple mounted effect to hide loading
+  useEffect(() => {
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -221,25 +247,27 @@ export const ExtensionTimer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dailyLimitStatus.isLimitReached, isRunning]);
 
-
+  // Auto-start timer when component mounts or stage changes
   useEffect(() => {
-    if (!isRunning && !hasStarted) {
+    if (!isRunning && !dailyLimitStatus.isLimitReached) {
       setRemaining(stageDurations[activeStage]);
+      // Auto-start after a short delay
+      setTimeout(() => {
+        autoStartTimer();
+      }, 100);
     }
-  }, [activeStage, stageDurations, isRunning, hasStarted]);
-
-  useEffect(() => {
-    if (!isRunning) {
-      setHasStarted(false);
-      setRemaining(stageDurations[activeStage]);
-    }
-  }, [stageDurations, activeStage, isRunning]);
+  }, [activeStage, stageDurations]);
 
   useEffect(() => {
     if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
-      setHasStarted(false);
       setRemaining(stageDurations[activeStage]);
       chrome.runtime.sendMessage({ type: 'RESET' });
+      // Auto-start fresh timer
+      setTimeout(() => {
+        if (!dailyLimitStatus.isLimitReached) {
+          autoStartTimer();
+        }
+      }, 100);
     }
   }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
 
@@ -336,14 +364,12 @@ export const ExtensionTimer = () => {
                   
                   if (isRunning) {
                     handlePause();
-                  } else if (hasStarted) {
-                    handleResume();
                   } else {
-                    handleStart();
+                    handleResume();
                   }
                 }}
                 disabled={dailyLimitStatus.isLimitReached}
-                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.startStop")}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : (isRunning ? "Pause" : "Resume")}
                 role="button"
               >
                 {dailyLimitStatus.isLimitReached ? (
@@ -355,7 +381,7 @@ export const ExtensionTimer = () => {
                   <>
                     {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
                     <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">
-                      {isRunning ? t('common.actions.stop') : hasStarted ? 'Resume' : t('common.actions.start')}
+                      {isRunning ? 'Pause' : 'Resume'}
                     </span>
                   </>
                 )}
