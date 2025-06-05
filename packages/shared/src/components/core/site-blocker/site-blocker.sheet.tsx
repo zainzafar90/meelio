@@ -1,12 +1,4 @@
-interface SiteBlockState {
-  siteId: string
-  blocked?: boolean
-  streak: number
-}
-
-type SiteBlockMap = Record<string, SiteBlockState>
-
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -30,6 +22,14 @@ import { useShallow } from "zustand/shallow";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
+
+interface SiteBlockState {
+  siteId: string;
+  blocked?: boolean;
+  streak: number;
+}
+
+type SiteBlockMap = Record<string, SiteBlockState>;
 
 export function SiteBlockerSheet() {
   const { t } = useTranslation();
@@ -114,15 +114,55 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
+
+  const storage = new Storage({
+    area: "local",
+  });
+
   const [blockedSites, setBlockedSites] = useStorage<SiteBlockMap>(
     {
       key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
+      instance: storage,
     },
-    {}
+    {} as SiteBlockMap
   );
+
+  const validateAndResetStorage = async () => {
+    try {
+      if (!blockedSites || typeof blockedSites !== "object") {
+        console.warn("[SiteBlocker] Invalid storage format detected");
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+        return;
+      }
+
+      const isValid = Object.entries(blockedSites).every(
+        ([_, value]) =>
+          value &&
+          typeof value === "object" &&
+          typeof value.siteId === "string" &&
+          typeof value.streak === "number"
+      );
+
+      if (!isValid) {
+        console.warn("[SiteBlocker] Invalid site entries detected");
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+      }
+    } catch (error) {
+      console.error("[SiteBlocker] Failed to validate storage:", error);
+      try {
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+      } catch (resetError) {
+        console.error("[SiteBlocker] Failed to reset storage:", resetError);
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    validateAndResetStorage();
+  }, []);
 
   const addCustomSite = async () => {
     let site = siteInput.trim();

@@ -1,11 +1,3 @@
-interface SiteBlockState {
-  siteId: string
-  blocked?: boolean
-  streak: number
-}
-
-type SiteBlockMap = Record<string, SiteBlockState>
-
 import type { PlasmoCSConfig } from "plasmo";
 import React from "react";
 import cssText from "data-text:./features/content/blocker.module.css";
@@ -16,6 +8,15 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
 import { pauseAllVideos } from "./utils/video.utils";
+
+interface SiteBlockState {
+  siteId: string;
+  blocked?: boolean;
+  streak: number;
+}
+
+type SiteBlockMap = Record<string, SiteBlockState>;
+
 
 export const config: PlasmoCSConfig = {
   run_at: "document_start",
