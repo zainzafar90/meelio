@@ -16,11 +16,25 @@ function initState(): Omit<
   | "reset"
   | "skipToStage"
   | "updateDurations"
-  | "toggleNotifications"
-  | "toggleSounds"
-  | "updateRemaining"
-  | "getLimitStatus"
-  | "sync"
+          const s = get();
+          const remaining =
+            s.prevRemaining ?? s.durations[s.stage];
+          const end = deps.now() + remaining * 1000;
+          deps.postMessage?.({ type: 'START', duration: remaining });
+          set({
+            isRunning: true,
+            endTimestamp: end,
+            prevRemaining: remaining,
+          });
+          const s = get();
+          const remaining = s.endTimestamp
+            ? Math.max(0, Math.ceil((s.endTimestamp - deps.now()) / 1000))
+            : s.prevRemaining ?? s.durations[s.stage];
+          set({
+            isRunning: false,
+            endTimestamp: null,
+            prevRemaining: remaining,
+          });
   | "restore"
 > {
   return {
