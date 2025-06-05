@@ -103,9 +103,9 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const { blockedSites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
+  const { sites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
     useShallow((state) => ({
-      blockedSites: state.blockedSites,
+      sites: state.sites,
       addSite: state.addSite,
       toggleSite: state.toggleSite,
       removeSite: state.removeSite,
@@ -140,15 +140,19 @@ const ExtensionSiteBlockerContent = () => {
 
     if (!site) return;
 
-    if (!blockedSites[site]?.blocked) {
+    const existingSite = Object.values(sites).find(
+      (s) => s.url === site && s.blocked
+    );
+
+    if (!existingSite) {
       await addSite(site);
       setSiteInput("");
     }
   };
 
-  const blockedSiteIds = Object.entries(blockedSites)
-    .filter(([_, state]) => state.blocked)
-    .map(([url]) => url);
+  const blockedSiteIds = Object.values(sites)
+    .filter((site) => site.blocked)
+    .map((site) => site.url);
 
   return (
     <>
