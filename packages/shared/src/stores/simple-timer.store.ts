@@ -1,77 +1,114 @@
-/** Portion of timer state persisted between sessions. */
-interface StoredTimerState
-  extends Omit<
-    TimerState,
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { useAuthStore } from "./auth.store";
+} from "../types/new/pomodoro-lite";
     | keyof TimerDeps
-    | 'start'
-    | 'pause'
-    | 'reset'
-    | 'skipToStage'
-    | 'updateDurations'
-    | 'toggleNotifications'
-    | 'toggleSounds'
-    | 'updateRemaining'
-    | 'getLimitStatus'
-    | 'sync'
-    | 'restore'
+    | "start"
+    | "pause"
+    | "reset"
+    | "skipToStage"
+    | "updateDurations"
+    | "toggleNotifications"
+    | "toggleSounds"
+    | "updateRemaining"
+    | "getLimitStatus"
+    | "sync"
+    | "restore"
   > {}
 
 function initState(): StoredTimerState {
 /** Build a Zustand store for a simple Pomodoro timer. */
-          set((s) => {
-            const nextDurations = {
-            };
-            const patch: Partial<StoredTimerState> = { durations: nextDurations };
-            const changed = d[s.stage];
-            if (s.isRunning && changed) {
-              patch.endTimestamp = deps.now() + changed * 1000;
-              patch.prevRemaining = changed;
-            }
-            return patch;
-          });
-          const remaining =
-            s.prevRemaining ?? s.durations[s.stage];
-          const end = deps.now() + remaining * 1000;
-          deps.postMessage?.({ type: 'START', duration: remaining });
+        const computeRemainingSec = (
+          timestamp: number | null,
+          fallback: number,
+        ) => {
+          if (!timestamp) return fallback;
+          const diff = Math.ceil((timestamp - deps.now()) / 1000);
+          return Math.max(0, diff);
+        };
+
+          const { stage, durations, prevRemaining } = get();
+          const remainingSec = prevRemaining ?? durations[stage];
+          const end = deps.now() + remainingSec * 1000;
+          deps.postMessage?.({ type: "START", duration: remainingSec });
+            prevRemaining: remainingSec,
+          const { stage, endTimestamp, prevRemaining, durations } = get();
+          const remainingSec = computeRemainingSec(
+            endTimestamp,
+            prevRemaining ?? durations[stage],
+          );
+          deps.postMessage?.({ type: "PAUSE" });
+            prevRemaining: remainingSec,
+          deps.postMessage?.({ type: "RESET" });
+          deps.postMessage?.({ type: "SKIP_TO_NEXT_STAGE" });
           set({
-            isRunning: true,
-            endTimestamp: end,
-            prevRemaining: remaining,
-          });
-          const s = get();
-          const remaining = s.endTimestamp
-            ? Math.max(0, Math.ceil((s.endTimestamp - deps.now()) / 1000))
-            : s.prevRemaining ?? s.durations[s.stage];
-          set({
+            stage,
             isRunning: false,
             endTimestamp: null,
-            prevRemaining: remaining,
+            prevRemaining: duration,
           });
-  | "restore"
-> {
-  return {
-    stage: TimerStage.Focus,
-    isRunning: false,
-    endTimestamp: null,
-    durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: true, sounds: true },
-    stats: { focusSec: 0, breakSec: 0 },
-    dailyLimitSec: 90 * 60,
-    unsyncedFocusSec: 0,
-    prevRemaining: null,
-  };
-}
-
-export const createTimerStore = (deps: TimerDeps) =>
-  create<TimerState>()(
-    persist(
-      (set, get) => {
-        const start = () => {
-          const duration = get().durations[get().stage];
-          const end = deps.now() + duration * 1000;
-          deps.postMessage?.({ type: "START", duration });
-          set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
+        const updateDurations = (
+          d: Partial<{ focus: number; break: number }>,
+        ) => {
+            const patch: Partial<StoredTimerState> = {
+              durations: nextDurations,
+            };
+            deps.postMessage?.({
+              type: "UPDATE_DURATION",
+              duration: d[current.stage]!,
+            });
+          set((s) => ({
+            settings: {
+              ...s.settings,
+              notifications: !s.settings.notifications,
+            },
+          }));
+          set((s) => ({
+            settings: { ...s.settings, sounds: !s.settings.sounds },
+          }));
+        const pushUsageIfNeeded = async (focusSec: number) => {
+          if (focusSec < 300) return;
+          try {
+            await deps.pushUsage(focusSec);
+            set({ unsyncedFocusSec: 0 });
+          } catch (error) {
+            console.error("sync usage failed", error);
+          }
         };
+
+        const applyStageDiff = (diff: number, stage: TimerStage) => {
+          if (stage === TimerStage.Focus) {
+            const { stats, unsyncedFocusSec } = get();
+            const focus = stats.focusSec + diff;
+            const unsynced = unsyncedFocusSec + diff;
+            set({
+              stats: { ...stats, focusSec: focus },
+              unsyncedFocusSec: unsynced,
+            });
+            void pushUsageIfNeeded(unsynced);
+            const { stats } = get();
+            set({ stats: { ...stats, breakSec: stats.breakSec + diff } });
+          }
+        };
+
+        const updateRemaining = (remaining: number) => {
+          const { isRunning, prevRemaining, stage } = get();
+          if (prevRemaining === null || !isRunning) {
+            return;
+          const diff = prevRemaining - remaining;
+          applyStageDiff(diff, stage);
+          set({ prevRemaining: remaining });
+          return {
+            isLimitReached: used >= limit,
+            remainingSec: Math.max(0, limit - used),
+          };
+            console.error("sync settings failed", error);
+            deps.postMessage?.({ type: "RESET" });
+            deps.postMessage?.({ type: "START", duration: left });
+        name: "meelio:simple-timer",
+      },
+    ),
+      if (typeof chrome !== "undefined" && chrome.runtime) {
 
         const pause = () => {
           deps.postMessage?.({ type: "PAUSE" });
