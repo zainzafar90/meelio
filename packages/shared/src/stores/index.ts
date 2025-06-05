@@ -7,5 +7,6 @@ export * from "./settings.store";
 export * from "./sync.store";
 export * from "./soundscapes.store";
 export * from "./todo.store";
+export * from "./app.store";
 export { usePomodoroStore } from "./unified-pomodoro.store";
 export { useTimerStore, createTimerStore } from "./simple-timer.store";

@@ -1,34 +1,34 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { useAuthStore } from './auth.store';
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { useAuthStore } from "./auth.store";
 import {
   TimerStage,
   TimerState,
   TimerDeps,
   TimerSettings,
-} from '../types/new/pomodoro-lite';
+} from "../types/new/pomodoro-lite";
 
 function initState(): Omit<
   TimerState,
   | keyof TimerDeps
-  | 'start'
-  | 'pause'
-  | 'reset'
-  | 'skipToStage'
-  | 'updateDurations'
-  | 'toggleNotifications'
-  | 'toggleSounds'
-  | 'updateRemaining'
-  | 'getLimitStatus'
-  | 'sync'
-  | 'restore'
+  | "start"
+  | "pause"
+  | "reset"
+  | "skipToStage"
+  | "updateDurations"
+  | "toggleNotifications"
+  | "toggleSounds"
+  | "updateRemaining"
+  | "getLimitStatus"
+  | "sync"
+  | "restore"
 > {
   return {
     stage: TimerStage.Focus,
     isRunning: false,
     endTimestamp: null,
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: false, sounds: false },
+    settings: { notifications: true, sounds: true },
     stats: { focusSec: 0, breakSec: 0 },
     dailyLimitSec: 90 * 60,
     unsyncedFocusSec: 0,
@@ -43,18 +43,18 @@ export const createTimerStore = (deps: TimerDeps) =>
         const start = () => {
           const duration = get().durations[get().stage];
           const end = deps.now() + duration * 1000;
-          deps.postMessage?.({ type: 'START', duration });
+          deps.postMessage?.({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
         };
 
         const pause = () => {
-          deps.postMessage?.({ type: 'PAUSE' });
+          deps.postMessage?.({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: null });
         };
 
         const reset = () => {
           const duration = get().durations[TimerStage.Focus];
-          deps.postMessage?.({ type: 'RESET' });
+          deps.postMessage?.({ type: "RESET" });
           set({
             stage: TimerStage.Focus,
             isRunning: false,
@@ -67,11 +67,18 @@ export const createTimerStore = (deps: TimerDeps) =>
 
         const skipToStage = (stage: TimerStage) => {
           const duration = get().durations[stage];
-          deps.postMessage?.({ type: 'SKIP_TO_NEXT_STAGE' });
-          set({ stage, isRunning: false, endTimestamp: null, prevRemaining: duration });
+          deps.postMessage?.({ type: "SKIP_TO_NEXT_STAGE" });
+          set({
+            stage,
+            isRunning: false,
+            endTimestamp: null,
+            prevRemaining: duration,
+          });
         };
 
-        const updateDurations = (d: Partial<{ focus: number; break: number }>) => {
+        const updateDurations = (
+          d: Partial<{ focus: number; break: number }>
+        ) => {
           set((s) => ({
             durations: {
               [TimerStage.Focus]: d.focus ?? s.durations[TimerStage.Focus],
@@ -80,16 +87,26 @@ export const createTimerStore = (deps: TimerDeps) =>
           }));
           const current = get();
           if (current.isRunning && d[current.stage]) {
-            deps.postMessage?.({ type: 'UPDATE_DURATION', duration: d[current.stage]! });
+            deps.postMessage?.({
+              type: "UPDATE_DURATION",
+              duration: d[current.stage]!,
+            });
           }
         };
 
         const toggleNotifications = () => {
-          set((s) => ({ settings: { ...s.settings, notifications: !s.settings.notifications } }));
+          set((s) => ({
+            settings: {
+              ...s.settings,
+              notifications: !s.settings.notifications,
+            },
+          }));
         };
 
         const toggleSounds = () => {
-          set((s) => ({ settings: { ...s.settings, sounds: !s.settings.sounds } }));
+          set((s) => ({
+            settings: { ...s.settings, sounds: !s.settings.sounds },
+          }));
         };
 
         const updateRemaining = (remaining: number) => {
@@ -109,7 +126,7 @@ export const createTimerStore = (deps: TimerDeps) =>
                   .pushUsage(unsynced)
                   .then(() => set({ unsyncedFocusSec: 0 }))
                   .catch((error: Error) => {
-                    console.error('sync usage failed', error);
+                    console.error("sync usage failed", error);
                   });
               }
             } else {
@@ -128,7 +145,10 @@ export const createTimerStore = (deps: TimerDeps) =>
           const isPro = !!auth.user?.isPro;
           const limit = isPro ? Infinity : get().dailyLimitSec;
           const used = get().stats.focusSec;
-          return { isLimitReached: used >= limit, remainingSec: Math.max(0, limit - used) };
+          return {
+            isLimitReached: used >= limit,
+            remainingSec: Math.max(0, limit - used),
+          };
         };
 
         const sync = async () => {
@@ -138,7 +158,7 @@ export const createTimerStore = (deps: TimerDeps) =>
           try {
             await deps.pushSettings(settings);
           } catch (error) {
-            console.error('sync settings failed', error);
+            console.error("sync settings failed", error);
           }
         };
 
@@ -148,9 +168,9 @@ export const createTimerStore = (deps: TimerDeps) =>
           const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
           if (left <= 0) {
             set({ isRunning: false, endTimestamp: null });
-            deps.postMessage?.({ type: 'RESET' });
+            deps.postMessage?.({ type: "RESET" });
           } else {
-            deps.postMessage?.({ type: 'START', duration: left });
+            deps.postMessage?.({ type: "START", duration: left });
             set({ prevRemaining: left });
           }
         };
@@ -171,7 +191,7 @@ export const createTimerStore = (deps: TimerDeps) =>
         } as TimerState;
       },
       {
-        name: 'meelio:simple-timer',
+        name: "meelio:simple-timer",
         storage: createJSONStorage(() => localStorage),
         partialize: (s) => ({
           stage: s.stage,
@@ -192,7 +212,7 @@ export const useTimerStore = createTimerStore({
   pushSettings: async (_: TimerSettings) => Promise.resolve(),
   postMessage: (msg) => {
     try {
-      if (typeof chrome !== 'undefined' && chrome.runtime) {
+      if (typeof chrome !== "undefined" && chrome.runtime) {
         chrome.runtime.sendMessage(msg);
       }
     } catch {
