@@ -4,15 +4,18 @@ import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
 import { siteBlockerApi } from "../api/site-blocker.api";
 
+interface SiteBlockState {
+  siteId: string;
+  blocked: boolean;
+  streak: number;
+}
+
 interface SiteBlockerState {
-  blockedSites: string[];
-  idMap: Record<string, string>; // url -> id
+  blockedSites: Record<string, SiteBlockState>;
   addSite: (url: string) => Promise<void>;
-  /**
-   * Remove a site from the local list. If `sync` is true and the user is
-   * authenticated the entry will also be deleted from the API.
-   */
   removeSite: (url: string, sync?: boolean) => Promise<void>;
+  toggleSite: (url: string) => Promise<void>;
+  incrementStreak: (url: string) => void;
   loadFromServer: () => Promise<void>;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -33,7 +36,10 @@ async function processSyncQueue() {
           const url = operation.data.url as string;
           const res = await siteBlockerApi.addBlockedSite(url);
           useSiteBlockerStore.setState((state) => ({
-            idMap: { ...state.idMap, [url]: res.id },
+            blockedSites: {
+              ...state.blockedSites,
+              [url]: { ...state.blockedSites[url], siteId: res.id },
+            },
           }));
           break;
         }
@@ -68,11 +74,13 @@ function startAutoSync() {
 export const useSiteBlockerStore = create<SiteBlockerState>()(
   persist(
     (set, get) => ({
-      blockedSites: [],
-      idMap: {},
+      blockedSites: {},
       addSite: async (url) => {
         set((state) => ({
-          blockedSites: Array.from(new Set([...state.blockedSites, url])),
+          blockedSites: {
+            ...state.blockedSites,
+            [url]: { siteId: url, blocked: true, streak: 0 },
+          },
         }));
         const user = useAuthStore.getState().user;
         const syncStore = useSyncStore.getState();
@@ -81,7 +89,12 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           if (syncStore.isOnline) {
             try {
               const res = await siteBlockerApi.addBlockedSite(url);
-              set((state) => ({ idMap: { ...state.idMap, [url]: res.id } }));
+              set((state) => ({
+                blockedSites: {
+                  ...state.blockedSites,
+                  [url]: { ...state.blockedSites[url], siteId: res.id },
+                },
+              }));
             } catch (e) {
               console.error(e);
             }
@@ -97,37 +110,59 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         }
       },
       removeSite: async (url, sync = true) => {
-        set((state) => ({
-          blockedSites: state.blockedSites.filter((s) => s !== url),
-        }));
+        set((state) => {
+          const newBlockedSites = { ...state.blockedSites };
+          delete newBlockedSites[url];
+          return { blockedSites: newBlockedSites };
+        });
+
         const user = useAuthStore.getState().user;
         const syncStore = useSyncStore.getState();
 
         if (sync && user) {
-          const id = get().idMap[url];
-          if (id) {
+          const siteState = get().blockedSites[url];
+          if (siteState?.siteId) {
             if (syncStore.isOnline) {
               try {
-                await siteBlockerApi.removeBlockedSite(id);
+                await siteBlockerApi.removeBlockedSite(siteState.siteId);
               } catch (e) {
                 console.error(e);
               }
             } else {
               syncStore.addToQueue("site-blocker", {
                 type: "delete",
-                entityId: id,
-                data: { id },
+                entityId: siteState.siteId,
+                data: { id: siteState.siteId },
               });
             }
 
             if (syncStore.isOnline) processSyncQueue();
           }
-          set((state) => {
-            const newMap = { ...state.idMap };
-            delete newMap[url];
-            return { idMap: newMap };
-          });
         }
+      },
+      toggleSite: async (url) => {
+        const currentState = get().blockedSites[url];
+        if (currentState?.blocked) {
+          await get().removeSite(url);
+        } else {
+          await get().addSite(url);
+        }
+      },
+      incrementStreak: (url) => {
+        set((state) => {
+          const siteState = state.blockedSites[url];
+          if (!siteState) return state;
+
+          return {
+            blockedSites: {
+              ...state.blockedSites,
+              [url]: {
+                ...siteState,
+                streak: (siteState.streak || 0) + 1,
+              },
+            },
+          };
+        });
       },
       loadFromServer: async () => {
         const user = useAuthStore.getState().user;
@@ -143,8 +178,12 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           try {
             const sites = await siteBlockerApi.getBlockedSites();
             set({
-              blockedSites: sites.map((s) => s.url),
-              idMap: Object.fromEntries(sites.map((s) => [s.url, s.id])),
+              blockedSites: Object.fromEntries(
+                sites.map((s) => [
+                  s.url,
+                  { siteId: s.id, blocked: true, streak: 0 },
+                ])
+              ),
             });
           } catch (e) {
             console.error(e);
@@ -179,7 +218,6 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
       version: 1,
       partialize: (state) => ({
         blockedSites: state.blockedSites,
-        idMap: state.idMap,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);

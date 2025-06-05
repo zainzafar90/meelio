@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -9,27 +9,16 @@ import {
 import { useDockStore } from "../../../stores/dock.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { useTranslation } from "react-i18next";
-// @ts-ignore
-import { Storage } from "@plasmohq/storage";
-// @ts-ignore
-import { useStorage } from "@plasmohq/storage/hook";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
 import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
+import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
-
-interface SiteBlockState {
-  siteId: string;
-  blocked?: boolean;
-  streak: number;
-}
-
-type SiteBlockMap = Record<string, SiteBlockState>;
 
 export function SiteBlockerSheet() {
   const { t } = useTranslation();
@@ -114,55 +103,28 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-
-  const storage = new Storage({
-    area: "local",
-  });
-
-  const [blockedSites, setBlockedSites] = useStorage<SiteBlockMap>(
-    {
-      key: "blockedSites",
-      instance: storage,
-    },
-    {} as SiteBlockMap
+  const { blockedSites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
+    useShallow((state) => ({
+      blockedSites: state.blockedSites,
+      addSite: state.addSite,
+      toggleSite: state.toggleSite,
+      removeSite: state.removeSite,
+    }))
   );
 
-  const validateAndResetStorage = async () => {
-    try {
-      if (!blockedSites || typeof blockedSites !== "object") {
-        console.warn("[SiteBlocker] Invalid storage format detected");
-        await storage.remove("blockedSites");
-        setBlockedSites({});
-        return;
-      }
+  const onBlockSites = useCallback(
+    async (sites: string[]) => {
+      await Promise.all(sites.map((site) => addSite(site)));
+    },
+    [addSite]
+  );
 
-      const isValid = Object.entries(blockedSites).every(
-        ([_, value]) =>
-          value &&
-          typeof value === "object" &&
-          typeof value.siteId === "string" &&
-          typeof value.streak === "number"
-      );
-
-      if (!isValid) {
-        console.warn("[SiteBlocker] Invalid site entries detected");
-        await storage.remove("blockedSites");
-        setBlockedSites({});
-      }
-    } catch (error) {
-      console.error("[SiteBlocker] Failed to validate storage:", error);
-      try {
-        await storage.remove("blockedSites");
-        setBlockedSites({});
-      } catch (resetError) {
-        console.error("[SiteBlocker] Failed to reset storage:", resetError);
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    validateAndResetStorage();
-  }, []);
+  const onUnblockSites = useCallback(
+    async (sites: string[]) => {
+      await Promise.all(sites.map((site) => removeSite(site)));
+    },
+    [removeSite]
+  );
 
   const addCustomSite = async () => {
     let site = siteInput.trim();
@@ -179,51 +141,14 @@ const ExtensionSiteBlockerContent = () => {
     if (!site) return;
 
     if (!blockedSites[site]?.blocked) {
-      setBlockedSites({
-        ...blockedSites,
-        [site]: { siteId: site, blocked: true, streak: 0 },
-      });
+      await addSite(site);
       setSiteInput("");
     }
   };
 
-  const toggleSite = (site: string) => {
-    const entry = blockedSites[site];
-    setBlockedSites({
-      ...blockedSites,
-      [site]: {
-        siteId: site,
-        blocked: !entry?.blocked,
-        streak: entry?.streak ?? 0,
-      },
-    });
-  };
-
-  const onBlockSites = (sites: string[]) => {
-    setBlockedSites((prev) => {
-      const updated = { ...prev };
-      sites.forEach((s) => {
-        const entry = updated[s] || { siteId: s, streak: 0 };
-        updated[s] = { ...entry, blocked: true };
-      });
-      return updated;
-    });
-  };
-
-  const onUnblockSites = (sites: string[]) => {
-    setBlockedSites((prev) => {
-      const updated = { ...prev };
-      sites.forEach((s) => {
-        const entry = updated[s];
-        if (entry) updated[s] = { ...entry, blocked: false };
-      });
-      return updated;
-    });
-  };
-
-  const blockedSiteIds = Object.keys(blockedSites).filter(
-    (id) => blockedSites[id].blocked
-  );
+  const blockedSiteIds = Object.entries(blockedSites)
+    .filter(([_, state]) => state.blocked)
+    .map(([url]) => url);
 
   return (
     <>
