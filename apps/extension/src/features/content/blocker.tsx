@@ -5,12 +5,16 @@ import React from "react";
 import * as style from "./blocker.module.css"
 
 interface BlockerProps {
-  siteName: string;
-  message: Quote;
-  onOpenAnyway: () => void;
+  siteName: string
+  message: Quote
+  streak: number
+  onOpenAnyway: () => void
 }
 
-export function Blocker({ siteName, message, onOpenAnyway }: BlockerProps) {
+/**
+ * Overlay shown when a site is blocked
+ */
+export function Blocker({ siteName, message, streak, onOpenAnyway }: BlockerProps) {
   const handleClose = (e: React.MouseEvent) => {
     e.stopPropagation();
     window.close();
@@ -40,7 +44,7 @@ export function Blocker({ siteName, message, onOpenAnyway }: BlockerProps) {
           <div className={style.stats}>
             <p className={style.siteName}>{siteName}</p>
             <p className={style.streak}>
-              <span className={style.streakEmoji}>🔥</span> Block Streak: 4
+              <span className={style.streakEmoji}>🔥</span> Block Streak: {streak}
             </p>
           </div>
 

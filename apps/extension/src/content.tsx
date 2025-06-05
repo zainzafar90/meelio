@@ -1,6 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo";
 import React from "react";
-import cssText from "data-text:./features/content/blocker.module.css"
+import cssText from "data-text:./features/content/blocker.module.css";
 
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
@@ -8,6 +8,15 @@ import { useStorage } from "@plasmohq/storage/hook";
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
 import { pauseAllVideos } from "./utils/video.utils";
+
+interface SiteBlockState {
+  siteId: string;
+  blocked?: boolean;
+  streak: number;
+}
+
+type SiteBlockMap = Record<string, SiteBlockState>;
+
 
 export const config: PlasmoCSConfig = {
   run_at: "document_start",
@@ -27,41 +36,56 @@ const doesHostMatch = (host: string, site: string) => {
   return host === site || host.endsWith(`.${site}`);
 };
 
-const isBlockedSite = (blockedSites: string[]) => {
-  const currentSite = getCurrentSite();
-  return blockedSites.some((site) => doesHostMatch(currentSite, site));
+const getMatchingSiteId = (sites: SiteBlockMap): string | undefined => {
+  const host = getCurrentSite();
+  return Object.keys(sites).find(
+    (id) => sites[id].blocked && doesHostMatch(host, id)
+  );
 };
 
 const PlasmoOverlay = () => {
   const currentSite = getCurrentSite();
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
+  const [blockedSites, setBlockedSites] = useStorage<SiteBlockMap>(
     {
       key: "blockedSites",
       instance: new Storage({
         area: "local",
       }),
     },
-    []
+    {}
   );
 
   const message = getCustomBlockerMessage();
-  const isBlocked = isBlockedSite(blockedSites || []);
+  const matchingSiteId = getMatchingSiteId(blockedSites || {});
+  const isBlocked = Boolean(matchingSiteId);
 
   React.useEffect(() => {
     if (isBlocked) {
       pauseAllVideos();
+      if (matchingSiteId) {
+        const entry = blockedSites[matchingSiteId];
+        setBlockedSites({
+          ...blockedSites,
+          [matchingSiteId]: {
+            ...entry,
+            streak: (entry?.streak ?? 0) + 1,
+          },
+        });
+      }
     }
-  }, [isBlocked]);
+  }, [isBlocked, matchingSiteId]);
 
   const openAnyway = () => {
-    const currentSite = getCurrentSite();
-    const blockedSite = blockedSites.find((site) =>
-      doesHostMatch(currentSite, site)
-    );
-
-    if (blockedSite) {
-      setBlockedSites(blockedSites.filter((site) => site !== blockedSite));
-    }
+    if (!matchingSiteId) return;
+    const entry = blockedSites[matchingSiteId];
+    setBlockedSites({
+      ...blockedSites,
+      [matchingSiteId]: {
+        ...entry,
+        blocked: false,
+        streak: 0,
+      },
+    });
   };
 
   if (!isBlocked) return null;
@@ -83,6 +107,7 @@ const PlasmoOverlay = () => {
       <Blocker
         message={message}
         siteName={currentSite}
+        streak={matchingSiteId ? blockedSites[matchingSiteId]?.streak ?? 0 : 0}
         onOpenAnyway={() => openAnyway()}
       />
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,14 @@ import { useShallow } from "zustand/shallow";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
+
+interface SiteBlockState {
+  siteId: string;
+  blocked?: boolean;
+  streak: number;
+}
+
+type SiteBlockMap = Record<string, SiteBlockState>;
 
 export function SiteBlockerSheet() {
   const { t } = useTranslation();
@@ -106,15 +114,55 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
+
+  const storage = new Storage({
+    area: "local",
+  });
+
+  const [blockedSites, setBlockedSites] = useStorage<SiteBlockMap>(
     {
       key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
+      instance: storage,
     },
-    []
+    {} as SiteBlockMap
   );
+
+  const validateAndResetStorage = async () => {
+    try {
+      if (!blockedSites || typeof blockedSites !== "object") {
+        console.warn("[SiteBlocker] Invalid storage format detected");
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+        return;
+      }
+
+      const isValid = Object.entries(blockedSites).every(
+        ([_, value]) =>
+          value &&
+          typeof value === "object" &&
+          typeof value.siteId === "string" &&
+          typeof value.streak === "number"
+      );
+
+      if (!isValid) {
+        console.warn("[SiteBlocker] Invalid site entries detected");
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+      }
+    } catch (error) {
+      console.error("[SiteBlocker] Failed to validate storage:", error);
+      try {
+        await storage.remove("blockedSites");
+        setBlockedSites({});
+      } catch (resetError) {
+        console.error("[SiteBlocker] Failed to reset storage:", resetError);
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    validateAndResetStorage();
+  }, []);
 
   const addCustomSite = async () => {
     let site = siteInput.trim();
@@ -130,29 +178,52 @@ const ExtensionSiteBlockerContent = () => {
 
     if (!site) return;
 
-    if (!blockedSites.includes(site)) {
-      setBlockedSites([...blockedSites, site]);
+    if (!blockedSites[site]?.blocked) {
+      setBlockedSites({
+        ...blockedSites,
+        [site]: { siteId: site, blocked: true, streak: 0 },
+      });
       setSiteInput("");
     }
   };
 
   const toggleSite = (site: string) => {
-    if (blockedSites.includes(site)) {
-      setBlockedSites(blockedSites.filter((s) => s !== site));
-    } else {
-      setBlockedSites([...blockedSites, site]);
-    }
+    const entry = blockedSites[site];
+    setBlockedSites({
+      ...blockedSites,
+      [site]: {
+        siteId: site,
+        blocked: !entry?.blocked,
+        streak: entry?.streak ?? 0,
+      },
+    });
   };
 
   const onBlockSites = (sites: string[]) => {
-    setBlockedSites((prev) => [...new Set([...(prev || []), ...sites])]);
+    setBlockedSites((prev) => {
+      const updated = { ...prev };
+      sites.forEach((s) => {
+        const entry = updated[s] || { siteId: s, streak: 0 };
+        updated[s] = { ...entry, blocked: true };
+      });
+      return updated;
+    });
   };
 
   const onUnblockSites = (sites: string[]) => {
-    setBlockedSites((prev) =>
-      (prev || []).filter((site) => !sites.includes(site))
-    );
+    setBlockedSites((prev) => {
+      const updated = { ...prev };
+      sites.forEach((s) => {
+        const entry = updated[s];
+        if (entry) updated[s] = { ...entry, blocked: false };
+      });
+      return updated;
+    });
   };
+
+  const blockedSiteIds = Object.keys(blockedSites).filter(
+    (id) => blockedSites[id].blocked
+  );
 
   return (
     <>
@@ -175,11 +246,11 @@ const ExtensionSiteBlockerContent = () => {
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="space-y-8">
           <CustomBlockedSites
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
           />
           <SiteList
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
             onBlockSites={onBlockSites}
             onUnblockSites={onUnblockSites}
