@@ -1,3 +1,11 @@
+interface SiteBlockState {
+  siteId: string
+  blocked?: boolean
+  streak: number
+}
+
+type SiteBlockMap = Record<string, SiteBlockState>
+
 import { useState } from "react";
 import {
   Sheet,
@@ -106,14 +114,14 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
+  const [blockedSites, setBlockedSites] = useStorage<SiteBlockMap>(
     {
       key: "blockedSites",
       instance: new Storage({
         area: "local",
       }),
     },
-    []
+    {}
   );
 
   const addCustomSite = async () => {
@@ -130,29 +138,52 @@ const ExtensionSiteBlockerContent = () => {
 
     if (!site) return;
 
-    if (!blockedSites.includes(site)) {
-      setBlockedSites([...blockedSites, site]);
+    if (!blockedSites[site]?.blocked) {
+      setBlockedSites({
+        ...blockedSites,
+        [site]: { siteId: site, blocked: true, streak: 0 },
+      });
       setSiteInput("");
     }
   };
 
   const toggleSite = (site: string) => {
-    if (blockedSites.includes(site)) {
-      setBlockedSites(blockedSites.filter((s) => s !== site));
-    } else {
-      setBlockedSites([...blockedSites, site]);
-    }
+    const entry = blockedSites[site];
+    setBlockedSites({
+      ...blockedSites,
+      [site]: {
+        siteId: site,
+        blocked: !entry?.blocked,
+        streak: entry?.streak ?? 0,
+      },
+    });
   };
 
   const onBlockSites = (sites: string[]) => {
-    setBlockedSites((prev) => [...new Set([...(prev || []), ...sites])]);
+    setBlockedSites((prev) => {
+      const updated = { ...prev };
+      sites.forEach((s) => {
+        const entry = updated[s] || { siteId: s, streak: 0 };
+        updated[s] = { ...entry, blocked: true };
+      });
+      return updated;
+    });
   };
 
   const onUnblockSites = (sites: string[]) => {
-    setBlockedSites((prev) =>
-      (prev || []).filter((site) => !sites.includes(site))
-    );
+    setBlockedSites((prev) => {
+      const updated = { ...prev };
+      sites.forEach((s) => {
+        const entry = updated[s];
+        if (entry) updated[s] = { ...entry, blocked: false };
+      });
+      return updated;
+    });
   };
+
+  const blockedSiteIds = Object.keys(blockedSites).filter(
+    (id) => blockedSites[id].blocked
+  );
 
   return (
     <>
@@ -175,11 +206,11 @@ const ExtensionSiteBlockerContent = () => {
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="space-y-8">
           <CustomBlockedSites
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
           />
           <SiteList
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
             onBlockSites={onBlockSites}
             onUnblockSites={onUnblockSites}
