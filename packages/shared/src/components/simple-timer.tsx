@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import { useTimerStore } from "../stores";
-import { useInterval, useDocumentTitle } from "../hooks";
-import { TimerStage } from "../types/new/pomodoro-lite";
-import { formatTime } from "../utils/timer.utils";
+import { useEffect, useState } from 'react'
+import { useTimerStore } from '../stores'
+import { useDocumentTitle } from '../hooks'
+import { TimerStage, TimerEvent } from '../types/new/pomodoro-lite'
+import { isChromeExtension } from '../utils/common.utils'
+import { formatTime } from '../utils/timer.utils'
 
 interface DurationValues {
   focusMin: number;
@@ -71,20 +72,32 @@ export const SimpleTimer = () => {
 
   useDocumentTitle({ remaining, stage, running: isRunning });
 
-  useInterval(() => {
-    if (!isRunning || !useTimerStore.getState().endTimestamp) return;
-    const left = Math.max(
-      0,
-      Math.ceil((useTimerStore.getState().endTimestamp! - Date.now()) / 1000),
-    );
-    updateRemaining(left);
-    if (left === 0) {
-      const next =
-        stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
-      skipToStage(next);
-      start();
-    }
-  }, 1000);
+  useEffect(() => {
+    if (!isChromeExtension()) return;
+    const handler = (msg: TimerEvent) => {
+      switch (msg.type) {
+        case 'TICK':
+          updateRemaining(msg.remaining);
+          break;
+        case 'STAGE_COMPLETE':
+          const next =
+            stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
+          skipToStage(next);
+          if (!getLimitStatus().isLimitReached) start();
+          break;
+        case 'PAUSED':
+          updateRemaining(msg.remaining);
+          break;
+        case 'RESET_COMPLETE':
+          updateRemaining(durations[stage]);
+          break;
+      }
+    };
+    chrome.runtime.onMessage.addListener(handler);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handler);
+    };
+  }, [stage, durations, updateRemaining, skipToStage, start, getLimitStatus]);
 
   const limit = getLimitStatus();
 

@@ -43,15 +43,18 @@ export const createTimerStore = (deps: TimerDeps) =>
         const start = () => {
           const duration = get().durations[get().stage];
           const end = deps.now() + duration * 1000;
+          deps.postMessage?.({ type: 'START', duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
         };
 
         const pause = () => {
+          deps.postMessage?.({ type: 'PAUSE' });
           set({ isRunning: false, endTimestamp: null, prevRemaining: null });
         };
 
         const reset = () => {
           const duration = get().durations[TimerStage.Focus];
+          deps.postMessage?.({ type: 'RESET' });
           set({
             stage: TimerStage.Focus,
             isRunning: false,
@@ -64,6 +67,7 @@ export const createTimerStore = (deps: TimerDeps) =>
 
         const skipToStage = (stage: TimerStage) => {
           const duration = get().durations[stage];
+          deps.postMessage?.({ type: 'SKIP_TO_NEXT_STAGE' });
           set({ stage, isRunning: false, endTimestamp: null, prevRemaining: duration });
         };
 
@@ -74,6 +78,10 @@ export const createTimerStore = (deps: TimerDeps) =>
               [TimerStage.Break]: d.break ?? s.durations[TimerStage.Break],
             },
           }));
+          const current = get();
+          if (current.isRunning && d[current.stage]) {
+            deps.postMessage?.({ type: 'UPDATE_DURATION', duration: d[current.stage]! });
+          }
         };
 
         const toggleNotifications = () => {
@@ -140,7 +148,9 @@ export const createTimerStore = (deps: TimerDeps) =>
           const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
           if (left <= 0) {
             set({ isRunning: false, endTimestamp: null });
+            deps.postMessage?.({ type: 'RESET' });
           } else {
+            deps.postMessage?.({ type: 'START', duration: left });
             set({ prevRemaining: left });
           }
         };
@@ -180,4 +190,13 @@ export const useTimerStore = createTimerStore({
   now: () => Date.now(),
   pushUsage: async () => Promise.resolve(),
   pushSettings: async (_: TimerSettings) => Promise.resolve(),
+  postMessage: (msg) => {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.runtime) {
+        chrome.runtime.sendMessage(msg);
+      }
+    } catch {
+      // ignore
+    }
+  },
 });

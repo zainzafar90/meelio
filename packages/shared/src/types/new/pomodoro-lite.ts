@@ -18,10 +18,33 @@ export interface TimerStats {
   breakSec: number;
 }
 
+export interface StartMessage { type: 'START'; duration: number }
+export interface PauseMessage { type: 'PAUSE' }
+export interface ResetMessage { type: 'RESET' }
+export interface UpdateDurationMessage { type: 'UPDATE_DURATION'; duration: number }
+export interface SkipStageMessage { type: 'SKIP_TO_NEXT_STAGE' }
+export type TimerMessage =
+  | StartMessage
+  | PauseMessage
+  | ResetMessage
+  | UpdateDurationMessage
+  | SkipStageMessage
+
+export interface TickMessage { type: 'TICK'; remaining: number }
+export interface StageCompleteMessage { type: 'STAGE_COMPLETE' }
+export interface PausedMessage { type: 'PAUSED'; remaining: number }
+export interface ResetCompleteMessage { type: 'RESET_COMPLETE' }
+export type TimerEvent =
+  | TickMessage
+  | StageCompleteMessage
+  | PausedMessage
+  | ResetCompleteMessage
+
 export interface TimerDeps {
   now: () => number;
   pushUsage: (seconds: number) => Promise<void>;
   pushSettings: (settings: TimerSettings) => Promise<void>;
+  postMessage?: (msg: TimerMessage) => void;
 }
 
 export interface TimerState {

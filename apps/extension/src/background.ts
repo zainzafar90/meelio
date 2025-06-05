@@ -1,15 +1,4 @@
-interface StartMessage { type: 'START'; duration: number }
-interface PauseMessage { type: 'PAUSE' }
-interface ResetMessage { type: 'RESET' }
-interface UpdateDurationMessage { type: 'UPDATE_DURATION'; duration: number }
-interface SkipStageMessage { type: 'SKIP_TO_NEXT_STAGE' }
-
-type TimerMessage =
-  | StartMessage
-  | PauseMessage
-  | ResetMessage
-  | UpdateDurationMessage
-  | SkipStageMessage
+import { TimerMessage } from '@repo/shared'
 
 let interval: NodeJS.Timeout | null = null
 let endTime = 0
