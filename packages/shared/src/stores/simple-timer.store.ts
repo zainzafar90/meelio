@@ -1,12 +1,74 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { useAuthStore } from "./auth.store";
+import { useAppStore } from "./app.store";
+import { pomodoroSounds } from "../data";
 import {
   TimerStage,
   TimerState,
   TimerDeps,
   TimerSettings,
 } from "../types/new/pomodoro-lite";
+
+const isExtension = () => {
+  try {
+    return useAppStore.getState().platform === "extension";
+  } catch {
+    return false;
+  }
+};
+
+const playCompletionSound = (soundEnabled: boolean, soundId: string = "timeout-1-back-chime") => {
+  if (!soundEnabled) return;
+
+  try {
+    const sound = pomodoroSounds.find((s) => s.id === soundId);
+    if (!sound) return;
+
+    const audio = new Audio(sound.url);
+    audio.volume = 0.5;
+    audio.play().catch((error) => {
+      console.error("Failed to play timer sound:", error);
+    });
+  } catch (error) {
+    console.error("Error playing completion sound:", error);
+  }
+};
+
+const showCompletionNotification = (stage: TimerStage, notificationsEnabled: boolean) => {
+  if (!notificationsEnabled) return;
+
+  const useChrome = isExtension() && typeof chrome?.notifications !== "undefined";
+
+  const title = stage === TimerStage.Focus
+    ? "Focus session complete! 🎯"
+    : "Break time is over! ☕";
+  const body = stage === TimerStage.Focus
+    ? "Great work! Time for a break."
+    : "Ready to focus again?";
+
+  if (useChrome) {
+    chrome.notifications.create({
+      type: "basic",
+      title,
+      message: body,
+      iconUrl: chrome.runtime.getURL("public/icon.png"),
+      silent: true,
+    });
+  } else if (
+    "Notification" in window &&
+    Notification.permission === "granted"
+  ) {
+    const n = new Notification(title, {
+      body,
+      icon: "/icon.png",
+      badge: "/icon.png",
+      requireInteraction: false,
+      silent: true,
+    });
+    setTimeout(() => n.close(), 5000);
+  }
+};
 
 function initState(): Omit<
   TimerState,
@@ -181,6 +243,26 @@ export const createTimerStore = (deps: TimerDeps) =>
           }
         };
 
+        const completeStage = () => {
+          const state = get();
+          const finishedStage = state.stage;
+          
+          // Play sound and show notification
+          playCompletionSound(state.settings.sounds);
+          showCompletionNotification(finishedStage, state.settings.notifications);
+          
+          // Switch to next stage
+          const nextStage = finishedStage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
+          const duration = state.durations[nextStage];
+          
+          set({
+            stage: nextStage,
+            isRunning: false,
+            endTimestamp: null,
+            prevRemaining: duration,
+          });
+        };
+
         return {
           ...initState(),
           start,
@@ -194,7 +276,14 @@ export const createTimerStore = (deps: TimerDeps) =>
           getLimitStatus,
           sync,
           restore,
-        } as TimerState;
+          completeStage,
+          playCompletionSound: () => playCompletionSound(get().settings.sounds),
+          showCompletionNotification: (stage: TimerStage) => showCompletionNotification(stage, get().settings.notifications),
+        } as TimerState & {
+          completeStage: () => void;
+          playCompletionSound: () => void;
+          showCompletionNotification: (stage: TimerStage) => void;
+        };
       },
       {
         name: "meelio:simple-timer",

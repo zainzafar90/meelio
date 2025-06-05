@@ -56,7 +56,7 @@ const useBackgroundMessages = (
   stage: TimerStage,
   durations: TimerDurations,
   updateRemaining: (n: number) => void,
-  skipToStage: (s: TimerStage) => void,
+  completeStage: () => void,
   start: () => void,
   getLimitStatus: () => { isLimitReached: boolean }
 ) => {
@@ -68,9 +68,7 @@ const useBackgroundMessages = (
           updateRemaining(msg.remaining);
           break;
         case "STAGE_COMPLETE":
-          const next =
-            stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
-          skipToStage(next);
+          completeStage();
           if (!getLimitStatus().isLimitReached) start();
           break;
         case "PAUSED":
@@ -85,7 +83,7 @@ const useBackgroundMessages = (
     return () => {
       chrome.runtime.onMessage.removeListener(handler);
     };
-  }, [stage, durations, updateRemaining, skipToStage, start, getLimitStatus]);
+  }, [stage, durations, updateRemaining, completeStage, start, getLimitStatus]);
 };
 
 interface TimerControlProps {
@@ -194,7 +192,7 @@ const useSimpleTimerState = () => {
     store.stage,
     store.durations,
     store.updateRemaining,
-    store.skipToStage,
+    (store as any).completeStage,
     store.start,
     store.getLimitStatus
   );
