@@ -97,8 +97,12 @@ export const createTimerStore = (deps: TimerDeps) =>
                 prevRemaining: remaining,
               });
               if (unsynced >= 300) {
-                deps.pushUsage(unsynced).catch(() => {});
-                set({ unsyncedFocusSec: 0 });
+                deps
+                  .pushUsage(unsynced)
+                  .then(() => set({ unsyncedFocusSec: 0 }))
+                  .catch((error: Error) => {
+                    console.error('sync usage failed', error);
+                  });
               }
             } else {
               set({
@@ -125,8 +129,8 @@ export const createTimerStore = (deps: TimerDeps) =>
           const settings = get().settings;
           try {
             await deps.pushSettings(settings);
-          } catch {
-            // ignore
+          } catch (error) {
+            console.error('sync settings failed', error);
           }
         };
 

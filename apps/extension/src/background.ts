@@ -1,5 +1,18 @@
-let interval: NodeJS.Timeout | null = null;
-let endTime = 0;
+interface StartMessage { type: 'START'; duration: number }
+interface PauseMessage { type: 'PAUSE' }
+interface ResetMessage { type: 'RESET' }
+interface UpdateDurationMessage { type: 'UPDATE_DURATION'; duration: number }
+interface SkipStageMessage { type: 'SKIP_TO_NEXT_STAGE' }
+
+type TimerMessage =
+  | StartMessage
+  | PauseMessage
+  | ResetMessage
+  | UpdateDurationMessage
+  | SkipStageMessage
+
+let interval: NodeJS.Timeout | null = null
+let endTime = 0
 
 const clean = () => {
   if (interval) clearInterval(interval);
@@ -7,9 +20,10 @@ const clean = () => {
   endTime = 0;
 };
 
-const remaining = () => Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+const remaining = (): number =>
+  Math.max(0, Math.ceil((endTime - Date.now()) / 1000))
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener((msg: TimerMessage) => {
   switch (msg.type) {
     case 'START':
       clean();
