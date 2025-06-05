@@ -45,7 +45,7 @@ const PlasmoOverlay = () => {
   );
 
   const message = getCustomBlockerMessage();
-  const isBlocked = isBlockedSite(blockedSites);
+  const isBlocked = isBlockedSite(blockedSites || []);
 
   React.useEffect(() => {
     if (isBlocked) {
@@ -58,6 +58,7 @@ const PlasmoOverlay = () => {
     const blockedSite = blockedSites.find((site) =>
       doesHostMatch(currentSite, site)
     );
+
     if (blockedSite) {
       setBlockedSites(blockedSites.filter((site) => site !== blockedSite));
     }
