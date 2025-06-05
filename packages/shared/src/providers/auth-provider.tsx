@@ -11,9 +11,15 @@ import {
 } from "../utils/guest-migration.utils";
 import { clearLocalData } from "../utils/clear-data.utils";
 import { toast } from "sonner";
+import { useSyncStore } from "../stores/sync.store";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [mounted, setMounted] = useState(false);
+  const { isOnline } = useSyncStore(
+    useShallow((state) => ({
+      isOnline: state.isOnline,
+    }))
+  );
 
   const authStore = useAuthStore(
     useShallow((state) => ({
@@ -35,6 +41,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (mounted) {
       (async () => {
+        if (!isOnline) return;
+
         const DELAY = authStore.user ? 3000 : 0;
         setTimeout(async () => {
           try {

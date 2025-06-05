@@ -1,7 +1,11 @@
 import { create } from "zustand";
-import { createJSONStorage } from "zustand/middleware";
 
-export type EntityType = "task" | "pomodoro" | "focus-time" | "tab-stash";
+export type EntityType =
+  | "task"
+  | "pomodoro"
+  | "focus-time"
+  | "tab-stash"
+  | "site-blocker";
 
 export interface SyncOperation {
   id: string;

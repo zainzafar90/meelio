@@ -24,6 +24,7 @@ export const CustomBlockedSites = ({
       <ul className="space-y-2">
         {customBlockedSites.map((site) => (
           <SiteItem
+            key={site}
             site={{
               id: site,
               name: site,
