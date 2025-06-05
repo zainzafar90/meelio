@@ -7,7 +7,7 @@ import { useStorage } from "@plasmohq/storage/hook";
 
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
-import { pauseAllVideos } from "./utils/video.utils";
+import { pauseAllVideos, startAutoPause } from "./utils/media.utils";
 
 interface SiteBlockState {
   siteId: string;
@@ -62,6 +62,14 @@ const PlasmoOverlay = () => {
   React.useEffect(() => {
     if (isBlocked) {
       pauseAllVideos();
+      startAutoPause();
+      window.addEventListener('yt-navigate-finish', pauseAllVideos); 
+
+      document.addEventListener('play', e => {
+          (e.target as HTMLVideoElement|HTMLAudioElement).pause();
+      }, true);
+
+
       if (matchingSiteId) {
         const entry = blockedSites[matchingSiteId];
         setBlockedSites({
