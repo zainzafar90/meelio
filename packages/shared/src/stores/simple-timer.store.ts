@@ -180,15 +180,12 @@ export const createTimerStore = (deps: TimerDeps) =>
           set((s) => ({
             durations: {
               [TimerStage.Focus]: d.focus ?? s.durations[TimerStage.Focus],
-          set((state) => {
-              [TimerStage.Focus]:
-                d.focus ?? state.durations[TimerStage.Focus],
-              [TimerStage.Break]: d.break ?? state.durations[TimerStage.Break],
-            const changed = d[state.stage];
-            if (changed) {
-              if (state.isRunning) {
-                patch.endTimestamp = deps.now() + changed * 1000;
-              }
+              [TimerStage.Break]: d.break ?? s.durations[TimerStage.Break],
+            },
+          }));
+          const current = get();
+          if (current.isRunning && d[current.stage]) {
+            deps.postMessage?.({
               type: "UPDATE_DURATION",
               duration: d[current.stage]!,
             });
