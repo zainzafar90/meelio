@@ -88,6 +88,7 @@ export * from "./core/timer/components/next-pinned-task";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
+export * from "./simple-timer";
 
 // Tasks
 export * from "./core/task-list/components/create-list";
