@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTimerStore } from "../stores";
-import { useDocumentTitle } from "../hooks";
+import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
   TimerEvent,
@@ -10,6 +10,7 @@ import { isChromeExtension } from "../utils/common.utils";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
 import { NextPinnedTask } from "./core/timer/components/next-pinned-task";
+import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
 
 interface DurationValues {
   focusMin: number;
@@ -119,6 +120,7 @@ interface TimerViewProps {
   skip: (s: TimerStage) => void;
   limitReached: boolean;
   onDurations: (d: DurationValues) => void;
+  onStatsClick: () => void;
 }
 
 const TimerView = ({
@@ -132,6 +134,7 @@ const TimerView = ({
   skip,
   limitReached,
   onDurations,
+  onStatsClick,
 }: TimerViewProps) => {
   const [showDurationEditor, setShowDurationEditor] = useState(false);
 
@@ -199,6 +202,16 @@ const TimerView = ({
               >
                 <Icons.resetTimer className="size-4 text-white/90" />
                 <span className="sr-only">Reset</span>
+              </button>
+
+              <button
+                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                onClick={onStatsClick}
+                title="View stats"
+                role="button"
+              >
+                <Icons.graph className="size-4 text-white/90" />
+                <span className="sr-only">Stats</span>
               </button>
 
               <button
@@ -303,6 +316,9 @@ const TimerView = ({
  */
 const useSimpleTimerState = () => {
   const store = useTimerStore();
+  const statsModal = useDisclosure();
+  const settingsModal = useDisclosure();
+
   const remaining = useTimerStore((s) => {
     // When paused, use the stored remaining time
     if (!s.isRunning && s.prevRemaining !== null) {
@@ -337,23 +353,39 @@ const useSimpleTimerState = () => {
     store.updateDurations({ focus: d.focusMin * 60, break: d.breakMin * 60 });
   };
 
-  return { store, remaining, limit, handleDurations };
+  return {
+    store,
+    remaining,
+    limit,
+    handleDurations,
+    statsModal,
+    settingsModal,
+  };
 };
 
 export const SimpleTimer = () => {
-  const { store, remaining, limit, handleDurations } = useSimpleTimerState();
+  const { store, remaining, limit, handleDurations, statsModal } =
+    useSimpleTimerState();
   return (
-    <TimerView
-      remaining={remaining}
-      running={store.isRunning}
-      stage={store.stage}
-      durations={store.durations}
-      start={store.start}
-      pause={store.pause}
-      reset={store.reset}
-      skip={store.skipToStage}
-      limitReached={limit.isLimitReached}
-      onDurations={handleDurations}
-    />
+    <>
+      <TimerView
+        remaining={remaining}
+        running={store.isRunning}
+        stage={store.stage}
+        durations={store.durations}
+        start={store.start}
+        pause={store.pause}
+        reset={store.reset}
+        skip={store.skipToStage}
+        limitReached={limit.isLimitReached}
+        onDurations={handleDurations}
+        onStatsClick={statsModal.open}
+      />
+
+      <TimerStatsDialog
+        isOpen={statsModal.isOpen}
+        onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
+      />
+    </>
   );
 };

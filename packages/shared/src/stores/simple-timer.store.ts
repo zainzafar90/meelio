@@ -9,6 +9,7 @@ import {
   TimerDeps,
   TimerSettings,
 } from "../types/new/pomodoro-lite";
+import { addSimpleTimerFocusTime, addSimpleTimerBreakTime } from "../lib/db/pomodoro.dexie";
 
 const isExtension = () => {
   try {
@@ -351,6 +352,18 @@ export const createTimerStore = (deps: TimerDeps) =>
         const completeStage = () => {
           const state = get();
           const finishedStage = state.stage;
+          const completedDuration = state.durations[finishedStage];
+
+          // Save completed stage to database
+          if (finishedStage === TimerStage.Focus) {
+            addSimpleTimerFocusTime(completedDuration).catch((error) => {
+              console.error("Failed to save focus time to database:", error);
+            });
+          } else if (finishedStage === TimerStage.Break) {
+            addSimpleTimerBreakTime(completedDuration).catch((error) => {
+              console.error("Failed to save break time to database:", error);
+            });
+          }
 
           // Play sound and show notification
           playCompletionSound(state.settings.sounds);
