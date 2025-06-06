@@ -107,12 +107,10 @@ export const playBreathingSound = (mode: string) => {
 
   if (!path) return;
 
-  let audioPath = getAssetPath(path);
-  if (isChromeExtension() && typeof chrome !== "undefined" && chrome.runtime) {
-    audioPath = chrome.runtime.getURL(path.replace(/^\/public\//, ""));
-  }
-
+  const audioPath = getAssetPath(path);
+  console.log("audioPath", audioPath);
   const audio = new Audio(audioPath);
+  audio.volume = 0.5;
   audio.play();
 };
 

@@ -86,7 +86,7 @@ export const useBreathingStore = create<BreathingState>((set, get) => ({
   count: 0,
   isActive: false,
   selectedMethod: BREATHING_METHODS[0],
-  sessionSets: 20,
+  sessionSets: 10,
   totalSets: 0,
   completedSets: 0,
 
