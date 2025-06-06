@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { useTimerStore } from "../stores";
-import { useDocumentTitle, useDisclosure } from "../hooks";
+import { useDocumentTitle, useDisclosure } from "@repo/shared";
 import {
   TimerStage,
-  TimerEvent,
   TimerDurations,
-} from "../types/new/pomodoro-lite";
-import { isChromeExtension } from "../utils/common.utils";
-import { formatTime } from "../utils/timer.utils";
-import { Icons } from "./icons";
-import { NextPinnedTask } from "./core/timer/components/next-pinned-task";
-import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
+  formatTime,
+  Icons,
+  NextPinnedTask,
+  TimerStatsDialog,
+} from "@repo/shared";
+import { useWebTimerStore, getWebTimerWorker } from "../stores/web-timer.store";
 
 interface DurationValues {
   focusMin: number;
@@ -128,40 +126,6 @@ const useRestoreTimer = (restore: () => void) => {
   useEffect(() => {
     restore();
   }, [restore]);
-};
-
-const useBackgroundMessages = (
-  stage: TimerStage,
-  durations: TimerDurations,
-  updateRemaining: (n: number) => void,
-  completeStage: () => void,
-  start: () => void,
-  getLimitStatus: () => { isLimitReached: boolean }
-) => {
-  useEffect(() => {
-    if (!isChromeExtension()) return;
-    const handler = (msg: TimerEvent) => {
-      switch (msg.type) {
-        case "TICK":
-          updateRemaining(msg.remaining);
-          break;
-        case "STAGE_COMPLETE":
-          completeStage();
-          if (!getLimitStatus().isLimitReached) start();
-          break;
-        case "PAUSED":
-          updateRemaining(msg.remaining);
-          break;
-        case "RESET_COMPLETE":
-          updateRemaining(durations[stage]);
-          break;
-      }
-    };
-    chrome.runtime.onMessage.addListener(handler);
-    return () => {
-      chrome.runtime.onMessage.removeListener(handler);
-    };
-  }, [stage, durations, updateRemaining, completeStage, start, getLimitStatus]);
 };
 
 interface TimerViewProps {
@@ -378,15 +342,11 @@ const TimerView = ({
   );
 };
 
-/**
- * Minimal Pomodoro timer widget with editable durations.
- */
-const useSimpleTimerState = () => {
-  const store = useTimerStore();
+const useWebSimpleTimerState = () => {
+  const store = useWebTimerStore();
   const statsModal = useDisclosure();
-  const settingsModal = useDisclosure();
 
-  const remaining = useTimerStore((s) => {
+  const remaining = useWebTimerStore((s) => {
     // When paused, use the stored remaining time
     if (!s.isRunning && s.prevRemaining !== null) {
       return s.prevRemaining;
@@ -401,18 +361,44 @@ const useSimpleTimerState = () => {
 
   useRestoreTimer(store.restore);
   useDocumentTitle({ remaining, stage: store.stage, running: store.isRunning });
-  useBackgroundMessages(
-    store.stage,
-    store.durations,
-    store.updateRemaining,
-    (store as any).completeStage,
-    store.start,
-    store.getLimitStatus
-  );
+
+  // Set up web worker message handling
+  useEffect(() => {
+    const worker = getWebTimerWorker();
+    
+    const handleMessage = (event: MessageEvent) => {
+      const { type, remaining } = event.data;
+      
+      switch (type) {
+        case "TICK":
+          store.updateRemaining(remaining);
+          break;
+        case "STAGE_COMPLETE":
+          store.completeStage();
+          if (!store.getLimitStatus().isLimitReached) {
+            store.start();
+          }
+          break;
+        case "PAUSED":
+          store.updateRemaining(remaining);
+          break;
+        case "RESET_COMPLETE":
+          store.updateRemaining(store.durations[store.stage]);
+          break;
+      }
+    };
+
+    worker.addMessageHandler(handleMessage);
+    
+    return () => {
+      worker.removeMessageHandler(handleMessage);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - setup once. Store is stable from Zustand
 
   useEffect(() => {
     store.checkDailyReset?.();
-  }, []);
+  }, [store]);
 
   const limit = store.getLimitStatus();
 
@@ -426,7 +412,6 @@ const useSimpleTimerState = () => {
     limit,
     handleDurations,
     statsModal,
-    settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
     toggleNotifications: store.toggleNotifications,
@@ -434,7 +419,10 @@ const useSimpleTimerState = () => {
   };
 };
 
-export const SimpleTimer = () => {
+/**
+ * Web-specific SimpleTimer that uses web worker for background processing
+ */
+export const WebSimpleTimer = () => {
   const {
     store,
     remaining,
@@ -445,7 +433,8 @@ export const SimpleTimer = () => {
     sounds,
     toggleNotifications,
     toggleSounds,
-  } = useSimpleTimerState();
+  } = useWebSimpleTimerState();
+
   return (
     <>
       <TimerView
