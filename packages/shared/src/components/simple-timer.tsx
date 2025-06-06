@@ -327,6 +327,10 @@ const useSimpleTimerState = () => {
     store.getLimitStatus
   );
 
+  useEffect(() => {
+    store.checkDailyReset?.();
+  }, []);
+
   const limit = store.getLimitStatus();
 
   const handleDurations = (d: DurationValues) => {
