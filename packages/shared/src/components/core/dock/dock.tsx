@@ -61,7 +61,7 @@ export const Dock = () => {
     isTimerVisible,
     isBreathingVisible,
     isSoundscapesVisible,
-    isTodosVisible,
+    isTasksVisible,
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
@@ -69,7 +69,7 @@ export const Dock = () => {
     toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
-    toggleTodos,
+    toggleTasks,
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
@@ -80,7 +80,7 @@ export const Dock = () => {
       isTimerVisible: state.isTimerVisible,
       isBreathingVisible: state.isBreathingVisible,
       isSoundscapesVisible: state.isSoundscapesVisible,
-      isTodosVisible: state.isTodosVisible,
+      isTasksVisible: state.isTasksVisible,
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
@@ -89,7 +89,7 @@ export const Dock = () => {
       toggleTimer: state.toggleTimer,
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
-      toggleTodos: state.toggleTodos,
+      toggleTasks: state.toggleTasks,
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
@@ -147,14 +147,14 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(dockIconsVisible.todos
+      ...(dockIconsVisible.tasks
         ? [
             {
-              id: "todos",
-              name: t("common.todo"),
-              icon: Icons.todoList,
-              activeIcon: Icons.todoListActive,
-              onClick: toggleTodos,
+              id: "tasks",
+              name: t("common.tasks"),
+              icon: Icons.taskList,
+              activeIcon: Icons.taskListActive,
+              onClick: toggleTasks,
             },
           ]
         : []),
@@ -200,7 +200,7 @@ export const Dock = () => {
       toggleTimer,
       toggleSoundscapes,
       toggleBreathing,
-      toggleTodos,
+      toggleTasks,
       toggleSiteBlocker,
       toggleTabStash,
       toggleBackgrounds,
@@ -331,7 +331,7 @@ export const Dock = () => {
                 (item.id === "timer" && isTimerVisible) ||
                 (item.id === "soundscapes" && isSoundscapesVisible) ||
                 (item.id === "breathepod" && isBreathingVisible) ||
-                (item.id === "todos" && isTodosVisible) ||
+                (item.id === "tasks" && isTasksVisible) ||
                 (item.id === "site-blocker" && isSiteBlockerVisible) ||
                 (item.id === "background" && isBackgroundsVisible) ||
                 (item.id === "tab-stash" && isTabStashVisible);

@@ -6,7 +6,7 @@ interface DockIconsVisibility {
   timer: boolean;
   breathing: boolean;
   soundscapes: boolean;
-  todos: boolean;
+  tasks: boolean;
   siteBlocker: boolean;
   tabStash: boolean;
   backgrounds: boolean;
@@ -20,7 +20,7 @@ interface DockState {
   isBreathingVisible: boolean;
   isGreetingsVisible: boolean;
   isSoundscapesVisible: boolean;
-  isTodosVisible: boolean;
+  isTasksVisible: boolean;
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
@@ -37,7 +37,7 @@ interface DockState {
   toggleBreathing: () => void;
   toggleGreetings: () => void;
   toggleSoundscapes: () => void;
-  toggleTodos: () => void;
+  toggleTasks: () => void;
   toggleBackgrounds: () => void;
   toggleSiteBlocker: () => void;
   toggleTabStash: () => void;
@@ -47,7 +47,7 @@ interface DockState {
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
   setSoundscapesVisible: (visible: boolean) => void;
-  setTodosVisible: (visible: boolean) => void;
+  setTasksVisible: (visible: boolean) => void;
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
@@ -73,7 +73,7 @@ export const useDockStore = create<DockState>()(
       isBreathingVisible: false,
       isGreetingsVisible: true,
       isSoundscapesVisible: false,
-      isTodosVisible: false,
+      isTasksVisible: false,
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
@@ -83,7 +83,7 @@ export const useDockStore = create<DockState>()(
         timer: true,
         breathing: true,
         soundscapes: true,
-        todos: true,
+        tasks: true,
         siteBlocker: true,
         tabStash: true,
         backgrounds: true,
@@ -125,8 +125,8 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isSoundscapesVisible: !state.isSoundscapesVisible }));
       },
 
-      toggleTodos: () => {
-        set((state) => ({ isTodosVisible: !state.isTodosVisible }));
+      toggleTasks: () => {
+        set((state) => ({ isTasksVisible: !state.isTasksVisible }));
       },
 
       toggleBackgrounds: () => {
@@ -162,8 +162,8 @@ export const useDockStore = create<DockState>()(
         set({ isSoundscapesVisible: visible });
       },
 
-      setTodosVisible: (visible: boolean) => {
-        set({ isTodosVisible: visible });
+      setTasksVisible: (visible: boolean) => {
+        set({ isTasksVisible: visible });
       },
 
       setBackgroundsVisible: (visible: boolean) => {
@@ -206,7 +206,7 @@ export const useDockStore = create<DockState>()(
           isBreathingVisible: false,
           isGreetingsVisible: true,
           isSoundscapesVisible: false,
-          isTodosVisible: false,
+          isTasksVisible: false,
           isBackgroundsVisible: false,
           isSiteBlockerVisible: false,
           isTabStashVisible: false,

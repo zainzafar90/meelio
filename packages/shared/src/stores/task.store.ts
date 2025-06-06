@@ -8,14 +8,14 @@ import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
 
-export interface TodoList {
+export interface TaskListMeta {
   id: string;
   name: string;
   type: "system" | "custom";
   emoji?: string;
 }
 
-const SYSTEM_LISTS: TodoList[] = [
+const DEFAULT_LISTS: TaskListMeta[] = [
   { id: "today", name: "Today", type: "system", emoji: "📅" },
   { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
   { id: "completed", name: "Completed", type: "system", emoji: "✅" },
@@ -23,8 +23,8 @@ const SYSTEM_LISTS: TodoList[] = [
   { id: "work", name: "Work", type: "custom", emoji: "💼" },
 ];
 
-interface TodoState {
-  lists: TodoList[];
+interface TaskState {
+  lists: TaskListMeta[];
   tasks: Task[];
   activeListId: string | null;
   isLoading: boolean;
@@ -41,7 +41,7 @@ interface TodoState {
   deleteTask: (taskId: string) => Promise<void>;
   deleteTasksByCategory: (category: string) => Promise<void>;
 
-  addList: (list: Omit<TodoList, "id"> & { id?: string }) => Promise<void>;
+  addList: (list: Omit<TaskListMeta, "id"> & { id?: string }) => Promise<void>;
   deleteList: (listId: string) => void;
   setActiveList: (listId: string | null) => void;
 
@@ -103,9 +103,9 @@ function startAutoSync() {
   autoSyncInterval = setInterval(() => processSyncQueue(), 5 * 60 * 1000);
 }
 
-export const useTodoStore = create<TodoState>()(
+export const useTaskStore = create<TaskState>()(
   subscribeWithSelector((set, get) => ({
-    lists: SYSTEM_LISTS,
+    lists: DEFAULT_LISTS,
     tasks: [],
     activeListId: "today",
     isLoading: false,
@@ -300,7 +300,7 @@ export const useTodoStore = create<TodoState>()(
 
       if (!userId) return;
 
-      const newList: TodoList = {
+      const newList: TaskListMeta = {
         ...list,
         id: list.id || generateUUID(),
       };
@@ -386,7 +386,7 @@ export const useTodoStore = create<TodoState>()(
           }
         }
       } catch (error: any) {
-        console.error("Failed to initialize todo store:", error);
+        console.error("Failed to initialize task store:", error);
         set({ error: error?.message || "Failed to initialize store" });
       } finally {
         set({ isLoading: false });
@@ -406,12 +406,24 @@ export const useTodoStore = create<TodoState>()(
         .equals(userId)
         .toArray();
 
+      await Promise.all(
+        localTasks.map(async (task) => {
+          if (task.category === "today") {
+            await db.tasks.update(task.id, {
+              category: undefined,
+              updatedAt: Date.now(),
+            });
+            task.category = undefined;
+          }
+        })
+      );
+
       // Extract categories from tasks
       const taskCategories = new Set<string>();
       localTasks.forEach((task) => {
         if (
           task.category &&
-          !SYSTEM_LISTS.some((l) => l.id === task.category)
+          !DEFAULT_LISTS.some((l) => l.id === task.category)
         ) {
           taskCategories.add(task.category);
         }
@@ -419,13 +431,13 @@ export const useTodoStore = create<TodoState>()(
 
       const categoryListsMap = new Map<
         string,
-        { list: TodoList; latestTask: number }
+        { list: TaskListMeta; latestTask: number }
       >();
 
       localTasks.forEach((task) => {
         if (
           task.category &&
-          !SYSTEM_LISTS.some((l) => l.id === task.category)
+          !DEFAULT_LISTS.some((l) => l.id === task.category)
         ) {
           const existing = categoryListsMap.get(task.category.toLowerCase());
           const taskTime = task.createdAt || 0;
@@ -450,7 +462,7 @@ export const useTodoStore = create<TodoState>()(
 
       set({
         tasks: localTasks,
-        lists: [...SYSTEM_LISTS, ...sortedCategoryLists],
+        lists: [...DEFAULT_LISTS, ...sortedCategoryLists],
       });
     },
 
@@ -477,9 +489,9 @@ export const useTodoStore = create<TodoState>()(
         });
 
         // Convert API categories to lists
-        const categoryLists: TodoList[] = apiCategories
+        const categoryLists: TaskListMeta[] = apiCategories
           .filter(
-            (cat) => !SYSTEM_LISTS.some((l) => l.id === cat.toLowerCase())
+            (cat) => !DEFAULT_LISTS.some((l) => l.id === cat.toLowerCase())
           )
           .map((cat) => ({
             id: cat.toLowerCase(),
@@ -490,7 +502,7 @@ export const useTodoStore = create<TodoState>()(
 
         set({
           tasks: serverTasks,
-          lists: [...SYSTEM_LISTS, ...categoryLists],
+          lists: [...DEFAULT_LISTS, ...categoryLists],
         });
 
         syncStore.setSyncing("task", false);

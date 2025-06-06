@@ -5,7 +5,7 @@
     "soundscapes": "Soundscapes",
     "breathing": "Breathepod",
     "settings": "Settings",
-    "todo": "Todos",
+    "tasks": "Tasks",
     "site-blocker": "Site Blocker",
     "background": "Background",
     "tab-stash": "Tab Stash",
@@ -80,8 +80,8 @@
       "title": "Breathing Exercises",
       "description": "Take mindful breaks with guided breathing exercises."
     },
-    "todos": {
-      "title": "Todo List",
+    "tasks": {
+      "title": "Task List",
       "description": "Keep track of your tasks and stay organized."
     },
     "site-blocker": {
@@ -136,7 +136,7 @@
       }
     }
   },
-  "todo": {
+  "tasks": {
     "sheet": {
       "title": "Todo List",
       "empty": "No todos yet",
@@ -164,7 +164,7 @@
           "placeholder": "Enter list name"
         },
         "button": "Create List",
-        "tooltip": "Create unlimited custom todo lists and organize your tasks your way!"
+        "tooltip": "Create unlimited custom task lists and organize your tasks your way!"
       },
       "empty": "No tasks",
       "task": {
@@ -326,8 +326,8 @@
         "error": "Failed to reset onboarding"
       },
       "confettiOnComplete": {
-        "title": "Todo Confetti",
-        "description": "Celebrate completed todos with confetti",
+        "title": "Task Confetti",
+        "description": "Celebrate completed tasks with confetti",
         "error": "Failed to update setting"
       },
       "twelveHourClock": {
@@ -367,7 +367,7 @@
       "breathing": {
         "description": "Guided breathing exercises"
       },
-      "todos": {
+      "tasks": {
         "description": "Task management"
       },
       "site-blocker": {

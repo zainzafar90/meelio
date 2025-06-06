@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
-import { useTodoStore } from "../../../stores/todo.store";
+import { useTaskStore } from "../../../stores/task.store";
 import { useSyncStore } from "../../../stores/sync.store";
 import { useAuthStore } from "../../../stores/auth.store";
 
@@ -29,12 +29,12 @@ import { CreateList } from "./components/create-list";
 import { Plus } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 
-export function TodoListSheet() {
+export function TaskListSheet() {
   const { t } = useTranslation();
-  const { isTodosVisible, setTodosVisible } = useDockStore(
+  const { isTasksVisible, setTasksVisible } = useDockStore(
     useShallow((state) => ({
-      isTodosVisible: state.isTodosVisible,
-      setTodosVisible: state.setTodosVisible,
+      isTasksVisible: state.isTasksVisible,
+      setTasksVisible: state.setTasksVisible,
     }))
   );
   const {
@@ -45,7 +45,7 @@ export function TodoListSheet() {
     initializeStore,
     isLoading,
     error,
-  } = useTodoStore(
+  } = useTaskStore(
     useShallow((state) => ({
       lists: state.lists,
       tasks: state.tasks,
@@ -72,10 +72,10 @@ export function TodoListSheet() {
     syncStore.queues.task?.filter((op) => op.retries >= 3) || [];
 
   useEffect(() => {
-    if (isTodosVisible) {
+    if (isTasksVisible) {
       initializeStore();
     }
-  }, [isTodosVisible, initializeStore]);
+  }, [isTasksVisible, initializeStore]);
 
   const activeList = lists.find((list) => list.id === activeListId);
 
@@ -104,7 +104,7 @@ export function TodoListSheet() {
   });
 
   return (
-    <Sheet open={isTodosVisible} onOpenChange={setTodosVisible}>
+    <Sheet open={isTasksVisible} onOpenChange={setTasksVisible}>
       <SheetContent
         side="right"
         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl"
@@ -115,11 +115,11 @@ export function TodoListSheet() {
       >
         <SheetHeader className="px-6 pt-6">
           <div className="flex items-center justify-between">
-            <SheetTitle>{t("todo.sheet.title")}</SheetTitle>
+            <SheetTitle>{t("tasks.sheet.title")}</SheetTitle>
             <SyncStatus entityType="task" />
           </div>
           <SheetDescription>
-            <span className="mb-2 block">{t("todo.sheet.description")}</span>
+            <span className="mb-2 block">{t("tasks.sheet.description")}</span>
           </SheetDescription>
         </SheetHeader>
 

@@ -52,10 +52,10 @@ export const ONBOARDING_STEPS = [
     position: 3, // Breathing
   },
   {
-    id: "todos",
-    titleKey: "onboarding.todos.title",
-    descriptionKey: "onboarding.todos.description",
-    icon: Icons.todoListActive,
+    id: "tasks",
+    titleKey: "onboarding.tasks.title",
+    descriptionKey: "onboarding.tasks.description",
+    icon: Icons.taskListActive,
     gradient: "from-indigo-500/20 to-violet-500/20",
     iconClass: "text-indigo-400",
     action: null,

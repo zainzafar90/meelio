@@ -11,7 +11,7 @@ import { Greeting } from "@repo/shared";
 import { AppLayout } from "@repo/shared";
 import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
-import { TodoListSheet } from "@repo/shared";
+import { TaskListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
 import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
@@ -126,7 +126,7 @@ const Content = () => {
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
-      <TodoListSheet />
+      <TaskListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />

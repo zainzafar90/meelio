@@ -1,6 +1,6 @@
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "../stores/auth.store";
-import { useTodoStore } from "../stores/todo.store";
+import { useTaskStore } from "../stores/task.store";
 import { useSyncStore } from "../stores/sync.store";
 import { usePomodoroStore } from "../stores/unified-pomodoro.store";
 
@@ -60,7 +60,7 @@ const migrateGuestTasks = async (
       }
     });
 
-    const todoStore = useTodoStore.getState();
+    const todoStore = useTaskStore.getState();
 
     // Reload tasks and trigger sync
     await todoStore.loadFromLocal();

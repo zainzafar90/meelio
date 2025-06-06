@@ -89,11 +89,11 @@ export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
 
-// Todos
-export * from "./core/todo-list/components/create-list";
-export * from "./core/todo-list/components/create-task";
-export * from "./core/todo-list/components/task-list";
-export * from "./core/todo-list/todo-list.sheet";
+// Tasks
+export * from "./core/task-list/components/create-list";
+export * from "./core/task-list/components/create-task";
+export * from "./core/task-list/components/task-list";
+export * from "./core/task-list/task-list.sheet";
 
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";

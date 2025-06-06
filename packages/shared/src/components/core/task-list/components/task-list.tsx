@@ -1,6 +1,6 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { useTranslation } from "react-i18next";
-import { useTodoStore } from "../../../../stores/todo.store";
+import { useTaskStore } from "../../../../stores/task.store";
 import { useShallow } from "zustand/shallow";
 
 import { Task } from "../../../../lib/db/models.dexie";
@@ -33,7 +33,7 @@ export function TaskList({
   if (tasks.length === 0)
     return (
       <div className="mt-4">
-        <p className="text-sm text-muted-foreground">{t("todo.list.empty")}</p>
+        <p className="text-sm text-muted-foreground">{t("tasks.list.empty")}</p>
       </div>
     );
 

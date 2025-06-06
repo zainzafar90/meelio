@@ -48,11 +48,11 @@ export const DockSettings = () => {
         isVisible: dockIconsVisible.breathing,
       },
       {
-        id: "todos",
-        name: t("common.todo"),
-        description: t("settings.dock.todos.description"),
-        icon: Icons.todoList,
-        isVisible: dockIconsVisible.todos,
+        id: "tasks",
+        name: t("common.tasks"),
+        description: t("settings.dock.tasks.description"),
+        icon: Icons.taskList,
+        isVisible: dockIconsVisible.tasks,
       },
       {
         id: "siteBlocker",

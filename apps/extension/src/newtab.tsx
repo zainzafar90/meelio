@@ -10,7 +10,7 @@ import {
   TabStashSheet, 
   useAuthStore, 
   useDockStore,
-  TodoListSheet,
+  TaskListSheet,
   Background,
   BackgroundOverlay,
   BackgroundSelectorSheet,
@@ -78,7 +78,7 @@ const Content = () => {
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
-      <TodoListSheet />
+      <TaskListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
