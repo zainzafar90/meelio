@@ -9,7 +9,10 @@ import {
   TimerDeps,
   TimerSettings,
 } from "../types/new/pomodoro-lite";
-import { addSimpleTimerFocusTime, addSimpleTimerBreakTime } from "../lib/db/pomodoro.dexie";
+import {
+  addSimpleTimerFocusTime,
+  addSimpleTimerBreakTime,
+} from "../lib/db/pomodoro.dexie";
 
 const isExtension = () => {
   try {
@@ -296,9 +299,6 @@ export const createTimerStore = (deps: TimerDeps) =>
           );
 
           if (lastResetDate !== todayStr) {
-            console.log("🌅 New day detected! Resetting daily focus stats");
-
-            // Reset daily stats
             set((state) => ({
               stats: {
                 ...state.stats,
@@ -309,28 +309,6 @@ export const createTimerStore = (deps: TimerDeps) =>
 
             // Save the reset date
             localStorage.setItem("meelio:simple-timer:lastReset", todayStr);
-
-            // Show notification about reset
-            const useChrome =
-              isExtension() && typeof chrome?.notifications !== "undefined";
-            if (useChrome) {
-              chrome.notifications.create({
-                type: "basic",
-                title: "Daily Focus Reset 🌅",
-                message:
-                  "Your daily focus limit has been reset. Ready for a productive day?",
-                iconUrl: chrome.runtime.getURL("public/icon.png"),
-                silent: false,
-              });
-            } else if (
-              "Notification" in window &&
-              Notification.permission === "granted"
-            ) {
-              new Notification("Daily Focus Reset 🌅", {
-                body: "Your daily focus limit has been reset. Ready for a productive day?",
-                icon: "/icon.png",
-              });
-            }
           }
         };
 
