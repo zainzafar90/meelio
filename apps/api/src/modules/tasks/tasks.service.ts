@@ -134,7 +134,7 @@ export const tasksService = {
     if (insertData.pinned) {
       await db
         .update(tasks)
-        .set({ pinned: false })
+        .set({ pinned: false } as Task)
         .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
     }
 
@@ -175,7 +175,7 @@ export const tasksService = {
       if (updateData.pinned) {
         await db
           .update(tasks)
-          .set({ pinned: false })
+          .set({ pinned: false } as Task)
           .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
       }
     }
