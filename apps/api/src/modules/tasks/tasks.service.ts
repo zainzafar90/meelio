@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { Task, TaskInsert, tasks } from "@/db/schema";
+import { Task, tasks } from "@/db/schema";
 import { eq, and, desc, asc, isNull, isNotNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
@@ -134,7 +134,7 @@ export const tasksService = {
     if (insertData.pinned) {
       await db
         .update(tasks)
-        .set({ pinned: false })
+        .set({ pinned: false } as Task)
         .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
     }
 
@@ -175,7 +175,7 @@ export const tasksService = {
       if (updateData.pinned) {
         await db
           .update(tasks)
-          .set({ pinned: false })
+          .set({ pinned: false } as Task)
           .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
       }
     }

@@ -45,7 +45,7 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     }))
   );
 
-  const confettiOnComplete = user?.settings?.todo?.confettiOnComplete ?? false;
+  const confettiOnComplete = user?.settings?.task?.confettiOnComplete ?? false;
 
   const handleResetOnboarding = async () => {
     setIsResetting(true);
@@ -64,7 +64,7 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     const newValue = !confettiOnComplete;
     setIsUpdatingConfetti(true);
     try {
-      await api.settings.settingsApi.updateTodoSettings({
+      await api.settings.settingsApi.updateTaskSettings({
         confettiOnComplete: newValue,
       });
 
@@ -73,8 +73,8 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
           ...user,
           settings: {
             ...user.settings,
-            todo: {
-              ...user.settings?.todo,
+            task: {
+              ...user.settings?.task,
               confettiOnComplete: newValue,
             },
           },

@@ -5,7 +5,7 @@
     "soundscapes": "Klanglandschaften",
     "breathing": "Atempod",
     "settings": "Einstellungen",
-    "todo": "Aufgaben",
+    "tasks": "Aufgaben",
     "site-blocker": "Seitenblocker",
     "background": "Hintergrund",
     "tab-stash": "Tab-Stash",
@@ -80,7 +80,7 @@
       "title": "Atempod",
       "description": "Nehme beruhigende Atemübungen, um dich zu entspannen und konzentrieren."
     },
-    "todos": {
+    "tasks": {
       "title": "Aufgabenliste",
       "description": "Bleib organisiert und halte deine Aufgaben im Auge."
     },
@@ -136,7 +136,7 @@
       }
     }
   },
-  "todo": {
+  "tasks": {
     "sheet": {
       "title": "Aufgabenliste",
       "empty": "Noch keine Aufgaben",
@@ -326,8 +326,8 @@
         "error": "Fehler beim Zurücksetzen des Onboardings"
       },
       "confettiOnComplete": {
-        "title": "Todo-Konfetti",
-        "description": "Feiere erledigte Todos mit Konfetti",
+        "title": "Aufgaben-Konfetti",
+        "description": "Feiere erledigte Aufgaben mit Konfetti",
         "error": "Fehler beim Aktualisieren der Einstellung"
       },
       "twelveHourClock": {
@@ -367,7 +367,7 @@
       "breathing": {
         "description": "Geführte Atemübungen"
       },
-      "todos": {
+      "tasks": {
         "description": "Aufgabenverwaltung"
       },
       "site-blocker": {

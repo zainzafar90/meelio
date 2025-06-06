@@ -2,7 +2,7 @@ import { KeyboardEvent, useState } from "react";
 
 import { Input } from "@repo/ui/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { useTodoStore } from "../../../../stores/todo.store";
+import { useTaskStore } from "../../../../stores/task.store";
 import { useShallow } from "zustand/shallow";
 
 import { Icons } from "../../../../components/icons";
@@ -10,7 +10,7 @@ import { Icons } from "../../../../components/icons";
 export function CreateTask() {
   const [title, setTitle] = useState("");
   const { t } = useTranslation();
-  const { activeListId, addTask } = useTodoStore(
+  const { activeListId, addTask } = useTaskStore(
     useShallow((state) => ({
       activeListId: state.activeListId,
       addTask: state.addTask,
@@ -25,7 +25,7 @@ export function CreateTask() {
 
       addTask({
         title: title.trim(),
-        category: isSystemList ? "today" : activeListId,
+        category: isSystemList ? undefined : activeListId,
         dueDate:
           activeListId === "today" ? new Date().toISOString() : undefined,
       });
@@ -43,8 +43,8 @@ export function CreateTask() {
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder={
           activeListId === "completed"
-            ? t("todo.list.task.add.completed")
-            : t("todo.list.task.add.normal")
+            ? t("tasks.list.task.add.completed")
+            : t("tasks.list.task.add.normal")
         }
         autoFocus
       />

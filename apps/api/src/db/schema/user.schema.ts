@@ -24,7 +24,7 @@ export const DEFAULT_SETTINGS: IUserSettings = {
     dailyFocusLimit: 120,
   },
   onboardingCompleted: false,
-  todo: {
+  task: {
     confettiOnComplete: false,
   },
 };

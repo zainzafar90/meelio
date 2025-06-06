@@ -19,7 +19,7 @@ import { Label } from "@repo/ui/components/ui/label";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { useTodoStore } from "../../../../stores/todo.store";
+import { useTaskStore } from "../../../../stores/task.store";
 import { useAuthStore } from "../../../../stores/auth.store";
 import { PremiumFeature } from "../../../common/premium-feature";
 
@@ -64,7 +64,7 @@ export function CreateList({ children }: CreateListProps) {
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { t } = useTranslation();
 
-  const { lists, addList, setActiveList } = useTodoStore(
+  const { lists, addList, setActiveList } = useTaskStore(
     useShallow((state) => ({
       lists: state.lists,
       addList: state.addList,
@@ -109,7 +109,7 @@ export function CreateList({ children }: CreateListProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button className="w-full">
-                <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
+                <Plus className="h-4 w-4" /> {t("tasks.list.create.button")}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -128,16 +128,16 @@ export function CreateList({ children }: CreateListProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("todo.list.create.title")}</DialogTitle>
+          <DialogTitle>{t("tasks.list.create.title")}</DialogTitle>
           <DialogDescription>
-            {t("todo.list.create.description")}
+            {t("tasks.list.create.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-2 w-full md:flex-row flex-col">
             <Label htmlFor="emoji" className="sr-only">
-              {t("todo.list.create.emoji.label")}
+              {t("tasks.list.create.emoji.label")}
             </Label>
 
             {/* <Popover>
@@ -147,7 +147,7 @@ export function CreateList({ children }: CreateListProps) {
                   variant="outline"
                   className="w-[60px] text-lg"
                   disabled={true}
-                  aria-label={t("todo.list.create.emoji.selected", {
+                  aria-label={t("tasks.list.create.emoji.selected", {
                     emoji: selectedEmoji,
                   })}
                 >
@@ -162,7 +162,7 @@ export function CreateList({ children }: CreateListProps) {
                       variant="ghost"
                       className="h-10 w-10 p-0 text-lg"
                       onClick={() => setSelectedEmoji(emoji)}
-                      aria-label={t("todo.list.create.emoji.select", { emoji })}
+                      aria-label={t("tasks.list.create.emoji.select", { emoji })}
                     >
                       {emoji}
                     </Button>
@@ -176,18 +176,18 @@ export function CreateList({ children }: CreateListProps) {
                 id="emoji"
                 variant="outline"
                 className="w-[40px] text-lg"
-                aria-label={t("todo.list.create.emoji.selected", {
+                aria-label={t("tasks.list.create.emoji.selected", {
                   emoji: selectedEmoji,
                 })}
               >
                 {selectedEmoji}
               </Button>
               <Label htmlFor="name" className="sr-only">
-                {t("todo.list.create.name.label")}
+                {t("tasks.list.create.name.label")}
               </Label>
               <Input
                 id="name"
-                placeholder={t("todo.list.create.name.placeholder")}
+                placeholder={t("tasks.list.create.name.placeholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -197,7 +197,7 @@ export function CreateList({ children }: CreateListProps) {
               onClick={handleCreate}
               disabled={!name.trim()}
             >
-              <Plus className="h-4 w-4" /> {t("todo.list.create.button")}
+              <Plus className="h-4 w-4" /> {t("tasks.list.create.button")}
             </Button>
           </div>
         </div>

@@ -28,7 +28,7 @@ export const DockButton = ({
     isTimerVisible,
     isSoundscapesVisible,
     isBreathingVisible,
-    isTodosVisible,
+    isTasksVisible,
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
@@ -38,7 +38,7 @@ export const DockButton = ({
       isTimerVisible: state.isTimerVisible,
       isSoundscapesVisible: state.isSoundscapesVisible,
       isBreathingVisible: state.isBreathingVisible,
-      isTodosVisible: state.isTodosVisible,
+      isTasksVisible: state.isTasksVisible,
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
@@ -50,7 +50,7 @@ export const DockButton = ({
     (item.id === "timer" && isTimerVisible) ||
     (item.id === "soundscapes" && isSoundscapesVisible) ||
     (item.id === "breathepod" && isBreathingVisible) ||
-    (item.id === "todos" && isTodosVisible) ||
+    (item.id === "tasks" && isTasksVisible) ||
     (item.id === "site-blocker" && isSiteBlockerVisible) ||
     (item.id === "background" && isBackgroundsVisible) ||
     (item.id === "tab-stash" && isTabStashVisible);

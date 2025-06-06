@@ -1,10 +1,10 @@
-import { useTodoStore } from "../../../../stores/todo.store";
+import { useTaskStore } from "../../../../stores/task.store";
 import { useShallow } from "zustand/shallow";
 import { Icons } from "../../../../components/icons/icons";
 import { AnimatePresence, motion } from "framer-motion";
 
 export const NextPinnedTask = () => {
-  const next = useTodoStore(useShallow((state) => state.getNextPinnedTask()));
+  const next = useTaskStore(useShallow((state) => state.getNextPinnedTask()));
 
   if (!next) return <div className="h-5 w-full" />;
 

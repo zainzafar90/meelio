@@ -59,10 +59,10 @@ class SettingsService {
       newSettings.onboardingCompleted = updates.onboardingCompleted;
     }
 
-    if (updates.todo) {
-      newSettings.todo = {
-        ...currentSettings.todo,
-        ...updates.todo,
+    if (updates.task) {
+      newSettings.task = {
+        ...currentSettings.task,
+        ...updates.task,
       };
     }
 
@@ -87,13 +87,13 @@ class SettingsService {
     return this.updateSettings(userId, { pomodoro: pomodoroSettings });
   }
 
-  async getTodoSettings(userId: string) {
+  async getTaskSettings(userId: string) {
     const settings = await this.getSettings(userId);
-    return settings.todo || DEFAULT_SETTINGS.todo;
+    return settings.task || DEFAULT_SETTINGS.task;
   }
 
-  async updateTodoSettings(userId: string, todoSettings: any) {
-    return this.updateSettings(userId, { todo: todoSettings });
+  async updateTaskSettings(userId: string, taskSettings: any) {
+    return this.updateSettings(userId, { task: taskSettings });
   }
 }
 

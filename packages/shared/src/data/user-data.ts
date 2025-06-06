@@ -3,7 +3,7 @@ import { PomodoroSettings } from "../types/auth";
 export const DEFAULT_SETTINGS: {
   pomodoro: PomodoroSettings;
   onboardingCompleted: boolean;
-  todo: { confettiOnComplete: boolean };
+  task: { confettiOnComplete: boolean };
 } = {
   pomodoro: {
     workDuration: 25,
@@ -12,9 +12,10 @@ export const DEFAULT_SETTINGS: {
     autoBlock: false,
     soundOn: true,
     dailyFocusLimit: 120,
+    notificationSoundEnabled: true,
   },
   onboardingCompleted: false,
-  todo: {
+  task: {
     confettiOnComplete: false,
   },
 };
