@@ -87,7 +87,7 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const { toggleTask, deleteTask, togglePinTask } = useTodoStore(
+  const { toggleTask, deleteTask, togglePinTask } = useTaskStore(
     useShallow((state) => ({
       toggleTask: state.toggleTask,
       deleteTask: state.deleteTask,
