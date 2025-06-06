@@ -326,8 +326,8 @@
         "error": "Fehler beim Zurücksetzen des Onboardings"
       },
       "confettiOnComplete": {
-        "title": "Todo-Konfetti",
-        "description": "Feiere erledigte Todos mit Konfetti",
+        "title": "Aufgaben-Konfetti",
+        "description": "Feiere erledigte Aufgaben mit Konfetti",
         "error": "Fehler beim Aktualisieren der Einstellung"
       },
       "twelveHourClock": {
@@ -367,7 +367,7 @@
       "breathing": {
         "description": "Geführte Atemübungen"
       },
-      "todos": {
+      "tasks": {
         "description": "Aufgabenverwaltung"
       },
       "site-blocker": {

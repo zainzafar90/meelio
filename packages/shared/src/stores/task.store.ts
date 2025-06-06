@@ -139,7 +139,10 @@ export const useTaskStore = create<TaskState>()(
         const pinnedTasks = get().tasks.filter((t) => t.pinned);
         await Promise.all(
           pinnedTasks.map(async (t) => {
-            await db.tasks.update(t.id, { pinned: false, updatedAt: Date.now() });
+            await db.tasks.update(t.id, {
+              pinned: false,
+              updatedAt: Date.now(),
+            });
             if (user) {
               syncStore.addToQueue("task", {
                 type: "update",
@@ -205,7 +208,7 @@ export const useTaskStore = create<TaskState>()(
 
         if (updatedData.completed) {
           const confettiEnabled =
-            authState.user?.settings?.todo?.confettiOnComplete ?? false;
+            authState.user?.settings?.task?.confettiOnComplete ?? false;
           if (confettiEnabled) {
             launchConfetti();
           }
@@ -315,6 +318,7 @@ export const useTaskStore = create<TaskState>()(
           userId: userId,
           title: `Welcome to ${newList.name}!`,
           completed: false,
+          pinned: false,
           category: newList.id,
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -523,10 +527,15 @@ export const useTaskStore = create<TaskState>()(
       const updatedData = { pinned: !task.pinned, updatedAt: Date.now() };
 
       const unpinOthers = async () => {
-        const pinnedTasks = get().tasks.filter((t) => t.pinned && t.id !== taskId);
+        const pinnedTasks = get().tasks.filter(
+          (t) => t.pinned && t.id !== taskId
+        );
         await Promise.all(
           pinnedTasks.map(async (t) => {
-            await db.tasks.update(t.id, { pinned: false, updatedAt: Date.now() });
+            await db.tasks.update(t.id, {
+              pinned: false,
+              updatedAt: Date.now(),
+            });
             if (user) {
               syncStore.addToQueue("task", {
                 type: "update",

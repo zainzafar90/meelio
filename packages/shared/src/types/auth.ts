@@ -14,7 +14,7 @@ export interface PomodoroSettings {
 export interface UserSettings {
   pomodoro: PomodoroSettings;
   onboardingCompleted: boolean;
-  todo: {
+  task: {
     confettiOnComplete: boolean;
   };
 }

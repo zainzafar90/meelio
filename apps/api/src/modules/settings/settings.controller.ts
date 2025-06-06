@@ -23,10 +23,13 @@ export const updatePomodoroSettings = catchAsync(
   }
 );
 
-export const updateTodoSettings = catchAsync(
+export const updateTaskSettings = catchAsync(
   async (req: Request, res: Response): Promise<void> => {
     const user = req.user as IUser;
-    const settings = await settingsService.updateTodoSettings(user.id, req.body);
+    const settings = await settingsService.updateTaskSettings(
+      user.id,
+      req.body
+    );
     res.status(httpStatus.OK).send({ settings });
   }
 );

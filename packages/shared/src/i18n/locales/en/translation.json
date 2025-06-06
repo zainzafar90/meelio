@@ -138,8 +138,8 @@
   },
   "tasks": {
     "sheet": {
-      "title": "Todo List",
-      "empty": "No todos yet",
+      "title": "Task List",
+      "empty": "No tasks yet",
       "add": "New List",
       "description": "Stay on top of your work, projects, and goals.",
       "input": {

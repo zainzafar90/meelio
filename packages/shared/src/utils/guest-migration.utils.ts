@@ -60,14 +60,14 @@ const migrateGuestTasks = async (
       }
     });
 
-    const todoStore = useTaskStore.getState();
+    const taskStore = useTaskStore.getState();
 
     // Reload tasks and trigger sync
-    await todoStore.loadFromLocal();
+    await taskStore.loadFromLocal();
 
     // If online, sync immediately
     if (syncStore.isOnline) {
-      await todoStore.syncWithServer();
+      await taskStore.syncWithServer();
     }
 
     return { success: true, migratedCount: guestTasks.length };
@@ -114,17 +114,19 @@ const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
   try {
     const pomodoroStore = usePomodoroStore.getState();
     const guestFocusTime = pomodoroStore.stats.todaysFocusTime;
-    
+
     if (guestFocusTime === 0) {
       return { success: true, migratedCount: 0 };
     }
 
     // The focus time will sync automatically when user logs in
     // No need to manually create sessions here
-    console.log(`✅ Guest had ${Math.floor(guestFocusTime / 60)} minutes of focus time`);
-    
-    return { 
-      success: true, 
+    console.log(
+      `✅ Guest had ${Math.floor(guestFocusTime / 60)} minutes of focus time`
+    );
+
+    return {
+      success: true,
       migratedCount: 1,
     };
   } catch (error) {
@@ -139,7 +141,7 @@ const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
 export const cleanupGuestData = async (guestUserId: string) => {
   try {
     await db.tasks.where("userId").equals(guestUserId).delete();
-    
+
     // Clear guest focus sessions from IndexedDB
     const today = new Date().toISOString().split("T")[0];
     await db.focusStats.where("date").equals(today).delete();
