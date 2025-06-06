@@ -20,13 +20,12 @@ import {
   Quote,
   SoundscapesSheet,
   Dock,
-  SiteBlockerSheet
+  SiteBlockerSheet,
+  SimpleTimer
  } from "@repo/shared";
-
-import { ExtensionTimer } from "./components/extension-timer";
+import { useAppStore } from "@repo/shared";
 
 import "./style.css";
-import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 
 const Home = () => {
   const { user, guestUser } = useAuthStore(useShallow((state) => ({
@@ -99,7 +98,7 @@ const GreetingsContent = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <ExtensionTimer />
+            <SimpleTimer />
           </motion.div>
         ) : (
           <motion.div
