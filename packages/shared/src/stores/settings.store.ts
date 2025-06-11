@@ -9,7 +9,8 @@ export type SettingsTab =
   | "billing"
   | "language"
   | "dock"
-  | "feedback";
+  | "feedback"
+  | "timer";
 
 interface SettingsState {
   isOpen: boolean;

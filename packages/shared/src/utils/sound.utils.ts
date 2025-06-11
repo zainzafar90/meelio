@@ -1,5 +1,6 @@
 import { Sound } from "../types";
 import { getAssetPath } from "./path.utils";
+import { isChromeExtension } from "./common.utils";
 
 export const OSCILLATION_INTERVAL_MS = 60_000; // 1 minute
 export const SHUFFLE_SOUNDS_INTERVAL_MS = 120_000; // 2 minutes
@@ -96,15 +97,21 @@ export const playTypewriterSound = (key: string) => {
 };
 
 export const playBreathingSound = (mode: string) => {
+  let path: string | null = null;
+
   if (mode === "inhale" || mode === "exhale") {
-    const audio = new Audio(
-      getAssetPath("/public/sounds/breathing/inhale-exhale.mp3")
-    );
-    audio.play();
+    path = "/public/sounds/breathing/inhale-exhale.mp3";
   } else if (mode === "hold1" || mode === "hold2") {
-    const audio = new Audio(getAssetPath("/public/sounds/breathing/hold.mp3"));
-    audio.play();
+    path = "/public/sounds/breathing/hold.mp3";
   }
+
+  if (!path) return;
+
+  const audioPath = getAssetPath(path);
+  console.log("audioPath", audioPath);
+  const audio = new Audio(audioPath);
+  audio.volume = 0.5;
+  audio.play();
 };
 
 const pomodorAudioDing = new Audio(

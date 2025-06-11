@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "0.3.5",
+  "version": "0.4.1",
   "private": true,
   "displayName": "Meelio",
   "description": "Focus, calm & productivity with every new tab",
@@ -30,7 +30,6 @@
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
     "@plasmohq/storage": "^1.13.0",
-    "@repo/core": "*",
     "@repo/shared": "*",
     "@repo/ui": "*",
     "@tailwindcss/typography": "^0.5.9",
@@ -47,7 +46,7 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "lucide-react": "^0.454.0",
     "next-themes": "^0.3.0",
-    "plasmo": "0.90.3",
+    "plasmo": "0.90.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",
@@ -113,7 +112,8 @@
       "https://*/*"
     ],
     "permissions": [
-      "storage"
+      "storage",
+      "notifications"
     ],
     "optional_permissions": [
       "tabs"

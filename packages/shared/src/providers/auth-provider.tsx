@@ -1,14 +1,26 @@
-import { ReactNode, useEffect } from "react";
-import { QueryClient } from "@tanstack/react-query";
+import { ReactNode, useEffect, useState } from "react";
 
 import { useAuthStore } from "../stores/auth.store";
 import { api } from "../api";
 import { AuthContext } from "../context/auth-context";
 import { useShallow } from "zustand/shallow";
 import { ExtensionRedirectDialog } from "../components/auth/extension-redirect-dialog";
+import {
+  migrateGuestDataToUser,
+  cleanupGuestData,
+} from "../utils/guest-migration.utils";
+import { clearLocalData } from "../utils/clear-data.utils";
+import { toast } from "sonner";
+import { useSyncStore } from "../stores/sync.store";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const queryClient = new QueryClient();
+  const [mounted, setMounted] = useState(false);
+  const { isOnline } = useSyncStore(
+    useShallow((state) => ({
+      isOnline: state.isOnline,
+    }))
+  );
+
   const authStore = useAuthStore(
     useShallow((state) => ({
       user: state.user,
@@ -23,23 +35,62 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    (async () => {
-      const DELAY = authStore.user ? 3000 : 0;
-      setTimeout(async () => {
-        try {
-          const response = await api.auth.getAuthenticatedAccount();
-          const user = response;
-          authStore.authenticate(user.data);
-          authStore.authenticateGuest(null as any);
-        } catch (error) {
-          authStore.authenticate(null as any);
-        }
-      }, DELAY);
-    })();
+    setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (mounted) {
+      (async () => {
+        if (!isOnline) return;
+
+        const DELAY = authStore.user ? 3000 : 0;
+        setTimeout(async () => {
+          try {
+            const response = await api.auth.getAuthenticatedAccount();
+            const user = response;
+
+            if (user.data) {
+              const shouldMigrate =
+                localStorage.getItem("meelio:local:migrate_guest") === "true";
+
+              if (authStore.guestUser) {
+                if (shouldMigrate) {
+                  const summary = await migrateGuestDataToUser(
+                    authStore.guestUser.id,
+                    user.data.id
+                  );
+
+                  if (summary.success && summary.tasks.migratedCount > 0) {
+                    toast.success(
+                      `Migrated ${summary.tasks.migratedCount} tasks to your account`,
+                      {
+                        description:
+                          "Your guest data has been successfully transferred.",
+                        duration: 5000,
+                      }
+                    );
+                  }
+
+                  await cleanupGuestData(authStore.guestUser.id);
+                  localStorage.removeItem("meelio:local:migrate_guest");
+                }
+
+                await clearLocalData();
+              }
+              authStore.authenticate(user.data);
+              authStore.authenticateGuest(null as any);
+            }
+          } catch (error) {
+            authStore.authenticate(null as any);
+          }
+        }, DELAY);
+      })();
+    }
+  }, [mounted]);
   return (
-    <AuthContext.Provider value={authStore}>
+    <AuthContext.Provider
+      value={{ ...authStore, logoutUser: authStore.logout }}
+    >
       {children}
       <ExtensionRedirectDialog />
     </AuthContext.Provider>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -9,14 +9,14 @@ import {
 import { useDockStore } from "../../../stores/dock.store";
 import { Button } from "@repo/ui/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { Storage } from "@plasmohq/storage";
-import { useStorage } from "@plasmohq/storage/hook";
 import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { PremiumFeature } from "../../../components/common/premium-feature";
 import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
+import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
+import { toast } from "sonner";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -104,43 +104,82 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const [blockedSites, setBlockedSites] = useStorage<string[]>(
-    {
-      key: "blockedSites",
-      instance: new Storage({
-        area: "local",
-      }),
+  const { sites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
+    useShallow((state) => ({
+      sites: state.sites,
+      addSite: state.addSite,
+      toggleSite: state.toggleSite,
+      removeSite: state.removeSite,
+    }))
+  );
+
+  const onBlockSites = useCallback(
+    async (sites: string[]) => {
+      await Promise.all(sites.map((site) => addSite(site)));
     },
-    []
+    [addSite]
+  );
+
+  const onUnblockSites = useCallback(
+    async (sites: string[]) => {
+      await Promise.all(sites.map((site) => removeSite(site)));
+    },
+    [removeSite]
   );
 
   const addCustomSite = async () => {
-    const site = siteInput.trim();
+    let site = siteInput.trim();
     if (!site) return;
 
-    if (!blockedSites.includes(site)) {
-      setBlockedSites([...blockedSites, site]);
-      setSiteInput("");
+    try {
+      const url = new URL(site.includes("://") ? site : `https://${site}`);
+      site = url.hostname.replace(/^www\./, "");
+    } catch {
+      const match = site.match(/([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      site = match ? match[1].replace(/^www\./, "") : "";
     }
-  };
 
-  const toggleSite = (site: string) => {
-    if (blockedSites.includes(site)) {
-      setBlockedSites(blockedSites.filter((s) => s !== site));
-    } else {
-      setBlockedSites([...blockedSites, site]);
+    if (!site) {
+      toast.error(t("site-blocker.invalid-url", "Invalid URL format"));
+      return;
     }
-  };
 
-  const onBlockSites = (sites: string[]) => {
-    setBlockedSites((prev) => [...new Set([...(prev || []), ...sites])]);
-  };
-
-  const onUnblockSites = (sites: string[]) => {
-    setBlockedSites((prev) =>
-      (prev || []).filter((site) => !sites.includes(site))
+    const existingSite = Object.values(sites).find(
+      (s) => s.url.toLowerCase() === site.toLowerCase()
     );
+
+    if (existingSite && existingSite.blocked) {
+      toast.error(
+        t("site-blocker.already-blocked", "Site is already blocked"),
+        {
+          description: site,
+        }
+      );
+      return;
+    }
+
+    try {
+      await addSite(site);
+      setSiteInput("");
+      toast.success(t("site-blocker.site-added", "Site blocked successfully"), {
+        description: site,
+      });
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        toast.error(t("site-blocker.already-exists", "Site already exists"), {
+          description: site,
+        });
+      } else {
+        toast.error(t("site-blocker.add-failed", "Failed to add site"), {
+          description: error.message || "Please try again",
+        });
+      }
+    }
   };
+
+  const blockedSiteIds = Object.values(sites)
+    .filter((site) => site.blocked)
+    .map((site) => site.url);
 
   return (
     <>
@@ -149,6 +188,11 @@ const ExtensionSiteBlockerContent = () => {
           type="text"
           value={siteInput}
           onChange={(e) => setSiteInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              addCustomSite();
+            }
+          }}
           placeholder={t(
             "site-blocker.input-placeholder",
             "Enter custom site URL (e.g., example.com)"
@@ -163,11 +207,11 @@ const ExtensionSiteBlockerContent = () => {
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="space-y-8">
           <CustomBlockedSites
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
           />
           <SiteList
-            blockedSites={blockedSites}
+            blockedSites={blockedSiteIds}
             onToggleSite={toggleSite}
             onBlockSites={onBlockSites}
             onUnblockSites={onUnblockSites}

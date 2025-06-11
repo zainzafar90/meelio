@@ -5,7 +5,7 @@
     "soundscapes": "Soundscapes",
     "breathing": "Breathepod",
     "settings": "Settings",
-    "todo": "Todos",
+    "tasks": "Tasks",
     "site-blocker": "Site Blocker",
     "background": "Background",
     "tab-stash": "Tab Stash",
@@ -48,6 +48,8 @@
       "toggle": "Toggle",
       "dismiss": "Dismiss"
     },
+    "loading": "Loading...",
+    "error": "Something went wrong",
     "close": "Close",
     "weekdays": {
       "short": {
@@ -78,8 +80,8 @@
       "title": "Breathing Exercises",
       "description": "Take mindful breaks with guided breathing exercises."
     },
-    "todos": {
-      "title": "Todo List",
+    "tasks": {
+      "title": "Task List",
       "description": "Keep track of your tasks and stay organized."
     },
     "site-blocker": {
@@ -134,12 +136,12 @@
       }
     }
   },
-  "todo": {
+  "tasks": {
     "sheet": {
-      "title": "Todo List",
-      "empty": "No todos yet",
+      "title": "Task List",
+      "empty": "No tasks yet",
       "add": "New List",
-      "description": "A list of tasks to help you stay organized and on top of your work, projects, and goals.",
+      "description": "Stay on top of your work, projects, and goals.",
       "input": {
         "placeholder": "What needs to be done?"
       }
@@ -161,7 +163,8 @@
           "label": "List Name",
           "placeholder": "Enter list name"
         },
-        "button": "Create List"
+        "button": "Create List",
+        "tooltip": "Create unlimited custom task lists and organize your tasks your way!"
       },
       "empty": "No tasks",
       "task": {
@@ -220,7 +223,8 @@
   "timer": {
     "stages": {
       "focus": "Focus",
-      "shortBreak": "Short Break"
+      "shortBreak": "Short Break",
+      "longBreak": "Long Break"
     },
     "stats": {
       "title": "Stats",
@@ -243,7 +247,8 @@
       },
       "pomodoro": {
         "label": "Pomodoro",
-        "shortBreak": "Short Break"
+        "shortBreak": "Short Break",
+        "longBreak": "Long Break"
       },
       "autoStart": {
         "label": "Auto Start Breaks",
@@ -266,6 +271,18 @@
     "reset": {
       "title": "Reset Timer",
       "description": "Are you sure you want to reset the timer? All progress will be lost."
+    },
+    "limitReached": {
+      "toast": "Daily 90-minute limit reached!",
+      "title": "Daily limit reached",
+      "description": "Great work today! Upgrade to Pro for unlimited time."
+    },
+    "controls": {
+      "focusMode": "Focus mode",
+      "breakMode": "Break mode",
+      "reset": "Reset timer",
+      "startStop": "Start/Stop timer",
+      "skipStage": "Skip to next stage"
     }
   },
   "settings": {
@@ -288,7 +305,8 @@
       "advanced": "Advanced",
       "language": "Language",
       "dock": "Dock",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "timer": "Timer"
     },
     "general": {
       "title": "General",
@@ -300,6 +318,21 @@
       "wallpaperRotation": {
         "title": "Wallpaper Rotation",
         "description": "Rotate fresh wallpapers every day"
+      },
+      "onboardingReset": {
+        "title": "Onboarding",
+        "description": "Show the dock onboarding tour again",
+        "button": "Restart",
+        "error": "Failed to reset onboarding"
+      },
+      "confettiOnComplete": {
+        "title": "Task Confetti",
+        "description": "Celebrate completed tasks with confetti",
+        "error": "Failed to update setting"
+      },
+      "twelveHourClock": {
+        "title": "24-Hour Clock",
+        "description": "Display time in 24-hour format"
       }
     },
     "appearance": {
@@ -334,7 +367,7 @@
       "breathing": {
         "description": "Guided breathing exercises"
       },
-      "todos": {
+      "tasks": {
         "description": "Task management"
       },
       "site-blocker": {
@@ -415,5 +448,30 @@
     "grant-permission": "Grant Permission",
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"
+  },
+  "auth": {
+    "verify": {
+      "verifying": "Verifying your account...",
+      "success": {
+        "title": "Successfully verified!",
+        "description": "Welcome back to Meelio."
+      },
+      "failed": {
+        "title": "Verification failed",
+        "description": "Your link should be valid for 10 minutes. Please try again."
+      }
+    },
+    "login": {
+      "title": "Welcome back",
+      "description": "Sign in to your Meelio Account",
+      "register": "Don't have an account? Sign Up",
+      "guest": "Continue as Guest"
+    },
+    "register": {
+      "title": "Create an account",
+      "description": "Provide email to create your account",
+      "login": "Already have an account? Sign In",
+      "privacy": "By clicking continue, you agree to our Privacy Policy."
+    }
   }
 }

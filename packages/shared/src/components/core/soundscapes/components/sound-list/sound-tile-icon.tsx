@@ -1,5 +1,3 @@
-import { memo } from "react";
-
 import { Spinner } from "@repo/ui/components/ui/spinner";
 import { VolumeSlider } from "@repo/ui/components/ui/volume-slider";
 
@@ -15,7 +13,7 @@ type Props = {
   sound: Sound;
 };
 
-export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
+export const SoundTileIcon: React.FC<Props> = ({ sound }) => {
   const { soundPlayed, soundStopped } = useTelemetry();
   const { setVolumeForSound, toggleSoundState } = useSoundscapesStore(
     useShallow((state) => ({
@@ -91,6 +89,6 @@ export const SoundTileIcon: React.FC<Props> = memo(({ sound }) => {
       </div>
     </div>
   );
-});
+};
 
 SoundTileIcon.displayName = "SoundTileIcon";

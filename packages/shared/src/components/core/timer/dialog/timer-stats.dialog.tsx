@@ -10,20 +10,17 @@ import {
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { t } from "i18next";
 
-import { Icons } from "../../../../components/icons";
-
 import { TimerExpandedContent } from "../components/timer-expanded-content";
+import { PremiumFeature } from "../../../common/premium-feature";
 
 interface TimerStatsDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSettingsClick: () => void;
 }
 
 export const TimerStatsDialog = ({
   isOpen,
   onOpenChange,
-  onSettingsClick,
 }: TimerStatsDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -42,17 +39,21 @@ export const TimerStatsDialog = ({
             </DialogDescription>
           </DialogHeader>
         </VisuallyHidden>
-        <TimerExpandedContent />
-        <DialogFooter className="sm:justify-between">
-          <Button variant="secondary" onClick={onSettingsClick}>
-            <Icons.settings className="size-4" />
-            <span className="sr-only">{t("common.actions.edit")}</span>
-          </Button>
-
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t("common.actions.close")}
-          </Button>
-        </DialogFooter>
+        <PremiumFeature
+          requirePro={true}
+          features={[
+            "Weekly focus statistics",
+            "Track focus vs break time patterns",
+            "And unlock more Pro features...",
+          ]}
+        >
+          <TimerExpandedContent />
+          <DialogFooter className="sm:justify-between">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              {t("common.actions.close")}
+            </Button>
+          </DialogFooter>
+        </PremiumFeature>
       </DialogContent>
     </Dialog>
   );

@@ -1,21 +1,14 @@
-export interface BaseModel {
+export interface SiteBlocker {
   id: string;
-  _syncStatus: "pending" | "synced" | "error";
-  _lastModified: number;
-  _version: number;
-  _errorMessage?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface SiteBlocker extends BaseModel {
+  userId: string;
   url: string;
   isBlocked: boolean;
   blockPattern: string;
   scheduleEnabled: boolean;
   scheduleStart?: string;
   scheduleEnd?: string;
-  userId: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface BackgroundMetadata {
@@ -25,40 +18,15 @@ export interface BackgroundMetadata {
   thumbnailUrl: string;
 }
 
-export interface Backgrounds extends BaseModel {
-  userId: string;
-  type: "static" | "live";
-  url: string;
-  metadata: BackgroundMetadata;
-  schedule?: {
-    enabled: boolean;
-    startTime?: string;
-    endTime?: string;
-  };
-  isFavourite?: boolean;
-}
-
-// Todo interfaces
+// Simplified Task model - unified with backend
 export interface Task {
   id: string;
+  userId: string;
   title: string;
   completed: boolean;
-  date: string;
-  listId: string;
-  createdAt: number;
-  updatedAt: number;
-  assignees?: {
-    name: string;
-    image?: string;
-  }[];
-}
-
-export interface TodoList {
-  id: string;
-  name: string;
-  icon?: string;
-  emoji: string;
-  type: "system" | "custom";
+  pinned: boolean;
+  category?: string;
+  dueDate?: string;
   createdAt: number;
   updatedAt: number;
 }
