@@ -8,7 +8,8 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(auth(), siteBlockerController.getSiteBlockers)
+  // TODO: add auth() here once we remove checkPro from site-blocker from extension
+  .get(siteBlockerController.getSiteBlockers)
   .post(
     auth(),
     validate(siteBlockerValidation.createSiteBlocker),
