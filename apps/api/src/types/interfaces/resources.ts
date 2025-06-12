@@ -33,6 +33,25 @@ export interface IToken {
   blacklisted?: boolean;
 }
 
+export interface IPomodoroSettings {
+  workDuration: number;
+  breakDuration: number;
+  autoStart: boolean;
+  autoBlock: boolean;
+  soundOn: boolean;
+  dailyFocusLimit: number;
+}
+
+export interface ITaskSettings {
+  confettiOnComplete: boolean;
+}
+
+export interface IUserSettings {
+  pomodoro: IPomodoroSettings;
+  onboardingCompleted: boolean;
+  task: ITaskSettings;
+}
+
 export interface IUser {
   id?: string;
   name: string;
@@ -41,6 +60,7 @@ export interface IUser {
   isEmailVerified: boolean;
   role: RoleType;
   image?: string;
+  settings?: IUserSettings;
 }
 
 export interface IBillingWebhook {

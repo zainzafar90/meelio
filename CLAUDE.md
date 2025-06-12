@@ -1,0 +1,13 @@
+- Begin every file with precise interface / type declarations. Zero any.
+- Break work into small, isolated functions (≤30 lines). This cut-down size plus single responsibility keeps the model from drifting or hallucinating. 
+- Keep functions pure unless you were asked for I/O.
+- Inject outside dependencies (HTTP, DB, clock) via parameters; avoid globals.
+- Default to const and immutable data.
+- Use clear names: verbs for functions, nouns for types; no abbreviations.
+- Throw typed errors or return Result<T,E>; never swallow failures.
+- split code the moment a second concern creeps in. 
+- Put a terse TSDoc (≤2 lines) above every export explaining purpose and params.
+- If tests are requested, output Jest tests with arrange → act → assert only.
+- Follow Prettier defaults; 80-char max line length.
+- Never embed secrets, tokens, or unsafe sample keys.
+- Don't add unnecessary comments for obviously clear code or method, unless something needs explanation 

@@ -9,11 +9,13 @@ interface AppState {
   mantraRotationCount: number;
   mantraRotationEnabled: boolean;
   wallpaperRotationEnabled: boolean;
+  twelveHourClock: boolean;
   setPlatform: (platform: "extension" | "web") => void;
   setVersion: (version: string) => void;
   incrementMantraRotationCount: () => void;
   setMantraRotation: (enabled: boolean) => void;
   setWallpaperRotationEnabled: (enabled: boolean) => void;
+  setTwelveHourClock: (enabled: boolean) => void;
   initializeApp: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -22,11 +24,12 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: "0.3.5",
+      version: "0.4.1",
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
       wallpaperRotationEnabled: true,
+      twelveHourClock: true,
       setPlatform: (platform) => set({ platform }),
       setVersion: (version) => set({ version }),
       incrementMantraRotationCount: () =>
@@ -36,6 +39,7 @@ export const useAppStore = create<AppState>()(
       setMantraRotation: (enabled) => set({ mantraRotationEnabled: enabled }),
       setWallpaperRotationEnabled: (enabled) =>
         set({ wallpaperRotationEnabled: enabled }),
+      setTwelveHourClock: (enabled) => set({ twelveHourClock: enabled }),
       initializeApp: () => {
         const version = localStorage.getItem("meelio:local:version");
         if (version) {
@@ -66,3 +70,5 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+
+export const isExtension = useAppStore.getState().platform === "extension";

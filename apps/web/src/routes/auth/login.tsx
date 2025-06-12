@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { UserAuthForm } from "@repo/shared";
 import { Logo } from "@repo/shared";
 import { AuthLayout } from "@/layouts/auth-layout";
 
 const Login = () => {
+  const { t } = useTranslation();
   return (
     <AuthLayout>
       <div className="mx-auto w-full max-w-md sm:px-4 md:w-96 md:max-w-sm md:px-0">
@@ -15,10 +17,10 @@ const Login = () => {
           <div className="mx-auto flex w-full flex-col justify-center space-y-6">
             <div className="flex flex-col space-y-2 text-center">
               <h1 className="font-heading text-2xl font-semibold">
-                Welcome back
+                {t("auth.login.title")}
               </h1>
               <p className="text-sm text-foreground">
-                Sign in to your Meelio Account
+                {t("auth.login.description")}
               </p>
             </div>
             <UserAuthForm userName="" onGuestContinue={() => {}} />
@@ -28,13 +30,13 @@ const Login = () => {
                 to="/register"
                 className="hover:text-brand underline underline-offset-4"
               >
-                Don&apos;t have an account? Sign Up
+                {t("auth.login.register")}
               </Link>
               <Link
                 to="/guest"
                 className="hover:text-brand underline underline-offset-4"
               >
-                Continue as Guest
+                {t("auth.login.guest")}
               </Link>
             </div>
           </div>

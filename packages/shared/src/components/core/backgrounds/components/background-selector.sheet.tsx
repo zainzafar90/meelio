@@ -12,21 +12,15 @@ import { useTranslation } from "react-i18next";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons/icons";
 import { useDockStore } from "../../../../stores/dock.store";
-import { useAuthStore } from "../../../../stores/auth.store";
 import {
   useBackgroundStore,
   Wallpaper,
 } from "../../../../stores/background.store";
-import * as backgroundsApi from "../../../../api/backgrounds.api";
 import { useShallow } from "zustand/shallow";
 
 export function BackgroundSelectorSheet() {
   const { t } = useTranslation();
-  const { user } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
-    }))
-  );
+
   const { isBackgroundsVisible, toggleBackgrounds } = useDockStore(
     useShallow((state) => ({
       isBackgroundsVisible: state.isBackgroundsVisible,
@@ -39,34 +33,18 @@ export function BackgroundSelectorSheet() {
       currentWallpaper: state.currentWallpaper,
     }))
   );
-  const { wallpapers, resetToDefault, initializeWallpapers, isLoading } =
-    useBackgroundStore(
-      useShallow((state) => ({
-        wallpapers: state.wallpapers,
-        resetToDefault: state.resetToDefault,
-        initializeWallpapers: state.initializeWallpapers,
-        isLoading: state.isLoading,
-      }))
-    );
+  const { wallpapers, resetToDefault } = useBackgroundStore(
+    useShallow((state) => ({
+      wallpapers: state.wallpapers,
+      resetToDefault: state.resetToDefault,
+    }))
+  );
 
   const liveWallpapers = wallpapers.filter((w) => w.type === "live");
   const staticWallpapers = wallpapers.filter((w) => w.type === "static");
 
   const handleSetBackground = async (background: Wallpaper) => {
     setCurrentWallpaper(background);
-
-    if (user && background.id) {
-      try {
-        const response = await backgroundsApi.setFavouriteBackground(
-          background.id
-        );
-        if (response.data && response.data.backgrounds) {
-          initializeWallpapers();
-        }
-      } catch (error) {
-        console.error("Error setting background in API:", error);
-      }
-    }
   };
 
   const handleRandomBackground = () => {
@@ -78,23 +56,6 @@ export function BackgroundSelectorSheet() {
   const handleResetToDefault = () => {
     resetToDefault();
   };
-
-  if (isLoading) {
-    return (
-      <Sheet open={isBackgroundsVisible} onOpenChange={toggleBackgrounds}>
-        <SheetContent side="right" className="w-full sm:max-w-xl">
-          <SheetHeader>
-            <SheetTitle>{t("backgrounds.title")}</SheetTitle>
-            <SheetDescription>{t("backgrounds.description")}</SheetDescription>
-          </SheetHeader>
-          <div className="flex items-center justify-center h-full">
-            <Icons.spinner className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading backgrounds...</span>
-          </div>
-        </SheetContent>
-      </Sheet>
-    );
-  }
 
   return (
     <Sheet open={isBackgroundsVisible} onOpenChange={toggleBackgrounds}>
@@ -167,8 +128,7 @@ export function BackgroundSelectorSheet() {
                         <p className="text-xs text-white/70">
                           {wallpaper.author} • Live
                         </p>
-                        {(wallpaper.source === "local" ||
-                          wallpaper.source === "api-default") && (
+                        {wallpaper.source === "local" && (
                           <span className="mt-1 inline-block rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
                             Default
                           </span>
@@ -223,8 +183,7 @@ export function BackgroundSelectorSheet() {
                       <p className="text-xs text-white/70">
                         {wallpaper.author}
                       </p>
-                      {(wallpaper.source === "local" ||
-                        wallpaper.source === "api-default") && (
+                      {wallpaper.source === "local" && (
                         <span className="mt-1 inline-block rounded-full bg-white/20 px-2 py-0.5 text-xs text-white">
                           Default
                         </span>

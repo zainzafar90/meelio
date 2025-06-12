@@ -5,3 +5,4 @@ export * from "./pomodoro";
 export * from "./sound";
 export * from "./subscription";
 export * from "./timer";
+export * from "./new/pomodoro-lite";

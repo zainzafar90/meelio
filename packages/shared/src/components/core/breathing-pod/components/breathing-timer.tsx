@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 import { playBreathingSound } from "../../../../utils/sound.utils";
 
@@ -12,6 +13,11 @@ export const useBreathingTimer = () => {
     setPhase,
     getCurrentPhaseTime,
     getNextPhase,
+    completedSets,
+    totalSets,
+    incrementCompletedSets,
+    stop,
+    selectedMethod,
   } = useBreathingStore();
 
   useEffect(() => {
@@ -25,7 +31,19 @@ export const useBreathingTimer = () => {
           if (prevCount === currentPhaseTime - 1) {
             const nextPhase = getNextPhase();
             setPhase(nextPhase);
-            playBreathingSound(phase);
+            playBreathingSound(nextPhase);
+
+            if (nextPhase === "inhale") {
+              incrementCompletedSets();
+
+              if (completedSets + 1 >= totalSets && totalSets > 0) {
+                toast("Breathing session complete!", {
+                  description: "Great job finishing your practice.",
+                });
+                stop();
+              }
+            }
+
             return 0;
           }
           return prevCount + 1;
@@ -34,7 +52,19 @@ export const useBreathingTimer = () => {
     }
 
     return () => clearInterval(timer);
-  }, [isActive, phase, getCurrentPhaseTime, getNextPhase, setCount, setPhase]);
+  }, [
+    isActive,
+    phase,
+    getCurrentPhaseTime,
+    getNextPhase,
+    setCount,
+    setPhase,
+    completedSets,
+    totalSets,
+    incrementCompletedSets,
+    stop,
+    selectedMethod,
+  ]);
 
   return null;
 };

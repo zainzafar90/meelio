@@ -3,6 +3,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, buttonVariants } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
+import { useTranslation } from "react-i18next";
 import { Label } from "@repo/ui/components/ui/label";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -15,7 +16,6 @@ import { env } from "../../utils";
 import { userAuthSchema } from "../../lib/validations/auth";
 import { useAuthStore } from "../../stores/auth.store";
 import { useShallow } from "zustand/shallow";
-import { useTranslation } from "react-i18next";
 import { useAppStore } from "../../stores/app.store";
 
 type FormData = z.infer<typeof userAuthSchema>;
@@ -73,7 +73,7 @@ export const UserAuthForm = ({
           "Click the secure link, and check your spam folder if you don't see it in your inbox.",
       });
     } catch (error) {
-      toast.error("Something went wrong.", {
+      toast.error(t("common.error"), {
         description:
           "We are unable to send you a magic link. Please try again.",
       });

@@ -11,13 +11,13 @@ import { Greeting } from "@repo/shared";
 import { AppLayout } from "@repo/shared";
 import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
-import { TodoListSheet } from "@repo/shared";
+import { TaskListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
 import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
 import { api } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
-import { WebTimer } from "@/components/web-timer";
+import { WebSimpleTimer } from "@/components/web-simple-timer";
 import { SiteBlockerSheet } from "@repo/shared";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
@@ -38,6 +38,7 @@ const Home = () => {
   })));
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -50,14 +51,14 @@ const Home = () => {
           token,
         });
         authenticate(user);
-        toast.success("Successfully verified!", {
-          description: "Welcome back to Meelio.",
+        toast.success(t("auth.verify.success.title"), {
+          description: t("auth.verify.success.description"),
         });
         searchParams.delete("token");
         window.history.replaceState({}, "", window.location.pathname);
       } catch (e) {
-        toast.error("Verification failed", {
-          description: "Your link should be valid for 10 minutes. Please try again.",
+        toast.error(t("auth.verify.failed.title"), {
+          description: t("auth.verify.failed.description"),
         });
       } finally {
         setIsVerifying(false);
@@ -80,7 +81,7 @@ const Home = () => {
         {renderBackground()}
         <PageSkeleton>
           <h3 className="text-foreground font-medium">
-            {isVerifying ? "Verifying your account..." : "Loading..."}
+            {isVerifying ? t("auth.verify.verifying") : t("common.loading")}
           </h3>
         </PageSkeleton>
       </>
@@ -125,7 +126,7 @@ const Content = () => {
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
-      <TodoListSheet />
+      <TaskListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
@@ -146,7 +147,7 @@ const GreetingsContent = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <WebTimer />
+            <WebSimpleTimer />
           </motion.div>
         ) : (
           <motion.div

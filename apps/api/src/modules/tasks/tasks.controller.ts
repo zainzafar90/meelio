@@ -2,20 +2,19 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "@/utils/catch-async";
 import { tasksService } from "./tasks.service";
-import { TaskStatus } from "@/db/schema";
 import { IUser } from "@/types/interfaces/resources";
+
 export const tasksController = {
   /**
    * Get tasks for the authenticated user with optional filters
    */
   getTasks: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { status, category, isFocus, dueDate, sortBy, sortOrder } = req.query;
+    const { completed, category, dueDate, sortBy, sortOrder } = req.query;
 
     const filters = {
-      status: status as TaskStatus,
+      completed: completed === "true" ? true : completed === "false" ? false : undefined,
       category: category as string,
-      isFocus: isFocus === "true",
       dueDate: dueDate as string,
       sortBy: sortBy as string,
       sortOrder: sortOrder as "asc" | "desc",
@@ -37,13 +36,13 @@ export const tasksController = {
   }),
 
   /**
-   * Get the current focus task
+   * Get task categories
    */
-  getFocusTask: catchAsync(async (req: Request, res: Response) => {
+  getCategories: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
 
-    const task = await tasksService.getFocusTask(user.id);
-    return res.status(httpStatus.OK).json(task);
+    const categories = await tasksService.getCategories(user.id);
+    return res.status(httpStatus.OK).json(categories);
   }),
 
   /**
@@ -77,6 +76,17 @@ export const tasksController = {
     const { id } = req.params;
 
     await tasksService.deleteTask(user.id, id);
+    return res.status(httpStatus.NO_CONTENT).send();
+  }),
+
+  /**
+   * Delete all tasks in a category
+   */
+  deleteTasksByCategory: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { category } = req.params;
+
+    await tasksService.deleteTasksByCategory(user.id, category);
     return res.status(httpStatus.NO_CONTENT).send();
   }),
 };

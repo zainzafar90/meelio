@@ -1,103 +1,65 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PomodoroStage, addPomodoroSession, addPomodoroSummary, formatTime, Icons, TimerSettingsDialog, TimerStatsDialog, useDisclosure, PomodoroState, SyncQueue } from "@repo/shared";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { PomodoroStage, formatTime, Icons, TimerStatsDialog, useDisclosure, PomodoroState, ConditionalFeature, TimerPlaceholder, NextPinnedTask, useSettingsStore } from "@repo/shared";
 
-import { usePomodoroStore } from "../lib/pomodoro-store";
-
-// Create a sync queue instance for timer sessions
-const timerSyncQueue = new SyncQueue();
+import { usePomodoroStore } from "@repo/shared";
+import { Crown } from "lucide-react";
 
 export const ExtensionTimer = () => {
   const { isOpen: isStatsDialogOpen, toggle: toggleStatsDialog } = useDisclosure();
-  const { isOpen: isSettingsDialogOpen, toggle: toggleSettingsDialog } = useDisclosure();
+  const { t } = useTranslation();
+  const { openSettings, setTab } = useSettingsStore();
   const {
     activeStage,
     isRunning,
     endTimestamp,
     stageDurations,
     autoStartTimers,
+    getDailyLimitStatus,
+    stats,
+    sessionCount,
   } = usePomodoroStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [remaining, setRemaining] = useState(stageDurations[activeStage]);
 
+  const dailyLimitStatus = getDailyLimitStatus();
+
   const completeStage = async () => {
-    const state = usePomodoroStore.getState();
-    const completedStage = state.activeStage;
-    const newStats = { ...state.stats };
-    const isFocus = completedStage === PomodoroStage.Focus;
+    const store = usePomodoroStore.getState();
+    const finishedStage = store.activeStage;
 
-    if (isFocus) {
-      newStats.todaysFocusSessions += 1;
-      newStats.todaysFocusTime += state.stageDurations[PomodoroStage.Focus];
-    } else if (completedStage === PomodoroStage.Break) {
-      newStats.todaysBreaks += 1;
-      newStats.todaysBreakTime += state.stageDurations[PomodoroStage.Break];
-    }
+    await store.completeSession();
+    store.playCompletionSound();
+    store.showCompletionNotification(finishedStage);
 
-    const nextStage = getNextStage(state);
-    const newSessionCount = isFocus ? state.sessionCount + 1 : state.sessionCount;
-    const duration = state.stageDurations[nextStage];
+    store.advanceTimer();
+    const newState = usePomodoroStore.getState();
 
-    usePomodoroStore.setState({
-      stats: newStats,
-      activeStage: nextStage,
-      sessionCount: newSessionCount,
-      isRunning: autoStartTimers ? true : false,
-      endTimestamp: autoStartTimers ? Date.now() + duration * 1000 : null,
-      lastUpdated: Date.now()
-    });
+    const duration = newState.stageDurations[newState.activeStage];
+    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
 
-    if (nextStage !== completedStage) {
-      chrome.runtime.sendMessage({
-        type: "UPDATE_DURATION",
-        duration
+    // Auto-start the next stage
+    if (!dailyLimitStatus.isLimitReached) {
+      chrome.runtime.sendMessage({ type: 'START', duration });
+      usePomodoroStore.setState({
+        endTimestamp: Date.now() + duration * 1000,
+        lastUpdated: Date.now(),
       });
+    } else {
+      usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
+      setRemaining(duration);
     }
 
-    // Create a session object to store in IndexedDB
-    const sessionData = {
-      timestamp: Date.now(),
-      stage: completedStage,
-      duration: state.stageDurations[completedStage],
-      completed: true,
-    };
-
-    try {
-      await addPomodoroSession(sessionData);
-      
-      if (isFocus) {
-        const now = new Date();
-        const sessionEndTime = now;
-        const sessionStartTime = new Date(now.getTime() - (state.stageDurations[PomodoroStage.Focus] * 1000));
-        
-        const focusSessionData = {
-          id: crypto.randomUUID(),
-          sessionStart: sessionStartTime.toISOString(),
-          sessionEnd: sessionEndTime.toISOString(),
-          duration: Math.floor(state.stageDurations[PomodoroStage.Focus] / 60), // Convert seconds to minutes
-          _syncStatus: 'pending' as "pending" | "synced" | "error",
-          _lastModified: Date.now(),
-          _version: 1,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          userId: 'extension-user'
-        };
-        
-        timerSyncQueue.addOperation({
-          entity: "focus-sessions",
-          operation: "create",
-          data: focusSessionData,
-          version: 1
-        });
-        
-        console.log("Focus session added to sync queue:", focusSessionData);
-      }
-      
-      // Add summary stats
-      await addPomodoroSummary(state.stageDurations[completedStage], completedStage);
-    } catch (error) {
-      console.error("Failed to record session or add to sync queue:", error);
+    if (
+      finishedStage === PomodoroStage.Focus &&
+      !dailyLimitStatus.isLimitReached &&
+      newState.getDailyLimitStatus().isLimitReached
+    ) {
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
+      });
     }
   };
 
@@ -108,76 +70,108 @@ export const ExtensionTimer = () => {
     return PomodoroStage.Focus;
   };
 
-  const handleStart = () => {
-    setHasStarted(true);
-    const duration = usePomodoroStore.getState().stageDurations[activeStage];
-    chrome.runtime.sendMessage({ 
-      type: 'START', 
-      duration 
-    });
-    
+  const autoStartTimer = () => {
+    if (dailyLimitStatus.isLimitReached) {
+      return;
+    }
+
+    const store = usePomodoroStore.getState();
+    const duration = store.stageDurations[activeStage];
+    chrome.runtime.sendMessage({ type: 'START', duration });
+
+    store.startTimer();
     usePomodoroStore.setState({
-      isRunning: true,
-      endTimestamp: Date.now() + (duration * 1000),
-      lastUpdated: Date.now()
+      endTimestamp: Date.now() + duration * 1000,
+      lastUpdated: Date.now(),
     });
   };
 
   const handlePause = () => {
     chrome.runtime.sendMessage({ type: 'PAUSE' });
-    usePomodoroStore.setState({
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
-    });
+    const store = usePomodoroStore.getState();
+    store.pauseTimer();
+    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
   };
 
   const handleResume = () => {
+    if (dailyLimitStatus.isLimitReached) {
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
+      });
+      return;
+    }
+
+    const store = usePomodoroStore.getState();
+    store.resumeTimer();
     usePomodoroStore.setState({
-      isRunning: true,
       endTimestamp: Date.now() + remaining * 1000,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
   };
 
   const handleReset = () => {
     chrome.runtime.sendMessage({ type: 'RESET' });
+    const store = usePomodoroStore.getState();
+    store.pauseTimer();
     usePomodoroStore.setState({
-      isRunning: false,
       endTimestamp: null,
       sessionCount: 0,
       activeStage,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     });
-    setHasStarted(false);
-    setRemaining(stageDurations[activeStage]);
+    setRemaining(stageDurations[PomodoroStage.Focus]);
+    // Auto-start after reset
+    setTimeout(() => {
+      if (!dailyLimitStatus.isLimitReached) {
+        autoStartTimer();
+      }
+    }, 100);
   };
 
   const handleSwitch = () => {
-    const nextStage = getNextStage(usePomodoroStore.getState());
+    const store = usePomodoroStore.getState();
+    const nextStage = getNextStage(store);
+    chrome.runtime.sendMessage({ type: 'RESET' });
     chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration: stageDurations[nextStage] });
-    usePomodoroStore.setState({
-      activeStage: nextStage,
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
-    });
+    store.changeStage(nextStage);
+    usePomodoroStore.setState({ endTimestamp: null, lastUpdated: Date.now() });
     setRemaining(stageDurations[nextStage]);
+    // Auto-start the new stage
+    setTimeout(() => {
+      if (!dailyLimitStatus.isLimitReached) {
+        const duration = stageDurations[nextStage];
+        chrome.runtime.sendMessage({ type: 'START', duration });
+        store.startTimer();
+        usePomodoroStore.setState({
+          endTimestamp: Date.now() + duration * 1000,
+          lastUpdated: Date.now(),
+        });
+      }
+    }, 100);
   };
 
   const handleSkipToNextStage = () => {
-    const nextStage = getNextStage(usePomodoroStore.getState());
-    chrome.runtime.sendMessage({
-      type: 'SKIP_TO_NEXT_STAGE',
-      payload: { duration: stageDurations[nextStage] }
-    });
-    usePomodoroStore.setState({
-      activeStage: nextStage,
-      isRunning: false,
-      endTimestamp: null,
-      lastUpdated: Date.now()
-    });
-    setRemaining(stageDurations[nextStage]);
+    const store = usePomodoroStore.getState();
+    chrome.runtime.sendMessage({ type: 'SKIP_TO_NEXT_STAGE' });
+    store.advanceTimer();
+    const state = usePomodoroStore.getState();
+    const duration = state.stageDurations[state.activeStage];
+    chrome.runtime.sendMessage({ type: 'UPDATE_DURATION', duration });
+    
+    // Auto-start the next stage
+    if (!dailyLimitStatus.isLimitReached) {
+      chrome.runtime.sendMessage({ type: 'START', duration });
+      usePomodoroStore.setState({
+        endTimestamp: Date.now() + duration * 1000,
+        lastUpdated: Date.now(),
+      });
+    } else {
+      usePomodoroStore.setState({
+        endTimestamp: null,
+        lastUpdated: Date.now(),
+      });
+    }
+    setRemaining(duration);
   };
 
   useEffect(() => {
@@ -186,6 +180,7 @@ export const ExtensionTimer = () => {
         case 'TICK':
           setIsLoading(false);
           setRemaining(msg.remaining);
+          usePomodoroStore.getState().updateTimer(msg.remaining);
           break;
         case 'STAGE_COMPLETE':
           completeStage();
@@ -206,7 +201,6 @@ export const ExtensionTimer = () => {
             activeStage,
             lastUpdated: Date.now()
           });
-          setHasStarted(false);
           setRemaining(stageDurations[activeStage]);
           break;
       }
@@ -214,6 +208,11 @@ export const ExtensionTimer = () => {
 
     chrome.runtime.onMessage.addListener(messageHandler);
     return () => chrome.runtime.onMessage.removeListener(messageHandler);
+  }, []);
+
+  // Simple mounted effect to hide loading
+  useEffect(() => {
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -237,25 +236,88 @@ export const ExtensionTimer = () => {
     document.title = isRunning ? `${emoji} ${timeStr} - ${mode}` : 'Meelio - focus, calm, & productivity';
   }, [remaining, activeStage, isRunning, stageDurations, isLoading]);
 
+  // Auto-pause timer when daily limit is reached
+  useEffect(() => {
+    if (isRunning && dailyLimitStatus.isLimitReached) {
+      handlePause();
+      toast.info(t("timer.limitReached.toast"), {
+        description: t("timer.limitReached.description")
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dailyLimitStatus.isLimitReached, isRunning]);
+
+  // Auto-start timer when component mounts or stage changes
+  useEffect(() => {
+    if (!isRunning && !dailyLimitStatus.isLimitReached) {
+      setRemaining(stageDurations[activeStage]);
+      // Auto-start after a short delay
+      setTimeout(() => {
+        autoStartTimer();
+      }, 100);
+    }
+  }, [activeStage, stageDurations]);
+
+  useEffect(() => {
+    if (stats.todaysFocusTime === 0 && stats.todaysFocusSessions === 0 && sessionCount === 0) {
+      setRemaining(stageDurations[activeStage]);
+      chrome.runtime.sendMessage({ type: 'RESET' });
+      // Auto-start fresh timer
+      setTimeout(() => {
+        if (!dailyLimitStatus.isLimitReached) {
+          autoStartTimer();
+        }
+      }, 100);
+    }
+  }, [stats.todaysFocusTime, stats.todaysFocusSessions, sessionCount, stageDurations, activeStage]);
 
   return (
     <div className="relative">
-      <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-        <div className="p-6 space-y-10">
+      <ConditionalFeature
+        key={`timer-${stageDurations[activeStage]}-${activeStage}`}
+        showFallback={dailyLimitStatus.isLimitReached}
+        fallback={
+          <TimerPlaceholder activeStage={activeStage} />
+        }
+      >
+        <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+          <div className="p-6 space-y-10">
           {/* Timer Mode Tabs */}
           <div className="w-full">
             <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
               <button
-                onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
-                  }`}
+                onClick={() => {
+                  if (dailyLimitStatus.isLimitReached) {
+                    return;
+                  }
+                  handleSwitch();
+                }}
+                disabled={dailyLimitStatus.isLimitReached}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                  activeStage === PomodoroStage.Focus ? 'bg-white/50' : ''
+                } ${
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.focusMode")}
               >
                 <span>Focus</span>
               </button>
               <button
-                onClick={handleSwitch}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
-                  }`}
+                onClick={() => {
+                  if (dailyLimitStatus.isLimitReached) {
+                    return;
+                  }
+                  if (activeStage === PomodoroStage.Focus) {
+                    handleSwitch();
+                  }
+                }}
+                disabled={activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached}
+                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                  activeStage === PomodoroStage.Break ? 'bg-white/50' : ''
+                } ${
+                  activeStage === PomodoroStage.Break || dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.breakMode")}
               >
                 <span>Break</span>
               </button>
@@ -267,49 +329,90 @@ export const ExtensionTimer = () => {
             <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
               {isLoading ? <TimeSkeleton /> : formatTime(remaining)}
             </div>
+            <NextPinnedTask />
           </div>
 
           <div className="flex flex-col gap-4">
             {/* Control Buttons */}
             <div className="flex items-center justify-between gap-4">
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleReset}
-                title="Reset timer"
+                className={`cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm ${
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={() => {
+                  if (dailyLimitStatus.isLimitReached) {
+                    return;
+                  }
+                  handleReset();
+                }}
+                disabled={dailyLimitStatus.isLimitReached}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.reset")}
                 role="button"
               >
                 <Icons.resetTimer className="size-4 text-white/90" />
-                <span className="sr-only">Reset timer</span>
+                <span className="sr-only">{t("timer.controls.reset")}</span>
               </button>
 
               <button
-                className="cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
-                onClick={isRunning ? handlePause : hasStarted ? handleResume : handleStart}
-                title="Switch timer"
+                className={`cursor-pointer relative flex h-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm ${
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={() => {
+                  if (dailyLimitStatus.isLimitReached) {
+                    return;
+                  }
+                  
+                  if (isRunning) {
+                    handlePause();
+                  } else {
+                    handleResume();
+                  }
+                }}
+                disabled={dailyLimitStatus.isLimitReached}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : (isRunning ? "Pause" : "Resume")}
                 role="button"
               >
-                {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
-                <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">{isRunning ? 'Stop' : hasStarted ? 'Resume' : 'Start'}</span>
+                {dailyLimitStatus.isLimitReached ? (
+                  <>
+                    <Crown className="size-4" />
+                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">Upgrade</span>
+                  </>
+                ) : (
+                  <>
+                    {isRunning ? <Icons.pause className="size-4" /> : <Icons.play className="size-4" />}
+                    <span className="ml-2 uppercase text-xs sm:text-sm md:text-base">
+                      {isRunning ? 'Pause' : 'Resume'}
+                    </span>
+                  </>
+                )}
               </button>
 
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={handleSkipToNextStage}
-                title="Skip to next timer"
+                className={`cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm ${
+                  dailyLimitStatus.isLimitReached ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={() => {
+                  if (dailyLimitStatus.isLimitReached) {
+                    return;
+                  }
+                  handleSkipToNextStage();
+                }}
+                disabled={dailyLimitStatus.isLimitReached}
+                title={dailyLimitStatus.isLimitReached ? t("timer.limitReached.title") : t("timer.controls.skipStage")}
                 role="button"
               >
                 <Icons.forward className="size-4 text-white/90" />
-                <span className="sr-only">Skip to next timer</span>
+                <span className="sr-only">{t("timer.controls.skipStage")}</span>
               </button>
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={toggleStatsDialog}
-                title="Stats"
+                title={t("timer.stats.title")}
                 role="button"
               >
                 <Icons.graph className="size-4 text-white/90" />
-                <span className="sr-only">Stats</span>
+                <span className="sr-only">{t("timer.stats.title")}</span>
               </button>
             </div>
 
@@ -327,19 +430,20 @@ export const ExtensionTimer = () => {
               />
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      </ConditionalFeature>
 
       <TimerStatsDialog
         isOpen={isStatsDialogOpen}
         onOpenChange={toggleStatsDialog}
-        onSettingsClick={toggleSettingsDialog}
+        onSettingsClick={() => {
+          toggleStatsDialog();
+          setTab("timer");
+          openSettings();
+        }}
       />
 
-      <TimerSettingsDialog
-        isOpen={isSettingsDialogOpen}
-        onClose={toggleSettingsDialog}
-      />
     </div>
   );
 };

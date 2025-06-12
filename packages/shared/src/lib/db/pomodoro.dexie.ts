@@ -68,3 +68,27 @@ export const addPomodoroSummary = async (
 
   return db.focusStats.put(todaysSummary);
 };
+
+export const addFocusTimeMinute = async (): Promise<IndexableType> => {
+  const todaysSummary = await getTodaysSummary();
+
+  todaysSummary.totalFocusTime += 60;
+
+  return db.focusStats.put(todaysSummary);
+};
+
+export const addSimpleTimerFocusTime = async (seconds: number): Promise<IndexableType> => {
+  const todaysSummary = await getTodaysSummary();
+
+  todaysSummary.totalFocusTime += seconds;
+
+  return db.focusStats.put(todaysSummary);
+};
+
+export const addSimpleTimerBreakTime = async (seconds: number): Promise<IndexableType> => {
+  const todaysSummary = await getTodaysSummary();
+
+  todaysSummary.totalBreakTime += seconds;
+
+  return db.focusStats.put(todaysSummary);
+};

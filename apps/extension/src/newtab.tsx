@@ -10,7 +10,7 @@ import {
   TabStashSheet, 
   useAuthStore, 
   useDockStore,
-  TodoListSheet,
+  TaskListSheet,
   Background,
   BackgroundOverlay,
   BackgroundSelectorSheet,
@@ -20,13 +20,12 @@ import {
   Quote,
   SoundscapesSheet,
   Dock,
-  SiteBlockerSheet
+  SiteBlockerSheet,
+  SimpleTimer
  } from "@repo/shared";
-
-import { ExtensionTimer } from "./components/extension-timer";
+import { useAppStore } from "@repo/shared";
 
 import "./style.css";
-import { useAppStore } from "../../../packages/shared/src/stores/app.store";
 
 const Home = () => {
   const { user, guestUser } = useAuthStore(useShallow((state) => ({
@@ -78,7 +77,7 @@ const Content = () => {
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
-      <TodoListSheet />
+      <TaskListSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
@@ -99,7 +98,7 @@ const GreetingsContent = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <ExtensionTimer />
+            <SimpleTimer />
           </motion.div>
         ) : (
           <motion.div

@@ -318,7 +318,7 @@ export const Icons = {
       />
     </svg>
   ),
-  todoList: ({ ...props }: LucideProps) => (
+  taskList: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -336,7 +336,7 @@ export const Icons = {
       />
     </svg>
   ),
-  todoListActive: ({ ...props }: LucideProps) => (
+  taskListActive: ({ ...props }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"

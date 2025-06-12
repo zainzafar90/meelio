@@ -10,6 +10,12 @@ export const siteBlockerController = {
    */
   getSiteBlockers: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
+
+    // TODO: Remove this once we remove checkPro from site-blocker from extension
+    if (!user) {
+      return res.status(httpStatus.OK).json([]);
+    }
+
     const { category } = req.query;
     const siteBlockers = await siteBlockerService.getSiteBlockers(
       user.id,

@@ -16,7 +16,6 @@ import { PermissionBanner } from "./components/permission-banner";
 import { SessionList } from "./components/session-list";
 import { SessionView } from "./components/session-view";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
-import { cn } from "../../../lib";
 import { useShallow } from "zustand/shallow";
 
 const isExtension = typeof chrome !== "undefined" && !!chrome.storage;

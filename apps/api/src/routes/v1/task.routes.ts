@@ -15,7 +15,11 @@ router
     tasksController.createTask
   );
 
-router.route("/focus").get(auth(), tasksController.getFocusTask);
+router.route("/categories").get(auth(), tasksController.getCategories);
+
+router
+  .route("/category/:category")
+  .delete(auth(), tasksController.deleteTasksByCategory);
 
 router
   .route("/:id")

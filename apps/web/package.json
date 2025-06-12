@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.3.5",
+  "version": "0.4.1",
   "private": true,
   "scripts": {
     "dev": "vite --port=4000",
@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
-    "@repo/core": "*",
     "@repo/eslint-config": "*",
     "@repo/prettier-config": "*",
     "@repo/tailwind-config": "*",
