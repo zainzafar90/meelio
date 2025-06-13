@@ -168,8 +168,7 @@ export const tasksService = {
     const data: Partial<Task> = {};
 
     if (updateData.title !== undefined) data.title = updateData.title;
-    if (updateData.completed !== undefined)
-      data.completed = updateData.completed;
+    if (updateData.completed !== undefined) data.completed = updateData.completed;
     if (updateData.pinned !== undefined) {
       data.pinned = updateData.pinned;
       if (updateData.pinned) {
@@ -181,12 +180,21 @@ export const tasksService = {
     }
     if (updateData.category !== undefined) data.category = updateData.category;
     if (updateData.dueDate !== undefined) data.dueDate = dueDateObj;
+    if (updateData.updatedAt !== undefined) data.updatedAt = updateData.updatedAt;
+
+    if (Object.keys(data).length === 0) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "No valid update data provided");
+    }
 
     const result = await db
       .update(tasks)
       .set(data)
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
       .returning();
+
+    if (!result.length) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
+    }
 
     return result[0];
   },

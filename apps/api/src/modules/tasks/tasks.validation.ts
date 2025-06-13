@@ -12,7 +12,8 @@ export const tasksValidation = {
     title: Joi.string().optional(),
     completed: Joi.boolean().optional(),
     pinned: Joi.boolean().optional(),
-    category: Joi.string().optional(),
+    category: Joi.string().optional().allow(null),
     dueDate: Joi.date().optional().allow(null),
+    updatedAt: Joi.number().optional(),
   }),
 };
