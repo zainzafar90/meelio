@@ -17,7 +17,7 @@ router
 router
   .route("/pomodoro")
   .patch(auth(), settingsController.updatePomodoroSettings);
-
-router.route("/tasks").patch(auth(), settingsController.updateSettings);
+router
+.route("/tasks").patch(auth(), settingsController.updateSettings);
 
 export default router;

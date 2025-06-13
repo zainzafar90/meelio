@@ -35,6 +35,10 @@ export const userUtils = {
         onboardingCompleted:
           userSettings.onboardingCompleted ??
           DEFAULT_SETTINGS.onboardingCompleted,
+        task: {
+          ...DEFAULT_SETTINGS.task,
+          ...userSettings.task,
+        },
       } as typeof safeUser.settings;
     }
 

@@ -12,14 +12,22 @@ export const pomodoroSettingsSchema = z.object({
   dailyFocusLimit: z.number().min(0).max(1440).default(120),
 });
 
+export const taskSettingsSchema = z.object({
+  confettiOnComplete: z.boolean(),
+});
+
 export const userSettingsSchema = z.object({
   pomodoro: pomodoroSettingsSchema.optional(),
   onboardingCompleted: z.boolean().optional(),
-  task: z.object({ confettiOnComplete: z.boolean() }).optional(),
+  task: taskSettingsSchema,
 });
 
 export const updateSettingsSchema = z.object({
   body: userSettingsSchema.partial(),
+});
+
+export const updateTaskSettingsSchema = z.object({
+  body: taskSettingsSchema,
 });
 
 export type PomodoroSettings = z.infer<typeof pomodoroSettingsSchema>;
