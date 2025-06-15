@@ -108,11 +108,13 @@ export const useBackgroundStore = create<BackgroundState>()(
           wallpapers: state.wallpapers,
         }));
       },
-      resetToDefault: () =>
+      resetToDefault: () => {
+        const index = getSeedIndexByDate(DEFAULT_WALLPAPERS.length);
         set({
-          currentWallpaper: CURRENT_DEFAULT_WALLPAPER,
+          currentWallpaper: DEFAULT_WALLPAPERS[index],
           wallpapers: DEFAULT_WALLPAPERS,
-        }),
+        });
+      },
     }),
     {
       name: STORAGE_KEY,
