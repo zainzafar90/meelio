@@ -18,7 +18,7 @@ export const settingsApi = {
   },
 
   updateTaskSettings: async (taskSettings: { confettiOnComplete: boolean }) => {
-    const response = await axios.patch("/v1/settings/task", taskSettings);
+    const response = await axios.patch("/v1/settings/tasks", taskSettings);
     return response.data.settings;
   },
 };
