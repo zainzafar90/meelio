@@ -12,6 +12,15 @@ interface TaskFilters {
   sortOrder?: "asc" | "desc";
 }
 
+interface TaskUpdateData {
+  title?: string;
+  completed?: boolean;
+  pinned?: boolean;
+  category?: string | null;
+  dueDate?: string | number | null;
+  updatedAt?: Date;
+}
+
 export const tasksService = {
   /**
    * Get tasks for a user with optional filters
@@ -108,38 +117,118 @@ export const tasksService = {
   /**
    * Create a new task
    */
-  async createTask(userId: string, taskData: any): Promise<Task> {
-    if (!taskData.title) {
+  async createTask(
+    userId: string,
+    taskData: Omit<TaskUpdateData, "updatedAt"> & { title: string }
+  ): Promise<Task> {
+    if (!taskData.title?.trim()) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Title is required");
     }
 
-    let dueDateObj;
-    if (taskData.dueDate) {
-      try {
-        dueDateObj = new Date(taskData.dueDate);
-      } catch (error) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Invalid date format");
-      }
-    }
-
-    const insertData = {
+    const parsedDueDate = tasksService.parseDate(taskData.dueDate);
+    const insertData: any = {
       userId,
       title: taskData.title,
       completed: taskData.completed ?? false,
       pinned: taskData.pinned ?? false,
       category: taskData.category ?? null,
-      dueDate: dueDateObj || null,
     };
 
+    // Only include dueDate if it's explicitly set
+    if (parsedDueDate !== undefined) {
+      insertData.dueDate = parsedDueDate;
+    }
+
+    // Handle pinned task logic
     if (insertData.pinned) {
+      await tasksService._handlePinnedTask(userId, true);
+    }
+
+    const result = await db.insert(tasks).values(insertData).returning();
+    return result[0];
+  },
+
+  /**
+   * Parse and validate due date
+   */
+  parseDate(
+    dueDate: string | number | null | undefined
+  ): Date | null | undefined {
+    if (dueDate === undefined) return undefined;
+    if (dueDate === null) return null;
+
+    try {
+      // Handle both ISO strings and timestamps (getTime() values)
+      const parsedDate =
+        typeof dueDate === "number" ? new Date(dueDate) : new Date(dueDate);
+
+      // Check if the date is valid
+      if (isNaN(parsedDate.getTime())) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          `Invalid date format: ${dueDate}`
+        );
+      }
+
+      return parsedDate;
+    } catch (error) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        `Invalid date format: ${dueDate}`
+      );
+    }
+  },
+
+  /**
+   * Handle pinned task logic - ensure only one task is pinned per user
+   */
+  async _handlePinnedTask(userId: string, isPinned: boolean): Promise<void> {
+    if (isPinned) {
       await db
         .update(tasks)
         .set({ pinned: false } as Task)
         .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
     }
+  },
 
-    const result = await db.insert(tasks).values(insertData).returning();
-    return result[0];
+  /**
+   * Build update data object from input
+   */
+  _buildUpdateData(updateData: TaskUpdateData): Partial<Task> {
+    const data: Partial<Task> = {};
+
+    // Handle each field explicitly for better type safety
+    if (updateData.title !== undefined) {
+      data.title = updateData.title;
+    }
+
+    if (updateData.completed !== undefined) {
+      data.completed = updateData.completed;
+    }
+
+    if (updateData.pinned !== undefined) {
+      data.pinned = updateData.pinned;
+    }
+
+    if (updateData.category !== undefined) {
+      data.category = updateData.category;
+    }
+
+    if (updateData.updatedAt !== undefined) {
+      data.updatedAt = updateData.updatedAt;
+    }
+
+    if (updateData.dueDate !== undefined) {
+      const parsedDate = tasksService.parseDate(updateData.dueDate);
+      // Only set dueDate if parsing was successful or explicitly null
+      if (parsedDate !== undefined) {
+        data.dueDate = parsedDate;
+      }
+    }
+
+    delete data.updatedAt;
+
+    return data;
   },
 
   /**
@@ -148,44 +237,30 @@ export const tasksService = {
   async updateTask(
     userId: string,
     taskId: string,
-    updateData: any
+    updateData: TaskUpdateData
   ): Promise<Task> {
-    const existingTask = await this.getTaskById(userId, taskId);
+    // Verify task exists
+    await this.getTaskById(userId, taskId);
 
-    let dueDateObj;
-    if (updateData.dueDate !== undefined) {
-      if (updateData.dueDate === null) {
-        dueDateObj = null;
-      } else {
-        try {
-          dueDateObj = new Date(updateData.dueDate);
-        } catch (error) {
-          throw new ApiError(httpStatus.BAD_REQUEST, "Invalid date format");
-        }
-      }
-    }
+    // Build update data
+    const data = tasksService._buildUpdateData(updateData);
 
-    const data: Partial<Task> = {};
+    console.log({ data });
 
-    if (updateData.title !== undefined) data.title = updateData.title;
-    if (updateData.completed !== undefined) data.completed = updateData.completed;
-    if (updateData.pinned !== undefined) {
-      data.pinned = updateData.pinned;
-      if (updateData.pinned) {
-        await db
-          .update(tasks)
-          .set({ pinned: false } as Task)
-          .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
-      }
-    }
-    if (updateData.category !== undefined) data.category = updateData.category;
-    if (updateData.dueDate !== undefined) data.dueDate = dueDateObj;
-    if (updateData.updatedAt !== undefined) data.updatedAt = updateData.updatedAt;
-
+    // Validate we have something to update
     if (Object.keys(data).length === 0) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "No valid update data provided");
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "No valid update data provided"
+      );
     }
 
+    // Handle pinned task logic
+    if (updateData.pinned !== undefined) {
+      await tasksService._handlePinnedTask(userId, updateData.pinned);
+    }
+
+    // Perform update
     const result = await db
       .update(tasks)
       .set(data)
@@ -203,7 +278,8 @@ export const tasksService = {
    * Delete a task
    */
   async deleteTask(userId: string, taskId: string): Promise<void> {
-    const existingTask = await this.getTaskById(userId, taskId);
+    // Verify task exists
+    await this.getTaskById(userId, taskId);
 
     await db
       .delete(tasks)

@@ -64,20 +64,31 @@ async function processSyncQueue() {
     try {
       switch (operation.type) {
         case "create":
-          const created = await taskApi.createTask({
-            title: operation.data.title,
-            category: operation.data.category,
-            completed: operation.data.completed || false,
-          });
-          await db.tasks.update(operation.entityId, { id: created.id });
+          {
+            const created = await taskApi.createTask({
+              title: operation.data.title,
+              category: operation.data.category,
+              completed: operation.data.completed || false,
+            });
+            await db.tasks.update(operation.entityId, { id: created.id });
+          }
           break;
 
         case "update":
-          await taskApi.updateTask(operation.entityId, operation.data);
+          {
+            const updated = await taskApi.updateTask(
+              operation.entityId,
+              operation.data
+            );
+            await db.tasks.update(operation.entityId, { id: updated.id });
+          }
           break;
 
         case "delete":
-          await taskApi.deleteTask(operation.entityId);
+          {
+            await taskApi.deleteTask(operation.entityId);
+            await db.tasks.delete(operation.entityId);
+          }
           break;
       }
 
