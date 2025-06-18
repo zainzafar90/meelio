@@ -12,6 +12,7 @@ import { SoundPlayer } from "../components/core/soundscapes/components/sound-pla
 import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
 import { TelemetryProvider } from "./telemetry-provider";
+import { CalendarProvider } from "./calendar-provider";
 
 type AppProviderProps = {
   children: React.ReactNode;
@@ -28,14 +29,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       >
         <AuthProvider>
           <TelemetryProvider>
-            <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
-              <TooltipProvider>
-                {children}
-                {hasPlayingSounds && <SoundPlayer />}
-                <Toaster richColors />
-                <ConnectionWarning />
-              </TooltipProvider>
-            </ThemeProvider>
+            <CalendarProvider>
+              <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
+                <TooltipProvider>
+                  {children}
+                  {hasPlayingSounds && <SoundPlayer />}
+                  <Toaster richColors />
+                  <ConnectionWarning />
+                </TooltipProvider>
+              </ThemeProvider>
+            </CalendarProvider>
           </TelemetryProvider>
         </AuthProvider>
       </BrowserRouter>
