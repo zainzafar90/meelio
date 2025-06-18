@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
-import { generateAuthUrl, storeToken } from "@/lib/google-calendar";
+import httpStatus from "http-status";
 import { logger } from "@/common/logger";
 import { config } from "@/config/config";
+import { IUser } from "@/types/interfaces/resources";
+import { catchAsync } from "@/utils/catch-async";
+import { calendarService } from "./calendar.service";
 
 interface AuthorizeRequest extends Request {
   user?: { id: string };
@@ -21,7 +24,7 @@ const authorize = async (req: AuthorizeRequest, res: Response) => {
       JSON.stringify({ userId, timestamp: Date.now() })
     ).toString("base64");
     
-    const authUrl = await generateAuthUrl(state);
+    const authUrl = await calendarService.generateAuthUrl(state);
     res.json({ authUrl });
   } catch (error) {
     logger.error("Calendar authorization error:", error);
@@ -44,7 +47,7 @@ const callback = async (req: Request, res: Response) => {
 
     const { userId } = JSON.parse(Buffer.from(state, "base64").toString());
     
-    await storeToken(userId, code);
+    await calendarService.storeToken(userId, code);
     
     res.redirect(`${config.clientUrl}?calendar=connected`);
   } catch (error) {
@@ -53,7 +56,63 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Get calendar token status for the authenticated user
+ */
+const getToken = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser;
+  const token = await calendarService.getToken(user.id);
+
+  if (!token) {
+    return res.status(httpStatus.OK).json({
+      hasToken: false,
+      accessToken: null,
+      expiresAt: null,
+    });
+  }
+
+  // Check if token is expired and refresh if needed
+  const validToken = await calendarService.getValidToken(user.id);
+
+  res.status(httpStatus.OK).json({
+    hasToken: true,
+    accessToken: validToken?.accessToken,
+    expiresAt: validToken?.expiresAt,
+  });
+});
+
+/**
+ * Save or update a calendar token for the authenticated user
+ */
+const saveToken = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser;
+  const { accessToken, refreshToken, expiresAt } = req.body as {
+    accessToken: string;
+    refreshToken: string;
+    expiresAt: Date;
+  };
+  const saved = await calendarService.saveToken(
+    user.id,
+    accessToken,
+    refreshToken,
+    expiresAt
+  );
+  res.status(httpStatus.OK).json(saved);
+});
+
+/**
+ * Delete the user's calendar token
+ */
+const deleteToken = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser;
+  await calendarService.deleteToken(user.id);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 export const calendarController = {
   authorize,
   callback,
+  getToken,
+  saveToken,
+  deleteToken,
 };

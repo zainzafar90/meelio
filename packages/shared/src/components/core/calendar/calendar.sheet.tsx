@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
 import { useCalendarTokenStore } from "../../../stores/calendar-token.store";
-import { getCalendarAuthUrl } from "../../../api/calendar.api";
+import { getCalendarAuthUrl, deleteCalendarToken } from "../../../api/calendar.api";
 
 /**
  * Connect Google Calendar and persist token
@@ -46,9 +46,14 @@ export const CalendarSheet = () => {
     }
   };
 
-  const handleDisconnect = () => {
-    clearToken();
-    setCalendarVisible(false);
+  const handleDisconnect = async () => {
+    try {
+      await deleteCalendarToken();
+      clearToken();
+      setCalendarVisible(false);
+    } catch (error) {
+      console.error("Failed to disconnect calendar:", error);
+    }
   };
 
   return (
