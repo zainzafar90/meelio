@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
-import { useCalendarTokenStore } from "../../../stores/calendar-token.store";
+import { useCalendarStore } from "../../../stores/calendar.store";
 
 interface CalendarBadgeProps {
   className?: string;
@@ -11,7 +11,7 @@ interface CalendarBadgeProps {
  * Display minutes until next calendar event as a badge
  */
 export const CalendarBadge = ({ className = "" }: CalendarBadgeProps) => {
-  const { getMinutesUntilNextEvent, nextEvent } = useCalendarTokenStore(
+  const { getMinutesUntilNextEvent, nextEvent } = useCalendarStore(
     useShallow((state) => ({
       getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
       nextEvent: state.nextEvent,

@@ -1,16 +1,15 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-
 import { CalendarEvent } from "../api/google-calendar.api";
 
-export interface CalendarTokenState {
+export interface CalendarState {
   token: string | null;
   expiresAt: number | null;
   events: CalendarEvent[];
   eventsLastFetched: number | null;
   nextEvent: CalendarEvent | null;
   setToken: (token: string, expiresAt: number) => void;
-  clearToken: () => void;
+  clearCalendar: () => void;
   refreshToken: (
     fetchNewToken: () => Promise<{ token: string; expiresIn: number }>,
   ) => Promise<void>;
@@ -22,9 +21,9 @@ export interface CalendarTokenState {
 }
 
 /**
- * Store for Google Calendar token and events
+ * Store for Google Calendar data and authentication
  */
-export const useCalendarTokenStore = create<CalendarTokenState>()(
+export const useCalendarStore = create<CalendarState>()(
   persist(
     (set, get) => ({
       token: null,
@@ -35,7 +34,7 @@ export const useCalendarTokenStore = create<CalendarTokenState>()(
       setToken: (token, expiresAt) => {
         set({ token, expiresAt });
       },
-      clearToken: () => {
+      clearCalendar: () => {
         set({ 
           token: null, 
           expiresAt: null, 
@@ -52,33 +51,31 @@ export const useCalendarTokenStore = create<CalendarTokenState>()(
         }
       },
       loadEvents: async (fetchEvents) => {
-        const { token, eventsLastFetched } = get();
+        const { token } = get();
         if (!token) return;
-        
-        // Check if events were fetched in the last hour (for caching)
-        const oneHourAgo = Date.now() - 3600000;
-        if (eventsLastFetched && eventsLastFetched > oneHourAgo) {
-          return; // Use cached events
+
+        try {
+          const events = await fetchEvents(token);
+          const now = new Date();
+          
+          // Find next upcoming event
+          const futureEvents = events.filter(event => {
+            const eventStart = new Date(event.start.dateTime || event.start.date || '');
+            return eventStart > now;
+          }).sort((a, b) => {
+            const aStart = new Date(a.start.dateTime || a.start.date || '');
+            const bStart = new Date(b.start.dateTime || b.start.date || '');
+            return aStart.getTime() - bStart.getTime();
+          });
+
+          set({ 
+            events, 
+            eventsLastFetched: Date.now(),
+            nextEvent: futureEvents[0] || null 
+          });
+        } catch (error) {
+          console.error('Failed to load events in store:', error);
         }
-
-        const events = await fetchEvents(token);
-        const now = new Date();
-        
-        // Find next upcoming event
-        const futureEvents = events.filter(event => {
-          const eventStart = new Date(event.start.dateTime || event.start.date || '');
-          return eventStart > now;
-        }).sort((a, b) => {
-          const aStart = new Date(a.start.dateTime || a.start.date || '');
-          const bStart = new Date(b.start.dateTime || b.start.date || '');
-          return aStart.getTime() - bStart.getTime();
-        });
-
-        set({ 
-          events, 
-          eventsLastFetched: Date.now(),
-          nextEvent: futureEvents[0] || null 
-        });
       },
       getNextEvent: () => {
         return get().nextEvent;
@@ -96,7 +93,7 @@ export const useCalendarTokenStore = create<CalendarTokenState>()(
       },
     }),
     {
-      name: "meelio:local:calendar-token",
+      name: "meelio:local:calendar",
       storage: createJSONStorage(() => localStorage),
     },
   ),

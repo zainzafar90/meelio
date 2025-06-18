@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
-import { useCalendarTokenStore } from "../../../stores/calendar-token.store";
+import { useCalendarStore } from "../../../stores/calendar.store";
 import { getCalendarAuthUrl, deleteCalendarToken } from "../../../api/calendar.api";
 
 /**
@@ -23,11 +23,11 @@ export const CalendarSheet = () => {
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
-  const { token, nextEvent, clearToken } = useCalendarTokenStore(
+  const { token, nextEvent, clearCalendar } = useCalendarStore(
     useShallow((state) => ({
       token: state.token,
       nextEvent: state.nextEvent,
-      clearToken: state.clearToken,
+      clearCalendar: state.clearCalendar,
     }))
   );
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export const CalendarSheet = () => {
   const handleDisconnect = async () => {
     try {
       await deleteCalendarToken();
-      clearToken();
+      clearCalendar();
       setCalendarVisible(false);
     } catch (error) {
       console.error("Failed to disconnect calendar:", error);

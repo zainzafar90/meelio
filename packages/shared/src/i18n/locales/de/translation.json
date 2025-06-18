@@ -452,7 +452,10 @@
   "calendar": {
     "sheet": {
       "title": "Google Kalender",
-      "connect": "Verbinden"
+      "connect": "Verbinden",
+      "connected": "Kalender erfolgreich verbunden",
+      "disconnect": "Verbindung trennen",
+      "nextEvent": "Nächster Termin"
     }
   },
   "auth": {
