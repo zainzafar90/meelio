@@ -111,6 +111,7 @@ html {
 
   body {
     @apply bg-background text-foreground;
+    background-color: #111;
   }
 }
 @layer utilities {

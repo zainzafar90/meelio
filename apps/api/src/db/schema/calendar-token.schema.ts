@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, index } from "drizzle-orm/pg-core";
+import { pgTable, text, index, timestamp } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
@@ -8,8 +8,10 @@ export const calendarTokens = pgTable(
   "calendar_tokens",
   {
     id,
-    userId: text("user_id").notNull(),
-    token: text("token").notNull(),
+    userId: text("user_id").notNull().unique(),
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
     createdAt,
     updatedAt,
   },

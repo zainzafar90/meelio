@@ -6,6 +6,7 @@ import * as taskApi from "./task.api";
 import * as settingsApi from "./settings.api";
 import * as calendarTokenApi from "./calendar-tokens.api";
 import * as googleCalendarApi from "./google-calendar.api";
+import * as calendarApi from "./calendar.api";
 
 const api = {
   auth: authApi,
@@ -16,6 +17,7 @@ const api = {
   settings: settingsApi,
   calendarTokens: calendarTokenApi,
   googleCalendar: googleCalendarApi,
+  calendar: calendarApi,
 };
 
 export { api };

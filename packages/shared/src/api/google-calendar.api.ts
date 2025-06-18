@@ -31,15 +31,26 @@ export const fetchCalendarEvents = async (
   token: string,
   fetchFn: typeof fetch = fetch,
 ): Promise<CalendarEvent[]> => {
+  const timeMin = new Date().toISOString();
+  const timeMax = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ahead
+  
+  const params = new URLSearchParams({
+    timeMin,
+    timeMax,
+    singleEvents: 'true',
+    orderBy: 'startTime',
+    maxResults: '300'
+  });
+
   const res = await fetchFn(
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
   );
   if (!res.ok) throw new CalendarEventError("Failed to fetch events");
   const data = (await res.json()) as { items: CalendarEvent[] };
-  return data.items;
+  return data.items || [];
 };
 
 /**

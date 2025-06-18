@@ -15,6 +15,7 @@ import noteRoute from "./note.routes";
 import focusSessionRoute from "./focus-session.routes";
 import settingsRoute from "./settings.routes";
 import calendarTokenRoute from "./calendar-token.routes";
+import calendarRoute from "./calendar.routes";
 
 const router: express.Router = express.Router();
 
@@ -67,6 +68,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/calendar-tokens",
     route: calendarTokenRoute,
+  },
+  {
+    path: "/calendar",
+    route: calendarRoute,
   },
   {
     path: "/settings",

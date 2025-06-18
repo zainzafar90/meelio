@@ -8,12 +8,9 @@ import {
 } from "@repo/ui/components/ui/sheet";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
-
-import { requestCalendarToken } from "../../api/google-calendar.api";
-import { saveCalendarToken } from "../../api/calendar-tokens.api";
-import { useDockStore } from "../../stores/dock.store";
-import { useCalendarTokenStore } from "../../stores/calendar-token.store";
-import { env } from "../../utils/env.wrapper";
+import { useDockStore } from "../../../stores/dock.store";
+import { useCalendarTokenStore } from "../../../stores/calendar-token.store";
+import { getCalendarAuthUrl } from "../../../api/calendar.api";
 
 /**
  * Connect Google Calendar and persist token
@@ -24,25 +21,34 @@ export const CalendarSheet = () => {
     useShallow((state) => ({
       isCalendarVisible: state.isCalendarVisible,
       setCalendarVisible: state.setCalendarVisible,
-    })),
+    }))
   );
-  const { setToken } = useCalendarTokenStore((state) => ({
-    setToken: state.setToken,
-  }));
+  const { token, nextEvent, clearToken } = useCalendarTokenStore(
+    useShallow((state) => ({
+      token: state.token,
+      nextEvent: state.nextEvent,
+      clearToken: state.clearToken,
+    }))
+  );
   const [loading, setLoading] = useState(false);
+
+  const isConnected = !!token;
 
   const handleConnect = async () => {
     setLoading(true);
     try {
-      const { token, expiresIn } = await requestCalendarToken(
-        env.googleClientId,
-      );
-      await saveCalendarToken(token);
-      setToken(token, Date.now() + expiresIn * 1000);
-      setCalendarVisible(false);
+      const response = await getCalendarAuthUrl();
+      window.location.href = response.data.authUrl;
+    } catch (error) {
+      console.error("Calendar authorization failed:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    clearToken();
+    setCalendarVisible(false);
   };
 
   return (
@@ -54,9 +60,26 @@ export const CalendarSheet = () => {
         <SheetHeader>
           <SheetTitle>{t("calendar.sheet.title")}</SheetTitle>
         </SheetHeader>
-        <Button onClick={handleConnect} disabled={loading}>
-          {loading ? t("common.loading") : t("calendar.sheet.connect")}
-        </Button>
+        
+        {isConnected ? (
+          <div className="flex flex-col gap-4">
+            <div className="text-sm text-green-600">
+              ✓ {t("calendar.sheet.connected")}
+            </div>
+            {nextEvent && (
+              <div className="text-sm text-gray-600">
+                <strong>{t("calendar.sheet.nextEvent")}:</strong> {nextEvent.summary}
+              </div>
+            )}
+            <Button onClick={handleDisconnect} variant="outline">
+              {t("calendar.sheet.disconnect")}
+            </Button>
+          </div>
+        ) : (
+          <Button onClick={handleConnect} disabled={loading}>
+            {loading ? t("common.loading") : t("calendar.sheet.connect")}
+          </Button>
+        )}
       </SheetContent>
     </Sheet>
   );

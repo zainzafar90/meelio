@@ -11,6 +11,7 @@ const router = express.Router();
 
 router
   .route("/")
+  .get(auth(), calendarTokenController.getToken)
   .post(
     auth(),
     validate(calendarTokenValidation.saveToken),

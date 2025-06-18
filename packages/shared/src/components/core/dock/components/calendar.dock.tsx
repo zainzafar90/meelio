@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { cn } from "@repo/ui/lib/utils";
 import { useTranslation } from "react-i18next";
+import { CalendarBadge } from "../../calendar/calendar-badge";
 
 export const CalendarDock = () => {
   const { t } = useTranslation();
@@ -20,20 +21,23 @@ export const CalendarDock = () => {
   const day = date.getDate();
 
   return (
-    <div
-      className={cn(
-        "flex size-10 items-center justify-center rounded-xl shadow-lg",
-        "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
-        "flex-col overflow-hidden"
-      )}
-      title={`${month} ${day}`}
-    >
-      <div className="w-full bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
-        {month}
+    <div className="relative">
+      <div
+        className={cn(
+          "flex size-10 items-center justify-center rounded-xl shadow-lg",
+          "cursor-pointer bg-gradient-to-b from-zinc-800 to-zinc-900",
+          "flex-col overflow-hidden"
+        )}
+        title={`${month} ${day}`}
+      >
+        <div className="w-full bg-red-600 pt-0.5 text-center text-xxs font-bold uppercase text-white">
+          {month}
+        </div>
+        <div className="flex flex-grow items-center justify-center">
+          <span className="text-base font-light text-white">{day}</span>
+        </div>
       </div>
-      <div className="flex flex-grow items-center justify-center">
-        <span className="text-base font-light text-white">{day}</span>
-      </div>
+      <CalendarBadge className="absolute -top-2 -right-2" />
     </div>
   );
 };
