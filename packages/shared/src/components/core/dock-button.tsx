@@ -46,7 +46,7 @@ export const DockButton = ({
     }))
   );
 
-  const isActive =
+  const derivedActive =
     (item.id === "timer" && isTimerVisible) ||
     (item.id === "soundscapes" && isSoundscapesVisible) ||
     (item.id === "breathepod" && isBreathingVisible) ||
@@ -54,6 +54,7 @@ export const DockButton = ({
     (item.id === "site-blocker" && isSiteBlockerVisible) ||
     (item.id === "background" && isBackgroundsVisible) ||
     (item.id === "tab-stash" && isTabStashVisible);
+  const isActive = item.isActive ?? derivedActive;
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 

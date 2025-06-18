@@ -449,6 +449,12 @@
     "permissions-needed": "Zusätzliche Berechtigungen erforderlich",
     "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden"
   },
+  "calendar": {
+    "sheet": {
+      "title": "Google Kalender",
+      "connect": "Verbinden"
+    }
+  },
   "auth": {
     "verify": {
       "verifying": "Dein Konto wird verifiziert...",

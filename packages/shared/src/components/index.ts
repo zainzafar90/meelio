@@ -39,6 +39,7 @@ export * from "./core/dock/components/clock.dock";
 export * from "./core/dock/components/language-switcher.dock";
 export * from "./core/dock/components/settings.dock";
 export * from "./core/dock/components/weather.dock";
+export * from "./core/calendar/calendar.sheet";
 
 // Greeting
 export * from "./core/greetings/greetings-mantras";

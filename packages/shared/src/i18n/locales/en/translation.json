@@ -449,6 +449,12 @@
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"
   },
+  "calendar": {
+    "sheet": {
+      "title": "Google Calendar",
+      "connect": "Connect"
+    }
+  },
   "auth": {
     "verify": {
       "verifying": "Verifying your account...",

@@ -7,8 +7,9 @@ import {
   AppProvider, 
   AuthContainer, 
   Clock, 
-  TabStashSheet, 
-  useAuthStore, 
+  TabStashSheet,
+  CalendarSheet,
+  useAuthStore,
   useDockStore,
   TaskListSheet,
   Background,
@@ -81,6 +82,7 @@ const Content = () => {
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <CalendarSheet />
     </main>
   );
 };

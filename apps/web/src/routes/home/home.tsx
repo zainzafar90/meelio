@@ -2,7 +2,13 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-import { Clock, TabStashSheet, useDockStore, useAuthStore } from "@repo/shared";
+import {
+  Clock,
+  TabStashSheet,
+  CalendarSheet,
+  useDockStore,
+  useAuthStore,
+} from "@repo/shared";
 import { Background } from "@repo/shared";
 import { BackgroundOverlay } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -130,6 +136,7 @@ const Content = () => {
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <CalendarSheet />
     </main>
   );
 };

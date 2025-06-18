@@ -5,6 +5,7 @@ import * as focusSessionsApi from "./focus-sessions.api";
 import * as taskApi from "./task.api";
 import * as settingsApi from "./settings.api";
 import * as calendarTokenApi from "./calendar-tokens.api";
+import * as googleCalendarApi from "./google-calendar.api";
 
 const api = {
   auth: authApi,
@@ -14,6 +15,7 @@ const api = {
   tasks: taskApi,
   settings: settingsApi,
   calendarTokens: calendarTokenApi,
+  googleCalendar: googleCalendarApi,
 };
 
 export { api };
