@@ -45,7 +45,7 @@
   apps/api/src/
   ├── config/config.ts                           #
   Google OAuth credentials
-  ├── db/schema/calendar-token.schema.ts          #
+  ├── db/schema/calendar.schema.ts                #
   Database schema for tokens
   ├── lib/google-calendar.ts                     #
   Google API integration
@@ -76,11 +76,11 @@
   ├── components/core/dock/components/
   │   └── calendar.dock.tsx                     #
   Calendar icon with badge
-  ├── providers/
-  │   └── calendar-provider.tsx                 # OAuth
-  callback handler
+  ├── hooks/
+  │   └── use-calendar-initialization.ts        # OAuth
+  initialization hook
   └── stores/
-      └── calendar-token.store.ts                # Token
+      └── calendar.store.ts                     # Token
    & events state management
 
   Key Configuration:

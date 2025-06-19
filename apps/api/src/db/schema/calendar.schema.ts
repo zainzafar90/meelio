@@ -4,8 +4,8 @@ import { pgTable, text, index, timestamp } from "drizzle-orm/pg-core";
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
 
-export const calendarTokens = pgTable(
-  "calendar_tokens",
+export const calendar = pgTable(
+  "calendar",
   {
     id,
     userId: text("user_id").notNull().unique(),
@@ -16,16 +16,16 @@ export const calendarTokens = pgTable(
     updatedAt,
   },
   (table) => ({
-    userIdx: index("idx_calendar_tokens_user_id").on(table.userId),
-  }),
+    userIdx: index("idx_calendar_user_id").on(table.userId),
+  })
 );
 
-export type CalendarToken = typeof calendarTokens.$inferSelect;
-export type CalendarTokenInsert = typeof calendarTokens.$inferInsert;
+export type Calendar = typeof calendar.$inferSelect;
+export type CalendarInsert = typeof calendar.$inferInsert;
 
-export const calendarTokensRelations = relations(calendarTokens, ({ one }) => ({
+export const calendarRelations = relations(calendar, ({ one }) => ({
   user: one(users, {
-    fields: [calendarTokens.userId],
+    fields: [calendar.userId],
     references: [users.id],
   }),
 }));

@@ -43,9 +43,29 @@ export const CalendarBadge = ({ className = "" }: CalendarBadgeProps) => {
     if (minutes < 60) {
       return `${minutes}m`;
     }
+
     const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+    if (hours < 24) {
+      return `${hours}h`;
+    }
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) {
+      return `${days}d`;
+    }
+
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) {
+      return `${weeks}w`;
+    }
+
+    const months = Math.floor(weeks / 4);
+    if (months < 12) {
+      return `${months}mo`;
+    }
+
+    const years = Math.floor(months / 12);
+    return `${years}y`;
   };
 
   return (

@@ -51,8 +51,18 @@ export const useCalendarStore = create<CalendarState>()(
         }
       },
       loadEvents: async (fetchEvents) => {
-        const { token } = get();
-        if (!token) return;
+        const { token, expiresAt } = get();
+        if (!token) {
+          console.error('No token available to load events');
+          return;
+        }
+
+        // Check if token is expired
+        if (expiresAt && Date.now() >= expiresAt) {
+          console.error('Token is expired, clearing calendar');
+          get().clearCalendar();
+          return;
+        }
 
         try {
           const events = await fetchEvents(token);
@@ -73,8 +83,13 @@ export const useCalendarStore = create<CalendarState>()(
             eventsLastFetched: Date.now(),
             nextEvent: futureEvents[0] || null 
           });
-        } catch (error) {
-          console.error('Failed to load events in store:', error);
+        } catch (error: any) {
+          console.error('Failed to load events:', error);
+          // If it's a 401, the token is invalid
+          if (error.message?.includes('401') || error.message?.includes('Failed to fetch events')) {
+            console.error('Token appears to be invalid, clearing calendar');
+            get().clearCalendar();
+          }
         }
       },
       getNextEvent: () => {

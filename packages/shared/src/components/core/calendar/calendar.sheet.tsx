@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Sheet,
@@ -10,7 +10,11 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
 import { useCalendarStore } from "../../../stores/calendar.store";
-import { getCalendarAuthUrl, deleteCalendarToken } from "../../../api/calendar.api";
+import {
+  getCalendarAuthUrl,
+  deleteCalendarToken,
+} from "../../../api/calendar.api";
+import { getCalendarToken } from "../../../api/calendar.api";
 
 /**
  * Connect Google Calendar and persist token
@@ -23,16 +27,37 @@ export const CalendarSheet = () => {
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
-  const { token, nextEvent, clearCalendar } = useCalendarStore(
+  const { token, nextEvent, clearCalendar, setToken } = useCalendarStore(
     useShallow((state) => ({
       token: state.token,
       nextEvent: state.nextEvent,
       clearCalendar: state.clearCalendar,
+      setToken: state.setToken,
     }))
   );
   const [loading, setLoading] = useState(false);
 
   const isConnected = !!token;
+
+  // Re-check token status when sheet opens
+  useEffect(() => {
+    if (isCalendarVisible && token) {
+      getCalendarToken()
+        .then((response) => {
+          if (response.data.accessToken) {
+            const expiresAt = response.data.expiresAt
+              ? new Date(response.data.expiresAt).getTime()
+              : Date.now() + 3600 * 1000; // 1 hour
+            setToken(response.data.accessToken, expiresAt);
+          } else {
+            clearCalendar();
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to refresh token status:", error);
+        });
+    }
+  }, [isCalendarVisible]);
 
   const handleConnect = async () => {
     setLoading(true);
@@ -65,7 +90,7 @@ export const CalendarSheet = () => {
         <SheetHeader>
           <SheetTitle>{t("calendar.sheet.title")}</SheetTitle>
         </SheetHeader>
-        
+
         {isConnected ? (
           <div className="flex flex-col gap-4">
             <div className="text-sm text-green-600">
@@ -73,7 +98,8 @@ export const CalendarSheet = () => {
             </div>
             {nextEvent && (
               <div className="text-sm text-gray-600">
-                <strong>{t("calendar.sheet.nextEvent")}:</strong> {nextEvent.summary}
+                <strong>{t("calendar.sheet.nextEvent")}:</strong>{" "}
+                {nextEvent.summary}
               </div>
             )}
             <Button onClick={handleDisconnect} variant="outline">
