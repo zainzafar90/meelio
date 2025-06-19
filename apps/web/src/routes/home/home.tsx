@@ -11,7 +11,6 @@ import {
   useAuthStore,
 } from "@repo/shared";
 import { Background } from "@repo/shared";
-import { BackgroundOverlay } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
 import { BreathePod } from "@repo/shared";
 import { Greeting } from "@repo/shared";
@@ -72,17 +71,11 @@ const Home = () => {
     verifyToken();
   }, [searchParams, authenticate]);
 
-  const renderBackground = () => (
-    <>
-      <Background />
-      <BackgroundOverlay />
-    </>
-  );
-
   if (loading || isVerifying) {
     return (
       <>
-        {renderBackground()}
+        <Background />
+
         <PageSkeleton>
           <h3 className="text-foreground font-medium">
             {isVerifying ? t("auth.verify.verifying") : t("common.loading")}
@@ -95,7 +88,7 @@ const Home = () => {
   if (!user && !guestUser) {
     return (
       <>
-        {renderBackground()}
+        <Background />
         <AuthContainer />
       </>
     );
@@ -103,7 +96,7 @@ const Home = () => {
 
   return (
     <>
-      {renderBackground()}
+      <Background />
       <AppLayout>
         <TopBar />
         <Content />

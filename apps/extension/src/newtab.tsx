@@ -13,7 +13,6 @@ import {
   useDockStore,
   TaskListSheet,
   Background,
-  BackgroundOverlay,
   BackgroundSelectorSheet,
   BreathePod,
   Greeting,
@@ -35,17 +34,11 @@ const Home = () => {
     guestUser: state.guestUser,
   })));
 
-  const renderBackground = () => (
-    <>
-      <Background />
-      <BackgroundOverlay />
-    </>
-  );
 
   if (!user && !guestUser) {
     return (
       <>
-        {renderBackground()}
+        <Background />
         <AuthContainer />
       </>
     );
@@ -53,7 +46,7 @@ const Home = () => {
 
   return (
     <>
-      {renderBackground()}
+      <Background />
       <AppLayout>
         <TopBar />
         <Content />
