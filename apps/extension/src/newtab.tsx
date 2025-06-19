@@ -24,6 +24,7 @@ import {
   SiteBlockerSheet,
   SimpleTimer
  } from "@repo/shared";
+ import {CalendarDynamicIsland} from "@repo/shared";
 import { useAppStore } from "@repo/shared";
 
 import "./style.css";
@@ -126,7 +127,9 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   return (
-    <div className="relative" />
+    <div className="relative flex justify-center pt-0">
+      <CalendarDynamicIsland />
+    </div>
   );
 };
 

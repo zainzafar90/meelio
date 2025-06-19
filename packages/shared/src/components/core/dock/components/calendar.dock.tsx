@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { cn } from "@repo/ui/lib/utils";
 import { useTranslation } from "react-i18next";
-import { CalendarBadge } from "../../calendar/calendar-badge";
 
 export const CalendarDock = () => {
   const { t } = useTranslation();
@@ -37,7 +36,6 @@ export const CalendarDock = () => {
           <span className="text-base font-light text-white">{day}</span>
         </div>
       </div>
-      <CalendarBadge className="absolute -top-2 -right-2" />
     </div>
   );
 };

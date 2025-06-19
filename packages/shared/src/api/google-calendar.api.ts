@@ -8,6 +8,7 @@ export interface CalendarEvent {
   summary?: string;
   start: CalendarEventTime;
   end: CalendarEventTime;
+  colorId?: string;
 }
 
 export class CalendarEventError extends Error {
@@ -39,7 +40,7 @@ export const fetchCalendarEvents = async (
     timeMax,
     singleEvents: "true",
     orderBy: "startTime",
-    maxResults: "300",
+    maxResults: "100",
   });
 
   const res = await fetchFn(

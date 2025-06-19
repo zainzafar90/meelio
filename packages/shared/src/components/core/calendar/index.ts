@@ -1,2 +1,2 @@
 export { CalendarSheet } from "./calendar.sheet";
-export { CalendarBadge } from "./calendar-badge";
+export { CalendarDynamicIsland } from "./calendar-dynamic-island";

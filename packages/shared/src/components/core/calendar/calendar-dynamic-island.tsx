@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
 import { useCalendarStore } from "../../../stores/calendar.store";
-
-interface CalendarBadgeProps {
-  className?: string;
-}
+import { getCalendarColor } from "../../../utils/calendar-colors";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "../../../lib/utils";
 
 /**
- * Display minutes until next calendar event as a badge
+ * Dynamic island component displaying upcoming calendar events
  */
-export const CalendarBadge = ({ className = "" }: CalendarBadgeProps) => {
+export const CalendarDynamicIsland = () => {
   const { getMinutesUntilNextEvent, nextEvent } = useCalendarStore(
     useShallow((state) => ({
       getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
@@ -26,10 +25,7 @@ export const CalendarBadge = ({ className = "" }: CalendarBadgeProps) => {
       setMinutesLeft(minutes);
     };
 
-    // Update immediately
     updateMinutes();
-
-    // Update every minute
     const interval = setInterval(updateMinutes, 60000);
 
     return () => clearInterval(interval);
@@ -68,12 +64,39 @@ export const CalendarBadge = ({ className = "" }: CalendarBadgeProps) => {
     return `${years}y`;
   };
 
+  const eventColor = getCalendarColor(nextEvent.colorId);
+
   return (
     <div
-      className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-medium text-white bg-blue-500 rounded-full ${className}`}
+      className="flex items-center w-full max-w-48 px-3 bg-black/60 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all"
       title={`Next event: ${nextEvent.summary} in ${formatTime(minutesLeft)}`}
     >
-      {formatTime(minutesLeft)}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`${nextEvent.summary}-${minutesLeft}-${eventColor}-${nextEvent.id}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex justify-between w-full mt-4"
+        >
+          <div className="flex items-center gap-2 ">
+            <div
+              className={cn(
+                "size-2.5 rounded-full",
+                minutesLeft < 10 && "animate-pulse"
+              )}
+              style={{ backgroundColor: eventColor }}
+              aria-hidden="true"
+            />
+            <span className="truncate max-w-32 text-xs">
+              {nextEvent.summary || "Event"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 ml-auto pl-3 text-xs opacity-80">
+            {formatTime(minutesLeft)}
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
