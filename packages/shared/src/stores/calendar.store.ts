@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { CalendarEvent } from "../api/google-calendar.api";
 import { getCalendarToken } from "../api/calendar.api";
+import { useAuthStore } from "../stores/auth.store";
 
 export interface CalendarState {
   token: string | null;
@@ -45,6 +46,9 @@ export const useCalendarStore = create<CalendarState>()(
         });
       },
       refreshToken: async (fetchNewToken) => {
+        const { user } = useAuthStore.getState();
+        if (!user) return;
+
         const { token, expiresAt } = get();
         if (!token || !expiresAt || Date.now() >= expiresAt) {
           const data = await fetchNewToken();
@@ -55,7 +59,11 @@ export const useCalendarStore = create<CalendarState>()(
         }
       },
       loadEvents: async (fetchEvents) => {
+        const { user } = useAuthStore.getState();
+        if (!user) return;
+
         const { token, expiresAt } = get();
+
         if (!token) {
           console.error("No token available to load events");
           return;

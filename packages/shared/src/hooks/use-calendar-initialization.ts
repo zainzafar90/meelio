@@ -3,13 +3,16 @@ import { fetchCalendarEvents } from "../api/google-calendar.api";
 import { getCalendarToken } from "../api/calendar.api";
 import { useCalendarStore } from "../stores";
 import { useDockStore } from "../stores/dock.store";
+import { useAuthStore } from "../stores/auth.store";
 
 /**
  * Hook to initialize calendar tokens and handle OAuth callbacks
+ * Only runs for authenticated users (not guest users)
  */
 export const useCalendarInitialization = () => {
   const { token, setToken, loadEvents } = useCalendarStore();
   const { setCalendarVisible } = useDockStore();
+  const { user } = useAuthStore();
 
   const initializeToken = async () => {
     try {
@@ -45,10 +48,10 @@ export const useCalendarInitialization = () => {
 
   useEffect(() => {
     handleOAuthCallback();
-    if (!token) {
+    if (!token && user) {
       initializeToken();
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (token) {
