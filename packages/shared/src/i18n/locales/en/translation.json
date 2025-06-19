@@ -451,11 +451,13 @@
   },
   "calendar": {
     "sheet": {
-      "title": "Google Calendar",
+      "title": "Calendar",
       "connect": "Connect",
-      "connected": "Calendar connected successfully",
+      "connected": "Google Calendar enabled",
       "disconnect": "Disconnect",
-      "nextEvent": "Next event"
+      "nextEvent": "Next event",
+      "joinMeeting": "Join Meeting",
+      "meetingLinkCopied": "Meeting link copied"
     }
   },
   "auth": {

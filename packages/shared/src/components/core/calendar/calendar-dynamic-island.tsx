@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
 import { useCalendarStore } from "../../../stores/calendar.store";
+import { useDockStore } from "../../../stores/dock.store";
 import { getCalendarColor } from "../../../utils/calendar-colors";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
@@ -14,6 +15,12 @@ export const CalendarDynamicIsland = () => {
     useShallow((state) => ({
       getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
       nextEvent: state.nextEvent,
+    }))
+  );
+  
+  const { setCalendarVisible } = useDockStore(
+    useShallow((state) => ({
+      setCalendarVisible: state.setCalendarVisible,
     }))
   );
 
@@ -36,6 +43,10 @@ export const CalendarDynamicIsland = () => {
   }
 
   const formatTime = (minutes: number): string => {
+    if (minutes <= 0) {
+      return "Now";
+    }
+
     if (minutes < 60) {
       return `${minutes}m`;
     }
@@ -66,10 +77,15 @@ export const CalendarDynamicIsland = () => {
 
   const eventColor = getCalendarColor(nextEvent.colorId);
 
+  const handleClick = () => {
+    setCalendarVisible(true);
+  };
+
   return (
     <div
-      className="flex items-center w-full max-w-48 px-3 bg-black/60 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all"
+      className="flex items-center w-full max-w-48 px-3 bg-black/60 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/70"
       title={`Next event: ${nextEvent.summary} in ${formatTime(minutesLeft)}`}
+      onClick={handleClick}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div

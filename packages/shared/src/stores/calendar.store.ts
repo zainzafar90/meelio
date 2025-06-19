@@ -22,7 +22,7 @@ export interface CalendarState {
 }
 
 /**
- * Store for Google Calendar data and authentication
+ * Store for Calendar data and authentication
  */
 export const useCalendarStore = create<CalendarState>()(
   persist(

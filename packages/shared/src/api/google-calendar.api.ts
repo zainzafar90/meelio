@@ -1,6 +1,27 @@
 export interface CalendarEventTime {
   dateTime?: string;
   date?: string;
+  timeZone?: string;
+}
+
+export interface ConferenceEntryPoint {
+  entryPointType: string;
+  uri: string;
+  label: string;
+}
+
+export interface ConferenceSolution {
+  key: {
+    type: string;
+  };
+  name: string;
+  iconUri: string;
+}
+
+export interface ConferenceData {
+  entryPoints: ConferenceEntryPoint[];
+  conferenceSolution: ConferenceSolution;
+  conferenceId: string;
 }
 
 export interface CalendarEvent {
@@ -9,6 +30,12 @@ export interface CalendarEvent {
   start: CalendarEventTime;
   end: CalendarEventTime;
   colorId?: string;
+  hangoutLink?: string;
+  conferenceData?: ConferenceData;
+  htmlLink?: string;
+  status?: string;
+  created?: string;
+  updated?: string;
 }
 
 export class CalendarEventError extends Error {

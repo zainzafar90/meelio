@@ -240,7 +240,6 @@ export const useDockStore = create<DockState>()(
         dockIconsVisible: state.dockIconsVisible,
         currentOnboardingStep: state.currentOnboardingStep,
         showIconLabels: state.showIconLabels,
-        isCalendarVisible: state.isCalendarVisible,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
