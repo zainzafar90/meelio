@@ -31,7 +31,7 @@ export const CalendarDynamicIsland = () => {
     return () => clearInterval(interval);
   }, [getMinutesUntilNextEvent, nextEvent]);
 
-  if (!nextEvent || minutesLeft === null || minutesLeft <= 0) {
+  if (!nextEvent || minutesLeft === null) {
     return null;
   }
 
@@ -73,7 +73,7 @@ export const CalendarDynamicIsland = () => {
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={`${nextEvent.summary}-${minutesLeft}-${eventColor}-${nextEvent.id}`}
+          key={`${nextEvent.summary}-${eventColor}-${nextEvent.id}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
