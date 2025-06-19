@@ -21,6 +21,7 @@ import { getCalendarToken } from "../../../api/calendar.api";
  */
 export const CalendarSheet = () => {
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
   const { isCalendarVisible, setCalendarVisible } = useDockStore(
     useShallow((state) => ({
       isCalendarVisible: state.isCalendarVisible,
@@ -35,11 +36,10 @@ export const CalendarSheet = () => {
       setToken: state.setToken,
     }))
   );
-  const [loading, setLoading] = useState(false);
 
   const isConnected = !!token;
 
-  // Re-check token status when sheet opens
+  // // Re-check token status when sheet opens
   useEffect(() => {
     if (isCalendarVisible && token) {
       getCalendarToken()
