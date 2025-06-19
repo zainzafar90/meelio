@@ -54,20 +54,9 @@
   Module exports
   │   └── calendar.controller.ts                # OAuth
   flow handlers
-  ├── modules/calendar-token/
-  │   ├── index.ts                               #
-  Module exports
-  │   ├── calendar-token.controller.ts           # Token
-   CRUD operations
-  │   ├── calendar-token.service.ts              # Token
-   business logic
-  │   └── calendar-token.validation.ts           #
-  Request validation
   └── routes/v1/
-      ├── calendar.routes.ts                     # OAuth
-   routes (/auth, /callback)
-      └── calendar-token.routes.ts               # Token
-   management routes
+      └── calendar.routes.ts                     # OAuth and token
+        routes (/auth, /callback, /tokens)
 
   Frontend Files:
 
