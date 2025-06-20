@@ -42,7 +42,6 @@ export const calendarService = {
 
     if (!record) return null;
 
-    // Check if token is expired
     if (record.expiresAt > new Date()) {
       return record;
     }

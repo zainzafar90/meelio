@@ -1,8 +1,13 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { CalendarEvent } from "../api/google-calendar.api";
-import { getCalendarToken } from "../api/calendar.api";
+import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
+import {
+  getCalendarToken,
+  fetchCalendarAccessToken,
+} from "../api/calendar.api";
 import { useAuthStore } from "../stores/auth.store";
+
+export const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
 export interface CalendarState {
   token: string | null;
@@ -12,19 +17,26 @@ export interface CalendarState {
   nextEvent: CalendarEvent | null;
   setToken: (token: string, expiresAt: number) => void;
   clearCalendar: () => void;
-  refreshToken: (
-    fetchNewToken: () => Promise<{ token: string; expiresIn: number }>
-  ) => Promise<void>;
-  loadEvents: (
-    fetchEvents: (token: string) => Promise<CalendarEvent[]>
-  ) => Promise<void>;
+  initializeToken: () => Promise<void>;
+  refreshToken: () => Promise<void>;
+  loadEvents: () => Promise<void>;
   getNextEvent: () => CalendarEvent | null;
   getMinutesUntilNextEvent: () => number | null;
 }
 
-/**
- * Store for Calendar data and authentication
- */
+export function shouldRefreshToken(
+  token: string | null,
+  expiresAt: number | null,
+  now: number,
+  thresholdMs = REFRESH_THRESHOLD_MS
+): boolean {
+  if (!token || !expiresAt) return true;
+  const timeUntilExpiry = expiresAt - now;
+  const shouldRefresh = timeUntilExpiry <= thresholdMs;
+
+  return shouldRefresh;
+}
+
 export const useCalendarStore = create<CalendarState>()(
   persist(
     (set, get) => ({
@@ -45,66 +57,63 @@ export const useCalendarStore = create<CalendarState>()(
           nextEvent: null,
         });
       },
-      refreshToken: async (fetchNewToken) => {
-        const { user } = useAuthStore.getState();
-        if (!user) return;
+      initializeToken: async () => {
+        try {
+          const response = await getCalendarToken();
+          const { accessToken, expiresAt } = response.data;
 
-        const { token, expiresAt } = get();
-        if (!token || !expiresAt || Date.now() >= expiresAt) {
-          const data = await fetchNewToken();
-          set({
-            token: data.token,
-            expiresAt: Date.now() + data.expiresIn * 1000,
-          });
+          if (accessToken && expiresAt) {
+            const expiryTime = new Date(expiresAt).getTime();
+            set({ token: accessToken, expiresAt: expiryTime });
+          }
+        } catch (error) {
+          console.error("Failed to initialize calendar token:", error);
         }
       },
-      loadEvents: async (fetchEvents) => {
+      refreshToken: async () => {
+        const { token, expiresAt } = get();
+        const now = Date.now();
+
+        if (!shouldRefreshToken(token, expiresAt, now)) {
+          return;
+        }
+
+        try {
+          const data = await fetchCalendarAccessToken();
+          if (data.accessToken && data.expiresAt) {
+            set({
+              token: data.accessToken,
+              expiresAt: data.expiresAt,
+            });
+          }
+        } catch (error) {
+          console.error("[refreshToken] Failed:", error);
+          get().clearCalendar();
+        }
+      },
+
+      loadEvents: async () => {
         const { user } = useAuthStore.getState();
         if (!user) return;
 
-        const { token, expiresAt, eventsLastFetched } = get();
+        const { eventsLastFetched } = get();
 
-        // Skip if events were fetched in the last minute
         if (eventsLastFetched && Date.now() - eventsLastFetched < 60000) {
           return;
         }
 
-        if (!token) {
+        await get().refreshToken();
+
+        const currentToken = get().token;
+        if (!currentToken) {
           console.error("No token available to load events");
           return;
         }
 
-        // Check if token is expired and attempt refresh
-        if (expiresAt && Date.now() >= expiresAt) {
-          console.warn("Token is expired, attempting to refresh...");
-          try {
-            const response = await getCalendarToken();
-
-            if (response.data.accessToken && response.data.expiresAt) {
-              // Update with refreshed token
-              const newExpiresAt = new Date(response.data.expiresAt).getTime();
-              set({
-                token: response.data.accessToken,
-                expiresAt: newExpiresAt,
-              });
-            } else {
-              console.error("Failed to refresh token, clearing calendar");
-              get().clearCalendar();
-              return;
-            }
-          } catch (error) {
-            console.error("Error refreshing token:", error);
-            get().clearCalendar();
-            return;
-          }
-        }
-
         try {
-          const currentToken = get().token; // Get updated token after potential refresh
-          const events = await fetchEvents(currentToken!);
+          const events = await fetchCalendarEvents(currentToken);
           const now = new Date();
 
-          // Find next upcoming event
           const futureEvents = events
             .filter((event) => {
               const eventStart = new Date(
@@ -125,7 +134,6 @@ export const useCalendarStore = create<CalendarState>()(
           });
         } catch (error: any) {
           console.error("Failed to load events:", error);
-          // If it's a 401, the token is invalid
           if (
             error.message?.includes("401") ||
             error.message?.includes("Failed to fetch events")
@@ -149,6 +157,7 @@ export const useCalendarStore = create<CalendarState>()(
         const diffMs = eventStart.getTime() - now;
 
         if (diffMs <= 0) return 0;
+
         return Math.floor(diffMs / (1000 * 60)); // Convert to minutes
       },
     }),

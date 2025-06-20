@@ -77,7 +77,7 @@
   │   └── calendar.dock.tsx                     #
   Calendar icon with badge
   ├── hooks/
-  │   └── use-calendar-initialization.ts        # OAuth
+  │   └── use-calendar.ts        # OAuth
   initialization hook
   └── stores/
       └── calendar.store.ts                     # Token
