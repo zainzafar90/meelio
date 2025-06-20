@@ -6,3 +6,4 @@ export * from "./use-oscillation";
 export * from "./use-previous";
 export * from "./use-timer";
 export * from "./use-document-title";
+export * from "./use-calendar-initialization";
