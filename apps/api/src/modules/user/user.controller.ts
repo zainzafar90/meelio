@@ -36,35 +36,6 @@ export const userController = {
     res.status(httpStatus.CREATED).send(createdUser as IUser);
   }),
 
-  getUsers: catchAsync(
-    async (req: Request, res: Response<UserListResponse>) => {
-      const user = req.user as IUser;
-      const filter = pick(req.query, ["name", "roles"]);
-      const options: IOptions = pick(req.query, [
-        "sortBy",
-        "sortOrder",
-        "limit",
-        "offset",
-        "projectBy",
-      ]);
-
-      const isAllowed = permissionService.checkPermissions(
-        user.role,
-        "read",
-        "users"
-      );
-      if (!isAllowed) {
-        throw new ApiError(
-          httpStatus.FORBIDDEN,
-          "You do not have permission to view users"
-        );
-      }
-
-      const result = await userService.queryUsers(filter, options);
-      res.send(result);
-    }
-  ),
-
   getUser: catchAsync(async (req: Request, res: Response<UserResponse>) => {
     const user = req.user as IUser;
     const isAllowed = permissionService.checkPermissions(

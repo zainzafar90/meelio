@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ne } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import httpStatus from "http-status";
 import {
   CreateUserReq,
@@ -11,18 +11,8 @@ import { ApiError } from "@/common/errors/api-error";
 import { db } from "@/db";
 import { User, UserInsert, users } from "@/db/schema";
 
-import { getPaginationConfig } from "../paginate/pagination";
 import { userUtils, SafeUser } from "./user.utils";
-import { IOptions } from "@/types/interfaces/pagination";
 import { IUser } from "@/types";
-
-type OrderDirection = "asc" | "desc";
-type OrderField = keyof (typeof users)["_"]["columns"];
-
-interface OrderParams {
-  field: OrderField;
-  direction: OrderDirection;
-}
 
 export const userService = {
   userDTO: (user: User) => {
@@ -93,50 +83,6 @@ export const userService = {
       .returning();
 
     return userUtils.sanitizeUser(user);
-  },
-
-  queryUsers: async (filter: Record<string, any>, options: IOptions) => {
-    const { limit, offset } = getPaginationConfig(options);
-
-    const conditions = [];
-    if (filter.name) {
-      conditions.push(eq(users.name, filter.name));
-    }
-
-    const whereClause = and(...conditions);
-
-    const orderParams: OrderParams = {
-      field: (options.sortBy as OrderField) || "createdAt",
-      direction: (options.sortOrder as OrderDirection) || "desc",
-    };
-
-    const orderBy =
-      orderParams.direction === "asc"
-        ? asc(users[orderParams.field])
-        : desc(users[orderParams.field]);
-
-    const [result, total] = await Promise.all([
-      db.query.users.findMany({
-        where: whereClause,
-        limit,
-        offset,
-        orderBy: [orderBy],
-      }),
-      db
-        .select({ count: count() })
-        .from(users)
-        .where(whereClause)
-        .then((result) => result[0].count),
-    ]);
-
-    return {
-      results: result.map(userService.userDTO),
-      total,
-      limit,
-      offset,
-      pages: Math.ceil(total / limit),
-      count: result.length,
-    };
   },
 
   getUserById: async (id: string) => {

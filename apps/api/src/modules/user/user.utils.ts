@@ -12,7 +12,7 @@ export const userUtils = {
 
   verifyPassword: async (
     password: string,
-    hashedPassword: string,
+    hashedPassword: string
   ): Promise<boolean> => {
     return bcrypt.compare(password, hashedPassword);
   },

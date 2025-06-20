@@ -64,10 +64,6 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     const newValue = !confettiOnComplete;
     setIsUpdatingConfetti(true);
     try {
-      await api.settings.settingsApi.updateTaskSettings({
-        confettiOnComplete: newValue,
-      });
-
       if (user) {
         const updatedUser = {
           ...user,
@@ -81,6 +77,10 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
         };
         authenticate(updatedUser);
       }
+
+      await api.settings.settingsApi.updateTaskSettings({
+        confettiOnComplete: newValue,
+      });
     } catch (error) {
       console.error("Failed to update confetti setting:", error);
       toast.error(t("settings.general.confettiOnComplete.error"));

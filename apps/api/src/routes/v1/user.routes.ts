@@ -8,14 +8,7 @@ const router: Router = express.Router();
 
 router
   .route("/")
-  .post(auth(), validate(userValidation.createUser), userController.createUser)
-  .get(auth(), validate(userValidation.getUsers), userController.getUsers);
-
-// router.post(
-//   "/guest",
-//   validate(userValidation.createGuestUser),
-//   userController.createGuestUser
-// );
+  .post(auth(), validate(userValidation.createUser), userController.createUser);
 
 router.post(
   "/:userId/convert-guest",
