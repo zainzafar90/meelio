@@ -83,7 +83,7 @@ export const CalendarDynamicIsland = () => {
 
   return (
     <div
-      className="flex items-center w-full max-w-48 px-3 bg-black/70 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/80"
+      className="flex items-center w-full max-w-48 px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90"
       title={`Next event: ${nextEvent.summary} in ${formatTime(minutesLeft)}`}
       onClick={handleClick}
     >

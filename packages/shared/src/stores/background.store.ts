@@ -126,7 +126,9 @@ export const useBackgroundStore = create<BackgroundState>()(
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
         if (useAppStore.getState().wallpaperRotationEnabled) {
-          state.setCurrentWallpaper(state.wallpapers[getSeedIndexByDate(state.wallpapers.length)]);
+          state.setCurrentWallpaper(
+            state.wallpapers[getSeedIndexByDate(state.wallpapers.length)]
+          );
         }
       },
     }

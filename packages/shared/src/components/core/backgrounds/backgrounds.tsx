@@ -7,6 +7,7 @@ import {
   StaticWallpaper,
   useBackgroundStore,
   useAuthStore,
+  useAppStore,
 } from "../../../stores";
 import { getSeedIndexByDate } from "../../../utils";
 
@@ -123,12 +124,15 @@ export const Background = () => {
     resetToDefault,
   } = useBackgroundStore();
   const { user, guestUser } = useAuthStore();
+  const { wallpaperRotationEnabled } = useAppStore();
   const wallpaper = getWallpaper();
 
   useEffect(() => {
     if (user?.id || guestUser?.id) {
-      const index = getSeedIndexByDate(wallpapers.length);
-      setCurrentWallpaper(wallpapers[index]);
+      if (wallpaperRotationEnabled) {
+        const index = getSeedIndexByDate(wallpapers.length);
+        setCurrentWallpaper(wallpapers[index]);
+      }
     }
 
     if (!user?.id && !guestUser?.id) {
