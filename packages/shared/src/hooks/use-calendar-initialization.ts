@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { fetchCalendarEvents } from "../api/google-calendar.api";
 import { getCalendarToken } from "../api/calendar.api";
 import { useCalendarStore } from "../stores";
@@ -13,6 +13,7 @@ export const useCalendarInitialization = () => {
   const { token, setToken, loadEvents } = useCalendarStore();
   const { setCalendarVisible } = useDockStore();
   const { user } = useAuthStore();
+  const isInitializing = useRef(false);
 
   const initializeToken = async () => {
     try {
@@ -26,7 +27,7 @@ export const useCalendarInitialization = () => {
         setToken(response.data.accessToken, expiresAt);
       }
     } catch (error) {
-      console.error("Failed to initialize calendar token:", error);
+      console.error("[Calendar] Failed to initialize token:", error);
     }
   };
 
@@ -48,14 +49,28 @@ export const useCalendarInitialization = () => {
 
   useEffect(() => {
     handleOAuthCallback();
-    if (!token && user) {
-      initializeToken();
-    }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
-    if (token) {
-      loadEvents(fetchCalendarEvents);
-    }
-  }, [token, loadEvents]);
+    const initializeCalendar = async () => {
+      if (!user) return;
+
+      if (isInitializing.current) return;
+
+      try {
+        isInitializing.current = true;
+
+        if (!token) {
+          await initializeToken();
+          return;
+        }
+
+        await loadEvents(fetchCalendarEvents);
+      } finally {
+        isInitializing.current = false;
+      }
+    };
+
+    initializeCalendar();
+  }, [token, user]);
 };

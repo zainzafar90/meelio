@@ -62,7 +62,12 @@ export const useCalendarStore = create<CalendarState>()(
         const { user } = useAuthStore.getState();
         if (!user) return;
 
-        const { token, expiresAt } = get();
+        const { token, expiresAt, eventsLastFetched } = get();
+
+        // Skip if events were fetched in the last minute
+        if (eventsLastFetched && Date.now() - eventsLastFetched < 60000) {
+          return;
+        }
 
         if (!token) {
           console.error("No token available to load events");

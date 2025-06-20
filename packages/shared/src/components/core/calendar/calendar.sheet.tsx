@@ -14,7 +14,6 @@ import {
   getCalendarAuthUrl,
   deleteCalendarToken,
 } from "../../../api/calendar.api";
-import { getCalendarToken } from "../../../api/calendar.api";
 import { CalendarEvent } from "../../../api/google-calendar.api";
 import { getCalendarColor } from "../../../utils/calendar-colors";
 import { Copy, Bell, Share } from "lucide-react";
@@ -32,12 +31,11 @@ export const CalendarSheet = () => {
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
-  const { token, events, clearCalendar, setToken } = useCalendarStore(
+  const { token, events, clearCalendar } = useCalendarStore(
     useShallow((state) => ({
       token: state.token,
       events: state.events,
       clearCalendar: state.clearCalendar,
-      setToken: state.setToken,
     }))
   );
 
@@ -126,26 +124,6 @@ export const CalendarSheet = () => {
       })
       .slice(0, 10); // Show max 10 upcoming events
   };
-
-  // // Re-check token status when sheet opens
-  useEffect(() => {
-    if (isCalendarVisible && token) {
-      getCalendarToken()
-        .then((response) => {
-          if (response.data.accessToken) {
-            const expiresAt = response.data.expiresAt
-              ? new Date(response.data.expiresAt).getTime()
-              : Date.now() + 3600 * 1000; // 1 hour
-            setToken(response.data.accessToken, expiresAt);
-          } else {
-            clearCalendar();
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to refresh token status:", error);
-        });
-    }
-  }, [isCalendarVisible]);
 
   const handleConnect = async () => {
     setLoading(true);
