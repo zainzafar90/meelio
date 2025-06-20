@@ -16,7 +16,7 @@ export * from "./common/theme-provider";
 // ------------- CORE COMPONENTS -------------
 // Backgrounds
 export * from "./core/backgrounds/backgrounds";
-export * from "./core/backgrounds/components/background-overlay";
+export * from "./core/backgrounds/components/shadow-overlay";
 export * from "./core/backgrounds/components/background-selector.sheet";
 
 // Breathing Pod

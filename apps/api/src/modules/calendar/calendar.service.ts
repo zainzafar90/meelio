@@ -1,11 +1,7 @@
 import { eq } from "drizzle-orm";
 import { google } from "googleapis";
 
-import {
-  calendarTokens,
-  CalendarToken,
-  CalendarTokenInsert,
-} from "@/db/schema";
+import { calendar, Calendar, CalendarInsert } from "@/db/schema";
 import { db } from "@/db";
 import { config } from "@/config/config";
 
@@ -21,7 +17,7 @@ function getOAuthClient() {
   return new google.auth.OAuth2(
     config.google.clientId,
     config.google.clientSecret,
-    redirect,
+    redirect
   );
 }
 
@@ -29,9 +25,9 @@ export const calendarService = {
   /**
    * Get calendar token for user
    */
-  async getToken(userId: string): Promise<CalendarToken | null> {
-    const token = await db.query.calendarTokens.findFirst({
-      where: eq(calendarTokens.userId, userId),
+  async getToken(userId: string): Promise<Calendar | null> {
+    const token = await db.query.calendar.findFirst({
+      where: eq(calendar.userId, userId),
     });
     return token || null;
   },
@@ -39,11 +35,11 @@ export const calendarService = {
   /**
    * Get valid calendar token, refreshing if expired
    */
-  async getValidToken(userId: string): Promise<CalendarToken | null> {
-    const record = await db.query.calendarTokens.findFirst({
-      where: eq(calendarTokens.userId, userId),
+  async getValidToken(userId: string): Promise<Calendar | null> {
+    const record = await db.query.calendar.findFirst({
+      where: eq(calendar.userId, userId),
     });
-    
+
     if (!record) return null;
 
     // Check if token is expired
@@ -60,21 +56,21 @@ export const calendarService = {
       });
 
       const { credentials } = await client.refreshAccessToken();
-      
+
       if (!credentials.access_token) {
         throw new Error("Failed to refresh access token");
       }
 
       // Update the token in database
       const [updated] = await db
-        .update(calendarTokens)
+        .update(calendar)
         .set({
           accessToken: credentials.access_token,
           expiresAt: credentials.expiry_date
             ? new Date(credentials.expiry_date)
             : new Date(Date.now() + 3600000), // 1 hour default
         })
-        .where(eq(calendarTokens.userId, userId))
+        .where(eq(calendar.userId, userId))
         .returning();
 
       return updated;
@@ -91,24 +87,29 @@ export const calendarService = {
     userId: string,
     accessToken: string,
     refreshToken: string,
-    expiresAt: Date,
-  ): Promise<CalendarToken> {
-    const existing = await db.query.calendarTokens.findFirst({
-      where: eq(calendarTokens.userId, userId),
+    expiresAt: Date
+  ): Promise<Calendar> {
+    const existing = await db.query.calendar.findFirst({
+      where: eq(calendar.userId, userId),
     });
 
     if (existing) {
       const [updated] = await db
-        .update(calendarTokens)
+        .update(calendar)
         .set({ accessToken, refreshToken, expiresAt })
-        .where(eq(calendarTokens.userId, userId))
+        .where(eq(calendar.userId, userId))
         .returning();
       return updated;
     }
 
     const [created] = await db
-      .insert(calendarTokens)
-      .values({ userId, accessToken, refreshToken, expiresAt } as CalendarTokenInsert)
+      .insert(calendar)
+      .values({
+        userId,
+        accessToken,
+        refreshToken,
+        expiresAt,
+      } as CalendarInsert)
       .returning();
     return created;
   },
@@ -117,7 +118,7 @@ export const calendarService = {
    * Delete calendar token for user
    */
   async deleteToken(userId: string): Promise<void> {
-    await db.delete(calendarTokens).where(eq(calendarTokens.userId, userId));
+    await db.delete(calendar).where(eq(calendar.userId, userId));
   },
 
   /**
@@ -139,7 +140,7 @@ export const calendarService = {
   async storeToken(userId: string, code: string): Promise<void> {
     const client = getOAuthClient();
     const { tokens } = await client.getToken(code);
-    
+
     if (!tokens.refresh_token || !tokens.access_token) {
       throw new Error("Missing tokens from Google OAuth response");
     }
@@ -160,7 +161,7 @@ export const calendarService = {
     if (!token) return null;
 
     const calendar = google.calendar({ version: "v3", auth: getOAuthClient() });
-    
+
     // Set credentials for this request
     const client = getOAuthClient();
     client.setCredentials({

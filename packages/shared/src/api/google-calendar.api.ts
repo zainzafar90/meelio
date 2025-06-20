@@ -1,6 +1,27 @@
 export interface CalendarEventTime {
   dateTime?: string;
   date?: string;
+  timeZone?: string;
+}
+
+export interface ConferenceEntryPoint {
+  entryPointType: string;
+  uri: string;
+  label: string;
+}
+
+export interface ConferenceSolution {
+  key: {
+    type: string;
+  };
+  name: string;
+  iconUri: string;
+}
+
+export interface ConferenceData {
+  entryPoints: ConferenceEntryPoint[];
+  conferenceSolution: ConferenceSolution;
+  conferenceId: string;
 }
 
 export interface CalendarEvent {
@@ -8,6 +29,13 @@ export interface CalendarEvent {
   summary?: string;
   start: CalendarEventTime;
   end: CalendarEventTime;
+  colorId?: string;
+  hangoutLink?: string;
+  conferenceData?: ConferenceData;
+  htmlLink?: string;
+  status?: string;
+  created?: string;
+  updated?: string;
 }
 
 export class CalendarEventError extends Error {
@@ -29,54 +57,32 @@ export class CalendarAuthError extends Error {
  */
 export const fetchCalendarEvents = async (
   token: string,
-  fetchFn: typeof fetch = fetch,
+  fetchFn: typeof fetch = fetch
 ): Promise<CalendarEvent[]> => {
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ahead
-  
+
   const params = new URLSearchParams({
     timeMin,
     timeMax,
-    singleEvents: 'true',
-    orderBy: 'startTime',
-    maxResults: '300'
+    singleEvents: "true",
+    orderBy: "startTime",
+    maxResults: "100",
   });
 
   const res = await fetchFn(
     `https://www.googleapis.com/calendar/v3/calendars/primary/events?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    },
+    }
   );
-  if (!res.ok) throw new CalendarEventError("Failed to fetch events");
+
+  if (!res.ok) {
+    throw new CalendarEventError(
+      `Failed to fetch events: ${res.status} ${res.statusText}`
+    );
+  }
+
   const data = (await res.json()) as { items: CalendarEvent[] };
   return data.items || [];
-};
-
-/**
- * Request calendar token from Google OAuth
- */
-export const requestCalendarToken = (
-  clientId: string,
-  google: typeof window.google = window.google,
-): Promise<{ token: string; expiresIn: number }> => {
-  return new Promise((resolve, reject) => {
-    const oauth = google?.accounts?.oauth2;
-    if (!oauth) {
-      reject(new CalendarAuthError("OAuth unavailable"));
-      return;
-    }
-    const client = oauth.initTokenClient({
-      client_id: clientId,
-      scope: "https://www.googleapis.com/auth/calendar.readonly",
-      callback: (res) => {
-        if (!res.access_token) {
-          reject(new CalendarAuthError(res.error || "No token"));
-          return;
-        }
-        resolve({ token: res.access_token, expiresIn: res.expires_in ?? 3600 });
-      },
-    });
-    client.requestAccessToken();
-  });
 };

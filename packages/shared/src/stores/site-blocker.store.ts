@@ -244,7 +244,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const user = useAuthStore.getState().user;
         const syncStore = useSyncStore.getState();
 
-        if (!user) return;
+        if (!user || !user.isPro) return;
 
         if (syncStore.isOnline) {
           await processSyncQueue();

@@ -5,23 +5,24 @@ interface CalendarAuthResponse {
   authUrl: string;
 }
 
-interface CalendarTokenStatus {
-  hasToken: boolean;
-  accessToken?: string | null;
-  expiresAt?: string | null;
+interface CalendarStatus {
+  accessToken: string | null;
+  expiresAt: string | null;
 }
 
 /**
  * Get Google Calendar authorization URL
  */
-export function getCalendarAuthUrl(): Promise<AxiosResponse<CalendarAuthResponse>> {
+export function getCalendarAuthUrl(): Promise<
+  AxiosResponse<CalendarAuthResponse>
+> {
   return axios.get("/v1/calendar/auth");
 }
 
 /**
  * Check if user has a calendar token
  */
-export function getCalendarTokenStatus(): Promise<AxiosResponse<CalendarTokenStatus>> {
+export function getCalendarToken(): Promise<AxiosResponse<CalendarStatus>> {
   return axios.get("/v1/calendar/tokens");
 }
 

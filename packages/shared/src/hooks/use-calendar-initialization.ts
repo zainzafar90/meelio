@@ -1,3 +1,9 @@
+import { useEffect } from "react";
+import { fetchCalendarEvents } from "../api/google-calendar.api";
+import { getCalendarToken } from "../api/calendar.api";
+import { useCalendarStore } from "../stores";
+import { useDockStore } from "../stores/dock.store";
+
 export interface CalendarTokenStatus {
   hasToken: boolean;
   accessToken?: string | null;
@@ -10,7 +16,6 @@ export interface TokenInitializerDeps {
   now: () => number;
 }
 
-/** Fetch token status and update store when available. */
 export async function initializeCalendarToken({
   fetchStatus,
   setToken,
@@ -31,7 +36,6 @@ export interface OAuthCallbackOptions {
   onError: (message: string) => void;
 }
 
-/** Parse OAuth callback params and trigger handlers. */
 export function handleCalendarOAuthCallback({
   search,
   pathname,
@@ -50,20 +54,22 @@ export function handleCalendarOAuthCallback({
   }
 }
 
-import { useEffect } from "react";
-import { fetchCalendarEvents } from "../api/google-calendar.api";
-import { getCalendarTokenStatus } from "../api/calendar.api";
-import { useCalendarStore } from "../stores";
-import { useDockStore } from "../stores/dock.store";
-
-/** Prepare calendar state and handle OAuth callbacks. */
 export const useCalendarInitialization = (): void => {
   const { token, setToken, loadEvents } = useCalendarStore();
   const { setCalendarVisible } = useDockStore();
 
   const init = () =>
     initializeCalendarToken({
-      fetchStatus: getCalendarTokenStatus,
+      fetchStatus: async () => {
+        const response = await getCalendarToken();
+        return {
+          data: {
+            hasToken: !!response.data.accessToken,
+            accessToken: response.data.accessToken,
+            expiresAt: response.data.expiresAt,
+          },
+        };
+      },
       setToken,
       now: Date.now,
     });

@@ -9,4 +9,4 @@ export * from "./site-blocker.schema";
 export * from "./tab-stash.schema";
 export * from "./note.schema";
 export * from "./focus-session.schema";
-export * from "./calendar-token.schema";
+export * from "./calendar.schema";

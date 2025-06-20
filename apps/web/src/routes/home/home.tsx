@@ -6,11 +6,11 @@ import {
   Clock,
   TabStashSheet,
   CalendarSheet,
+  CalendarDynamicIsland,
   useDockStore,
   useAuthStore,
 } from "@repo/shared";
 import { Background } from "@repo/shared";
-import { BackgroundOverlay } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
 import { BreathePod } from "@repo/shared";
 import { Greeting } from "@repo/shared";
@@ -29,19 +29,16 @@ import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
-  const {
-    user,
-    guestUser,
-    loading,
-    authenticate,
-  } = useAuthStore(useShallow((state) => ({
-    user: state.user,
-    guestUser: state.guestUser,
-    loading: state.loading,
-    authenticate: state.authenticate,
-    authenticateGuest: state.authenticateGuest,
-    logout: state.logout,
-  })));
+  const { user, guestUser, loading, authenticate } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+      loading: state.loading,
+      authenticate: state.authenticate,
+      authenticateGuest: state.authenticateGuest,
+      logout: state.logout,
+    })),
+  );
   const [searchParams] = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(false);
   const { t } = useTranslation();
@@ -74,17 +71,11 @@ const Home = () => {
     verifyToken();
   }, [searchParams, authenticate]);
 
-  const renderBackground = () => (
-    <>
-      <Background />
-      <BackgroundOverlay />
-    </>
-  );
-
   if (loading || isVerifying) {
     return (
       <>
-        {renderBackground()}
+        <Background />
+
         <PageSkeleton>
           <h3 className="text-foreground font-medium">
             {isVerifying ? t("auth.verify.verifying") : t("common.loading")}
@@ -94,11 +85,10 @@ const Home = () => {
     );
   }
 
-
   if (!user && !guestUser) {
     return (
       <>
-        {renderBackground()}
+        <Background />
         <AuthContainer />
       </>
     );
@@ -106,7 +96,7 @@ const Home = () => {
 
   return (
     <>
-      {renderBackground()}
+      <Background />
       <AppLayout>
         <TopBar />
         <Content />
@@ -117,11 +107,14 @@ const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(useShallow((state) => ({
-    isBreathingVisible: state.isBreathingVisible,
-    isGreetingsVisible: state.isGreetingsVisible,
-    isTimerVisible: state.isTimerVisible,
-  })));
+  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } =
+    useDockStore(
+      useShallow((state) => ({
+        isBreathingVisible: state.isBreathingVisible,
+        isGreetingsVisible: state.isGreetingsVisible,
+        isTimerVisible: state.isTimerVisible,
+      })),
+    );
   const { t } = useTranslation();
 
   return (
@@ -180,9 +173,8 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   return (
-    <div className="relative">
-
-
+    <div className="relative flex justify-center pt-0">
+      <CalendarDynamicIsland />
     </div>
   );
 };

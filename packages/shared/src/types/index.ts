@@ -6,3 +6,4 @@ export * from "./sound";
 export * from "./subscription";
 export * from "./timer";
 export * from "./new/pomodoro-lite";
+export * from "../components/core/calendar";

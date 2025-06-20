@@ -17,6 +17,7 @@ import {
   Wallpaper,
 } from "../../../../stores/background.store";
 import { useShallow } from "zustand/shallow";
+import { useAppStore } from "../../../../stores";
 
 export function BackgroundSelectorSheet() {
   const { t } = useTranslation();
@@ -40,21 +41,30 @@ export function BackgroundSelectorSheet() {
     }))
   );
 
+  const { setWallpaperRotationEnabled } = useAppStore(
+    useShallow((state) => ({
+      setWallpaperRotationEnabled: state.setWallpaperRotationEnabled,
+    }))
+  );
+
   const liveWallpapers = wallpapers.filter((w) => w.type === "live");
   const staticWallpapers = wallpapers.filter((w) => w.type === "static");
 
   const handleSetBackground = async (background: Wallpaper) => {
     setCurrentWallpaper(background);
+    setWallpaperRotationEnabled(false);
   };
 
   const handleRandomBackground = () => {
     const randomIndex = Math.floor(Math.random() * wallpapers.length);
     const randomWallpaper = wallpapers[randomIndex];
     setCurrentWallpaper(randomWallpaper);
+    setWallpaperRotationEnabled(false);
   };
 
   const handleResetToDefault = () => {
     resetToDefault();
+    setWallpaperRotationEnabled(true);
   };
 
   return (

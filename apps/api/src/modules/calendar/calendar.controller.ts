@@ -23,7 +23,7 @@ const authorize = async (req: AuthorizeRequest, res: Response) => {
     const state = Buffer.from(
       JSON.stringify({ userId, timestamp: Date.now() })
     ).toString("base64");
-    
+
     const authUrl = await calendarService.generateAuthUrl(state);
     res.json({ authUrl });
   } catch (error) {
@@ -38,7 +38,7 @@ const authorize = async (req: AuthorizeRequest, res: Response) => {
 const callback = async (req: Request, res: Response) => {
   try {
     const { code, state } = req.query as { code?: string; state?: string };
-    
+
     if (!code || !state) {
       return res.redirect(
         `${config.clientUrl}?calendar=error&error=missing_params`
@@ -46,9 +46,9 @@ const callback = async (req: Request, res: Response) => {
     }
 
     const { userId } = JSON.parse(Buffer.from(state, "base64").toString());
-    
+
     await calendarService.storeToken(userId, code);
-    
+
     res.redirect(`${config.clientUrl}?calendar=connected`);
   } catch (error) {
     logger.error("Calendar callback error:", error);
@@ -65,7 +65,6 @@ const getToken = catchAsync(async (req: Request, res: Response) => {
 
   if (!token) {
     return res.status(httpStatus.OK).json({
-      hasToken: false,
       accessToken: null,
       expiresAt: null,
     });
@@ -75,7 +74,6 @@ const getToken = catchAsync(async (req: Request, res: Response) => {
   const validToken = await calendarService.getValidToken(user.id);
 
   res.status(httpStatus.OK).json({
-    hasToken: true,
     accessToken: validToken?.accessToken,
     expiresAt: validToken?.expiresAt,
   });
