@@ -23,11 +23,17 @@ export function CreateTask() {
         activeListId || ""
       );
 
+      let dueDate: string | undefined;
+      if (activeListId === "today") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        dueDate = today.toISOString();
+      }
+
       addTask({
         title: title.trim(),
         category: isSystemList ? undefined : activeListId,
-        dueDate:
-          activeListId === "today" ? new Date().toISOString() : undefined,
+        dueDate,
       });
       setTitle("");
     }

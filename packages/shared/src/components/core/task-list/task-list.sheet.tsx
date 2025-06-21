@@ -83,16 +83,24 @@ export function TaskListSheet() {
     if (!activeListId || activeListId === "all") return true;
     if (activeListId === "completed") return task.completed;
     if (activeListId === "today") {
-      // Filter tasks for today
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
       if (task.dueDate) {
-        const dueDate = new Date(task.dueDate);
-        return dueDate >= today && dueDate < tomorrow;
+        try {
+          const dueDate = new Date(task.dueDate);
+          dueDate.setHours(0, 0, 0, 0);
+          const isToday = dueDate.getTime() === today.getTime();
+          
+          return isToday;
+        } catch (error) {
+          console.warn("Invalid dueDate for task:", task.id, task.dueDate);
+          return false;
+        }
       }
+      
       return false;
     }
     return task.category === activeListId;
