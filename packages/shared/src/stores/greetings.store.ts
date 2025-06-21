@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import mantras from "../data/mantras.json";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getSeedIndexByDate } from "../utils/common.utils";
+import { contentService } from "../services/content.service";
 
 /**
  * ------------
@@ -15,18 +15,19 @@ import { getSeedIndexByDate } from "../utils/common.utils";
 interface MantraStore {
   isMantraVisible: boolean;
   currentMantra: string;
-  mantras: string[];
   updateMantra: () => void;
   setIsMantraVisible: (isVisible: boolean) => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 }
 
+// Load mantras eagerly in background
+contentService.preloadData();
+
 export const useMantraStore = create<MantraStore>()(
   persist(
-    (set) => ({
-      currentMantra: mantras[0],
-      mantras,
+    (set, get) => ({
+      currentMantra: "Live in the moment.",
       isMantraVisible: false,
       _hasHydrated: false,
       setHasHydrated: (state) => {
@@ -34,13 +35,21 @@ export const useMantraStore = create<MantraStore>()(
           _hasHydrated: state,
         });
         if (state) {
-          const index = getSeedIndexByDate(mantras.length);
-          set({ currentMantra: mantras[index] });
+          // Load today's mantra silently in background
+          contentService.getTodaysMantra().then((mantra) => {
+            set({ currentMantra: mantra });
+          }).catch((error) => {
+            console.error("Failed to load today's mantra:", error);
+          });
         }
       },
       updateMantra: () => {
-        const index = getSeedIndexByDate(mantras.length);
-        set({ currentMantra: mantras[index] });
+        // Always fetch today's mantra directly
+        contentService.getTodaysMantra().then((mantra) => {
+          set({ currentMantra: mantra });
+        }).catch((error) => {
+          console.error("Failed to update mantra:", error);
+        });
       },
       setIsMantraVisible: (isVisible: boolean) =>
         set({ isMantraVisible: isVisible }),

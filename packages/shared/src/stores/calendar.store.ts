@@ -8,6 +8,9 @@ import {
 import { useAuthStore } from "../stores/auth.store";
 
 export const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
+const BASE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+const MIN_CACHE_DURATION = 60 * 1000; // 1 minute
 
 export interface CalendarState {
   token: string | null;
@@ -19,9 +22,10 @@ export interface CalendarState {
   clearCalendar: () => void;
   initializeToken: () => Promise<void>;
   refreshToken: () => Promise<void>;
-  loadEvents: () => Promise<void>;
+  loadEvents: (force?: boolean) => Promise<void>;
   getNextEvent: () => CalendarEvent | null;
   getMinutesUntilNextEvent: () => number | null;
+  getSmartCacheDuration: () => number;
 }
 
 export function shouldRefreshToken(
@@ -92,13 +96,35 @@ export const useCalendarStore = create<CalendarState>()(
         }
       },
 
-      loadEvents: async () => {
+      getSmartCacheDuration: () => {
+        const { nextEvent } = get();
+        
+        if (!nextEvent) {
+          return MAX_CACHE_DURATION;
+        }
+
+        const now = Date.now();
+        const eventStart = new Date(
+          nextEvent.start.dateTime || nextEvent.start.date || ""
+        ).getTime();
+        const timeUntilEvent = eventStart - now;
+
+        if (timeUntilEvent < 15 * 60 * 1000) {
+          return MIN_CACHE_DURATION;
+        } else if (timeUntilEvent < 60 * 60 * 1000) {
+          return BASE_CACHE_DURATION;
+        } else {
+          return Math.min(MAX_CACHE_DURATION, timeUntilEvent / 4);
+        }
+      },
+      loadEvents: async (force = false) => {
         const { user } = useAuthStore.getState();
         if (!user) return;
 
         const { eventsLastFetched } = get();
+        const cacheDuration = get().getSmartCacheDuration();
 
-        if (eventsLastFetched && Date.now() - eventsLastFetched < 60000) {
+        if (!force && eventsLastFetched && Date.now() - eventsLastFetched < cacheDuration) {
           return;
         }
 

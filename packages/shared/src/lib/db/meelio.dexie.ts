@@ -4,6 +4,8 @@ import type {
   Task,
   PomodoroSession,
   DailySummary,
+  Mantra,
+  Quote,
 } from "./models.dexie";
 
 export class MeelioDB extends Dexie {
@@ -11,6 +13,8 @@ export class MeelioDB extends Dexie {
   tasks!: Table<Task>;
   focusSessions!: Table<PomodoroSession>;
   focusStats!: Table<DailySummary>;
+  mantras!: Table<Mantra>;
+  quotes!: Table<Quote>;
 
   constructor() {
     super("meelio");
@@ -66,6 +70,16 @@ export class MeelioDB extends Dexie {
               task.pinned = false;
             }
           });
+      });
+
+    this.version(4)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        mantras: "id, lastUpdated",
+        quotes: "id, lastUpdated",
       });
   }
 }
