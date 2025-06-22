@@ -5,7 +5,6 @@ export type Environment = {
   lemonSqueezyLifetimeVariantId: string;
   posthogKey: string;
   posthogHost: string;
-  googleClientId: string;
   dev: boolean | string;
 };
 
@@ -45,8 +44,6 @@ export class EnvWrapper {
       // @ts-ignore - Vite specific
       posthogHost: import.meta.env.VITE_APP_PUBLIC_POSTHOG_HOST || "",
       // @ts-ignore - Vite specific
-      googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || "",
-      // @ts-ignore - Vite specific
       dev: import.meta.env.DEV || false,
     };
   }
@@ -62,7 +59,6 @@ export class EnvWrapper {
         process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
       posthogKey: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_KEY || "",
       posthogHost: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_HOST || "",
-      googleClientId: process.env.PLASMO_PUBLIC_GOOGLE_CLIENT_ID || "",
       dev: process.env.PLASMO_PUBLIC_DEV || false,
     };
   }

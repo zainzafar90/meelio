@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { REFRESH_THRESHOLD_MS, useCalendarStore } from "../stores";
 import { useDockStore } from "../stores/dock.store";
 
-export const useCalendarInitialization = (): void => {
+export const useCalendar = (): void => {
   const { token, initializeToken, refreshToken, loadEvents } =
     useCalendarStore();
   const { setCalendarVisible } = useDockStore();

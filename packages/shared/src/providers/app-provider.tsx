@@ -12,7 +12,7 @@ import { SoundPlayer } from "../components/core/soundscapes/components/sound-pla
 import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
 import { TelemetryProvider } from "./telemetry-provider";
-import { useCalendarInitialization } from "../hooks/use-calendar";
+import { useCalendar } from "../hooks/use-calendar";
 
 type AppProviderProps = {
   children: React.ReactNode;
@@ -23,7 +23,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
 
   // Initialize calendar authentication and OAuth handling
-  useCalendarInitialization();
+  useCalendar();
 
   return (
     <I18nextProvider i18n={i18n}>
