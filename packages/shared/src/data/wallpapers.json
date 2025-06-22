@@ -26,6 +26,56 @@
     }
   },
   {
+    "id": "1505699261378",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1505699261378-c372af38134c",
+    "title": "Xinghai Bridge",
+    "thumbnail": "https://images.unsplash.com/photo-1505699261378-c372af38134c?w=160&fit=max",
+    "blurhash": "L}JFcXIpNbX8}?RlS4W;xYe:a#W;",
+    "author": "Wade Meng",
+    "source": "https://unsplash.com/photos/gray-bridge-above-body-of-water-during-golden-hour-photography-LgCj9qcrfhI"
+  },
+  {
+    "id": "1497436072909",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1",
+    "title": "Blue lake and green shore",
+    "thumbnail": "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=160&fit=max",
+    "blurhash": "LG87OVl:ICIoL#TKyZs;nNyYVXQ,",
+    "author": "Andreas Gücklhorn",
+    "source": "https://unsplash.com/photos/birds-eye-view-photography-of-trees-and-body-of-water-mawU2PoJWfU"
+  },
+  {
+    "id": "1739543682798",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1739543682798-9abc12646485",
+    "title": "Rocky Mountain Corno Bianco",
+    "thumbnail": "https://images.unsplash.com/photo-1739543682798-9abc12646485?q=100&w=160&auto=format",
+    "blurhash": "L~HVe#t6ayoe?woLoLfQkER+ofay",
+    "author": "Madlen Seibert",
+    "source": "https://unsplash.com/photos/a-small-house-in-a-field-with-mountains-in-the-background-C0_TDRpDKP8"
+  },
+  {
+    "id": "1677074125958",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a",
+    "title": "Field Full of Hay Bales",
+    "thumbnail": "https://images.unsplash.com/photo-1677074125958-fd0ee5300d7a?q=100&w=160&auto=format",
+    "blurhash": "L~HL-,odWVayyZoea#azxbj[j[jt",
+    "author": "Ingemar Johnsson",
+    "source": "https://unsplash.com/photos/a-field-full-of-hay-bales-under-a-cloudy-blue-sky-lsfnw3MEmtA"
+  },
+  {
+    "id": "1637118513447",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6",
+    "title": "Large Body of Water Surrounded by Mountains",
+    "thumbnail": "https://images.unsplash.com/photo-1637118513447-7df76ff7aaf6?q=100&w=160&auto=format",
+    "blurhash": "LtAxi]bbaJRjk]X9kBbJE9ofozof",
+    "author": "Takashi Miyazaki",
+    "source": "https://unsplash.com/photos/a-large-body-of-water-surrounded-by-mountains-tdAQLLJNoZs"
+  },
+  {
     "id": "mjp5E0n8-fY",
     "type": "static",
     "url": "https://images.unsplash.com/photo-1731432248688-b0b0d1743add",
@@ -3734,5 +3784,15 @@
     "blurhash": "LJE{68?aX8ENO^WXaxay2|-7xaxZ",
     "author": "Ashutosh Saraswat",
     "source": "https://unsplash.com/photos/s3EjzLRA4Yw"
+  },
+  {
+    "id": "qEutE51bMng",
+    "type": "static",
+    "url": "https://images.unsplash.com/photo-1659437191722-c30c7c780d55?w=1920&fit=max",
+    "title": "a bridge over a river",
+    "thumbnail": "https://images.unsplash.com/photo-1659437191722-c30c7c780d55?w=160&fit=max",
+    "blurhash": "LJ8qmRs,I7o#yDRkMxkDtoj@RNo#",
+    "author": "Sylvester Aswin Stanley",
+    "source": "https://unsplash.com/photos/qEutE51bMng"
   }
 ]
