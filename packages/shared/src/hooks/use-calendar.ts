@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useCalendarStore } from "../stores";
 import { useDockStore } from "../stores/dock.store";
 import { useAuthStore } from "../stores/auth.store";
@@ -8,24 +8,32 @@ export const useCalendar = (): void => {
   const { setCalendarVisible } = useDockStore();
   const { user } = useAuthStore();
 
-  const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
+  const calendarEnabled = useMemo(
+    () => user?.settings?.calendar?.enabled ?? false,
+    [user]
+  );
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get("calendar");
+    const handleOAuthCallback = () => {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get("calendar");
 
-    // Handle OAuth callback
-    if (status) {
+      if (!status) return;
+
+      // Clean up URL once we've parsed the status
       window.history.replaceState({}, "", window.location.pathname);
+
       if (status === "connected") {
+        // Close the calendar connection modal and re-initialize the token
         setCalendarVisible(false);
-        // Force token initialization after OAuth success (always needed for connection flow)
         initializeToken();
       }
-    }
+    };
 
-    // Only initialize token if user is authenticated, no token exists, AND calendar is enabled
-    if (user && !token && calendarEnabled) {
+    handleOAuthCallback();
+
+    // Initialize token if user is authenticated, has calendar enabled, and no token exists
+    if (user && calendarEnabled && !token) {
       initializeToken();
     }
   }, [user, token, calendarEnabled, initializeToken, setCalendarVisible]);
@@ -33,9 +41,7 @@ export const useCalendar = (): void => {
   // Remove refresh interval - backend handles token refresh automatically
 
   useEffect(() => {
-    // Only load events when token is available AND calendar features are enabled
-    if (token && calendarEnabled) {
-      loadEvents(true); // Force refresh after OAuth
-    }
+    if (!token || !calendarEnabled) return;
+    loadEvents(true); // Force refresh after OAuth connection
   }, [token, calendarEnabled, loadEvents]);
 };
