@@ -54,18 +54,12 @@ export function BackgroundSelectorSheet() {
     }))
   );
 
-  const {
-    filteredWallpapers,
-    displayedWallpapers,
-    totalCount,
-    hasMore,
-    setSearchQuery,
-    loadMore,
-  } = useWallpaperSearch({
-    wallpapers,
-    initialLimit: 24,
-    loadMoreIncrement: 24,
-  });
+  const { displayedWallpapers, totalCount, hasMore, setSearchQuery, loadMore } =
+    useWallpaperSearch({
+      wallpapers,
+      initialLimit: 30,
+      loadMoreIncrement: 30,
+    });
 
   // Update search query when debounced search changes
   React.useEffect(() => {
