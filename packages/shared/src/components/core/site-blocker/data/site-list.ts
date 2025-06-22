@@ -65,6 +65,7 @@ import {
   siRumble,
   siRakuten,
   siAliexpress,
+  siSoundcloud,
 } from "simple-icons";
 
 export interface SiteCategory {
@@ -174,6 +175,12 @@ export const SITE_LIST: Record<string, Site[]> = {
       name: "Spotify Web",
       url: "open.spotify.com",
       icon: siSpotify,
+    },
+    {
+      id: "soundcloud",
+      name: "SoundCloud",
+      url: "soundcloud.com",
+      icon: siSoundcloud,
     },
     { id: "apple-tv", name: "Apple TV+", url: "tv.apple.com", icon: siAppletv },
     {
