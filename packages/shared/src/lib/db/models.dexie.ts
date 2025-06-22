@@ -47,16 +47,3 @@ export interface DailySummary {
   totalFocusTime: number; // in seconds
   totalBreakTime: number; // in seconds
 }
-
-export interface Mantra {
-  id: number;
-  text: string;
-  lastUpdated: number;
-}
-
-export interface Quote {
-  id: number;
-  quote: string;
-  author: string;
-  lastUpdated: number;
-}

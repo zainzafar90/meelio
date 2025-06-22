@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
+import quotes from "../data/quotes.json";
 import { getSeedIndexByDate } from "../utils/common.utils";
-import { contentService } from "../services/content.service";
 
 interface Quote {
   quote: string;
@@ -10,29 +10,15 @@ interface Quote {
 
 interface QuoteStore {
   currentQuote: Quote;
+  quotes: Quote[];
   updateQuote: () => void;
 }
 
-// Load today's quote eagerly in background 
-contentService.getTodaysQuote().then((quote) => {
-  useQuoteStore.setState({ 
-    currentQuote: quote
-  });
-}).catch((error) => {
-  console.error("Failed to load today's quote:", error);
-});
-
-export const useQuoteStore = create<QuoteStore>((set, get) => ({
-  currentQuote: {
-    quote: "What you do today can improve all your tomorrows.",
-    author: "Ralph Marston"
-  },
+export const useQuoteStore = create<QuoteStore>((set) => ({
+  currentQuote: quotes[0],
+  quotes,
   updateQuote: () => {
-    // Always fetch today's quote directly
-    contentService.getTodaysQuote().then((quote) => {
-      set({ currentQuote: quote });
-    }).catch((error) => {
-      console.error("Failed to update quote:", error);
-    });
+    const index = getSeedIndexByDate(quotes.length);
+    set({ currentQuote: quotes[index] });
   },
 }));

@@ -426,7 +426,10 @@
     "liveWallpapers": "Live Wallpapers",
     "staticWallpapers": "Static Wallpapers",
     "resetToDefault": "Reset to Default",
-    "randomBackground": "Random Background"
+    "randomBackground": "Random Background",
+    "currentWallpaper": "Current Wallpaper",
+    "searchPlaceholder": "Search wallpapers...",
+    "allWallpapers": "All Wallpapers"
   },
   "site-blocker": {
     "title": "Site Blocker",
