@@ -3373,7 +3373,7 @@
     "@plasmohq/parcel-compressor-utf8" "0.1.1"
     "@plasmohq/parcel-namer-manifest" "0.3.12"
     "@plasmohq/parcel-optimizer-encapsulate" "0.0.8"
-    "@plasmohq/parcel-optimizer-es" "0.4.1"
+    "@plasmohq/parcel-optimizer-es" "0.5.0"
     "@plasmohq/parcel-packager" "0.6.15"
     "@plasmohq/parcel-resolver" "0.14.1"
     "@plasmohq/parcel-resolver-post" "0.4.5"
@@ -3428,7 +3428,7 @@
     "@parcel/types" "2.9.3"
 
 "@plasmohq/parcel-optimizer-es@0.4.1":
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/@plasmohq/parcel-optimizer-es/-/parcel-optimizer-es-0.4.1.tgz#7f8cd575180b3573aa7039e494158798b3209086"
   integrity sha512-2FvBq3L5wHyD+TNHpO0IVMJKX1XQ+uBruFVcRUgo+lDkIAyop7P8wpsY4iq3dOKXJrqjwBop9nzNcq0L/zaalQ==
   dependencies:
@@ -3518,7 +3518,7 @@
     "@parcel/plugin" "2.9.3"
     "@parcel/types" "2.9.3"
     "@parcel/utils" "2.9.3"
-    content-security-policy-parser "0.4.1"
+    content-security-policy-parser "0.5.0"
     json-schema-to-ts "3.1.1"
     nullthrows "1.1.1"
 
@@ -4381,7 +4381,7 @@
   integrity sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==
 
 "@sec-ant/readable-stream@^0.4.1":
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/@sec-ant/readable-stream/-/readable-stream-0.4.1.tgz#60de891bb126abfdc5410fdc6166aca065f10a0c"
   integrity sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==
 
@@ -6794,7 +6794,7 @@ content-disposition@0.5.4, content-disposition@^0.5.3:
     safe-buffer "5.2.1"
 
 content-security-policy-parser@0.4.1:
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/content-security-policy-parser/-/content-security-policy-parser-0.4.1.tgz#27b507649b1b75bc75f179df91919a869ee116b5"
   integrity sha512-NNJS8XPnx3OKr/CUOSwDSJw+lWTrZMYnclLKj0Y9CYOfJNJTWLFGPg3u2hYgbXMXKVRkZR2fbyReNQ1mUff/Qg==
 
@@ -10266,7 +10266,7 @@ json-schema-to-ts@3.1.1:
     ts-algebra "^2.0.0"
 
 json-schema-traverse@^0.4.1:
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz#69f6a87d9513ab8bb8fe63bdb0979c448e684660"
   integrity sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==
 
@@ -10450,7 +10450,7 @@ leven@^3.1.0:
   integrity sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==
 
 levn@^0.4.1:
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/levn/-/levn-0.4.1.tgz#ae4562c007473b932a6200d403268dd2fffc6ade"
   integrity sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==
   dependencies:
@@ -12059,7 +12059,7 @@ prettier-plugin-packagejson@^2.4.5:
     synckit "0.11.8"
 
 prettier-plugin-tailwindcss@^0.4.1:
-  version "0.4.1"
+  version "0.5.0"
   resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.4.1.tgz#f7ed664199540978b2cbd037bac3a337d6689e86"
   integrity sha512-hwn2EiJmv8M+AW4YDkbjJ6HlZCTzLyz1QlySn9sMuKV/Px0fjwldlB7tol8GzdgqtkdPtzT3iJ4UzdnYXP25Ag==
 
