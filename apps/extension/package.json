@@ -111,6 +111,9 @@
     "host_permissions": [
       "https://*.meelio.io/*"
     ],
+    "optional_host_permissions": [
+      "https://*/*"
+    ],
     "permissions": [
       "storage",
       "notifications"
