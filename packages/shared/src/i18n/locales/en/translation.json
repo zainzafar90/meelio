@@ -426,7 +426,10 @@
     "liveWallpapers": "Live Wallpapers",
     "staticWallpapers": "Static Wallpapers",
     "resetToDefault": "Reset to Default",
-    "randomBackground": "Random Background"
+    "randomBackground": "Random Background",
+    "currentWallpaper": "Current Wallpaper",
+    "searchPlaceholder": "Search wallpapers...",
+    "allWallpapers": "All Wallpapers"
   },
   "site-blocker": {
     "title": "Site Blocker",
@@ -448,6 +451,17 @@
     "grant-permission": "Grant Permission",
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"
+  },
+  "calendar": {
+    "sheet": {
+      "title": "Calendar",
+      "connect": "Connect",
+      "connected": "Google Calendar enabled",
+      "disconnect": "Disconnect",
+      "nextEvent": "Next event",
+      "joinMeeting": "Join Meeting",
+      "meetingLinkCopied": "Meeting link copied"
+    }
   },
   "auth": {
     "verify": {

@@ -51,7 +51,7 @@ export const Quote = () => {
           className="text-xxs text-white/50 sm:text-xs md:text-sm"
           aria-label={t("home.quote.aria.author")}
         >
-          &mdash; {currentQuote.author}
+          — {currentQuote.author}
         </span>
         <QuoteIcon
           className="absolute bottom-2 right-2 hidden size-6 text-white/20 sm:block"

@@ -11,6 +11,7 @@ import {
   useMantraStore,
 } from "../../../stores/greetings.store";
 import { useInterval } from "../../../hooks";
+import { ShadowOverlay } from "../backgrounds/components/shadow-overlay";
 
 export const Greeting = () => {
   const { user, guestUser } = useAuthStore(
@@ -78,7 +79,7 @@ export const Greeting = () => {
 
   return (
     <div
-      className="cursor-pointer space-y-4 md:space-y-6"
+      className="relative cursor-pointer space-y-4 md:space-y-6"
       onClick={handleClick}
     >
       <AnimatePresence mode="wait">
@@ -94,6 +95,7 @@ export const Greeting = () => {
               : "greeting" + mantraRotationCount
           }
         >
+          <ShadowOverlay />
           {showMantra ? currentMantra : greeting}
           {getFirstName() && ` — ${getFirstName()}`}
         </motion.h2>

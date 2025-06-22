@@ -25,8 +25,8 @@ interface MantraStore {
 export const useMantraStore = create<MantraStore>()(
   persist(
     (set) => ({
-      currentMantra: mantras[0],
-      mantras,
+      currentMantra: mantras[0].text,
+      mantras: mantras.map((mantra) => mantra.text),
       isMantraVisible: false,
       _hasHydrated: false,
       setHasHydrated: (state) => {
@@ -35,12 +35,12 @@ export const useMantraStore = create<MantraStore>()(
         });
         if (state) {
           const index = getSeedIndexByDate(mantras.length);
-          set({ currentMantra: mantras[index] });
+          set({ currentMantra: mantras[index].text });
         }
       },
       updateMantra: () => {
         const index = getSeedIndexByDate(mantras.length);
-        set({ currentMantra: mantras[index] });
+        set({ currentMantra: mantras[index].text });
       },
       setIsMantraVisible: (isVisible: boolean) =>
         set({ isMantraVisible: isVisible }),

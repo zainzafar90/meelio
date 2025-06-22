@@ -426,7 +426,10 @@
     "liveWallpapers": "Lebende Hintergründe",
     "staticWallpapers": "Statische Hintergründe",
     "resetToDefault": "Zurücksetzen auf Standard",
-    "randomBackground": "Zufälliger Hintergrund"
+    "randomBackground": "Zufälliger Hintergrund",
+    "currentWallpaper": "Aktueller Hintergrund",
+    "searchPlaceholder": "Hintergründe suchen...",
+    "allWallpapers": "Alle Hintergründe"
   },
   "site-blocker": {
     "title": "Seitenblocker",
@@ -448,6 +451,17 @@
     "grant-permission": "Berechtigung gewähren",
     "permissions-needed": "Zusätzliche Berechtigungen erforderlich",
     "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden"
+  },
+  "calendar": {
+    "sheet": {
+      "title": "Kalender",
+      "connect": "Verbinden",
+      "connected": "GoogleKalender aktiviert",
+      "disconnect": "Verbindung trennen",
+      "nextEvent": "Nächster Termin",
+      "joinMeeting": "Meeting beitreten",
+      "meetingLinkCopied": "Meeting-Link kopiert"
+    }
   },
   "auth": {
     "verify": {

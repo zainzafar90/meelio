@@ -24,6 +24,7 @@ interface DockState {
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
+  isCalendarVisible: boolean;
 
   // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
@@ -41,6 +42,7 @@ interface DockState {
   toggleBackgrounds: () => void;
   toggleSiteBlocker: () => void;
   toggleTabStash: () => void;
+  toggleCalendar: () => void;
 
   // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
@@ -51,6 +53,7 @@ interface DockState {
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
+  setCalendarVisible: (visible: boolean) => void;
 
   // Icon visibility setters
   setDockIconVisible: (
@@ -77,6 +80,7 @@ export const useDockStore = create<DockState>()(
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
+      isCalendarVisible: false,
 
       // Icon visibility in dock - all visible by default
       dockIconsVisible: {
@@ -145,6 +149,10 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isTabStashVisible: !state.isTabStashVisible }));
       },
 
+      toggleCalendar: () => {
+        set((state) => ({ isCalendarVisible: !state.isCalendarVisible }));
+      },
+
       // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
@@ -176,6 +184,10 @@ export const useDockStore = create<DockState>()(
 
       setTabStashVisible: (visible: boolean) => {
         set({ isTabStashVisible: visible });
+      },
+
+      setCalendarVisible: (visible: boolean) => {
+        set({ isCalendarVisible: visible });
       },
 
       // Icon visibility setter
@@ -210,6 +222,7 @@ export const useDockStore = create<DockState>()(
           isBackgroundsVisible: false,
           isSiteBlockerVisible: false,
           isTabStashVisible: false,
+          isCalendarVisible: false,
 
           // Don't reset icon visibility on reset
           currentOnboardingStep: -1,

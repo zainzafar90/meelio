@@ -21,7 +21,7 @@ import { PremiumFeature } from "../../../components/common/premium-feature";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
-const STATIC_DOCK_ITEMS: {
+const BASE_STATIC_DOCK_ITEMS: {
   id: string;
   name: string;
   icon: DockIconComponent;
@@ -73,8 +73,10 @@ export const Dock = () => {
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
+    toggleCalendar,
     resetDock,
     dockIconsVisible,
+    isCalendarVisible,
   } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
@@ -93,7 +95,9 @@ export const Dock = () => {
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
+      toggleCalendar: state.toggleCalendar,
       dockIconsVisible: state.dockIconsVisible,
+      isCalendarVisible: state.isCalendarVisible,
     }))
   );
 
@@ -103,6 +107,16 @@ export const Dock = () => {
       user: state.user,
       guestUser: state.guestUser,
     }))
+  );
+
+  const staticItems = useMemo(
+    () =>
+      BASE_STATIC_DOCK_ITEMS.map((item) =>
+        item.id === "calendar"
+          ? { ...item, onClick: toggleCalendar, isActive: isCalendarVisible }
+          : item,
+      ),
+    [toggleCalendar, isCalendarVisible],
   );
 
   const items = useMemo(
@@ -204,6 +218,7 @@ export const Dock = () => {
       toggleSiteBlocker,
       toggleTabStash,
       toggleBackgrounds,
+      toggleCalendar,
       dockIconsVisible,
     ]
   );
@@ -276,7 +291,7 @@ export const Dock = () => {
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/10 pl-3">
-              {STATIC_DOCK_ITEMS.map((item, index) => {
+              {staticItems.map((item, index) => {
                 if (
                   (item.id === "clock" && !dockIconsVisible.clock) ||
                   (item.id === "calendar" && !dockIconsVisible.calendar)
@@ -296,9 +311,13 @@ export const Dock = () => {
                         "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                     )}
                   >
-                    <div className="flex items-center justify-center">
-                      <item.icon />
-                    </div>
+                    {item.id === "calendar" ? (
+                      <DockButton item={item} />
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <item.icon />
+                      </div>
+                    )}
                   </div>
                 );
               })}

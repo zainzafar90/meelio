@@ -7,12 +7,12 @@ import {
   AppProvider, 
   AuthContainer, 
   Clock, 
-  TabStashSheet, 
-  useAuthStore, 
+  TabStashSheet,
+  CalendarSheet,
+  useAuthStore,
   useDockStore,
   TaskListSheet,
   Background,
-  BackgroundOverlay,
   BackgroundSelectorSheet,
   BreathePod,
   Greeting,
@@ -23,6 +23,7 @@ import {
   SiteBlockerSheet,
   SimpleTimer
  } from "@repo/shared";
+ import {CalendarDynamicIsland} from "@repo/shared";
 import { useAppStore } from "@repo/shared";
 
 import "./style.css";
@@ -33,17 +34,11 @@ const Home = () => {
     guestUser: state.guestUser,
   })));
 
-  const renderBackground = () => (
-    <>
-      <Background />
-      <BackgroundOverlay />
-    </>
-  );
 
   if (!user && !guestUser) {
     return (
       <>
-        {renderBackground()}
+        <Background />
         <AuthContainer />
       </>
     );
@@ -51,7 +46,7 @@ const Home = () => {
 
   return (
     <>
-      {renderBackground()}
+      <Background />
       <AppLayout>
         <TopBar />
         <Content />
@@ -81,6 +76,7 @@ const Content = () => {
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <CalendarSheet />
     </main>
   );
 };
@@ -124,7 +120,9 @@ const BreathingContent = () => {
 
 const TopBar = () => {
   return (
-    <div className="relative" />
+    <div className="relative flex justify-center pt-0">
+      <CalendarDynamicIsland />
+    </div>
   );
 };
 
