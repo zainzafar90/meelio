@@ -19,35 +19,23 @@ export const useCalendar = (): void => {
       window.history.replaceState({}, "", window.location.pathname);
       if (status === "connected") {
         setCalendarVisible(false);
-        // Force token initialization with retry logic after OAuth success
-        const retryTokenInit = async () => {
-          await initializeToken();
-          // If no token after first try, retry once more after a delay
-          setTimeout(async () => {
-            const currentToken = useCalendarStore.getState().token;
-            if (!currentToken) {
-              await initializeToken();
-            }
-          }, 500);
-        };
-        retryTokenInit();
+        // Force token initialization after OAuth success (always needed for connection flow)
+        initializeToken();
       }
     }
 
-    // Initialize token if user is authenticated and no token exists
-    // (We always check for tokens regardless of visibility setting)
-    if (user && !token) {
+    // Only initialize token if user is authenticated, no token exists, AND calendar is enabled
+    if (user && !token && calendarEnabled) {
       initializeToken();
     }
-  }, [user, token, initializeToken, setCalendarVisible]);
+  }, [user, token, calendarEnabled, initializeToken, setCalendarVisible]);
 
   // Remove refresh interval - backend handles token refresh automatically
 
   useEffect(() => {
-    // Load events when token is available (regardless of visibility)
-    // This keeps data fresh for quick show/hide
-    if (token) {
+    // Only load events when token is available AND calendar features are enabled
+    if (token && calendarEnabled) {
       loadEvents(true); // Force refresh after OAuth
     }
-  }, [token, loadEvents]);
+  }, [token, calendarEnabled, loadEvents]);
 };

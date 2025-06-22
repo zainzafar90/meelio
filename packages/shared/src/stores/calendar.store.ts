@@ -14,10 +14,12 @@ const MIN_CACHE_DURATION = 60 * 1000; // 1 minute
 export interface CalendarState {
   token: string | null;
   expiresAt: number | null;
+  connectedEmail: string | null;
   events: CalendarEvent[];
   eventsLastFetched: number | null;
   nextEvent: CalendarEvent | null;
   setToken: (token: string, expiresAt: number) => void;
+  setConnectedEmail: (email: string) => void;
   clearCalendar: () => void;
   initializeToken: () => Promise<void>;
   refreshToken: () => Promise<void>;
@@ -34,16 +36,21 @@ export const useCalendarStore = create<CalendarState>()(
     (set, get) => ({
       token: null,
       expiresAt: null,
+      connectedEmail: null,
       events: [],
       eventsLastFetched: null,
       nextEvent: null,
       setToken: (token, expiresAt) => {
         set({ token, expiresAt });
       },
+      setConnectedEmail: (email) => {
+        set({ connectedEmail: email });
+      },
       clearCalendar: () => {
         set({
           token: null,
           expiresAt: null,
+          connectedEmail: null,
           events: [],
           eventsLastFetched: null,
           nextEvent: null,
@@ -53,8 +60,6 @@ export const useCalendarStore = create<CalendarState>()(
         const { user } = useAuthStore.getState();
         if (!user) return;
 
-        // Allow token initialization even if settings aren't enabled yet
-        // This handles OAuth callback timing where token exists but settings sync is delayed
         try {
           const response = await getCalendarToken();
           const { accessToken, expiresAt } = response.data;
@@ -98,26 +103,32 @@ export const useCalendarStore = create<CalendarState>()(
         const { user } = useAuthStore.getState();
         if (!user) return;
 
-        // Load events when token exists (regardless of visibility setting)
-        // This keeps data fresh for quick show/hide
+        // Only load events when calendar features are enabled
+        const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
+        if (!calendarEnabled) return;
 
-        const { eventsLastFetched } = get();
+        const { eventsLastFetched, token } = get();
         const cacheDuration = get().getSmartCacheDuration();
 
         if (!force && eventsLastFetched && Date.now() - eventsLastFetched < cacheDuration) {
           return;
         }
 
-        // Get fresh token from backend (backend handles refresh automatically)
-        await get().initializeToken();
-
-        const currentToken = get().token;
-        if (!currentToken) {
+        // Use existing token, don't initialize unnecessarily
+        if (!token) {
           return;
         }
 
         try {
-          const events = await fetchCalendarEvents(currentToken);
+          const eventsResponse = await fetchCalendarEvents(token);
+          
+          // Extract Google account email from calendar response
+          const googleEmail = eventsResponse.summary || null;
+          if (googleEmail && googleEmail !== get().connectedEmail) {
+            set({ connectedEmail: googleEmail });
+          }
+
+          const events = eventsResponse.items || [];
           const now = new Date();
 
           const futureEvents = events

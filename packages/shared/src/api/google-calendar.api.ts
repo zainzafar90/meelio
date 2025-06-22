@@ -38,6 +38,15 @@ export interface CalendarEvent {
   updated?: string;
 }
 
+export interface CalendarEventsResponse {
+  kind: string;
+  etag: string;
+  summary: string;
+  description: string;
+  timeZone: string;
+  items: CalendarEvent[];
+}
+
 export class CalendarEventError extends Error {
   constructor(message: string) {
     super(message);
@@ -58,7 +67,7 @@ export class CalendarAuthError extends Error {
 export const fetchCalendarEvents = async (
   token: string,
   fetchFn: typeof fetch = fetch
-): Promise<CalendarEvent[]> => {
+): Promise<CalendarEventsResponse> => {
   const timeMin = new Date().toISOString();
   const timeMax = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ahead
 
@@ -83,6 +92,6 @@ export const fetchCalendarEvents = async (
     );
   }
 
-  const data = (await res.json()) as { items: CalendarEvent[] };
-  return data.items || [];
+  const data = (await res.json()) as CalendarEventsResponse;
+  return data;
 };

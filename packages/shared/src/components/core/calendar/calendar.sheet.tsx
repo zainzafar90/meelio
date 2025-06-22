@@ -31,10 +31,11 @@ export const CalendarSheet = () => {
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
-  const { token, events, clearCalendar } = useCalendarStore(
+  const { token, events, connectedEmail, clearCalendar } = useCalendarStore(
     useShallow((state) => ({
       token: state.token,
       events: state.events,
+      connectedEmail: state.connectedEmail,
       clearCalendar: state.clearCalendar,
     }))
   );
@@ -154,7 +155,17 @@ export const CalendarSheet = () => {
         className="flex flex-col gap-4 p-6 sm:max-w-sm"
       >
         <SheetHeader>
-          <SheetTitle>{t("calendar.sheet.title")}</SheetTitle>
+          <SheetTitle>
+            {t("calendar.sheet.title")}
+            {connectedEmail && (
+              <div className="text-sm font-normal text-muted-foreground mt-1">
+                Connected as{" "}
+                <span className="font-medium text-blue-600">
+                  {connectedEmail}
+                </span>
+              </div>
+            )}
+          </SheetTitle>
         </SheetHeader>
 
         {isConnected ? (

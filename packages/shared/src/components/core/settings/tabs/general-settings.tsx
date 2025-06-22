@@ -55,9 +55,10 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     }))
   );
 
-  const { token, clearCalendar } = useCalendarStore(
+  const { token, connectedEmail, clearCalendar } = useCalendarStore(
     useShallow((state) => ({
       token: state.token,
+      connectedEmail: state.connectedEmail,
       clearCalendar: state.clearCalendar,
     }))
   );
@@ -349,9 +350,21 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed pr-4">
-              {isGuestUser
-                ? "Sign up for a free account to connect your Google Calendar and see upcoming events"
-                : "Connect your Google Calendar to access events and display upcoming meetings directly in your workspace"}
+              {isGuestUser ? (
+                "Sign up for a free account to connect your Google Calendar and see upcoming events"
+              ) : isCalendarConnected && connectedEmail ? (
+                <span>
+                  {" "}
+                  Connected to{" "}
+                  <span className="font-medium text-blue-600">
+                    {connectedEmail}
+                  </span>
+                  . Access events and display upcoming meetings directly in your
+                  workspace.
+                </span>
+              ) : (
+                "Connect your Google Calendar to access events and display upcoming meetings directly in your workspace"
+              )}
             </p>
           </div>
 
