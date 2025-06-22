@@ -38,15 +38,22 @@ export const siteBlockerController = {
   }),
 
   /**
-   * Create a site blocker
+   * Create or toggle a site blocker
    */
   createSiteBlocker: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const siteBlocker = await siteBlockerService.createSiteBlocker(
+    const result = await siteBlockerService.createSiteBlocker(
       user.id,
       req.body
     );
-    return res.status(httpStatus.CREATED).json(siteBlocker);
+    
+    if (result === null) {
+      // Site was removed
+      return res.status(httpStatus.OK).json({ removed: true });
+    } else {
+      // Site was added
+      return res.status(httpStatus.CREATED).json(result);
+    }
   }),
 
   /**

@@ -50,12 +50,12 @@ export const siteBlockerService = {
   },
 
   /**
-   * Create a site blocker
+   * Create or toggle a site blocker
    */
   createSiteBlocker: async (
     userId: string,
     data: any
-  ): Promise<SiteBlocker> => {
+  ): Promise<SiteBlocker | null> => {
     // Normalize URL to prevent duplicates
     const normalizedUrl = data.url
       .replace(/^(https?:\/\/)?(www\.)?/, "")
@@ -72,10 +72,16 @@ export const siteBlockerService = {
       );
 
     if (existingSite.length > 0) {
-      throw new ApiError(
-        httpStatus.CONFLICT,
-        `Site ${data.url} is already blocked`
-      );
+      // Remove the existing site blocker
+      await db
+        .delete(siteBlockers)
+        .where(
+          and(
+            eq(siteBlockers.userId, userId),
+            eq(siteBlockers.url, normalizedUrl)
+          )
+        );
+      return null;
     }
 
     const insertData = {
