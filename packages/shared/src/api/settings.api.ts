@@ -21,4 +21,9 @@ export const settingsApi = {
     const response = await axios.patch("/v1/settings/tasks", taskSettings);
     return response.data.settings;
   },
+
+  updateCalendarSettings: async (calendarSettings: { enabled: boolean }) => {
+    const response = await axios.patch("/v1/settings/calendar", calendarSettings);
+    return response.data.settings;
+  },
 };

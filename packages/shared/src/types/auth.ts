@@ -17,6 +17,9 @@ export interface UserSettings {
   task: {
     confettiOnComplete: boolean;
   };
+  calendar: {
+    enabled: boolean;
+  };
 }
 
 export type AuthUser = {

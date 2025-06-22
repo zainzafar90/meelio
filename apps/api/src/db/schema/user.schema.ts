@@ -27,6 +27,9 @@ export const DEFAULT_SETTINGS: IUserSettings = {
   task: {
     confettiOnComplete: false,
   },
+  calendar: {
+    enabled: false,
+  },
 };
 
 const EnumUserRole = customType<{

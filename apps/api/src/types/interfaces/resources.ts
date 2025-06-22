@@ -46,10 +46,15 @@ export interface ITaskSettings {
   confettiOnComplete: boolean;
 }
 
+export interface ICalendarSettings {
+  enabled: boolean;
+}
+
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
   onboardingCompleted: boolean;
   task: ITaskSettings;
+  calendar: ICalendarSettings;
 }
 
 export interface IUser {

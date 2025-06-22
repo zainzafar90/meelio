@@ -17,6 +17,19 @@ router
 router
   .route("/pomodoro")
   .patch(auth(), settingsController.updatePomodoroSettings);
-router.route("/tasks").patch(auth(), settingsController.updateSettings);
+router
+  .route("/tasks")
+  .patch(
+    auth(),
+    validate(settingsValidation.updateTaskSettingsSchema),
+    settingsController.updateTaskSettings
+  );
+router
+  .route("/calendar")
+  .patch(
+    auth(),
+    validate(settingsValidation.updateCalendarSettingsSchema),
+    settingsController.updateCalendarSettings
+  );
 
 export default router;

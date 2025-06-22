@@ -3,15 +3,17 @@ import { useShallow } from "zustand/shallow";
 
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
+import { useAuthStore } from "../../../stores/auth.store";
 import { getCalendarColor } from "../../../utils/calendar-colors";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
 
 export const CalendarDynamicIsland = () => {
-  const { getMinutesUntilNextEvent, nextEvent } = useCalendarStore(
+  const { getMinutesUntilNextEvent, nextEvent, token } = useCalendarStore(
     useShallow((state) => ({
       getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
       nextEvent: state.nextEvent,
+      token: state.token,
     }))
   );
 
@@ -20,6 +22,14 @@ export const CalendarDynamicIsland = () => {
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
+
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
+  const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
 
   const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
 
@@ -35,7 +45,10 @@ export const CalendarDynamicIsland = () => {
     return () => clearInterval(interval);
   }, [getMinutesUntilNextEvent, nextEvent]);
 
-  if (!nextEvent || minutesLeft === null) {
+  const shouldShow =
+    !!token && calendarEnabled && nextEvent && minutesLeft !== null;
+
+  if (!shouldShow) {
     return null;
   }
 

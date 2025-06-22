@@ -49,18 +49,3 @@ export function saveCalendarToken(
 export function deleteCalendarToken(): Promise<AxiosResponse> {
   return axios.delete("/v1/calendar/tokens");
 }
-
-/**
- * Get a fresh access token from the server
- */
-export async function fetchCalendarAccessToken(): Promise<CalendarAccessToken> {
-  const res = await getCalendarToken();
-  const { accessToken, expiresAt } = res.data;
-  if (!accessToken || !expiresAt) {
-    throw new Error("Missing calendar token");
-  }
-  return {
-    accessToken,
-    expiresAt: new Date(expiresAt).getTime(),
-  };
-}

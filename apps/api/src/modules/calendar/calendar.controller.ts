@@ -15,13 +15,13 @@ interface AuthorizeRequest extends Request {
  */
 const authorize = async (req: AuthorizeRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
-    if (!userId) {
+    const user = req.user as IUser;
+    if (!user?.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
     const state = Buffer.from(
-      JSON.stringify({ userId, timestamp: Date.now() })
+      JSON.stringify({ userId: user.id, timestamp: Date.now() })
     ).toString("base64");
 
     const authUrl = await calendarService.generateAuthUrl(state);

@@ -33,3 +33,14 @@ export const updateTaskSettings = catchAsync(
     res.status(httpStatus.OK).send({ settings });
   }
 );
+
+export const updateCalendarSettings = catchAsync(
+  async (req: Request, res: Response): Promise<void> => {
+    const user = req.user as IUser;
+    const settings = await settingsService.updateCalendarSettings(
+      user.id,
+      req.body
+    );
+    res.status(httpStatus.OK).send({ settings });
+  }
+);

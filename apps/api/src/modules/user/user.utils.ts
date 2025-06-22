@@ -39,6 +39,10 @@ export const userUtils = {
           ...DEFAULT_SETTINGS.task,
           ...userSettings.task,
         },
+        calendar: {
+          ...DEFAULT_SETTINGS.calendar,
+          ...userSettings.calendar,
+        },
       } as typeof safeUser.settings;
     }
 

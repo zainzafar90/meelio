@@ -4,6 +4,7 @@ import { google } from "googleapis";
 import { calendar, Calendar, CalendarInsert } from "@/db/schema";
 import { db } from "@/db";
 import { config } from "@/config/config";
+import { settingsService } from "../settings/settings.service";
 
 /**
  * Get configured OAuth2 client
@@ -92,25 +93,32 @@ export const calendarService = {
       where: eq(calendar.userId, userId),
     });
 
+    let result: Calendar;
+
     if (existing) {
       const [updated] = await db
         .update(calendar)
         .set({ accessToken, refreshToken, expiresAt })
         .where(eq(calendar.userId, userId))
         .returning();
-      return updated;
+      result = updated;
+    } else {
+      const [created] = await db
+        .insert(calendar)
+        .values({
+          userId,
+          accessToken,
+          refreshToken,
+          expiresAt,
+        } as CalendarInsert)
+        .returning();
+      result = created;
     }
 
-    const [created] = await db
-      .insert(calendar)
-      .values({
-        userId,
-        accessToken,
-        refreshToken,
-        expiresAt,
-      } as CalendarInsert)
-      .returning();
-    return created;
+    // Auto-enable calendar features when token is first saved
+    await settingsService.updateCalendarSettings(userId, { enabled: true });
+
+    return result;
   },
 
   /**
@@ -118,6 +126,9 @@ export const calendarService = {
    */
   async deleteToken(userId: string): Promise<void> {
     await db.delete(calendar).where(eq(calendar.userId, userId));
+    
+    // Auto-disable calendar features when token is deleted
+    await settingsService.updateCalendarSettings(userId, { enabled: false });
   },
 
   /**

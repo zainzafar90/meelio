@@ -16,6 +16,10 @@ export const taskSettingsSchema = z.object({
   confettiOnComplete: z.boolean(),
 });
 
+export const calendarSettingsSchema = z.object({
+  enabled: z.boolean(),
+});
+
 export const userSettingsSchema = z.object({
   pomodoro: pomodoroSettingsSchema.optional(),
   onboardingCompleted: z.boolean().optional(),
@@ -28,6 +32,10 @@ export const updateSettingsSchema = z.object({
 
 export const updateTaskSettingsSchema = z.object({
   body: taskSettingsSchema,
+});
+
+export const updateCalendarSettingsSchema = z.object({
+  body: calendarSettingsSchema,
 });
 
 export type PomodoroSettings = z.infer<typeof pomodoroSettingsSchema>;

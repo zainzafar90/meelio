@@ -3,11 +3,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
 import {
   getCalendarToken,
-  fetchCalendarAccessToken,
 } from "../api/calendar.api";
 import { useAuthStore } from "../stores/auth.store";
 
-export const REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
+export const REFRESH_THRESHOLD_MS = 15 * 60 * 1000;
 const BASE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 const MIN_CACHE_DURATION = 60 * 1000; // 1 minute
@@ -28,18 +27,7 @@ export interface CalendarState {
   getSmartCacheDuration: () => number;
 }
 
-export function shouldRefreshToken(
-  token: string | null,
-  expiresAt: number | null,
-  now: number,
-  thresholdMs = REFRESH_THRESHOLD_MS
-): boolean {
-  if (!token || !expiresAt) return true;
-  const timeUntilExpiry = expiresAt - now;
-  const shouldRefresh = timeUntilExpiry <= thresholdMs;
-
-  return shouldRefresh;
-}
+// Removed shouldRefreshToken - backend handles token refresh automatically
 
 export const useCalendarStore = create<CalendarState>()(
   persist(
@@ -62,6 +50,11 @@ export const useCalendarStore = create<CalendarState>()(
         });
       },
       initializeToken: async () => {
+        const { user } = useAuthStore.getState();
+        if (!user) return;
+
+        // Allow token initialization even if settings aren't enabled yet
+        // This handles OAuth callback timing where token exists but settings sync is delayed
         try {
           const response = await getCalendarToken();
           const { accessToken, expiresAt } = response.data;
@@ -75,25 +68,9 @@ export const useCalendarStore = create<CalendarState>()(
         }
       },
       refreshToken: async () => {
-        const { token, expiresAt } = get();
-        const now = Date.now();
-
-        if (!shouldRefreshToken(token, expiresAt, now)) {
-          return;
-        }
-
-        try {
-          const data = await fetchCalendarAccessToken();
-          if (data.accessToken && data.expiresAt) {
-            set({
-              token: data.accessToken,
-              expiresAt: data.expiresAt,
-            });
-          }
-        } catch (error) {
-          console.error("[refreshToken] Failed:", error);
-          get().clearCalendar();
-        }
+        // Backend handles token refresh automatically
+        // This method exists for compatibility but delegates to initializeToken
+        return get().initializeToken();
       },
 
       getSmartCacheDuration: () => {
@@ -121,6 +98,9 @@ export const useCalendarStore = create<CalendarState>()(
         const { user } = useAuthStore.getState();
         if (!user) return;
 
+        // Load events when token exists (regardless of visibility setting)
+        // This keeps data fresh for quick show/hide
+
         const { eventsLastFetched } = get();
         const cacheDuration = get().getSmartCacheDuration();
 
@@ -128,11 +108,11 @@ export const useCalendarStore = create<CalendarState>()(
           return;
         }
 
-        await get().refreshToken();
+        // Get fresh token from backend (backend handles refresh automatically)
+        await get().initializeToken();
 
         const currentToken = get().token;
         if (!currentToken) {
-          console.error("No token available to load events");
           return;
         }
 
@@ -164,7 +144,6 @@ export const useCalendarStore = create<CalendarState>()(
             error.message?.includes("401") ||
             error.message?.includes("Failed to fetch events")
           ) {
-            console.error("Token appears to be invalid, clearing calendar");
             get().clearCalendar();
           }
         }

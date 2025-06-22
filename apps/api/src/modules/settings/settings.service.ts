@@ -45,7 +45,12 @@ class SettingsService {
     }
 
     const newSettings: IUserSettings = {
+      ...DEFAULT_SETTINGS,
       ...currentSettings,
+      calendar: {
+        ...DEFAULT_SETTINGS.calendar,
+        ...currentSettings.calendar,
+      },
     };
 
     if (updates.pomodoro) {
@@ -63,6 +68,13 @@ class SettingsService {
       newSettings.task = {
         ...currentSettings.task,
         ...updates.task,
+      };
+    }
+
+    if (updates.calendar) {
+      newSettings.calendar = {
+        ...currentSettings.calendar,
+        ...updates.calendar,
       };
     }
 
@@ -94,6 +106,15 @@ class SettingsService {
 
   async updateTaskSettings(userId: string, taskSettings: any) {
     return this.updateSettings(userId, { task: taskSettings });
+  }
+
+  async getCalendarSettings(userId: string) {
+    const settings = await this.getSettings(userId);
+    return settings.calendar || DEFAULT_SETTINGS.calendar;
+  }
+
+  async updateCalendarSettings(userId: string, calendarSettings: any) {
+    return this.updateSettings(userId, { calendar: calendarSettings });
   }
 }
 
