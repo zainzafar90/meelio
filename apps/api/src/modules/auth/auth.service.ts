@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import httpStatus from "http-status";
 import moment from "moment";
 import jwt from "jsonwebtoken";
@@ -177,6 +177,7 @@ const checkSubscription = async (
 }> => {
   const subscription = await db.query.subscriptions.findFirst({
     where: eq(subscriptions.email, email),
+    orderBy: desc(subscriptions.createdAt),
   });
 
   if (!subscription)
