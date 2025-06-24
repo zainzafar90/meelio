@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
+
 import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
@@ -30,28 +36,34 @@ export const PlayButton = (props: Props) => {
   const Icon = isAnySoundPlaying ? Icons.pause : Icons.play;
 
   return (
-    <button
-      role="button"
-      onClick={() => toggleAllSounds()}
-      aria-label={isAnySoundPlaying ? "Paused" : "Playing"}
-      disabled={!props.isPlayButtonActive}
-      className={cn(
-        "group relative flex cursor-pointer items-center justify-center",
-        {
-          "hover:bg-initial cursor-not-allowed opacity-50":
-            !props.isPlayButtonActive,
-        }
-      )}
-    >
-      <div
-        className={cn(
-          "flex size-12 items-center justify-center rounded-xl bg-zinc-900",
-          "shadow-sm shadow-zinc-950/50"
-        )}
-        title={isAnySoundPlaying ? "Paused" : "Playing"}
-      >
-        <Icon className="size-4 text-white" />
-      </div>
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          role="button"
+          onClick={() => toggleAllSounds()}
+          aria-label={isAnySoundPlaying ? "Pause" : "Play"}
+          disabled={!props.isPlayButtonActive}
+          className={cn(
+            "group relative flex cursor-pointer items-center justify-center",
+            {
+              "hover:bg-initial cursor-not-allowed opacity-50":
+                !props.isPlayButtonActive,
+            }
+          )}
+        >
+          <div
+            className={cn(
+              "flex size-12 items-center justify-center rounded-xl bg-zinc-900",
+              "shadow-sm shadow-zinc-950/50"
+            )}
+          >
+            <Icon className="size-4 text-white" />
+          </div>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top">
+        <p>{isAnySoundPlaying ? "Pause all sounds" : "Play sounds"}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
