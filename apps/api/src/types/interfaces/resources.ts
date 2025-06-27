@@ -33,6 +33,18 @@ export interface IToken {
   blacklisted?: boolean;
 }
 
+export interface ISession {
+  id?: string;
+  userId: string;
+  provider: string;
+  accessToken: string;
+  accessTokenExpires?: Date;
+  refreshToken?: string | null;
+  refreshTokenExpires?: Date | null;
+  deviceInfo?: string | null;
+  blacklisted?: boolean;
+}
+
 export interface IPomodoroSettings {
   workDuration: number;
   breakDuration: number;

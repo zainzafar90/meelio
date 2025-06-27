@@ -11,13 +11,15 @@ import { Moment } from "moment";
 import { config } from "@/config/config";
 import {
   IAccessAndRefreshTokens,
-  IToken,
+  ISession,
   IUser,
 } from "@/types/interfaces/resources";
 import {
   Account,
   AccountInsert,
   accounts,
+  sessions,
+  SessionInsertTable,
   subscriptions,
   users,
 } from "@/db/schema";
@@ -37,7 +39,7 @@ export const generateToken = (
   userId: string,
   expires: Moment,
   type: "access" | "refresh",
-  secret: string = config.jwt.secret
+  secret: string = config.jwt.secret,
 ): string => {
   const payload = {
     sub: userId,
@@ -52,13 +54,13 @@ export const generateToken = (
  * Verify token and return token doc (or throw an error if it is not valid)
  * @param {string} token
  * @param {string} type
- * @returns {Promise<ITokenDoc>}
+ * @returns {Promise<ISession>}
  */
-const verifyToken = async (token: string): Promise<IToken> => {
+const verifyToken = async (token: string): Promise<ISession> => {
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "Authentication token is missing"
+      "Authentication token is missing",
     );
   }
 
@@ -72,22 +74,21 @@ const verifyToken = async (token: string): Promise<IToken> => {
   if (!payload || !payload.sub || typeof payload.sub !== "string") {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
-      "Token payload is malformed or bad user"
+      "Token payload is malformed or bad user",
     );
   }
 
-  const accountTokenDoc = await db.query.accounts.findFirst({
+  const sessionDoc = await db.query.sessions.findFirst({
     where: and(
-      eq(accounts.accessToken, token),
-      eq(accounts.userId, payload.sub),
-      eq(accounts.blacklisted, false)
+      eq(sessions.accessToken, token),
+      eq(sessions.blacklisted, false),
     ),
   });
 
-  if (!accountTokenDoc) {
+  if (!sessionDoc) {
     throw new Error("Token not found");
   }
-  return accountTokenDoc;
+  return sessionDoc;
 };
 
 /**
@@ -96,15 +97,15 @@ const verifyToken = async (token: string): Promise<IToken> => {
  * @returns {Promise<AccountTokens>}
  */
 const generateAuthTokens = async (
-  user: IUser
+  user: IUser,
 ): Promise<IAccessAndRefreshTokens> => {
   const accessExpiration = moment().add(
     config.jwt.accessExpirationMinutes,
-    "minutes"
+    "minutes",
   );
   const refreshExpiration = moment().add(
     config.jwt.refreshExpirationDays,
-    "days"
+    "days",
   );
 
   const accessToken = generateToken(user.id, accessExpiration, "access");
@@ -124,8 +125,26 @@ const generateAuthTokens = async (
   return tokens;
 };
 
+const insertSession = async (
+  userId: string,
+  provider: Provider,
+  tokens: IAccessAndRefreshTokens,
+  deviceInfo?: string,
+  database = db,
+): Promise<void> => {
+  await database.insert(sessions).values({
+    userId,
+    provider,
+    accessToken: tokens.access.token,
+    accessTokenExpires: tokens.access.expires,
+    refreshToken: tokens.refresh.token,
+    refreshTokenExpires: tokens.refresh.expires,
+    deviceInfo,
+  } as SessionInsertTable);
+};
+
 /**
- * Update account tokens in database
+ * Record a new session for the user
  * @param {string} userId
  * @param {string} provider
  * @param {object} tokens
@@ -133,35 +152,41 @@ const generateAuthTokens = async (
 const updateAccountTokens = async (
   userId: string,
   provider: string,
-  tokens: IAccessAndRefreshTokens
+  tokens: IAccessAndRefreshTokens,
+  deviceInfo?: string,
+  database = db,
 ): Promise<void> => {
-  const account = await db.query.accounts.findFirst({
+  const account = await database.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, userId),
-      eq(accounts.provider, provider as Provider)
+      eq(accounts.provider, provider as Provider),
     ),
   });
 
-  if (account) {
-    await db
-      .update(accounts)
-      .set({
-        accessToken: tokens.access.token,
-        accessTokenExpires: tokens.access.expires,
-        refreshToken: tokens.refresh.token,
-        refreshTokenExpires: tokens.refresh.expires,
-      } as Account)
-      .where(eq(accounts.id, account.id));
-  } else {
-    await db.insert(accounts).values({
-      userId,
-      provider,
-      accessToken: tokens.access.token,
-      accessTokenExpires: tokens.access.expires,
-      refreshToken: tokens.refresh.token,
-      refreshTokenExpires: tokens.refresh.expires,
-    } as Account);
+  if (!account) {
+    await database
+      .insert(accounts)
+      .values({ userId, provider } as AccountInsert);
   }
+
+  await insertSession(
+    userId,
+    provider as Provider,
+    tokens,
+    deviceInfo,
+    database,
+  );
+};
+
+const logoutSession = async (
+  accessToken: string,
+  database = db,
+): Promise<void> => {
+  const session = await verifyToken(accessToken);
+  await database
+    .update(sessions)
+    .set({ blacklisted: true })
+    .where(eq(sessions.id, session.id!));
 };
 
 /**
@@ -170,7 +195,7 @@ const updateAccountTokens = async (
  * @returns {Promise<boolean>}
  */
 const checkSubscription = async (
-  email: string
+  email: string,
 ): Promise<{
   isPro: boolean;
   subscriptionId: string | null;
@@ -205,7 +230,7 @@ const checkSubscription = async (
  */
 const getUserAccount = async (
   accessToken: string,
-  includeId?: boolean
+  includeId?: boolean,
 ): Promise<{
   user: IUser;
   userId: string;
@@ -240,7 +265,7 @@ const getUserAccount = async (
  */
 const updateUserAccount = async (
   accessToken: string,
-  updateBody: IUser
+  updateBody: IUser,
 ): Promise<{
   user: IUser;
   isPro: boolean;
@@ -275,7 +300,7 @@ const updateUserAccount = async (
  */
 const loginUserWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<IUser> => {
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
@@ -284,14 +309,14 @@ const loginUserWithEmailAndPassword = async (
   const account = await db.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, user?.id),
-      eq(accounts.provider, Provider.PASSWORD)
+      eq(accounts.provider, Provider.PASSWORD),
     ),
   });
 
   if (!account) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "This email is registered with a different provider. Please make sure you are using the right email and password."
+      "This email is registered with a different provider. Please make sure you are using the right email and password.",
     );
   }
 
@@ -310,13 +335,13 @@ const loginUserWithEmailAndPassword = async (
  */
 const resetPassword = async (
   resetPasswordToken: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<void> => {
   try {
     const resetPasswordTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         resetPasswordToken,
-        VerificationTokenType.RESET_PASSWORD
+        VerificationTokenType.RESET_PASSWORD,
       );
     const user = await userService.getUserByEmail(resetPasswordTokenDoc.email);
     if (!user) {
@@ -326,7 +351,7 @@ const resetPassword = async (
 
     await verificationTokenService.deleteMany(
       user.email,
-      VerificationTokenType.RESET_PASSWORD
+      VerificationTokenType.RESET_PASSWORD,
     );
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Password reset failed");
@@ -342,7 +367,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
     const verifyEmailTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyEmailToken,
-        VerificationTokenType.VERIFY_EMAIL
+        VerificationTokenType.VERIFY_EMAIL,
       );
     const user = await userService.getUserByEmail(verifyEmailTokenDoc.email);
 
@@ -352,7 +377,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
 
     await verificationTokenService.deleteMany(
       user.email,
-      VerificationTokenType.VERIFY_EMAIL
+      VerificationTokenType.VERIFY_EMAIL,
     );
     const updatedUser = await userService.updateUserById(user.id, {
       isEmailVerified: true,
@@ -368,19 +393,19 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
  * @param {string} verifyMagicLinkToken
  */
 const verifyMagicLink = async (
-  verifyMagicLinkToken: string
+  verifyMagicLinkToken: string,
 ): Promise<IUser | null> => {
   try {
     const verifyMagicLinkTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyMagicLinkToken,
-        VerificationTokenType.MAGIC_LINK
+        VerificationTokenType.MAGIC_LINK,
       );
 
     if (!verifyMagicLinkTokenDoc) {
       throw new ApiError(
         httpStatus.BAD_REQUEST,
-        "Expired or invalid magic link token"
+        "Expired or invalid magic link token",
       );
     }
 
@@ -403,7 +428,7 @@ const verifyMagicLink = async (
           if (!user) {
             throw new ApiError(
               httpStatus.INTERNAL_SERVER_ERROR,
-              "Failed to retrieve existing user"
+              "Failed to retrieve existing user",
             );
           }
         } else {
@@ -415,32 +440,23 @@ const verifyMagicLink = async (
     const existingAccount = await db.query.accounts.findFirst({
       where: and(
         eq(accounts.userId, user.id),
-        eq(accounts.provider, Provider.MAGIC_LINK)
+        eq(accounts.provider, Provider.MAGIC_LINK),
       ),
     });
 
     if (!existingAccount && user.id) {
-      try {
-        const tokens = await generateAuthTokens(user);
-        await db.insert(accounts).values({
-          providerAccountId: user.id,
-          provider: Provider.MAGIC_LINK,
-          userId: user.id,
-          accessToken: tokens.access.token,
-          accessTokenExpires: tokens.access.expires,
-          refreshToken: tokens.refresh.token,
-          refreshTokenExpires: tokens.refresh.expires,
-        } as AccountInsert);
-      } catch (accountError) {
-        // Continue even if account creation fails - the user was created successfully
-      }
+      await db.insert(accounts).values({
+        providerAccountId: user.id,
+        provider: Provider.MAGIC_LINK,
+        userId: user.id,
+      } as AccountInsert);
     }
 
     return user;
   } catch (error) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "Magic link verification failed"
+      "Magic link verification failed",
     );
   }
 };
@@ -451,6 +467,7 @@ export const accountService = {
   generateToken,
   generateAuthTokens,
   updateAccountTokens,
+  logoutSession,
   loginUserWithEmailAndPassword,
   resetPassword,
   verifyEmail,

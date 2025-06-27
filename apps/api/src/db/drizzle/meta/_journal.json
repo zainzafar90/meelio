@@ -36,6 +36,13 @@
       "when": 1748348172043,
       "tag": "0004_silent_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1748348172044,
+      "tag": "0005_add_sessions",
+      "breakpoints": true
     }
   ]
 }
