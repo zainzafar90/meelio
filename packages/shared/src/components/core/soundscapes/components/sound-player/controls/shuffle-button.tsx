@@ -1,5 +1,11 @@
 import gsap from "gsap";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
+
 import { Sound } from "../../../../../../types";
 import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
@@ -10,7 +16,6 @@ import {
   generateNextVolumeForShuffle,
   SHUFFLE_SOUNDS_INTERVAL_MS,
 } from "../../../../../../utils/sound.utils";
-import { useTelemetry } from "../../../../../../hooks/use-telemetry";
 import { useShallow } from "zustand/shallow";
 
 export const ShuffleButton = () => {
@@ -21,8 +26,6 @@ export const ShuffleButton = () => {
     pauseSound,
     isShuffling,
     toggleShuffle,
-    pausePlayingSounds,
-    resumePausedSounds,
   } = useSoundscapesStore(useShallow((state) => state));
 
   useInterval(() => {
@@ -75,20 +78,27 @@ export const ShuffleButton = () => {
   }, SHUFFLE_SOUNDS_INTERVAL_MS);
 
   const shuffleButtonContent = (
-    <button
-      type="button"
-      className={cn(
-        "bg-muted-background focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-offset-1",
-        {
-          "bg-background/50 text-foreground": isShuffling,
-        }
-      )}
-      onClick={() => toggleShuffle()}
-      aria-label={isShuffling ? "Shuffle Enabled" : "Shuffle Disabled"}
-    >
-      <div className="absolute -inset-4 md:hidden" />
-      <Icons.shuffle className="size-6" />
-    </button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            "bg-muted-background focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/50 hover:bg-background/60 focus:outline-none focus:ring-2 focus:ring-offset-1",
+            {
+              "bg-background/50 text-foreground": isShuffling,
+            }
+          )}
+          onClick={() => toggleShuffle()}
+          aria-label={isShuffling ? "Shuffle Enabled" : "Shuffle Disabled"}
+        >
+          <div className="absolute -inset-4 md:hidden" />
+          <Icons.shuffle className="size-6" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="top">
+        <p>{isShuffling ? "Disable shuffle mode" : "Enable shuffle mode"}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 
   return (
@@ -96,14 +106,21 @@ export const ShuffleButton = () => {
       <PremiumFeature
         requirePro={true}
         fallback={
-          <button
-            type="button"
-            className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 "
-            aria-label="Premium Feature: Shuffle"
-          >
-            <div className="absolute -inset-4 md:hidden" />
-            <Icons.shuffle className="size-6" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 "
+                aria-label="Premium Feature: Shuffle"
+              >
+                <div className="absolute -inset-4 md:hidden" />
+                <Icons.shuffle className="size-6" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>Shuffle mode (Premium feature)</p>
+            </TooltipContent>
+          </Tooltip>
         }
       >
         {shuffleButtonContent}
