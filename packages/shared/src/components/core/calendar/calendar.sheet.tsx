@@ -45,11 +45,26 @@ export const CalendarSheet = () => {
   const formatTimeRemaining = (event: CalendarEvent): string => {
     const now = new Date();
     const eventStart = new Date(event.start.dateTime || event.start.date || "");
-    const diffMs = eventStart.getTime() - now.getTime();
+    const eventEnd = new Date(event.end.dateTime || event.end.date || "");
+    
+    // Check if event is currently happening
+    if (now >= eventStart && now < eventEnd) {
+      const endDiffMs = eventEnd.getTime() - now.getTime();
+      const endMinutes = Math.floor(endDiffMs / (1000 * 60));
+      
+      if (endMinutes <= 0) return "Ending now";
+      if (endMinutes < 60) return `${endMinutes} minutes left`;
+      
+      const endHours = Math.floor(endMinutes / 60);
+      return `${endHours} hours left`;
+    }
+    
+    // Event is in the future
+    const startDiffMs = eventStart.getTime() - now.getTime();
+    
+    if (startDiffMs <= 0) return "Now";
 
-    if (diffMs <= 0) return "Now";
-
-    const minutes = Math.floor(diffMs / (1000 * 60));
+    const minutes = Math.floor(startDiffMs / (1000 * 60));
     if (minutes < 60) return `${minutes} minutes before`;
 
     const hours = Math.floor(minutes / 60);
@@ -113,17 +128,18 @@ export const CalendarSheet = () => {
     const now = new Date();
     return events
       .filter((event) => {
-        const eventStart = new Date(
-          event.start.dateTime || event.start.date || ""
+        // Keep events visible until their end time has passed
+        const eventEnd = new Date(
+          event.end.dateTime || event.end.date || ""
         );
-        return eventStart > now;
+        return eventEnd > now;
       })
       .sort((a, b) => {
         const aStart = new Date(a.start.dateTime || a.start.date || "");
         const bStart = new Date(b.start.dateTime || b.start.date || "");
         return aStart.getTime() - bStart.getTime();
       })
-      .slice(0, 10); // Show max 10 upcoming events
+      .slice(0, 10); // Show max 10 events
   };
 
   const handleConnect = async () => {
