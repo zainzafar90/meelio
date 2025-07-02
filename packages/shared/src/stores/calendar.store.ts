@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
-import {
-  getCalendarToken,
-} from "../api/calendar.api";
+import { getCalendarToken } from "../api/calendar.api";
 import { useAuthStore } from "../stores/auth.store";
 
 export const REFRESH_THRESHOLD_MS = 15 * 60 * 1000;
@@ -80,7 +78,7 @@ export const useCalendarStore = create<CalendarState>()(
 
       getSmartCacheDuration: () => {
         const { nextEvent } = get();
-        
+
         if (!nextEvent) {
           return MAX_CACHE_DURATION;
         }
@@ -110,7 +108,11 @@ export const useCalendarStore = create<CalendarState>()(
         const { eventsLastFetched, token } = get();
         const cacheDuration = get().getSmartCacheDuration();
 
-        if (!force && eventsLastFetched && Date.now() - eventsLastFetched < cacheDuration) {
+        if (
+          !force &&
+          eventsLastFetched &&
+          Date.now() - eventsLastFetched < cacheDuration
+        ) {
           return;
         }
 
@@ -121,7 +123,6 @@ export const useCalendarStore = create<CalendarState>()(
 
         try {
           const eventsResponse = await fetchCalendarEvents(token);
-          
           // Extract Google account email from calendar response
           const googleEmail = eventsResponse.summary || null;
           if (googleEmail && googleEmail !== get().connectedEmail) {
@@ -131,12 +132,12 @@ export const useCalendarStore = create<CalendarState>()(
           const events = eventsResponse.items || [];
           const now = new Date();
 
-          const futureEvents = events
+          const activeEvents = events
             .filter((event) => {
-              const eventStart = new Date(
-                event.start.dateTime || event.start.date || ""
+              const eventEnd = new Date(
+                event.end.dateTime || event.end.date || ""
               );
-              return eventStart > now;
+              return eventEnd > now;
             })
             .sort((a, b) => {
               const aStart = new Date(a.start.dateTime || a.start.date || "");
@@ -147,7 +148,7 @@ export const useCalendarStore = create<CalendarState>()(
           set({
             events,
             eventsLastFetched: Date.now(),
-            nextEvent: futureEvents[0] || null,
+            nextEvent: activeEvents[0] || null,
           });
         } catch (error: any) {
           console.error("Failed to load events:", error);
@@ -170,8 +171,17 @@ export const useCalendarStore = create<CalendarState>()(
         const eventStart = new Date(
           nextEvent.start.dateTime || nextEvent.start.date || ""
         );
-        const diffMs = eventStart.getTime() - now;
+        const eventEnd = new Date(
+          nextEvent.end.dateTime || nextEvent.end.date || ""
+        );
 
+        if (now >= eventStart.getTime() && now < eventEnd.getTime()) {
+          const diffMs = eventEnd.getTime() - now;
+          if (diffMs <= 0) return 0;
+          return Math.floor(diffMs / (1000 * 60)); // Convert to minutes
+        }
+
+        const diffMs = eventStart.getTime() - now;
         if (diffMs <= 0) return 0;
 
         return Math.floor(diffMs / (1000 * 60)); // Convert to minutes

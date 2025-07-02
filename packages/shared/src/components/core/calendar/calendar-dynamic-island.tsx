@@ -85,16 +85,40 @@ export const CalendarDynamicIsland = () => {
     return `${years}y`;
   };
 
+  const getEventStatus = () => {
+    if (!nextEvent || minutesLeft === null)
+      return { isHappening: false, timeText: "" };
+
+    const now = Date.now();
+    const eventStart = new Date(
+      nextEvent.start.dateTime || nextEvent.start.date || ""
+    );
+    const eventEnd = new Date(
+      nextEvent.end.dateTime || nextEvent.end.date || ""
+    );
+
+    const isHappening = now >= eventStart.getTime() && now < eventEnd.getTime();
+    const timeText = formatTime(minutesLeft);
+
+    return { isHappening, timeText };
+  };
+
+  const { isHappening, timeText } = getEventStatus();
+
   const eventColor = getCalendarColor(nextEvent.colorId);
 
   const handleClick = () => {
     setCalendarVisible(true);
   };
 
+  const tooltipText = isHappening
+    ? `Current event: ${nextEvent.summary} ending in ${timeText}`
+    : `Next event: ${nextEvent.summary} in ${timeText}`;
+
   return (
     <div
       className="fixed top-0 inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90"
-      title={`Next event: ${nextEvent.summary} in ${formatTime(minutesLeft)}`}
+      title={tooltipText}
       onClick={handleClick}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -109,7 +133,7 @@ export const CalendarDynamicIsland = () => {
             <div
               className={cn(
                 "size-2.5 rounded-full",
-                minutesLeft < 10 && "animate-pulse"
+                (minutesLeft < 10 || isHappening) && "animate-pulse"
               )}
               style={{ backgroundColor: eventColor }}
               aria-hidden="true"
@@ -119,7 +143,7 @@ export const CalendarDynamicIsland = () => {
             </span>
           </div>
           <div className="flex items-center gap-1 ml-auto pl-3 text-xs opacity-80">
-            {formatTime(minutesLeft)}
+            {timeText}
           </div>
         </motion.div>
       </AnimatePresence>
