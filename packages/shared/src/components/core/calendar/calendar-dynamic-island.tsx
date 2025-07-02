@@ -85,16 +85,40 @@ export const CalendarDynamicIsland = () => {
     return `${years}y`;
   };
 
+  const getEventStatus = () => {
+    if (!nextEvent || minutesLeft === null)
+      return { isHappening: false, timeText: "" };
+
+    const now = Date.now();
+    const eventStart = new Date(
+      nextEvent.start.dateTime || nextEvent.start.date || ""
+    );
+    const eventEnd = new Date(
+      nextEvent.end.dateTime || nextEvent.end.date || ""
+    );
+
+    const isHappening = now >= eventStart.getTime() && now < eventEnd.getTime();
+    const timeText = formatTime(minutesLeft);
+
+    return { isHappening, timeText };
+  };
+
+  const { isHappening, timeText } = getEventStatus();
+
   const eventColor = getCalendarColor(nextEvent.colorId);
 
   const handleClick = () => {
     setCalendarVisible(true);
   };
 
+  const tooltipText = isHappening
+    ? `Current event: ${nextEvent.summary} ending in ${timeText}`
+    : `Next event: ${nextEvent.summary} in ${timeText}`;
+
   return (
     <div
       className="fixed top-0 inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90"
-      title={`Next event: ${nextEvent.summary} in ${formatTime(minutesLeft)}`}
+      title={tooltipText}
       onClick={handleClick}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -103,23 +127,23 @@ export const CalendarDynamicIsland = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="flex justify-between w-full mt-4"
+          className="flex items-center justify-between w-full mt-4 min-w-0"
         >
-          <div className="flex items-center gap-2 ">
+          <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
             <div
               className={cn(
-                "size-2.5 rounded-full",
-                minutesLeft < 10 && "animate-pulse"
+                "size-2.5 rounded-full flex-shrink-0",
+                (minutesLeft < 10 || isHappening) && "animate-pulse"
               )}
               style={{ backgroundColor: eventColor }}
               aria-hidden="true"
             />
-            <span className="truncate max-w-32 text-xs">
+            <span className="truncate text-xs flex-1 min-w-0">
               {nextEvent.summary || "Event"}
             </span>
           </div>
-          <div className="flex items-center gap-1 ml-auto pl-3 text-xs opacity-80">
-            {formatTime(minutesLeft)}
+          <div className="flex items-center gap-1 text-xs opacity-80 flex-shrink-0">
+            {timeText}
           </div>
         </motion.div>
       </AnimatePresence>
