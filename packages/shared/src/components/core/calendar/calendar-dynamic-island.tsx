@@ -113,7 +113,7 @@ export const CalendarDynamicIsland = () => {
 
   const tooltipText = isHappening
     ? `Current event: ${nextEvent.summary} ending in ${timeText}`
-    : `Next event: ${nextEvent.summary} in ${timeText}`;
+    : `Next event: ${nextEvent.summary} starts in ${timeText}`;
 
   return (
     <div
