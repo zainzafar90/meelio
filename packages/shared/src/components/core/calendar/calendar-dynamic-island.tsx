@@ -9,13 +9,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
 
 export const CalendarDynamicIsland = () => {
-  const { getMinutesUntilNextEvent, nextEvent, token } = useCalendarStore(
-    useShallow((state) => ({
-      getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
-      nextEvent: state.nextEvent,
-      token: state.token,
-    }))
-  );
+  const { getMinutesUntilNextEvent, nextEvent, token, events } =
+    useCalendarStore(
+      useShallow((state) => ({
+        getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
+        nextEvent: state.nextEvent,
+        token: state.token,
+        events: state.events,
+      }))
+    );
 
   const { setCalendarVisible } = useDockStore(
     useShallow((state) => ({
@@ -32,6 +34,7 @@ export const CalendarDynamicIsland = () => {
   const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
 
   const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
+  const [displayEvent, setDisplayEvent] = useState<any>(null);
 
   useEffect(() => {
     const updateMinutes = () => {
@@ -45,8 +48,30 @@ export const CalendarDynamicIsland = () => {
     return () => clearInterval(interval);
   }, [getMinutesUntilNextEvent, nextEvent]);
 
-  const shouldShow =
-    !!token && calendarEnabled && nextEvent && minutesLeft !== null;
+  // Check if we should keep showing a recently started event (within 10 minutes)
+  useEffect(() => {
+    const now = Date.now();
+
+    const recentlyStartedEvent = events.find((event) => {
+      const eventStart = new Date(
+        event.start.dateTime || event.start.date || ""
+      );
+      const eventEnd = new Date(event.end.dateTime || event.end.date || "");
+      const timeSinceStart = now - eventStart.getTime();
+
+      // Event started within last 10 minutes and hasn't ended
+      return (
+        timeSinceStart >= 0 &&
+        timeSinceStart <= 10 * 60 * 1000 &&
+        now < eventEnd.getTime()
+      );
+    });
+
+    setDisplayEvent(nextEvent || recentlyStartedEvent || null);
+  }, [nextEvent, events]);
+
+  // Always show indicator when calendar is enabled and connected
+  const shouldShow = !!token && calendarEnabled;
 
   if (!shouldShow) {
     return null;
@@ -86,34 +111,39 @@ export const CalendarDynamicIsland = () => {
   };
 
   const getEventStatus = () => {
-    if (!nextEvent || minutesLeft === null)
-      return { isHappening: false, timeText: "" };
+    if (!displayEvent) {
+      return { isHappening: false, timeText: "", hasEvent: false };
+    }
 
     const now = Date.now();
     const eventStart = new Date(
-      nextEvent.start.dateTime || nextEvent.start.date || ""
+      displayEvent.start.dateTime || displayEvent.start.date || ""
     );
     const eventEnd = new Date(
-      nextEvent.end.dateTime || nextEvent.end.date || ""
+      displayEvent.end.dateTime || displayEvent.end.date || ""
     );
 
     const isHappening = now >= eventStart.getTime() && now < eventEnd.getTime();
-    const timeText = formatTime(minutesLeft);
+    const timeText = minutesLeft !== null ? formatTime(minutesLeft) : "";
 
-    return { isHappening, timeText };
+    return { isHappening, timeText, hasEvent: true };
   };
 
-  const { isHappening, timeText } = getEventStatus();
+  const { isHappening, timeText, hasEvent } = getEventStatus();
 
-  const eventColor = getCalendarColor(nextEvent.colorId);
+  const eventColor = hasEvent
+    ? getCalendarColor(displayEvent.colorId)
+    : "#6b7280";
 
   const handleClick = () => {
     setCalendarVisible(true);
   };
 
-  const tooltipText = isHappening
-    ? `Current event: ${nextEvent.summary} ending in ${timeText}`
-    : `Next event: ${nextEvent.summary} starts in ${timeText}`;
+  const tooltipText = hasEvent
+    ? isHappening
+      ? `Current event: ${displayEvent.summary} ending in ${timeText}`
+      : `Next event: ${displayEvent.summary} starts in ${timeText}`
+    : "No upcoming events";
 
   return (
     <div
@@ -123,28 +153,34 @@ export const CalendarDynamicIsland = () => {
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={`${nextEvent.summary}-${eventColor}-${nextEvent.id}`}
+          key={
+            hasEvent
+              ? `${displayEvent.summary}-${eventColor}-${displayEvent.id}`
+              : "no-events"
+          }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="flex justify-between w-full mt-4"
         >
-          <div className="flex items-center gap-2 ">
+          <div className="flex items-center gap-2">
             <div
               className={cn(
                 "size-2.5 rounded-full",
-                (minutesLeft < 10 || isHappening) && "animate-pulse"
+                hasEvent && (minutesLeft < 10 || isHappening) && "animate-pulse"
               )}
               style={{ backgroundColor: eventColor }}
               aria-hidden="true"
             />
             <span className="truncate max-w-32 text-xs">
-              {nextEvent.summary || "Event"}
+              {hasEvent ? displayEvent.summary || "Event" : "No Events"}
             </span>
           </div>
-          <div className="flex items-center gap-1 ml-auto pl-3 text-xs opacity-80">
-            {timeText}
-          </div>
+          {hasEvent && (
+            <div className="flex items-center gap-1 ml-auto pl-3 text-xs opacity-80">
+              {timeText}
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
