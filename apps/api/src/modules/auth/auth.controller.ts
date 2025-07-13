@@ -17,8 +17,8 @@ import { googleAuthenticatePassport } from "./providers/google";
 
 export const register = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.registerUser(req.body);
-  const tokens = await accountService.generateAuthTokens(user as IUser);
-  await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
+  const tokens = await accountService.generateAuthTokens(user as IUser, Provider.PASSWORD);
+  await accountService.ensureAccountExists(user.id, Provider.PASSWORD);
   cookieService.setResponseCookie(res, tokens);
   res.status(httpStatus.CREATED).send({ user });
 });
@@ -38,8 +38,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     email,
     password,
   );
-  const tokens = await accountService.generateAuthTokens(user);
-  await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
+  const tokens = await accountService.generateAuthTokens(user, Provider.PASSWORD);
+  await accountService.ensureAccountExists(user.id, Provider.PASSWORD);
   cookieService.setResponseCookie(res, tokens);
   res.status(httpStatus.OK).send({
     success: true,
@@ -115,12 +115,8 @@ export const verifyMagicLinkEmail = catchAsync(
       throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
 
-    const tokens = await accountService.generateAuthTokens(user);
-    await accountService.updateAccountTokens(
-      user.id,
-      Provider.MAGIC_LINK,
-      tokens,
-    );
+    const tokens = await accountService.generateAuthTokens(user, Provider.MAGIC_LINK);
+    await accountService.ensureAccountExists(user.id, Provider.MAGIC_LINK);
     cookieService.setResponseCookie(res, tokens);
 
     res.status(httpStatus.OK).send({
@@ -151,12 +147,8 @@ const googleAuthCallback = catchAsync(
       async (err: any, user: IUser) => {
         if (err) return next(err);
 
-        const tokens = await accountService.generateAuthTokens(user);
-        await accountService.updateAccountTokens(
-          user.id,
-          Provider.GOOGLE,
-          tokens,
-        );
+        const tokens = await accountService.generateAuthTokens(user, Provider.GOOGLE);
+        await accountService.ensureAccountExists(user.id, Provider.GOOGLE);
         cookieService.setResponseCookie(res, tokens);
 
         const baseUrl =

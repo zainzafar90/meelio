@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import httpStatus from "http-status";
 import moment from "moment";
 import jwt from "jsonwebtoken";
@@ -13,9 +13,9 @@ import {
   IAccessAndRefreshTokens,
   ISession,
   IUser,
+  IPayload,
 } from "@/types/interfaces/resources";
 import {
-  Account,
   AccountInsert,
   accounts,
   sessions,
@@ -32,6 +32,7 @@ import { RoleType } from "@/types/enums.types";
  * @param {string} userId
  * @param {Moment} expires
  * @param {string} type
+ * @param {string} [sessionId]
  * @param {string} [secret]
  * @returns {string}
  */
@@ -39,6 +40,7 @@ export const generateToken = (
   userId: string,
   expires: Moment,
   type: "access" | "refresh",
+  sessionId?: string,
   secret: string = config.jwt.secret,
 ): string => {
   const payload = {
@@ -46,17 +48,17 @@ export const generateToken = (
     iat: moment().unix(),
     exp: expires.unix(),
     type,
+    ...(sessionId && { sessionId }),
   };
   return jwt.sign(payload, secret);
 };
 
 /**
- * Verify token and return token doc (or throw an error if it is not valid)
+ * Verify JWT token and return payload
  * @param {string} token
- * @param {string} type
- * @returns {Promise<ISession>}
+ * @returns {Promise<IPayload>}
  */
-const verifyToken = async (token: string): Promise<ISession> => {
+const verifyJwtToken = async (token: string): Promise<IPayload> => {
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
@@ -64,20 +66,53 @@ const verifyToken = async (token: string): Promise<ISession> => {
     );
   }
 
-  let payload;
   try {
-    payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, config.jwt.secret) as IPayload;
+    if (!payload || !payload.sub || typeof payload.sub !== "string") {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Token payload is malformed or bad user",
+      );
+    }
+    return payload;
   } catch (err) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid or expired token");
   }
+};
 
-  if (!payload || !payload.sub || typeof payload.sub !== "string") {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Token payload is malformed or bad user",
-    );
+/**
+ * Verify session exists and is not blacklisted
+ * @param {string} sessionId
+ * @returns {Promise<ISession>}
+ */
+const verifySession = async (sessionId: string): Promise<ISession> => {
+  const sessionDoc = await db.query.sessions.findFirst({
+    where: and(
+      eq(sessions.id, sessionId),
+      eq(sessions.blacklisted, false),
+    ),
+  });
+
+  if (!sessionDoc) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Session not found or expired");
   }
+  return sessionDoc;
+};
 
+/**
+ * Verify token and return session (optimized with session ID lookup)
+ * @param {string} token
+ * @returns {Promise<ISession>}
+ */
+const verifyToken = async (token: string): Promise<ISession> => {
+  const payload = await verifyJwtToken(token);
+  
+  // For new tokens with sessionId, use direct lookup
+  if (payload.sessionId) {
+    return await verifySession(payload.sessionId);
+  }
+  
+  // Fallback for old tokens without sessionId
   const sessionDoc = await db.query.sessions.findFirst({
     where: and(
       eq(sessions.accessToken, token),
@@ -86,19 +121,23 @@ const verifyToken = async (token: string): Promise<ISession> => {
   });
 
   if (!sessionDoc) {
-    throw new Error("Token not found");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Session not found or expired");
   }
   return sessionDoc;
 };
 
 /**
- * Generate auth tokens
- * @param {IUserDoc} user
- * @returns {Promise<AccountTokens>}
+ * Generate auth tokens with session tracking
+ * @param {IUser} user
+ * @param {string} provider
+ * @param {string} [deviceInfo]
+ * @returns {Promise<IAccessAndRefreshTokens & { sessionId: string }>}
  */
 const generateAuthTokens = async (
   user: IUser,
-): Promise<IAccessAndRefreshTokens> => {
+  provider: Provider,
+  deviceInfo?: string,
+): Promise<IAccessAndRefreshTokens & { sessionId: string }> => {
   const accessExpiration = moment().add(
     config.jwt.accessExpirationMinutes,
     "minutes",
@@ -108,10 +147,33 @@ const generateAuthTokens = async (
     "days",
   );
 
-  const accessToken = generateToken(user.id, accessExpiration, "access");
-  const refreshToken = generateToken(user.id, refreshExpiration, "refresh");
+  // Create session first to get ID
+  const sessionData = {
+    userId: user.id!,
+    provider,
+    accessToken: "", // Will be updated after token generation
+    accessTokenExpires: accessExpiration.toDate(),
+    refreshToken: "", // Will be updated after token generation
+    refreshTokenExpires: refreshExpiration.toDate(),
+    deviceInfo,
+  } as SessionInsertTable;
 
-  const tokens = {
+  const [sessionResult] = await db.insert(sessions).values(sessionData).returning({ id: sessions.id });
+  const sessionId = sessionResult.id;
+
+  // Generate tokens with session ID
+  const accessToken = generateToken(user.id!, accessExpiration, "access", sessionId);
+  const refreshToken = generateToken(user.id!, refreshExpiration, "refresh", sessionId);
+
+  // Update session with actual tokens  
+  await db.update(sessions)
+    .set({
+      accessToken,
+      refreshToken,
+    } as Partial<SessionInsertTable>)
+    .where(eq(sessions.id, sessionId));
+
+  return {
     access: {
       token: accessToken,
       expires: accessExpiration.toDate(),
@@ -120,46 +182,26 @@ const generateAuthTokens = async (
       token: refreshToken,
       expires: refreshExpiration.toDate(),
     },
+    sessionId,
   };
-
-  return tokens;
 };
 
-const insertSession = async (
-  userId: string,
-  provider: Provider,
-  tokens: IAccessAndRefreshTokens,
-  deviceInfo?: string,
-  database = db,
-): Promise<void> => {
-  await database.insert(sessions).values({
-    userId,
-    provider,
-    accessToken: tokens.access.token,
-    accessTokenExpires: tokens.access.expires,
-    refreshToken: tokens.refresh.token,
-    refreshTokenExpires: tokens.refresh.expires,
-    deviceInfo,
-  } as SessionInsertTable);
-};
+// Removed - session creation is now handled in generateAuthTokens
 
 /**
- * Record a new session for the user
+ * Ensure account exists for provider
  * @param {string} userId
  * @param {string} provider
- * @param {object} tokens
  */
-const updateAccountTokens = async (
+const ensureAccountExists = async (
   userId: string,
-  provider: string,
-  tokens: IAccessAndRefreshTokens,
-  deviceInfo?: string,
+  provider: Provider,
   database = db,
 ): Promise<void> => {
   const account = await database.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, userId),
-      eq(accounts.provider, provider as Provider),
+      eq(accounts.provider, provider),
     ),
   });
 
@@ -168,14 +210,6 @@ const updateAccountTokens = async (
       .insert(accounts)
       .values({ userId, provider } as AccountInsert);
   }
-
-  await insertSession(
-    userId,
-    provider as Provider,
-    tokens,
-    deviceInfo,
-    database,
-  );
 };
 
 const logoutSession = async (
@@ -185,8 +219,43 @@ const logoutSession = async (
   const session = await verifyToken(accessToken);
   await database
     .update(sessions)
-    .set({ blacklisted: true })
-    .where(eq(sessions.id, session.id!));
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(eq(sessions.id, session.id));
+};
+
+/**
+ * Logout all sessions for a user
+ * @param {string} userId
+ */
+const logoutAllUserSessions = async (
+  userId: string,
+  database = db,
+): Promise<void> => {
+  await database
+    .update(sessions)
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(eq(sessions.userId, userId));
+};
+
+/**
+ * Clean up expired sessions (should be run periodically)
+ */
+const cleanupExpiredSessions = async (database = db): Promise<number> => {
+  const now = new Date();
+  const result = await database
+    .update(sessions)
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(
+      and(
+        eq(sessions.blacklisted, false),
+        or(
+          lt(sessions.accessTokenExpires, now),
+          lt(sessions.refreshTokenExpires, now)
+        )
+      )
+    );
+  
+  return result.rowCount || 0;
 };
 
 /**
@@ -466,8 +535,10 @@ export const accountService = {
   updateUserAccount,
   generateToken,
   generateAuthTokens,
-  updateAccountTokens,
+  ensureAccountExists,
   logoutSession,
+  logoutAllUserSessions,
+  cleanupExpiredSessions,
   loginUserWithEmailAndPassword,
   resetPassword,
   verifyEmail,

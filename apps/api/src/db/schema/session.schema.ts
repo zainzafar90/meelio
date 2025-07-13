@@ -1,20 +1,3 @@
-export interface Session {
-  id: string;
-  userId: string;
-  provider: string;
-  accessToken: string;
-  accessTokenExpires: Date | null;
-  refreshToken: string | null;
-  refreshTokenExpires: Date | null;
-  deviceInfo: string | null;
-  blacklisted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface SessionInsert
-  extends Omit<Session, "id" | "createdAt" | "updatedAt"> {}
-
 import { relations } from "drizzle-orm";
 import {
   pgTable,
@@ -22,6 +5,7 @@ import {
   timestamp,
   boolean,
   customType,
+  index,
 } from "drizzle-orm/pg-core";
 
 import { Provider } from "@/types/enums.types";
@@ -44,7 +28,11 @@ export const sessions = pgTable("sessions", {
   blacklisted: boolean("blacklisted").notNull().default(false),
   createdAt,
   updatedAt,
-});
+}, (table) => ({
+  tokenIndex: index("idx_sessions_token").on(table.accessToken),
+  userBlacklistedIndex: index("idx_sessions_user_blacklisted").on(table.userId, table.blacklisted),
+  expirationIndex: index("idx_sessions_expiration").on(table.accessTokenExpires, table.refreshTokenExpires),
+}));
 
 export type SessionTable = typeof sessions.$inferSelect;
 export type SessionInsertTable = typeof sessions.$inferInsert;
