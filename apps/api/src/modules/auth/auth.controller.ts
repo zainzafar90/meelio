@@ -17,8 +17,8 @@ import { googleAuthenticatePassport } from "./providers/google";
 
 export const register = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.registerUser(req.body);
-  const tokens = await accountService.generateAuthTokens(user as IUser);
-  await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
+  const tokens = await accountService.generateAuthTokens(user as IUser, Provider.PASSWORD);
+  await accountService.ensureAccountExists(user.id, Provider.PASSWORD);
   cookieService.setResponseCookie(res, tokens);
   res.status(httpStatus.CREATED).send({ user });
 });
@@ -36,10 +36,10 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await accountService.loginUserWithEmailAndPassword(
     email,
-    password
+    password,
   );
-  const tokens = await accountService.generateAuthTokens(user);
-  await accountService.updateAccountTokens(user.id, Provider.PASSWORD, tokens);
+  const tokens = await accountService.generateAuthTokens(user, Provider.PASSWORD);
+  await accountService.ensureAccountExists(user.id, Provider.PASSWORD);
   cookieService.setResponseCookie(res, tokens);
   res.status(httpStatus.OK).send({
     success: true,
@@ -52,18 +52,18 @@ export const forgotPassword = catchAsync(
       await verificationTokenService.generateResetPasswordToken(req.body.email);
     await emailService.sendResetPasswordEmail(
       req.body.email,
-      resetPasswordToken
+      resetPasswordToken,
     );
     res.status(httpStatus.OK).send({
       success: true,
     });
-  }
+  },
 );
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
   await accountService.resetPassword(
     req.query["token"] as string,
-    req.body.password
+    req.body.password,
   );
   res.status(httpStatus.OK).send({
     success: true,
@@ -79,12 +79,12 @@ export const sendVerificationEmail = catchAsync(
     await emailService.sendVerificationEmail(
       user.email,
       verifyEmailToken,
-      user.name
+      user.name,
     );
     res.status(httpStatus.OK).send({
       success: true,
     });
-  }
+  },
 );
 
 export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
@@ -103,33 +103,33 @@ export const sendMagicLinkEmail = catchAsync(
     res.status(httpStatus.OK).send({
       success: true,
     });
-  }
+  },
 );
 
 export const verifyMagicLinkEmail = catchAsync(
   async (req: Request, res: Response) => {
     const user = await accountService.verifyMagicLink(
-      req.query["token"] as string
+      req.query["token"] as string,
     );
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
 
-    const tokens = await accountService.generateAuthTokens(user);
-    await accountService.updateAccountTokens(
-      user.id,
-      Provider.MAGIC_LINK,
-      tokens
-    );
+    const tokens = await accountService.generateAuthTokens(user, Provider.MAGIC_LINK);
+    await accountService.ensureAccountExists(user.id, Provider.MAGIC_LINK);
     cookieService.setResponseCookie(res, tokens);
 
     res.status(httpStatus.OK).send({
       success: true,
     });
-  }
+  },
 );
 
-const logout = catchAsync(async (_req: Request, res: Response) => {
+const logout = catchAsync(async (req: Request, res: Response) => {
+  const token = cookieService.getAuthCookieToken(req);
+  if (token) {
+    await accountService.logoutSession(token);
+  }
   cookieService.clearJwtCookie(res);
   res.status(httpStatus.NO_CONTENT).send();
 });
@@ -147,12 +147,8 @@ const googleAuthCallback = catchAsync(
       async (err: any, user: IUser) => {
         if (err) return next(err);
 
-        const tokens = await accountService.generateAuthTokens(user);
-        await accountService.updateAccountTokens(
-          user.id,
-          Provider.GOOGLE,
-          tokens
-        );
+        const tokens = await accountService.generateAuthTokens(user, Provider.GOOGLE);
+        await accountService.ensureAccountExists(user.id, Provider.GOOGLE);
         cookieService.setResponseCookie(res, tokens);
 
         const baseUrl =
@@ -164,9 +160,9 @@ const googleAuthCallback = catchAsync(
           redirectUrl.searchParams.set("auth_origin", origin);
         }
         return res.redirect(redirectUrl.toString());
-      }
+      },
     )(req, res, next);
-  }
+  },
 );
 
 const googleAuthCallbackFailure = catchAsync(
@@ -176,7 +172,7 @@ const googleAuthCallbackFailure = catchAsync(
       message: "Login Error",
       details: `Something went wrong when you tried to log in just now (Origin: ${origin}). Please try again later. If you're experiencing a critical issue, please email support@meelio.io`,
     });
-  }
+  },
 );
 
 const googleAuthCallbackSuccess = catchAsync(
@@ -185,7 +181,7 @@ const googleAuthCallbackSuccess = catchAsync(
     return res.status(httpStatus.OK).json({
       message: `Login Success (Origin: ${origin})`,
     });
-  }
+  },
 );
 
 const getAccount = catchAsync(async (req: Request, res: Response) => {

@@ -7,6 +7,7 @@ export interface IPayload extends JwtPayload {
   iat: number;
   exp: number;
   type: "access" | "refresh";
+  sessionId?: string;
 }
 
 export type IAccessAndRefreshTokens = {
@@ -31,6 +32,20 @@ export interface IToken {
   scope: string;
   userId: string;
   blacklisted?: boolean;
+}
+
+export interface ISession {
+  id: string;
+  userId: string;
+  provider: string;
+  accessToken: string;
+  accessTokenExpires: Date | null;
+  refreshToken: string | null;
+  refreshTokenExpires: Date | null;
+  deviceInfo: string | null;
+  blacklisted: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IPomodoroSettings {

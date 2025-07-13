@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import httpStatus from "http-status";
 import moment from "moment";
 import jwt from "jsonwebtoken";
@@ -11,13 +11,15 @@ import { Moment } from "moment";
 import { config } from "@/config/config";
 import {
   IAccessAndRefreshTokens,
-  IToken,
+  ISession,
   IUser,
+  IPayload,
 } from "@/types/interfaces/resources";
 import {
-  Account,
   AccountInsert,
   accounts,
+  sessions,
+  SessionInsertTable,
   subscriptions,
   users,
 } from "@/db/schema";
@@ -30,6 +32,7 @@ import { RoleType } from "@/types/enums.types";
  * @param {string} userId
  * @param {Moment} expires
  * @param {string} type
+ * @param {string} [sessionId]
  * @param {string} [secret]
  * @returns {string}
  */
@@ -37,80 +40,140 @@ export const generateToken = (
   userId: string,
   expires: Moment,
   type: "access" | "refresh",
-  secret: string = config.jwt.secret
+  sessionId?: string,
+  secret: string = config.jwt.secret,
 ): string => {
   const payload = {
     sub: userId,
     iat: moment().unix(),
     exp: expires.unix(),
     type,
+    ...(sessionId && { sessionId }),
   };
   return jwt.sign(payload, secret);
 };
 
 /**
- * Verify token and return token doc (or throw an error if it is not valid)
+ * Verify JWT token and return payload
  * @param {string} token
- * @param {string} type
- * @returns {Promise<ITokenDoc>}
+ * @returns {Promise<IPayload>}
  */
-const verifyToken = async (token: string): Promise<IToken> => {
+const verifyJwtToken = async (token: string): Promise<IPayload> => {
   if (!token) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "Authentication token is missing"
+      "Authentication token is missing",
     );
   }
 
-  let payload;
   try {
-    payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, config.jwt.secret) as IPayload;
+    if (!payload || !payload.sub || typeof payload.sub !== "string") {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Token payload is malformed or bad user",
+      );
+    }
+    return payload;
   } catch (err) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid or expired token");
   }
-
-  if (!payload || !payload.sub || typeof payload.sub !== "string") {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Token payload is malformed or bad user"
-    );
-  }
-
-  const accountTokenDoc = await db.query.accounts.findFirst({
-    where: and(
-      eq(accounts.accessToken, token),
-      eq(accounts.userId, payload.sub),
-      eq(accounts.blacklisted, false)
-    ),
-  });
-
-  if (!accountTokenDoc) {
-    throw new Error("Token not found");
-  }
-  return accountTokenDoc;
 };
 
 /**
- * Generate auth tokens
- * @param {IUserDoc} user
- * @returns {Promise<AccountTokens>}
+ * Verify session exists and is not blacklisted
+ * @param {string} sessionId
+ * @returns {Promise<ISession>}
+ */
+const verifySession = async (sessionId: string): Promise<ISession> => {
+  const sessionDoc = await db.query.sessions.findFirst({
+    where: and(
+      eq(sessions.id, sessionId),
+      eq(sessions.blacklisted, false),
+    ),
+  });
+
+  if (!sessionDoc) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Session not found or expired");
+  }
+  return sessionDoc;
+};
+
+/**
+ * Verify token and return session (optimized with session ID lookup)
+ * @param {string} token
+ * @returns {Promise<ISession>}
+ */
+const verifyToken = async (token: string): Promise<ISession> => {
+  const payload = await verifyJwtToken(token);
+  
+  // For new tokens with sessionId, use direct lookup
+  if (payload.sessionId) {
+    return await verifySession(payload.sessionId);
+  }
+  
+  // Fallback for old tokens without sessionId
+  const sessionDoc = await db.query.sessions.findFirst({
+    where: and(
+      eq(sessions.accessToken, token),
+      eq(sessions.blacklisted, false),
+    ),
+  });
+
+  if (!sessionDoc) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Session not found or expired");
+  }
+  return sessionDoc;
+};
+
+/**
+ * Generate auth tokens with session tracking
+ * @param {IUser} user
+ * @param {string} provider
+ * @param {string} [deviceInfo]
+ * @returns {Promise<IAccessAndRefreshTokens & { sessionId: string }>}
  */
 const generateAuthTokens = async (
-  user: IUser
-): Promise<IAccessAndRefreshTokens> => {
+  user: IUser,
+  provider: Provider,
+  deviceInfo?: string,
+): Promise<IAccessAndRefreshTokens & { sessionId: string }> => {
   const accessExpiration = moment().add(
     config.jwt.accessExpirationMinutes,
-    "minutes"
+    "minutes",
   );
   const refreshExpiration = moment().add(
     config.jwt.refreshExpirationDays,
-    "days"
+    "days",
   );
 
-  const accessToken = generateToken(user.id, accessExpiration, "access");
-  const refreshToken = generateToken(user.id, refreshExpiration, "refresh");
+  // Create session first to get ID
+  const sessionData = {
+    userId: user.id!,
+    provider,
+    accessToken: "", // Will be updated after token generation
+    accessTokenExpires: accessExpiration.toDate(),
+    refreshToken: "", // Will be updated after token generation
+    refreshTokenExpires: refreshExpiration.toDate(),
+    deviceInfo,
+  } as SessionInsertTable;
 
-  const tokens = {
+  const [sessionResult] = await db.insert(sessions).values(sessionData).returning({ id: sessions.id });
+  const sessionId = sessionResult.id;
+
+  // Generate tokens with session ID
+  const accessToken = generateToken(user.id!, accessExpiration, "access", sessionId);
+  const refreshToken = generateToken(user.id!, refreshExpiration, "refresh", sessionId);
+
+  // Update session with actual tokens  
+  await db.update(sessions)
+    .set({
+      accessToken,
+      refreshToken,
+    } as Partial<SessionInsertTable>)
+    .where(eq(sessions.id, sessionId));
+
+  return {
     access: {
       token: accessToken,
       expires: accessExpiration.toDate(),
@@ -119,49 +182,80 @@ const generateAuthTokens = async (
       token: refreshToken,
       expires: refreshExpiration.toDate(),
     },
+    sessionId,
   };
-
-  return tokens;
 };
 
+// Removed - session creation is now handled in generateAuthTokens
+
 /**
- * Update account tokens in database
+ * Ensure account exists for provider
  * @param {string} userId
  * @param {string} provider
- * @param {object} tokens
  */
-const updateAccountTokens = async (
+const ensureAccountExists = async (
   userId: string,
-  provider: string,
-  tokens: IAccessAndRefreshTokens
+  provider: Provider,
+  database = db,
 ): Promise<void> => {
-  const account = await db.query.accounts.findFirst({
+  const account = await database.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, userId),
-      eq(accounts.provider, provider as Provider)
+      eq(accounts.provider, provider),
     ),
   });
 
-  if (account) {
-    await db
-      .update(accounts)
-      .set({
-        accessToken: tokens.access.token,
-        accessTokenExpires: tokens.access.expires,
-        refreshToken: tokens.refresh.token,
-        refreshTokenExpires: tokens.refresh.expires,
-      } as Account)
-      .where(eq(accounts.id, account.id));
-  } else {
-    await db.insert(accounts).values({
-      userId,
-      provider,
-      accessToken: tokens.access.token,
-      accessTokenExpires: tokens.access.expires,
-      refreshToken: tokens.refresh.token,
-      refreshTokenExpires: tokens.refresh.expires,
-    } as Account);
+  if (!account) {
+    await database
+      .insert(accounts)
+      .values({ userId, provider } as AccountInsert);
   }
+};
+
+const logoutSession = async (
+  accessToken: string,
+  database = db,
+): Promise<void> => {
+  const session = await verifyToken(accessToken);
+  await database
+    .update(sessions)
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(eq(sessions.id, session.id));
+};
+
+/**
+ * Logout all sessions for a user
+ * @param {string} userId
+ */
+const logoutAllUserSessions = async (
+  userId: string,
+  database = db,
+): Promise<void> => {
+  await database
+    .update(sessions)
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(eq(sessions.userId, userId));
+};
+
+/**
+ * Clean up expired sessions (should be run periodically)
+ */
+const cleanupExpiredSessions = async (database = db): Promise<number> => {
+  const now = new Date();
+  const result = await database
+    .update(sessions)
+    .set({ blacklisted: true } as Partial<SessionInsertTable>)
+    .where(
+      and(
+        eq(sessions.blacklisted, false),
+        or(
+          lt(sessions.accessTokenExpires, now),
+          lt(sessions.refreshTokenExpires, now)
+        )
+      )
+    );
+  
+  return result.rowCount || 0;
 };
 
 /**
@@ -170,7 +264,7 @@ const updateAccountTokens = async (
  * @returns {Promise<boolean>}
  */
 const checkSubscription = async (
-  email: string
+  email: string,
 ): Promise<{
   isPro: boolean;
   subscriptionId: string | null;
@@ -205,7 +299,7 @@ const checkSubscription = async (
  */
 const getUserAccount = async (
   accessToken: string,
-  includeId?: boolean
+  includeId?: boolean,
 ): Promise<{
   user: IUser;
   userId: string;
@@ -240,7 +334,7 @@ const getUserAccount = async (
  */
 const updateUserAccount = async (
   accessToken: string,
-  updateBody: IUser
+  updateBody: IUser,
 ): Promise<{
   user: IUser;
   isPro: boolean;
@@ -275,7 +369,7 @@ const updateUserAccount = async (
  */
 const loginUserWithEmailAndPassword = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<IUser> => {
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
@@ -284,14 +378,14 @@ const loginUserWithEmailAndPassword = async (
   const account = await db.query.accounts.findFirst({
     where: and(
       eq(accounts.userId, user?.id),
-      eq(accounts.provider, Provider.PASSWORD)
+      eq(accounts.provider, Provider.PASSWORD),
     ),
   });
 
   if (!account) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "This email is registered with a different provider. Please make sure you are using the right email and password."
+      "This email is registered with a different provider. Please make sure you are using the right email and password.",
     );
   }
 
@@ -310,13 +404,13 @@ const loginUserWithEmailAndPassword = async (
  */
 const resetPassword = async (
   resetPasswordToken: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<void> => {
   try {
     const resetPasswordTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         resetPasswordToken,
-        VerificationTokenType.RESET_PASSWORD
+        VerificationTokenType.RESET_PASSWORD,
       );
     const user = await userService.getUserByEmail(resetPasswordTokenDoc.email);
     if (!user) {
@@ -326,7 +420,7 @@ const resetPassword = async (
 
     await verificationTokenService.deleteMany(
       user.email,
-      VerificationTokenType.RESET_PASSWORD
+      VerificationTokenType.RESET_PASSWORD,
     );
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "Password reset failed");
@@ -342,7 +436,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
     const verifyEmailTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyEmailToken,
-        VerificationTokenType.VERIFY_EMAIL
+        VerificationTokenType.VERIFY_EMAIL,
       );
     const user = await userService.getUserByEmail(verifyEmailTokenDoc.email);
 
@@ -352,7 +446,7 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
 
     await verificationTokenService.deleteMany(
       user.email,
-      VerificationTokenType.VERIFY_EMAIL
+      VerificationTokenType.VERIFY_EMAIL,
     );
     const updatedUser = await userService.updateUserById(user.id, {
       isEmailVerified: true,
@@ -368,19 +462,19 @@ const verifyEmail = async (verifyEmailToken: string): Promise<IUser | null> => {
  * @param {string} verifyMagicLinkToken
  */
 const verifyMagicLink = async (
-  verifyMagicLinkToken: string
+  verifyMagicLinkToken: string,
 ): Promise<IUser | null> => {
   try {
     const verifyMagicLinkTokenDoc =
       await verificationTokenService.verifyVerificationToken(
         verifyMagicLinkToken,
-        VerificationTokenType.MAGIC_LINK
+        VerificationTokenType.MAGIC_LINK,
       );
 
     if (!verifyMagicLinkTokenDoc) {
       throw new ApiError(
         httpStatus.BAD_REQUEST,
-        "Expired or invalid magic link token"
+        "Expired or invalid magic link token",
       );
     }
 
@@ -403,7 +497,7 @@ const verifyMagicLink = async (
           if (!user) {
             throw new ApiError(
               httpStatus.INTERNAL_SERVER_ERROR,
-              "Failed to retrieve existing user"
+              "Failed to retrieve existing user",
             );
           }
         } else {
@@ -415,32 +509,23 @@ const verifyMagicLink = async (
     const existingAccount = await db.query.accounts.findFirst({
       where: and(
         eq(accounts.userId, user.id),
-        eq(accounts.provider, Provider.MAGIC_LINK)
+        eq(accounts.provider, Provider.MAGIC_LINK),
       ),
     });
 
     if (!existingAccount && user.id) {
-      try {
-        const tokens = await generateAuthTokens(user);
-        await db.insert(accounts).values({
-          providerAccountId: user.id,
-          provider: Provider.MAGIC_LINK,
-          userId: user.id,
-          accessToken: tokens.access.token,
-          accessTokenExpires: tokens.access.expires,
-          refreshToken: tokens.refresh.token,
-          refreshTokenExpires: tokens.refresh.expires,
-        } as AccountInsert);
-      } catch (accountError) {
-        // Continue even if account creation fails - the user was created successfully
-      }
+      await db.insert(accounts).values({
+        providerAccountId: user.id,
+        provider: Provider.MAGIC_LINK,
+        userId: user.id,
+      } as AccountInsert);
     }
 
     return user;
   } catch (error) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      "Magic link verification failed"
+      "Magic link verification failed",
     );
   }
 };
@@ -450,7 +535,10 @@ export const accountService = {
   updateUserAccount,
   generateToken,
   generateAuthTokens,
-  updateAccountTokens,
+  ensureAccountExists,
+  logoutSession,
+  logoutAllUserSessions,
+  cleanupExpiredSessions,
   loginUserWithEmailAndPassword,
   resetPassword,
   verifyEmail,
