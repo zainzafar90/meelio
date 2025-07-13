@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Sheet,
@@ -16,6 +16,12 @@ import {
 } from "../../../api/calendar.api";
 import { CalendarEvent } from "../../../api/google-calendar.api";
 import { getCalendarColor } from "../../../utils/calendar-colors";
+import { 
+  getEventStartDate, 
+  getEventEndDate, 
+  isEventHappening,
+  isAllDayEvent 
+} from "../../../utils/calendar-date.utils";
 import { Copy, Bell, Share } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,58 +49,100 @@ export const CalendarSheet = () => {
   const isConnected = !!token;
 
   const formatTimeRemaining = (event: CalendarEvent): string => {
-    const now = new Date();
-    const eventStart = new Date(event.start.dateTime || event.start.date || "");
-    const eventEnd = new Date(event.end.dateTime || event.end.date || "");
-    
-    // Check if event is currently happening
-    if (now >= eventStart && now < eventEnd) {
-      const endDiffMs = eventEnd.getTime() - now.getTime();
-      const endMinutes = Math.floor(endDiffMs / (1000 * 60));
+    try {
+      const now = new Date();
+      const eventStart = getEventStartDate(event);
+      const eventEnd = getEventEndDate(event);
       
-      if (endMinutes <= 0) return "Ending now";
-      if (endMinutes < 60) return `${endMinutes} minutes left`;
+      // Handle all-day events
+      if (isAllDayEvent(event)) {
+        if (isEventHappening(event, now)) {
+          return "All day";
+        }
+        const startDiffMs = eventStart.getTime() - now.getTime();
+        const days = Math.floor(startDiffMs / (1000 * 60 * 60 * 24));
+        if (days === 0) return "Today";
+        if (days === 1) return "Tomorrow";
+        return `${days} days remaining`;
+      }
       
-      const endHours = Math.floor(endMinutes / 60);
-      return `${endHours} hours left`;
+      // Check if event is currently happening
+      if (isEventHappening(event, now)) {
+        const endDiffMs = eventEnd.getTime() - now.getTime();
+        const endMinutes = Math.floor(endDiffMs / (1000 * 60));
+        
+        if (endMinutes <= 0) return "Ending now";
+        if (endMinutes < 60) return `${endMinutes} minutes left`;
+        
+        const endHours = Math.floor(endMinutes / 60);
+        return `${endHours} hours left`;
+      }
+      
+      // Event is in the future
+      const startDiffMs = eventStart.getTime() - now.getTime();
+      
+      if (startDiffMs <= 0) return "Now";
+
+      const minutes = Math.floor(startDiffMs / (1000 * 60));
+      if (minutes < 60) return `${minutes} minutes remaining`;
+
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} hours remaining`;
+
+      const days = Math.floor(hours / 24);
+      return `${days} days remaining`;
+    } catch (error) {
+      console.error("Error formatting time remaining:", error);
+      return "Time unknown";
     }
-    
-    // Event is in the future
-    const startDiffMs = eventStart.getTime() - now.getTime();
-    
-    if (startDiffMs <= 0) return "Now";
-
-    const minutes = Math.floor(startDiffMs / (1000 * 60));
-    if (minutes < 60) return `${minutes} minutes remaining`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hours remaining`;
-
-    const days = Math.floor(hours / 24);
-    return `${days} days remaining`;
   };
 
   const formatEventTime = (event: CalendarEvent): string => {
-    const start = new Date(event.start.dateTime || event.start.date || "");
-    const end = new Date(event.end.dateTime || event.end.date || "");
+    try {
+      const start = getEventStartDate(event);
+      const end = getEventEndDate(event);
 
-    const formatTime = (date: Date) => {
-      return date.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-    };
+      const formatTime = (date: Date) => {
+        return date.toLocaleTimeString([], {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+      };
 
-    const formatDate = (date: Date) => {
-      return date.toLocaleDateString([], {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      });
-    };
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString([], {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      };
 
-    return `${formatDate(start)} • ${formatTime(start)} – ${formatTime(end)}`;
+      // Handle all-day events
+      if (isAllDayEvent(event)) {
+        const startDate = formatDate(start);
+        const endDate = formatDate(end);
+        
+        // Single day all-day event
+        if (start.toDateString() === end.toDateString()) {
+          return `${startDate} • All day`;
+        }
+        
+        // Multi-day all-day event
+        return `${startDate} – ${endDate}`;
+      }
+
+      // Same day event with times
+      if (start.toDateString() === end.toDateString()) {
+        return `${formatDate(start)} • ${formatTime(start)} – ${formatTime(end)}`;
+      }
+
+      // Multi-day event with times
+      return `${formatDate(start)} ${formatTime(start)} – ${formatDate(end)} ${formatTime(end)}`;
+    } catch (error) {
+      console.error("Error formatting event time:", error);
+      return "Time unavailable";
+    }
   };
 
   const copyMeetingLink = async (link: string) => {
@@ -128,16 +176,24 @@ export const CalendarSheet = () => {
     const now = new Date();
     return events
       .filter((event) => {
-        // Keep events visible until their end time has passed
-        const eventEnd = new Date(
-          event.end.dateTime || event.end.date || ""
-        );
-        return eventEnd > now;
+        try {
+          // Keep events visible until their end time has passed
+          const eventEnd = getEventEndDate(event);
+          return eventEnd > now;
+        } catch (error) {
+          console.error("Error parsing event date:", error);
+          return false;
+        }
       })
       .sort((a, b) => {
-        const aStart = new Date(a.start.dateTime || a.start.date || "");
-        const bStart = new Date(b.start.dateTime || b.start.date || "");
-        return aStart.getTime() - bStart.getTime();
+        try {
+          const aStart = getEventStartDate(a);
+          const bStart = getEventStartDate(b);
+          return aStart.getTime() - bStart.getTime();
+        } catch (error) {
+          console.error("Error sorting events:", error);
+          return 0;
+        }
       })
       .slice(0, 10); // Show max 10 events
   };

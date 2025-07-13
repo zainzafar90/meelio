@@ -3,6 +3,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
 import { getCalendarToken } from "../api/calendar.api";
 import { useAuthStore } from "../stores/auth.store";
+import { 
+  getEventStartDate, 
+  getEventEndDate, 
+  getMinutesUntilEvent 
+} from "../utils/calendar-date.utils";
 
 export const REFRESH_THRESHOLD_MS = 15 * 60 * 1000;
 const BASE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -134,15 +139,23 @@ export const useCalendarStore = create<CalendarState>()(
 
           const activeEvents = events
             .filter((event) => {
-              const eventEnd = new Date(
-                event.end.dateTime || event.end.date || ""
-              );
-              return eventEnd > now;
+              try {
+                const eventEnd = getEventEndDate(event);
+                return eventEnd > now;
+              } catch (error) {
+                console.error("Error parsing event date:", error);
+                return false;
+              }
             })
             .sort((a, b) => {
-              const aStart = new Date(a.start.dateTime || a.start.date || "");
-              const bStart = new Date(b.start.dateTime || b.start.date || "");
-              return aStart.getTime() - bStart.getTime();
+              try {
+                const aStart = getEventStartDate(a);
+                const bStart = getEventStartDate(b);
+                return aStart.getTime() - bStart.getTime();
+              } catch (error) {
+                console.error("Error sorting events:", error);
+                return 0;
+              }
             });
 
           set({
@@ -167,24 +180,7 @@ export const useCalendarStore = create<CalendarState>()(
         const { nextEvent } = get();
         if (!nextEvent) return null;
 
-        const now = Date.now();
-        const eventStart = new Date(
-          nextEvent.start.dateTime || nextEvent.start.date || ""
-        );
-        const eventEnd = new Date(
-          nextEvent.end.dateTime || nextEvent.end.date || ""
-        );
-
-        if (now >= eventStart.getTime() && now < eventEnd.getTime()) {
-          const diffMs = eventEnd.getTime() - now;
-          if (diffMs <= 0) return 0;
-          return Math.floor(diffMs / (1000 * 60)); // Convert to minutes
-        }
-
-        const diffMs = eventStart.getTime() - now;
-        if (diffMs <= 0) return 0;
-
-        return Math.floor(diffMs / (1000 * 60)); // Convert to minutes
+        return getMinutesUntilEvent(nextEvent);
       },
     }),
     {
