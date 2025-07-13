@@ -127,9 +127,9 @@ export const CalendarDynamicIsland = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="flex justify-between w-full mt-4"
+          className="flex items-center justify-between w-full mt-4 min-w-0"
         >
-          <div className="flex items-center gap-2 ">
+          <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
             <div
               className={cn(
                 "size-2.5 rounded-full",
@@ -138,7 +138,7 @@ export const CalendarDynamicIsland = () => {
               style={{ backgroundColor: eventColor }}
               aria-hidden="true"
             />
-            <span className="truncate max-w-32 text-xs">
+            <span className="truncate text-xs flex-1 min-w-0">
               {nextEvent.summary || "Event"}
             </span>
           </div>
