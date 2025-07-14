@@ -48,3 +48,7 @@ chrome.runtime.onMessage.addListener((msg: TimerMessage) => {
       break;
   }
 });
+
+chrome.action.onClicked.addListener(() => {
+  chrome.tabs.create({ url: chrome.runtime.getURL("newtab.html") })
+})

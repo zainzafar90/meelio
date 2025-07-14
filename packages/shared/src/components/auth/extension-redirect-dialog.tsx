@@ -11,26 +11,22 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { ExternalLink } from "lucide-react";
 
-type Browser = "chrome" | "edge" | "firefox" | "opera";
+type Browser = "chrome" | "edge" | "opera";
 
 const PLACEHOLDER_IDS = {
-  edge: "your_edge_id",
-  firefox: "your_firefox_id",
   opera: "your_opera_id",
 } as const;
 
 const EXT_IDS: Record<Browser, string> = {
   chrome: "cjcgnlglboofgepielbmjcepcdohipaj",
-  edge: PLACEHOLDER_IDS.edge,
-  firefox: PLACEHOLDER_IDS.firefox,
+  edge: "fgebfeellnjjjicifeoonnkfpbfmaadp",
   opera: PLACEHOLDER_IDS.opera,
 };
 
 const STORE_URLS: Record<Browser, string> = {
   chrome:
     "https://chromewebstore.google.com/detail/meelio/cjcgnlglboofgepielbmjcepcdohipaj",
-  edge: "https://microsoftedge.microsoft.com/addons/detail/your_edge_id",
-  firefox: "https://addons.mozilla.org/en-US/firefox/addon/your_firefox_slug",
+  edge: "https://microsoftedge.microsoft.com/addons/detail/fgebfeellnjjjicifeoonnkfpbfmaadp",
   opera: "https://addons.opera.com/en/extensions/details/your_opera_slug",
 };
 
@@ -38,7 +34,6 @@ function getBrowser(): Browser | null {
   const ua = navigator.userAgent;
   if (ua.includes("Edg/")) return "edge";
   if (ua.includes("OPR/") || ua.includes("Opera")) return "opera";
-  if (ua.includes("Firefox/")) return "firefox";
   if (ua.includes("Chrome/")) return "chrome";
   return null;
 }
@@ -56,9 +51,9 @@ function openExtensionOrStore(browser: Browser) {
 
   try {
     const extUrl =
-      browser === "firefox"
-        ? `moz-extension://${extId}/newtab.html`
-        : `chrome-extension://${extId}/newtab.html`;
+      browser === "edge"
+        ? `extension://fgebfeellnjjjicifeoonnkfpbfmaadp/newtab.html`
+        : `chrome-extension://cjcgnlglboofgepielbmjcepcdohipaj/newtab.html`;
 
     const win = window.open(extUrl, "_blank");
     setTimeout(() => {
