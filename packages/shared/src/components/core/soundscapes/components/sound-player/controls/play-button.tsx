@@ -21,8 +21,8 @@ export const PlayButton = (props: Props) => {
     }))
   );
 
-  const isAnySoundPlaying = useSoundscapesStore((state) =>
-    state.sounds.some((sound) => sound.playing)
+  const isAnySoundPlaying = useSoundscapesStore(
+    useShallow((state) => state.sounds.some((sound) => sound.playing))
   );
 
   const toggleAllSounds = () => {

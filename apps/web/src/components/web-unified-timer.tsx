@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/shallow";
 import { useWebUnifiedTimerStore, webTimerPlatform } from "../stores/unified-web-timer.store";
 import { useDocumentTitle, useDisclosure } from "@repo/shared";
 import {
   TimerStage,
-  TimerEvent,
   TimerDurations,
 } from "@repo/shared";
 import { formatTime } from "@repo/shared";
@@ -13,10 +12,6 @@ import { NextPinnedTask } from "@repo/shared";
 import { TimerStatsDialog } from "@repo/shared";
 import { UnifiedTimerSettingsDialog } from "@repo/shared";
 
-interface DurationValues {
-  focusMin: number;
-  breakMin: number;
-}
 
 const useRestoreTimer = (restore: () => void) => {
   useEffect(() => {
@@ -260,26 +255,36 @@ const TimerView = ({
  * Web-specific unified timer component.
  */
 const useSimpleTimerState = () => {
-  const store = useWebUnifiedTimerStore(
-    useShallow((state) => ({
-      stage: state.stage,
-      isRunning: state.isRunning,
-      durations: state.durations,
-      settings: state.settings,
-      start: state.start,
-      pause: state.pause,
-      reset: state.reset,
-      skipToStage: state.skipToStage,
-      updateDurations: state.updateDurations,
-      toggleNotifications: state.toggleNotifications,
-      toggleSounds: state.toggleSounds,
-      updateRemaining: state.updateRemaining,
-      getLimitStatus: state.getLimitStatus,
-      restore: state.restore,
-      completeStage: state.completeStage,
-      checkDailyReset: state.checkDailyReset,
+  // Use a single selector with useShallow for state only
+  const state = useWebUnifiedTimerStore(
+    useShallow((s) => ({
+      stage: s.stage,
+      isRunning: s.isRunning,
+      durations: s.durations,
+      settings: s.settings,
     }))
   );
+
+  // Get actions in a stable way - these don't change
+  const actions = useMemo(() => {
+    const store = useWebUnifiedTimerStore.getState();
+    return {
+      start: store.start,
+      pause: store.pause,
+      reset: store.reset,
+      skipToStage: store.skipToStage,
+      updateDurations: store.updateDurations,
+      toggleNotifications: store.toggleNotifications,
+      toggleSounds: store.toggleSounds,
+      updateRemaining: store.updateRemaining,
+      getLimitStatus: store.getLimitStatus,
+      restore: store.restore,
+      completeStage: store.completeStage,
+      checkDailyReset: store.checkDailyReset,
+    };
+  }, []);
+  
+  const store = { ...state, ...actions };
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
@@ -310,7 +315,9 @@ const useSimpleTimerState = () => {
   );
 
   useEffect(() => {
-    store.checkDailyReset?.();
+    // Call checkDailyReset once on component mount
+    const checkDailyReset = useWebUnifiedTimerStore.getState().checkDailyReset;
+    checkDailyReset?.();
   }, []);
 
   const limit = store.getLimitStatus();

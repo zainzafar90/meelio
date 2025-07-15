@@ -82,7 +82,9 @@ const Content = () => {
 };
 
 const GreetingsContent = () => {
-  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+  const isTimerVisible = useDockStore(
+    useShallow((state) => state.isTimerVisible),
+  );
 
   return (
     <motion.div>
