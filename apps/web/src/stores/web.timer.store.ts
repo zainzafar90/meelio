@@ -43,7 +43,7 @@ class WebTimerPlatform {
 
 // Create web-specific store with platform access
 const webPlatform = new WebTimerPlatform();
-export const useWebUnifiedTimerStore = createTimerStore(webPlatform);
+export const useWebTimerStore = createTimerStore(webPlatform);
 
 // Export platform for message listening
 export const webTimerPlatform = webPlatform;

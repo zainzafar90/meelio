@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/shallow";
-import { useWebUnifiedTimerStore, webTimerPlatform } from "../stores/unified-web-timer.store";
+import { useWebTimerStore, webTimerPlatform } from "../stores/web.timer.store";
 import { useDocumentTitle, useDisclosure } from "@repo/shared";
 import {
   TimerStage,
@@ -256,7 +256,7 @@ const TimerView = ({
  */
 const useSimpleTimerState = () => {
   // Use a single selector with useShallow for state only
-  const state = useWebUnifiedTimerStore(
+  const state = useWebTimerStore(
     useShallow((s) => ({
       stage: s.stage,
       isRunning: s.isRunning,
@@ -267,7 +267,7 @@ const useSimpleTimerState = () => {
 
   // Get actions in a stable way - these don't change
   const actions = useMemo(() => {
-    const store = useWebUnifiedTimerStore.getState();
+    const store = useWebTimerStore.getState();
     return {
       start: store.start,
       pause: store.pause,
@@ -288,7 +288,7 @@ const useSimpleTimerState = () => {
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
-  const remaining = useWebUnifiedTimerStore(
+  const remaining = useWebTimerStore(
     useShallow((s) => {
       // When paused, use the stored remaining time
       if (!s.isRunning && s.prevRemaining !== null) {
@@ -316,7 +316,7 @@ const useSimpleTimerState = () => {
 
   useEffect(() => {
     // Call checkDailyReset once on component mount
-    const checkDailyReset = useWebUnifiedTimerStore.getState().checkDailyReset;
+    const checkDailyReset = useWebTimerStore.getState().checkDailyReset;
     checkDailyReset?.();
   }, []);
 
@@ -354,7 +354,7 @@ const useSimpleTimerState = () => {
   };
 };
 
-export const WebUnifiedTimer = () => {
+export const WebTimer = () => {
   const {
     store,
     remaining,

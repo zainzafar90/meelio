@@ -12,12 +12,6 @@ import { Icons } from "./icons";
 import { NextPinnedTask } from "./core/timer/components/timer-next-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
 import { TimerSettingsDialog } from "./timer-settings.dialog";
-import { getTimerPlatform } from "../lib/timer.platform";
-
-interface DurationValues {
-  focusMin: number;
-  breakMin: number;
-}
 
 const useRestoreTimer = (restore: () => void) => {
   useEffect(() => {
@@ -392,7 +386,7 @@ export const Timer = () => {
         onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
       />
 
-      <UnifiedTimerSettingsDialog
+      <TimerSettingsDialog
         isOpen={settingsModal.isOpen}
         onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
         focusMin={store.durations[TimerStage.Focus] / 60}
