@@ -13,6 +13,8 @@ import {
   addSimpleTimerBreakTime,
 } from "../lib/db/pomodoro.dexie";
 import { getTimerPlatform, TimerPlatform } from "../lib/timer-platform";
+import { useSoundscapesStore } from "./soundscapes.store";
+import { Category } from "../types/category";
 
 const playCompletionSound = (
   soundEnabled: boolean,
@@ -116,6 +118,22 @@ export const createUnifiedTimerStore = (platform: TimerPlatform) => {
           const end = deps.now() + duration * 1000;
           deps.postMessage?.({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
+          
+          // Handle soundscapes when focus starts
+          if (state.stage === TimerStage.Focus) {
+            const soundscapesState = useSoundscapesStore.getState();
+            
+            // Check if any soundscapes are currently playing
+            const hasPlayingSounds = soundscapesState.sounds.some(sound => sound.playing);
+            
+            if (hasPlayingSounds) {
+              // If soundscapes are already playing, let them continue
+              soundscapesState.resumePausedSounds();
+            } else {
+              // If no soundscapes are playing, auto-start productivity sounds
+              soundscapesState.playCategory(Category.Productivity);
+            }
+          }
         };
 
         const pause = () => {
@@ -126,6 +144,9 @@ export const createUnifiedTimerStore = (platform: TimerPlatform) => {
               : null;
           deps.postMessage?.({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
+          
+          // Pause soundscapes when timer is paused
+          useSoundscapesStore.getState().pausePlayingSounds();
         };
 
         const reset = () => {
@@ -331,6 +352,11 @@ export const createUnifiedTimerStore = (platform: TimerPlatform) => {
                 "You've completed today's focus goal. Enjoy your break - see you tomorrow!"
               );
             }
+          }
+
+          // Pause soundscapes when switching to break
+          if (nextStage === TimerStage.Break) {
+            useSoundscapesStore.getState().pausePlayingSounds();
           }
 
           set({
