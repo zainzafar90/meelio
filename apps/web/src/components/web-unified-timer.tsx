@@ -10,7 +10,7 @@ import { formatTime } from "@repo/shared";
 import { Icons } from "@repo/shared";
 import { NextPinnedTask } from "@repo/shared";
 import { TimerStatsDialog } from "@repo/shared";
-import { TimerSettingsPanel, TimerSettingsValues } from "@repo/shared";
+import { UnifiedTimerSettings } from "@repo/shared";
 
 interface DurationValues {
   focusMin: number;
@@ -65,7 +65,11 @@ interface TimerViewProps {
   reset: () => void;
   skip: (s: TimerStage) => void;
   limitReached: boolean;
-  onSettingsChange: (settings: TimerSettingsValues) => void;
+  onSettingsChange: (settings: {
+    durations: { focusMin: number; breakMin: number };
+    notifications: boolean;
+    sounds: boolean;
+  }) => void;
   onStatsClick: () => void;
   notifications: boolean;
   sounds: boolean;
@@ -245,7 +249,7 @@ const TimerView = ({
 
             {/* Settings Panel (when settings clicked) */}
             {showDurationEditor && (
-              <TimerSettingsPanel
+              <UnifiedTimerSettings
                 focusMin={durations[TimerStage.Focus] / 60}
                 breakMin={durations[TimerStage.Break] / 60}
                 notifications={notifications}
@@ -301,7 +305,11 @@ const useSimpleTimerState = () => {
 
   const limit = store.getLimitStatus();
 
-  const handleSettingsChange = (settings: TimerSettingsValues) => {
+  const handleSettingsChange = (settings: {
+    durations: { focusMin: number; breakMin: number };
+    notifications: boolean;
+    sounds: boolean;
+  }) => {
     // Update durations
     store.updateDurations({ 
       focus: settings.durations.focusMin * 60, 

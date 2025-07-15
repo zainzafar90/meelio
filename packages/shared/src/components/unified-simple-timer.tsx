@@ -10,7 +10,7 @@ import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
 import { NextPinnedTask } from "./core/timer/components/next-pinned-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
-import { TimerSettingsPanel, TimerSettingsValues } from "./timer-settings-panel";
+import { UnifiedTimerSettings } from "./unified-timer-settings";
 import { getTimerPlatform } from "../lib/timer-platform";
 
 interface DurationValues {
@@ -73,7 +73,11 @@ interface TimerViewProps {
   reset: () => void;
   skip: (s: TimerStage) => void;
   limitReached: boolean;
-  onSettingsChange: (settings: TimerSettingsValues) => void;
+  onSettingsChange: (settings: {
+    durations: { focusMin: number; breakMin: number };
+    notifications: boolean;
+    sounds: boolean;
+  }) => void;
   onStatsClick: () => void;
   notifications: boolean;
   sounds: boolean;
@@ -253,7 +257,7 @@ const TimerView = ({
 
             {/* Settings Panel (when settings clicked) */}
             {showDurationEditor && (
-              <TimerSettingsPanel
+              <UnifiedTimerSettings
                 focusMin={durations[TimerStage.Focus] / 60}
                 breakMin={durations[TimerStage.Break] / 60}
                 notifications={notifications}
@@ -312,7 +316,11 @@ const useSimpleTimerState = () => {
 
   const limit = store.getLimitStatus();
 
-  const handleSettingsChange = (settings: TimerSettingsValues) => {
+  const handleSettingsChange = (settings: {
+    durations: { focusMin: number; breakMin: number };
+    notifications: boolean;
+    sounds: boolean;
+  }) => {
     // Update durations
     store.updateDurations({ 
       focus: settings.durations.focusMin * 60, 

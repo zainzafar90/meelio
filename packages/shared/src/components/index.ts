@@ -92,6 +92,7 @@ export * from "./core/timer/timer-placeholder";
 export { LegacySimpleTimer } from "./simple-timer";
 export * from "./unified-simple-timer";
 export * from "./timer-settings-panel";
+export * from "./unified-timer-settings";
 
 // Main timer component - now points to unified implementation
 export { UnifiedSimpleTimer as SimpleTimer } from "./unified-simple-timer";
