@@ -1,7 +1,6 @@
 import { createTimerStore } from "@repo/shared";
 import TimerWorker from "../workers/timer-worker?worker";
 
-// Web-specific timer platform
 class WebTimerPlatform {
   private worker: Worker | null = null;
   private listeners: Set<(message: any) => void> = new Set();
@@ -18,7 +17,6 @@ class WebTimerPlatform {
   }
 
   sendMessage(message: any): void {
-    // Transform message format for web worker
     const workerMessage = {
       type: message.type,
       payload: {
@@ -41,9 +39,7 @@ class WebTimerPlatform {
   }
 }
 
-// Create web-specific store with platform access
 const webPlatform = new WebTimerPlatform();
 export const useWebTimerStore = createTimerStore(webPlatform);
 
-// Export platform for message listening
 export const webTimerPlatform = webPlatform;

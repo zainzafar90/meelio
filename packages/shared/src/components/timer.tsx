@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useTimerStore } from "../stores/timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
@@ -68,15 +68,8 @@ interface TimerViewProps {
   reset: () => void;
   skip: (s: TimerStage) => void;
   limitReached: boolean;
-  onSettingsChange: (settings: {
-    durations: { focusMin: number; breakMin: number };
-    notifications: boolean;
-    sounds: boolean;
-  }) => void;
   onStatsClick: () => void;
   onSettingsClick: () => void;
-  notifications: boolean;
-  sounds: boolean;
 }
 
 const TimerView = ({
@@ -89,11 +82,8 @@ const TimerView = ({
   reset,
   skip,
   limitReached,
-  onSettingsChange,
   onStatsClick,
   onSettingsClick,
-  notifications,
-  sounds,
 }: TimerViewProps) => {
 
   return (
@@ -258,10 +248,8 @@ const TimerView = ({
   );
 };
 
-/**
- * Unified Pomodoro timer widget that works across extension and web.
- */
-const useSimpleTimerState = () => {
+
+const useTimerState = () => {
   const timerStore = useTimerStore();
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
@@ -324,13 +312,11 @@ const useSimpleTimerState = () => {
     notifications: boolean;
     sounds: boolean;
   }) => {
-    // Update durations
     store.updateDurations({ 
       focus: settings.durations.focusMin * 60, 
       break: settings.durations.breakMin * 60 
     });
     
-    // Update notifications and sounds
     if (settings.notifications !== store.settings.notifications) {
       store.toggleNotifications();
     }
@@ -361,7 +347,7 @@ export const Timer = () => {
     settingsModal,
     notifications,
     sounds,
-  } = useSimpleTimerState();
+  } = useTimerState();
   return (
     <>
       <TimerView
@@ -374,11 +360,8 @@ export const Timer = () => {
         reset={store.reset}
         skip={store.skipToStage}
         limitReached={limit.isLimitReached}
-        onSettingsChange={handleSettingsChange}
         onStatsClick={statsModal.open}
         onSettingsClick={settingsModal.open}
-        notifications={notifications}
-        sounds={sounds}
       />
 
       <TimerStatsDialog

@@ -226,6 +226,7 @@ const PricingSection = ({
   benefits?: string[];
   onNeedAuth: () => void;
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuthStore(
     useShallow((state) => ({
       user: state.user,

@@ -27,8 +27,8 @@ import { useAppStore } from "../stores/app.store";
 import { pomodoroSounds } from "../data/sounds-data";
 
 const timerSettingsSchema = z.object({
-  focusTime: z.number().min(1).max(90),
-  breakTime: z.number().min(1).max(30),
+  focusTime: z.number().min(1).max(1440),
+  breakTime: z.number().min(1).max(1440),
 });
 
 type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
@@ -158,7 +158,7 @@ export function TimerSettingsDialog({
                       <Input
                         {...field}
                         min={1}
-                        max={90}
+                        max={1440}
                         type="number"
                         id="focus-time"
                         autoCorrect="off"
@@ -194,7 +194,7 @@ export function TimerSettingsDialog({
                       <Input
                         {...field}
                         min={1}
-                        max={30}
+                        max={1440}
                         type="number"
                         id="break-time"
                         autoCorrect="off"
@@ -234,7 +234,8 @@ export function TimerSettingsDialog({
             </div>
 
             <div
-              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+              onClick={handleSoundsToggle}
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Timer notification sound</p>
@@ -247,6 +248,7 @@ export function TimerSettingsDialog({
                 disabled={!notifications}
                 checked={sounds}
                 onCheckedChange={handleSoundsToggle}
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
 

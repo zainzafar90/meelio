@@ -62,7 +62,7 @@ function initState(): Omit<
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
     settings: { notifications: true, sounds: true },
     stats: { focusSec: 0, breakSec: 0 },
-    dailyLimitSec: 90 * 60 * 60,
+    dailyLimitSec: 120 * 60 * 60,
     unsyncedFocusSec: 0,
     prevRemaining: null,
   };

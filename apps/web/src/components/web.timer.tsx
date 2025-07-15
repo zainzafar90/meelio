@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useWebTimerStore, webTimerPlatform } from "../stores/web.timer.store";
 import { useDocumentTitle, useDisclosure } from "@repo/shared";
@@ -61,15 +61,8 @@ interface TimerViewProps {
   reset: () => void;
   skip: (s: TimerStage) => void;
   limitReached: boolean;
-  onSettingsChange: (settings: {
-    durations: { focusMin: number; breakMin: number };
-    notifications: boolean;
-    sounds: boolean;
-  }) => void;
   onStatsClick: () => void;
   onSettingsClick: () => void;
-  notifications: boolean;
-  sounds: boolean;
 }
 
 const TimerView = ({
@@ -82,11 +75,8 @@ const TimerView = ({
   reset,
   skip,
   limitReached,
-  onSettingsChange,
   onStatsClick,
   onSettingsClick,
-  notifications,
-  sounds,
 }: TimerViewProps) => {
 
   return (
@@ -251,42 +241,31 @@ const TimerView = ({
   );
 };
 
-/**
- * Web-specific unified timer component.
- */
-const useSimpleTimerState = () => {
-  // Use a single selector with useShallow for state only
-  const state = useWebTimerStore(
-    useShallow((s) => ({
-      stage: s.stage,
-      isRunning: s.isRunning,
-      durations: s.durations,
-      settings: s.settings,
-    }))
-  );
 
-  // Get actions in a stable way - these don't change
-  const actions = useMemo(() => {
-    const store = useWebTimerStore.getState();
-    return {
-      start: store.start,
-      pause: store.pause,
-      reset: store.reset,
-      skipToStage: store.skipToStage,
-      updateDurations: store.updateDurations,
-      toggleNotifications: store.toggleNotifications,
-      toggleSounds: store.toggleSounds,
-      updateRemaining: store.updateRemaining,
-      getLimitStatus: store.getLimitStatus,
-      restore: store.restore,
-      completeStage: store.completeStage,
-      checkDailyReset: store.checkDailyReset,
-    };
-  }, []);
-  
-  const store = { ...state, ...actions };
+const useTimerState = () => {
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
+
+  const store = useWebTimerStore(
+    useShallow((state) => ({
+      stage: state.stage,
+      isRunning: state.isRunning,
+      durations: state.durations,
+      settings: state.settings,
+      start: state.start,
+      pause: state.pause,
+      reset: state.reset,
+      skipToStage: state.skipToStage,
+      updateDurations: state.updateDurations,
+      toggleNotifications: state.toggleNotifications,
+      toggleSounds: state.toggleSounds,
+      updateRemaining: state.updateRemaining,
+      getLimitStatus: state.getLimitStatus,
+      restore: state.restore,
+      completeStage: state.completeStage,
+      checkDailyReset: state.checkDailyReset,
+    }))
+  );
 
   const remaining = useWebTimerStore(
     useShallow((s) => {
@@ -364,7 +343,7 @@ export const WebTimer = () => {
     settingsModal,
     notifications,
     sounds,
-  } = useSimpleTimerState();
+  } = useTimerState();
   return (
     <>
       <TimerView
@@ -377,11 +356,8 @@ export const WebTimer = () => {
         reset={store.reset}
         skip={store.skipToStage}
         limitReached={limit.isLimitReached}
-        onSettingsChange={handleSettingsChange}
         onStatsClick={statsModal.open}
         onSettingsClick={settingsModal.open}
-        notifications={notifications}
-        sounds={sounds}
       />
 
       <TimerStatsDialog
