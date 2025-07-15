@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@repo/ui/components/ui/select";
 
+import { useShallow } from "zustand/shallow";
 import { useAppStore } from "../stores/app.store";
 import { pomodoroSounds } from "../data/sounds-data";
 
@@ -55,7 +56,7 @@ export function UnifiedTimerSettingsDialog({
   sounds,
   onSave,
 }: UnifiedTimerSettingsDialogProps) {
-  const isExtension = useAppStore.getState().platform === "extension";
+  const isExtension = useAppStore(useShallow((state) => state.platform === "extension"));
   const { t } = useTranslation();
 
   const form = useForm<TimerSettingsValues>({

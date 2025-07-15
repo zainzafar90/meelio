@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 import { useUnifiedTimerStore } from "../stores/unified-simple-timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
@@ -271,20 +272,41 @@ const useSimpleTimerState = () => {
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
-  const store = timerStore();
+  const store = timerStore(
+    useShallow((state) => ({
+      stage: state.stage,
+      isRunning: state.isRunning,
+      durations: state.durations,
+      settings: state.settings,
+      start: state.start,
+      pause: state.pause,
+      reset: state.reset,
+      skipToStage: state.skipToStage,
+      updateDurations: state.updateDurations,
+      toggleNotifications: state.toggleNotifications,
+      toggleSounds: state.toggleSounds,
+      updateRemaining: state.updateRemaining,
+      getLimitStatus: state.getLimitStatus,
+      restore: state.restore,
+      completeStage: state.completeStage,
+      checkDailyReset: state.checkDailyReset,
+    }))
+  );
   
-  const remaining = timerStore((s) => {
-    // When paused, use the stored remaining time
-    if (!s.isRunning && s.prevRemaining !== null) {
-      return s.prevRemaining;
-    }
-    // When running with endTimestamp, calculate remaining
-    if (s.endTimestamp) {
-      return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
-    }
-    // Default to stage duration
-    return s.durations[s.stage];
-  });
+  const remaining = timerStore(
+    useShallow((s) => {
+      // When paused, use the stored remaining time
+      if (!s.isRunning && s.prevRemaining !== null) {
+        return s.prevRemaining;
+      }
+      // When running with endTimestamp, calculate remaining
+      if (s.endTimestamp) {
+        return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
+      }
+      // Default to stage duration
+      return s.durations[s.stage];
+    })
+  );
 
   useRestoreTimer(store.restore);
   useDocumentTitle({ remaining, stage: store.stage, running: store.isRunning });
@@ -292,7 +314,7 @@ const useSimpleTimerState = () => {
     store.stage,
     store.durations,
     store.updateRemaining,
-    (store as any).completeStage,
+    store.completeStage,
     store.start,
     store.getLimitStatus
   );
