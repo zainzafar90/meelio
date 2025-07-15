@@ -7,6 +7,7 @@ import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
+import { toast } from "sonner";
 
 export interface TaskListMeta {
   id: string;
@@ -225,6 +226,7 @@ export const useTaskStore = create<TaskState>()(
       const updatedData = {
         completed: !task.completed,
         updatedAt: Date.now(),
+        ...(task.pinned && !task.completed ? { pinned: false } : {}),
       };
 
       try {
@@ -587,6 +589,12 @@ export const useTaskStore = create<TaskState>()(
     togglePinTask: async (taskId) => {
       const task = get().tasks.find((t) => t.id === taskId);
       if (!task) return;
+
+      // Don't allow pinning completed tasks
+      if (task.completed && !task.pinned) {
+        toast.warning("You can't pin a completed task");
+        return;
+      }
 
       const authState = useAuthStore.getState();
       const user = authState.user;
