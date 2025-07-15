@@ -10,7 +10,7 @@ import { formatTime } from "@repo/shared";
 import { Icons } from "@repo/shared";
 import { NextPinnedTask } from "@repo/shared";
 import { TimerStatsDialog } from "@repo/shared";
-import { UnifiedTimerSettings } from "@repo/shared";
+import { UnifiedTimerSettingsDialog } from "@repo/shared";
 
 interface DurationValues {
   focusMin: number;
@@ -71,6 +71,7 @@ interface TimerViewProps {
     sounds: boolean;
   }) => void;
   onStatsClick: () => void;
+  onSettingsClick: () => void;
   notifications: boolean;
   sounds: boolean;
 }
@@ -87,10 +88,10 @@ const TimerView = ({
   limitReached,
   onSettingsChange,
   onStatsClick,
+  onSettingsClick,
   notifications,
   sounds,
 }: TimerViewProps) => {
-  const [showDurationEditor, setShowDurationEditor] = useState(false);
 
   return (
     <div className="relative">
@@ -224,7 +225,7 @@ const TimerView = ({
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={() => setShowDurationEditor(!showDurationEditor)}
+                onClick={onSettingsClick}
                 title="Settings"
                 role="button"
               >
@@ -247,20 +248,6 @@ const TimerView = ({
               />
             </div>
 
-            {/* Settings Panel (when settings clicked) */}
-            {showDurationEditor && (
-              <UnifiedTimerSettings
-                focusMin={durations[TimerStage.Focus] / 60}
-                breakMin={durations[TimerStage.Break] / 60}
-                notifications={notifications}
-                sounds={sounds}
-                onSave={(values) => {
-                  onSettingsChange(values);
-                  setShowDurationEditor(false);
-                }}
-                onCancel={() => setShowDurationEditor(false)}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -274,6 +261,7 @@ const TimerView = ({
 const useSimpleTimerState = () => {
   const store = useWebUnifiedTimerStore();
   const statsModal = useDisclosure();
+  const settingsModal = useDisclosure();
 
   const remaining = useWebUnifiedTimerStore((s) => {
     // When paused, use the stored remaining time
@@ -331,6 +319,7 @@ const useSimpleTimerState = () => {
     limit,
     handleSettingsChange,
     statsModal,
+    settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
   };
@@ -343,6 +332,7 @@ export const WebUnifiedTimer = () => {
     limit,
     handleSettingsChange,
     statsModal,
+    settingsModal,
     notifications,
     sounds,
   } = useSimpleTimerState();
@@ -360,6 +350,7 @@ export const WebUnifiedTimer = () => {
         limitReached={limit.isLimitReached}
         onSettingsChange={handleSettingsChange}
         onStatsClick={statsModal.open}
+        onSettingsClick={settingsModal.open}
         notifications={notifications}
         sounds={sounds}
       />
@@ -367,6 +358,16 @@ export const WebUnifiedTimer = () => {
       <TimerStatsDialog
         isOpen={statsModal.isOpen}
         onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
+      />
+
+      <UnifiedTimerSettingsDialog
+        isOpen={settingsModal.isOpen}
+        onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
+        focusMin={store.durations[TimerStage.Focus] / 60}
+        breakMin={store.durations[TimerStage.Break] / 60}
+        notifications={notifications}
+        sounds={sounds}
+        onSave={handleSettingsChange}
       />
     </>
   );

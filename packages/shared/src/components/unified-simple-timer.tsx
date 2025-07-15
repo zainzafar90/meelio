@@ -10,7 +10,7 @@ import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
 import { NextPinnedTask } from "./core/timer/components/next-pinned-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
-import { UnifiedTimerSettings } from "./unified-timer-settings";
+import { UnifiedTimerSettingsDialog } from "./unified-timer-settings.dialog";
 import { getTimerPlatform } from "../lib/timer-platform";
 
 interface DurationValues {
@@ -79,6 +79,7 @@ interface TimerViewProps {
     sounds: boolean;
   }) => void;
   onStatsClick: () => void;
+  onSettingsClick: () => void;
   notifications: boolean;
   sounds: boolean;
 }
@@ -95,10 +96,10 @@ const TimerView = ({
   limitReached,
   onSettingsChange,
   onStatsClick,
+  onSettingsClick,
   notifications,
   sounds,
 }: TimerViewProps) => {
-  const [showDurationEditor, setShowDurationEditor] = useState(false);
 
   return (
     <div className="relative">
@@ -232,7 +233,7 @@ const TimerView = ({
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={() => setShowDurationEditor(!showDurationEditor)}
+                onClick={onSettingsClick}
                 title="Settings"
                 role="button"
               >
@@ -255,20 +256,6 @@ const TimerView = ({
               />
             </div>
 
-            {/* Settings Panel (when settings clicked) */}
-            {showDurationEditor && (
-              <UnifiedTimerSettings
-                focusMin={durations[TimerStage.Focus] / 60}
-                breakMin={durations[TimerStage.Break] / 60}
-                notifications={notifications}
-                sounds={sounds}
-                onSave={(values) => {
-                  onSettingsChange(values);
-                  setShowDurationEditor(false);
-                }}
-                onCancel={() => setShowDurationEditor(false)}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -355,6 +342,7 @@ export const UnifiedSimpleTimer = () => {
     limit,
     handleSettingsChange,
     statsModal,
+    settingsModal,
     notifications,
     sounds,
   } = useSimpleTimerState();
@@ -372,6 +360,7 @@ export const UnifiedSimpleTimer = () => {
         limitReached={limit.isLimitReached}
         onSettingsChange={handleSettingsChange}
         onStatsClick={statsModal.open}
+        onSettingsClick={settingsModal.open}
         notifications={notifications}
         sounds={sounds}
       />
@@ -379,6 +368,16 @@ export const UnifiedSimpleTimer = () => {
       <TimerStatsDialog
         isOpen={statsModal.isOpen}
         onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
+      />
+
+      <UnifiedTimerSettingsDialog
+        isOpen={settingsModal.isOpen}
+        onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
+        focusMin={store.durations[TimerStage.Focus] / 60}
+        breakMin={store.durations[TimerStage.Break] / 60}
+        notifications={notifications}
+        sounds={sounds}
+        onSave={handleSettingsChange}
       />
     </>
   );
