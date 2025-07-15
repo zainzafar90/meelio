@@ -60,7 +60,6 @@ export * from "./core/settings/tabs/account-settings";
 export * from "./core/settings/tabs/appearance-settings";
 export * from "./core/settings/tabs/billing-settings";
 export * from "./core/settings/tabs/general-settings";
-export * from "./core/settings/tabs/timer-settings";
 
 // Soundscapes
 export * from "./core/soundscapes/soundscapes.sheet";
@@ -80,7 +79,6 @@ export * from "./core/soundscapes/components/sound-player/controls/shuffle-butto
 export * from "./core/soundscapes/components/sound-player/controls/sound-control-bar";
 
 // Timer
-export * from "./core/timer/components/timer-controls";
 export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
@@ -89,10 +87,7 @@ export * from "./core/timer/components/next-pinned-task";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
-export { LegacySimpleTimer } from "./simple-timer";
 export * from "./unified-simple-timer";
-export * from "./timer-settings-panel";
-export * from "./unified-timer-settings";
 export * from "./unified-timer-settings.dialog";
 
 // Main timer component - now points to unified implementation

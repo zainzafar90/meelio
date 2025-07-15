@@ -1,4 +1,4 @@
-import { PomodoroStage } from "../../types/pomodoro";
+import { TimerStage } from "../../types/new/pomodoro-lite";
 import { db } from "./meelio.dexie";
 import { PomodoroSession, DailySummary } from "./models.dexie";
 import { IndexableType } from "dexie";
@@ -54,14 +54,14 @@ export const addPomodoroSession = async (
 
 export const addPomodoroSummary = async (
   duration: number,
-  stage: PomodoroStage
+  stage: TimerStage
 ): Promise<IndexableType> => {
   const todaysSummary = await getTodaysSummary();
 
-  if (stage === PomodoroStage.Focus) {
+  if (stage === TimerStage.Focus) {
     todaysSummary.focusSessions++;
     todaysSummary.totalFocusTime += duration;
-  } else if (stage === PomodoroStage.Break) {
+  } else if (stage === TimerStage.Break) {
     todaysSummary.breaks++;
     todaysSummary.totalBreakTime += duration;
   }
