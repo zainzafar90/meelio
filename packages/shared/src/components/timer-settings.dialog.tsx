@@ -218,8 +218,7 @@ export function TimerSettingsDialog({
             </div>
 
             <div
-              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
-              onClick={handleNotificationsToggle}
+              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Timer notification</p>
@@ -231,13 +230,11 @@ export function TimerSettingsDialog({
                 size="sm"
                 checked={notifications}
                 onCheckedChange={handleNotificationsToggle}
-                onClick={(e) => e.stopPropagation()}
               />
             </div>
 
             <div
-              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
-              onClick={handleSoundsToggle}
+              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Timer notification sound</p>
@@ -250,7 +247,6 @@ export function TimerSettingsDialog({
                 disabled={!notifications}
                 checked={sounds}
                 onCheckedChange={handleSoundsToggle}
-                onClick={(e) => e.stopPropagation()}
               />
             </div>
 
