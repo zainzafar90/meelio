@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { TimerStage } from "../types/new/pomodoro-lite";
+import { TimerStage } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 
 export interface DocumentTitleProps {

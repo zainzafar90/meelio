@@ -2,7 +2,7 @@ import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "../stores/auth.store";
 import { useTaskStore } from "../stores/task.store";
 import { useSyncStore } from "../stores/sync.store";
-import { useUnifiedTimerStore } from "../stores/unified-simple-timer.store";
+import { useTimerStore } from "../stores/timer.store";
 
 interface MigrationResult {
   success: boolean;
@@ -112,7 +112,7 @@ export const migrateGuestDataToUser = async (
  */
 const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
   try {
-    const pomodoroStore = useUnifiedTimerStore.getState();
+    const pomodoroStore = useTimerStore().getState();
     const guestFocusTime = pomodoroStore.stats.focusSec;
 
     if (guestFocusTime === 0) {

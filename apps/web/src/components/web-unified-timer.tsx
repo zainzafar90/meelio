@@ -10,7 +10,7 @@ import { formatTime } from "@repo/shared";
 import { Icons } from "@repo/shared";
 import { NextPinnedTask } from "@repo/shared";
 import { TimerStatsDialog } from "@repo/shared";
-import { UnifiedTimerSettingsDialog } from "@repo/shared";
+import { TimerSettingsDialog } from "@repo/shared";
 
 
 const useRestoreTimer = (restore: () => void) => {
@@ -389,7 +389,7 @@ export const WebUnifiedTimer = () => {
         onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
       />
 
-      <UnifiedTimerSettingsDialog
+      <TimerSettingsDialog
         isOpen={settingsModal.isOpen}
         onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
         focusMin={store.durations[TimerStage.Focus] / 60}

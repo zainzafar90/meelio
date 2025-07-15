@@ -83,15 +83,15 @@ export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
 export * from "./core/timer/components/timer-stats";
-export * from "./core/timer/components/next-pinned-task";
-export * from "./core/timer/dialog/reset-timer.dialog";
+export * from "./core/timer/components/timer-next-task";
+export * from "./core/timer/dialog/timer-reset.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
-export * from "./unified-simple-timer";
-export * from "./unified-timer-settings.dialog";
+export * from "./timer";
+export * from "./timer-settings.dialog";
 
 // Main timer component - now points to unified implementation
-export { UnifiedSimpleTimer as SimpleTimer } from "./unified-simple-timer";
+export { Timer as SimpleTimer } from "./timer";
 
 // Tasks
 export * from "./core/task-list/components/create-list";

@@ -1,4 +1,4 @@
-import { createUnifiedTimerStore } from "@repo/shared";
+import { createTimerStore } from "@repo/shared";
 import TimerWorker from "../workers/timer-worker?worker";
 
 // Web-specific timer platform
@@ -43,7 +43,7 @@ class WebTimerPlatform {
 
 // Create web-specific store with platform access
 const webPlatform = new WebTimerPlatform();
-export const useWebUnifiedTimerStore = createUnifiedTimerStore(webPlatform);
+export const useWebUnifiedTimerStore = createTimerStore(webPlatform);
 
 // Export platform for message listening
 export const webTimerPlatform = webPlatform;

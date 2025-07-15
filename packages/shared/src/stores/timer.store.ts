@@ -7,12 +7,12 @@ import {
   TimerState,
   TimerDeps,
   TimerSettings,
-} from "../types/new/pomodoro-lite";
+} from "../types/timer.types";
 import {
   addSimpleTimerFocusTime,
   addSimpleTimerBreakTime,
 } from "../lib/db/pomodoro.dexie";
-import { getTimerPlatform, TimerPlatform } from "../lib/timer-platform";
+import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
 import { useSoundscapesStore } from "./soundscapes.store";
 import { Category } from "../types/category";
 
@@ -68,7 +68,7 @@ function initState(): Omit<
   };
 }
 
-export const createUnifiedTimerStore = (platform: TimerPlatform) => {
+export const createTimerStore = (platform: TimerPlatform) => {
   const deps: TimerDeps = {
     now: () => Date.now(),
     pushUsage: async () => Promise.resolve(),
@@ -410,10 +410,10 @@ export const createUnifiedTimerStore = (platform: TimerPlatform) => {
 };
 
 // Create singleton stores for each platform
-let extensionStore: ReturnType<typeof createUnifiedTimerStore> | null = null;
-let webStore: ReturnType<typeof createUnifiedTimerStore> | null = null;
+let extensionStore: ReturnType<typeof createTimerStore> | null = null;
+let webStore: ReturnType<typeof createTimerStore> | null = null;
 
-export const useUnifiedTimerStore = () => {
+export const useTimerStore = () => {
   const platform = getTimerPlatform();
   
   // Check if we're in extension or web context
@@ -421,12 +421,12 @@ export const useUnifiedTimerStore = () => {
   
   if (isExtension) {
     if (!extensionStore) {
-      extensionStore = createUnifiedTimerStore(platform);
+      extensionStore = createTimerStore(platform);
     }
     return extensionStore;
   } else {
     if (!webStore) {
-      webStore = createUnifiedTimerStore(platform);
+      webStore = createTimerStore(platform);
     }
     return webStore;
   }

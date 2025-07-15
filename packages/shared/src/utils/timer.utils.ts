@@ -1,4 +1,4 @@
-import { TimerStage } from "../types/new/pomodoro-lite";
+import { TimerStage } from "../types/timer.types";
 
 /*
 |--------------------------------------------------------------------------

@@ -33,7 +33,7 @@ const timerSettingsSchema = z.object({
 
 type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
 
-export interface UnifiedTimerSettingsDialogProps {
+export interface TimerSettingsDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   focusMin: number;
@@ -47,7 +47,7 @@ export interface UnifiedTimerSettingsDialogProps {
   }) => void;
 }
 
-export function UnifiedTimerSettingsDialog({
+export function TimerSettingsDialog({
   isOpen,
   onOpenChange,
   focusMin,
@@ -55,7 +55,7 @@ export function UnifiedTimerSettingsDialog({
   notifications,
   sounds,
   onSave,
-}: UnifiedTimerSettingsDialogProps) {
+}: TimerSettingsDialogProps) {
   const isExtension = useAppStore(useShallow((state) => state.platform === "extension"));
   const { t } = useTranslation();
 

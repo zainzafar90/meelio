@@ -6,7 +6,7 @@ import { useOnboardingStore } from "../stores/onboarding.store";
 import { useAppStore } from "../stores/app.store";
 import { useSettingsStore } from "../stores/settings.store";
 import { useMantraStore, useGreetingStore } from "../stores/greetings.store";
-import { useUnifiedTimerStore } from "../stores/unified-simple-timer.store";
+import { useTimerStore } from "../stores/timer.store";
 import { useCalendarStore } from "../stores";
 
 /**
@@ -22,7 +22,7 @@ export async function clearLocalData() {
     useSettingsStore.persist?.clearStorage?.();
     useMantraStore.persist?.clearStorage?.();
     useGreetingStore.persist?.clearStorage?.();
-    useUnifiedTimerStore.persist?.clearStorage?.();
+    useTimerStore().persist?.clearStorage?.();
     useCalendarStore.persist?.clearStorage?.();
 
     // Remove local-only keys

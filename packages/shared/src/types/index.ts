@@ -3,5 +3,5 @@ export * from "./category";
 export * from "./combo";
 export * from "./sound";
 export * from "./subscription";
-export * from "./new/pomodoro-lite";
+export * from "./timer.types";
 export * from "../components/core/calendar";

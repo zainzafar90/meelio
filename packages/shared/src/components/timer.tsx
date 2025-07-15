@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
-import { useUnifiedTimerStore } from "../stores/unified-simple-timer.store";
+import { useTimerStore } from "../stores/timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
   TimerEvent,
   TimerDurations,
-} from "../types/new/pomodoro-lite";
+} from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
-import { NextPinnedTask } from "./core/timer/components/next-pinned-task";
+import { NextPinnedTask } from "./core/timer/components/timer-next-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
-import { UnifiedTimerSettingsDialog } from "./unified-timer-settings.dialog";
-import { getTimerPlatform } from "../lib/timer-platform";
+import { TimerSettingsDialog } from "./timer-settings.dialog";
+import { getTimerPlatform } from "../lib/timer.platform";
 
 interface DurationValues {
   focusMin: number;
@@ -268,7 +268,7 @@ const TimerView = ({
  * Unified Pomodoro timer widget that works across extension and web.
  */
 const useSimpleTimerState = () => {
-  const timerStore = useUnifiedTimerStore();
+  const timerStore = useTimerStore();
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
@@ -357,7 +357,7 @@ const useSimpleTimerState = () => {
   };
 };
 
-export const UnifiedSimpleTimer = () => {
+export const Timer = () => {
   const {
     store,
     remaining,

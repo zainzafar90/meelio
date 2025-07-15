@@ -1,6 +1,6 @@
 import { memo } from "react";
 
-import { NextPinnedTask } from "./next-pinned-task";
+import { NextPinnedTask } from "./timer-next-task";
 import { TimerStats } from "./timer-stats";
 
 export const TimerExpandedContent = memo(() => {

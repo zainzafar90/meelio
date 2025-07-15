@@ -1,5 +1,5 @@
 import { Crown } from "lucide-react";
-import { TimerStage } from "../../../types/new/pomodoro-lite";
+import { TimerStage } from "../../../types/timer.types";
 import { Icons } from "../../icons";
 import { useTranslation } from "react-i18next";
 

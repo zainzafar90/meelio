@@ -10,4 +10,4 @@ export * from "./task.store";
 export * from "./app.store";
 export * from "./calendar.store";
 
-export { useUnifiedTimerStore, createUnifiedTimerStore } from "./unified-simple-timer.store";
+export { useTimerStore, createTimerStore } from "./timer.store";
