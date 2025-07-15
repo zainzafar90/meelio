@@ -1,12 +1,10 @@
-// Platform abstraction for timer background processing
 export interface TimerPlatform {
   sendMessage(message: any): void;
   onMessage(callback: (message: any) => void): () => void;
   showNotification(title: string, message: string): void;
 }
 
-// Chrome Extension implementation
-export class ChromeTimerPlatform implements TimerPlatform {
+class ChromeTimerPlatform implements TimerPlatform {
   sendMessage(message: any): void {
     if (chrome?.runtime?.sendMessage) {
       chrome.runtime.sendMessage(message);
@@ -34,7 +32,6 @@ export class ChromeTimerPlatform implements TimerPlatform {
   }
 }
 
-// Factory function to get the appropriate platform (extension only)
 export function getTimerPlatform(): TimerPlatform {
   if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
     return new ChromeTimerPlatform();
