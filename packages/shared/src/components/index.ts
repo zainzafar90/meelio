@@ -89,7 +89,12 @@ export * from "./core/timer/components/next-pinned-task";
 export * from "./core/timer/dialog/reset-timer.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
-export * from "./simple-timer";
+export { LegacySimpleTimer } from "./simple-timer";
+export * from "./unified-simple-timer";
+export * from "./timer-settings-panel";
+
+// Main timer component - now points to unified implementation
+export { UnifiedSimpleTimer as SimpleTimer } from "./unified-simple-timer";
 
 // Tasks
 export * from "./core/task-list/components/create-list";

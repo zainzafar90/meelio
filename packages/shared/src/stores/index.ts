@@ -12,3 +12,4 @@ export * from "./calendar.store";
 
 export { usePomodoroStore } from "./unified-pomodoro.store";
 export { useTimerStore, createTimerStore } from "./simple-timer.store";
+export { useUnifiedTimerStore, createUnifiedTimerStore } from "./unified-simple-timer.store";
