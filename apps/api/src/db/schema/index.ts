@@ -11,3 +11,5 @@ export * from "./tab-stash.schema";
 export * from "./note.schema";
 export * from "./focus-session.schema";
 export * from "./calendar.schema";
+export * from "./category.schema";
+export * from "./provider.schema";
