@@ -10,11 +10,11 @@ import {
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useTranslation } from "react-i18next";
 import { useDockStore } from "../../../stores/dock.store";
-import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useShallow } from "zustand/shallow";
 import { SoundList } from "./components/sound-list/sound-list";
 import { CategoryList } from "./components/categories/category-list";
 import { SoundControlsBar } from "./components/sound-player/controls/sound-control-bar";
+import { ConnectionWarning } from "../../common/connection-warning";
 
 export const SoundscapesSheet: React.FC = () => {
   const { t } = useTranslation();
@@ -43,6 +43,8 @@ export const SoundscapesSheet: React.FC = () => {
         </VisuallyHidden>
         <div className="flex h-full flex-col overflow-hidden p-6">
           <CategoryList />
+          <ConnectionWarning />
+
           <div className="flex-1 overflow-y-auto">
             <SoundList />
           </div>

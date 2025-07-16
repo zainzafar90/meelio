@@ -7,7 +7,6 @@ import { Toaster } from "sonner";
 import { useSoundscapesStore } from "../stores/soundscapes.store";
 
 import { ThemeProvider } from "../components/common/theme-provider";
-import { ConnectionWarning } from "../components/common/connection-warning";
 import { SoundPlayer } from "../components/core/soundscapes/components/sound-player/sound-player";
 import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
@@ -37,7 +36,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 {children}
                 {hasPlayingSounds && <SoundPlayer />}
                 <Toaster richColors />
-                <ConnectionWarning />
               </TooltipProvider>
             </ThemeProvider>
           </TelemetryProvider>

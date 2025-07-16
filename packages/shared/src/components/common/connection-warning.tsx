@@ -47,8 +47,8 @@ export const ConnectionWarning = () => {
   return (
     <>
       {showAlert && isAnySoundPlaying && (
-        <div className="pointer-events-none fixed inset-x-0 top-14 z-40 sm:flex sm:justify-center sm:top-1 sm:px-6 lg:pb-5 lg:px-8">
-          <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-yellow-950 px-6 py-2 sm:rounded-sm lg:py-2 lg:pl-4 lg:pr-3.5">
+        <div className="pointer-events-none inset-x-0 top-14 z-40 flex w-full">
+          <div className="pointer-events-auto flex items-center justify-between gap-x-6 bg-yellow-950 px-6 py-2 sm:rounded-sm w-full">
             <p className="text-sm leading-6 text-white">
               <span className="text-[12px] sm:text-sm">
                 <strong className="font-semibold">Slow Network</strong>
@@ -59,7 +59,7 @@ export const ConnectionWarning = () => {
                 >
                   <circle cx={1} cy={1} r={1} />
                 </svg>
-                The app might not perform as expected.
+                Sounds might take a while to load.
               </span>
             </p>
             <button
