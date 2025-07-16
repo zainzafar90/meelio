@@ -1,26 +1,20 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { useAuthStore } from "./auth.store";
-import { useAppStore } from "./app.store";
 import { pomodoroSounds } from "../data";
 import {
   TimerStage,
   TimerState,
   TimerDeps,
   TimerSettings,
-} from "../types/new/pomodoro-lite";
+} from "../types/timer.types";
 import {
   addSimpleTimerFocusTime,
   addSimpleTimerBreakTime,
 } from "../lib/db/pomodoro.dexie";
-
-const isExtension = () => {
-  try {
-    return useAppStore.getState().platform === "extension";
-  } catch {
-    return false;
-  }
-};
+import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
+import { useSoundscapesStore } from "./soundscapes.store";
+import { Category } from "../types/category";
 
 const playCompletionSound = (
   soundEnabled: boolean,
@@ -39,47 +33,6 @@ const playCompletionSound = (
     });
   } catch (error) {
     console.error("Error playing completion sound:", error);
-  }
-};
-
-const showCompletionNotification = (
-  stage: TimerStage,
-  notificationsEnabled: boolean
-) => {
-  if (!notificationsEnabled) return;
-
-  const useChrome =
-    isExtension() && typeof chrome?.notifications !== "undefined";
-
-  const title =
-    stage === TimerStage.Focus
-      ? "Focus session complete! 🎯"
-      : "Break time is over! ☕";
-  const body =
-    stage === TimerStage.Focus
-      ? "Great work! Time for a break."
-      : "Ready to focus again?";
-
-  if (useChrome) {
-    chrome.notifications.create({
-      type: "basic",
-      title,
-      message: body,
-      iconUrl: chrome.runtime.getURL("public/icon.png"),
-      silent: true,
-    });
-  } else if (
-    "Notification" in window &&
-    Notification.permission === "granted"
-  ) {
-    const n = new Notification(title, {
-      body,
-      icon: "/icon.png",
-      badge: "/icon.png",
-      requireInteraction: false,
-      silent: true,
-    });
-    setTimeout(() => n.close(), 5000);
   }
 };
 
@@ -109,16 +62,43 @@ function initState(): Omit<
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
     settings: { notifications: true, sounds: true },
     stats: { focusSec: 0, breakSec: 0 },
-    dailyLimitSec: 90 * 60 * 60,
+    dailyLimitSec: 120 * 60 * 60,
     unsyncedFocusSec: 0,
     prevRemaining: null,
   };
 }
 
-export const createTimerStore = (deps: TimerDeps) =>
-  create<TimerState>()(
+export const createTimerStore = (platform: TimerPlatform) => {
+  const deps: TimerDeps = {
+    now: () => Date.now(),
+    pushUsage: async () => Promise.resolve(),
+    pushSettings: async (_: TimerSettings) => Promise.resolve(),
+    postMessage: (msg) => platform.sendMessage(msg),
+  };
+
+  return create<TimerState>()(
     persist(
       (set, get) => {
+        const showCompletionNotification = (
+          stage: TimerStage,
+          notificationsEnabled: boolean
+        ) => {
+          if (!notificationsEnabled) {
+            return;
+          }
+
+          const title =
+            stage === TimerStage.Focus
+              ? "Focus session complete! 🎯"
+              : "Break time is over! ☕";
+          const body =
+            stage === TimerStage.Focus
+              ? "Great work! Time for a break."
+              : "Ready to focus again?";
+
+          platform.showNotification(title, body);
+        };
+
         const start = () => {
           checkDailyReset();
 
@@ -138,6 +118,22 @@ export const createTimerStore = (deps: TimerDeps) =>
           const end = deps.now() + duration * 1000;
           deps.postMessage?.({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
+          
+          // Handle soundscapes when focus starts
+          if (state.stage === TimerStage.Focus) {
+            const soundscapesState = useSoundscapesStore.getState();
+            
+            // Check if any soundscapes are currently playing
+            const hasPlayingSounds = soundscapesState.sounds.some(sound => sound.playing);
+            
+            if (hasPlayingSounds) {
+              // If soundscapes are already playing, let them continue
+              soundscapesState.resumePausedSounds();
+            } else {
+              // If no soundscapes are playing, auto-start productivity sounds
+              soundscapesState.playCategory(Category.Productivity);
+            }
+          }
         };
 
         const pause = () => {
@@ -148,6 +144,9 @@ export const createTimerStore = (deps: TimerDeps) =>
               : null;
           deps.postMessage?.({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
+          
+          // Pause soundscapes when timer is paused
+          useSoundscapesStore.getState().pausePlayingSounds();
         };
 
         const reset = () => {
@@ -221,27 +220,10 @@ export const createTimerStore = (deps: TimerDeps) =>
                 console.log("⚠️ Today's focus limit reached, pausing timer");
                 pause();
                 // Show notification about limit reached
-                const useChrome =
-                  isExtension() && typeof chrome?.notifications !== "undefined";
-
-                if (useChrome) {
-                  chrome.notifications.create({
-                    type: "basic",
-                    title: "Daily Focus Limit Reached 🎯",
-                    message:
-                      "You've hit today's focus limit! Take a well-deserved break. Your limit resets tomorrow.",
-                    iconUrl: chrome.runtime.getURL("public/icon.png"),
-                    silent: false,
-                  });
-                } else if (
-                  "Notification" in window &&
-                  Notification.permission === "granted"
-                ) {
-                  new Notification("Daily Focus Limit Reached 🎯", {
-                    body: "You've hit today's focus limit! Take a well-deserved break. Your limit resets tomorrow.",
-                    icon: "/icon.png",
-                  });
-                }
+                platform.showNotification(
+                  "Daily Focus Limit Reached 🎯",
+                  "You've hit today's focus limit! Take a well-deserved break. Your limit resets tomorrow."
+                );
                 return;
               }
 
@@ -365,28 +347,16 @@ export const createTimerStore = (deps: TimerDeps) =>
                 "⚠️ Today's focus limit reached after stage completion"
               );
               // Show special notification
-              const useChrome =
-                isExtension() && typeof chrome?.notifications !== "undefined";
-
-              if (useChrome) {
-                chrome.notifications.create({
-                  type: "basic",
-                  title: "Today's Focus Complete! 🎉",
-                  message:
-                    "You've completed today's focus goal. Enjoy your break - see you tomorrow!",
-                  iconUrl: chrome.runtime.getURL("public/icon.png"),
-                  silent: false,
-                });
-              } else if (
-                "Notification" in window &&
-                Notification.permission === "granted"
-              ) {
-                new Notification("Today's Focus Complete! 🎉", {
-                  body: "You've completed today's focus goal. Enjoy your break - see you tomorrow!",
-                  icon: "/icon.png",
-                });
-              }
+              platform.showNotification(
+                "Today's Focus Complete! 🎉",
+                "You've completed today's focus goal. Enjoy your break - see you tomorrow!"
+              );
             }
+          }
+
+          // Pause soundscapes when switching to break
+          if (nextStage === TimerStage.Break) {
+            useSoundscapesStore.getState().pausePlayingSounds();
           }
 
           set({
@@ -437,18 +407,27 @@ export const createTimerStore = (deps: TimerDeps) =>
       }
     )
   );
+};
 
-export const useTimerStore = createTimerStore({
-  now: () => Date.now(),
-  pushUsage: async () => Promise.resolve(),
-  pushSettings: async (_: TimerSettings) => Promise.resolve(),
-  postMessage: (msg) => {
-    try {
-      if (typeof chrome !== "undefined" && chrome.runtime) {
-        chrome.runtime.sendMessage(msg);
-      }
-    } catch {
-      // ignore
+// Create singleton stores for each platform
+let extensionStore: ReturnType<typeof createTimerStore> | null = null;
+let webStore: ReturnType<typeof createTimerStore> | null = null;
+
+export const useTimerStore = () => {
+  const platform = getTimerPlatform();
+  
+  // Check if we're in extension or web context
+  const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
+  
+  if (isExtension) {
+    if (!extensionStore) {
+      extensionStore = createTimerStore(platform);
     }
-  },
-});
+    return extensionStore;
+  } else {
+    if (!webStore) {
+      webStore = createTimerStore(platform);
+    }
+    return webStore;
+  }
+};

@@ -10,5 +10,4 @@ export * from "./task.store";
 export * from "./app.store";
 export * from "./calendar.store";
 
-export { usePomodoroStore } from "./unified-pomodoro.store";
-export { useTimerStore, createTimerStore } from "./simple-timer.store";
+export { useTimerStore, createTimerStore } from "./timer.store";

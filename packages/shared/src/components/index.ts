@@ -60,7 +60,6 @@ export * from "./core/settings/tabs/account-settings";
 export * from "./core/settings/tabs/appearance-settings";
 export * from "./core/settings/tabs/billing-settings";
 export * from "./core/settings/tabs/general-settings";
-export * from "./core/settings/tabs/timer-settings";
 
 // Soundscapes
 export * from "./core/soundscapes/soundscapes.sheet";
@@ -80,16 +79,19 @@ export * from "./core/soundscapes/components/sound-player/controls/shuffle-butto
 export * from "./core/soundscapes/components/sound-player/controls/sound-control-bar";
 
 // Timer
-export * from "./core/timer/components/timer-controls";
 export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
 export * from "./core/timer/components/timer-stats";
-export * from "./core/timer/components/next-pinned-task";
-export * from "./core/timer/dialog/reset-timer.dialog";
+export * from "./core/timer/components/timer-next-task";
+export * from "./core/timer/dialog/timer-reset.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./core/timer/timer-placeholder";
-export * from "./simple-timer";
+export * from "./timer";
+export * from "./timer-settings.dialog";
+
+// Main timer component - now points to unified implementation
+export { Timer as SimpleTimer } from "./timer";
 
 // Tasks
 export * from "./core/task-list/components/create-list";

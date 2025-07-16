@@ -1,6 +1,7 @@
 import { Icons } from "../icons/icons";
 import { useSoundscapesStore } from "../../stores/soundscapes.store";
 import { useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 
 const navigator = (
   typeof window !== "undefined" ? window.navigator : null
@@ -9,8 +10,8 @@ const navigator = (
 export const ConnectionWarning = () => {
   const [isSlow, setIsSlow] = useState(false);
   const [showAlert, setShowAlert] = useState(true);
-  const isAnySoundPlaying = useSoundscapesStore((state) =>
-    state.sounds.some((sound) => sound.playing)
+  const isAnySoundPlaying = useSoundscapesStore(
+    useShallow((state) => state.sounds.some((sound) => sound.playing))
   );
 
   useEffect(() => {

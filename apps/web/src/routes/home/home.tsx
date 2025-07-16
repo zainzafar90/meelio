@@ -23,7 +23,7 @@ import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
 import { api } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
-import { WebSimpleTimer } from "@/components/web-simple-timer";
+import { WebTimer } from "@/components/web.timer";
 import { SiteBlockerSheet } from "@repo/shared";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
@@ -135,7 +135,9 @@ const Content = () => {
 };
 
 const GreetingsContent = () => {
-  const isTimerVisible = useDockStore((state) => state.isTimerVisible);
+  const isTimerVisible = useDockStore(
+    useShallow((state) => state.isTimerVisible),
+  );
 
   return (
     <motion.div>
@@ -147,7 +149,7 @@ const GreetingsContent = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <WebSimpleTimer />
+            <WebTimer />
           </motion.div>
         ) : (
           <motion.div

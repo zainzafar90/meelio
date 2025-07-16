@@ -1,131 +1,61 @@
-import { useEffect, useState } from "react";
-import { useDocumentTitle, useDisclosure } from "@repo/shared";
+import { useEffect } from "react";
+import { useShallow } from "zustand/shallow";
+import { useTimerStore } from "../stores/timer.store";
+import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
+  TimerEvent,
   TimerDurations,
-  formatTime,
-  Icons,
-  NextPinnedTask,
-  TimerStatsDialog,
-} from "@repo/shared";
-import { useWebTimerStore, getWebTimerWorker } from "../stores/web-timer.store";
-
-interface DurationValues {
-  focusMin: number;
-  breakMin: number;
-}
-
-interface SettingsPanelProps extends DurationValues {
-  onSave: (v: DurationValues) => void;
-  notifications: boolean;
-  sounds: boolean;
-  onToggleNotifications: () => void;
-  onToggleSounds: () => void;
-}
-
-const SettingsPanel = ({
-  focusMin,
-  breakMin,
-  onSave,
-  notifications,
-  sounds,
-  onToggleNotifications,
-  onToggleSounds,
-}: SettingsPanelProps) => {
-  const [focus, setFocus] = useState(focusMin);
-  const [brk, setBreak] = useState(breakMin);
-
-  return (
-    <div className="bg-white/10 backdrop-blur rounded-2xl p-4 space-y-4">
-      {/* Duration Settings */}
-      <div>
-        <h3 className="text-sm font-medium text-white/80 mb-3">
-          Timer Duration
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs text-white/60 mb-1 block">
-              Focus (min)
-            </label>
-            <input
-              type="number"
-              className="w-full bg-white/10 backdrop-blur rounded-lg px-3 py-2 text-white text-sm outline-none focus:ring-2 focus:ring-white/20"
-              value={focus}
-              min={1}
-              max={90}
-              onChange={(e) => setFocus(Number(e.target.value))}
-            />
-          </div>
-          <div>
-            <label className="text-xs text-white/60 mb-1 block">
-              Break (min)
-            </label>
-            <input
-              type="number"
-              className="w-full bg-white/10 backdrop-blur rounded-lg px-3 py-2 text-white text-sm outline-none focus:ring-2 focus:ring-white/20"
-              value={brk}
-              min={1}
-              max={30}
-              onChange={(e) => setBreak(Number(e.target.value))}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Notification & Sound Settings */}
-      <div>
-        <h3 className="text-sm font-medium text-white/80 mb-3">
-          Notifications & Sound
-        </h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-white/70">Enable notifications</span>
-            <button
-              onClick={onToggleNotifications}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                notifications ? "bg-white/30" : "bg-white/10"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  notifications ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-white/70">Enable sounds</span>
-            <button
-              onClick={onToggleSounds}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                sounds ? "bg-white/30" : "bg-white/10"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  sounds ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <button
-        onClick={() => onSave({ focusMin: focus, breakMin: brk })}
-        className="w-full bg-white/20 backdrop-blur rounded-lg px-4 py-2 text-white text-sm font-medium hover:bg-white/30 transition-colors"
-      >
-        Save Duration Changes
-      </button>
-    </div>
-  );
-};
+} from "../types/timer.types";
+import { formatTime } from "../utils/timer.utils";
+import { Icons } from "./icons";
+import { NextPinnedTask } from "./core/timer/components/timer-next-task";
+import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
+import { TimerSettingsDialog } from "./timer-settings.dialog";
 
 const useRestoreTimer = (restore: () => void) => {
   useEffect(() => {
     restore();
   }, [restore]);
+};
+
+const useBackgroundMessages = (
+  stage: TimerStage,
+  durations: TimerDurations,
+  updateRemaining: (n: number) => void,
+  completeStage: () => void,
+  start: () => void,
+  getLimitStatus: () => { isLimitReached: boolean }
+) => {
+  useEffect(() => {
+    // Only handle Chrome extension messages here
+    if (typeof chrome === 'undefined' || !chrome.runtime) {
+      return;
+    }
+    
+    const handler = (msg: TimerEvent) => {
+      switch (msg.type) {
+        case "TICK":
+          updateRemaining(msg.remaining);
+          break;
+        case "STAGE_COMPLETE":
+          completeStage();
+          if (!getLimitStatus().isLimitReached) start();
+          break;
+        case "PAUSED":
+          updateRemaining(msg.remaining);
+          break;
+        case "RESET_COMPLETE":
+          updateRemaining(durations[stage]);
+          break;
+      }
+    };
+    
+    chrome.runtime.onMessage.addListener(handler);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handler);
+    };
+  }, [stage, durations, updateRemaining, completeStage, start, getLimitStatus]);
 };
 
 interface TimerViewProps {
@@ -138,12 +68,8 @@ interface TimerViewProps {
   reset: () => void;
   skip: (s: TimerStage) => void;
   limitReached: boolean;
-  onDurations: (d: DurationValues) => void;
   onStatsClick: () => void;
-  notifications: boolean;
-  sounds: boolean;
-  onToggleNotifications: () => void;
-  onToggleSounds: () => void;
+  onSettingsClick: () => void;
 }
 
 const TimerView = ({
@@ -156,14 +82,9 @@ const TimerView = ({
   reset,
   skip,
   limitReached,
-  onDurations,
   onStatsClick,
-  notifications,
-  sounds,
-  onToggleNotifications,
-  onToggleSounds,
+  onSettingsClick,
 }: TimerViewProps) => {
-  const [showDurationEditor, setShowDurationEditor] = useState(false);
 
   return (
     <div className="relative">
@@ -297,7 +218,7 @@ const TimerView = ({
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
-                onClick={() => setShowDurationEditor(!showDurationEditor)}
+                onClick={onSettingsClick}
                 title="Settings"
                 role="button"
               >
@@ -320,21 +241,6 @@ const TimerView = ({
               />
             </div>
 
-            {/* Settings Panel (when settings clicked) */}
-            {showDurationEditor && (
-              <SettingsPanel
-                focusMin={durations[TimerStage.Focus] / 60}
-                breakMin={durations[TimerStage.Break] / 60}
-                notifications={notifications}
-                sounds={sounds}
-                onSave={(values) => {
-                  onDurations(values);
-                  setShowDurationEditor(false);
-                }}
-                onToggleNotifications={onToggleNotifications}
-                onToggleSounds={onToggleSounds}
-              />
-            )}
           </div>
         </div>
       </div>
@@ -342,99 +248,106 @@ const TimerView = ({
   );
 };
 
-const useWebSimpleTimerState = () => {
-  const store = useWebTimerStore();
-  const statsModal = useDisclosure();
 
-  const remaining = useWebTimerStore((s) => {
-    // When paused, use the stored remaining time
-    if (!s.isRunning && s.prevRemaining !== null) {
-      return s.prevRemaining;
-    }
-    // When running with endTimestamp, calculate remaining
-    if (s.endTimestamp) {
-      return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
-    }
-    // Default to stage duration
-    return s.durations[s.stage];
-  });
+const useTimerState = () => {
+  const timerStore = useTimerStore();
+  const statsModal = useDisclosure();
+  const settingsModal = useDisclosure();
+
+  const store = timerStore(
+    useShallow((state) => ({
+      stage: state.stage,
+      isRunning: state.isRunning,
+      durations: state.durations,
+      settings: state.settings,
+      start: state.start,
+      pause: state.pause,
+      reset: state.reset,
+      skipToStage: state.skipToStage,
+      updateDurations: state.updateDurations,
+      toggleNotifications: state.toggleNotifications,
+      toggleSounds: state.toggleSounds,
+      updateRemaining: state.updateRemaining,
+      getLimitStatus: state.getLimitStatus,
+      restore: state.restore,
+      completeStage: state.completeStage,
+      checkDailyReset: state.checkDailyReset,
+    }))
+  );
+  
+  const remaining = timerStore(
+    useShallow((s) => {
+      // When paused, use the stored remaining time
+      if (!s.isRunning && s.prevRemaining !== null) {
+        return s.prevRemaining;
+      }
+      // When running with endTimestamp, calculate remaining
+      if (s.endTimestamp) {
+        return Math.max(0, Math.ceil((s.endTimestamp - Date.now()) / 1000));
+      }
+      // Default to stage duration
+      return s.durations[s.stage];
+    })
+  );
 
   useRestoreTimer(store.restore);
   useDocumentTitle({ remaining, stage: store.stage, running: store.isRunning });
-
-  // Set up web worker message handling
-  useEffect(() => {
-    const worker = getWebTimerWorker();
-    
-    const handleMessage = (event: MessageEvent) => {
-      const { type, remaining } = event.data;
-      
-      switch (type) {
-        case "TICK":
-          store.updateRemaining(remaining);
-          break;
-        case "STAGE_COMPLETE":
-          store.completeStage();
-          if (!store.getLimitStatus().isLimitReached) {
-            store.start();
-          }
-          break;
-        case "PAUSED":
-          store.updateRemaining(remaining);
-          break;
-        case "RESET_COMPLETE":
-          store.updateRemaining(store.durations[store.stage]);
-          break;
-      }
-    };
-
-    worker.addMessageHandler(handleMessage);
-    
-    return () => {
-      worker.removeMessageHandler(handleMessage);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array - setup once. Store is stable from Zustand
+  useBackgroundMessages(
+    store.stage,
+    store.durations,
+    store.updateRemaining,
+    store.completeStage,
+    store.start,
+    store.getLimitStatus
+  );
 
   useEffect(() => {
     store.checkDailyReset?.();
-  }, [store]);
+  }, []);
 
   const limit = store.getLimitStatus();
 
-  const handleDurations = (d: DurationValues) => {
-    store.updateDurations({ focus: d.focusMin * 60, break: d.breakMin * 60 });
+  const handleSettingsChange = (settings: {
+    durations: { focusMin: number; breakMin: number };
+    notifications: boolean;
+    sounds: boolean;
+  }) => {
+    store.updateDurations({ 
+      focus: settings.durations.focusMin * 60, 
+      break: settings.durations.breakMin * 60 
+    });
+    
+    if (settings.notifications !== store.settings.notifications) {
+      store.toggleNotifications();
+    }
+    if (settings.sounds !== store.settings.sounds) {
+      store.toggleSounds();
+    }
   };
 
   return {
     store,
     remaining,
     limit,
-    handleDurations,
+    handleSettingsChange,
     statsModal,
+    settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
-    toggleNotifications: store.toggleNotifications,
-    toggleSounds: store.toggleSounds,
   };
 };
 
-/**
- * Web-specific SimpleTimer that uses web worker for background processing
- */
-export const WebSimpleTimer = () => {
+export const Timer = () => {
   const {
     store,
     remaining,
     limit,
-    handleDurations,
+    handleSettingsChange,
     statsModal,
+    settingsModal,
     notifications,
     sounds,
-    toggleNotifications,
-    toggleSounds,
-  } = useWebSimpleTimerState();
-
+  } = useTimerState();
   return (
     <>
       <TimerView
@@ -447,17 +360,23 @@ export const WebSimpleTimer = () => {
         reset={store.reset}
         skip={store.skipToStage}
         limitReached={limit.isLimitReached}
-        onDurations={handleDurations}
         onStatsClick={statsModal.open}
-        notifications={notifications}
-        sounds={sounds}
-        onToggleNotifications={toggleNotifications}
-        onToggleSounds={toggleSounds}
+        onSettingsClick={settingsModal.open}
       />
 
       <TimerStatsDialog
         isOpen={statsModal.isOpen}
         onOpenChange={(open) => (open ? statsModal.open() : statsModal.close())}
+      />
+
+      <TimerSettingsDialog
+        isOpen={settingsModal.isOpen}
+        onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
+        focusMin={store.durations[TimerStage.Focus] / 60}
+        breakMin={store.durations[TimerStage.Break] / 60}
+        notifications={notifications}
+        sounds={sounds}
+        onSave={handleSettingsChange}
       />
     </>
   );

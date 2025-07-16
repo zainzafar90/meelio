@@ -1,10 +1,10 @@
 import { Crown } from "lucide-react";
-import { PomodoroStage } from "../../../types/pomodoro";
+import { TimerStage } from "../../../types/timer.types";
 import { Icons } from "../../icons";
 import { useTranslation } from "react-i18next";
 
 interface TimerPlaceholderProps {
-  activeStage: PomodoroStage;
+  activeStage: TimerStage;
   onUpgradeClick?: () => void;
 }
 
@@ -22,7 +22,7 @@ export const TimerPlaceholder = ({
             <button
               disabled
               className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                activeStage === PomodoroStage.Focus ? "bg-white/50" : ""
+                activeStage === TimerStage.Focus ? "bg-white/50" : ""
               } opacity-50 cursor-not-allowed`}
               title={t("timer.limitReached.title")}
             >
@@ -31,7 +31,7 @@ export const TimerPlaceholder = ({
             <button
               disabled
               className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                activeStage === PomodoroStage.Break ? "bg-white/50" : ""
+                activeStage === TimerStage.Break ? "bg-white/50" : ""
               } opacity-50 cursor-not-allowed`}
               title={t("timer.limitReached.title")}
             >

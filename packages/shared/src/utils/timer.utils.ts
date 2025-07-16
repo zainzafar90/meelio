@@ -1,4 +1,4 @@
-import { PomodoroStage } from "../types";
+import { TimerStage } from "../types/timer.types";
 
 /*
 |--------------------------------------------------------------------------
@@ -9,11 +9,11 @@ import { PomodoroStage } from "../types";
 | used to display the next stage of the pomodoro timer. 
 |
 */
-export const getNextStage = (activeStage: PomodoroStage) => {
-  if (activeStage === PomodoroStage.Focus) {
-    return PomodoroStage.Break;
+export const getNextStage = (activeStage: TimerStage) => {
+  if (activeStage === TimerStage.Focus) {
+    return TimerStage.Break;
   }
-  return PomodoroStage.Focus;
+  return TimerStage.Focus;
 };
 
 /*
@@ -26,12 +26,12 @@ export const getNextStage = (activeStage: PomodoroStage) => {
 |
 */
 export const getSessionCount = (
-  activeStage: PomodoroStage,
+  activeStage: TimerStage,
   sessionCount: number
 ) => {
   let newSessionCount = sessionCount;
 
-  if (activeStage === PomodoroStage.Focus) {
+  if (activeStage === TimerStage.Focus) {
     newSessionCount++;
   }
   return newSessionCount;
