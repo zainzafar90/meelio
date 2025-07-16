@@ -6,7 +6,6 @@ import { ApiError } from "@/common/errors/api-error";
 
 interface TaskFilters {
   completed?: boolean;
-  category?: string;
   dueDate?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
@@ -16,7 +15,6 @@ interface TaskUpdateData {
   title?: string;
   completed?: boolean;
   pinned?: boolean;
-  category?: string | null;
   dueDate?: string | number | null;
   updatedAt?: Date;
 }
@@ -32,9 +30,6 @@ export const tasksService = {
       conditions.push(eq(tasks.completed, filters.completed));
     }
 
-    if (filters.category) {
-      conditions.push(eq(tasks.category, filters.category));
-    }
 
     if (filters.dueDate) {
       if (filters.dueDate === "null") {
@@ -70,9 +65,6 @@ export const tasksService = {
         case "completed":
           orderColumn = tasks.completed;
           break;
-        case "category":
-          orderColumn = tasks.category;
-          break;
         case "createdAt":
           orderColumn = tasks.createdAt;
           break;
@@ -102,17 +94,6 @@ export const tasksService = {
     return task[0];
   },
 
-  /**
-   * Get task categories for a user
-   */
-  async getCategories(userId: string): Promise<string[]> {
-    const result = await db
-      .selectDistinct({ category: tasks.category })
-      .from(tasks)
-      .where(and(eq(tasks.userId, userId), isNotNull(tasks.category)));
-
-    return result.map((r) => r.category).filter((c): c is string => c !== null);
-  },
 
   /**
    * Create a new task
@@ -131,7 +112,6 @@ export const tasksService = {
       title: taskData.title,
       completed: taskData.completed ?? false,
       pinned: taskData.pinned ?? false,
-      category: taskData.category ?? null,
     };
 
     // Only include dueDate if it's explicitly set
@@ -210,9 +190,6 @@ export const tasksService = {
       data.pinned = updateData.pinned;
     }
 
-    if (updateData.category !== undefined) {
-      data.category = updateData.category;
-    }
 
     if (updateData.updatedAt !== undefined) {
       data.updatedAt = updateData.updatedAt;
@@ -286,12 +263,4 @@ export const tasksService = {
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 
-  /**
-   * Delete all tasks for a user in a category
-   */
-  async deleteTasksByCategory(userId: string, category: string): Promise<void> {
-    await db
-      .delete(tasks)
-      .where(and(eq(tasks.userId, userId), eq(tasks.category, category)));
-  },
 };

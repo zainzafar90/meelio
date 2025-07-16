@@ -15,12 +15,6 @@ router
     tasksController.createTask
   );
 
-router.route("/categories").get(auth(), tasksController.getCategories);
-
-router
-  .route("/category/:category")
-  .delete(auth(), tasksController.deleteTasksByCategory);
-
 router
   .route("/:id")
   .get(auth(), tasksController.getTask)

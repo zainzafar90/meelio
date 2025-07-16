@@ -32,7 +32,6 @@ export function CreateTask() {
 
       addTask({
         title: title.trim(),
-        category: isSystemList ? undefined : activeListId,
         dueDate,
       });
       setTitle("");

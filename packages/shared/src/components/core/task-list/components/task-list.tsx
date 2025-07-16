@@ -37,43 +37,6 @@ export function TaskList({
       </div>
     );
 
-  if (activeListId === "all") {
-    const tasksByCategory = tasks.reduce(
-      (acc, task) => {
-        const category = task.category || "No Category";
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(task);
-        return acc;
-      },
-      {} as Record<string, Task[]>
-    );
-
-    return (
-      <div className="mt-4 space-y-8">
-        {Object.entries(tasksByCategory).map(([category, categoryTasks]) => {
-          return (
-            <div key={category} className="space-y-2">
-              <div className="flex items-center justify-between px-2 py-1">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="capitalize">{category}</span>
-                </div>
-                <Badge variant="secondary" className="text-xs">
-                  {categoryTasks.length}
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                {categoryTasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
 
   return (
     <div className="mt-4">

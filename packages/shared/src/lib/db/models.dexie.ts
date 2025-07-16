@@ -25,7 +25,6 @@ export interface Task {
   title: string;
   completed: boolean;
   pinned: boolean;
-  category?: string;
   dueDate?: string;
   createdAt: number;
   updatedAt: number;

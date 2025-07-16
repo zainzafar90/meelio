@@ -33,14 +33,12 @@ interface TaskState {
 
   addTask: (task: {
     title: string;
-    category?: string;
     dueDate?: string;
     pinned?: boolean;
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
-  deleteTasksByCategory: (category: string) => Promise<void>;
 
   addList: (list: Omit<TaskListMeta, "id"> & { id?: string }) => Promise<void>;
   deleteList: (listId: string) => void;
@@ -68,7 +66,6 @@ async function processSyncQueue() {
           {
             const created = await taskApi.createTask({
               title: operation.data.title,
-              category: operation.data.category,
               completed: operation.data.completed || false,
               dueDate: operation.data.dueDate,
               pinned: operation.data.pinned || false,
@@ -161,7 +158,6 @@ export const useTaskStore = create<TaskState>()(
         title: task.title,
         completed: false,
         pinned: task.pinned ?? false,
-        category: task.category,
         dueDate: normalizedDueDate,
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -293,39 +289,6 @@ export const useTaskStore = create<TaskState>()(
       }
     },
 
-    deleteTasksByCategory: async (category) => {
-      const authState = useAuthStore.getState();
-      const user = authState.user;
-      const syncStore = useSyncStore.getState();
-      const tasksToDelete = get().tasks.filter((t) => t.category === category);
-
-      try {
-        await Promise.all(
-          tasksToDelete.map((task) => db.tasks.delete(task.id))
-        );
-
-        set((state) => ({
-          tasks: state.tasks.filter((t) => t.category !== category),
-        }));
-
-        // Only sync for authenticated users
-        if (user) {
-          tasksToDelete.forEach((task) => {
-            syncStore.addToQueue("task", {
-              type: "delete",
-              entityId: task.id,
-            });
-          });
-
-          if (syncStore.isOnline) processSyncQueue();
-        }
-      } catch (error) {
-        set({
-          error:
-            error instanceof Error ? error.message : "Failed to delete tasks",
-        });
-      }
-    },
 
     addList: async (list) => {
       const authState = useAuthStore.getState();
@@ -351,7 +314,6 @@ export const useTaskStore = create<TaskState>()(
           title: `Welcome to ${newList.name}!`,
           completed: false,
           pinned: false,
-          category: newList.id,
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
@@ -449,71 +411,13 @@ export const useTaskStore = create<TaskState>()(
 
       await Promise.all(
         localTasks.map(async (task) => {
-          if (task.category === "today" && !task.dueDate) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            await db.tasks.update(task.id, {
-              category: undefined,
-              dueDate: today.toISOString(),
-              updatedAt: Date.now(),
-            });
-            task.category = undefined;
-            task.dueDate = today.toISOString();
-          } else if (task.category === "today") {
-            await db.tasks.update(task.id, {
-              category: undefined,
-              updatedAt: Date.now(),
-            });
-            task.category = undefined;
-          }
         })
       );
 
-      const taskCategories = new Set<string>();
-      localTasks.forEach((task) => {
-        if (
-          task.category &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
-        ) {
-          taskCategories.add(task.category);
-        }
-      });
-
-      const categoryListsMap = new Map<
-        string,
-        { list: TaskListMeta; latestTask: number }
-      >();
-
-      localTasks.forEach((task) => {
-        if (
-          task.category &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
-        ) {
-          const existing = categoryListsMap.get(task.category.toLowerCase());
-          const taskTime = task.createdAt || 0;
-
-          if (!existing || taskTime > existing.latestTask) {
-            categoryListsMap.set(task.category.toLowerCase(), {
-              list: {
-                id: task.category.toLowerCase(),
-                name: task.category,
-                type: "custom" as const,
-                emoji: "📝",
-              },
-              latestTask: taskTime,
-            });
-          }
-        }
-      });
-
-      const sortedCategoryLists = Array.from(categoryListsMap.values())
-        .sort((a, b) => b.latestTask - a.latestTask)
-        .map((item) => item.list);
 
       set({
         tasks: localTasks,
-        lists: [...DEFAULT_LISTS, ...sortedCategoryLists],
+        lists: DEFAULT_LISTS,
       });
     },
 
@@ -528,10 +432,7 @@ export const useTaskStore = create<TaskState>()(
       try {
         await processSyncQueue();
 
-        const [serverTasks, apiCategories] = await Promise.all([
-          taskApi.getTasks(),
-          taskApi.getCategories(),
-        ]);
+        const serverTasks = await taskApi.getTasks();
 
         const localTasks = await db.tasks
           .where("userId")
@@ -562,20 +463,10 @@ export const useTaskStore = create<TaskState>()(
           await db.tasks.bulkAdd(mergedTasks);
         });
 
-        const categoryLists: TaskListMeta[] = apiCategories
-          .filter(
-            (cat) => !DEFAULT_LISTS.some((l) => l.id === cat.toLowerCase())
-          )
-          .map((cat) => ({
-            id: cat.toLowerCase(),
-            name: cat,
-            type: "custom" as const,
-            emoji: "📝",
-          }));
 
         set({
           tasks: mergedTasks,
-          lists: [...DEFAULT_LISTS, ...categoryLists],
+          lists: DEFAULT_LISTS,
         });
 
         syncStore.setSyncing("task", false);

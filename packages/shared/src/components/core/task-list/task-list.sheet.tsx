@@ -103,7 +103,7 @@ export function TaskListSheet() {
       
       return false;
     }
-    return task.category === activeListId;
+    return false;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
