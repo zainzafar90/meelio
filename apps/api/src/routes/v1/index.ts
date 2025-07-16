@@ -9,6 +9,7 @@ import billingRoute from "./billing.routes";
 import subscriptionRoute from "./subscription.routes";
 import mantraRoute from "./mantra.routes";
 import taskRoute from "./task.routes";
+import categoriesRoute from "./categories.routes";
 import siteBlockerRoute from "./site-blocker.routes";
 import tabStashRoute from "./tab-stash.routes";
 import noteRoute from "./note.routes";
@@ -47,6 +48,10 @@ const defaultIRoute: IRoute[] = [
   {
     path: "/tasks",
     route: taskRoute,
+  },
+  {
+    path: "/categories",
+    route: categoriesRoute,
   },
   {
     path: "/site-blockers",

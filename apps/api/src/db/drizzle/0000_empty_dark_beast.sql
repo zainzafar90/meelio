@@ -6,6 +6,7 @@ CREATE TABLE "users" (
 	"is_email_verified" boolean DEFAULT false,
 	"image" varchar(255),
 	"role" text DEFAULT 'user' NOT NULL,
+	"settings" jsonb DEFAULT '{"pomodoro":{"workDuration":25,"breakDuration":5,"autoStart":false,"autoBlock":false,"soundOn":true,"dailyFocusLimit":120},"onboardingCompleted":false,"task":{"confettiOnComplete":false},"calendar":{"enabled":false}}'::jsonb NOT NULL,
 	"deletedAt" timestamp with time zone,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
@@ -34,6 +35,20 @@ CREATE TABLE "accounts" (
 	"refresh_token_expires" timestamp,
 	"id_token" text,
 	"scope" text,
+	"blacklisted" boolean DEFAULT false NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "sessions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"provider" text NOT NULL,
+	"access_token" text NOT NULL,
+	"access_token_expires" timestamp,
+	"refresh_token" text,
+	"refresh_token_expires" timestamp,
+	"device_info" text,
 	"blacklisted" boolean DEFAULT false NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
@@ -73,29 +88,6 @@ CREATE TABLE "billing_webhooks" (
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "backgrounds" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"type" text NOT NULL,
-	"url" text NOT NULL,
-	"metadata" jsonb,
-	"schedule" jsonb,
-	"is_selected" boolean DEFAULT false,
-	"default_background_id" text,
-	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "soundscapes" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"name" text NOT NULL,
-	"config" jsonb,
-	"shareable" boolean DEFAULT false,
-	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "mantras" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
@@ -110,24 +102,11 @@ CREATE TABLE "tasks" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
 	"title" text NOT NULL,
-	"description" text,
-	"category" text,
-	"is_focus" boolean DEFAULT false,
-	"status" text DEFAULT 'pending' NOT NULL,
+	"completed" boolean DEFAULT false NOT NULL,
+	"pinned" boolean DEFAULT false NOT NULL,
 	"due_date" timestamp with time zone,
-	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "pomodoro_settings" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"work_duration" integer DEFAULT 25 NOT NULL,
-	"break_duration" integer DEFAULT 5 NOT NULL,
-	"auto_start" boolean DEFAULT false,
-	"auto_block" boolean DEFAULT false,
-	"sound_on" boolean DEFAULT true,
-	"daily_focus_limit" integer DEFAULT 120,
+	"category_id" uuid,
+	"provider_id" uuid,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -159,22 +138,6 @@ CREATE TABLE "notes" (
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "weather_cache" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"weather_data" jsonb,
-	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "breathepod" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"config" jsonb,
-	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
-	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
-);
---> statement-breakpoint
 CREATE TABLE "focus_sessions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
@@ -185,25 +148,59 @@ CREATE TABLE "focus_sessions" (
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "calendar" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"access_token" text NOT NULL,
+	"refresh_token" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "calendar_user_id_unique" UNIQUE("user_id")
+);
+--> statement-breakpoint
+CREATE TABLE "task_categories" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"name" text NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "unique_user_category" UNIQUE("user_id","name")
+);
+--> statement-breakpoint
+CREATE TABLE "providers" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" text NOT NULL,
+	"display_name" text NOT NULL,
+	"enabled" boolean DEFAULT true NOT NULL,
+	"client_id" text,
+	"client_secret" text,
+	"scopes" json DEFAULT '[]'::json,
+	"auth_url" text,
+	"token_url" text,
+	"user_info_url" text,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "providers_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE INDEX "idx_users_name" ON "users" USING btree ("name");--> statement-breakpoint
 CREATE INDEX "idx_users_email" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "idx_users_role" ON "users" USING btree ("role");--> statement-breakpoint
 CREATE INDEX "idx_tokens_token_type" ON "verification_tokens" USING btree ("token","type");--> statement-breakpoint
 CREATE INDEX "idx_tokens_email" ON "verification_tokens" USING btree ("email");--> statement-breakpoint
-CREATE INDEX "idx_backgrounds_user_id" ON "backgrounds" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_backgrounds_type" ON "backgrounds" USING btree ("type");--> statement-breakpoint
-CREATE INDEX "idx_soundscapes_user_id" ON "soundscapes" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_soundscapes_name" ON "soundscapes" USING btree ("name");--> statement-breakpoint
-CREATE INDEX "idx_soundscapes_shareable" ON "soundscapes" USING btree ("shareable");--> statement-breakpoint
+CREATE INDEX "idx_sessions_token" ON "sessions" USING btree ("access_token");--> statement-breakpoint
+CREATE INDEX "idx_sessions_user_blacklisted" ON "sessions" USING btree ("user_id","blacklisted");--> statement-breakpoint
+CREATE INDEX "idx_sessions_expiration" ON "sessions" USING btree ("access_token_expires","refresh_token_expires");--> statement-breakpoint
 CREATE INDEX "idx_mantras_user_id" ON "mantras" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_mantras_type" ON "mantras" USING btree ("type");--> statement-breakpoint
 CREATE INDEX "idx_mantras_date" ON "mantras" USING btree ("date");--> statement-breakpoint
 CREATE INDEX "idx_tasks_user_id" ON "tasks" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_tasks_category" ON "tasks" USING btree ("category");--> statement-breakpoint
-CREATE INDEX "idx_tasks_status" ON "tasks" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "idx_tasks_is_focus" ON "tasks" USING btree ("is_focus");--> statement-breakpoint
+CREATE INDEX "idx_tasks_completed" ON "tasks" USING btree ("completed");--> statement-breakpoint
+CREATE INDEX "idx_tasks_pinned" ON "tasks" USING btree ("pinned");--> statement-breakpoint
 CREATE INDEX "idx_tasks_due_date" ON "tasks" USING btree ("due_date");--> statement-breakpoint
-CREATE INDEX "idx_pomodoro_settings_user_id" ON "pomodoro_settings" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_tasks_category_id" ON "tasks" USING btree ("category_id");--> statement-breakpoint
+CREATE INDEX "idx_tasks_provider_id" ON "tasks" USING btree ("provider_id");--> statement-breakpoint
 CREATE INDEX "idx_site_blockers_user_id" ON "site_blockers" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_site_blockers_category" ON "site_blockers" USING btree ("category");--> statement-breakpoint
 CREATE INDEX "idx_site_blockers_url" ON "site_blockers" USING btree ("url");--> statement-breakpoint
@@ -211,8 +208,10 @@ CREATE INDEX "idx_tab_stashes_user_id" ON "tab_stashes" USING btree ("user_id");
 CREATE INDEX "idx_tab_stashes_window_id" ON "tab_stashes" USING btree ("window_id");--> statement-breakpoint
 CREATE INDEX "idx_notes_user_id" ON "notes" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_notes_title" ON "notes" USING btree ("title");--> statement-breakpoint
-CREATE INDEX "idx_weather_cache_user_id" ON "weather_cache" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_breathepod_user_id" ON "breathepod" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_focus_sessions_user_id" ON "focus_sessions" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "idx_focus_sessions_start" ON "focus_sessions" USING btree ("session_start");--> statement-breakpoint
-CREATE INDEX "idx_focus_sessions_end" ON "focus_sessions" USING btree ("session_end");
+CREATE INDEX "idx_focus_sessions_end" ON "focus_sessions" USING btree ("session_end");--> statement-breakpoint
+CREATE INDEX "idx_calendar_user_id" ON "calendar" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_categories_user_id" ON "task_categories" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "idx_providers_name" ON "providers" USING btree ("name");--> statement-breakpoint
+CREATE INDEX "idx_providers_enabled" ON "providers" USING btree ("enabled");

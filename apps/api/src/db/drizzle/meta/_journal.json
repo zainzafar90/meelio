@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740518304996,
-      "tag": "0000_useful_nitro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1740599118618,
-      "tag": "0001_loud_sauron",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1741033137565,
-      "tag": "0002_cultured_madripoor",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1741033639362,
-      "tag": "0003_slow_tigra",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1748348172043,
-      "tag": "0004_silent_jack_flag",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1748348172044,
-      "tag": "0005_add_sessions",
+      "when": 1752697533874,
+      "tag": "0000_empty_dark_beast",
       "breakpoints": true
     }
   ]

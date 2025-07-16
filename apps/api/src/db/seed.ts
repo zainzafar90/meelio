@@ -5,6 +5,8 @@ import { seed } from "drizzle-seed";
 import { Pool } from "pg";
 
 import { users } from "./schema/user.schema";
+import { providers } from "./schema/provider.schema";
+import { categories } from "./schema/category.schema";
 
 // Load environment variables
 config();
@@ -21,20 +23,65 @@ const pool = new Pool({
 
 const schema = {
   users,
+  // Don't include providers and categories in automatic seeding
 };
 
 const db = drizzle(pool, {
-  schema,
+  schema: {
+    users,
+    providers,
+    categories,
+  },
 });
 
 async function main() {
   try {
     console.log("🌱 Starting seed process...");
 
-    // Replace the manual cleanup with the new function
     await cleanupDatabase(db);
 
     console.log("🌱 Seeding Initiated...");
+
+    const defaultProviders = [
+      { 
+        name: "meelio", 
+        displayName: "Meelio", 
+        enabled: true,
+        clientId: "",
+        clientSecret: "",
+        scopes: [],
+        authUrl: "",
+        tokenUrl: "",
+        userInfoUrl: "",
+      },
+      { 
+        name: "google", 
+        displayName: "Google", 
+        enabled: false,
+        clientId: "",
+        clientSecret: "",
+        scopes: ["https://www.googleapis.com/auth/tasks"],
+        authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
+        tokenUrl: "https://oauth2.googleapis.com/token",
+        userInfoUrl: "https://www.googleapis.com/oauth2/v2/userinfo",
+      },
+      { 
+        name: "todoist", 
+        displayName: "Todoist", 
+        enabled: false,
+        clientId: "",
+        clientSecret: "",
+        scopes: ["data:read", "data:write"],
+        authUrl: "https://todoist.com/oauth/authorize",
+        tokenUrl: "https://todoist.com/oauth/access_token",
+        userInfoUrl: "",
+      },
+    ];
+
+    for (const provider of defaultProviders) {
+      await db.insert(providers).values(provider).onConflictDoNothing();
+    }
+    console.log("✅ Providers seeded:", defaultProviders.length);
 
     const hashedPassword =
       "$2a$08$1DdxLqST2pLfpcdOZZ.eRuWJ1H/DGD33e8RK5jilXHUICxPXsnJIK"; // securePassword123
@@ -67,6 +114,22 @@ async function main() {
 
     const seededUsers = await db.select().from(users);
     console.log("✅ Users seeded:", seededUsers.length);
+
+    // Seed default categories for the admin user
+    if (seededUsers.length > 0) {
+      const adminUser = seededUsers.find(u => u.email === "admin@tallymatic.com") || seededUsers[0];
+      
+      const defaultCategories = [
+        { userId: adminUser.id, name: "Work" },
+        { userId: adminUser.id, name: "Personal" },
+      ];
+
+      for (const category of defaultCategories) {
+        await db.insert(categories).values(category).onConflictDoNothing();
+      }
+      console.log("✅ Categories seeded:", defaultCategories.length);
+    }
+
     console.log("✅ All data seeded successfully");
   } catch (error) {
     console.error("❌ Error seeding database:", error);
@@ -85,7 +148,11 @@ main().catch((err) => {
 async function cleanupDatabase(db: any) {
   console.log("🗑️  Cleaning up existing data...");
 
-  const tables = [{ name: "users", schema: users }];
+  const tables = [
+    { name: "users", schema: users },
+    { name: "providers", schema: providers },
+    { name: "categories", schema: categories },
+  ];
 
   try {
     await db.execute(sql`SET session_replication_role = 'replica'`);

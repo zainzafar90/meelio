@@ -1,8 +1,13 @@
 import { db } from "@/db";
-import { Task, tasks } from "@/db/schema";
+import { Task, tasks, categories, providers, Category, Provider } from "@/db/schema";
 import { eq, and, desc, asc, isNull, isNotNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
+
+interface TaskWithRelations extends Task {
+  category: Category | null;
+  provider: Provider | null;
+}
 
 interface TaskFilters {
   completed?: boolean;
@@ -17,13 +22,15 @@ interface TaskUpdateData {
   pinned?: boolean;
   dueDate?: string | number | null;
   updatedAt?: Date;
+  categoryId?: string | null;
+  providerId?: string | null;
 }
 
 export const tasksService = {
   /**
    * Get tasks for a user with optional filters
    */
-  async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
+  async getTasks(userId: string, filters: TaskFilters): Promise<TaskWithRelations[]> {
     const conditions = [eq(tasks.userId, userId)];
 
     if (filters.completed !== undefined) {
@@ -47,8 +54,23 @@ export const tasksService = {
     }
 
     const baseQuery = db
-      .select()
+      .select({
+        id: tasks.id,
+        userId: tasks.userId,
+        title: tasks.title,
+        completed: tasks.completed,
+        pinned: tasks.pinned,
+        dueDate: tasks.dueDate,
+        categoryId: tasks.categoryId,
+        providerId: tasks.providerId,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+        category: categories,
+        provider: providers,
+      })
       .from(tasks)
+      .leftJoin(categories, eq(tasks.categoryId, categories.id))
+      .leftJoin(providers, eq(tasks.providerId, providers.id))
       .where(and(...conditions));
 
     if (filters.sortBy) {
@@ -81,10 +103,25 @@ export const tasksService = {
   /**
    * Get a specific task by ID
    */
-  async getTaskById(userId: string, taskId: string): Promise<Task> {
+  async getTaskById(userId: string, taskId: string): Promise<TaskWithRelations> {
     const task = await db
-      .select()
+      .select({
+        id: tasks.id,
+        userId: tasks.userId,
+        title: tasks.title,
+        completed: tasks.completed,
+        pinned: tasks.pinned,
+        dueDate: tasks.dueDate,
+        categoryId: tasks.categoryId,
+        providerId: tasks.providerId,
+        createdAt: tasks.createdAt,
+        updatedAt: tasks.updatedAt,
+        category: categories,
+        provider: providers,
+      })
       .from(tasks)
+      .leftJoin(categories, eq(tasks.categoryId, categories.id))
+      .leftJoin(providers, eq(tasks.providerId, providers.id))
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
 
     if (!task.length) {
@@ -117,6 +154,15 @@ export const tasksService = {
     // Only include dueDate if it's explicitly set
     if (parsedDueDate !== undefined) {
       insertData.dueDate = parsedDueDate;
+    }
+
+    // Handle categoryId and providerId
+    if (taskData.categoryId !== undefined) {
+      insertData.categoryId = taskData.categoryId;
+    }
+
+    if (taskData.providerId !== undefined) {
+      insertData.providerId = taskData.providerId;
     }
 
     // Handle pinned task logic
@@ -201,6 +247,14 @@ export const tasksService = {
       if (parsedDate !== undefined) {
         data.dueDate = parsedDate;
       }
+    }
+
+    if (updateData.categoryId !== undefined) {
+      data.categoryId = updateData.categoryId;
+    }
+
+    if (updateData.providerId !== undefined) {
+      data.providerId = updateData.providerId;
     }
 
     delete data.updatedAt;

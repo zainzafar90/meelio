@@ -2,43 +2,37 @@ import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
+  uuid,
   index,
-  pgEnum,
+  unique,
 } from "drizzle-orm/pg-core";
 
 import { createdAt, id, updatedAt } from "./helpers/date-helpers";
-
-// Create enum for category names matching the shared Category enum
-export const categoryEnum = pgEnum("category_name", [
-  "Productivity",
-  "Relax",
-  "NoiseBlocker",
-  "CreativeThinking",
-  "BeautifulAmbients",
-  "Random",
-  "Motivation",
-  "Sleep",
-  "Studying",
-  "Writing",
-]);
+import { users } from "./user.schema";
+import { tasks } from "./task.schema";
 
 export const categories = pgTable(
-  "categories",
+  "task_categories",
   {
     id,
-    name: categoryEnum("name").notNull().unique(),
-    title: text("title").notNull(),
-    description: text("description").notNull(),
+    userId: uuid("user_id").notNull(),
+    name: text("name").notNull(),
     createdAt,
     updatedAt,
   },
   (table) => ({
-    nameIdx: index("idx_categories_name").on(table.name),
+    userIdIdx: index("idx_categories_user_id").on(table.userId),
+    uniqueUserCategory: unique("unique_user_category").on(table.userId, table.name),
   })
 );
 
 export type Category = typeof categories.$inferSelect;
 export type CategoryInsert = typeof categories.$inferInsert;
 
-// Define relations if needed in the future
-export const categoriesRelations = relations(categories, ({}) => ({}));
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  user: one(users, {
+    fields: [categories.userId],
+    references: [users.id],
+  }),
+  tasks: many(tasks),
+}));
