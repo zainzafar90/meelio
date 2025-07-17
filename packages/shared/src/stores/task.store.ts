@@ -481,9 +481,6 @@ export const useTaskStore = create<TaskState>()(
           tasks: mergedTasks,
         });
 
-        // Reload categories as lists after sync
-        await get().loadCategoriesAsLists();
-
         syncStore.setSyncing("task", false);
         syncStore.setLastSyncTime("task", Date.now());
       } catch (error) {
