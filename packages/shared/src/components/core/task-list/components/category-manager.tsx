@@ -46,7 +46,7 @@ export function CategoryManager({ children }: CategoryManagerProps) {
     if (!newCategoryName.trim()) return;
 
     try {
-      await createCategory(newCategoryName);
+      await createCategory({ name: newCategoryName, icon: "" });
       setNewCategoryName("");
       toast.success("Category created");
     } catch (error) {
@@ -58,7 +58,7 @@ export function CategoryManager({ children }: CategoryManagerProps) {
     if (!editingName.trim()) return;
 
     try {
-      await updateCategory(id, editingName);
+      await updateCategory(id, { name: editingName, icon: "" });
       setEditingId(null);
       setEditingName("");
       toast.success("Category updated");

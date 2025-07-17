@@ -115,20 +115,17 @@ async function main() {
     const seededUsers = await db.select().from(users);
     console.log("✅ Users seeded:", seededUsers.length);
 
-    // Seed default categories for the admin user
-    if (seededUsers.length > 0) {
-      const adminUser = seededUsers.find(u => u.email === "admin@tallymatic.com") || seededUsers[0];
-      
-      const defaultCategories = [
-        { userId: adminUser.id, name: "Work" },
-        { userId: adminUser.id, name: "Personal" },
-      ];
+    // Seed system categories (available to all users)
+    const systemCategories = [
+      { userId: null, name: "Personal", icon: "👤", type: "system" },
+      { userId: null, name: "Work", icon: "💼", type: "system" },
+      { userId: null, name: "Inbox", icon: "📥", type: "system" },
+    ];
 
-      for (const category of defaultCategories) {
-        await db.insert(categories).values(category).onConflictDoNothing();
-      }
-      console.log("✅ Categories seeded:", defaultCategories.length);
+    for (const category of systemCategories) {
+      await db.insert(categories).values(category).onConflictDoNothing();
     }
+    console.log("✅ System categories seeded:", systemCategories.length);
 
     console.log("✅ All data seeded successfully");
   } catch (error) {

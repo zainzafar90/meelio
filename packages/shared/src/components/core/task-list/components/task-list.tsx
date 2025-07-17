@@ -6,7 +6,6 @@ import { useShallow } from "zustand/shallow";
 import { Task } from "../../../../lib/db/models.dexie";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
-import { CategoryBadge } from "./category-badge";
 
 interface TaskListProps {
   tasks: Task[];
@@ -88,9 +87,6 @@ const TaskItem = ({ task }: { task: Task }) => {
             {task.title}
           </span>
         </div>
-        {task.categoryId && (
-          <CategoryBadge categoryId={task.categoryId} className="mt-1" />
-        )}
       </div>
       <div className="ml-auto flex items-center gap-2">
         <button

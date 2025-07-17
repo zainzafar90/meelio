@@ -97,7 +97,7 @@ export { Timer as SimpleTimer } from "./timer";
 export * from "./core/task-list/components/create-list";
 export * from "./core/task-list/components/create-task";
 export * from "./core/task-list/components/task-list";
-export * from "./core/task-list/task-list.sheet";
+export * from "./core/task-list/tasks.sheet";
 
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";
