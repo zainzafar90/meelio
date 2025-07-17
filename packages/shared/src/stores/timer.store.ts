@@ -188,6 +188,12 @@ export const createTimerStore = (platform: TimerPlatform) => {
               type: "UPDATE_DURATION",
               duration: d[current.stage]!,
             });
+          } else if (!current.isRunning) {
+            // When timer is not running, update prevRemaining to use new duration for current stage
+            const newDuration = d[current.stage === TimerStage.Focus ? 'focus' : 'break'];
+            if (newDuration !== undefined) {
+              set({ prevRemaining: newDuration });
+            }
           }
         };
 

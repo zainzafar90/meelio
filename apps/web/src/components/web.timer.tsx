@@ -123,7 +123,7 @@ const TimerView = ({
 
           {/* Timer Display */}
           <div className="text-center space-y-4">
-            <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+            <div className="font-bold tracking-normal overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: 'clamp(2.5rem, 8vw, 6rem)' }}>
               {formatTime(remaining)}
             </div>
             <NextPinnedTask />
