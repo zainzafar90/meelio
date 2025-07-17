@@ -35,9 +35,10 @@ export interface Task {
 // Add Category model
 export interface Category {
   id: string;
-  userId: string;
+  userId: string | null;
   name: string;
   icon?: string;
+  type: "system" | "user";
   createdAt: number;
   updatedAt: number;
 }

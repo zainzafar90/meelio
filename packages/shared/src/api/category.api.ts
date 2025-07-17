@@ -2,9 +2,10 @@ import { axios } from "./axios";
 
 export interface Category {
   id: string;
-  userId: string;
+  userId: string | null;
   name: string;
   icon?: string;
+  type: "system" | "user";
   createdAt: string;
   updatedAt: string;
 }

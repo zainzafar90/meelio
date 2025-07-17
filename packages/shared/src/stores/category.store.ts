@@ -7,9 +7,10 @@ import { generateUUID } from "../utils/common.utils";
 // Add local type
 type LocalCategory = {
   id: string;
-  userId: string;
+  userId: string | null;
   name: string;
   icon?: string;
+  type: "system" | "user";
   createdAt: number;
   updatedAt: number;
 };
@@ -28,7 +29,6 @@ interface CategoryState {
   reset: () => void;
 }
 
-const DEFAULT_CATEGORIES = ["Personal", "Work"];
 
 export const useCategoryStore = create<CategoryState>()((set, get) => ({
   categories: [],
@@ -64,23 +64,7 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
         })) as LocalCategory[];
       }
       
-      if (categories.length === 0) {
-        for (const name of DEFAULT_CATEGORIES) {
-          await get().createCategory({ name });
-        }
-        
-        // Reload after creating defaults
-        if (isGuest) {
-          categories = await db.categories.where("userId").equals(userId).toArray() as LocalCategory[];
-        } else {
-          const apiCats = await api.categories.categoryApi.getCategories();
-          categories = apiCats.map(cat => ({
-            ...cat,
-            createdAt: new Date(cat.createdAt).getTime(),
-            updatedAt: new Date(cat.updatedAt).getTime(),
-          })) as LocalCategory[];
-        }
-      }
+      // No need to create default categories - they come from the backend as system categories
       
       set({ categories, isLoading: false });
     } catch (error) {
@@ -108,6 +92,7 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
       userId,
       name: data.name.trim(),
       icon: data.icon,
+      type: "user",
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -122,6 +107,7 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
       newCat.id = created.id;
       newCat.userId = created.userId;
       newCat.icon = created.icon;
+      newCat.type = created.type;
       newCat.createdAt = new Date(created.createdAt).getTime();
       newCat.updatedAt = new Date(created.updatedAt).getTime();
     }

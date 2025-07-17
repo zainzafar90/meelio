@@ -94,7 +94,7 @@ export class MeelioDB extends Dexie {
         tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
-        categories: "id, userId, name, icon",
+        categories: "id, userId, name, icon, type",
       });
   }
 }

@@ -89,6 +89,11 @@ const TaskItem = ({ task }: { task: Task }) => {
         </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
+       {task.dueDate && (
+          <Badge className="uppercase" variant="secondary">
+            {new Date(task.dueDate).toLocaleDateString()}
+          </Badge>
+        )}
         <button
           className="text-muted-foreground hover:text-yellow-500"
           onClick={(e) => {
@@ -103,11 +108,7 @@ const TaskItem = ({ task }: { task: Task }) => {
             )}
           />
         </button>
-        {task.dueDate && (
-          <Badge className="uppercase" variant="secondary">
-            {new Date(task.dueDate).toLocaleDateString()}
-          </Badge>
-        )}
+       
         <button
           className="invisible text-muted-foreground group-hover:visible"
           onClick={(e) => {

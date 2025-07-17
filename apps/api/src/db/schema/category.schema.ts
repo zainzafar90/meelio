@@ -15,9 +15,10 @@ export const categories = pgTable(
   "task_categories",
   {
     id,
-    userId: uuid("user_id").notNull(),
+    userId: uuid("user_id"),
     name: text("name").notNull(),
     icon: text("icon"),
+    type: text("type").notNull().default("user"),
     createdAt,
     updatedAt,
   },
