@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { Category, categories } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, not } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
@@ -35,7 +35,7 @@ export const categoriesService = {
   /**
    * Create a new category
    */
-  async createCategory(userId: string, name: string): Promise<Category> {
+  async createCategory(userId: string, name: string, icon?: string): Promise<Category> {
     if (!name?.trim()) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Category name is required");
     }
@@ -55,6 +55,7 @@ export const categoriesService = {
       .values({
         userId,
         name: name.trim(),
+        ...(icon?.trim() && { icon: icon.trim() }),
       })
       .returning();
 
@@ -67,7 +68,8 @@ export const categoriesService = {
   async updateCategory(
     userId: string,
     categoryId: string,
-    name: string
+    name: string,
+    icon?: string
   ): Promise<Category> {
     if (!name?.trim()) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Category name is required");
@@ -85,7 +87,7 @@ export const categoriesService = {
           eq(categories.userId, userId),
           eq(categories.name, name.trim()),
           // Exclude current category from check
-          db.not(eq(categories.id, categoryId))
+          not(eq(categories.id, categoryId))
         )
       );
 
@@ -95,7 +97,10 @@ export const categoriesService = {
 
     const result = await db
       .update(categories)
-      .set({ name: name.trim() })
+      .set({ 
+        name: name.trim(), 
+        ...(icon !== undefined && { icon: icon?.trim() }),
+      })
       .where(and(eq(categories.id, categoryId), eq(categories.userId, userId)))
       .returning();
 

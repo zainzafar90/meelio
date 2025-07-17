@@ -3,6 +3,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { useTaskStore } from "../stores/task.store";
 import { useSyncStore } from "../stores/sync.store";
 import { useTimerStore } from "../stores/timer.store";
+import { categoryApi } from "../api/category.api";
 
 interface MigrationResult {
   success: boolean;
@@ -14,6 +15,7 @@ interface MigrationSummary {
   success: boolean;
   tasks: MigrationResult;
   pomodoro: MigrationResult;
+  categories: MigrationResult;
   // Future migrations can be added here
   // settings: MigrationResult;
   // etc.
@@ -78,6 +80,70 @@ const migrateGuestTasks = async (
 };
 
 /**
+ * Migrate guest user categories and update tasks accordingly
+ */
+const migrateGuestCategories = async (
+  guestUserId: string,
+  authenticatedUserId: string
+): Promise<MigrationResult> => {
+  try {
+    const guestCategories = await db.categories
+      .where("userId")
+      .equals(guestUserId)
+      .toArray();
+
+    if (guestCategories.length === 0) {
+      return { success: true, migratedCount: 0 };
+    }
+
+    const idMap = new Map<string, string>();
+
+    // Create categories on server
+    for (const cat of guestCategories) {
+      const created = await categoryApi.createCategory({ name: cat.name });
+      idMap.set(cat.id, created.id);
+    }
+
+    // Update tasks with new category IDs
+    // Note: userId already updated in migrateTasks
+    const tasks = await db.tasks
+      .where("userId")
+      .equals(authenticatedUserId)
+      .toArray();
+
+    const syncStore = useSyncStore.getState();
+
+    await db.transaction("rw", db.tasks, async () => {
+      for (const task of tasks) {
+        if (task.categoryId && idMap.has(task.categoryId)) {
+          const newCategoryId = idMap.get(task.categoryId)!;
+          await db.tasks.update(task.id, {
+            categoryId: newCategoryId,
+            updatedAt: Date.now(),
+          });
+
+          syncStore.addToQueue("task", {
+            type: "update",
+            entityId: task.id,
+            data: { categoryId: newCategoryId, updatedAt: Date.now() },
+          });
+        }
+      }
+    });
+
+    // If online, sync tasks
+    if (syncStore.isOnline) {
+      await useTaskStore.getState().syncWithServer();
+    }
+
+    return { success: true, migratedCount: guestCategories.length };
+  } catch (error) {
+    console.error("Failed to migrate guest categories:", error);
+    return { success: false, migratedCount: 0, error };
+  }
+};
+
+/**
  * Main migration orchestrator
  * Migrate all guest user data to authenticated user
  */
@@ -89,19 +155,20 @@ export const migrateGuestDataToUser = async (
     success: true,
     tasks: { success: false, migratedCount: 0 },
     pomodoro: { success: false, migratedCount: 0 },
+    categories: { success: false, migratedCount: 0 },
   };
 
   // Migrate tasks
   summary.tasks = await migrateGuestTasks(guestUserId, authenticatedUserId);
 
-  // Migrate pomodoro sessions
+  // Migrate categories after tasks
+  summary.categories = await migrateGuestCategories(guestUserId, authenticatedUserId);
+
+  // Migrate pomodoro
   summary.pomodoro = await migrateGuestPomodoroSessions();
 
-  // Future migrations can be added here
-  // summary.settings = await migrateGuestSettings(guestUserId, authenticatedUserId);
-
-  // Overall success is true only if all migrations succeed
-  summary.success = summary.tasks.success && summary.pomodoro.success;
+  // Overall success
+  summary.success = summary.tasks.success && summary.categories.success && summary.pomodoro.success;
 
   return summary;
 };
@@ -141,6 +208,7 @@ const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
 export const cleanupGuestData = async (guestUserId: string) => {
   try {
     await db.tasks.where("userId").equals(guestUserId).delete();
+    await db.categories.where("userId").equals(guestUserId).delete();
 
     // Clear guest focus sessions from IndexedDB
     const today = new Date().toISOString().split("T")[0];

@@ -4,8 +4,7 @@ import type {
   Task,
   PomodoroSession,
   DailySummary,
-  Mantra,
-  Quote,
+  Category,
 } from "./models.dexie";
 
 export class MeelioDB extends Dexie {
@@ -13,8 +12,7 @@ export class MeelioDB extends Dexie {
   tasks!: Table<Task>;
   focusSessions!: Table<PomodoroSession>;
   focusStats!: Table<DailySummary>;
-  mantras!: Table<Mantra>;
-  quotes!: Table<Quote>;
+  categories!: Table<Category, string>;
 
   constructor() {
     super("meelio");
@@ -78,8 +76,16 @@ export class MeelioDB extends Dexie {
         tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
-        mantras: "id, lastUpdated",
-        quotes: "id, lastUpdated",
+        categories: "id, userId, name",
+      });
+
+    this.version(5)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name",
       });
   }
 }

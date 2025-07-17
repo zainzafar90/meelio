@@ -6,6 +6,8 @@ export interface CreateTaskDto {
   completed?: boolean;
   dueDate?: string;
   pinned?: boolean;
+  categoryId?: string;
+  providerId?: string;
 }
 
 export interface UpdateTaskDto {
@@ -13,6 +15,8 @@ export interface UpdateTaskDto {
   completed?: boolean;
   dueDate?: string;
   pinned?: boolean;
+  categoryId?: string;
+  providerId?: string;
 }
 
 export const taskApi = {

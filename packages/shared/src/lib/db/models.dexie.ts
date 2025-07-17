@@ -26,6 +26,17 @@ export interface Task {
   completed: boolean;
   pinned: boolean;
   dueDate?: string;
+  categoryId?: string;
+  providerId?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+// Add Category model
+export interface Category {
+  id: string;
+  userId: string;
+  name: string;
   createdAt: number;
   updatedAt: number;
 }

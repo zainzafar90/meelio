@@ -17,6 +17,7 @@ export const categories = pgTable(
     id,
     userId: uuid("user_id").notNull(),
     name: text("name").notNull(),
+    icon: text("icon"),
     createdAt,
     updatedAt,
   },

@@ -173,6 +173,11 @@
           "normal": "Add a task"
         }
       }
+    },
+    "category": {
+      "select": "Select category",
+      "none": "No category",
+      "manage": "Manage categories"
     }
   },
   "sidebar": {

@@ -29,8 +29,8 @@ export const categoriesController = {
    */
   createCategory: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { name } = req.body;
-    const category = await categoriesService.createCategory(user.id, name);
+    const { name, icon } = req.body;
+    const category = await categoriesService.createCategory(user.id, name, icon);
     return res.status(httpStatus.CREATED).json(category);
   }),
 
@@ -40,8 +40,8 @@ export const categoriesController = {
   updateCategory: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
     const { id } = req.params;
-    const { name } = req.body;
-    const category = await categoriesService.updateCategory(user.id, id, name);
+    const { name, icon } = req.body;
+    const category = await categoriesService.updateCategory(user.id, id, name, icon);
     return res.status(httpStatus.OK).json(category);
   }),
 

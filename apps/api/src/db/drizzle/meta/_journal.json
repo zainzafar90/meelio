@@ -8,6 +8,13 @@
       "when": 1752697533874,
       "tag": "0000_empty_dark_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752743688747,
+      "tag": "0001_wide_the_captain",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
+import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
 import { toast } from "sonner";
@@ -16,12 +17,10 @@ export interface TaskListMeta {
   emoji?: string;
 }
 
-const DEFAULT_LISTS: TaskListMeta[] = [
-  { id: "today", name: "Today", type: "system", emoji: "📅" },
+const SYSTEM_LISTS: TaskListMeta[] = [
   { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
+  { id: "today", name: "Today", type: "system", emoji: "📅" },
   { id: "completed", name: "Completed", type: "system", emoji: "✅" },
-  { id: "personal", name: "Personal", type: "custom", emoji: "👤" },
-  { id: "work", name: "Work", type: "custom", emoji: "💼" },
 ];
 
 interface TaskState {
@@ -35,6 +34,7 @@ interface TaskState {
     title: string;
     dueDate?: string;
     pinned?: boolean;
+    categoryId?: string;
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
@@ -47,6 +47,7 @@ interface TaskState {
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
+  loadCategoriesAsLists: () => Promise<void>;
 
   getNextPinnedTask: () => Task | undefined;
 }
@@ -69,6 +70,7 @@ async function processSyncQueue() {
               completed: operation.data.completed || false,
               dueDate: operation.data.dueDate,
               pinned: operation.data.pinned || false,
+              categoryId: operation.data.categoryId,
             });
             
             await db.tasks.update(operation.entityId, { 
@@ -126,9 +128,9 @@ function startAutoSync() {
 
 export const useTaskStore = create<TaskState>()(
   subscribeWithSelector((set, get) => ({
-    lists: DEFAULT_LISTS,
+    lists: SYSTEM_LISTS,
     tasks: [],
-    activeListId: "today",
+    activeListId: "all",
     isLoading: false,
     error: null,
 
@@ -144,6 +146,13 @@ export const useTaskStore = create<TaskState>()(
       }
 
       const syncStore = useSyncStore.getState();
+      const activeListId = get().activeListId;
+      
+      // If the active list is a category (not a system list), assign it to the task
+      let categoryId = task.categoryId;
+      if (activeListId && !["all", "today", "completed"].includes(activeListId)) {
+        categoryId = activeListId;
+      }
       
       let normalizedDueDate = task.dueDate;
       if (task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString()) {
@@ -159,6 +168,7 @@ export const useTaskStore = create<TaskState>()(
         completed: false,
         pinned: task.pinned ?? false,
         dueDate: normalizedDueDate,
+        categoryId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -380,6 +390,9 @@ export const useTaskStore = create<TaskState>()(
         }
 
         await get().loadFromLocal();
+        
+        // Load categories as lists
+        await get().loadCategoriesAsLists();
 
         if (user) {
           const syncStore = useSyncStore.getState();
@@ -417,7 +430,7 @@ export const useTaskStore = create<TaskState>()(
 
       set({
         tasks: localTasks,
-        lists: DEFAULT_LISTS,
+        lists: SYSTEM_LISTS,
       });
     },
 
@@ -466,7 +479,6 @@ export const useTaskStore = create<TaskState>()(
 
         set({
           tasks: mergedTasks,
-          lists: DEFAULT_LISTS,
         });
 
         syncStore.setSyncing("task", false);
@@ -547,6 +559,26 @@ export const useTaskStore = create<TaskState>()(
         set({
           error: error instanceof Error ? error.message : "Failed to pin task",
         });
+      }
+    },
+
+    loadCategoriesAsLists: async () => {
+      try {
+        await useCategoryStore.getState().loadCategories();
+        const categories = useCategoryStore.getState().categories;
+        
+        const categoryLists: TaskListMeta[] = categories.map(category => ({
+          id: category.id,
+          name: category.name,
+          type: "custom" as const,
+          emoji: category.icon || "🏷️",
+        }));
+        
+        set(() => ({
+          lists: [...SYSTEM_LISTS, ...categoryLists]
+        }));
+      } catch (error) {
+        console.error("Failed to load categories as lists:", error);
       }
     },
 
