@@ -21,8 +21,8 @@ interface CategoryState {
   error: string | null;
   
   loadCategories: () => Promise<void>;
-  createCategory: (name: string) => Promise<void>;
-  updateCategory: (id: string, name: string) => Promise<void>;
+  createCategory: (data: { name: string; icon?: string }) => Promise<LocalCategory>;
+  updateCategory: (id: string, data: { name: string; icon?: string }) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
   getCategoryById: (id: string) => LocalCategory | undefined;
   reset: () => void;
@@ -66,7 +66,7 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
       
       if (categories.length === 0) {
         for (const name of DEFAULT_CATEGORIES) {
-          await get().createCategory(name);
+          await get().createCategory({ name });
         }
         
         // Reload after creating defaults
@@ -91,22 +91,23 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
     }
   },
 
-  createCategory: async (name: string) => {
+  createCategory: async (data: { name: string; icon?: string }) => {
     const { user, guestUser } = useAuthStore.getState();
     const isGuest = !!guestUser && !user;
     const userId = user?.id || guestUser?.id;
     
     if (!userId) throw new Error("No user found");
-    if (!name.trim()) throw new Error("Name is required");
+    if (!data.name.trim()) throw new Error("Name is required");
     
     // Check for existing
-    const existing = get().categories.find(c => c.name.toLowerCase() === name.trim().toLowerCase());
+    const existing = get().categories.find(c => c.name.toLowerCase() === data.name.trim().toLowerCase());
     if (existing) throw new Error("Category exists");
     
     const newCat: LocalCategory = {
       id: generateUUID(),
       userId,
-      name: name.trim(),
+      name: data.name.trim(),
+      icon: data.icon,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -114,17 +115,22 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
     if (isGuest) {
       await db.categories.add(newCat);
     } else {
-      const created = await api.categories.categoryApi.createCategory({ name: newCat.name });
+      const created = await api.categories.categoryApi.createCategory({ 
+        name: newCat.name,
+        icon: newCat.icon 
+      });
       newCat.id = created.id;
-      newCat.userId = created.userId; // Assume has
+      newCat.userId = created.userId;
+      newCat.icon = created.icon;
       newCat.createdAt = new Date(created.createdAt).getTime();
       newCat.updatedAt = new Date(created.updatedAt).getTime();
     }
     
     set(state => ({ categories: [...state.categories, newCat] }));
+    return newCat;
   },
 
-  updateCategory: async (id: string, name: string) => {
+  updateCategory: async (id: string, data: { name: string; icon?: string }) => {
     const { user, guestUser } = useAuthStore.getState();
     const isGuest = !!guestUser && !user;
     const userId = user?.id || guestUser?.id;
@@ -134,12 +140,19 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
     const cat = get().getCategoryById(id);
     if (!cat) throw new Error("Category not found");
     
-    const updates = { name: name.trim(), updatedAt: Date.now() };
+    const updates = { 
+      name: data.name.trim(), 
+      icon: data.icon,
+      updatedAt: Date.now() 
+    };
     
     if (isGuest) {
       await db.categories.update(id, updates);
     } else {
-      await api.categories.categoryApi.updateCategory(id, { name: updates.name });
+      await api.categories.categoryApi.updateCategory(id, { 
+        name: updates.name,
+        icon: updates.icon 
+      });
     }
     
     set(state => ({

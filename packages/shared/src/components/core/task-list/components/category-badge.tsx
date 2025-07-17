@@ -36,6 +36,7 @@ export function CategoryBadge({ categoryId, className }: CategoryBadgeProps) {
 
   return (
     <Badge variant="secondary" className={cn("text-xs", className)}>
+      {category.icon && <span className="mr-1">{category.icon}</span>}
       {category.name}
     </Badge>
   );

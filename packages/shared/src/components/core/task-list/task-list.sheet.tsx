@@ -26,9 +26,8 @@ import { CreateTask } from "./components/create-task";
 import { TaskList } from "./components/task-list";
 import { SyncStatus } from "../../sync-status";
 import { CreateList } from "./components/create-list";
-import { Plus, Tags } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
-import { CategoryManager } from "./components/category-manager";
 
 export function TaskListSheet() {
   const { t } = useTranslation();
@@ -191,11 +190,6 @@ export function TaskListSheet() {
                 <Plus className="h-4 w-4" />
               </Button>
             </CreateList>
-            <CategoryManager>
-              <Button variant="ghost" size="icon" title={t("tasks.category.manage")}>
-                <Tags className="h-4 w-4" />
-              </Button>
-            </CategoryManager>
           </div>
 
           <div className="space-y-8">

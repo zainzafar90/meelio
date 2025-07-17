@@ -87,6 +87,15 @@ export class MeelioDB extends Dexie {
         focusStats: "++id, date",
         categories: "id, userId, name",
       });
+
+    this.version(6)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon",
+      });
   }
 }
 

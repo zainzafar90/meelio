@@ -56,11 +56,12 @@ export function CategoryPicker({ value, onChange, inline = false }: CategoryPick
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="none">{t("tasks.category.none")}</SelectItem>
-          {categories.map((category) => (
-            <SelectItem key={category.id} value={category.id}>
-              {category.name}
-            </SelectItem>
-          ))}
+          {categories
+            .map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     );
@@ -73,11 +74,12 @@ export function CategoryPicker({ value, onChange, inline = false }: CategoryPick
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">{t("tasks.category.none")}</SelectItem>
-        {categories.map((category) => (
-          <SelectItem key={category.id} value={category.id}>
-            {category.name}
-          </SelectItem>
-        ))}
+        {categories
+          .map((category) => (
+            <SelectItem key={category.id} value={category.id}>
+              {category.name}
+            </SelectItem>
+          ))}
       </SelectContent>
     </Select>
   );

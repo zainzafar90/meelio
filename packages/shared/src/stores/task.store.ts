@@ -390,9 +390,6 @@ export const useTaskStore = create<TaskState>()(
         }
 
         await get().loadFromLocal();
-        
-        // Load categories as lists
-        await get().loadCategoriesAsLists();
 
         if (user) {
           const syncStore = useSyncStore.getState();
@@ -400,6 +397,9 @@ export const useTaskStore = create<TaskState>()(
             await get().syncWithServer();
           }
         }
+        
+        // Load categories as lists after potential sync
+        await get().loadCategoriesAsLists();
       } catch (error: any) {
         console.error("Failed to initialize task store:", error);
         set({ error: error?.message || "Failed to initialize store" });
@@ -480,6 +480,9 @@ export const useTaskStore = create<TaskState>()(
         set({
           tasks: mergedTasks,
         });
+
+        // Reload categories as lists after sync
+        await get().loadCategoriesAsLists();
 
         syncStore.setSyncing("task", false);
         syncStore.setLastSyncTime("task", Date.now());
@@ -564,21 +567,37 @@ export const useTaskStore = create<TaskState>()(
 
     loadCategoriesAsLists: async () => {
       try {
-        await useCategoryStore.getState().loadCategories();
-        const categories = useCategoryStore.getState().categories;
+        const authState = useAuthStore.getState();
+        const user = authState.user;
+        const guestUser = authState.guestUser;
         
-        const categoryLists: TaskListMeta[] = categories.map(category => ({
-          id: category.id,
-          name: category.name,
-          type: "custom" as const,
-          emoji: category.icon || "🏷️",
-        }));
-        
-        set(() => ({
-          lists: [...SYSTEM_LISTS, ...categoryLists]
-        }));
+        // Only load categories if we have a user (guest or authenticated)
+        if (user || guestUser) {
+          await useCategoryStore.getState().loadCategories();
+          const categories = useCategoryStore.getState().categories;
+          
+          const categoryLists: TaskListMeta[] = categories.map(category => ({
+            id: category.id,
+            name: category.name,
+            type: "custom" as const,
+            emoji: category.icon || "🏷️",
+          }));
+          
+          set(() => ({
+            lists: [...SYSTEM_LISTS, ...categoryLists]
+          }));
+        } else {
+          // No user, just show system lists
+          set(() => ({
+            lists: SYSTEM_LISTS
+          }));
+        }
       } catch (error) {
         console.error("Failed to load categories as lists:", error);
+        // Fallback to system lists only
+        set(() => ({
+          lists: SYSTEM_LISTS
+        }));
       }
     },
 
