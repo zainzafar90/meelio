@@ -101,36 +101,52 @@ const getSubscriptionById = async (id: string) => {
 };
 
 const getSubscriptionByEmail = async (email: string) => {
-  const baseConditions = [
-    eq(subscriptions.email, email),
-    or(
-      eq(subscriptions.status, 'active'),
-      eq(subscriptions.status, 'on_trial'),
-      eq(subscriptions.status, 'past_due'),
-      eq(subscriptions.status, 'paused'),
-      eq(subscriptions.status, 'cancelled'),
+  const allSubscriptions = await db.query.subscriptions.findMany({
+    where: and(
+      eq(subscriptions.email, email),
+      or(
+        eq(subscriptions.status, 'active'),
+        eq(subscriptions.status, 'on_trial'),
+        eq(subscriptions.status, 'past_due'),
+        eq(subscriptions.status, 'paused'),
+        eq(subscriptions.status, 'cancelled'),
+      )
     ),
-  ];
-
-  const subscription = await db.query.subscriptions.findFirst({
-    where: and(...baseConditions),
     orderBy: desc(subscriptions.createdAt),
   });
 
-  const hasActiveSubscription =
-    subscription.status === "active" ||
-    subscription.status === "on_trial" ||
-    subscription.status === "past_due" ||
-    subscription.status === "paused" ||
-    (subscription.status === "cancelled" &&
-      subscription.endsAt &&
-      subscription.endsAt > new Date());
-
-  if (!hasActiveSubscription) {
+  if (!allSubscriptions || allSubscriptions.length === 0) {
     return null;
   }
 
-  return subscription as ISubscription;
+  const activeSubscription = allSubscriptions.find(sub => sub.status === 'active');
+  if (activeSubscription) {
+    return activeSubscription as ISubscription;
+  }
+
+  const trialSubscription = allSubscriptions.find(sub => sub.status === 'on_trial');
+  if (trialSubscription) {
+    return trialSubscription as ISubscription;
+  }
+
+  const pastDueOrPausedSubscription = allSubscriptions.find(
+    sub => sub.status === 'past_due' || sub.status === 'paused'
+  );
+  if (pastDueOrPausedSubscription) {
+    return pastDueOrPausedSubscription as ISubscription;
+  }
+
+  // Check for cancelled subscriptions that haven't expired yet
+  const validCancelledSubscription = allSubscriptions.find(
+    sub => sub.status === 'cancelled' &&
+      sub.endsAt &&
+      sub.endsAt > new Date()
+  );
+  if (validCancelledSubscription) {
+    return validCancelledSubscription as ISubscription;
+  }
+
+  return null;
 };
 
 export const subscriptionService = {
