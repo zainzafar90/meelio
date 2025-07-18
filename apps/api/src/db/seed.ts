@@ -55,8 +55,8 @@ async function main() {
         userInfoUrl: "",
       },
       { 
-        name: "google", 
-        displayName: "Google", 
+        name: "googletasks", 
+        displayName: "Google Tasks", 
         enabled: false,
         clientId: "",
         clientSecret: "",
