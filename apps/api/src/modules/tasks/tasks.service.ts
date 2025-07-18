@@ -156,13 +156,25 @@ export const tasksService = {
       insertData.dueDate = parsedDueDate;
     }
 
-    // Handle categoryId and providerId
+    // Handle categoryId
     if (taskData.categoryId !== undefined) {
       insertData.categoryId = taskData.categoryId;
     }
 
+    // Handle providerId - if not provided, use default "meelio" provider
     if (taskData.providerId !== undefined) {
       insertData.providerId = taskData.providerId;
+    } else {
+      // Get the default "meelio" provider
+      const [meelioProvider] = await db
+        .select()
+        .from(providers)
+        .where(eq(providers.name, "meelio"))
+        .limit(1);
+      
+      if (meelioProvider) {
+        insertData.providerId = meelioProvider.id;
+      }
     }
 
     // Handle pinned task logic

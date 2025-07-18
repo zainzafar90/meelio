@@ -35,6 +35,7 @@ interface TaskState {
     dueDate?: string;
     pinned?: boolean;
     categoryId?: string;
+    providerId?: string;
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
@@ -169,6 +170,7 @@ export const useTaskStore = create<TaskState>()(
         pinned: task.pinned ?? false,
         dueDate: normalizedDueDate,
         categoryId,
+        providerId: task.providerId, // For now, we'll need to pass this from the backend
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
