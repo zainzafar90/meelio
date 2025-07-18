@@ -16,7 +16,11 @@ export function ProPlanSection({
   onManageSubscription,
 }: ProPlanSectionProps) {
   const isProSubscriptionValid = (subscription: Subscription) => {
-    const isSubscriptionActive = subscription.status === "active";
+    const isSubscriptionActive = 
+      subscription.status === "active" ||
+      subscription.status === "on_trial" ||
+      subscription.status === "past_due" ||
+      subscription.status === "paused";
     const isCancelledSubscriptionCurrentlyValid =
       subscription.status === "cancelled" &&
       subscription.endsAt &&
@@ -37,6 +41,22 @@ export function ProPlanSection({
       return (
         <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">
           Auto-Renew Off
+        </span>
+      );
+    }
+
+    if (subscription.status === "on_trial") {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+          Trial
+        </span>
+      );
+    }
+
+    if (subscription.status === "past_due") {
+      return (
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+          Past Due
         </span>
       );
     }

@@ -4,7 +4,7 @@ import {
   subscriptions,
   SubscriptionInsert,
 } from "@/db/schema/subscription.schema";
-import { eq } from "drizzle-orm";
+import { eq, or, and, desc } from "drizzle-orm";
 
 const addOrUpdateSubscription = async (
   subscriptionObj: SubscriptionObject,
@@ -100,7 +100,41 @@ const getSubscriptionById = async (id: string) => {
   return subscription as ISubscription;
 };
 
+const getSubscriptionByEmail = async (email: string) => {
+  const baseConditions = [
+    eq(subscriptions.email, email),
+    or(
+      eq(subscriptions.status, 'active'),
+      eq(subscriptions.status, 'on_trial'),
+      eq(subscriptions.status, 'past_due'),
+      eq(subscriptions.status, 'paused'),
+      eq(subscriptions.status, 'cancelled'),
+    ),
+  ];
+
+  const subscription = await db.query.subscriptions.findFirst({
+    where: and(...baseConditions),
+    orderBy: desc(subscriptions.createdAt),
+  });
+
+  const hasActiveSubscription =
+    subscription.status === "active" ||
+    subscription.status === "on_trial" ||
+    subscription.status === "past_due" ||
+    subscription.status === "paused" ||
+    (subscription.status === "cancelled" &&
+      subscription.endsAt &&
+      subscription.endsAt > new Date());
+
+  if (!hasActiveSubscription) {
+    return null;
+  }
+
+  return subscription as ISubscription;
+};
+
 export const subscriptionService = {
   addOrUpdateSubscription,
   getSubscriptionById,
+  getSubscriptionByEmail,
 };

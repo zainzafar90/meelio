@@ -27,6 +27,7 @@ import { userUtils } from "../user/user.utils";
 import { verificationTokenService } from "../verification-token";
 import { userService } from "../user";
 import { RoleType } from "@/types/enums.types";
+import { subscriptionService } from "../subscription/subscription.service";
 /**
  * Generate token
  * @param {string} userId
@@ -106,12 +107,12 @@ const verifySession = async (sessionId: string): Promise<ISession> => {
  */
 const verifyToken = async (token: string): Promise<ISession> => {
   const payload = await verifyJwtToken(token);
-  
+
   // For new tokens with sessionId, use direct lookup
   if (payload.sessionId) {
     return await verifySession(payload.sessionId);
   }
-  
+
   // Fallback for old tokens without sessionId
   const sessionDoc = await db.query.sessions.findFirst({
     where: and(
@@ -254,7 +255,7 @@ const cleanupExpiredSessions = async (database = db): Promise<number> => {
         )
       )
     );
-  
+
   return result.rowCount || 0;
 };
 
@@ -269,10 +270,7 @@ const checkSubscription = async (
   isPro: boolean;
   subscriptionId: string | null;
 }> => {
-  const subscription = await db.query.subscriptions.findFirst({
-    where: eq(subscriptions.email, email),
-    orderBy: desc(subscriptions.createdAt),
-  });
+  const subscription = await subscriptionService.getSubscriptionByEmail(email);
 
   if (!subscription)
     return {
@@ -280,14 +278,8 @@ const checkSubscription = async (
       subscriptionId: null,
     };
 
-  const hasActiveSubscription =
-    subscription.status === "active" ||
-    (subscription.status === "cancelled" &&
-      subscription.endsAt &&
-      subscription.endsAt > new Date());
-
   return {
-    isPro: !!hasActiveSubscription,
+    isPro: !!subscription,
     subscriptionId: subscription.id,
   };
 };
