@@ -2,7 +2,7 @@
 // import toJSON from "../toJSON/toJSON";
 // import { ISubscriptionDoc, ISubscriptionModel } from "./subscription.interface";
 
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 import { users } from "./user.schema";
@@ -30,6 +30,11 @@ export const subscriptions = pgTable("subscriptions", {
   isUsageBased: boolean("is_usage_based").notNull().default(false),
   createdAt,
   updatedAt,
+}, (table) => {
+  return {
+    statusIdx: index("status_idx").on(table.status),
+    emailIdx: index("email_idx").on(table.email),
+  };
 });
 
 export type Subscription = typeof subscriptions.$inferSelect;
