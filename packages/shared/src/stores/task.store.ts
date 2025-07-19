@@ -53,12 +53,18 @@ interface TaskState {
   getNextPinnedTask: () => Task | undefined;
 }
 
+let isProcessingSyncQueue = false;
+
 async function processSyncQueue() {
+  // Prevent concurrent sync operations
+  if (isProcessingSyncQueue) return;
+  
   const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("task");
 
   if (queue.length === 0 || !syncStore.isOnline) return;
 
+  isProcessingSyncQueue = true;
   syncStore.setSyncing("task", true);
 
   for (const operation of queue) {
@@ -73,8 +79,8 @@ async function processSyncQueue() {
               pinned: operation.data.pinned || false,
               categoryId: operation.data.categoryId,
             });
-            
-            await db.tasks.update(operation.entityId, { 
+
+            await db.tasks.update(operation.entityId, {
               id: created.id,
               completed: operation.data.completed || false
             });
@@ -87,8 +93,8 @@ async function processSyncQueue() {
               operation.entityId,
               operation.data
             );
-            
-            await db.tasks.update(operation.entityId, { 
+
+            await db.tasks.update(operation.entityId, {
               id: updated.id,
               completed: operation.data.completed !== undefined ? operation.data.completed : updated.completed
             });
@@ -117,6 +123,7 @@ async function processSyncQueue() {
 
   syncStore.setSyncing("task", false);
   syncStore.setLastSyncTime("task", Date.now());
+  isProcessingSyncQueue = false;
 }
 
 let autoSyncInterval: NodeJS.Timeout | null = null;
@@ -148,20 +155,20 @@ export const useTaskStore = create<TaskState>()(
 
       const syncStore = useSyncStore.getState();
       const activeListId = get().activeListId;
-      
+
       // If the active list is a category (not a system list), assign it to the task
       let categoryId = task.categoryId;
       if (activeListId && !["all", "today", "completed"].includes(activeListId)) {
         categoryId = activeListId;
       }
-      
+
       let normalizedDueDate = task.dueDate;
       if (task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString()) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         normalizedDueDate = today.toISOString();
       }
-      
+
       const newTask: Task = {
         id: generateUUID(),
         userId: userId,
@@ -401,7 +408,7 @@ export const useTaskStore = create<TaskState>()(
             await get().syncWithServer();
           }
         }
-        
+
         // Load categories as lists after potential sync
         await get().loadCategoriesAsLists();
       } catch (error: any) {
@@ -460,7 +467,7 @@ export const useTaskStore = create<TaskState>()(
         const localTasksMap = new Map(localTasks.map(task => [task.id, task]));
 
         const tasksToKeep = localTasks.filter(task => !serverTasksMap.has(task.id));
-        
+
         const mergedServerTasks = serverTasks.map(serverTask => {
           const localTask = localTasksMap.get(serverTask.id);
           if (localTask) {
@@ -472,7 +479,7 @@ export const useTaskStore = create<TaskState>()(
           }
           return serverTask;
         });
-        
+
         const mergedTasks = [...mergedServerTasks, ...tasksToKeep];
 
         await db.transaction("rw", db.tasks, async () => {
@@ -571,19 +578,19 @@ export const useTaskStore = create<TaskState>()(
         const authState = useAuthStore.getState();
         const user = authState.user;
         const guestUser = authState.guestUser;
-        
+
         // Only load categories if we have a user (guest or authenticated)
         if (user || guestUser) {
           await useCategoryStore.getState().loadCategories();
           const categories = useCategoryStore.getState().categories;
-          
+
           const categoryLists: TaskListMeta[] = categories.map(category => ({
             id: category.id,
             name: category.name,
             type: "custom" as const,
             emoji: category.icon || "🏷️",
           }));
-          
+
           set(() => ({
             lists: [...SYSTEM_LISTS, ...categoryLists]
           }));
@@ -608,3 +615,25 @@ export const useTaskStore = create<TaskState>()(
     },
   }))
 );
+
+// Track sync state for reconnection
+let isSyncingOnReconnect = false;
+
+useSyncStore.subscribe((state, prevState) => {
+  const isOnline = state.isOnline;
+  const wasOnline = prevState.isOnline;
+  
+  // Only process sync queue when transitioning from offline to online
+  if (isOnline && !wasOnline && !isSyncingOnReconnect) {
+    const authState = useAuthStore.getState();
+    if (authState.user) {
+      // Prevent multiple concurrent syncs
+      isSyncingOnReconnect = true;
+      // Process sync queue when coming back online
+      processSyncQueue().finally(() => {
+        isSyncingOnReconnect = false;
+      });
+    }
+  }
+});
+
