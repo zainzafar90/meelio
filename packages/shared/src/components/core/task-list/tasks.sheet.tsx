@@ -88,9 +88,9 @@ export function TaskListSheet() {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      if (task.dueDate) {
+      if (task.createdAt || task.dueDate) {
         try {
-          const dueDate = new Date(task.dueDate);
+          const dueDate = new Date(task.dueDate || task.createdAt);
           dueDate.setHours(0, 0, 0, 0);
           const isToday = dueDate.getTime() === today.getTime();
           

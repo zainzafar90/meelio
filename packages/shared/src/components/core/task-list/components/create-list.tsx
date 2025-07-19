@@ -11,11 +11,11 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-// import {
-//   Popover,
-//   PopoverContent,
-//   PopoverTrigger,
-// } from "@repo/ui/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components/ui/popover";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -152,13 +152,12 @@ export function CreateList({ children }: CreateListProps) {
               {t("tasks.list.create.emoji.label")}
             </Label>
 
-            {/* <Popover>
+            <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="emoji"
                   variant="outline"
                   className="w-[60px] text-lg"
-                  disabled={true}
                   aria-label={t("tasks.list.create.emoji.selected", {
                     emoji: selectedEmoji,
                   })}
@@ -181,19 +180,9 @@ export function CreateList({ children }: CreateListProps) {
                   ))}
                 </div>
               </PopoverContent>
-            </Popover> */}
+            </Popover> 
 
             <div className="flex w-full items-center gap-2">
-              <Button
-                id="emoji"
-                variant="outline"
-                className="w-[40px] text-lg"
-                aria-label={t("tasks.list.create.emoji.selected", {
-                  emoji: selectedEmoji,
-                })}
-              >
-                {selectedEmoji}
-              </Button>
               <Label htmlFor="name" className="sr-only">
                 {t("tasks.list.create.name.label")}
               </Label>

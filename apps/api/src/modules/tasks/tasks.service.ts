@@ -1,13 +1,9 @@
 import { db } from "@/db";
-import { Task, tasks, categories, providers, Category, Provider } from "@/db/schema";
-import { eq, and, desc, asc, isNull, isNotNull } from "drizzle-orm";
+import { Task, tasks, providers, } from "@/db/schema";
+import { eq, and, desc, asc, } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
-interface TaskWithRelations extends Task {
-  category: Category | null;
-  provider: Provider | null;
-}
 
 interface TaskFilters {
   completed?: boolean;
@@ -30,105 +26,40 @@ export const tasksService = {
   /**
    * Get tasks for a user with optional filters
    */
-  async getTasks(userId: string, filters: TaskFilters): Promise<TaskWithRelations[]> {
-    const conditions = [eq(tasks.userId, userId)];
-
-    if (filters.completed !== undefined) {
-      conditions.push(eq(tasks.completed, filters.completed));
+  async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
+    const defaultProvider = await db.query.providers.findFirst({
+      where: eq(providers.name, "meelio"),
+    });
+    if (!defaultProvider) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Default provider not found");
     }
+    const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
 
+    const result = db.query.tasks.findMany({
+      where: and(...conditions),
+      orderBy: filters.sortBy
+        ? [filters.sortOrder === "desc" ? desc(tasks[filters.sortBy]) : asc(tasks[filters.sortBy])]
+        : [desc(tasks.createdAt)],
+    });
 
-    if (filters.dueDate) {
-      if (filters.dueDate === "null") {
-        conditions.push(isNull(tasks.dueDate));
-      } else if (filters.dueDate === "not-null") {
-        conditions.push(isNotNull(tasks.dueDate));
-      } else {
-        try {
-          const dateObj = new Date(filters.dueDate);
-          conditions.push(eq(tasks.dueDate, dateObj));
-        } catch (error) {
-          throw new ApiError(httpStatus.BAD_REQUEST, "Invalid date format");
-        }
-      }
-    }
-
-    const baseQuery = db
-      .select({
-        id: tasks.id,
-        userId: tasks.userId,
-        title: tasks.title,
-        completed: tasks.completed,
-        pinned: tasks.pinned,
-        dueDate: tasks.dueDate,
-        categoryId: tasks.categoryId,
-        providerId: tasks.providerId,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-        category: categories,
-        provider: providers,
-      })
-      .from(tasks)
-      .leftJoin(categories, eq(tasks.categoryId, categories.id))
-      .leftJoin(providers, eq(tasks.providerId, providers.id))
-      .where(and(...conditions));
-
-    if (filters.sortBy) {
-      const orderFn = filters.sortOrder === "desc" ? desc : asc;
-      let orderColumn;
-
-      switch (filters.sortBy) {
-        case "title":
-          orderColumn = tasks.title;
-          break;
-        case "dueDate":
-          orderColumn = tasks.dueDate;
-          break;
-        case "completed":
-          orderColumn = tasks.completed;
-          break;
-        case "createdAt":
-          orderColumn = tasks.createdAt;
-          break;
-        default:
-          orderColumn = tasks.createdAt;
-      }
-
-      return await baseQuery.orderBy(orderFn(orderColumn));
-    } else {
-      return await baseQuery.orderBy(desc(tasks.createdAt));
-    }
+    return result;
   },
 
   /**
    * Get a specific task by ID
    */
-  async getTaskById(userId: string, taskId: string): Promise<TaskWithRelations> {
-    const task = await db
-      .select({
-        id: tasks.id,
-        userId: tasks.userId,
-        title: tasks.title,
-        completed: tasks.completed,
-        pinned: tasks.pinned,
-        dueDate: tasks.dueDate,
-        categoryId: tasks.categoryId,
-        providerId: tasks.providerId,
-        createdAt: tasks.createdAt,
-        updatedAt: tasks.updatedAt,
-        category: categories,
-        provider: providers,
-      })
-      .from(tasks)
-      .leftJoin(categories, eq(tasks.categoryId, categories.id))
-      .leftJoin(providers, eq(tasks.providerId, providers.id))
-      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+  async getTaskById(userId: string, taskId: string): Promise<Task> {
+    const task = await db.query.tasks.findFirst(
+      {
+        where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
+      }
+    )
 
-    if (!task.length) {
+    if (!task) {
       throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
     }
 
-    return task[0];
+    return task;
   },
 
 
@@ -171,7 +102,7 @@ export const tasksService = {
         .from(providers)
         .where(eq(providers.name, "meelio"))
         .limit(1);
-      
+
       if (meelioProvider) {
         insertData.providerId = meelioProvider.id;
       }

@@ -84,31 +84,31 @@ async function main() {
     const hashedPassword =
       "$2a$08$1DdxLqST2pLfpcdOZZ.eRuWJ1H/DGD33e8RK5jilXHUICxPXsnJIK"; // securePassword123
 
-    await seed(db, schema).refine((funcs) => ({
-      users: {
-        count: NUMBER_OF_USERS,
-        columns: {
-          name: funcs.fullName(),
-          email: funcs.weightedRandom([
-            {
-              value: funcs.default({ defaultValue: "admin@tallymatic.com" }),
-              weight: 1,
-            },
-            {
-              value: funcs.email(),
-              weight: 0,
-            },
-          ]),
-          password: funcs.default({ defaultValue: hashedPassword }),
-          isEmailVerified: funcs.boolean(),
-          role: funcs.valuesFromArray({ values: ["user"] }),
-          createdAt: funcs.date({
-            minDate: "2023-01-01",
-            maxDate: "2024-12-16",
-          }),
-        },
-      },
-    }));
+    // await seed(db, schema).refine((funcs) => ({
+    //   users: {
+    //     count: NUMBER_OF_USERS,
+    //     columns: {
+    //       name: funcs.fullName(),
+    //       email: funcs.weightedRandom([
+    //         {
+    //           value: funcs.default({ defaultValue: "admin@tallymatic.com" }),
+    //           weight: 1,
+    //         },
+    //         {
+    //           value: funcs.email(),
+    //           weight: 0,
+    //         },
+    //       ]),
+    //       password: funcs.default({ defaultValue: hashedPassword }),
+    //       isEmailVerified: funcs.boolean(),
+    //       role: funcs.valuesFromArray({ values: ["user"] }),
+    //       createdAt: funcs.date({
+    //         minDate: "2023-01-01",
+    //         maxDate: "2024-12-16",
+    //       }),
+    //     },
+    //   },
+    // }));
 
     const seededUsers = await db.select().from(users);
     console.log("✅ Users seeded:", seededUsers.length);
