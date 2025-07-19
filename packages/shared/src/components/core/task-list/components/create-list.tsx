@@ -22,7 +22,9 @@ import { useTranslation } from "react-i18next";
 import { useTaskStore } from "../../../../stores/task.store";
 import { useAuthStore } from "../../../../stores/auth.store";
 import { useCategoryStore } from "../../../../stores/category.store";
+import { useSyncStore } from "../../../../stores/sync.store";
 import { PremiumFeature } from "../../../common/premium-feature";
+import { toast } from "sonner";
 
 import { useShallow } from "zustand/shallow";
 import {
@@ -88,8 +90,16 @@ export function CreateList({ children }: CreateListProps) {
   const freeListLimit = 0;
   const canCreateMoreLists = user?.isPro || customListCount < freeListLimit;
 
+  const syncStore = useSyncStore();
+  const isOnline = syncStore.isOnline;
+
   const handleCreate = async () => {
     if (!name.trim()) return;
+
+    if (!isOnline) {
+      toast.error("You can't create categories in offline mode");
+      return;
+    }
 
     try {
       // Create category on backend
@@ -109,7 +119,7 @@ export function CreateList({ children }: CreateListProps) {
       setOpen(false);
     } catch (error) {
       console.error("Failed to create category:", error);
-      // TODO: Show error toast
+      toast.error("Failed to create category");
     }
   };
 
