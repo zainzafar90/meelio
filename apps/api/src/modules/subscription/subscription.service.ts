@@ -4,7 +4,7 @@ import {
   subscriptions,
   SubscriptionInsert,
 } from "@/db/schema/subscription.schema";
-import { eq } from "drizzle-orm";
+import { eq, or, and, desc } from "drizzle-orm";
 
 const addOrUpdateSubscription = async (
   subscriptionObj: SubscriptionObject,
@@ -100,7 +100,57 @@ const getSubscriptionById = async (id: string) => {
   return subscription as ISubscription;
 };
 
+const getSubscriptionByEmail = async (email: string) => {
+  const allSubscriptions = await db.query.subscriptions.findMany({
+    where: and(
+      eq(subscriptions.email, email),
+      or(
+        eq(subscriptions.status, 'active'),
+        eq(subscriptions.status, 'on_trial'),
+        eq(subscriptions.status, 'past_due'),
+        eq(subscriptions.status, 'paused'),
+        eq(subscriptions.status, 'cancelled'),
+      )
+    ),
+    orderBy: desc(subscriptions.createdAt),
+  });
+
+  if (!allSubscriptions || allSubscriptions.length === 0) {
+    return null;
+  }
+
+  const activeSubscription = allSubscriptions.find(sub => sub.status === 'active');
+  if (activeSubscription) {
+    return activeSubscription as ISubscription;
+  }
+
+  const trialSubscription = allSubscriptions.find(sub => sub.status === 'on_trial');
+  if (trialSubscription) {
+    return trialSubscription as ISubscription;
+  }
+
+  const pastDueOrPausedSubscription = allSubscriptions.find(
+    sub => sub.status === 'past_due' || sub.status === 'paused'
+  );
+  if (pastDueOrPausedSubscription) {
+    return pastDueOrPausedSubscription as ISubscription;
+  }
+
+  // Check for cancelled subscriptions that haven't expired yet
+  const validCancelledSubscription = allSubscriptions.find(
+    sub => sub.status === 'cancelled' &&
+      sub.endsAt &&
+      sub.endsAt > new Date()
+  );
+  if (validCancelledSubscription) {
+    return validCancelledSubscription as ISubscription;
+  }
+
+  return null;
+};
+
 export const subscriptionService = {
   addOrUpdateSubscription,
   getSubscriptionById,
+  getSubscriptionByEmail,
 };
