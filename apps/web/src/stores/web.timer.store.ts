@@ -1,9 +1,15 @@
 import { createTimerStore } from "@repo/shared";
 import TimerWorker from "../workers/timer-worker?worker";
 
+interface TimerMessage {
+  type: string;
+  duration?: number;
+  remaining?: number;
+}
+
 class WebTimerPlatform {
   private worker: Worker | null = null;
-  private listeners: Set<(message: any) => void> = new Set();
+  private listeners: Set<(message: TimerMessage) => void> = new Set();
 
   constructor() {
     this.initWorker();
@@ -16,7 +22,7 @@ class WebTimerPlatform {
     };
   }
 
-  sendMessage(message: any): void {
+  sendMessage(message: TimerMessage): void {
     const workerMessage = {
       type: message.type,
       payload: {
@@ -27,7 +33,7 @@ class WebTimerPlatform {
     this.worker?.postMessage(workerMessage);
   }
 
-  onMessage(callback: (message: any) => void): () => void {
+  onMessage(callback: (message: TimerMessage) => void): () => void {
     this.listeners.add(callback);
     return () => this.listeners.delete(callback);
   }

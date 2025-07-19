@@ -29,19 +29,20 @@ const useBackgroundMessages = (
 ) => {
   useEffect(() => {
     // Listen to web worker messages through the platform
-    const cleanup = webTimerPlatform.onMessage((msg: any) => {
+    const cleanup = webTimerPlatform.onMessage((msg: { type: string; remaining?: number }) => {
       switch (msg.type) {
         case "TICK":
-          updateRemaining(msg.remaining);
+          updateRemaining(msg.remaining || 0);
           break;
         case "STAGE_COMPLETE":
           completeStage();
           if (!getLimitStatus().isLimitReached) start();
           break;
         case "PAUSED":
-          updateRemaining(msg.remaining);
+          // Worker paused, remaining is in msg.remaining
           break;
         case "RESET_COMPLETE":
+          // Worker reset complete
           updateRemaining(durations[stage]);
           break;
       }

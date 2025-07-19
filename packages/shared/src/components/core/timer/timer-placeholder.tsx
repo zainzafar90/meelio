@@ -42,7 +42,7 @@ export const TimerPlaceholder = ({
 
         {/* Timer Display */}
         <div className="text-center space-y-4">
-          <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+          <div className="font-bold tracking-normal overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontSize: 'clamp(2.5rem, 8vw, 6rem)' }}>
             <TimerSkeletonDisplay />
           </div>
           <div className="flex flex-col items-center gap-1 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
