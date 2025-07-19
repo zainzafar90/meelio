@@ -618,6 +618,14 @@ export const useTaskStore = create<TaskState>()(
   }))
 );
 
+/**
+  * ╔═══════════════════════════════════════════════════════════════════════╗
+  * ║                    Handle Online Status Changes                       ║
+  * ╠═══════════════════════════════════════════════════════════════════════╣
+  * ║  Triggers sync queue processing when transitioning from offline       ║
+  * ║  to online. Ensures no concurrent syncs are running.                  ║
+  * ╚═══════════════════════════════════════════════════════════════════════╝
+***/
 let isSyncingOnReconnect = false;
 
 const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
