@@ -17,7 +17,7 @@ export interface SyncOperation {
   retries: number;
 }
 
-interface SyncState {
+export interface SyncState {
   queues: Record<string, SyncOperation[]>;
   isOnline: boolean;
   syncingEntities: Set<string>;
@@ -132,14 +132,9 @@ export const useSyncStore = create<SyncState>()(
   )
 );
 
-/**
- * Listen for online/offline events
- */
 if (typeof window !== "undefined") {
   window.addEventListener("online", () => {
     useSyncStore.getState().setOnlineStatus(true);
-    // Trigger sync processing when coming back online
-    // This will be handled by each entity's store that listens to online status
   });
 
   window.addEventListener("offline", () => {

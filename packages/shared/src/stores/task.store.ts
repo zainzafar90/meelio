@@ -4,7 +4,7 @@ import { taskApi } from "../api/task.api";
 import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
-import { useSyncStore } from "./sync.store";
+import { SyncState, useSyncStore } from "./sync.store";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -56,13 +56,13 @@ interface TaskState {
 let isProcessingSyncQueue = false;
 
 async function processSyncQueue() {
-  // Prevent concurrent sync operations
   if (isProcessingSyncQueue) return;
-  
+
   const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("task");
+  const shouldSync = queue.length > 0 && syncStore.isOnline;
 
-  if (queue.length === 0 || !syncStore.isOnline) return;
+  if (!shouldSync) return;
 
   isProcessingSyncQueue = true;
   syncStore.setSyncing("task", true);
@@ -113,7 +113,9 @@ async function processSyncQueue() {
     } catch (error) {
       console.error("Sync operation failed:", error);
 
-      if (operation.retries >= 3) {
+      const hasExceededRetryLimit = operation.retries >= 3;
+
+      if (hasExceededRetryLimit) {
         syncStore.removeFromQueue("task", operation.id);
       } else {
         syncStore.incrementRetry("task", operation.id);
@@ -616,24 +618,20 @@ export const useTaskStore = create<TaskState>()(
   }))
 );
 
-// Track sync state for reconnection
 let isSyncingOnReconnect = false;
 
-useSyncStore.subscribe((state, prevState) => {
-  const isOnline = state.isOnline;
-  const wasOnline = prevState.isOnline;
-  
-  // Only process sync queue when transitioning from offline to online
-  if (isOnline && !wasOnline && !isSyncingOnReconnect) {
-    const authState = useAuthStore.getState();
-    if (authState.user) {
-      // Prevent multiple concurrent syncs
-      isSyncingOnReconnect = true;
-      // Process sync queue when coming back online
-      processSyncQueue().finally(() => {
-        isSyncingOnReconnect = false;
-      });
-    }
+const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
+  const justCameOnline = state.isOnline && !prevState.isOnline;
+  const isAuthenticated = useAuthStore.getState().user;
+  const canSync = justCameOnline && isAuthenticated && !isSyncingOnReconnect;
+
+  if (canSync) {
+    isSyncingOnReconnect = true;
+    processSyncQueue().finally(() => {
+      isSyncingOnReconnect = false;
+    });
   }
-});
+};
+
+useSyncStore.subscribe(handleOnlineStatusChange);
 
