@@ -208,14 +208,16 @@ export const useTaskStore = create<TaskState>()(
           error: null,
         }));
 
-        if (user && syncStore.isOnline) {
+        if (user) {
           syncStore.addToQueue("task", {
             type: "create",
             entityId: newTask.id,
             data: newTask,
           });
 
-          processSyncQueue();
+          if (syncStore.isOnline) {
+            processSyncQueue();
+          }
         }
       } catch (error) {
         set({
