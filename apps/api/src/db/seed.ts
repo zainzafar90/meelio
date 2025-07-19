@@ -8,7 +8,6 @@ import { users } from "./schema/user.schema";
 import { providers } from "./schema/provider.schema";
 import { categories } from "./schema/category.schema";
 
-// Load environment variables
 config();
 
 if (!process.env.DB_URL) {
@@ -23,7 +22,6 @@ const pool = new Pool({
 
 const schema = {
   users,
-  // Don't include providers and categories in automatic seeding
 };
 
 const db = drizzle(pool, {
@@ -38,14 +36,14 @@ async function main() {
   try {
     console.log("🌱 Starting seed process...");
 
-    await cleanupDatabase(db);
+    // await cleanupDatabase(db);
 
     console.log("🌱 Seeding Initiated...");
 
     const defaultProviders = [
-      { 
-        name: "meelio", 
-        displayName: "Meelio", 
+      {
+        name: "meelio",
+        displayName: "Meelio",
         enabled: true,
         clientId: "",
         clientSecret: "",
@@ -54,9 +52,9 @@ async function main() {
         tokenUrl: "",
         userInfoUrl: "",
       },
-      { 
-        name: "googletasks", 
-        displayName: "Google Tasks", 
+      {
+        name: "googletasks",
+        displayName: "Google Tasks",
         enabled: false,
         clientId: "",
         clientSecret: "",
@@ -65,9 +63,9 @@ async function main() {
         tokenUrl: "https://oauth2.googleapis.com/token",
         userInfoUrl: "https://www.googleapis.com/oauth2/v2/userinfo",
       },
-      { 
-        name: "todoist", 
-        displayName: "Todoist", 
+      {
+        name: "todoist",
+        displayName: "Todoist",
         enabled: false,
         clientId: "",
         clientSecret: "",
@@ -115,10 +113,7 @@ async function main() {
     const seededUsers = await db.select().from(users);
     console.log("✅ Users seeded:", seededUsers.length);
 
-    // Seed system categories (available to all users)
     const systemCategories = [
-      { userId: null, name: "Personal", icon: "👤", type: "system" },
-      { userId: null, name: "Work", icon: "💼", type: "system" },
       { userId: null, name: "Inbox", icon: "📥", type: "system" },
     ];
 
@@ -142,34 +137,34 @@ main().catch((err) => {
   process.exit(1);
 });
 
-async function cleanupDatabase(db: any) {
-  console.log("🗑️  Cleaning up existing data...");
+// async function cleanupDatabase(db: any) {
+//   console.log("🗑️  Cleaning up existing data...");
 
-  const tables = [
-    { name: "users", schema: users },
-    { name: "providers", schema: providers },
-    { name: "categories", schema: categories },
-  ];
+//   const tables = [
+//     { name: "users", schema: users },
+//     { name: "providers", schema: providers },
+//     { name: "categories", schema: categories },
+//   ];
 
-  try {
-    await db.execute(sql`SET session_replication_role = 'replica'`);
+//   try {
+//     await db.execute(sql`SET session_replication_role = 'replica'`);
 
-    for (const table of tables) {
-      try {
-        await db.execute(
-          sql.raw(`TRUNCATE TABLE "${table.name}" RESTART IDENTITY CASCADE`)
-        );
-        console.log(`✓ Cleaned ${table.name}`);
-      } catch (error) {
-        console.log(`ℹ️ Skipping ${table.name} - ${(error as Error).message}`);
-      }
-    }
+//     for (const table of tables) {
+//       try {
+//         await db.execute(
+//           sql.raw(`TRUNCATE TABLE "${table.name}" RESTART IDENTITY CASCADE`)
+//         );
+//         console.log(`✓ Cleaned ${table.name}`);
+//       } catch (error) {
+//         console.log(`ℹ️ Skipping ${table.name} - ${(error as Error).message}`);
+//       }
+//     }
 
-    await db.execute(sql`SET session_replication_role = 'origin'`);
+//     await db.execute(sql`SET session_replication_role = 'origin'`);
 
-    console.log("✨ Database cleaned");
-  } catch (error) {
-    console.error("Error during cleanup:", error);
-    throw error;
-  }
-}
+//     console.log("✨ Database cleaned");
+//   } catch (error) {
+//     console.error("Error during cleanup:", error);
+//     throw error;
+//   }
+// }
