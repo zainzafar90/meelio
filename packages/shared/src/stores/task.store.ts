@@ -84,6 +84,15 @@ async function processSyncQueue() {
               id: created.id,
               completed: operation.data.completed || false
             });
+
+            // Update React state with the new server-generated ID
+            useTaskStore.setState((state) => ({
+              tasks: state.tasks.map((task) =>
+                task.id === operation.entityId
+                  ? { ...task, id: created.id, completed: operation.data.completed || false }
+                  : task
+              ),
+            }));
           }
           break;
 
@@ -98,6 +107,17 @@ async function processSyncQueue() {
               id: updated.id,
               completed: operation.data.completed !== undefined ? operation.data.completed : updated.completed
             });
+
+            // Update React state if the ID changed (unlikely but safe)
+            if (updated.id !== operation.entityId) {
+              useTaskStore.setState((state) => ({
+                tasks: state.tasks.map((task) =>
+                  task.id === operation.entityId
+                    ? { ...task, ...updated }
+                    : task
+                ),
+              }));
+            }
           }
           break;
 
