@@ -4,17 +4,19 @@ import { Task } from "../lib/db/models.dexie";
 export interface CreateTaskDto {
   title: string;
   completed?: boolean;
-  category?: string;
   dueDate?: string;
   pinned?: boolean;
+  categoryId?: string;
+  providerId?: string;
 }
 
 export interface UpdateTaskDto {
   title?: string;
   completed?: boolean;
-  category?: string;
   dueDate?: string;
   pinned?: boolean;
+  categoryId?: string;
+  providerId?: string;
 }
 
 export const taskApi = {
@@ -24,19 +26,6 @@ export const taskApi = {
     return response.data;
   },
 
-  // Get tasks by category
-  async getTasksByCategory(category: string): Promise<Task[]> {
-    const response = await axios.get("/v1/tasks", {
-      params: { category }
-    });
-    return response.data;
-  },
-
-  // Get all categories
-  async getCategories(): Promise<string[]> {
-    const response = await axios.get("/v1/tasks/categories");
-    return response.data;
-  },
 
   // Create a new task
   async createTask(task: CreateTaskDto): Promise<Task> {
@@ -53,10 +42,5 @@ export const taskApi = {
   // Delete a task
   async deleteTask(id: string): Promise<void> {
     await axios.delete(`/v1/tasks/${id}`);
-  },
-
-  // Delete all tasks in a category
-  async deleteTasksByCategory(category: string): Promise<void> {
-    await axios.delete(`/v1/tasks/category/${category}`);
   }
 };

@@ -1,12 +1,12 @@
 import { db } from "@/db";
-import { Task, tasks } from "@/db/schema";
-import { eq, and, desc, asc, isNull, isNotNull } from "drizzle-orm";
+import { Task, tasks, providers, } from "@/db/schema";
+import { eq, and, desc, asc, } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
+
 interface TaskFilters {
   completed?: boolean;
-  category?: string;
   dueDate?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
@@ -16,9 +16,10 @@ interface TaskUpdateData {
   title?: string;
   completed?: boolean;
   pinned?: boolean;
-  category?: string | null;
   dueDate?: string | number | null;
   updatedAt?: Date;
+  categoryId?: string | null;
+  providerId?: string | null;
 }
 
 export const tasksService = {
@@ -26,93 +27,41 @@ export const tasksService = {
    * Get tasks for a user with optional filters
    */
   async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
-    const conditions = [eq(tasks.userId, userId)];
-
-    if (filters.completed !== undefined) {
-      conditions.push(eq(tasks.completed, filters.completed));
+    const defaultProvider = await db.query.providers.findFirst({
+      where: eq(providers.name, "meelio"),
+    });
+    if (!defaultProvider) {
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Default provider not found");
     }
+    const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
 
-    if (filters.category) {
-      conditions.push(eq(tasks.category, filters.category));
-    }
+    const result = db.query.tasks.findMany({
+      where: and(...conditions),
+      orderBy: filters.sortBy
+        ? [filters.sortOrder === "desc" ? desc(tasks[filters.sortBy]) : asc(tasks[filters.sortBy])]
+        : [desc(tasks.createdAt)],
+    });
 
-    if (filters.dueDate) {
-      if (filters.dueDate === "null") {
-        conditions.push(isNull(tasks.dueDate));
-      } else if (filters.dueDate === "not-null") {
-        conditions.push(isNotNull(tasks.dueDate));
-      } else {
-        try {
-          const dateObj = new Date(filters.dueDate);
-          conditions.push(eq(tasks.dueDate, dateObj));
-        } catch (error) {
-          throw new ApiError(httpStatus.BAD_REQUEST, "Invalid date format");
-        }
-      }
-    }
-
-    const baseQuery = db
-      .select()
-      .from(tasks)
-      .where(and(...conditions));
-
-    if (filters.sortBy) {
-      const orderFn = filters.sortOrder === "desc" ? desc : asc;
-      let orderColumn;
-
-      switch (filters.sortBy) {
-        case "title":
-          orderColumn = tasks.title;
-          break;
-        case "dueDate":
-          orderColumn = tasks.dueDate;
-          break;
-        case "completed":
-          orderColumn = tasks.completed;
-          break;
-        case "category":
-          orderColumn = tasks.category;
-          break;
-        case "createdAt":
-          orderColumn = tasks.createdAt;
-          break;
-        default:
-          orderColumn = tasks.createdAt;
-      }
-
-      return await baseQuery.orderBy(orderFn(orderColumn));
-    } else {
-      return await baseQuery.orderBy(desc(tasks.createdAt));
-    }
+    return result;
   },
 
   /**
    * Get a specific task by ID
    */
   async getTaskById(userId: string, taskId: string): Promise<Task> {
-    const task = await db
-      .select()
-      .from(tasks)
-      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+    const task = await db.query.tasks.findFirst(
+      {
+        where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
+      }
+    )
 
-    if (!task.length) {
+    if (!task) {
       throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
     }
 
-    return task[0];
+    return task;
   },
 
-  /**
-   * Get task categories for a user
-   */
-  async getCategories(userId: string): Promise<string[]> {
-    const result = await db
-      .selectDistinct({ category: tasks.category })
-      .from(tasks)
-      .where(and(eq(tasks.userId, userId), isNotNull(tasks.category)));
-
-    return result.map((r) => r.category).filter((c): c is string => c !== null);
-  },
 
   /**
    * Create a new task
@@ -131,12 +80,32 @@ export const tasksService = {
       title: taskData.title,
       completed: taskData.completed ?? false,
       pinned: taskData.pinned ?? false,
-      category: taskData.category ?? null,
     };
 
     // Only include dueDate if it's explicitly set
     if (parsedDueDate !== undefined) {
       insertData.dueDate = parsedDueDate;
+    }
+
+    // Handle categoryId
+    if (taskData.categoryId !== undefined) {
+      insertData.categoryId = taskData.categoryId;
+    }
+
+    // Handle providerId - if not provided, use default "meelio" provider
+    if (taskData.providerId !== undefined) {
+      insertData.providerId = taskData.providerId;
+    } else {
+      // Get the default "meelio" provider
+      const [meelioProvider] = await db
+        .select()
+        .from(providers)
+        .where(eq(providers.name, "meelio"))
+        .limit(1);
+
+      if (meelioProvider) {
+        insertData.providerId = meelioProvider.id;
+      }
     }
 
     // Handle pinned task logic
@@ -210,9 +179,6 @@ export const tasksService = {
       data.pinned = updateData.pinned;
     }
 
-    if (updateData.category !== undefined) {
-      data.category = updateData.category;
-    }
 
     if (updateData.updatedAt !== undefined) {
       data.updatedAt = updateData.updatedAt;
@@ -224,6 +190,14 @@ export const tasksService = {
       if (parsedDate !== undefined) {
         data.dueDate = parsedDate;
       }
+    }
+
+    if (updateData.categoryId !== undefined) {
+      data.categoryId = updateData.categoryId;
+    }
+
+    if (updateData.providerId !== undefined) {
+      data.providerId = updateData.providerId;
     }
 
     delete data.updatedAt;
@@ -286,12 +260,4 @@ export const tasksService = {
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 
-  /**
-   * Delete all tasks for a user in a category
-   */
-  async deleteTasksByCategory(userId: string, category: string): Promise<void> {
-    await db
-      .delete(tasks)
-      .where(and(eq(tasks.userId, userId), eq(tasks.category, category)));
-  },
 };

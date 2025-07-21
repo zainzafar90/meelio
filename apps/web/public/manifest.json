@@ -2,19 +2,31 @@
   "manifest_version": 3,
   "name": "Meelio",
   "short_name": "Meelio",
-  "version": "0.5.0",
+  "version": "0.5.5",
   "description": "Find your focus & calm with enhanced soundscapes. Meelio's tools fuel productivity and relaxation",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": ["storage", "cookies"],
+  "permissions": [
+    "storage",
+    "cookies"
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["*.js", "*.css", "*.html", "assets/*"],
-      "matches": ["https://*.meelio.io/*"]
+      "resources": [
+        "*.js",
+        "*.css",
+        "*.html",
+        "assets/*"
+      ],
+      "matches": [
+        "https://*.meelio.io/*"
+      ]
     }
   ],
-  "host_permissions": ["https://*.meelio.io/*"],
+  "host_permissions": [
+    "https://*.meelio.io/*"
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
   },

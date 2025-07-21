@@ -10,11 +10,10 @@ export const tasksController = {
    */
   getTasks: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { completed, category, dueDate, sortBy, sortOrder } = req.query;
+    const { completed, dueDate, sortBy, sortOrder } = req.query;
 
     const filters = {
       completed: completed === "true" ? true : completed === "false" ? false : undefined,
-      category: category as string,
       dueDate: dueDate as string,
       sortBy: sortBy as string,
       sortOrder: sortOrder as "asc" | "desc",
@@ -35,15 +34,6 @@ export const tasksController = {
     return res.status(httpStatus.OK).json(task);
   }),
 
-  /**
-   * Get task categories
-   */
-  getCategories: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-
-    const categories = await tasksService.getCategories(user.id);
-    return res.status(httpStatus.OK).json(categories);
-  }),
 
   /**
    * Create a new task
@@ -79,14 +69,4 @@ export const tasksController = {
     return res.status(httpStatus.NO_CONTENT).send();
   }),
 
-  /**
-   * Delete all tasks in a category
-   */
-  deleteTasksByCategory: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const { category } = req.params;
-
-    await tasksService.deleteTasksByCategory(user.id, category);
-    return res.status(httpStatus.NO_CONTENT).send();
-  }),
 };

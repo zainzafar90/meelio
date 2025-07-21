@@ -25,8 +25,20 @@ export interface Task {
   title: string;
   completed: boolean;
   pinned: boolean;
-  category?: string;
   dueDate?: string;
+  categoryId?: string;
+  providerId?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+// Add Category model
+export interface Category {
+  id: string;
+  userId: string | null;
+  name: string;
+  icon?: string;
+  type: "system" | "user";
   createdAt: number;
   updatedAt: number;
 }

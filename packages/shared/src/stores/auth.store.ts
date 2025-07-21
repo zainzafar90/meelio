@@ -4,6 +4,7 @@ import { AuthUser } from "../types";
 import { GuestUser } from "../types";
 import { createJSONStorage, persist } from "zustand/middleware";
 // import { useBackgroundStore } from "./background.store";
+import { useCategoryStore } from "./category.store";
 
 export type AuthState = {
   user: AuthUser | null;
@@ -37,8 +38,14 @@ export const useAuthStore = create<AuthState>()(
           guestUser: user,
           loading: false,
         })),
-      logout: () => set(() => ({ user: null, guestUser: null })),
-      logoutUser: () => set(() => ({ user: null })),
+      logout: () => {
+        useCategoryStore.getState().reset();
+        set(() => ({ user: null, guestUser: null }));
+      },
+      logoutUser: () => {
+        useCategoryStore.getState().reset();
+        set(() => ({ user: null }));
+      },
     }),
     {
       name: "meelio:local:user",

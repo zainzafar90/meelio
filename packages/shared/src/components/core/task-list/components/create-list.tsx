@@ -11,20 +11,22 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-// import {
-//   Popover,
-//   PopoverContent,
-//   PopoverTrigger,
-// } from "@repo/ui/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components/ui/popover";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTaskStore } from "../../../../stores/task.store";
 import { useAuthStore } from "../../../../stores/auth.store";
+import { useCategoryStore } from "../../../../stores/category.store";
+import { useSyncStore } from "../../../../stores/sync.store";
 import { PremiumFeature } from "../../../common/premium-feature";
+import { toast } from "sonner";
 
 import { useShallow } from "zustand/shallow";
-import { generateUUID } from "../../../../utils";
 import {
   Tooltip,
   TooltipContent,
@@ -64,11 +66,11 @@ export function CreateList({ children }: CreateListProps) {
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { t } = useTranslation();
 
-  const { lists, addList, setActiveList } = useTaskStore(
+  const { lists, setActiveList, loadCategoriesAsLists } = useTaskStore(
     useShallow((state) => ({
       lists: state.lists,
-      addList: state.addList,
       setActiveList: state.setActiveList,
+      loadCategoriesAsLists: state.loadCategoriesAsLists,
     }))
   );
 
@@ -78,27 +80,47 @@ export function CreateList({ children }: CreateListProps) {
     }))
   );
 
+  const { createCategory } = useCategoryStore(
+    useShallow((state) => ({
+      createCategory: state.createCategory,
+    }))
+  );
+
   const customListCount = lists.filter((list) => list.type === "custom").length;
   const freeListLimit = 0;
   const canCreateMoreLists = user?.isPro || customListCount < freeListLimit;
 
-  const handleCreate = () => {
+  const syncStore = useSyncStore();
+  const isOnline = syncStore.isOnline;
+
+  const handleCreate = async () => {
     if (!name.trim()) return;
 
-    const newListId = generateUUID();
+    if (!isOnline) {
+      toast.error("You can't create categories in offline mode");
+      return;
+    }
 
-    addList({
-      id: newListId,
-      name: name.trim(),
-      type: "custom",
-      emoji: selectedEmoji,
-    });
+    try {
+      // Create category on backend
+      const category = await createCategory({
+        name: name.trim(),
+        icon: selectedEmoji,
+      });
 
-    setActiveList(newListId);
+      // Reload categories as lists in task store
+      await loadCategoriesAsLists();
 
-    setName("");
-    setSelectedEmoji("📝");
-    setOpen(false);
+      // Set the new category as active
+      setActiveList(category.id);
+
+      setName("");
+      setSelectedEmoji("📝");
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to create category:", error);
+      toast.error("Failed to create category");
+    }
   };
 
   if (!canCreateMoreLists) {
@@ -128,9 +150,9 @@ export function CreateList({ children }: CreateListProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("tasks.list.create.title")}</DialogTitle>
+          <DialogTitle>Create Category</DialogTitle>
           <DialogDescription>
-            {t("tasks.list.create.description")}
+            Create a new category to organize your tasks
           </DialogDescription>
         </DialogHeader>
 
@@ -140,13 +162,12 @@ export function CreateList({ children }: CreateListProps) {
               {t("tasks.list.create.emoji.label")}
             </Label>
 
-            {/* <Popover>
+            <Popover>
               <PopoverTrigger asChild>
                 <Button
                   id="emoji"
                   variant="outline"
                   className="w-[60px] text-lg"
-                  disabled={true}
                   aria-label={t("tasks.list.create.emoji.selected", {
                     emoji: selectedEmoji,
                   })}
@@ -169,19 +190,9 @@ export function CreateList({ children }: CreateListProps) {
                   ))}
                 </div>
               </PopoverContent>
-            </Popover> */}
+            </Popover> 
 
             <div className="flex w-full items-center gap-2">
-              <Button
-                id="emoji"
-                variant="outline"
-                className="w-[40px] text-lg"
-                aria-label={t("tasks.list.create.emoji.selected", {
-                  emoji: selectedEmoji,
-                })}
-              >
-                {selectedEmoji}
-              </Button>
               <Label htmlFor="name" className="sr-only">
                 {t("tasks.list.create.name.label")}
               </Label>
@@ -197,7 +208,7 @@ export function CreateList({ children }: CreateListProps) {
               onClick={handleCreate}
               disabled={!name.trim()}
             >
-              <Plus className="h-4 w-4" /> {t("tasks.list.create.button")}
+              <Plus className="h-4 w-4" /> Create
             </Button>
           </div>
         </div>

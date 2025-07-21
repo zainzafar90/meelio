@@ -88,9 +88,9 @@ export function TaskListSheet() {
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      if (task.dueDate) {
+      if (task.createdAt || task.dueDate) {
         try {
-          const dueDate = new Date(task.dueDate);
+          const dueDate = new Date(task.dueDate || task.createdAt);
           dueDate.setHours(0, 0, 0, 0);
           const isToday = dueDate.getTime() === today.getTime();
           
@@ -103,7 +103,9 @@ export function TaskListSheet() {
       
       return false;
     }
-    return task.category === activeListId;
+    
+    // If it's not a system list, it's a category - filter by categoryId
+    return task.categoryId === activeListId;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -184,7 +186,7 @@ export function TaskListSheet() {
               </SelectContent>
             </Select>
             <CreateList>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" title={t("tasks.list.create.title")}>
                 <Plus className="h-4 w-4" />
               </Button>
             </CreateList>

@@ -362,7 +362,7 @@ export const Dock = () => {
               if (item.id === "settings") {
                 return (
                   <SidebarTrigger
-                    key={index}
+                    key={item.id}
                     title="Toggle Sidebar"
                     className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                   >
@@ -375,6 +375,7 @@ export const Dock = () => {
               if (item.requirePro) {
                 return (
                   <PremiumFeature
+                  key={item.id}
                     requirePro={item.requirePro}
                     tooltipClassName="top-2 right-2"
                     fallback={
@@ -401,7 +402,7 @@ export const Dock = () => {
 
               return (
                 <button
-                  key={index}
+                  key={item.id}
                   className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                   onClick={item.onClick}
                 >

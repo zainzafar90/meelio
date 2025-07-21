@@ -37,43 +37,6 @@ export function TaskList({
       </div>
     );
 
-  if (activeListId === "all") {
-    const tasksByCategory = tasks.reduce(
-      (acc, task) => {
-        const category = task.category || "No Category";
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(task);
-        return acc;
-      },
-      {} as Record<string, Task[]>
-    );
-
-    return (
-      <div className="mt-4 space-y-8">
-        {Object.entries(tasksByCategory).map(([category, categoryTasks]) => {
-          return (
-            <div key={category} className="space-y-2">
-              <div className="flex items-center justify-between px-2 py-1">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="capitalize">{category}</span>
-                </div>
-                <Badge variant="secondary" className="text-xs">
-                  {categoryTasks.length}
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                {categoryTasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
 
   return (
     <div className="mt-4">
@@ -113,17 +76,24 @@ const TaskItem = ({ task }: { task: Task }) => {
           <span />
         )}
       </button>
-      <div className="flex flex-col gap-1">
-        <span
-          className={cn(
-            "text-sm transition-all duration-200",
-            task.completed && "text-muted-foreground line-through"
-          )}
-        >
-          {task.title}
-        </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              "text-sm transition-all duration-200",
+              task.completed && "text-muted-foreground line-through"
+            )}
+          >
+            {task.title}
+          </span>
+        </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
+       {task.dueDate && (
+          <Badge className="uppercase" variant="secondary">
+            {new Date(task.dueDate).toLocaleDateString()}
+          </Badge>
+        )}
         <button
           className="text-muted-foreground hover:text-yellow-500"
           onClick={(e) => {
@@ -138,11 +108,7 @@ const TaskItem = ({ task }: { task: Task }) => {
             )}
           />
         </button>
-        {task.dueDate && (
-          <Badge className="uppercase" variant="secondary">
-            {new Date(task.dueDate).toLocaleDateString()}
-          </Badge>
-        )}
+       
         <button
           className="invisible text-muted-foreground group-hover:visible"
           onClick={(e) => {

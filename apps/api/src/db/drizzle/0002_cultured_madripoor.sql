@@ -1,1 +1,0 @@
-ALTER TABLE "backgrounds" ADD COLUMN "is_shown" boolean DEFAULT true;

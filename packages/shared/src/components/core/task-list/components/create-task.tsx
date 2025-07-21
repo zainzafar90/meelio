@@ -18,7 +18,7 @@ export function CreateTask() {
   );
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && title.trim()) {
+    if (e.key === "Enter" && title.trim() && activeListId !== "completed") {
       const isSystemList = ["all", "completed", "today"].includes(
         activeListId || ""
       );
@@ -32,27 +32,29 @@ export function CreateTask() {
 
       addTask({
         title: title.trim(),
-        category: isSystemList ? undefined : activeListId,
         dueDate,
       });
       setTitle("");
     }
   };
 
+  const isCompletedTab = activeListId === "completed";
+
   return (
     <div className="flex w-full items-center gap-2 rounded-lg border border-border/10 bg-card/50">
-      <Icons.add className="h-5 w-5 text-muted-foreground" />
+      <Icons.add className={`h-5 w-5 ${isCompletedTab ? "text-muted-foreground/50" : "text-muted-foreground"}`} />
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
         className="border-0 bg-transparent focus-visible:ring-0"
         placeholder={
-          activeListId === "completed"
-            ? t("tasks.list.task.add.completed")
+          isCompletedTab
+            ? "Cannot create tasks in completed view"
             : t("tasks.list.task.add.normal")
         }
-        autoFocus
+        disabled={isCompletedTab}
+        autoFocus={!isCompletedTab}
       />
     </div>
   );

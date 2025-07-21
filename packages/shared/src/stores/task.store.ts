@@ -4,7 +4,8 @@ import { taskApi } from "../api/task.api";
 import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
-import { useSyncStore } from "./sync.store";
+import { SyncState, useSyncStore } from "./sync.store";
+import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
 import { toast } from "sonner";
@@ -16,12 +17,10 @@ export interface TaskListMeta {
   emoji?: string;
 }
 
-const DEFAULT_LISTS: TaskListMeta[] = [
-  { id: "today", name: "Today", type: "system", emoji: "📅" },
+const SYSTEM_LISTS: TaskListMeta[] = [
   { id: "all", name: "All Tasks", type: "system", emoji: "📋" },
+  { id: "today", name: "Today", type: "system", emoji: "📅" },
   { id: "completed", name: "Completed", type: "system", emoji: "✅" },
-  { id: "personal", name: "Personal", type: "custom", emoji: "👤" },
-  { id: "work", name: "Work", type: "custom", emoji: "💼" },
 ];
 
 interface TaskState {
@@ -33,14 +32,14 @@ interface TaskState {
 
   addTask: (task: {
     title: string;
-    category?: string;
     dueDate?: string;
     pinned?: boolean;
+    categoryId?: string;
+    providerId?: string;
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
-  deleteTasksByCategory: (category: string) => Promise<void>;
 
   addList: (list: Omit<TaskListMeta, "id"> & { id?: string }) => Promise<void>;
   deleteList: (listId: string) => void;
@@ -49,16 +48,23 @@ interface TaskState {
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
+  loadCategoriesAsLists: () => Promise<void>;
 
   getNextPinnedTask: () => Task | undefined;
 }
 
+let isProcessingSyncQueue = false;
+
 async function processSyncQueue() {
+  if (isProcessingSyncQueue) return;
+
   const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("task");
+  const shouldSync = queue.length > 0 && syncStore.isOnline;
 
-  if (queue.length === 0 || !syncStore.isOnline) return;
+  if (!shouldSync) return;
 
+  isProcessingSyncQueue = true;
   syncStore.setSyncing("task", true);
 
   for (const operation of queue) {
@@ -68,13 +74,13 @@ async function processSyncQueue() {
           {
             const created = await taskApi.createTask({
               title: operation.data.title,
-              category: operation.data.category,
               completed: operation.data.completed || false,
               dueDate: operation.data.dueDate,
               pinned: operation.data.pinned || false,
+              categoryId: operation.data.categoryId,
             });
-            
-            await db.tasks.update(operation.entityId, { 
+
+            await db.tasks.update(operation.entityId, {
               id: created.id,
               completed: operation.data.completed || false
             });
@@ -87,8 +93,8 @@ async function processSyncQueue() {
               operation.entityId,
               operation.data
             );
-            
-            await db.tasks.update(operation.entityId, { 
+
+            await db.tasks.update(operation.entityId, {
               id: updated.id,
               completed: operation.data.completed !== undefined ? operation.data.completed : updated.completed
             });
@@ -107,7 +113,9 @@ async function processSyncQueue() {
     } catch (error) {
       console.error("Sync operation failed:", error);
 
-      if (operation.retries >= 3) {
+      const hasExceededRetryLimit = operation.retries >= 3;
+
+      if (hasExceededRetryLimit) {
         syncStore.removeFromQueue("task", operation.id);
       } else {
         syncStore.incrementRetry("task", operation.id);
@@ -117,6 +125,7 @@ async function processSyncQueue() {
 
   syncStore.setSyncing("task", false);
   syncStore.setLastSyncTime("task", Date.now());
+  isProcessingSyncQueue = false;
 }
 
 let autoSyncInterval: NodeJS.Timeout | null = null;
@@ -129,9 +138,9 @@ function startAutoSync() {
 
 export const useTaskStore = create<TaskState>()(
   subscribeWithSelector((set, get) => ({
-    lists: DEFAULT_LISTS,
+    lists: SYSTEM_LISTS,
     tasks: [],
-    activeListId: "today",
+    activeListId: "all",
     isLoading: false,
     error: null,
 
@@ -147,22 +156,30 @@ export const useTaskStore = create<TaskState>()(
       }
 
       const syncStore = useSyncStore.getState();
-      
+      const activeListId = get().activeListId;
+
+      // If the active list is a category (not a system list), assign it to the task
+      let categoryId = task.categoryId;
+      if (activeListId && !["all", "today", "completed"].includes(activeListId)) {
+        categoryId = activeListId;
+      }
+
       let normalizedDueDate = task.dueDate;
       if (task.dueDate && new Date(task.dueDate).toDateString() === new Date().toDateString()) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         normalizedDueDate = today.toISOString();
       }
-      
+
       const newTask: Task = {
         id: generateUUID(),
         userId: userId,
         title: task.title,
         completed: false,
         pinned: task.pinned ?? false,
-        category: task.category,
         dueDate: normalizedDueDate,
+        categoryId,
+        providerId: task.providerId, // For now, we'll need to pass this from the backend
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
@@ -200,14 +217,16 @@ export const useTaskStore = create<TaskState>()(
           error: null,
         }));
 
-        if (user && syncStore.isOnline) {
+        if (user) {
           syncStore.addToQueue("task", {
             type: "create",
             entityId: newTask.id,
             data: newTask,
           });
 
-          processSyncQueue();
+          if (syncStore.isOnline) {
+            processSyncQueue();
+          }
         }
       } catch (error) {
         set({
@@ -293,39 +312,6 @@ export const useTaskStore = create<TaskState>()(
       }
     },
 
-    deleteTasksByCategory: async (category) => {
-      const authState = useAuthStore.getState();
-      const user = authState.user;
-      const syncStore = useSyncStore.getState();
-      const tasksToDelete = get().tasks.filter((t) => t.category === category);
-
-      try {
-        await Promise.all(
-          tasksToDelete.map((task) => db.tasks.delete(task.id))
-        );
-
-        set((state) => ({
-          tasks: state.tasks.filter((t) => t.category !== category),
-        }));
-
-        // Only sync for authenticated users
-        if (user) {
-          tasksToDelete.forEach((task) => {
-            syncStore.addToQueue("task", {
-              type: "delete",
-              entityId: task.id,
-            });
-          });
-
-          if (syncStore.isOnline) processSyncQueue();
-        }
-      } catch (error) {
-        set({
-          error:
-            error instanceof Error ? error.message : "Failed to delete tasks",
-        });
-      }
-    },
 
     addList: async (list) => {
       const authState = useAuthStore.getState();
@@ -351,7 +337,6 @@ export const useTaskStore = create<TaskState>()(
           title: `Welcome to ${newList.name}!`,
           completed: false,
           pinned: false,
-          category: newList.id,
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
@@ -425,6 +410,9 @@ export const useTaskStore = create<TaskState>()(
             await get().syncWithServer();
           }
         }
+
+        // Load categories as lists after potential sync
+        await get().loadCategoriesAsLists();
       } catch (error: any) {
         console.error("Failed to initialize task store:", error);
         set({ error: error?.message || "Failed to initialize store" });
@@ -449,71 +437,13 @@ export const useTaskStore = create<TaskState>()(
 
       await Promise.all(
         localTasks.map(async (task) => {
-          if (task.category === "today" && !task.dueDate) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            await db.tasks.update(task.id, {
-              category: undefined,
-              dueDate: today.toISOString(),
-              updatedAt: Date.now(),
-            });
-            task.category = undefined;
-            task.dueDate = today.toISOString();
-          } else if (task.category === "today") {
-            await db.tasks.update(task.id, {
-              category: undefined,
-              updatedAt: Date.now(),
-            });
-            task.category = undefined;
-          }
         })
       );
 
-      const taskCategories = new Set<string>();
-      localTasks.forEach((task) => {
-        if (
-          task.category &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
-        ) {
-          taskCategories.add(task.category);
-        }
-      });
-
-      const categoryListsMap = new Map<
-        string,
-        { list: TaskListMeta; latestTask: number }
-      >();
-
-      localTasks.forEach((task) => {
-        if (
-          task.category &&
-          !DEFAULT_LISTS.some((l) => l.id === task.category)
-        ) {
-          const existing = categoryListsMap.get(task.category.toLowerCase());
-          const taskTime = task.createdAt || 0;
-
-          if (!existing || taskTime > existing.latestTask) {
-            categoryListsMap.set(task.category.toLowerCase(), {
-              list: {
-                id: task.category.toLowerCase(),
-                name: task.category,
-                type: "custom" as const,
-                emoji: "📝",
-              },
-              latestTask: taskTime,
-            });
-          }
-        }
-      });
-
-      const sortedCategoryLists = Array.from(categoryListsMap.values())
-        .sort((a, b) => b.latestTask - a.latestTask)
-        .map((item) => item.list);
 
       set({
         tasks: localTasks,
-        lists: [...DEFAULT_LISTS, ...sortedCategoryLists],
+        lists: SYSTEM_LISTS,
       });
     },
 
@@ -528,10 +458,7 @@ export const useTaskStore = create<TaskState>()(
       try {
         await processSyncQueue();
 
-        const [serverTasks, apiCategories] = await Promise.all([
-          taskApi.getTasks(),
-          taskApi.getCategories(),
-        ]);
+        const serverTasks = await taskApi.getTasks();
 
         const localTasks = await db.tasks
           .where("userId")
@@ -542,7 +469,7 @@ export const useTaskStore = create<TaskState>()(
         const localTasksMap = new Map(localTasks.map(task => [task.id, task]));
 
         const tasksToKeep = localTasks.filter(task => !serverTasksMap.has(task.id));
-        
+
         const mergedServerTasks = serverTasks.map(serverTask => {
           const localTask = localTasksMap.get(serverTask.id);
           if (localTask) {
@@ -554,7 +481,7 @@ export const useTaskStore = create<TaskState>()(
           }
           return serverTask;
         });
-        
+
         const mergedTasks = [...mergedServerTasks, ...tasksToKeep];
 
         await db.transaction("rw", db.tasks, async () => {
@@ -562,20 +489,9 @@ export const useTaskStore = create<TaskState>()(
           await db.tasks.bulkAdd(mergedTasks);
         });
 
-        const categoryLists: TaskListMeta[] = apiCategories
-          .filter(
-            (cat) => !DEFAULT_LISTS.some((l) => l.id === cat.toLowerCase())
-          )
-          .map((cat) => ({
-            id: cat.toLowerCase(),
-            name: cat,
-            type: "custom" as const,
-            emoji: "📝",
-          }));
 
         set({
           tasks: mergedTasks,
-          lists: [...DEFAULT_LISTS, ...categoryLists],
         });
 
         syncStore.setSyncing("task", false);
@@ -659,9 +575,71 @@ export const useTaskStore = create<TaskState>()(
       }
     },
 
+    loadCategoriesAsLists: async () => {
+      try {
+        const authState = useAuthStore.getState();
+        const user = authState.user;
+        const guestUser = authState.guestUser;
+
+        // Only load categories if we have a user (guest or authenticated)
+        if (user || guestUser) {
+          await useCategoryStore.getState().loadCategories();
+          const categories = useCategoryStore.getState().categories;
+
+          const categoryLists: TaskListMeta[] = categories.map(category => ({
+            id: category.id,
+            name: category.name,
+            type: "custom" as const,
+            emoji: category.icon || "🏷️",
+          }));
+
+          set(() => ({
+            lists: [...SYSTEM_LISTS, ...categoryLists]
+          }));
+        } else {
+          // No user, just show system lists
+          set(() => ({
+            lists: SYSTEM_LISTS
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load categories as lists:", error);
+        // Fallback to system lists only
+        set(() => ({
+          lists: SYSTEM_LISTS
+        }));
+      }
+    },
+
     getNextPinnedTask: () => {
       const state = get();
       return state.tasks.find((t) => t.pinned && !t.completed);
     },
   }))
 );
+
+/**
+  * ╔═══════════════════════════════════════════════════════════════════════╗
+  * ║                    Handle Online Status Changes                       ║
+  * ╠═══════════════════════════════════════════════════════════════════════╣
+  * ║  Triggers sync queue processing when transitioning from offline       ║
+  * ║  to online. Ensures no concurrent syncs are running.                  ║
+  * ╚═══════════════════════════════════════════════════════════════════════╝
+***/
+let isSyncingOnReconnect = false;
+
+const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
+  const justCameOnline = state.isOnline && !prevState.isOnline;
+  const isAuthenticated = useAuthStore.getState().user;
+  const canSync = justCameOnline && isAuthenticated && !isSyncingOnReconnect;
+
+  if (canSync) {
+    isSyncingOnReconnect = true;
+    processSyncQueue().finally(() => {
+      isSyncingOnReconnect = false;
+    });
+  }
+};
+
+useSyncStore.subscribe(handleOnlineStatusChange);
+
