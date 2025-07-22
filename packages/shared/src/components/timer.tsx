@@ -2,11 +2,7 @@ import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useTimerStore } from "../stores/timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
-import {
-  TimerStage,
-  TimerEvent,
-  TimerDurations,
-} from "../types/timer.types";
+import { TimerStage, TimerEvent, TimerDurations } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
 import { NextPinnedTask } from "./core/timer/components/timer-next-task";
@@ -25,14 +21,14 @@ const useBackgroundMessages = (
   updateRemaining: (n: number) => void,
   completeStage: () => void,
   start: () => void,
-  getLimitStatus: () => { isLimitReached: boolean }
+  getLimitStatus: () => { isLimitReached: boolean },
 ) => {
   useEffect(() => {
     // Only handle Chrome extension messages here
-    if (typeof chrome === 'undefined' || !chrome.runtime) {
+    if (typeof chrome === "undefined" || !chrome.runtime) {
       return;
     }
-    
+
     const handler = (msg: TimerEvent) => {
       switch (msg.type) {
         case "TICK":
@@ -50,7 +46,7 @@ const useBackgroundMessages = (
           break;
       }
     };
-    
+
     chrome.runtime.onMessage.addListener(handler);
     return () => {
       chrome.runtime.onMessage.removeListener(handler);
@@ -85,7 +81,6 @@ const TimerView = ({
   onStatsClick,
   onSettingsClick,
 }: TimerViewProps) => {
-
   return (
     <div className="relative">
       <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
@@ -203,7 +198,7 @@ const TimerView = ({
                   skip(
                     stage === TimerStage.Focus
                       ? TimerStage.Break
-                      : TimerStage.Focus
+                      : TimerStage.Focus,
                   );
                 }}
                 disabled={limitReached}
@@ -240,14 +235,12 @@ const TimerView = ({
                 aria-valuemax={100}
               />
             </div>
-
           </div>
         </div>
       </div>
     </div>
   );
 };
-
 
 const useTimerState = () => {
   const timerStore = useTimerStore();
@@ -272,9 +265,9 @@ const useTimerState = () => {
       restore: state.restore,
       completeStage: state.completeStage,
       checkDailyReset: state.checkDailyReset,
-    }))
+    })),
   );
-  
+
   const remaining = timerStore(
     useShallow((s) => {
       // When paused, use the stored remaining time
@@ -287,7 +280,7 @@ const useTimerState = () => {
       }
       // Default to stage duration
       return s.durations[s.stage];
-    })
+    }),
   );
 
   useRestoreTimer(store.restore);
@@ -298,7 +291,7 @@ const useTimerState = () => {
     store.updateRemaining,
     store.completeStage,
     store.start,
-    store.getLimitStatus
+    store.getLimitStatus,
   );
 
   useEffect(() => {
@@ -311,17 +304,21 @@ const useTimerState = () => {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
+    soundscapes: boolean;
   }) => {
-    store.updateDurations({ 
-      focus: settings.durations.focusMin * 60, 
-      break: settings.durations.breakMin * 60 
+    store.updateDurations({
+      focus: settings.durations.focusMin * 60,
+      break: settings.durations.breakMin * 60,
     });
-    
+
     if (settings.notifications !== store.settings.notifications) {
       store.toggleNotifications();
     }
     if (settings.sounds !== store.settings.sounds) {
       store.toggleSounds();
+    }
+    if (settings.soundscapes !== store.settings.soundscapes) {
+      store.toggleSoundscapes();
     }
   };
 
@@ -334,6 +331,7 @@ const useTimerState = () => {
     settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
+    soundscapes: store.settings.soundscapes,
   };
 };
 
@@ -371,11 +369,14 @@ export const Timer = () => {
 
       <TimerSettingsDialog
         isOpen={settingsModal.isOpen}
-        onOpenChange={(open) => (open ? settingsModal.open() : settingsModal.close())}
+        onOpenChange={(open) =>
+          open ? settingsModal.open() : settingsModal.close()
+        }
         focusMin={store.durations[TimerStage.Focus] / 60}
         breakMin={store.durations[TimerStage.Break] / 60}
         notifications={notifications}
         sounds={sounds}
+        soundscapes={soundscapes}
         onSave={handleSettingsChange}
       />
     </>
