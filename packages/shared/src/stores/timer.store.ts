@@ -176,17 +176,25 @@ export const createTimerStore = (platform: TimerPlatform) => {
         const updateDurations = (
           d: Partial<{ focus: number; break: number }>
         ) => {
-          set((s) => ({
-            durations: {
-              [TimerStage.Focus]: d.focus ?? s.durations[TimerStage.Focus],
-              [TimerStage.Break]: d.break ?? s.durations[TimerStage.Break],
-            },
-          }));
           const current = get();
-          if (current.isRunning && d[current.stage]) {
+          const newDurations = {
+            [TimerStage.Focus]: d.focus ?? current.durations[TimerStage.Focus],
+            [TimerStage.Break]: d.break ?? current.durations[TimerStage.Break],
+          };
+          
+          set((s) => ({
+            durations: newDurations,
+            // Update prevRemaining if the timer is not running and the current stage's duration was updated
+            prevRemaining: !s.isRunning && d[s.stage] !== undefined 
+              ? newDurations[s.stage] 
+              : s.prevRemaining,
+          }));
+          
+          const updatedState = get();
+          if (updatedState.isRunning && d[updatedState.stage]) {
             deps.postMessage?.({
               type: "UPDATE_DURATION",
-              duration: d[current.stage]!,
+              duration: d[updatedState.stage]!,
             });
           }
         };
