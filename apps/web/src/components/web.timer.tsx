@@ -330,6 +330,7 @@ const useTimerState = () => {
     settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
+    soundscapes: store.settings.soundscapes,
   };
 };
 
@@ -338,11 +339,12 @@ export const WebTimer = () => {
     store,
     remaining,
     limit,
-    handleSettingsChange,
     statsModal,
     settingsModal,
     notifications,
     sounds,
+    soundscapes,
+    handleSettingsChange,
   } = useTimerState();
   return (
     <>
@@ -372,6 +374,7 @@ export const WebTimer = () => {
         breakMin={store.durations[TimerStage.Break] / 60}
         notifications={notifications}
         sounds={sounds}
+        soundscapes={soundscapes}
         onSave={handleSettingsChange}
       />
     </>

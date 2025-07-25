@@ -260,6 +260,7 @@ const useTimerState = () => {
       updateDurations: state.updateDurations,
       toggleNotifications: state.toggleNotifications,
       toggleSounds: state.toggleSounds,
+      toggleSoundscapes: state.toggleSoundscapes,
       updateRemaining: state.updateRemaining,
       getLimitStatus: state.getLimitStatus,
       restore: state.restore,
@@ -340,11 +341,12 @@ export const Timer = () => {
     store,
     remaining,
     limit,
-    handleSettingsChange,
     statsModal,
     settingsModal,
     notifications,
     sounds,
+    soundscapes,
+    handleSettingsChange,
   } = useTimerState();
   return (
     <>
