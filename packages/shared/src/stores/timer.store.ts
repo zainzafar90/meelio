@@ -208,9 +208,15 @@ export const createTimerStore = (platform: TimerPlatform) => {
         };
 
         const toggleSoundscapes = () => {
+          const currentSoundscapes = get().settings.soundscapes;
           set((s) => ({
             settings: { ...s.settings, soundscapes: !s.settings.soundscapes },
           }));
+
+          // If soundscapes are being disabled, stop any playing sounds
+          if (!currentSoundscapes) {
+            useSoundscapesStore.getState().pausePlayingSounds();
+          }
         };
 
         const updateRemaining = (remaining: number) => {

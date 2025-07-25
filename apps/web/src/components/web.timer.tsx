@@ -259,6 +259,7 @@ const useTimerState = () => {
       updateDurations: state.updateDurations,
       toggleNotifications: state.toggleNotifications,
       toggleSounds: state.toggleSounds,
+      toggleSoundscapes: state.toggleSoundscapes,
       updateRemaining: state.updateRemaining,
       getLimitStatus: state.getLimitStatus,
       restore: state.restore,
@@ -305,6 +306,7 @@ const useTimerState = () => {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
+    soundscapes: boolean;
   }) => {
     // Update durations
     store.updateDurations({ 
@@ -318,6 +320,9 @@ const useTimerState = () => {
     }
     if (settings.sounds !== store.settings.sounds) {
       store.toggleSounds();
+    }
+    if (settings.soundscapes !== store.settings.soundscapes) {
+      store.toggleSoundscapes();
     }
   };
 
