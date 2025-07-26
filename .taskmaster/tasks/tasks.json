@@ -1,0 +1,140 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Add isBlocked field to database schema",
+        "description": "Create and run database migration to add the isBlocked boolean field to the site_blockers table with default value of true",
+        "details": "1. Create migration file using Drizzle ORM\n2. Add column: isBlocked: boolean('is_blocked').notNull().default(true)\n3. Run migration in development and staging environments\n4. Update TypeScript types for SiteBlocker entity\n5. Ensure backward compatibility by handling null values during transition",
+        "testStrategy": "1. Verify migration runs successfully without data loss\n2. Test that existing records get default value of true\n3. Confirm new records properly set isBlocked field\n4. Test rollback procedure\n5. Validate schema changes in database admin tool",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Update Site Blocker Service Layer",
+        "description": "Modify the site blocker service to handle the new isBlocked field in all CRUD operations and add filtering capabilities",
+        "details": "1. Update createSiteBlocker to set isBlocked: true by default\n2. Modify getSiteBlockers to include isBlocked in response\n3. Add query parameter filtering: ?isBlocked=true/false\n4. Update updateSiteBlocker to handle isBlocked changes\n5. Ensure all DTOs and response types include isBlocked field",
+        "testStrategy": "1. Unit test createSiteBlocker with and without explicit isBlocked\n2. Test getSiteBlockers returns isBlocked field\n3. Verify filtering works correctly with isBlocked parameter\n4. Test edge cases with null/undefined values\n5. Integration test with actual database",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Implement Toggle Endpoint",
+        "description": "Create PUT /api/site-blockers/:id/toggle endpoint to flip the isBlocked state of a specific site blocker",
+        "details": "1. Create route handler: PUT /api/site-blockers/:id/toggle\n2. Implement toggle logic: fetch current state, flip boolean, save\n3. Add proper validation and error handling\n4. Return updated site blocker with new isBlocked state\n5. Add rate limiting to prevent abuse\n6. Implement proper authorization checks",
+        "testStrategy": "1. Test successful toggle from true to false and vice versa\n2. Test with invalid site blocker ID (404 response)\n3. Test authorization (user can only toggle their own blockers)\n4. Test concurrent toggle requests\n5. Verify response includes updated isBlocked value",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Implement Bulk Toggle Endpoint",
+        "description": "Create PUT /api/site-blockers/bulk-toggle endpoint to update multiple site blockers' isBlocked state in a single request",
+        "details": "1. Create route: PUT /api/site-blockers/bulk-toggle\n2. Accept body: { ids: string[], isBlocked: boolean }\n3. Validate all IDs belong to authenticated user\n4. Use transaction for atomic updates\n5. Return array of updated site blockers\n6. Handle partial failures gracefully",
+        "testStrategy": "1. Test bulk update with valid IDs\n2. Test with mix of valid and invalid IDs\n3. Test transaction rollback on error\n4. Test authorization (cannot update other users' blockers)\n5. Performance test with large ID arrays",
+        "priority": "medium",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Update Extension Storage Interfaces",
+        "description": "Modify Chrome extension's TypeScript interfaces and storage structure to include isBlocked field while maintaining backward compatibility",
+        "details": "1. Update SiteBlockState interface:\ninterface SiteBlockState {\n  id: string;\n  url: string;\n  isBlocked: boolean;\n  blocked?: boolean; // deprecated\n  streak: number;\n  createdAt: number;\n}\n2. Create migration logic for existing storage data\n3. Map blocked -> isBlocked for backward compatibility\n4. Update all storage read/write operations\n5. Add version tracking for storage schema",
+        "testStrategy": "1. Test storage migration with existing data\n2. Verify backward compatibility with old field\n3. Test new installations start with correct schema\n4. Test storage limits aren't exceeded\n5. Verify data integrity after migration",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement API Sync Logic in Extension",
+        "description": "Create synchronization mechanism between Chrome extension and API to keep isBlocked state consistent across both systems",
+        "details": "1. On extension load: fetch all site blockers from API\n2. Merge API data with local storage (API as source of truth)\n3. Implement sync function for state changes:\n   - On toggle: update local immediately, queue API call\n   - Handle API response and rollback on failure\n4. Add periodic sync (every 5 minutes)\n5. Implement conflict resolution strategy",
+        "testStrategy": "1. Test initial sync on extension load\n2. Test real-time sync on toggle action\n3. Test offline behavior and queue\n4. Test conflict resolution (local vs remote changes)\n5. Test sync performance with large datasets",
+        "priority": "high",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Add Offline Queue Handling",
+        "description": "Implement offline queue system to handle API sync operations when the extension is offline and process them when connection is restored",
+        "details": "1. Create OfflineQueue class with Chrome storage backend\n2. Queue structure: { action: 'toggle', id: string, timestamp: number }\n3. Detect online/offline state using navigator.onLine\n4. Process queue on connection restore\n5. Implement retry logic with exponential backoff\n6. Clear processed items and handle failures",
+        "testStrategy": "1. Test queue persistence across extension restarts\n2. Test queue processing on connection restore\n3. Test deduplication of queued actions\n4. Test queue size limits and cleanup\n5. Test retry behavior on API failures",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Update Content Script Blocker Logic",
+        "description": "Modify content.tsx to check isBlocked field instead of blocked field when determining whether to show the blocking overlay",
+        "details": "1. Update checkIfBlocked function to use isBlocked field\n2. Maintain fallback to blocked field for compatibility\n3. Ensure overlay only shows when isBlocked === true\n4. Add debug logging for state transitions\n5. Optimize storage queries for performance",
+        "testStrategy": "1. Test blocking works with isBlocked: true\n2. Test no blocking with isBlocked: false\n3. Test fallback to old blocked field\n4. Test performance with many blocked sites\n5. Verify no console errors in production",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Add Toggle UI in Extension Popup",
+        "description": "Create toggle switch UI component in the extension popup to allow users to quickly enable/disable blocking for each site",
+        "details": "1. Add toggle switch component (use existing UI library)\n2. Show isBlocked state for each site in list\n3. Visual indicators: green (active), gray (inactive)\n4. Optimistic UI updates with rollback on failure\n5. Add loading states during API sync\n6. Implement debouncing for rapid toggles",
+        "testStrategy": "1. Test toggle switch updates local state immediately\n2. Test visual feedback during API sync\n3. Test error handling and rollback\n4. Test accessibility (keyboard navigation)\n5. Test UI with many sites (scrolling, performance)",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Add User Notification System",
+        "description": "Implement notification system to inform users about important state changes and guide them through the blocking process",
+        "details": "1. Create notification when site is added: 'Site will be blocked on next visit'\n2. Add refresh prompt for already-open tabs\n3. Show sync status notifications (syncing, synced, offline)\n4. Implement Chrome notifications API\n5. Add settings to control notification preferences\n6. Include quick action buttons in notifications",
+        "testStrategy": "1. Test notification appears when adding new site\n2. Test notification permissions handling\n3. Test notification click actions\n4. Test notification preferences persistence\n5. Verify notifications don't spam users",
+        "priority": "low",
+        "dependencies": [
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-26T09:27:38.438Z",
+      "updated": "2025-07-26T09:27:38.438Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
