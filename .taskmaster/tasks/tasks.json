@@ -79,7 +79,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -87,7 +87,7 @@
             "description": "Modify the createSiteBlocker method in the site blocker service to set isBlocked: true by default when creating new site blockers",
             "dependencies": [],
             "details": "Update the service method to include isBlocked: true in the site blocker creation payload. Ensure the method accepts an optional isBlocked parameter but defaults to true if not provided. Update the corresponding DTO to include the isBlocked field.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests to verify that createSiteBlocker sets isBlocked to true by default, test explicit isBlocked: false creation, and ensure the response includes the isBlocked field"
           },
           {
@@ -96,7 +96,7 @@
             "description": "Update the getSiteBlockers service method to include isBlocked in responses and implement query parameter filtering for isBlocked status",
             "dependencies": [],
             "details": "Modify the getSiteBlockers method to ensure isBlocked field is included in all returned site blocker objects. Implement query parameter parsing to accept ?isBlocked=true/false and filter results accordingly. Handle edge cases where the parameter is not provided.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that getSiteBlockers returns isBlocked field for all items, verify filtering works with isBlocked=true, isBlocked=false, and when parameter is omitted"
           },
           {
@@ -105,7 +105,7 @@
             "description": "Enhance the updateSiteBlocker service method to handle updates to the isBlocked field",
             "dependencies": [],
             "details": "Modify updateSiteBlocker to accept isBlocked in the update payload. Ensure proper validation and that the updated isBlocked value is persisted and returned in the response. Handle partial updates where isBlocked might not be included.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test updating isBlocked from true to false and vice versa, test partial updates without isBlocked field, verify response includes updated isBlocked value"
           },
           {
@@ -118,7 +118,7 @@
               "2.3"
             ],
             "details": "Add isBlocked: boolean to CreateSiteBlockerDto, UpdateSiteBlockerDto, and SiteBlockerResponseDto. Ensure all TypeScript interfaces and types used in the service layer include the isBlocked field. Update any validation schemas if applicable.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify TypeScript compilation passes with updated types, test that all CRUD operations properly serialize/deserialize the isBlocked field"
           },
           {
@@ -132,7 +132,7 @@
               "2.4"
             ],
             "details": "Write integration tests that cover the complete flow: create with default isBlocked, get with filtering, update isBlocked status, and verify data persistence. Test edge cases including null/undefined values and ensure backward compatibility.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test full CRUD cycle with isBlocked field, verify database persistence, test filtering combinations, ensure no regression in existing functionality"
           }
         ]
@@ -280,7 +280,7 @@
         "testStrategy": "1. Test storage migration with existing data\n2. Verify backward compatibility with old field\n3. Test new installations start with correct schema\n4. Test storage limits aren't exceeded\n5. Verify data integrity after migration",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -323,7 +323,7 @@
               "5.3"
             ],
             "details": "Update all chrome.storage.sync.set() and chrome.storage.local.set() calls to write the isBlocked field. Ensure new entries only write isBlocked (not blocked). Update bulk operations and partial updates to handle the new field correctly. Implement storage quota management considering the additional field.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. Test creating new entries with isBlocked field only\n2. Test updating existing entries preserves other fields\n3. Test bulk operations with mixed old/new formats\n4. Verify storage quota limits are respected\n5. Test write operation error handling and retries"
           },
           {
@@ -335,7 +335,7 @@
               "5.4"
             ],
             "details": "Create a storage schema versioning system that tracks the current schema version in chrome.storage. Implement version comparison logic and migration registry for future updates. Add initialization code to set version on first install. Include debug utilities to inspect current schema version and migration history.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "1. Test version initialization on fresh install\n2. Test version detection on existing installations\n3. Verify version updates after migration\n4. Test rollback scenarios and version conflicts\n5. Validate version persistence across browser restarts"
           }
         ]
@@ -692,7 +692,7 @@
     ],
     "metadata": {
       "created": "2025-07-26T09:27:38.438Z",
-      "updated": "2025-07-26T09:53:21.194Z",
+      "updated": "2025-07-26T09:58:56.983Z",
       "description": "Tasks for master context"
     }
   }
