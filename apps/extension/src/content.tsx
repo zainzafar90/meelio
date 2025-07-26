@@ -12,7 +12,8 @@ import { pauseAllVideos, startAutoPause } from "./utils/media.utils";
 interface SiteBlockState {
   id: string;
   url: string;
-  blocked: boolean;
+  isBlocked: boolean;
+  blocked?: boolean; // @deprecated Use isBlocked instead
   streak: number;
   createdAt: number;
 }
@@ -52,7 +53,11 @@ const getCurrentSite = () => {
 const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
   const host = getCurrentSite();
   return Object.values(sites).find(
-    (site) => site.blocked && doesHostMatch(host, site.url)
+    (site) => {
+      // Use isBlocked if defined, otherwise fall back to blocked
+      const isBlocked = site.isBlocked !== undefined ? site.isBlocked : site.blocked;
+      return isBlocked && doesHostMatch(host, site.url);
+    }
   );
 };
 
@@ -107,7 +112,8 @@ const PlasmoOverlay = () => {
           ...sites,
           [matchingSite.id]: {
             ...matchingSite,
-            blocked: false,
+            isBlocked: false,
+            blocked: false, // Keep for backward compatibility
             streak: 0,
           },
         },
