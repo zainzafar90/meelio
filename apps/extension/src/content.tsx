@@ -56,6 +56,18 @@ const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
     (site) => {
       // Use isBlocked if defined, otherwise fall back to blocked
       const isBlocked = site.isBlocked !== undefined ? site.isBlocked : site.blocked;
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[Meelio] Site blocker check:', {
+          host,
+          siteUrl: site.url,
+          isBlocked: site.isBlocked,
+          blockedLegacy: site.blocked,
+          effectiveBlocked: isBlocked,
+          matches: doesHostMatch(host, site.url)
+        });
+      }
+      
       return isBlocked && doesHostMatch(host, site.url);
     }
   );

@@ -147,7 +147,7 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -155,7 +155,7 @@
             "description": "Set up the PUT /api/site-blockers/:id/toggle endpoint with proper routing and middleware configuration",
             "dependencies": [],
             "details": "Create the route handler file, configure Express/Next.js routing to handle PUT requests at /api/site-blockers/:id/toggle, set up proper middleware chain including authentication, CORS, and body parsing",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that the route responds to PUT requests, returns 401 for unauthenticated requests, properly extracts the ID parameter from the URL"
           },
           {
@@ -166,7 +166,7 @@
               "3.1"
             ],
             "details": "Extract user ID from authentication token, validate that the site blocker ID exists and belongs to the authenticated user, return 404 for non-existent blockers and 403 for unauthorized access attempts",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with valid user/blocker combinations, test with invalid blocker IDs, test attempts to toggle other users' blockers, verify proper error codes and messages"
           },
           {
@@ -177,7 +177,7 @@
               "3.2"
             ],
             "details": "Fetch the current site blocker from database, flip the isBlocked boolean value, update the database record with the new state, handle database errors gracefully with proper rollback",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test toggling from true to false and vice versa, test database update success, test handling of database connection errors, verify the state change is persisted"
           },
           {
@@ -188,7 +188,7 @@
               "3.1"
             ],
             "details": "Configure rate limiting middleware (e.g., express-rate-limit) with appropriate limits per user/IP, set reasonable time windows and request limits, return 429 status code when limit exceeded with retry-after header",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test normal usage stays under limits, test rapid requests trigger rate limiting, verify rate limit resets after time window, test different users have separate limits"
           },
           {
@@ -199,7 +199,7 @@
               "3.3"
             ],
             "details": "Return the complete updated site blocker object with new isBlocked state, implement consistent error response format, add logging for debugging and monitoring, include appropriate HTTP status codes for all scenarios",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test successful response includes all site blocker fields with updated isBlocked value, test error responses have consistent format, verify all edge cases return appropriate status codes"
           }
         ]
@@ -490,7 +490,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -498,7 +498,7 @@
             "description": "Find the content.tsx file in the Chrome extension codebase and analyze the current checkIfBlocked function implementation to understand how it currently checks the blocked field",
             "dependencies": [],
             "details": "Search for content.tsx in the extension directory, identify the checkIfBlocked function, understand current logic flow, document all places where the blocked field is referenced, and analyze how the blocking overlay is triggered",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify file exists, document current function behavior, create test cases for existing functionality before modification"
           },
           {
@@ -509,7 +509,7 @@
               "8.1"
             ],
             "details": "Update field check from 'blocked' to 'isBlocked', implement fallback logic: if (site.isBlocked !== undefined ? site.isBlocked : site.blocked), ensure overlay triggers only when isBlocked === true explicitly, handle edge cases where both fields might exist",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with isBlocked: true shows overlay, isBlocked: false hides overlay, undefined isBlocked falls back to blocked field, both fields present prioritizes isBlocked"
           },
           {
@@ -520,7 +520,7 @@
               "8.2"
             ],
             "details": "Add console.debug statements for: initial site check, field values (isBlocked vs blocked), state transitions, overlay show/hide decisions, storage query timings, include timestamps and site URL in logs, use conditional logging based on environment",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify logs appear in development mode, ensure no logs in production builds, test log output contains useful debugging information, verify no performance impact from logging"
           },
           {
@@ -532,7 +532,7 @@
               "8.3"
             ],
             "details": "Implement caching strategy for frequently checked sites, batch storage reads where possible, use chrome.storage.local instead of sync for performance-critical data, implement debouncing for rapid URL changes, minimize storage reads by storing active block states in memory",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Benchmark storage query times before and after optimization, test with 100+ blocked sites, verify cache invalidation works correctly, ensure memory usage stays reasonable, test performance on tab switching"
           },
           {
@@ -544,7 +544,7 @@
               "8.2"
             ],
             "details": "Search for all occurrences of 'blocked' field in content.tsx and related files, update each reference to use isBlocked with fallback, update any TypeScript interfaces or types used in content script, ensure message passing between content script and background script uses correct field names",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Grep for all 'blocked' field references and verify updates, test all functionality that depends on blocking state, verify no TypeScript errors after changes, test message passing with new field names"
           }
         ]
@@ -692,7 +692,7 @@
     ],
     "metadata": {
       "created": "2025-07-26T09:27:38.438Z",
-      "updated": "2025-07-26T09:58:56.983Z",
+      "updated": "2025-07-26T10:06:24.651Z",
       "description": "Tasks for master context"
     }
   }

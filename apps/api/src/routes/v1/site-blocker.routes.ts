@@ -3,6 +3,7 @@ import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { siteBlockerController } from "@/modules/site-blocker";
 import { siteBlockerValidation } from "@/modules/site-blocker/site-blocker.validation";
+import { toggleLimiter } from "@/utils/rate-limiter";
 
 const router = express.Router();
 
@@ -25,5 +26,9 @@ router
     siteBlockerController.updateSiteBlocker
   )
   .delete(auth(), siteBlockerController.deleteSiteBlocker);
+
+router
+  .route("/:id/toggle")
+  .put(auth(), toggleLimiter, siteBlockerController.toggleSiteBlocker);
 
 export default router;
