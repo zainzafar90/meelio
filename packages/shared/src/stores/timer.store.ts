@@ -15,8 +15,9 @@ import {
 import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
 import { useSoundscapesStore } from "./soundscapes.store";
 import { Category } from "../types/category";
+import { soundSyncService } from "../services/sound-sync.service";
 
-const playCompletionSound = (
+const playCompletionSound = async (
   soundEnabled: boolean,
   soundId: string = "timeout-1-back-chime"
 ) => {
@@ -26,7 +27,8 @@ const playCompletionSound = (
     const sound = pomodoroSounds.find((s) => s.id === soundId);
     if (!sound) return;
 
-    const audio = new Audio(sound.url);
+    const url = await soundSyncService.getSoundUrl(sound.url);
+    const audio = new Audio(url);
     audio.volume = 0.5;
     audio.play().catch((error) => {
       console.error("Failed to play timer sound:", error);
@@ -326,7 +328,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           }
 
           // Play sound and show notification
-          playCompletionSound(state.settings.sounds);
+          playCompletionSound(state.settings.sounds).catch(console.error);
           showCompletionNotification(
             finishedStage,
             state.settings.notifications
@@ -382,7 +384,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           restore,
           completeStage,
           checkDailyReset,
-          playCompletionSound: () => playCompletionSound(get().settings.sounds),
+          playCompletionSound: () => playCompletionSound(get().settings.sounds).catch(console.error),
           showCompletionNotification: (stage: TimerStage) =>
             showCompletionNotification(stage, get().settings.notifications),
         } as TimerState & {

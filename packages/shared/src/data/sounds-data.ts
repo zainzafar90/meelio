@@ -1,10 +1,8 @@
 import { Sound, SoundType } from "../types";
 import { SoundIcons } from "../components/icons";
-import { getAssetPath } from "../utils/path.utils";
 
 const SOUND_FILES_EXTENSION = ".mp3";
-const SOUND_FILES_BASE_URL = getAssetPath("/public/sounds/yT3sxTz");
-const POMODORO_SOUNDS_BASE_URL = getAssetPath("/public/sounds/pomodoro");
+const SOUND_FILES_BASE_PATH = "https://cdn.meelio.io/file/meelio/sounds";
 
 export const allSounds: Sound[] = [
   {
@@ -12,7 +10,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Rain Tent",
-    url: `${SOUND_FILES_BASE_URL}/rain-tent/rain-tent${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/rain-tent/rain-tent${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.rainOnTent,
   },
   {
@@ -20,7 +18,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Waves",
-    url: `${SOUND_FILES_BASE_URL}/waves/waves${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/waves/waves${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.waves,
   },
   {
@@ -28,7 +26,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Tropical Forest",
-    url: `${SOUND_FILES_BASE_URL}/tropical-forest/tropical-forest${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/tropical-forest/tropical-forest${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.tropicalForest,
   },
   {
@@ -36,7 +34,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Campfire",
-    url: `${SOUND_FILES_BASE_URL}/fireplace/fireplace${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/fireplace/fireplace${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.campfire,
   },
   {
@@ -44,7 +42,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Thunder Storm",
-    url: `${SOUND_FILES_BASE_URL}/thunderstorm/thunderstorm${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/thunderstorm/thunderstorm${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.thunderstorm,
   },
   {
@@ -52,7 +50,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Train",
-    url: `${SOUND_FILES_BASE_URL}/train/train${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/train/train${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.train,
   },
   {
@@ -60,7 +58,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Coffee Shop",
-    url: `${SOUND_FILES_BASE_URL}/coffeeshop/coffeeshop${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/coffeeshop/coffeeshop${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.coffee,
   },
   {
@@ -68,7 +66,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Underwater",
-    url: `${SOUND_FILES_BASE_URL}/underwater/underwater${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/underwater/underwater${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.underwater,
   },
   {
@@ -76,7 +74,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "White Noise",
-    url: `${SOUND_FILES_BASE_URL}/white-noise/white-noise${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/white-noise/white-noise${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.whiteNoise,
   },
   {
@@ -84,7 +82,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Pink Noise",
-    url: `${SOUND_FILES_BASE_URL}/pink-noise/pink-noise${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/pink-noise/pink-noise${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.pinkNoise,
   },
   {
@@ -92,7 +90,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Brown Noise",
-    url: `${SOUND_FILES_BASE_URL}/brown-noise/brown-noise${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/brown-noise/brown-noise${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.brownNoise,
   },
   {
@@ -100,7 +98,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Cicadas",
-    url: `${SOUND_FILES_BASE_URL}/cicada/cicada${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/cicada/cicada${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.cicadas,
   },
   {
@@ -108,7 +106,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Space Engine",
-    url: `${SOUND_FILES_BASE_URL}/space-engine/space-engine${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/space-engine/space-engine${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.spaceEngine,
   },
   {
@@ -116,7 +114,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Wind",
-    url: `${SOUND_FILES_BASE_URL}/wind/wind${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/wind/wind${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.wind,
   },
   {
@@ -124,7 +122,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Howling Wind",
-    url: `${SOUND_FILES_BASE_URL}/wind-howling/wind-howling${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/wind-howling/wind-howling${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.windHowling,
   },
   {
@@ -132,7 +130,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Cityscape",
-    url: `${SOUND_FILES_BASE_URL}/city-scape/city-scape${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/city-scape/city-scape${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.cityScape,
   },
   {
@@ -140,7 +138,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Water",
-    url: `${SOUND_FILES_BASE_URL}/river-stream/river-stream${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/river-stream/river-stream${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.water,
   },
   {
@@ -148,7 +146,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Summer Night",
-    url: `${SOUND_FILES_BASE_URL}/summer-nights/summer-nights${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/summer-nights/summer-nights${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.summerNight,
   },
   {
@@ -156,7 +154,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Fan",
-    url: `${SOUND_FILES_BASE_URL}/fan/fan${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/fan/fan${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.fan,
   },
   {
@@ -164,7 +162,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Leaves",
-    url: `${SOUND_FILES_BASE_URL}/leaves/leaves${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/leaves/leaves${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.autumn,
   },
   {
@@ -172,7 +170,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Airplane",
-    url: `${SOUND_FILES_BASE_URL}/airplane/airplane${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/airplane/airplane${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.airplane,
   },
   {
@@ -180,7 +178,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Bubbles",
-    url: `${SOUND_FILES_BASE_URL}/bubbles/bubbles${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/bubbles/bubbles${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.bubbles,
   },
   {
@@ -188,7 +186,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Waterfall",
-    url: `${SOUND_FILES_BASE_URL}/waterfall/waterfall${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/waterfall/waterfall${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.waterfall,
   },
   {
@@ -196,7 +194,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Whale",
-    url: `${SOUND_FILES_BASE_URL}/whale/whale${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/whale/whale${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.whale,
   },
   {
@@ -204,7 +202,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Bonfire",
-    url: `${SOUND_FILES_BASE_URL}/fire/fire${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/fire/fire${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.fire,
   },
   {
@@ -212,7 +210,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Washing Machine",
-    url: `${SOUND_FILES_BASE_URL}/washing-machine/washing-machine${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/washing-machine/washing-machine${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.washingMachine,
   },
   {
@@ -220,7 +218,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Rain",
-    url: `${SOUND_FILES_BASE_URL}/rain-low/rain-low${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/rain-low/rain-low${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.rain,
   },
   {
@@ -228,7 +226,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Rain On Umbrella",
-    url: `${SOUND_FILES_BASE_URL}/rain-on-umbrella/rain-on-umbrella${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/rain-on-umbrella/rain-on-umbrella${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.rainOnUmbrella,
   },
   {
@@ -236,7 +234,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Cosmic Sounds",
-    url: `${SOUND_FILES_BASE_URL}/cosmos/cosmos${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/cosmos/cosmos${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.cosmos,
   },
   {
@@ -244,7 +242,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Forest",
-    url: `${SOUND_FILES_BASE_URL}/forest/forest${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/forest/forest${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.forest,
   },
   {
@@ -252,7 +250,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Ocean Waves",
-    url: `${SOUND_FILES_BASE_URL}/ocean-waves/ocean-waves${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/ocean-waves/ocean-waves${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.oceanWaves,
   },
   {
@@ -260,10 +258,28 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Water Stream",
-    url: `${SOUND_FILES_BASE_URL}/water-stream/water-stream${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/water-stream/water-stream${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.waterStream,
   },
 ];
+
+export const keyboardSounds = {
+  space: `${SOUND_FILES_BASE_PATH}/keyboard/space${SOUND_FILES_EXTENSION}`,
+  return: `${SOUND_FILES_BASE_PATH}/keyboard/return${SOUND_FILES_EXTENSION}`,
+  backspace: `${SOUND_FILES_BASE_PATH}/keyboard/backspace${SOUND_FILES_EXTENSION}`,
+  keys: [
+    `${SOUND_FILES_BASE_PATH}/keyboard/key-01${SOUND_FILES_EXTENSION}`,
+    `${SOUND_FILES_BASE_PATH}/keyboard/key-02${SOUND_FILES_EXTENSION}`,
+    `${SOUND_FILES_BASE_PATH}/keyboard/key-03${SOUND_FILES_EXTENSION}`,
+    `${SOUND_FILES_BASE_PATH}/keyboard/key-04${SOUND_FILES_EXTENSION}`,
+    `${SOUND_FILES_BASE_PATH}/keyboard/key-05${SOUND_FILES_EXTENSION}`,
+  ],
+};
+
+export const breathingSounds = {
+  inhaleExhale: `${SOUND_FILES_BASE_PATH}/breathing/inhale-exhale${SOUND_FILES_EXTENSION}`,
+  hold: `${SOUND_FILES_BASE_PATH}/breathing/hold${SOUND_FILES_EXTENSION}`,
+};
 
 export const pomodoroSounds: {
   id: string;
@@ -273,21 +289,21 @@ export const pomodoroSounds: {
   {
     id: "timeout-1-back-chime",
     name: "Back Chime",
-    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-1-back-chime${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/pomodoro/timeout-1-back-chime${SOUND_FILES_EXTENSION}`,
   },
   {
     id: "timeout-2-bell-chime",
     name: "Bell Chime",
-    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-2-bell-chime${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/pomodoro/timeout-2-bell-chime${SOUND_FILES_EXTENSION}`,
   },
   {
     id: "timeout-3-forward-single-chime",
     name: "Forward Single Chime",
-    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-3-forward-single-chime${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/pomodoro/timeout-3-forward-single-chime${SOUND_FILES_EXTENSION}`,
   },
   {
     id: "timeout-4-beep",
     name: "Beep",
-    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-4-beep${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_PATH}/pomodoro/timeout-4-beep${SOUND_FILES_EXTENSION}`,
   },
 ];

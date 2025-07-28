@@ -1,10 +1,10 @@
 import { Player, AudioElement } from "./react-player";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
 import { useShallow } from "zustand/shallow";
-import { useCachedSound } from "../../../../../hooks/use-cached-sound";
+import { useCachedSoundUrl } from "../../../../../hooks/use-cached-sound-url";
 
 const SoundPlayerItem = ({ sound }: { sound: any }) => {
-  const cachedUrl = useCachedSound(sound);
+  const soundUrl = useCachedSoundUrl(sound.url);
   const { globalVolume, setSoundLoading } = useSoundscapesStore(
     useShallow((state) => ({
       globalVolume: state.globalVolume,
@@ -12,10 +12,12 @@ const SoundPlayerItem = ({ sound }: { sound: any }) => {
     }))
   );
 
+  if (!soundUrl) return null;
+
   return (
     <Player
       activePlayer={AudioElement}
-      src={cachedUrl}
+      src={soundUrl}
       playing={sound.playing}
       volume={sound.volume * globalVolume}
       loop={true}
