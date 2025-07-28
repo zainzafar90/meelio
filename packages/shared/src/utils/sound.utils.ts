@@ -1,6 +1,7 @@
 import { Sound } from "../types";
 import { getAssetPath } from "./path.utils";
 import { isChromeExtension } from "./common.utils";
+import { soundCacheManager } from "./sound-cache.utils";
 
 export const OSCILLATION_INTERVAL_MS = 60_000; // 1 minute
 export const SHUFFLE_SOUNDS_INTERVAL_MS = 120_000; // 2 minutes
@@ -74,53 +75,89 @@ const KEY_SOUNDS = [
   getAssetPath("/public/sounds/keyboard/key-05.mp3"),
 ];
 
-export const playTypewriterSound = (key: string) => {
+export const playTypewriterSound = async (key: string) => {
+  let soundUrl: string | null = null;
+  let soundId: string | null = null;
+
   if (key === "Space") {
-    const audio = new Audio(getAssetPath("/public/sounds/keyboard/space.mp3"));
-    audio.play();
+    soundId = "keyboard-space";
+    soundUrl = getAssetPath("/public/sounds/keyboard/space.mp3");
   } else if (key === "Enter") {
-    const audio = new Audio(getAssetPath("/public/sounds/keyboard/return.mp3"));
-    audio.play();
+    soundId = "keyboard-return";
+    soundUrl = getAssetPath("/public/sounds/keyboard/return.mp3");
   } else if (key === "Backspace") {
-    const audio = new Audio(
-      getAssetPath("/public/sounds/keyboard/backspace.mp3")
-    );
-    audio.play();
+    soundId = "keyboard-backspace";
+    soundUrl = getAssetPath("/public/sounds/keyboard/backspace.mp3");
   } else if (
     // eslint-disable-next-line no-useless-escape
     /[a-zA-Z0-9\s\.,-\/#!$%\^&\*;:{}=\-_`~()@\+\?><\[\]\+]/.test(key)
   ) {
     const randomIndex = Math.floor(Math.random() * KEY_SOUNDS.length);
-    const audio = new Audio(KEY_SOUNDS[randomIndex]);
+    soundId = `keyboard-key-${randomIndex + 1}`;
+    soundUrl = KEY_SOUNDS[randomIndex];
+  }
+
+  if (soundUrl && soundId) {
+    try {
+      const cachedUrl = await soundCacheManager.getSoundUrl(soundId, soundUrl);
+      const audio = new Audio(cachedUrl);
+      audio.play();
+    } catch (error) {
+      // Fallback to original URL
+      const audio = new Audio(soundUrl);
+      audio.play();
+    }
+  }
+};
+
+export const playBreathingSound = async (mode: string) => {
+  let path: string | null = null;
+  let soundId: string | null = null;
+
+  if (mode === "inhale" || mode === "exhale") {
+    path = "/public/sounds/breathing/inhale-exhale.mp3";
+    soundId = "breathing-inhale-exhale";
+  } else if (mode === "hold1" || mode === "hold2") {
+    path = "/public/sounds/breathing/hold.mp3";
+    soundId = "breathing-hold";
+  }
+
+  if (!path || !soundId) return;
+
+  try {
+    const audioPath = getAssetPath(path);
+    const cachedUrl = await soundCacheManager.getSoundUrl(soundId, audioPath);
+    const audio = new Audio(cachedUrl);
+    audio.volume = 0.5;
+    audio.play();
+  } catch (error) {
+    // Fallback to original URL
+    const audioPath = getAssetPath(path);
+    const audio = new Audio(audioPath);
+    audio.volume = 0.5;
     audio.play();
   }
 };
 
-export const playBreathingSound = (mode: string) => {
-  let path: string | null = null;
+let pomodorAudioDing: HTMLAudioElement | null = null;
 
-  if (mode === "inhale" || mode === "exhale") {
-    path = "/public/sounds/breathing/inhale-exhale.mp3";
-  } else if (mode === "hold1" || mode === "hold2") {
-    path = "/public/sounds/breathing/hold.mp3";
+const getPomodoroAudio = async () => {
+  if (!pomodorAudioDing) {
+    const url = getAssetPath("/public/sounds/pomodoro/timeout-3-forward-single-chime.mp3");
+    try {
+      const cachedUrl = await soundCacheManager.getSoundUrl("timeout-3-forward-single-chime", url);
+      pomodorAudioDing = new Audio(cachedUrl);
+    } catch (error) {
+      pomodorAudioDing = new Audio(url);
+    }
   }
-
-  if (!path) return;
-
-  const audioPath = getAssetPath(path);
-  console.log("audioPath", audioPath);
-  const audio = new Audio(audioPath);
-  audio.volume = 0.5;
-  audio.play();
+  return pomodorAudioDing;
 };
 
-const pomodorAudioDing = new Audio(
-  getAssetPath("/public/sounds/pomodoro/timeout-3-forward-single-chime.mp3")
-);
-
-export const playPomodoroSound = (sound: "timeout" | "ticking") => {
+export const playPomodoroSound = async (sound: "timeout" | "ticking") => {
   if (sound === "timeout") {
-    pomodorAudioDing.play();
+    const audio = await getPomodoroAudio();
+    audio.play();
   }
 
   return;

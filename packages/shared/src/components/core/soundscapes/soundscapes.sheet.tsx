@@ -15,6 +15,7 @@ import { SoundList } from "./components/sound-list/sound-list";
 import { CategoryList } from "./components/categories/category-list";
 import { SoundControlsBar } from "./components/sound-player/controls/sound-control-bar";
 import { ConnectionWarning } from "../../common/connection-warning";
+import { OfflineIndicator } from "./offline-indicator";
 
 export const SoundscapesSheet: React.FC = () => {
   const { t } = useTranslation();
@@ -44,6 +45,9 @@ export const SoundscapesSheet: React.FC = () => {
         <div className="flex h-full flex-col overflow-hidden p-6">
           <CategoryList />
           <ConnectionWarning />
+          <div className="mt-2 mb-2">
+            <OfflineIndicator />
+          </div>
 
           <div className="flex-1 overflow-y-auto">
             <SoundList />

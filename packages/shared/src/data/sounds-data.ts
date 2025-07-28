@@ -252,7 +252,7 @@ export const allSounds: Sound[] = [
     playing: false,
     volume: 0.5,
     name: "Ocean Waves",
-    url: `${SOUND_FILES_BASE_URL}/rain-low/rain-low${SOUND_FILES_EXTENSION}`,
+    url: `${SOUND_FILES_BASE_URL}/ocean-waves/ocean-waves${SOUND_FILES_EXTENSION}`,
     icon: SoundIcons.oceanWaves,
   },
   {
@@ -288,6 +288,6 @@ export const pomodoroSounds: {
   {
     id: "timeout-4-beep",
     name: "Beep",
-    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-4-beep/timeout-4-beep${SOUND_FILES_EXTENSION}`,
+    url: `${POMODORO_SOUNDS_BASE_URL}/timeout-4-beep${SOUND_FILES_EXTENSION}`,
   },
 ];

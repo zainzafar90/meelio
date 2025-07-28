@@ -8,6 +8,7 @@ import { useSoundscapesStore } from "../stores/soundscapes.store";
 
 import { ThemeProvider } from "../components/common/theme-provider";
 import { SoundPlayer } from "../components/core/soundscapes/components/sound-player/sound-player";
+import { SoundPreloader } from "../components/core/soundscapes/sound-preloader";
 import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
 import { TelemetryProvider } from "./telemetry-provider";
@@ -34,6 +35,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
               <TooltipProvider>
                 {children}
+                <SoundPreloader />
                 {hasPlayingSounds && <SoundPlayer />}
                 <Toaster richColors />
               </TooltipProvider>
