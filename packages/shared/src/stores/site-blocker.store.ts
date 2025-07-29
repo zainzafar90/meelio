@@ -7,8 +7,7 @@ import { siteBlockerApi } from "../api/site-blocker.api";
 interface SiteBlockState {
   id: string;
   url: string;
-  isBlocked: boolean;
-  blocked?: boolean; // @deprecated Use isBlocked instead
+  blocked: boolean;
   streak: number;
   createdAt: number;
 }
@@ -64,8 +63,7 @@ async function processSyncQueue() {
               [res.id]: {
                 id: res.id,
                 url: normalizedUrl,
-                isBlocked: true,
-                blocked: true, // Keep for backward compatibility
+                blocked: true,
                 streak: 0,
                 createdAt: Date.now(),
               },
@@ -101,21 +99,6 @@ function startAutoSync() {
   autoSyncInterval = setInterval(() => processSyncQueue(), 5 * 60 * 1000);
 }
 
-// Migration function to convert old blocked field to isBlocked
-function migrateSites(sites: Record<string, any>): Record<string, SiteBlockState> {
-  const migrated: Record<string, SiteBlockState> = {};
-  
-  for (const [id, site] of Object.entries(sites)) {
-    migrated[id] = {
-      ...site,
-      isBlocked: site.isBlocked !== undefined ? site.isBlocked : site.blocked ?? true,
-      blocked: site.blocked, // Keep for backward compatibility
-    };
-  }
-  
-  return migrated;
-}
-
 export const useSiteBlockerStore = create<SiteBlockerState>()(
   persist(
     (set, get) => ({
@@ -129,15 +112,13 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         );
 
         if (existingSite) {
-          const isCurrentlyBlocked = existingSite.isBlocked !== undefined ? existingSite.isBlocked : existingSite.blocked;
-          if (!isCurrentlyBlocked) {
+          if (!existingSite.blocked) {
             set((state) => ({
               sites: {
                 ...state.sites,
                 [existingSite.id]: {
                   ...existingSite,
-                  isBlocked: true,
-                  blocked: true, // Keep for backward compatibility
+                  blocked: true,
                 },
               },
             }));
@@ -158,8 +139,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
                   [res.id]: {
                     id: res.id,
                     url: normalizedUrl,
-                    isBlocked: true,
-                    blocked: true, // Keep for backward compatibility
+                    blocked: true, 
                     streak: 0,
                     createdAt: Date.now(),
                   },
@@ -187,8 +167,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
               [localId]: {
                 id: localId,
                 url: normalizedUrl,
-                isBlocked: true,
-                blocked: true, // Keep for backward compatibility
+                blocked: true,
                 streak: 0,
                 createdAt: Date.now(),
               },
@@ -237,8 +216,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           doesHostMatch(s.url, normalizedUrl)
         );
 
-        const isCurrentlyBlocked = site ? (site.isBlocked !== undefined ? site.isBlocked : site.blocked) : false;
-        if (isCurrentlyBlocked) {
+        if (site?.blocked) {
           await get().removeSite(url);
         } else {
           await get().addSite(url);
@@ -282,8 +260,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
                   {
                     id: s.id,
                     url: normalizeUrl(s.url),
-                    isBlocked: s.isBlocked !== undefined ? s.isBlocked : true,
-                    blocked: true, // Keep for backward compatibility
+                    blocked: true,
                     streak: 0,
                     createdAt: Date.now(),
                   },
@@ -320,20 +297,11 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           }
         },
       })),
-      version: 2, // Increment version for migration
+      version: 1,
       partialize: (state) => ({
         sites: state.sites,
       }),
-      migrate: (persistedState: any, version: number) => {
-        if (version === 1) {
-          // Migrate from version 1 to 2
-          return {
-            ...persistedState,
-            sites: migrateSites(persistedState.sites || {}),
-          };
-        }
-        return persistedState;
-      },
+     
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
         const user = useAuthStore.getState().user;
