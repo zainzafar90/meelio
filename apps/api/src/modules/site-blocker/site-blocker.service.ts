@@ -18,10 +18,6 @@ export const siteBlockerService = {
     if (category) {
       conditions.push(eq(siteBlockers.category, category));
     }
-    
-    if (isBlocked !== undefined) {
-      conditions.push(eq(siteBlockers.isBlocked, isBlocked));
-    }
 
     return await db
       .select()
@@ -87,7 +83,6 @@ export const siteBlockerService = {
       userId,
       url: normalizedUrl,
       category: data.category,
-      isBlocked: data.isBlocked ?? true, // Default to true if not provided
     };
 
     const result = await db.insert(siteBlockers).values(insertData).returning();
@@ -114,10 +109,7 @@ export const siteBlockerService = {
     if (data.category !== undefined) {
       updateData.category = data.category;
     }
-    
-    if (data.isBlocked !== undefined) {
-      updateData.isBlocked = data.isBlocked;
-    }
+
 
     const result = await db
       .update(siteBlockers)
@@ -140,20 +132,4 @@ export const siteBlockerService = {
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 
-  /**
-   * Toggle the isBlocked state of a site blocker
-   */
-  toggleSiteBlocker: async (id: string, userId: string): Promise<SiteBlocker> => {
-    // Get the current site blocker
-    const siteBlocker = await siteBlockerService.getSiteBlockerById(id, userId);
-    
-    // Toggle the isBlocked state
-    const result = await db
-      .update(siteBlockers)
-      .set({ isBlocked: !siteBlocker.isBlocked })
-      .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)))
-      .returning();
-
-    return result[0];
-  },
 };

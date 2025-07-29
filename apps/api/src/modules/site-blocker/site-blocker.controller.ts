@@ -80,14 +80,4 @@ export const siteBlockerController = {
     await siteBlockerService.deleteSiteBlocker(id, user.id);
     return res.status(httpStatus.NO_CONTENT).send();
   }),
-
-  /**
-   * Toggle the isBlocked state of a site blocker
-   */
-  toggleSiteBlocker: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const { id } = req.params;
-    const siteBlocker = await siteBlockerService.toggleSiteBlocker(id, user.id);
-    return res.status(httpStatus.OK).json(siteBlocker);
-  }),
 };

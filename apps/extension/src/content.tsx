@@ -12,8 +12,7 @@ import { pauseAllVideos, startAutoPause } from "./utils/media.utils";
 interface SiteBlockState {
   id: string;
   url: string;
-  isBlocked: boolean;
-  blocked?: boolean; // @deprecated Use isBlocked instead
+  blocked?: boolean;
   streak: number;
   createdAt: number;
 }
@@ -53,23 +52,7 @@ const getCurrentSite = () => {
 const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
   const host = getCurrentSite();
   return Object.values(sites).find(
-    (site) => {
-      // Use isBlocked if defined, otherwise fall back to blocked
-      const isBlocked = site.isBlocked !== undefined ? site.isBlocked : site.blocked;
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.debug('[Meelio] Site blocker check:', {
-          host,
-          siteUrl: site.url,
-          isBlocked: site.isBlocked,
-          blockedLegacy: site.blocked,
-          effectiveBlocked: isBlocked,
-          matches: doesHostMatch(host, site.url)
-        });
-      }
-      
-      return isBlocked && doesHostMatch(host, site.url);
-    }
+    (site) => site.blocked && doesHostMatch(host, site.url)
   );
 };
 
@@ -124,8 +107,7 @@ const PlasmoOverlay = () => {
           ...sites,
           [matchingSite.id]: {
             ...matchingSite,
-            isBlocked: false,
-            blocked: false, // Keep for backward compatibility
+            blocked: false,
             streak: 0,
           },
         },
