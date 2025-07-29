@@ -263,6 +263,10 @@
         "label": "Enable Sounds",
         "description": "Play sounds when the timer ends, and when breaks start."
       },
+      "soundscapes": {
+        "label": "Enable Soundscapes",
+        "description": "Auto-play ambient sounds during focus sessions."
+      },
       "reset": {
         "label": "Reset Pomodoro Timer",
         "description": "Are you sure you want to reset the timer? This will reset the timer to the default settings.",
