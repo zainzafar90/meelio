@@ -16,11 +16,10 @@ export const siteBlockerController = {
       return res.status(httpStatus.OK).json([]);
     }
 
-    const { category, isBlocked } = req.query;
+    const { category } = req.query;
     const siteBlockers = await siteBlockerService.getSiteBlockers(
       user.id,
       category as string | undefined,
-      isBlocked !== undefined ? isBlocked === 'true' : undefined
     );
     return res.status(httpStatus.OK).json(siteBlockers);
   }),

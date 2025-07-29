@@ -11,7 +11,6 @@ export const siteBlockerService = {
   getSiteBlockers: async (
     userId: string,
     category?: string,
-    isBlocked?: boolean
   ): Promise<SiteBlocker[]> => {
     const conditions = [eq(siteBlockers.userId, userId)];
     
