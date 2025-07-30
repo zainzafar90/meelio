@@ -81,8 +81,8 @@ const TimerView = ({
 
   return (
     <div className="relative">
-      <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-        <div className="p-3 sm:p-6 space-y-10">
+      <div className="max-w-full w-88 sm:w-[440px] lg:w-[540px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+        <div className="p-4 sm:p-8 space-y-12">
           {/* Timer Mode Tabs */}
           <div className="w-full">
             <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
