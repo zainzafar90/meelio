@@ -14,8 +14,8 @@ export const TimerPlaceholder = ({
 }: TimerPlaceholderProps) => {
   const { t } = useTranslation();
   return (
-    <div className="max-w-full w-72 sm:w-[400px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-      <div className="p-6 space-y-6">
+    <div className="max-w-full w-88 sm:w-[440px] lg:w-[540px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
+      <div className="p-8 space-y-8">
         {/* Timer Mode Tabs */}
         <div className="w-full">
           <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
