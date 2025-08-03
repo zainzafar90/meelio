@@ -1,5 +1,6 @@
 export type Environment = {
   serverUrl: string;
+  cdnUrl:string;
   lemonSqueezyMonthlyVariantId: string;
   lemonSqueezyYearlyVariantId: string;
   lemonSqueezyLifetimeVariantId: string;
@@ -29,6 +30,8 @@ export class EnvWrapper {
     return {
       // @ts-ignore - Vite specific
       serverUrl: import.meta.env.VITE_SERVER_URL || "",
+      // @ts-ignore - Vite specific
+      cdnUrl: import.meta.env.VITE_CDN_URL || "",
       lemonSqueezyMonthlyVariantId:
         // @ts-ignore - Vite specific
         import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID || "",
@@ -51,6 +54,7 @@ export class EnvWrapper {
   private getExtensionEnv(): Environment {
     return {
       serverUrl: process.env.PLASMO_PUBLIC_SERVER_URL || "",
+      cdnUrl: process.env.PLASMO_PUBLIC_CDN_URL || "",
       lemonSqueezyMonthlyVariantId:
         process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_MONTHLY_VARIANT_ID || "",
       lemonSqueezyYearlyVariantId:

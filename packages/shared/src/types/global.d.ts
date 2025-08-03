@@ -1,6 +1,7 @@
 // TODO: fix the imports and use proper types
 interface ImportMetaEnv {
   VITE_SERVER_URL: string;
+  VITE_CDN_URL: string;
   VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID: string;
   VITE_LEMON_SQUEEZY_YEARLY_VARIANT_ID: string;
   VITE_LEMON_SQUEEZY_LIFETIME_VARIANT_ID: string;
