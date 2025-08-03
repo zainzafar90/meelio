@@ -11,31 +11,31 @@ export enum TelemetryEvent {
 export const useTelemetry = () => {
   return {
     track: (event: string, properties?: Record<string, unknown>) => {
-      console.log(event, properties);
+      console.debug(event, properties);
     },
 
     identify: (id: string) => {
-      console.log(id);
+      console.debug(id);
     },
 
     pageView: () => {
-      console.log(TelemetryEvent.PageView);
+      console.debug(TelemetryEvent.PageView);
     },
 
     soundPlayed: (sound: Sound) => {
-      console.log(TelemetryEvent.SoundPlayed, { sound });
+      console.debug(TelemetryEvent.SoundPlayed, { sound });
     },
 
     soundStopped: (sound: Sound) => {
-      console.log(TelemetryEvent.SoundStopped, { sound });
+      console.debug(TelemetryEvent.SoundStopped, { sound });
     },
 
     categoryPlayed: (category: string) => {
-      console.log(TelemetryEvent.CategoryPlayed, { category });
+      console.debug(TelemetryEvent.CategoryPlayed, { category });
     },
 
     categoryStopped: (category: string) => {
-      console.log(TelemetryEvent.CategoryStopped, { category });
+      console.debug(TelemetryEvent.CategoryStopped, { category });
     },
   };
 };
