@@ -40,12 +40,10 @@ export interface TimerSettingsDialogProps {
   breakMin: number;
   notifications: boolean;
   sounds: boolean;
-  soundscapes: boolean;
   onSave: (values: {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
-    soundscapes: boolean;
   }) => void;
 }
 
@@ -56,12 +54,9 @@ export function TimerSettingsDialog({
   breakMin,
   notifications,
   sounds,
-  soundscapes,
   onSave,
 }: TimerSettingsDialogProps) {
-  const isExtension = useAppStore(
-    useShallow((state) => state.platform === "extension"),
-  );
+  const isExtension = useAppStore(useShallow((state) => state.platform === "extension"));
   const { t } = useTranslation();
 
   const form = useForm<TimerSettingsValues>({
@@ -98,7 +93,6 @@ export function TimerSettingsDialog({
         },
         notifications,
         sounds,
-        soundscapes,
       });
 
       onOpenChange(false);
@@ -118,7 +112,6 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications: !notifications,
       sounds,
-      soundscapes,
     });
   };
 
@@ -127,16 +120,6 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications,
       sounds: !sounds,
-      soundscapes,
-    });
-  };
-
-  const handleSoundscapesToggle = () => {
-    onSave({
-      durations: { focusMin, breakMin },
-      notifications,
-      sounds,
-      soundscapes: !soundscapes,
     });
   };
 
@@ -149,7 +132,7 @@ export function TimerSettingsDialog({
             Configure your timer duration, notifications, and sounds.
           </DialogDescription>
         </DialogHeader>
-
+        
         <div className="space-y-6">
           <form
             onSubmit={form.handleSubmit(handleSave)}
@@ -234,7 +217,9 @@ export function TimerSettingsDialog({
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">
+            <div
+              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+            >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Timer notification</p>
                 <p className="text-sm text-muted-foreground">
@@ -267,22 +252,6 @@ export function TimerSettingsDialog({
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50">
-              <div className="space-y-1">
-                <p className="text-sm font-medium">
-                  {t("timer.settings.soundscapes.label")}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {t("timer.settings.soundscapes.description")}
-                </p>
-              </div>
-              <Switch
-                size="sm"
-                checked={soundscapes}
-                onCheckedChange={handleSoundscapesToggle}
-              />
-            </div>
-
             {notifications && (
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-1">
@@ -292,7 +261,10 @@ export function TimerSettingsDialog({
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Select value="timeout-1-back-chime" onValueChange={() => {}}>
+                  <Select
+                    value="timeout-1-back-chime"
+                    onValueChange={() => {}}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select a sound" />
                     </SelectTrigger>
@@ -318,9 +290,9 @@ export function TimerSettingsDialog({
             )}
 
             <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
+              <Button 
+                type="button" 
+                variant="outline" 
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
