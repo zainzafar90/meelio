@@ -21,8 +21,9 @@ export const plansData: PlanData[] = [
     label: "Monthly",
     price: 3,
     priceDisplay: "$3",
-    priceLabel: "/ mo",
-    description: "Billed Monthly",
+    priceLabel: "/mo",
+    description: "Billed monthly — cancel anytime",
+    trial: "14-day money-back guarantee",
   },
   {
     id: PlanInterval.Yearly,
@@ -31,9 +32,10 @@ export const plansData: PlanData[] = [
     label: "Yearly",
     price: 30,
     priceDisplay: "$30",
-    priceLabel: "/ yr",
-    description: "Billed yearly (equivalent to $2.50/month)",
+    priceLabel: "/yr",
+    description: "Billed annually — save 20% (equivalent to $2.50/month; cancel anytime)",
     discount: "20% off",
+    trial: "14-day money-back guarantee",
   },
   {
     id: PlanInterval.Lifetime,
@@ -43,6 +45,6 @@ export const plansData: PlanData[] = [
     price: 89,
     priceDisplay: "$89",
     priceLabel: "",
-    description: "One-time payment",
+    description: "Lifetime access — one-time payment, no recurring fees",
   },
 ];

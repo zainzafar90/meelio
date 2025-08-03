@@ -21,7 +21,7 @@ export const Plans = ({
         setSelectedPlan(value);
         onPlanChange(value);
       }}
-      className="no-scrollbar flex flex-wrap gap-x-4 gap-y-6 overflow-x-scroll px-1 py-4 pr-24"
+      className="no-scrollbar space-y-2 overflow-x-scroll px-1 py-4 mb-4 pr-24"
     >
       {plansData.map((plan) => (
         <div key={plan.value}>
@@ -49,8 +49,8 @@ export const Plans = ({
             </div>
 
             {plan.value === PlanInterval.Yearly && plan.discount && (
-              <div className="absolute -inset-x-[1px] -top-2">
-                <div className="flex w-full items-start justify-center rounded-t-md bg-accent py-1 text-center text-xs uppercase text-background">
+              <div className="absolute -inset-x-[1px] -top-0">
+                <div className="flex w-full items-start justify-center rounded-t-md bg-accent py-0.5 text-center text-xs uppercase text-background">
                   {plan.discount}
                 </div>
               </div>
