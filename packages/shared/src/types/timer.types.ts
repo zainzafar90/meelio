@@ -11,7 +11,6 @@ export interface TimerDurations {
 export interface TimerSettings {
   notifications: boolean;
   sounds: boolean;
-  soundscapes: boolean;
 }
 
 export interface TimerStats {
@@ -85,11 +84,10 @@ export interface TimerState {
   reset: () => void;
   skipToStage: (stage: TimerStage) => void;
   updateDurations: (
-    durations: Partial<{ focus: number; break: number }>,
+    durations: Partial<{ focus: number; break: number }>
   ) => void;
   toggleNotifications: () => void;
   toggleSounds: () => void;
-  toggleSoundscapes: () => void;
   updateRemaining: (remaining: number) => void;
   getLimitStatus: () => { isLimitReached: boolean; remainingSec: number };
   sync: () => Promise<void>;

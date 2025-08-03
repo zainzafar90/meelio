@@ -258,10 +258,6 @@
         "label": "Töne aktivieren",
         "description": "Spiele Töne ab, wenn der Timer endet und Pausen beginnen."
       },
-      "soundscapes": {
-        "label": "Soundscapes aktivieren",
-        "description": "Starte automatisch Ambient-Sounds während Fokus-Sessions."
-      },
       "reset": {
         "label": "Pomodoro Timer zurücksetzen",
         "description": "Bist du sicher, dass du den Timer zurücksetzen möchtest? Dies setzt den Timer auf die Standardeinstellungen zurück.",
