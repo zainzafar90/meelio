@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@repo/ui/components/ui/radio-group";
 
 import { PlanInterval } from "../../../../../types/subscription";
 import { plansData } from "../../../../../data";
+import { PlanCard } from "../../../../common/plan-card";
 
 export const Plans = ({
   onPlanChange,
@@ -21,41 +22,27 @@ export const Plans = ({
         setSelectedPlan(value);
         onPlanChange(value);
       }}
-      className="no-scrollbar space-y-2 overflow-x-scroll px-1 py-4 mb-4 pr-24"
+      className="no-scrollbar space-y-2 overflow-x-scroll px-1 py-4 mb-4"
     >
       {plansData.map((plan) => (
-        <div key={plan.value}>
-          <Label
-            htmlFor={plan.value}
-            className="relative flex flex-shrink-0 cursor-pointer select-none flex-wrap rounded-lg border border-foreground/20 bg-background/50 p-4 shadow-sm transition hover:border-foreground/50 focus:outline-none [&:has([data-state=checked])]:border-accent [&:has([data-state=checked])]:ring-1 [&:has([data-state=checked])]:ring-accent"
-          >
+        <div key={plan.value} className="relative">
+          <Label htmlFor={plan.value} className="absolute inset-0 z-10 cursor-pointer">
             <RadioGroupItem
               id={plan.value}
               value={plan.value}
               className="peer sr-only"
             />
-            <div className="flex min-w-max flex-1 gap-4 px-2">
-              <div className="flex flex-col">
-                <span className="block text-sm font-medium text-foreground/90">
-                  {plan.price}${" "}
-                  <small className="align-baseline text-xs uppercase opacity-90">
-                    {plan.priceLabel}
-                  </small>
-                </span>
-                <span className="mt-1 flex items-center text-xs font-normal text-foreground/50">
-                  {plan.description}
-                </span>
-              </div>
-            </div>
-
-            {plan.value === PlanInterval.Yearly && plan.discount && (
-              <div className="absolute -inset-x-[1px] -top-0">
-                <div className="flex w-full items-start justify-center rounded-t-md bg-accent py-0.5 text-center text-xs uppercase text-background">
-                  {plan.discount}
-                </div>
-              </div>
-            )}
           </Label>
+          <PlanCard
+            plan={plan}
+            isSelected={selectedPlan === plan.value}
+            onClick={() => {
+              setSelectedPlan(plan.value);
+              onPlanChange(plan.value);
+            }}
+            className="relative"
+            variant="dark"
+          />
         </div>
       ))}
     </RadioGroup>

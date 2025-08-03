@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { buttonVariants } from "@repo/ui/components/ui/button";
+import { Button, buttonVariants } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import { toast } from "sonner";
 
@@ -32,10 +32,9 @@ export function FreePlanSection({
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         <div>
-          <h4 className="text-sm font-medium">Switch to Pro</h4>
-          <p className="text-xs text-foreground/70">
+          <p className="text- text-foreground/70">
             Upgrade to a paid plan for additional features.
           </p>
         </div>
@@ -48,31 +47,29 @@ export function FreePlanSection({
           </p>
         )}
 
-        <div className="border-t pt-4">
-          <button
-            className={cn(buttonVariants())}
-            disabled={isLoadingPortal}
-            onClick={() => {
-              if (!IS_PAYMENTS_ENABLED) {
-                return toast("Payments are disabled for now.", {
-                  description:
-                    "Please contact the administrator to enable payments.",
-                });
-              }
-              if (!selectedPlan) {
-                setShowError(true);
-                return;
-              }
-              setShowError(false);
-              onOpenCheckout(selectedPlan);
-            }}
-          >
-            {isLoadingPortal && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
+
+
+          <Button
+        disabled={isLoadingPortal}
+        className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white mb-4"
+        onClick={() => {
+          if (!IS_PAYMENTS_ENABLED) {
+            return toast("Payments are disabled for now.", {
+              description:
+                "Please contact the administrator to enable payments.",
+            });
+          }
+          if (!selectedPlan) {
+            setShowError(true);
+            return;
+          }
+          setShowError(false);
+          onOpenCheckout(selectedPlan);
+        }}
+      >
             Upgrade to PRO
-          </button>
-        </div>
+
+      </Button>
       </div>
     </div>
   );

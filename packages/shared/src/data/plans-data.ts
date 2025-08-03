@@ -7,6 +7,7 @@ export interface PlanData {
   label: string;
   price: number;
   priceLabel: string;
+  priceLabelDescription: string;
   priceDisplay: string;
   description: string;
   discount?: string;
@@ -22,8 +23,9 @@ export const plansData: PlanData[] = [
     price: 3,
     priceDisplay: "$3",
     priceLabel: "/mo",
-    description: "Billed monthly — cancel anytime",
-    trial: "14-day money-back guarantee",
+    priceLabelDescription:"Billed monthly",
+    description: "Cancel anytime",
+    trial: "",
   },
   {
     id: PlanInterval.Yearly,
@@ -33,9 +35,10 @@ export const plansData: PlanData[] = [
     price: 30,
     priceDisplay: "$30",
     priceLabel: "/yr",
-    description: "Billed annually — save 20% (equivalent to $2.50/month; cancel anytime)",
+    priceLabelDescription:"Equivalent to $2.50/month",
+    description: "Cancel anytime",
     discount: "20% off",
-    trial: "14-day money-back guarantee",
+    trial: "",
   },
   {
     id: PlanInterval.Lifetime,
@@ -45,6 +48,8 @@ export const plansData: PlanData[] = [
     price: 89,
     priceDisplay: "$89",
     priceLabel: "",
-    description: "Lifetime access — one-time payment, no recurring fees",
+    priceLabelDescription:"One-time payment",
+    description: "No recurring fees",
+    trial: "",
   },
 ];

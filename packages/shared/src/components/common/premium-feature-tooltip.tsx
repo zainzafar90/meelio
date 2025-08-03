@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../stores/auth.store";
 import { UserAuthForm } from "../auth/user-auth-form";
 import { useShallow } from "zustand/shallow";
+import { PlanCard } from "./plan-card";
 
 interface PremiumFeatureTooltipProps {
   featureName?: string;
@@ -244,42 +245,6 @@ const PricingSection = ({
     </div>
   );
 
-  const renderPlanCard = (plan) => (
-    <div
-      key={plan.id}
-      className={`relative rounded-md transition-all cursor-pointer ${
-        selectedPlan === plan.id
-          ? "ring-1 ring-sky-500 bg-sky-50 border border-sky-500"
-          : "hover:bg-gray-50 border border-gray-200"
-      }`}
-      onClick={() => setSelectedPlan(plan.id)}
-    >
-      {plan.discount && (
-        <div className="absolute top-0 right-0 bg-sky-500 text-white text-xs px-1.5 py-0.5 rounded-bl-sm">
-          {plan.discount}
-        </div>
-      )}
-
-      <div className="p-3 flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-medium text-gray-900">{plan.title}</h3>
-          <p className="text-xs text-gray-500">{plan.description}</p>
-          {plan.trial && (
-            <div className="text-sky-600 text-xs font-medium">{plan.trial}</div>
-          )}
-        </div>
-
-        <div className="text-right flex items-center gap-2">
-          <div className="text-base font-semibold text-gray-900 flex items-baseline">
-            {plan.priceDisplay}
-            <span className="text-xs text-gray-500 ml-0.5">
-              {plan.priceLabel}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 
   const onOpenCheckout = async (plan: PlanInterval) => {
     // If no user, show auth form
@@ -331,11 +296,23 @@ const PricingSection = ({
         )}
       </div>
 
-      <h2 className="text-lg font-medium text-gray-900 mb-4">
+      <h2 className="text-lg font-medium text-gray-900 mb-2">
         Choose your plan
       </h2>
+      <p className="text-sky-600 text-sm font-medium mb-4">
+        14 days money back guarantee
+      </p>
 
-      <div className="space-y-2 mb-4">{plansData.map(renderPlanCard)}</div>
+      <div className="space-y-4 mb-4">
+        {plansData.map((plan) => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            isSelected={selectedPlan === plan.id}
+            onClick={() => setSelectedPlan(plan.id)}
+          />
+        ))}
+      </div>
 
       <Button
         disabled={isLoadingPortal}
