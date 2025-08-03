@@ -19,7 +19,7 @@ export const siteBlockerController = {
     const { category } = req.query;
     const siteBlockers = await siteBlockerService.getSiteBlockers(
       user.id,
-      category as string | undefined
+      category as string | undefined,
     );
     return res.status(httpStatus.OK).json(siteBlockers);
   }),

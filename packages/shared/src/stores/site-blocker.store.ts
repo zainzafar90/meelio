@@ -139,7 +139,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
                   [res.id]: {
                     id: res.id,
                     url: normalizedUrl,
-                    blocked: true,
+                    blocked: true, 
                     streak: 0,
                     createdAt: Date.now(),
                   },
@@ -301,6 +301,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
       partialize: (state) => ({
         sites: state.sites,
       }),
+     
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
         const user = useAuthStore.getState().user;

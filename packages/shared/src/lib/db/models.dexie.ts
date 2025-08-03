@@ -59,3 +59,12 @@ export interface DailySummary {
   totalFocusTime: number; // in seconds
   totalBreakTime: number; // in seconds
 }
+
+export interface CachedSound {
+  id: string;
+  path: string;
+  blob: Blob;
+  size: number;
+  lastAccessed: number;
+  downloadedAt: number;
+}

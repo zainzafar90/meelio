@@ -25,6 +25,7 @@ import {
 import { useShallow } from "zustand/shallow";
 import { useAppStore } from "../stores/app.store";
 import { pomodoroSounds } from "../data/sounds-data";
+import { soundSyncService } from "../services/sound-sync.service";
 
 const timerSettingsSchema = z.object({
   focusTime: z.number().min(1).max(1440),
@@ -67,14 +68,16 @@ export function TimerSettingsDialog({
     },
   });
 
-  const playPreviewSound = (soundId: string) => {
+  const playPreviewSound = async (soundId: string) => {
     try {
-      const soundFile = `${soundId}.mp3`;
-      const soundPath = isExtension
-        ? chrome.runtime.getURL(`public/sounds/pomodoro/${soundFile}`)
-        : `/sounds/pomodoro/${soundFile}`;
+      const sound = pomodoroSounds.find((s) => s.id === soundId);
+      if (!sound) {
+        console.error("Sound not found:", soundId);
+        return;
+      }
 
-      const audio = new Audio(soundPath);
+      const url = await soundSyncService.getSoundUrl(sound.url);
+      const audio = new Audio(url);
       audio.volume = 0.5;
       audio.play().catch((error) => {
         console.error("Failed to play preview sound:", error);

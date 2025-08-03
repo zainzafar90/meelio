@@ -12,7 +12,7 @@ import { pauseAllVideos, startAutoPause } from "./utils/media.utils";
 interface SiteBlockState {
   id: string;
   url: string;
-  blocked: boolean;
+  blocked?: boolean;
   streak: number;
   createdAt: number;
 }

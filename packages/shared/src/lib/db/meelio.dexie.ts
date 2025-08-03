@@ -5,6 +5,7 @@ import type {
   PomodoroSession,
   DailySummary,
   Category,
+  CachedSound,
 } from "./models.dexie";
 
 export class MeelioDB extends Dexie {
@@ -13,6 +14,7 @@ export class MeelioDB extends Dexie {
   focusSessions!: Table<PomodoroSession>;
   focusStats!: Table<DailySummary>;
   categories!: Table<Category, string>;
+  sounds!: Table<CachedSound, string>;
 
   constructor() {
     super("meelio");
@@ -96,6 +98,16 @@ export class MeelioDB extends Dexie {
         focusStats: "++id, date",
         categories: "id, userId, name, icon, type",
       });
+
+    this.version(7)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+      });
   }
 }
 
@@ -104,9 +116,7 @@ export const db = new MeelioDB();
 export async function resetDatabase() {
   try {
     await db.delete();
-    console.log("Database deleted successfully");
     await db.open();
-    console.log("Database recreated with latest schema");
   } catch (error) {
     console.error("Failed to reset database:", error);
     throw error;
@@ -114,5 +124,5 @@ export async function resetDatabase() {
 }
 
 db.on("ready", async () => {
-  console.log("Database ready");
+  console.debug("Database ready");
 });

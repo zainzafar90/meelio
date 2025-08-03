@@ -10,24 +10,18 @@ export const siteBlockerService = {
    */
   getSiteBlockers: async (
     userId: string,
-    category?: string
+    category?: string,
   ): Promise<SiteBlocker[]> => {
+    const conditions = [eq(siteBlockers.userId, userId)];
+    
     if (category) {
-      return await db
-        .select()
-        .from(siteBlockers)
-        .where(
-          and(
-            eq(siteBlockers.userId, userId),
-            eq(siteBlockers.category, category)
-          )
-        );
+      conditions.push(eq(siteBlockers.category, category));
     }
 
     return await db
       .select()
       .from(siteBlockers)
-      .where(eq(siteBlockers.userId, userId));
+      .where(and(...conditions));
   },
 
   /**
@@ -115,6 +109,7 @@ export const siteBlockerService = {
       updateData.category = data.category;
     }
 
+
     const result = await db
       .update(siteBlockers)
       .set(updateData)
@@ -135,4 +130,5 @@ export const siteBlockerService = {
       .delete(siteBlockers)
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
+
 };

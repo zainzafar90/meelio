@@ -15,6 +15,7 @@ import { SoundList } from "./components/sound-list/sound-list";
 import { CategoryList } from "./components/categories/category-list";
 import { SoundControlsBar } from "./components/sound-player/controls/sound-control-bar";
 import { ConnectionWarning } from "../../common/connection-warning";
+import { SoundSyncStatus } from "./sound-sync-status";
 
 export const SoundscapesSheet: React.FC = () => {
   const { t } = useTranslation();
@@ -36,15 +37,16 @@ export const SoundscapesSheet: React.FC = () => {
         <VisuallyHidden>
           <SheetHeader>
             <SheetTitle>{t("soundscapes.dialog.title")}</SheetTitle>
+          
             <SheetDescription>
               {t("soundscapes.dialog.description")}
             </SheetDescription>
           </SheetHeader>
         </VisuallyHidden>
         <div className="flex h-full flex-col overflow-hidden p-6">
+          <SoundSyncStatus />
           <CategoryList />
           <ConnectionWarning />
-
           <div className="flex-1 overflow-y-auto">
             <SoundList />
           </div>
