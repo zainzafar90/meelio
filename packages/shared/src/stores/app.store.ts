@@ -24,7 +24,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: "0.5.6",
+      version: "0.5.7",
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
@@ -58,6 +58,13 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
       version: 2,
       skipHydration: false,
+      partialize: (s) => ({
+        platform: s.platform,
+        mantraRotationCount: s.mantraRotationCount,
+        mantraRotationEnabled: s.mantraRotationEnabled,
+        wallpaperRotationEnabled: s.wallpaperRotationEnabled,
+        twelveHourClock: s.twelveHourClock,
+      }),
       onRehydrateStorage: () => (state) => {
         if (state && state.mantraRotationEnabled) {
           state.incrementMantraRotationCount();
