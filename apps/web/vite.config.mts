@@ -1,7 +1,5 @@
 import path from "path";
 
-// import { env } from "process";
-
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, UserConfig } from "vite";
 // import { VitePWA } from "vite-plugin-pwa";
