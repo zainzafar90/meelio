@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Meelio",
   "short_name": "Meelio",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "Find your focus & calm with enhanced soundscapes. Meelio's tools fuel productivity and relaxation",
   "chrome_url_overrides": {
     "newtab": "index.html"

@@ -1,9 +1,8 @@
 import { Sound, SoundType } from "../types";
 import { SoundIcons } from "../components/icons";
-import { env } from "../utils/env.utils";
 
 const SOUND_FILES_EXTENSION = ".mp3";
-const SOUND_FILES_BASE_PATH =  env.dev ? "http://localhost:4000/sounds/yT3sxTz": "https://cdn.meelio.io/file/meelio/sounds";
+const SOUND_FILES_BASE_PATH =  "https://cdn.meelio.io/file/meelio/sounds";
 
 export const allSounds: Sound[] = [
   {
