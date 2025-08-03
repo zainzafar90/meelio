@@ -32,7 +32,7 @@ export const plansData: PlanData[] = [
     price: 30,
     priceDisplay: "$30",
     priceLabel: "/ yr",
-    description: "Billed Yearly",
+    description: "Billed yearly (equivalent to $2.50/month)",
     discount: "20% off",
   },
   {

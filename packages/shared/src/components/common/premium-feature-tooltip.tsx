@@ -1,4 +1,4 @@
-import React, { useState, useId, useEffect } from "react";
+import React, { useState, useId } from "react";
 import { Icons } from "../icons/icons";
 import {
   Dialog,
@@ -19,7 +19,6 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../stores/auth.store";
 import { UserAuthForm } from "../auth/user-auth-form";
-import { AuthUser } from "../../types";
 import { useShallow } from "zustand/shallow";
 
 interface PremiumFeatureTooltipProps {
@@ -51,7 +50,6 @@ export const PremiumFeatureTooltip: React.FC<PremiumFeatureTooltipProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const { t } = useTranslation();
 
   const { user, guestUser } = useAuthStore(
     useShallow((state) => ({
