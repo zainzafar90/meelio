@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   Sheet,
   SheetContent,
@@ -16,17 +15,42 @@ import { CategoryList } from "./components/categories/category-list";
 import { SoundControlsBar } from "./components/sound-player/controls/sound-control-bar";
 import { ConnectionWarning } from "../../common/connection-warning";
 import { SoundSyncStatus } from "./sound-sync-status";
+import { useSoundSyncProgress } from "./use-sound-sync-progress";
 
-export const SoundscapesSheet: React.FC = () => {
+export interface SoundscapesSheetProps {}
+
+export interface SoundscapesBodyProps {
+  readonly isSyncing: boolean;
+}
+
+const SoundscapesBody: React.FC<SoundscapesBodyProps> = ({ isSyncing }) => (
+  <>
+    <SoundSyncStatus />
+    {isSyncing ? null : (
+      <>
+        <CategoryList />
+        <ConnectionWarning />
+        <div className="flex-1 overflow-y-auto">
+          <SoundList />
+        </div>
+      </>
+    )}
+  </>
+);
+
+/**
+ * Display soundscape controls and sounds.
+ */
+export const SoundscapesSheet: React.FC<SoundscapesSheetProps> = () => {
   const { t } = useTranslation();
-
   const { isSoundscapesVisible, setSoundscapesVisible } = useDockStore(
-    useShallow((state) => ({
-      isSoundscapesVisible: state.isSoundscapesVisible,
-      setSoundscapesVisible: state.setSoundscapesVisible,
-    }))
+    useShallow((s) => ({
+      isSoundscapesVisible: s.isSoundscapesVisible,
+      setSoundscapesVisible: s.setSoundscapesVisible,
+    })),
   );
-
+  const progress = useSoundSyncProgress();
+  const isSyncing = !progress.isComplete;
   return (
     <Sheet open={isSoundscapesVisible} onOpenChange={setSoundscapesVisible}>
       <SheetContent
@@ -37,21 +61,15 @@ export const SoundscapesSheet: React.FC = () => {
         <VisuallyHidden>
           <SheetHeader>
             <SheetTitle>{t("soundscapes.dialog.title")}</SheetTitle>
-          
             <SheetDescription>
               {t("soundscapes.dialog.description")}
             </SheetDescription>
           </SheetHeader>
         </VisuallyHidden>
         <div className="flex h-full flex-col overflow-hidden p-6">
-          <SoundSyncStatus />
-          <CategoryList />
-          <ConnectionWarning />
-          <div className="flex-1 overflow-y-auto">
-            <SoundList />
-          </div>
+          <SoundscapesBody isSyncing={isSyncing} />
         </div>
-        <SoundControlsBar />
+        {isSyncing ? null : <SoundControlsBar />}
       </SheetContent>
     </Sheet>
   );

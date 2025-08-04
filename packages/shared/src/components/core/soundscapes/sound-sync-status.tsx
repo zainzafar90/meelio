@@ -1,73 +1,61 @@
 import { useEffect, useState } from "react";
-import { soundSyncService, SoundSyncProgress } from "../../../services/sound-sync.service";
 import { Progress } from "@repo/ui/components/ui/progress";
+import { useSoundSyncProgress } from "./use-sound-sync-progress";
 
-export const SoundSyncStatus = () => {
+export interface OfflineMessageProps {}
+
+const OfflineMessage: React.FC<OfflineMessageProps> = () => (
+  <div className="p-2 rounded-md bg-muted/50">
+    <p className="text-xs text-muted-foreground">
+      Connect to the internet to download sounds for offline use
+    </p>
+  </div>
+);
+
+export interface SyncProgressProps {
+  readonly value: number;
+}
+
+const SyncProgress: React.FC<SyncProgressProps> = ({ value }) => (
+  <div className="space-y-1">
+    <div className="flex items-center justify-between text-xs">
+      <span className="text-muted-foreground">Downloading sounds...</span>
+      <span className="text-muted-foreground">{value}%</span>
+    </div>
+    <Progress value={value} className="h-1" />
+  </div>
+);
+
+export interface SoundSyncStatusProps {}
+
+/**
+ * Display progress of cached sound downloads.
+ */
+export const SoundSyncStatus: React.FC<SoundSyncStatusProps> = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [syncProgress, setSyncProgress] = useState<SoundSyncProgress>({
-    total: 0,
-    downloaded: 0,
-    isComplete: false,
-  });
-
+  const progress = useSoundSyncProgress();
   useEffect(() => {
-
-    const updateStatus = async () => {
-      const progress = soundSyncService.getSyncStatus();
-      setSyncProgress(progress);
-      
-      if (progress.isComplete) {
-        const size = await soundSyncService.getCacheSize();
-        console.log(`[SoundSync] Cache size: ${(size / (1024 * 1024)).toFixed(1)}MB`);
-      }
-    };
-
-    updateStatus();
-
-    // Update every 2 seconds during sync
-    const interval = setInterval(updateStatus, 2000);
-
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
+    const online = () => setIsOnline(true);
+    const offline = () => setIsOnline(false);
+    window.addEventListener("online", online);
+    window.addEventListener("offline", offline);
     return () => {
-      clearInterval(interval);
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", online);
+      window.removeEventListener("offline", offline);
     };
   }, []);
-
-  const syncPercentage = syncProgress.total > 0 
-    ? Math.round((syncProgress.downloaded / syncProgress.total) * 100)
-    : 0;
-
+  const percent =
+    progress.total > 0
+      ? Math.round((progress.downloaded / progress.total) * 100)
+      : 0;
   return (
     <div className="flex flex-col gap-2">
-      {/* Offline message - only show if no sounds downloaded */}
-      {!isOnline && syncProgress.total > 0 && syncProgress.downloaded === 0 && (
-        <div className="p-2 rounded-md bg-muted/50">
-          <p className="text-xs text-muted-foreground">
-            Connect to the internet to download sounds for offline use
-          </p>
-        </div>
+      {!isOnline && progress.total > 0 && progress.downloaded === 0 && (
+        <OfflineMessage />
       )}
-
-      {/* Sync Progress - only show when actively syncing */}
-      {isOnline && !syncProgress.isComplete && syncProgress.total > 0 && (
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">
-              Downloading sounds...
-            </span>
-            <span className="text-muted-foreground">{syncPercentage}%</span>
-          </div>
-          <Progress value={syncPercentage} className="h-1" />
-        </div>
+      {isOnline && !progress.isComplete && progress.total > 0 && (
+        <SyncProgress value={percent} />
       )}
-
     </div>
   );
 };
