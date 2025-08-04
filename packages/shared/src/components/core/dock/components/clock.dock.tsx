@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { cn } from "@repo/ui/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 import { toZonedTime } from "date-fns-tz";
 
 const CLOCK_UPDATE_INTERVAL = 1000;
@@ -40,59 +46,68 @@ export const ClockDock = () => {
   const handClass = isDaytime ? "bg-black" : "bg-white";
 
   return (
-    <div
-      className={cn(
-        "size-10 rounded-xl shadow-lg",
-        "hidden items-center justify-center sm:flex",
-        "bg-gradient-to-b from-zinc-800 to-zinc-900"
-      )}
-    >
-      <div className="relative flex aspect-square w-7 items-center justify-center rounded-full">
-        <div
-          className={cn(
-            "relative flex aspect-square w-full items-center justify-center rounded-full",
-            clockFaceClass
-          )}
-        >
-          {/* Hour hand */}
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
           <div
             className={cn(
-              "absolute h-[32%] w-0.5 origin-bottom rounded-full",
-              handClass
-            )}
-            style={{ transform: `translateY(-50%) rotate(${hourDegrees}deg)` }}
-          />
-
-          {/* Minute hand */}
-          <div
-            className={cn(
-              "absolute h-[44%] w-0.5 origin-bottom rounded-full",
-              handClass
-            )}
-            style={{
-              transform: `translateY(-50%) rotate(${minuteDegrees}deg)`,
-            }}
-          />
-
-          {/* Second hand */}
-          <div
-            className="absolute h-[48%] w-0.5 origin-bottom rounded-full bg-orange-400"
-            style={{
-              transform: `translateY(-50%) rotate(${secondDegrees}deg)`,
-            }}
-          />
-
-          {/* Center dot */}
-          <div
-            className={cn(
-              "absolute flex h-1.5 w-1.5 items-center justify-center rounded-full",
-              handClass
+              "size-10 rounded-xl shadow-lg",
+              "hidden items-center justify-center sm:flex",
+              "bg-gradient-to-b from-zinc-800 to-zinc-900"
             )}
           >
-            <div className={cn("h-0.5 w-0.5 rounded-full", clockFaceClass)} />
+            <div className="relative flex aspect-square w-7 items-center justify-center rounded-full">
+              <div
+                className={cn(
+                  "relative flex aspect-square w-full items-center justify-center rounded-full",
+                  clockFaceClass
+                )}
+              >
+                {/* Hour hand */}
+                <div
+                  className={cn(
+                    "absolute h-[32%] w-0.5 origin-bottom rounded-full",
+                    handClass
+                  )}
+                  style={{ transform: `translateY(-50%) rotate(${hourDegrees}deg)` }}
+                />
+
+                {/* Minute hand */}
+                <div
+                  className={cn(
+                    "absolute h-[44%] w-0.5 origin-bottom rounded-full",
+                    handClass
+                  )}
+                  style={{
+                    transform: `translateY(-50%) rotate(${minuteDegrees}deg)`,
+                  }}
+                />
+
+                {/* Second hand */}
+                <div
+                  className="absolute h-[48%] w-0.5 origin-bottom rounded-full bg-orange-400"
+                  style={{
+                    transform: `translateY(-50%) rotate(${secondDegrees}deg)`,
+                  }}
+                />
+
+                {/* Center dot */}
+                <div
+                  className={cn(
+                    "absolute flex h-1.5 w-1.5 items-center justify-center rounded-full",
+                    handClass
+                  )}
+                >
+                  <div className={cn("h-0.5 w-0.5 rounded-full", clockFaceClass)} />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Clock</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

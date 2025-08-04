@@ -2,6 +2,12 @@ import { cn } from "@repo/ui/lib/utils";
 import { useDockStore } from "../../stores/dock.store";
 import { ComponentType } from "react";
 import { useShallow } from "zustand/shallow";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@repo/ui/components/ui/tooltip";
 
 export interface DockItem {
   id: string;
@@ -67,26 +73,34 @@ export const DockButton = ({
   };
 
   return (
-    <button
-      className={cn(
-        "cursor-pointer",
-        "relative flex size-10 items-center justify-center rounded-xl shadow-lg",
-        "bg-gradient-to-b from-zinc-800 to-zinc-900",
-        className
-      )}
-      onClick={handleClick}
-      title={item.name}
-      role="button"
-    >
-      <IconComponent className="size-6 text-white" />
-      {isActive && (
-        <div className="absolute -bottom-3 h-1 w-1 rounded-full bg-zinc-500" />
-      )}
-      {showIconLabels && (
-        <span className="absolute -bottom-3 text-muted-foreground">
-          <span className="text-[7px] leading-none">{item.name}</span>
-        </span>
-      )}
-    </button>
+    <TooltipProvider delayDuration={0}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className={cn(
+              "cursor-pointer",
+              "relative flex size-10 items-center justify-center rounded-xl shadow-lg",
+              "bg-gradient-to-b from-zinc-800 to-zinc-900",
+              className
+            )}
+            onClick={handleClick}
+            role="button"
+          >
+            <IconComponent className="size-6 text-white" />
+            {isActive && (
+              <div className="absolute -bottom-3 h-1 w-1 rounded-full bg-zinc-500" />
+            )}
+            {showIconLabels && (
+              <span className="absolute -bottom-3 text-muted-foreground">
+                <span className="text-[7px] leading-none">{item.name}</span>
+              </span>
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{item.name}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
