@@ -24,7 +24,7 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      version: "0.5.8",
+      version: "0.5.9",
       platform: "extension",
       mantraRotationCount: 0,
       mantraRotationEnabled: true,
