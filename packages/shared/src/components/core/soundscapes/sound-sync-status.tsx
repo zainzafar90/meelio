@@ -24,8 +24,8 @@ export const SoundSyncStatus = () => {
 
     updateStatus();
 
-    // Update every 2 seconds during sync
-    const interval = setInterval(updateStatus, 2000);
+    // Update every 5 seconds during sync
+    const interval = setInterval(updateStatus, 5000);
 
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
