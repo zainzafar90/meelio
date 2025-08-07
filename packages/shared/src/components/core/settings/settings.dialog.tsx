@@ -43,8 +43,7 @@ import { SettingsTab, useSettingsStore } from "../../../stores/settings.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { clearLocalData } from "../../../utils/clear-data.utils";
 import { useShallow } from "zustand/shallow";
-import { LogoMonochrome } from "../../../components/common/logo";
-import { LoginButton } from "./components/common/login-protected";
+import { PromotionalLoginButton } from "./components/common/promotional-login-button";
 import { FeedbackSettings } from "./tabs/feedback-settings";
 
 type SettingsNavItem = {
@@ -133,29 +132,7 @@ export function SettingsDialog() {
             <SidebarContent>
               {!user && guestUser && (
                 <SidebarGroup>
-                  <LoginButton className="w-full">
-                    <div className="relative">
-                      <div
-                        className={cn(
-                          "flex w-full items-center gap-2 px-3 py-2 rounded-md",
-                          "bg-gradient-to-r from-blue-500 to-sky-500",
-                          "text-white font-medium shadow-sm transition-colors backdrop-blur-sm"
-                        )}
-                      >
-                        <div className="flex flex-col w-full text-left text-sm">
-                          Login
-                          <small className="opacity-80 text-xs">
-                            to save and sync your data
-                          </small>
-                        </div>
-                        <LogoMonochrome className="h-6 w-6 text-white" />
-                      </div>
-                      <span className="absolute -top-1 -left-1 h-3 w-3 isolate">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-300 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 -top-1 right-0 bg-blue-500"></span>
-                      </span>
-                    </div>
-                  </LoginButton>
+                  <PromotionalLoginButton variant="compact" />
                 </SidebarGroup>
               )}
               <SidebarGroup>

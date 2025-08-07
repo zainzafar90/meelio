@@ -10,6 +10,8 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
 import { useCalendarStore } from "../../../stores/calendar.store";
+import { useAuthStore } from "../../../stores/auth.store";
+import { PromotionalLoginButton } from "../settings/components/common/promotional-login-button";
 import {
   getCalendarAuthUrl,
   deleteCalendarToken,
@@ -45,8 +47,15 @@ export const CalendarSheet = () => {
       clearCalendar: state.clearCalendar,
     }))
   );
+  const { user, guestUser } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+      guestUser: state.guestUser,
+    }))
+  );
 
   const isConnected = !!token;
+  const isGuestMode = guestUser && !user;
 
   const formatTimeRemaining = (event: CalendarEvent): string => {
     try {
@@ -240,7 +249,15 @@ export const CalendarSheet = () => {
           </SheetTitle>
         </SheetHeader>
 
-        {isConnected ? (
+        {isGuestMode ? (
+          <div className="flex flex-col gap-4">
+            <PromotionalLoginButton 
+              variant="minimal"
+              title="Sign in to unlock Calendar"
+              subtitle="Connect your Google Calendar and sync events"
+            />
+          </div>
+        ) : isConnected ? (
           <div className="flex flex-col gap-4 flex-1 overflow-hidden">
             <div className="flex items-center justify-between p-2">
               <div className="text-sm text-green-600">
