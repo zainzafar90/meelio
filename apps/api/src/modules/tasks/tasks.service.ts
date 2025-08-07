@@ -270,15 +270,16 @@ export const tasksService = {
   async bulkSync(
     userId: string,
     payload: {
-      creates: Array<{ title: string; completed?: boolean; pinned?: boolean; dueDate?: string | number | null; categoryId?: string | null; providerId?: string | null; updatedAt?: Date }>;
-      updates: Array<{ id: string } & TaskUpdateData>;
-      deletes: Array<{ id: string; deletedAt?: Date }>;
+      creates: Array<{ clientId?: string; title: string; completed?: boolean; pinned?: boolean; dueDate?: string | number | null; categoryId?: string | null; providerId?: string | null; updatedAt?: Date }>;
+      updates: Array<({ id?: string; clientId?: string }) & TaskUpdateData>;
+      deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
     }
-  ): Promise<{ created: Task[]; updated: Task[]; deleted: string[] }> {
-    const created: Task[] = [];
+  ): Promise<{ created: Array<Task & { clientId?: string }>; updated: Task[]; deleted: string[] }> {
+    const created: Array<Task & { clientId?: string }> = [];
     const updated: Task[] = [];
     const deleted: string[] = [];
 
+    const idMap = new Map<string, string>();
     for (const c of payload.creates || []) {
       const task = await tasksService.createTask(userId, {
         title: c.title,
@@ -288,20 +289,42 @@ export const tasksService = {
         categoryId: c.categoryId ?? undefined,
         providerId: c.providerId ?? undefined,
       });
-      created.push(task);
+      if (c.clientId) idMap.set(c.clientId, task.id);
+      created.push({ ...task, clientId: c.clientId });
     }
 
+    // Collapse multiple updates to the same id to the last one by updatedAt
+    const updateById = new Map<string, any>();
     for (const u of payload.updates || []) {
-      const task = await tasksService.updateTask(userId, u.id, u);
-      updated.push(task);
+      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
+      if (!resolvedId) continue;
+      const prev = updateById.get(resolvedId);
+      if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
+        updateById.set(resolvedId, u);
+      }
+    }
+    for (const [resolvedId, u] of updateById) {
+      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
+      try {
+        const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
+        updated.push(task);
+      } catch (err) {
+        // Skip not found
+      }
     }
 
     for (const d of payload.deletes || []) {
-      await db
-        .update(tasks)
-        .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
-        .where(and(eq(tasks.id, d.id), eq(tasks.userId, userId)));
-      deleted.push(d.id);
+      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
+      if (!resolvedId) continue;
+      try {
+        await db
+          .update(tasks)
+          .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
+          .where(and(eq(tasks.id, resolvedId), eq(tasks.userId, userId)));
+        deleted.push(resolvedId);
+      } catch (err) {
+        // ignore
+      }
     }
 
     return { created, updated, deleted };

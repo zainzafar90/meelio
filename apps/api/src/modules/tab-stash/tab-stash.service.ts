@@ -101,31 +101,37 @@ export const tabStashService = {
   bulkSync: async (
     userId: string,
     payload: {
-      creates: Array<{ windowId: string; urls: string[] }>;
-      updates: Array<{ id: string; windowId?: string; urls?: string[] }>;
-      deletes: Array<{ id: string }>;
+      creates: Array<{ clientId?: string; windowId: string; urls: string[] }>;
+      updates: Array<{ id?: string; clientId?: string; windowId?: string; urls?: string[] }>;
+      deletes: Array<{ id?: string; clientId?: string }>;
     }
-  ): Promise<{ created: TabStash[]; updated: TabStash[]; deleted: string[] }> => {
-    const created: TabStash[] = [];
+  ): Promise<{ created: Array<TabStash & { clientId?: string }>; updated: TabStash[]; deleted: string[] }> => {
+    const created: Array<TabStash & { clientId?: string }> = [];
     const updated: TabStash[] = [];
     const deleted: string[] = [];
 
+    const idMap = new Map<string, string>();
     for (const c of payload.creates || []) {
       const ts = await tabStashService.createTabStash(userId, c);
-      created.push(ts);
+      if (c.clientId) idMap.set(c.clientId, ts.id);
+      created.push({ ...ts, clientId: c.clientId });
     }
 
     for (const u of payload.updates || []) {
-      const ts = await tabStashService.updateTabStash(u.id, userId, u);
+      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
+      if (!resolvedId) continue;
+      const ts = await tabStashService.updateTabStash(resolvedId, userId, u);
       updated.push(ts);
     }
 
     for (const d of payload.deletes || []) {
+      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
+      if (!resolvedId) continue;
       await db
         .update(tabStashes)
         .set({ deletedAt: new Date() } as any)
-        .where(and(eq(tabStashes.id, d.id), eq(tabStashes.userId, userId)));
-      deleted.push(d.id);
+        .where(and(eq(tabStashes.id, resolvedId), eq(tabStashes.userId, userId)));
+      deleted.push(resolvedId);
     }
 
     return { created, updated, deleted };

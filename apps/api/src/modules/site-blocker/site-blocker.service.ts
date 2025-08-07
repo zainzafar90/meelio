@@ -136,21 +136,27 @@ export const siteBlockerService = {
   bulkSync: async (
     userId: string,
     payload: {
-      creates: Array<{ url: string; category?: string }>;
-      deletes: Array<{ id: string }>;
+      creates: Array<{ clientId?: string; url: string; category?: string }>;
+      deletes: Array<{ id?: string; clientId?: string }>;
     }
-  ): Promise<{ created: SiteBlocker[]; deleted: string[] }> => {
-    const created: SiteBlocker[] = [];
+  ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; deleted: string[] }> => {
+    const created: Array<SiteBlocker & { clientId?: string }> = [];
     const deleted: string[] = [];
 
+    const idMap = new Map<string, string>();
     for (const c of payload.creates || []) {
       const res = await siteBlockerService.createSiteBlocker(userId, c);
-      if (res) created.push(res);
+      if (res) {
+        if (c.clientId) idMap.set(c.clientId, res.id);
+        created.push({ ...res, clientId: c.clientId });
+      }
     }
 
     for (const d of payload.deletes || []) {
-      await siteBlockerService.deleteSiteBlocker(d.id, userId);
-      deleted.push(d.id);
+      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
+      if (!resolvedId) continue;
+      await siteBlockerService.deleteSiteBlocker(resolvedId, userId);
+      deleted.push(resolvedId);
     }
 
     return { created, deleted };

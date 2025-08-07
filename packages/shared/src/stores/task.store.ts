@@ -67,86 +67,57 @@ async function processSyncQueue() {
   isProcessingSyncQueue = true;
   syncStore.setSyncing("task", true);
 
-  for (const operation of queue) {
-    try {
-      switch (operation.type) {
-        case "create":
-          {
-            const created = await taskApi.createTask({
-              title: operation.data.title,
-              completed: operation.data.completed || false,
-              dueDate: operation.data.dueDate,
-              pinned: operation.data.pinned || false,
-              categoryId: operation.data.categoryId,
-              updatedAt: operation.data.updatedAt,
-            });
-
-            await db.tasks.update(operation.entityId, {
-              id: created.id,
-              completed: operation.data.completed || false
-            });
-
-            // Update React state with the new server-generated ID
-            useTaskStore.setState((state) => ({
-              tasks: state.tasks.map((task) =>
-                task.id === operation.entityId
-                  ? { ...task, id: created.id, completed: operation.data.completed || false }
-                  : task
-              ),
-            }));
-          }
-          break;
-
-        case "update":
-          {
-            const updated = await taskApi.updateTask(
-              operation.entityId,
-              operation.data
-            );
-
-            await db.tasks.update(operation.entityId, {
-              id: updated.id,
-              completed: operation.data.completed !== undefined ? operation.data.completed : updated.completed
-            });
-
-            // Update React state if the ID changed (unlikely but safe)
-            if (updated.id !== operation.entityId) {
-              useTaskStore.setState((state) => ({
-                tasks: state.tasks.map((task) =>
-                  task.id === operation.entityId
-                    ? { ...task, ...updated }
-                    : task
-                ),
-              }));
-            }
-          }
-          break;
-
-        case "delete":
-          {
-            // Send delete to server, keep local tombstone
-            await taskApi.deleteTask(operation.entityId);
-            // Ensure we keep a tombstone locally to avoid resurrection on next merge
-            await db.tasks.update(operation.entityId, {
-              deletedAt: operation.data?.deletedAt || Date.now(),
-              updatedAt: operation.data?.deletedAt || Date.now(),
-            });
-          }
-          break;
-      }
-
-      syncStore.removeFromQueue("task", operation.id);
-    } catch (error) {
-      console.error("Sync operation failed:", error);
-
-      const hasExceededRetryLimit = operation.retries >= 3;
-
-      if (hasExceededRetryLimit) {
-        syncStore.removeFromQueue("task", operation.id);
-      } else {
-        syncStore.incrementRetry("task", operation.id);
-      }
+  // Build bulk payload
+  const creates = [] as any[];
+  const updates = [] as any[];
+  const deletes = [] as any[];
+  for (const op of queue) {
+    if (op.type === "create") {
+      creates.push({
+        clientId: op.entityId,
+        title: op.data.title,
+        completed: !!op.data.completed,
+        dueDate: op.data.dueDate,
+        pinned: !!op.data.pinned,
+        categoryId: op.data.categoryId,
+        providerId: op.data.providerId,
+        updatedAt: op.data.updatedAt,
+      });
+    } else if (op.type === "update") {
+      updates.push({ id: op.entityId, ...op.data });
+    } else if (op.type === "delete") {
+      deletes.push({ id: op.entityId, deletedAt: op.data?.deletedAt });
     }
+  }
+
+  try {
+    const result = await taskApi.bulkSync({ creates, updates, deletes });
+    const idMap = new Map<string, string>();
+    for (const c of result.created) {
+      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
+    }
+
+    // Reconcile local DB and state
+    await db.transaction("rw", db.tasks, async () => {
+      for (const [clientId, serverId] of idMap) {
+        await db.tasks.update(clientId, { id: serverId });
+        useTaskStore.setState((state) => ({
+          tasks: state.tasks.map((t) => (t.id === clientId ? { ...t, id: serverId } : t)),
+        }));
+      }
+      for (const d of result.deleted) {
+        await db.tasks.update(d, { deletedAt: Date.now(), updatedAt: Date.now() });
+      }
+      for (const u of result.updated) {
+        await db.tasks.update(u.id, u as any);
+      }
+    });
+
+    // Clear queue upon success
+    for (const op of queue) syncStore.removeFromQueue("task", op.id);
+  } catch (error) {
+    console.error("Bulk task sync failed:", error);
+    // Leave queue for retry
   }
 
   syncStore.setSyncing("task", false);
