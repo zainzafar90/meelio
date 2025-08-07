@@ -20,37 +20,32 @@ async function processSyncQueue() {
 
   syncStore.setSyncing("tab-stash", true);
 
-  for (const operation of queue) {
-    try {
-      switch (operation.type) {
-        case "create": {
-          const session = operation.data.session as TabSession;
-          const created = await tabStashService.createTabStash({
-            windowId: session.id,
-            urls: session.tabs.map((t) => t.url),
-          });
-
-          useTabStashStore.setState((state) => ({
-            sessions: state.sessions.map((s) =>
-              s.id === session.id ? { ...s, id: created.id } : s
-            ),
-          }));
-          break;
-        }
-        case "delete":
-          await tabStashService.deleteTabStash(operation.entityId);
-          break;
-      }
-
-      syncStore.removeFromQueue("tab-stash", operation.id);
-    } catch (error) {
-      console.error("Tab stash sync failed:", error);
-      if (operation.retries >= 3) {
-        syncStore.removeFromQueue("tab-stash", operation.id);
-      } else {
-        syncStore.incrementRetry("tab-stash", operation.id);
-      }
+  const creates: any[] = [];
+  const updates: any[] = [];
+  const deletes: any[] = [];
+  for (const op of queue) {
+    if (op.type === "create") {
+      const session = op.data.session as TabSession;
+      creates.push({ clientId: session.id, windowId: session.id, urls: session.tabs.map((t) => t.url) });
+    } else if (op.type === "update") {
+      // not used yet
+    } else if (op.type === "delete") {
+      deletes.push({ id: op.entityId });
     }
+  }
+
+  try {
+    const result = await tabStashService.bulkSync({ creates, updates, deletes });
+    const idMap = new Map<string, string>();
+    for (const c of result.created) {
+      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
+    }
+    useTabStashStore.setState((state) => ({
+      sessions: state.sessions.map((s) => (idMap.has(s.id) ? { ...s, id: idMap.get(s.id)! } : s)),
+    }));
+    for (const op of queue) syncStore.removeFromQueue("tab-stash", op.id);
+  } catch (error) {
+    console.error("Tab stash bulk sync failed:", error);
   }
 
   syncStore.setSyncing("tab-stash", false);
@@ -84,28 +79,11 @@ export const useTabStashStore = create<TabStashState>()(
         }));
 
         if (authUser) {
-          if (syncStore.isOnline) {
-            try {
-              const created = await tabStashService.createTabStash({
-                windowId: session.id,
-                urls: session.tabs.map((t) => t.url),
-              });
-              set((state) => ({
-                sessions: state.sessions.map((s) =>
-                  s.id === session.id ? { ...s, id: created.id } : s
-                ),
-              }));
-            } catch (error) {
-              console.error("Failed to sync tab stash:", error);
-            }
-          } else {
-            syncStore.addToQueue("tab-stash", {
-              type: "create",
-              entityId: session.id,
-              data: { session },
-            });
-          }
-
+          syncStore.addToQueue("tab-stash", {
+            type: "create",
+            entityId: session.id,
+            data: { session },
+          });
           if (syncStore.isOnline) processSyncQueue();
         }
       },
@@ -121,19 +99,10 @@ export const useTabStashStore = create<TabStashState>()(
         const syncStore = useSyncStore.getState();
 
         if (authUser) {
-          if (syncStore.isOnline) {
-            try {
-              await tabStashService.deleteTabStash(sessionId);
-            } catch (error) {
-              console.error("Failed to delete remote tab stash:", error);
-            }
-          } else {
-            syncStore.addToQueue("tab-stash", {
-              type: "delete",
-              entityId: sessionId,
-            });
-          }
-
+          syncStore.addToQueue("tab-stash", {
+            type: "delete",
+            entityId: sessionId,
+          });
           if (syncStore.isOnline) processSyncQueue();
         }
       },

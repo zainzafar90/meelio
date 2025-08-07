@@ -46,4 +46,12 @@ export const tabStashService = {
   async deleteTabStash(id: string): Promise<void> {
     await axios.delete(`/v1/tab-stashes/${id}`);
   },
+  async bulkSync(payload: {
+    creates?: Array<{ clientId?: string; windowId: string; urls: string[] }>;
+    updates?: Array<{ id?: string; clientId?: string; windowId?: string; urls?: string[] }>;
+    deletes?: Array<{ id?: string; clientId?: string }>;
+  }): Promise<{ created: Array<TabStash & { clientId?: string }>; updated: TabStash[]; deleted: string[] }> {
+    const res = await axios.post(`/v1/tab-stashes/bulk`, payload);
+    return res.data;
+  },
 };

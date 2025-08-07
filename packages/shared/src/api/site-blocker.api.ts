@@ -31,4 +31,13 @@ export const siteBlockerApi = {
     checkPro();
     await axios.delete(`/v1/site-blockers/${id}`);
   },
+
+  async bulkSync(payload: {
+    creates?: Array<{ clientId?: string; url: string; category?: string }>;
+    deletes?: Array<{ id?: string; clientId?: string }>;
+  }): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; deleted: string[] }> {
+    checkPro();
+    const res = await axios.post(`/v1/site-blockers/bulk`, payload);
+    return res.data;
+  },
 };

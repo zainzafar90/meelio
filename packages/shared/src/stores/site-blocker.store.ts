@@ -51,43 +51,37 @@ function doesHostMatch(host: string, site: string): boolean {
 
   syncStore.setSyncing("site-blocker", true);
 
-  for (const operation of queue) {
-    try {
-      switch (operation.type) {
-        case "create": {
-          const url = operation.data.url as string;
-          const normalizedUrl = normalizeUrl(url);
-          const res = await siteBlockerApi.addBlockedSite(normalizedUrl);
-          useSiteBlockerStore.setState((state) => ({
-            sites: {
-              ...state.sites,
-              [res.id]: {
-                id: res.id,
-                url: normalizedUrl,
-                blocked: true,
-                streak: 0,
-                createdAt: Date.now(),
-              },
-            },
-          }));
-          break;
-        }
-        case "delete": {
-          const id = operation.data.id as string;
-          await siteBlockerApi.removeBlockedSite(id);
-          break;
-        }
-      }
-
-      syncStore.removeFromQueue("site-blocker", operation.id);
-    } catch (error) {
-      console.error("Site blocker sync failed:", error);
-      if (operation.retries >= 3) {
-        syncStore.removeFromQueue("site-blocker", operation.id);
-      } else {
-        syncStore.incrementRetry("site-blocker", operation.id);
-      }
+  const creates: any[] = [];
+  const deletes: any[] = [];
+  for (const op of queue) {
+    if (op.type === "create") {
+      const url = normalizeUrl(op.data.url as string);
+      creates.push({ clientId: op.entityId, url });
+    } else if (op.type === "delete") {
+      deletes.push({ id: op.entityId });
     }
+  }
+
+  try {
+    const result = await siteBlockerApi.bulkSync({ creates, deletes });
+    const idMap = new Map<string, string>();
+    for (const c of result.created) {
+      if ((c as any).clientId && c.id !== (c as any).clientId) idMap.set((c as any).clientId as string, c.id);
+    }
+    useSiteBlockerStore.setState((state) => ({
+      sites: Object.fromEntries(
+        Object.values(state.sites).map((s) => {
+          const mapped = idMap.get(s.id);
+          if (mapped) {
+            return [mapped, { ...s, id: mapped }];
+          }
+          return [s.id, s];
+        })
+      ),
+    }));
+    for (const op of queue) syncStore.removeFromQueue("site-blocker", op.id);
+  } catch (error) {
+    console.error("Site blocker bulk sync failed:", error);
   }
 
   syncStore.setSyncing("site-blocker", false);
@@ -131,46 +125,24 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const syncStore = useSyncStore.getState();
 
         if (user) {
-          if (syncStore.isOnline) {
-            try {
-              const res = await siteBlockerApi.addBlockedSite(normalizedUrl);
-              set((state) => ({
-                sites: {
-                  ...state.sites,
-                  [res.id]: {
-                    id: res.id,
-                    url: normalizedUrl,
-                    blocked: true, 
-                    streak: 0,
-                    createdAt: Date.now(),
-                  },
-                },
-              }));
-            } catch (e) {
-              console.error(e);
-              throw e;
-            }
-          } else {
-            const tempId = `temp_${Date.now()}`;
-            set((state) => ({
-              sites: {
-                ...state.sites,
-                [tempId]: {
-                  id: tempId,
-                  url: normalizedUrl,
-                  blocked: true,
-                  streak: 0,
-                  createdAt: Date.now(),
-                },
+          const tempId = `temp_${Date.now()}`;
+          set((state) => ({
+            sites: {
+              ...state.sites,
+              [tempId]: {
+                id: tempId,
+                url: normalizedUrl,
+                blocked: true,
+                streak: 0,
+                createdAt: Date.now(),
               },
-            }));
-            syncStore.addToQueue("site-blocker", {
-              type: "create",
-              entityId: tempId,
-              data: { url: normalizedUrl },
-            });
-          }
-
+            },
+          }));
+          syncStore.addToQueue("site-blocker", {
+            type: "create",
+            entityId: tempId,
+            data: { url: normalizedUrl },
+          });
           if (syncStore.isOnline) processSyncQueue();
         } else {
           // For non-authenticated users, use a local ID
