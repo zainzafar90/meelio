@@ -5,7 +5,7 @@ import { TabSession, TabStashState } from "../types/tab-stash.types";
 import { lwwMergeById } from "../utils/sync.utils";
 import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
-import { tabStashService } from "../services/tab-stash.service";
+import { tabStashApi } from "../api/tab-stash.api";
 import {
   checkTabPermissions,
   groupTabsByWindow,
@@ -35,7 +35,7 @@ async function processSyncQueue() {
   }
 
   try {
-    const result = await tabStashService.bulkSync({ creates, updates, deletes });
+    const result = await tabStashApi.bulkSync({ creates, updates, deletes });
     const idMap = new Map<string, string>();
     for (const c of result.created) {
       if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
@@ -197,7 +197,7 @@ export const useTabStashStore = create<TabStashState>()(
 
           if (syncStore.isOnline) {
             try {
-              const remote = await tabStashService.getTabStashes();
+              const remote = await tabStashApi.getTabStashes();
               const remoteSessions: TabSession[] = remote.map((r) => ({
                 id: r.id,
                 name: new Date(r.createdAt).toLocaleString(),

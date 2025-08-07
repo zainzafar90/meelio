@@ -1,4 +1,4 @@
-import { axios } from "../api/axios";
+import { axios } from "./axios";
 
 export interface TabStash {
   id: string;
@@ -19,7 +19,7 @@ export interface UpdateTabStashDto {
   urls?: string[];
 }
 
-export const tabStashService = {
+export const tabStashApi = {
   async getTabStashes(): Promise<TabStash[]> {
     const res = await axios.get("/v1/tab-stashes");
     return res.data;
@@ -55,3 +55,4 @@ export const tabStashService = {
     return res.data;
   },
 };
+
