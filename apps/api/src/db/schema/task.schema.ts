@@ -8,7 +8,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { createdAt, id, updatedAt, deletedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
 import { categories } from "./category.schema";
 import { providers } from "./provider.schema";
@@ -26,6 +26,7 @@ export const tasks = pgTable(
     providerId: uuid("provider_id"),
     createdAt,
     updatedAt,
+    deletedAt,
   },
   (table) => ({
     userIdIdx: index("idx_tasks_user_id").on(table.userId),

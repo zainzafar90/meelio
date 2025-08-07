@@ -30,6 +30,7 @@ export interface Task {
   providerId?: string;
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number | null;
 }
 
 // Add Category model

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { SiteBlocker, siteBlockers } from "@/db/schema/site-blocker.schema";
+import { SiteBlocker, SiteBlockerInsert, siteBlockers } from "@/db/schema/site-blocker.schema";
 import { eq, and } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
@@ -21,7 +21,7 @@ export const siteBlockerService = {
     return await db
       .select()
       .from(siteBlockers)
-      .where(and(...conditions));
+      .where(and(...conditions, eq(siteBlockers.deletedAt, null)));
   },
 
   /**
@@ -68,7 +68,8 @@ export const siteBlockerService = {
     if (existingSite.length > 0) {
       // Remove the existing site blocker
       await db
-        .delete(siteBlockers)
+        .update(siteBlockers)
+        .set({ deletedAt: new Date() } as any)
         .where(
           and(
             eq(siteBlockers.userId, userId),
@@ -127,7 +128,8 @@ export const siteBlockerService = {
     await siteBlockerService.getSiteBlockerById(id, userId);
 
     await db
-      .delete(siteBlockers)
+      .update(siteBlockers)
+      .set({ deletedAt: new Date() } as SiteBlocker)
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 

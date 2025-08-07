@@ -19,7 +19,7 @@ export const tabStashService = {
     return await db
       .select()
       .from(tabStashes)
-      .where(eq(tabStashes.userId, userId));
+      .where(and(eq(tabStashes.userId, userId), eq(tabStashes.deletedAt, null)));
   },
 
   /**
@@ -94,7 +94,8 @@ export const tabStashService = {
     await tabStashService.getTabStashById(id, userId);
 
     await db
-      .delete(tabStashes)
+      .update(tabStashes)
+      .set({ deletedAt: new Date() } as TabStash)
       .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
   },
 };

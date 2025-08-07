@@ -20,6 +20,7 @@ interface TaskUpdateData {
   updatedAt?: Date;
   categoryId?: string | null;
   providerId?: string | null;
+  deletedAt?: Date | null;
 }
 
 export const tasksService = {
@@ -36,7 +37,7 @@ export const tasksService = {
     const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
 
     const result = db.query.tasks.findMany({
-      where: and(...conditions),
+      where: and(...conditions, eq(tasks.deletedAt, null)),
       orderBy: filters.sortBy
         ? [filters.sortOrder === "desc" ? desc(tasks[filters.sortBy]) : asc(tasks[filters.sortBy])]
         : [desc(tasks.createdAt)],
@@ -183,6 +184,10 @@ export const tasksService = {
     if (updateData.updatedAt !== undefined) {
       data.updatedAt = updateData.updatedAt;
     }
+    
+    if (updateData.deletedAt !== undefined) {
+      data.deletedAt = updateData.deletedAt;
+    }
 
     if (updateData.dueDate !== undefined) {
       const parsedDate = tasksService.parseDate(updateData.dueDate);
@@ -255,8 +260,10 @@ export const tasksService = {
     // Verify task exists
     await this.getTaskById(userId, taskId);
 
+    // Soft delete: set deletedAt
     await db
-      .delete(tasks)
+      .update(tasks)
+      .set({ deletedAt: new Date() } as Task)
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 

@@ -78,6 +78,7 @@ async function processSyncQueue() {
               dueDate: operation.data.dueDate,
               pinned: operation.data.pinned || false,
               categoryId: operation.data.categoryId,
+              updatedAt: operation.data.updatedAt,
             });
 
             await db.tasks.update(operation.entityId, {
@@ -123,8 +124,13 @@ async function processSyncQueue() {
 
         case "delete":
           {
+            // Send delete to server, keep local tombstone
             await taskApi.deleteTask(operation.entityId);
-            await db.tasks.delete(operation.entityId);
+            // Ensure we keep a tombstone locally to avoid resurrection on next merge
+            await db.tasks.update(operation.entityId, {
+              deletedAt: operation.data?.deletedAt || Date.now(),
+              updatedAt: operation.data?.deletedAt || Date.now(),
+            });
           }
           break;
       }
@@ -202,6 +208,7 @@ export const useTaskStore = create<TaskState>()(
         providerId: task.providerId, // For now, we'll need to pass this from the backend
         createdAt: Date.now(),
         updatedAt: Date.now(),
+        deletedAt: null,
       };
 
       if (newTask.pinned) {
@@ -309,7 +316,9 @@ export const useTaskStore = create<TaskState>()(
       const syncStore = useSyncStore.getState();
 
       try {
-        await db.tasks.delete(taskId);
+        const deletedAt = Date.now();
+        // Soft delete locally (tombstone)
+        await db.tasks.update(taskId, { deletedAt, updatedAt: deletedAt });
 
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== taskId),
@@ -320,6 +329,7 @@ export const useTaskStore = create<TaskState>()(
           syncStore.addToQueue("task", {
             type: "delete",
             entityId: taskId,
+            data: { deletedAt },
           });
 
           if (syncStore.isOnline) processSyncQueue();
@@ -461,10 +471,10 @@ export const useTaskStore = create<TaskState>()(
       );
 
 
-      set({
-        tasks: localTasks,
-        lists: SYSTEM_LISTS,
-      });
+        set({
+          tasks: localTasks.filter(t => !t.deletedAt),
+          lists: SYSTEM_LISTS,
+        });
     },
 
     syncWithServer: async () => {
@@ -488,21 +498,35 @@ export const useTaskStore = create<TaskState>()(
         const serverTasksMap = new Map(serverTasks.map(task => [task.id, task]));
         const localTasksMap = new Map(localTasks.map(task => [task.id, task]));
 
-        const tasksToKeep = localTasks.filter(task => !serverTasksMap.has(task.id));
+        const mergedById = new Map<string, Task>();
 
-        const mergedServerTasks = serverTasks.map(serverTask => {
+        const lwwMerge = (a: Task, b: Task): Task => {
+          const aDel = a.deletedAt ?? 0;
+          const bDel = b.deletedAt ?? 0;
+          if (aDel !== bDel) return aDel > bDel ? a : b; // newer delete wins
+          if (a.updatedAt !== b.updatedAt) return a.updatedAt > b.updatedAt ? a : b; // newer update wins
+          return b; // tie-breaker prefer server when b is server
+        };
+
+        // Merge ids that exist on server
+        for (const serverTask of serverTasks) {
           const localTask = localTasksMap.get(serverTask.id);
           if (localTask) {
-            return {
-              ...serverTask,
-              completed: localTask.completed,
-              pinned: localTask.pinned,
-            };
+            mergedById.set(serverTask.id, lwwMerge(localTask, serverTask));
+          } else {
+            mergedById.set(serverTask.id, serverTask);
           }
-          return serverTask;
-        });
+        }
 
-        const mergedTasks = [...mergedServerTasks, ...tasksToKeep];
+        // Handle locals not on server
+        for (const localTask of localTasks) {
+          if (!mergedById.has(localTask.id)) {
+            mergedById.set(localTask.id, localTask);
+          }
+        }
+
+        // Final list, filtering out tombstoned items from UI/state
+        const mergedTasks = Array.from(mergedById.values());
 
         await db.transaction("rw", db.tasks, async () => {
           await db.tasks.where("userId").equals(user.id).delete();
@@ -511,7 +535,7 @@ export const useTaskStore = create<TaskState>()(
 
 
         set({
-          tasks: mergedTasks,
+          tasks: mergedTasks.filter(t => !t.deletedAt),
         });
 
         syncStore.setSyncing("task", false);

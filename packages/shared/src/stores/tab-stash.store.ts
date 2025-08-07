@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import { persist, createJSONStorage } from "zustand/middleware";
 import { TabSession, TabStashState } from "../types/tab-stash.types";
+import { lwwMergeById } from "../utils/sync.utils";
 import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
 import { tabStashService } from "../services/tab-stash.service";
@@ -228,7 +229,7 @@ export const useTabStashStore = create<TabStashState>()(
           if (syncStore.isOnline) {
             try {
               const remote = await tabStashService.getTabStashes();
-              const sessions: TabSession[] = remote.map((r) => ({
+              const remoteSessions: TabSession[] = remote.map((r) => ({
                 id: r.id,
                 name: new Date(r.createdAt).toLocaleString(),
                 timestamp: new Date(r.createdAt).getTime(),
@@ -240,7 +241,11 @@ export const useTabStashStore = create<TabStashState>()(
                   pinned: false,
                 })),
               }));
-              set({ sessions });
+              const merged = lwwMergeById(
+                get().sessions.map((s) => ({ ...s, updatedAt: s.timestamp })),
+                remoteSessions.map((s) => ({ ...s, updatedAt: s.timestamp }))
+              );
+              set({ sessions: merged });
               return;
             } catch (error) {
               console.error("Failed to load sessions from server:", error);

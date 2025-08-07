@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { useAuthStore } from "./auth.store";
 import { useSyncStore } from "./sync.store";
+import { lwwMergeById } from "../utils/sync.utils";
 import { siteBlockerApi } from "../api/site-blocker.api";
 
 interface SiteBlockState {
@@ -42,7 +43,7 @@ function doesHostMatch(host: string, site: string): boolean {
   );
 }
 
-async function processSyncQueue() {
+  async function processSyncQueue() {
   const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("site-blocker");
 
@@ -147,12 +148,25 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
               }));
             } catch (e) {
               console.error(e);
-              throw e; // Re-throw to allow UI to handle the error
+              throw e;
             }
           } else {
+            const tempId = `temp_${Date.now()}`;
+            set((state) => ({
+              sites: {
+                ...state.sites,
+                [tempId]: {
+                  id: tempId,
+                  url: normalizedUrl,
+                  blocked: true,
+                  streak: 0,
+                  createdAt: Date.now(),
+                },
+              },
+            }));
             syncStore.addToQueue("site-blocker", {
               type: "create",
-              entityId: normalizedUrl,
+              entityId: tempId,
               data: { url: normalizedUrl },
             });
           }
@@ -253,19 +267,22 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         if (syncStore.isOnline) {
           try {
             const sites = await siteBlockerApi.getBlockedSites();
+            // Merge remote with local in case of offline additions
+            const localArray = Object.values(get().sites);
+            const remoteArray = sites.map((s) => ({
+              id: s.id,
+              url: normalizeUrl(s.url),
+              blocked: true,
+              streak: 0,
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            }));
+            const merged = lwwMergeById(
+              localArray.map((s) => ({ ...s, updatedAt: s.createdAt })),
+              remoteArray
+            );
             set({
-              sites: Object.fromEntries(
-                sites.map((s) => [
-                  s.id,
-                  {
-                    id: s.id,
-                    url: normalizeUrl(s.url),
-                    blocked: true,
-                    streak: 0,
-                    createdAt: Date.now(),
-                  },
-                ])
-              ),
+              sites: Object.fromEntries(merged.map((m) => [m.id, m])),
             });
           } catch (e) {
             console.error(e);
