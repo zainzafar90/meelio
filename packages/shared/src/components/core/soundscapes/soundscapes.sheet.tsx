@@ -44,9 +44,9 @@ export const SoundscapesSheet: React.FC = () => {
           </SheetHeader>
         </VisuallyHidden>
         <div className="flex h-full flex-col overflow-hidden p-6">
-          <SoundSyncStatus />
           <CategoryList />
           <ConnectionWarning />
+          <SoundSyncStatus />
           <div className="flex-1 overflow-y-auto">
             <SoundList />
           </div>
