@@ -3,7 +3,7 @@ import path from "path";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig, UserConfig } from "vite";
 // import { VitePWA } from "vite-plugin-pwa";
-import { viteStaticCopy } from "vite-plugin-static-copy";
+// import { viteStaticCopy } from "vite-plugin-static-copy";
 
 export default defineConfig({
   base: "./",
@@ -27,14 +27,14 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: "public/manifest.json",
-          dest: ".",
-        },
-      ],
-    }),
+    // viteStaticCopy({
+    //   targets: [
+    //     {
+    //       src: "public/manifest.json",
+    //       dest: ".",
+    //     },
+    //   ],
+    // }),
     // VitePWA(
     //   env.NODE_ENV === "development"
     //     ? {}
