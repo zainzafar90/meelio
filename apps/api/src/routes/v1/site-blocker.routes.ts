@@ -16,6 +16,8 @@ router
     siteBlockerController.createSiteBlocker
   );
 
+router.post("/bulk", auth(), siteBlockerController.bulkSync);
+
 router
   .route("/:id")
   .get(auth(), siteBlockerController.getSiteBlocker)

@@ -15,6 +15,8 @@ router
     tabStashController.createTabStash
   );
 
+router.post("/bulk", auth(), tabStashController.bulkSync);
+
 router
   .route("/:id")
   .get(auth(), tabStashController.getTabStash)

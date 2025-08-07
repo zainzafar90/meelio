@@ -15,6 +15,8 @@ router
     tasksController.createTask
   );
 
+router.post("/bulk", auth(), tasksController.bulkSync);
+
 router
   .route("/:id")
   .get(auth(), tasksController.getTask)

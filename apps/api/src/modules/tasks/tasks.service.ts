@@ -267,4 +267,44 @@ export const tasksService = {
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 
+  async bulkSync(
+    userId: string,
+    payload: {
+      creates: Array<{ title: string; completed?: boolean; pinned?: boolean; dueDate?: string | number | null; categoryId?: string | null; providerId?: string | null; updatedAt?: Date }>;
+      updates: Array<{ id: string } & TaskUpdateData>;
+      deletes: Array<{ id: string; deletedAt?: Date }>;
+    }
+  ): Promise<{ created: Task[]; updated: Task[]; deleted: string[] }> {
+    const created: Task[] = [];
+    const updated: Task[] = [];
+    const deleted: string[] = [];
+
+    for (const c of payload.creates || []) {
+      const task = await tasksService.createTask(userId, {
+        title: c.title,
+        completed: c.completed,
+        pinned: c.pinned,
+        dueDate: c.dueDate ?? undefined,
+        categoryId: c.categoryId ?? undefined,
+        providerId: c.providerId ?? undefined,
+      });
+      created.push(task);
+    }
+
+    for (const u of payload.updates || []) {
+      const task = await tasksService.updateTask(userId, u.id, u);
+      updated.push(task);
+    }
+
+    for (const d of payload.deletes || []) {
+      await db
+        .update(tasks)
+        .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
+        .where(and(eq(tasks.id, d.id), eq(tasks.userId, userId)));
+      deleted.push(d.id);
+    }
+
+    return { created, updated, deleted };
+  },
+
 };

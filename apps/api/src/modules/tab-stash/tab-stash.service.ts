@@ -98,4 +98,36 @@ export const tabStashService = {
       .set({ deletedAt: new Date() } as TabStash)
       .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
   },
+  bulkSync: async (
+    userId: string,
+    payload: {
+      creates: Array<{ windowId: string; urls: string[] }>;
+      updates: Array<{ id: string; windowId?: string; urls?: string[] }>;
+      deletes: Array<{ id: string }>;
+    }
+  ): Promise<{ created: TabStash[]; updated: TabStash[]; deleted: string[] }> => {
+    const created: TabStash[] = [];
+    const updated: TabStash[] = [];
+    const deleted: string[] = [];
+
+    for (const c of payload.creates || []) {
+      const ts = await tabStashService.createTabStash(userId, c);
+      created.push(ts);
+    }
+
+    for (const u of payload.updates || []) {
+      const ts = await tabStashService.updateTabStash(u.id, userId, u);
+      updated.push(ts);
+    }
+
+    for (const d of payload.deletes || []) {
+      await db
+        .update(tabStashes)
+        .set({ deletedAt: new Date() } as any)
+        .where(and(eq(tabStashes.id, d.id), eq(tabStashes.userId, userId)));
+      deleted.push(d.id);
+    }
+
+    return { created, updated, deleted };
+  },
 };

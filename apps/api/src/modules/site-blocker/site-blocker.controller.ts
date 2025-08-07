@@ -79,4 +79,11 @@ export const siteBlockerController = {
     await siteBlockerService.deleteSiteBlocker(id, user.id);
     return res.status(httpStatus.NO_CONTENT).send();
   }),
+
+  bulkSync: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { creates = [], deletes = [] } = req.body || {};
+    const result = await siteBlockerService.bulkSync(user.id, { creates, deletes });
+    return res.status(httpStatus.OK).json(result);
+  }),
 };

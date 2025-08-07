@@ -56,7 +56,7 @@ export class MeelioDB extends Dexie {
       .stores({
         siteBlocker: "id, userId, url",
 
-        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
 
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
@@ -75,7 +75,7 @@ export class MeelioDB extends Dexie {
     this.version(4)
       .stores({
         siteBlocker: "id, userId, url",
-        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
         categories: "id, userId, name",
@@ -84,7 +84,7 @@ export class MeelioDB extends Dexie {
     this.version(5)
       .stores({
         siteBlocker: "id, userId, url",
-        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
         categories: "id, userId, name",
@@ -93,7 +93,7 @@ export class MeelioDB extends Dexie {
     this.version(6)
       .stores({
         siteBlocker: "id, userId, url",
-        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
         categories: "id, userId, name, icon, type",
@@ -102,11 +102,34 @@ export class MeelioDB extends Dexie {
     this.version(7)
       .stores({
         siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+      });
+
+    this.version(8)
+      .stores({
+        siteBlocker: "id, userId, url",
         tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
         focusSessions: "++id, timestamp",
         focusStats: "++id, date",
         categories: "id, userId, name, icon, type",
         sounds: "id, path, downloadedAt, lastAccessed",
+      })
+      .upgrade(async (trans) => {
+        await trans
+          .table("tasks")
+          .toCollection()
+          .modify((task: any) => {
+            if (task.updatedAt === undefined) {
+              task.updatedAt = task.createdAt ?? Date.now();
+            }
+            if (task.deletedAt === undefined) {
+              task.deletedAt = null;
+            }
+          });
       });
   }
 }

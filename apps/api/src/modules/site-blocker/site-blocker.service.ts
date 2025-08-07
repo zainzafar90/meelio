@@ -133,4 +133,26 @@ export const siteBlockerService = {
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 
+  bulkSync: async (
+    userId: string,
+    payload: {
+      creates: Array<{ url: string; category?: string }>;
+      deletes: Array<{ id: string }>;
+    }
+  ): Promise<{ created: SiteBlocker[]; deleted: string[] }> => {
+    const created: SiteBlocker[] = [];
+    const deleted: string[] = [];
+
+    for (const c of payload.creates || []) {
+      const res = await siteBlockerService.createSiteBlocker(userId, c);
+      if (res) created.push(res);
+    }
+
+    for (const d of payload.deletes || []) {
+      await siteBlockerService.deleteSiteBlocker(d.id, userId);
+      deleted.push(d.id);
+    }
+
+    return { created, deleted };
+  },
 };
