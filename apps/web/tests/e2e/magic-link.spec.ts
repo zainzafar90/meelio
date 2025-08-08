@@ -50,34 +50,102 @@ test('magic link authentication', async ({ page, context }) => {
   await etherealPage.waitForLoadState('networkidle');
   console.log('📧 On Ethereal messages page');
   
-  // 10. Click the first (latest) email with bold style - it's the newest one
-  const latestEmail = etherealPage.locator('tbody tr[style*="bold"]').first();
-  await latestEmail.click();
-  console.log('📨 Opened latest email');
+  // 10. Find and open the latest email
+  const emailRows = etherealPage.locator('tbody tr');
+  const emailCount = await emailRows.count();
+  
+  if (emailCount === 0) {
+    throw new Error('No emails found in Ethereal inbox');
+  }
+  
+  // Look for the message link in the first email row
+  const firstRow = emailRows.first();
+  const messageLink = firstRow.locator('td a[href*="/message"]').first();
+  
+  if (await messageLink.count() > 0) {
+    const href = await messageLink.getAttribute('href');
+    if (href) {
+      console.log('📧 Found message link:', href);
+      // Navigate directly to the message
+      if (href.startsWith('/')) {
+        await etherealPage.goto(`https://ethereal.email${href}`);
+      } else {
+        await etherealPage.goto(href);
+      }
+      console.log('✅ Navigated to message view');
+    }
+  } else {
+    // Fallback: click the row
+    await firstRow.click();
+    console.log('📧 Clicked email row');
+  }
   
   // 11. Wait for email view to load
   await etherealPage.waitForLoadState('networkidle');
-  await etherealPage.waitForTimeout(2000);
+  await etherealPage.waitForTimeout(3000);
   
-  // 12. Extract magic link from page content
-  const pageContent = await etherealPage.content();
+  // 12. Try different tabs to find the email content
+  let magicLink: string | null = null;
   
-  // Look for the magic link URL pattern in the page
-  const tokenPattern = new RegExp(`${FRONTEND_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\?token=[A-Za-z0-9\\-._~]+`);
-  const tokenMatch = pageContent.match(tokenPattern);
-  
-  if (!tokenMatch) {
-    console.log('❌ Could not extract magic link from email');
-    throw new Error('Magic link not found in email');
+  // Look for different tabs/views that might contain the email content
+  const tabs = ['HTML', 'Html', 'html', 'Text', 'text', 'Raw', 'raw'];
+  for (const tab of tabs) {
+    const tabElement = etherealPage.locator(`text="${tab}"`).first();
+    if (await tabElement.count() > 0) {
+      console.log(`📄 Found ${tab} tab, clicking...`);
+      await tabElement.click();
+      await etherealPage.waitForTimeout(1000);
+      
+      // Check if we can find the magic link after clicking this tab
+      const pageContent = await etherealPage.content();
+      const linkMatch = pageContent.match(/http:\/\/localhost:4000\?token=[A-Za-z0-9\-._~]+/);
+      if (linkMatch) {
+        console.log(`🔗 Found magic link in ${tab} view`);
+        magicLink = linkMatch[0];
+        break;
+      }
+    }
   }
   
-  const [magicLink] = tokenMatch || [];
-  console.log('🔗 Found magic link:', magicLink);
-
+  // If not found in tabs, try other methods
+  if (!magicLink) {
+    // Try to find the email content in pre or code blocks
+    const preBlocks = await etherealPage.locator('pre, code').all();
+    for (const block of preBlocks) {
+      const text = await block.textContent();
+      if (text) {
+        const linkMatch = text.match(/http:\/\/localhost:4000\?token=[A-Za-z0-9\-._~]+/);
+        if (linkMatch) {
+          console.log('🔗 Found magic link in pre/code block');
+          magicLink = linkMatch[0];
+          break;
+        }
+      }
+    }
+  }
+  
+  // Final fallback: check entire page content
+  if (!magicLink) {
+    const pageContent = await etherealPage.content();
+    const linkMatch = pageContent.match(/http:\/\/localhost:4000\?token=[A-Za-z0-9\-._~]+/);
+    if (linkMatch) {
+      console.log('🔗 Found magic link in page content');
+      magicLink = linkMatch[0];
+    }
+  }
+  
   if (!magicLink) {
     console.log('❌ Could not extract magic link from email');
+    // Log debugging info
+    const visibleText = await etherealPage.locator('body').innerText();
+    console.log('Visible text length:', visibleText.length);
+    if (visibleText.includes('localhost')) {
+      console.log('Page contains "localhost" but no valid magic link pattern found');
+    }
     throw new Error('Magic link not found in email');
   }
+  
+  console.log('🔗 Found magic link:', magicLink);
   
   // 13. Close Ethereal tab
   await etherealPage.close();
