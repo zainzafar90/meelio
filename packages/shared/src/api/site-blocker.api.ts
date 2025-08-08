@@ -6,6 +6,9 @@ export interface SiteBlockerDto {
   url: string;
   category?: string;
   isBlocked: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 function checkPro() {

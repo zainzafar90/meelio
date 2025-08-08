@@ -14,9 +14,9 @@ export const siteBlockerController = {
       url,
       category,
       isBlocked: !!enabled,
-      createdAt,
-      updatedAt,
-      deletedAt,
+      createdAt: createdAt?.toISOString?.() ?? createdAt,
+      updatedAt: updatedAt?.toISOString?.() ?? updatedAt,
+      deletedAt: deletedAt ? deletedAt?.toISOString?.() : null,
       userId,
     };
   },
@@ -99,11 +99,10 @@ export const siteBlockerController = {
 
   bulkSync: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { creates = [], updates = [], deletes = [] } = req.body || {};
-    const result = await siteBlockerService.bulkSync(user.id, { creates, updates, deletes });
+    const { creates = [], deletes = [] } = req.body || {};
+    const result = await siteBlockerService.bulkSync(user.id, { creates, deletes });
     return res.status(httpStatus.OK).json({
       created: result.created.map((r) => ({ ...siteBlockerController._toDto(r), clientId: (r as any).clientId })),
-      updated: result.updated.map(siteBlockerController._toDto),
       deleted: result.deleted,
     });
   }),

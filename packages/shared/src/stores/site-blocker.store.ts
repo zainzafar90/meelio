@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { useAuthStore } from "./auth.store";
 import { siteBlockerApi } from "../api/site-blocker.api";
-import { useSyncStore } from "./sync.store";
 import { generateUUID } from "../utils/common.utils";
 
 interface SiteBlockState {
@@ -19,6 +18,8 @@ interface SiteBlockerState {
   addSite: (url: string, category?: string) => Promise<void>;
   removeSite: (url: string) => Promise<void>;
   toggleSite: (url: string) => Promise<void>;
+  bulkAddSites: (urls: string[], category?: string) => Promise<void>;
+  bulkRemoveSites: (urls: string[]) => Promise<void>;
   initializeStore: () => Promise<void>;
   syncWithServer: () => Promise<void>;
   _hasHydrated: boolean;
@@ -35,69 +36,6 @@ function normalizeUrl(url: string): string {
   }
 }
 
-let isProcessingSyncQueue = false;
-
-async function processSyncQueue() {
-  if (isProcessingSyncQueue) return;
-
-  const syncStore = useSyncStore.getState();
-  const queue = syncStore.getQueue("site-blocker");
-  const shouldSync = queue.length > 0 && syncStore.isOnline;
-  if (!shouldSync) return;
-
-  isProcessingSyncQueue = true;
-  syncStore.setSyncing("site-blocker", true);
-
-  const creates: Array<{ clientId?: string; url: string; category?: string }> = [];
-  const deletes: Array<{ id?: string; clientId?: string }> = [];
-  for (const op of queue) {
-    if (op.type === "create") {
-      creates.push({ clientId: op.entityId, url: op.data.url, category: op.data.category });
-    } else if (op.type === "delete") {
-      const id = op.entityId;
-      if (id.startsWith("temp_")) {
-        deletes.push({ clientId: id });
-      } else {
-        deletes.push({ id });
-      }
-    }
-  }
-
-  try {
-    const result = await siteBlockerApi.bulkSync({ creates, deletes });
-    const idMap = new Map<string, string>();
-    for (const c of result.created) {
-      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
-    }
-
-    // Reconcile local state ids
-    useSiteBlockerStore.setState((state) => {
-      const copy = { ...state.sites };
-      for (const [clientId, serverId] of idMap) {
-        const prev = copy[clientId];
-        if (prev) {
-          delete copy[clientId];
-          copy[serverId] = { ...prev, id: serverId };
-        }
-      }
-      // Remove deleted ids
-      for (const deletedId of result.deleted) {
-        if (copy[deletedId]) delete copy[deletedId];
-      }
-      return { sites: copy } as Partial<SiteBlockerState> as any;
-    });
-
-    // Clear queue upon success (use clear to avoid any stragglers)
-    syncStore.clearQueue("site-blocker");
-  } catch (error) {
-    console.error("Site-blocker bulk sync failed:", error);
-  }
-
-  syncStore.setSyncing("site-blocker", false);
-  syncStore.setLastSyncTime("site-blocker", Date.now());
-  isProcessingSyncQueue = false;
-}
-
 export const useSiteBlockerStore = create<SiteBlockerState>()(
   persist(
     (set, get) => ({
@@ -107,13 +45,19 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
 
       addSite: async (url, category) => {
         const normalizedUrl = normalizeUrl(url);
-        const existsBlocked = Object.values(get().sites).some(
+        const user = useAuthStore.getState().user;
+        
+        // Check if already blocked
+        const existing = Object.values(get().sites).find(
           (s) => s.url === normalizedUrl && s.blocked
         );
-        if (existsBlocked) return;
+        if (existing) return;
 
+        // Generate a temporary ID for optimistic update
         const tempId = `temp_${generateUUID()}`;
         const createdAt = Date.now();
+        
+        // Optimistically add to local state
         set((state) => ({
           sites: {
             ...state.sites,
@@ -127,40 +71,73 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           },
         }));
 
-        const user = useAuthStore.getState().user;
-        const syncStore = useSyncStore.getState();
+        // Sync to server if Pro user
         if (user?.isPro) {
-          syncStore.addToQueue("site-blocker", {
-            type: "create",
-            entityId: tempId,
-            data: { url: normalizedUrl, category },
-          });
-          if (syncStore.isOnline) processSyncQueue();
+          try {
+            const result = await siteBlockerApi.bulkSync({
+              creates: [{ clientId: tempId, url: normalizedUrl, category }],
+            });
+            
+            // Update local state with server ID
+            if (result.created && result.created.length > 0) {
+              const created = result.created[0];
+              set((state) => {
+                const copy = { ...state.sites };
+                delete copy[tempId];
+                copy[created.id] = {
+                  id: created.id,
+                  url: normalizedUrl,
+                  blocked: true,
+                  streak: 0,
+                  createdAt,
+                };
+                return { sites: copy };
+              });
+            }
+          } catch (error) {
+            console.error("Failed to sync site block:", error);
+            // Remove optimistic update on failure
+            set((state) => {
+              const copy = { ...state.sites };
+              delete copy[tempId];
+              return { sites: copy };
+            });
+          }
         }
       },
 
       removeSite: async (url) => {
         const normalizedUrl = normalizeUrl(url);
+        const user = useAuthStore.getState().user;
+        
         const entry = Object.values(get().sites).find(
           (s) => s.url === normalizedUrl && s.blocked
         );
         if (!entry) return;
 
+        // Optimistically remove from local state
         set((state) => {
           const copy = { ...state.sites };
           delete copy[entry.id];
           return { sites: copy };
         });
 
-        const user = useAuthStore.getState().user;
-        const syncStore = useSyncStore.getState();
-        if (user?.isPro) {
-          syncStore.addToQueue("site-blocker", {
-            type: "delete",
-            entityId: entry.id,
-            data: {},
-          });
-          if (syncStore.isOnline) processSyncQueue();
+        // Sync to server if Pro user
+        if (user?.isPro && !entry.id.startsWith("temp_")) {
+          try {
+            await siteBlockerApi.bulkSync({
+              deletes: [{ id: entry.id }],
+            });
+          } catch (error) {
+            console.error("Failed to sync site unblock:", error);
+            // Restore on failure
+            set((state) => ({
+              sites: {
+                ...state.sites,
+                [entry.id]: entry,
+              },
+            }));
+          }
         }
       },
 
@@ -169,6 +146,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const entry = Object.values(get().sites).find(
           (s) => s.url === normalizedUrl && s.blocked
         );
+        
         if (entry) {
           await get().removeSite(url);
         } else {
@@ -176,54 +154,154 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         }
       },
 
+      bulkAddSites: async (urls, category) => {
+        const user = useAuthStore.getState().user;
+        const normalizedUrls = urls.map(normalizeUrl);
+        const currentSites = get().sites;
+        
+        // Filter out already blocked sites
+        const toAdd = normalizedUrls.filter(url => 
+          !Object.values(currentSites).some(s => s.url === url && s.blocked)
+        );
+        
+        if (toAdd.length === 0) return;
+        
+        // Generate temp IDs and optimistically update
+        const creates: Array<{ clientId: string; url: string; category?: string }> = [];
+        const newSites: Record<string, SiteBlockState> = {};
+        
+        for (const url of toAdd) {
+          const tempId = `temp_${generateUUID()}`;
+          creates.push({ clientId: tempId, url, category });
+          newSites[tempId] = {
+            id: tempId,
+            url,
+            blocked: true,
+            streak: 0,
+            createdAt: Date.now(),
+          };
+        }
+        
+        // Optimistically update local state
+        set((state) => ({
+          sites: { ...state.sites, ...newSites }
+        }));
+        
+        // Sync to server if Pro user
+        if (user?.isPro) {
+          try {
+            const result = await siteBlockerApi.bulkSync({ creates });
+            
+            // Update local state with server IDs
+            if (result.created && result.created.length > 0) {
+              set((state) => {
+                const copy = { ...state.sites };
+                for (const created of result.created) {
+                  if (created.clientId) {
+                    delete copy[created.clientId];
+                    copy[created.id] = {
+                      id: created.id,
+                      url: normalizeUrl(created.url),
+                      blocked: true,
+                      streak: 0,
+                      createdAt: newSites[created.clientId]?.createdAt || Date.now(),
+                    };
+                  }
+                }
+                return { sites: copy };
+              });
+            }
+          } catch (error) {
+            console.error("Failed to bulk sync site blocks:", error);
+            // Remove optimistic updates on failure
+            set((state) => {
+              const copy = { ...state.sites };
+              for (const { clientId } of creates) {
+                delete copy[clientId];
+              }
+              return { sites: copy };
+            });
+          }
+        }
+      },
+
+      bulkRemoveSites: async (urls) => {
+        const user = useAuthStore.getState().user;
+        const normalizedUrls = urls.map(normalizeUrl);
+        const currentSites = get().sites;
+        
+        // Find sites to remove
+        const toRemove = Object.values(currentSites).filter(site => 
+          normalizedUrls.includes(site.url) && site.blocked
+        );
+        
+        if (toRemove.length === 0) return;
+        
+        // Optimistically remove from local state
+        set((state) => {
+          const copy = { ...state.sites };
+          for (const site of toRemove) {
+            delete copy[site.id];
+          }
+          return { sites: copy };
+        });
+        
+        // Sync to server if Pro user
+        if (user?.isPro) {
+          const deletes = toRemove
+            .filter(site => !site.id.startsWith("temp_"))
+            .map(site => ({ id: site.id }));
+            
+          if (deletes.length > 0) {
+            try {
+              await siteBlockerApi.bulkSync({ deletes });
+            } catch (error) {
+              console.error("Failed to bulk unblock sites:", error);
+              // Restore on failure
+              set((state) => {
+                const copy = { ...state.sites };
+                for (const site of toRemove) {
+                  copy[site.id] = site;
+                }
+                return { sites: copy };
+              });
+            }
+          }
+        }
+      },
+
       initializeStore: async () => {
         const user = useAuthStore.getState().user;
         if (!user?.isPro) return;
-        const syncStore = useSyncStore.getState();
-        if (syncStore.isOnline) {
-          await get().syncWithServer();
-        }
+        await get().syncWithServer();
       },
 
       syncWithServer: async () => {
         const user = useAuthStore.getState().user;
         if (!user?.isPro) return;
-        const syncStore = useSyncStore.getState();
+        
         try {
-          await processSyncQueue();
           const server = await siteBlockerApi.getBlockedSites();
-          if (!server || server.length === 0) {
-            // Keep local if server has nothing
-            syncStore.setLastSyncTime("site-blocker", Date.now());
-            return;
-          }
-          const current = get().sites;
-          const next = { ...current } as Record<string, SiteBlockState>;
-          for (const s of server) {
-            const normalized = normalizeUrl(s.url);
-            const existing = Object.values(next).find((e) => e.url === normalized);
-            if (existing) {
-              if (existing.id !== s.id) {
-                delete next[existing.id];
-                next[s.id] = { ...existing, id: s.id, blocked: true };
-              } else {
-                next[s.id] = { ...existing, blocked: true };
-              }
-            } else {
-              next[s.id] = {
-                id: s.id,
-                url: normalized,
+          
+          // Build the new state from server data
+          const newSites: Record<string, SiteBlockState> = {};
+          for (const site of server) {
+            // Only include sites that are actually blocked (isBlocked = true)
+            if (site.isBlocked) {
+              newSites[site.id] = {
+                id: site.id,
+                url: normalizeUrl(site.url),
                 blocked: true,
                 streak: 0,
-                createdAt: Date.now(),
+                createdAt: new Date(site.createdAt).getTime(),
               };
             }
           }
-          set({ sites: next });
-          syncStore.setLastSyncTime("site-blocker", Date.now());
-        } catch (e) {
-          console.error("Site-blocker sync failed:", e);
-          syncStore.setSyncing("site-blocker", false);
+          
+          // Replace local state with server state
+          set({ sites: newSites });
+        } catch (error) {
+          console.error("Failed to sync with server:", error);
         }
       },
     }),

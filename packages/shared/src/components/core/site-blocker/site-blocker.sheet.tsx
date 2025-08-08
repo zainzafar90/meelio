@@ -106,12 +106,14 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const { sites, addSite, toggleSite, removeSite, initializeStore } = useSiteBlockerStore(
+  const { sites, addSite, toggleSite, removeSite, bulkAddSites, bulkRemoveSites, initializeStore } = useSiteBlockerStore(
     useShallow((state) => ({
       sites: state.sites,
       addSite: state.addSite,
       toggleSite: state.toggleSite,
       removeSite: state.removeSite,
+      bulkAddSites: state.bulkAddSites,
+      bulkRemoveSites: state.bulkRemoveSites,
       initializeStore: state.initializeStore,
     }))
   );
@@ -123,16 +125,16 @@ const ExtensionSiteBlockerContent = () => {
 
   const onBlockSites = useCallback(
     async (sites: string[]) => {
-      await Promise.all(sites.map((site) => addSite(site)));
+      await bulkAddSites(sites);
     },
-    [addSite]
+    [bulkAddSites]
   );
 
   const onUnblockSites = useCallback(
     async (sites: string[]) => {
-      await Promise.all(sites.map((site) => removeSite(site)));
+      await bulkRemoveSites(sites);
     },
-    [removeSite]
+    [bulkRemoveSites]
   );
 
   const addCustomSite = async () => {
