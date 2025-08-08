@@ -66,25 +66,17 @@ export const siteBlockerService = {
       );
 
     if (existingSite.length > 0) {
-      await db
+      const [updated] = await db
         .update(siteBlockers)
-        .set({ enabled: true, deletedAt: null } as any)
+        .set({ enabled: true, deletedAt: null, updatedAt: new Date() })
         .where(
           and(
             eq(siteBlockers.userId, userId),
             eq(siteBlockers.url, normalizedUrl)
           )
-        );
-      const [row] = await db
-        .select()
-        .from(siteBlockers)
-        .where(
-          and(
-            eq(siteBlockers.userId, userId),
-            eq(siteBlockers.url, normalizedUrl)
-          )
-        );
-      return row ?? null;
+        )
+        .returning();
+      return updated ?? null;
     }
 
     const insertData = {
@@ -146,7 +138,7 @@ export const siteBlockerService = {
 
     await db
       .update(siteBlockers)
-      .set({ enabled: false, deletedAt: new Date() } as any)
+      .set({ enabled: false, deletedAt: new Date(), updatedAt: new Date() })
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 
@@ -171,7 +163,7 @@ export const siteBlockerService = {
     }
 
     for (const d of payload.deletes || []) {
-      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
+      const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
       if (!resolvedId) continue;
       await siteBlockerService.deleteSiteBlocker(resolvedId, userId);
       deleted.push(resolvedId);

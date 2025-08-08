@@ -11,6 +11,7 @@ interface SiteBlockState {
   blocked: boolean;
   streak: number;
   createdAt: number;
+  updatedAt?: number;
 }
 
 interface SiteBlockerState {
@@ -283,23 +284,36 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         try {
           const server = await siteBlockerApi.getBlockedSites();
           
-          // Build the new state from server data
-          const newSites: Record<string, SiteBlockState> = {};
-          for (const site of server) {
-            // Only include sites that are actually blocked (isBlocked = true)
-            if (site.isBlocked) {
-              newSites[site.id] = {
-                id: site.id,
-                url: normalizeUrl(site.url),
-                blocked: true,
-                streak: 0,
-                createdAt: new Date(site.createdAt).getTime(),
-              };
-            }
+          // Convert server data to local format
+          const serverSites: SiteBlockState[] = server
+            .filter(site => site.isBlocked)
+            .map(site => ({
+              id: site.id,
+              url: normalizeUrl(site.url),
+              blocked: true,
+              streak: 0,
+              createdAt: new Date(site.createdAt).getTime(),
+              updatedAt: new Date(site.updatedAt).getTime(),
+            }));
+          
+          // Get current local state
+          const localSites = Object.values(get().sites);
+          
+          // Merge using LWW - server wins on conflicts
+          const mergedMap: Record<string, SiteBlockState> = {};
+          
+          // Add all local sites first
+          for (const site of localSites) {
+            mergedMap[site.id] = site;
           }
           
-          // Replace local state with server state
-          set({ sites: newSites });
+          // Merge server sites (server wins on conflict)
+          for (const site of serverSites) {
+            mergedMap[site.id] = site;
+          }
+          
+          // Update state with merged data
+          set({ sites: mergedMap });
         } catch (error) {
           console.error("Failed to sync with server:", error);
         }

@@ -296,7 +296,7 @@ export const tasksService = {
     // Collapse multiple updates to the same id to the last one by updatedAt
     const updateById = new Map<string, any>();
     for (const u of payload.updates || []) {
-      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
+      const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
       if (!resolvedId) continue;
       const prev = updateById.get(resolvedId);
       if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
@@ -304,7 +304,6 @@ export const tasksService = {
       }
     }
     for (const [resolvedId, u] of updateById) {
-      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
       try {
         const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
         updated.push(task);
@@ -314,7 +313,7 @@ export const tasksService = {
     }
 
     for (const d of payload.deletes || []) {
-      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
+      const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
       if (!resolvedId) continue;
       try {
         await db
