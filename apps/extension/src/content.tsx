@@ -119,21 +119,6 @@ const PlasmoOverlay = () => {
         },
       },
     });
-    
-    // Send message to background script to sync with server if needed
-    // This ensures the server is updated when user clicks "Open Anyway"
-    try {
-      if (chrome?.runtime?.sendMessage) {
-        chrome.runtime.sendMessage({
-          type: "SYNC_SITE_BLOCKER",
-          action: "unblock",
-          siteId: matchingSite.id,
-          url: matchingSite.url,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to send sync message:", error);
-    }
   };
 
   if (!isBlocked) return null;
