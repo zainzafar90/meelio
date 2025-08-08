@@ -187,7 +187,7 @@ const ExtensionSiteBlockerContent = () => {
     }
   };
 
-  const blockedSiteIds = Object.values(sites)
+  const blockedSiteUrls = Object.values(sites)
     .filter((site) => site.blocked)
     .map((site) => site.url);
 
@@ -217,11 +217,11 @@ const ExtensionSiteBlockerContent = () => {
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="space-y-8">
           <CustomBlockedSites
-            blockedSites={blockedSiteIds}
+            sites={sites}
             onToggleSite={toggleSite}
           />
           <SiteList
-            blockedSites={blockedSiteIds}
+            blockedSites={blockedSiteUrls}
             onToggleSite={toggleSite}
             onBlockSites={onBlockSites}
             onUnblockSites={onUnblockSites}

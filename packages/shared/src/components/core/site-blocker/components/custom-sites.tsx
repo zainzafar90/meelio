@@ -1,36 +1,43 @@
 import { SITE_LIST } from "../data/site-list";
 import { SiteItem } from "./site-item";
 
+interface SiteState {
+  id: string;
+  url: string;
+  blocked: boolean;
+}
+
 interface CustomSitesProps {
-  blockedSites: string[];
+  sites: Record<string, SiteState>;
   onToggleSite: (site: string) => void;
 }
 
 export const CustomBlockedSites = ({
-  blockedSites,
+  sites,
   onToggleSite,
 }: CustomSitesProps) => {
-  const customBlockedSites = blockedSites.filter(
+  // Get all custom sites (not in the predefined SITE_LIST)
+  const customSites = Object.values(sites).filter(
     (site) =>
       !Object.values(SITE_LIST)
         .flat()
-        .some((s) => s.url === site)
+        .some((s) => s.url === site.url)
   );
 
-  if (customBlockedSites.length === 0) return null;
+  if (customSites.length === 0) return null;
   return (
     <div className="my-8">
-      <h2 className="mb-6 text-2xl font-bold">Custom Blocked Sites</h2>
+      <h2 className="mb-6 text-2xl font-bold">Custom Sites</h2>
       <ul className="space-y-2">
-        {customBlockedSites.map((site) => (
+        {customSites.map((site) => (
           <SiteItem
-            key={site}
+            key={site.id}
             site={{
-              id: site,
-              name: site,
-              url: site,
+              id: site.id,
+              name: site.url,
+              url: site.url,
             }}
-            isBlocked={true}
+            isBlocked={site.blocked}
             onToggle={onToggleSite}
           />
         ))}

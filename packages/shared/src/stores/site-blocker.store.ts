@@ -48,13 +48,69 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const normalizedUrl = normalizeUrl(url);
         const user = useAuthStore.getState().user;
         
-        // Check if already blocked
+        // Check if site already exists
         const existing = Object.values(get().sites).find(
-          (s) => s.url === normalizedUrl && s.blocked
+          (s) => s.url === normalizedUrl
         );
-        if (existing) return;
+        
+        if (existing) {
+          // If already blocked, nothing to do
+          if (existing.blocked) return;
+          
+          // Site exists but not blocked, update it to blocked
+          set((state) => ({
+            sites: {
+              ...state.sites,
+              [existing.id]: {
+                ...existing,
+                blocked: true,
+                updatedAt: Date.now(),
+              },
+            },
+          }));
+          
+          // Sync to server if Pro user
+          if (user?.isPro && !existing.id.startsWith("temp_")) {
+            try {
+              const result = await siteBlockerApi.bulkSync({
+                creates: [{
+                  url: normalizedUrl,
+                  category,
+                  isBlocked: true,
+                }],
+              });
+              
+              if (result.created && result.created.length > 0) {
+                const updated = result.created[0];
+                set((state) => ({
+                  sites: {
+                    ...state.sites,
+                    [updated.id]: {
+                      id: updated.id,
+                      url: normalizedUrl,
+                      blocked: updated.isBlocked,
+                      streak: existing.streak,
+                      createdAt: existing.createdAt,
+                      updatedAt: Date.now(),
+                    },
+                  },
+                }));
+              }
+            } catch (error) {
+              console.error("Failed to sync site block:", error);
+              // Revert on failure
+              set((state) => ({
+                sites: {
+                  ...state.sites,
+                  [existing.id]: existing,
+                },
+              }));
+            }
+          }
+          return;
+        }
 
-        // Generate a temporary ID for optimistic update
+        // Site doesn't exist, create new one
         const tempId = `temp_${generateUUID()}`;
         const createdAt = Date.now();
         
@@ -116,19 +172,46 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         );
         if (!entry) return;
 
-        // Optimistically remove from local state
-        set((state) => {
-          const copy = { ...state.sites };
-          delete copy[entry.id];
-          return { sites: copy };
-        });
+        // Optimistically update to isBlocked: false
+        set((state) => ({
+          sites: {
+            ...state.sites,
+            [entry.id]: {
+              ...entry,
+              blocked: false,
+              updatedAt: Date.now(),
+            },
+          },
+        }));
 
         // Sync to server if Pro user
         if (user?.isPro && !entry.id.startsWith("temp_")) {
           try {
-            await siteBlockerApi.bulkSync({
-              deletes: [{ id: entry.id }],
+            // Using creates will update if exists due to backend logic
+            const result = await siteBlockerApi.bulkSync({
+              creates: [{
+                url: normalizedUrl,
+                isBlocked: false,
+              }],
             });
+            
+            // Update with server response if site was updated
+            if (result.created && result.created.length > 0) {
+              const updated = result.created[0];
+              set((state) => ({
+                sites: {
+                  ...state.sites,
+                  [updated.id]: {
+                    id: updated.id,
+                    url: normalizedUrl,
+                    blocked: updated.isBlocked,
+                    streak: entry.streak,
+                    createdAt: entry.createdAt,
+                    updatedAt: Date.now(),
+                  },
+                },
+              }));
+            }
           } catch (error) {
             console.error("Failed to sync site unblock:", error);
             // Restore on failure
@@ -144,13 +227,70 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
 
       toggleSite: async (url) => {
         const normalizedUrl = normalizeUrl(url);
+        const user = useAuthStore.getState().user;
+        
+        // Find existing entry regardless of blocked status
         const entry = Object.values(get().sites).find(
-          (s) => s.url === normalizedUrl && s.blocked
+          (s) => s.url === normalizedUrl
         );
         
         if (entry) {
-          await get().removeSite(url);
+          // Toggle the blocked status
+          const newBlockedStatus = !entry.blocked;
+          
+          // Optimistically update local state
+          set((state) => ({
+            sites: {
+              ...state.sites,
+              [entry.id]: {
+                ...entry,
+                blocked: newBlockedStatus,
+                updatedAt: Date.now(),
+              },
+            },
+          }));
+          
+          // Sync to server if Pro user
+          if (user?.isPro && !entry.id.startsWith("temp_")) {
+            try {
+              // Using creates will update if exists due to backend logic
+              const result = await siteBlockerApi.bulkSync({
+                creates: [{
+                  url: normalizedUrl,
+                  isBlocked: newBlockedStatus,
+                }],
+              });
+              
+              // Update with server response if site was updated
+              if (result.created && result.created.length > 0) {
+                const updated = result.created[0];
+                set((state) => ({
+                  sites: {
+                    ...state.sites,
+                    [updated.id]: {
+                      id: updated.id,
+                      url: normalizedUrl,
+                      blocked: updated.isBlocked,
+                      streak: entry.streak,
+                      createdAt: entry.createdAt,
+                      updatedAt: Date.now(),
+                    },
+                  },
+                }));
+              }
+            } catch (error) {
+              console.error("Failed to toggle site block:", error);
+              // Revert on failure
+              set((state) => ({
+                sites: {
+                  ...state.sites,
+                  [entry.id]: entry,
+                },
+              }));
+            }
+          }
         } else {
+          // Site doesn't exist, add it as blocked
           await get().addSite(url);
         }
       },
@@ -160,18 +300,52 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const normalizedUrls = urls.map(normalizeUrl);
         const currentSites = get().sites;
         
-        // Filter out already blocked sites
-        const toAdd = normalizedUrls.filter(url => 
-          !Object.values(currentSites).some(s => s.url === url && s.blocked)
-        );
+        // Separate existing unblocked sites from new sites
+        const existingUnblocked: SiteBlockState[] = [];
+        const newUrls: string[] = [];
         
-        if (toAdd.length === 0) return;
+        for (const url of normalizedUrls) {
+          const existing = Object.values(currentSites).find(s => s.url === url);
+          if (existing) {
+            if (!existing.blocked) {
+              existingUnblocked.push(existing);
+            }
+            // Skip if already blocked
+          } else {
+            newUrls.push(url);
+          }
+        }
         
-        // Generate temp IDs and optimistically update
-        const creates: Array<{ clientId: string; url: string; category?: string; isBlocked?: boolean }> = [];
+        if (existingUnblocked.length === 0 && newUrls.length === 0) return;
+        
+        // Update existing unblocked sites to blocked
+        if (existingUnblocked.length > 0) {
+          set((state) => {
+            const copy = { ...state.sites };
+            for (const site of existingUnblocked) {
+              copy[site.id] = {
+                ...site,
+                blocked: true,
+                updatedAt: Date.now(),
+              };
+            }
+            return { sites: copy };
+          });
+        }
+        
+        // Generate temp IDs and optimistically update for new sites
+        const creates: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }> = [];
         const newSites: Record<string, SiteBlockState> = {};
         
-        for (const url of toAdd) {
+        // Add existing unblocked sites to sync
+        for (const site of existingUnblocked) {
+          if (!site.id.startsWith("temp_")) {
+            creates.push({ url: site.url, category, isBlocked: true });
+          }
+        }
+        
+        // Add new sites
+        for (const url of newUrls) {
           const tempId = `temp_${generateUUID()}`;
           creates.push({ clientId: tempId, url, category, isBlocked: true });
           newSites[tempId] = {
@@ -183,13 +357,15 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           };
         }
         
-        // Optimistically update local state
-        set((state) => ({
-          sites: { ...state.sites, ...newSites }
-        }));
+        // Optimistically update local state with new sites
+        if (Object.keys(newSites).length > 0) {
+          set((state) => ({
+            sites: { ...state.sites, ...newSites }
+          }));
+        }
         
         // Sync to server if Pro user
-        if (user?.isPro) {
+        if (user?.isPro && creates.length > 0) {
           try {
             const result = await siteBlockerApi.bulkSync({ creates });
             
@@ -231,37 +407,68 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         const normalizedUrls = urls.map(normalizeUrl);
         const currentSites = get().sites;
         
-        // Find sites to remove
-        const toRemove = Object.values(currentSites).filter(site => 
+        // Find sites to update to isBlocked: false
+        const toUpdate = Object.values(currentSites).filter(site => 
           normalizedUrls.includes(site.url) && site.blocked
         );
         
-        if (toRemove.length === 0) return;
+        if (toUpdate.length === 0) return;
         
-        // Optimistically remove from local state
+        // Optimistically update to isBlocked: false
         set((state) => {
           const copy = { ...state.sites };
-          for (const site of toRemove) {
-            delete copy[site.id];
+          for (const site of toUpdate) {
+            copy[site.id] = {
+              ...site,
+              blocked: false,
+              updatedAt: Date.now(),
+            };
           }
           return { sites: copy };
         });
         
         // Sync to server if Pro user
         if (user?.isPro) {
-          const deletes = toRemove
+          const creates = toUpdate
             .filter(site => !site.id.startsWith("temp_"))
-            .map(site => ({ id: site.id }));
+            .map(site => ({ url: site.url, isBlocked: false }));
             
-          if (deletes.length > 0) {
+          if (creates.length > 0) {
             try {
-              await siteBlockerApi.bulkSync({ deletes });
+              // Using creates will update if exists due to backend logic
+              const result = await siteBlockerApi.bulkSync({ creates });
+              
+              // Update with server response
+              if (result.created && result.created.length > 0) {
+                set((state) => {
+                  const copy = { ...state.sites };
+                  for (const updated of result.created) {
+                    // Find original site to preserve local data
+                    const original = toUpdate.find(s => normalizeUrl(s.url) === normalizeUrl(updated.url));
+                    if (original) {
+                      copy[updated.id] = {
+                        id: updated.id,
+                        url: normalizeUrl(updated.url),
+                        blocked: updated.isBlocked,
+                        streak: original.streak,
+                        createdAt: original.createdAt,
+                        updatedAt: Date.now(),
+                      };
+                      // Remove old entry if ID changed
+                      if (original.id !== updated.id && copy[original.id]) {
+                        delete copy[original.id];
+                      }
+                    }
+                  }
+                  return { sites: copy };
+                });
+              }
             } catch (error) {
               console.error("Failed to bulk unblock sites:", error);
               // Restore on failure
               set((state) => {
                 const copy = { ...state.sites };
-                for (const site of toRemove) {
+                for (const site of toUpdate) {
                   copy[site.id] = site;
                 }
                 return { sites: copy };

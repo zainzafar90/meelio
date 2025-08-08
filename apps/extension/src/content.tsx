@@ -15,6 +15,7 @@ interface SiteBlockState {
   blocked?: boolean;
   streak: number;
   createdAt: number;
+  updatedAt?: number;
 }
 
 type SiteBlockMap = Record<string, SiteBlockState>;
@@ -99,20 +100,40 @@ const PlasmoOverlay = () => {
     }
   }, [isBlocked]);
 
-  const openAnyway = () => {
+  const openAnyway = async () => {
     if (!matchingSite) return;
-    setStorageData({
+    
+    // Update local storage to unblock the site
+    const updatedSite = {
+      ...matchingSite,
+      blocked: false,
+      streak: 0,
+      updatedAt: Date.now(),
+    };
+    
+    await setStorageData({
       state: {
         sites: {
           ...sites,
-          [matchingSite.id]: {
-            ...matchingSite,
-            blocked: false,
-            streak: 0,
-          },
+          [matchingSite.id]: updatedSite,
         },
       },
     });
+    
+    // Send message to background script to sync with server if needed
+    // This ensures the server is updated when user clicks "Open Anyway"
+    try {
+      if (chrome?.runtime?.sendMessage) {
+        chrome.runtime.sendMessage({
+          type: "SYNC_SITE_BLOCKER",
+          action: "unblock",
+          siteId: matchingSite.id,
+          url: matchingSite.url,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to send sync message:", error);
+    }
   };
 
   if (!isBlocked) return null;
