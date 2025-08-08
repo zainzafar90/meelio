@@ -5,10 +5,11 @@ import * as path from 'path';
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '..', '.env.test') });
 
-const ETHEREAL_EMAIL = process.env.ETHEREAL_EMAIL || 'iz6gkho3vdpzzqm5@ethereal.email';
-const ETHEREAL_PASSWORD = process.env.ETHEREAL_PASSWORD || 'DR6TmfmnyFBxsHh8Xf';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4000';
-const TEST_EMAIL = process.env.TEST_EMAIL || 'zainzafar90@gmail.com';
+// Export environment variables for use in other tests
+export const ETHEREAL_EMAIL = process.env.ETHEREAL_EMAIL || 'iz6gkho3vdpzzqm5@ethereal.email';
+export const ETHEREAL_PASSWORD = process.env.ETHEREAL_PASSWORD || 'DR6TmfmnyFBxsHh8Xf';
+export const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:4000';
+export const TEST_EMAIL = process.env.TEST_EMAIL || 'zainzafar90@gmail.com';
 
 export interface AuthHelperOptions {
   email?: string;
@@ -309,52 +310,6 @@ export async function authenticateUser(
       throw new Error('Authentication failed - user not logged in after magic link');
     }
   }
-}
-
-/**
- * Create a unique test email address
- */
-export function generateUniqueEmail(prefix: string = 'test'): string {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(7);
-  return `${prefix}_${timestamp}_${random}@test.com`;
-}
-
-/**
- * Wait for user session to be established
- */
-export async function waitForSession(page: Page, timeout: number = 10000): Promise<void> {
-  await page.waitForFunction(
-    () => {
-      const userStr = localStorage.getItem('meelio:local:user');
-      if (!userStr) return false;
-      try {
-        const user = JSON.parse(userStr);
-        return !!user?.state?.user?.email;
-      } catch {
-        return false;
-      }
-    },
-    { timeout }
-  );
-  console.log('✅ User session established');
-}
-
-/**
- * Get current user data from localStorage
- */
-export async function getCurrentUser(page: Page): Promise<{ email?: string; name?: string; id?: string } | null> {
-  return await page.evaluate(() => {
-    const userStr = localStorage.getItem('meelio:local:user');
-    if (!userStr) return null;
-    
-    try {
-      const user = JSON.parse(userStr);
-      return user?.state?.user || null;
-    } catch {
-      return null;
-    }
-  });
 }
 
 /**
