@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { useAuthStore } from "./auth.store";
-import { useSyncStore } from "./sync.store";
-import { lwwMergeById } from "../utils/sync.utils";
 import { siteBlockerApi } from "../api/site-blocker.api";
+import { useSyncStore } from "./sync.store";
+import { generateUUID } from "../utils/common.utils";
 
 interface SiteBlockState {
   id: string;
@@ -15,11 +16,11 @@ interface SiteBlockState {
 
 interface SiteBlockerState {
   sites: Record<string, SiteBlockState>;
-  addSite: (url: string) => Promise<void>;
-  removeSite: (url: string, sync?: boolean) => Promise<void>;
+  addSite: (url: string, category?: string) => Promise<void>;
+  removeSite: (url: string) => Promise<void>;
   toggleSite: (url: string) => Promise<void>;
-  incrementStreak: (url: string) => void;
-  loadFromServer: () => Promise<void>;
+  initializeStore: () => Promise<void>;
+  syncWithServer: () => Promise<void>;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 }
@@ -34,31 +35,31 @@ function normalizeUrl(url: string): string {
   }
 }
 
-function doesHostMatch(host: string, site: string): boolean {
-  const normalizedHost = normalizeUrl(host);
-  const normalizedSite = normalizeUrl(site);
-  return (
-    normalizedHost === normalizedSite ||
-    normalizedHost.endsWith(`.${normalizedSite}`)
-  );
-}
+let isProcessingSyncQueue = false;
 
-  async function processSyncQueue() {
+async function processSyncQueue() {
+  if (isProcessingSyncQueue) return;
+
   const syncStore = useSyncStore.getState();
   const queue = syncStore.getQueue("site-blocker");
+  const shouldSync = queue.length > 0 && syncStore.isOnline;
+  if (!shouldSync) return;
 
-  if (queue.length === 0 || !syncStore.isOnline) return;
-
+  isProcessingSyncQueue = true;
   syncStore.setSyncing("site-blocker", true);
 
-  const creates: any[] = [];
-  const deletes: any[] = [];
+  const creates: Array<{ clientId?: string; url: string; category?: string }> = [];
+  const deletes: Array<{ id?: string; clientId?: string }> = [];
   for (const op of queue) {
     if (op.type === "create") {
-      const url = normalizeUrl(op.data.url as string);
-      creates.push({ clientId: op.entityId, url });
+      creates.push({ clientId: op.entityId, url: op.data.url, category: op.data.category });
     } else if (op.type === "delete") {
-      deletes.push({ id: op.entityId });
+      const id = op.entityId;
+      if (id.startsWith("temp_")) {
+        deletes.push({ clientId: id });
+      } else {
+        deletes.push({ id });
+      }
     }
   }
 
@@ -66,238 +67,218 @@ function doesHostMatch(host: string, site: string): boolean {
     const result = await siteBlockerApi.bulkSync({ creates, deletes });
     const idMap = new Map<string, string>();
     for (const c of result.created) {
-      if ((c as any).clientId && c.id !== (c as any).clientId) idMap.set((c as any).clientId as string, c.id);
+      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
     }
-    useSiteBlockerStore.setState((state) => ({
-      sites: Object.fromEntries(
-        Object.values(state.sites).map((s) => {
-          const mapped = idMap.get(s.id);
-          if (mapped) {
-            return [mapped, { ...s, id: mapped }];
-          }
-          return [s.id, s];
-        })
-      ),
-    }));
-    for (const op of queue) syncStore.removeFromQueue("site-blocker", op.id);
+
+    // Reconcile local state ids
+    useSiteBlockerStore.setState((state) => {
+      const copy = { ...state.sites };
+      for (const [clientId, serverId] of idMap) {
+        const prev = copy[clientId];
+        if (prev) {
+          delete copy[clientId];
+          copy[serverId] = { ...prev, id: serverId };
+        }
+      }
+      // Remove deleted ids
+      for (const deletedId of result.deleted) {
+        if (copy[deletedId]) delete copy[deletedId];
+      }
+      return { sites: copy } as Partial<SiteBlockerState> as any;
+    });
+
+    // Clear queue upon success (use clear to avoid any stragglers)
+    syncStore.clearQueue("site-blocker");
   } catch (error) {
-    console.error("Site blocker bulk sync failed:", error);
+    console.error("Site-blocker bulk sync failed:", error);
   }
 
   syncStore.setSyncing("site-blocker", false);
   syncStore.setLastSyncTime("site-blocker", Date.now());
-}
-
-let autoSyncInterval: NodeJS.Timeout | null = null;
-function startAutoSync() {
-  if (autoSyncInterval) clearInterval(autoSyncInterval);
-  autoSyncInterval = setInterval(() => processSyncQueue(), 5 * 60 * 1000);
+  isProcessingSyncQueue = false;
 }
 
 export const useSiteBlockerStore = create<SiteBlockerState>()(
   persist(
     (set, get) => ({
       sites: {},
-      addSite: async (url) => {
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+
+      addSite: async (url, category) => {
         const normalizedUrl = normalizeUrl(url);
-
-        // Check if site already exists
-        const existingSite = Object.values(get().sites).find((site) =>
-          doesHostMatch(site.url, normalizedUrl)
+        const existsBlocked = Object.values(get().sites).some(
+          (s) => s.url === normalizedUrl && s.blocked
         );
+        if (existsBlocked) return;
 
-        if (existingSite) {
-          if (!existingSite.blocked) {
-            set((state) => ({
-              sites: {
-                ...state.sites,
-                [existingSite.id]: {
-                  ...existingSite,
-                  blocked: true,
-                },
-              },
-            }));
-          }
-          return;
-        }
+        const tempId = `temp_${generateUUID()}`;
+        const createdAt = Date.now();
+        set((state) => ({
+          sites: {
+            ...state.sites,
+            [tempId]: {
+              id: tempId,
+              url: normalizedUrl,
+              blocked: true,
+              streak: 0,
+              createdAt,
+            },
+          },
+        }));
 
         const user = useAuthStore.getState().user;
         const syncStore = useSyncStore.getState();
-
-        if (user) {
-          const tempId = `temp_${Date.now()}`;
-          set((state) => ({
-            sites: {
-              ...state.sites,
-              [tempId]: {
-                id: tempId,
-                url: normalizedUrl,
-                blocked: true,
-                streak: 0,
-                createdAt: Date.now(),
-              },
-            },
-          }));
+        if (user?.isPro) {
           syncStore.addToQueue("site-blocker", {
             type: "create",
             entityId: tempId,
-            data: { url: normalizedUrl },
+            data: { url: normalizedUrl, category },
           });
           if (syncStore.isOnline) processSyncQueue();
-        } else {
-          // For non-authenticated users, use a local ID
-          const localId = `local_${Date.now()}`;
-          set((state) => ({
-            sites: {
-              ...state.sites,
-              [localId]: {
-                id: localId,
-                url: normalizedUrl,
-                blocked: true,
-                streak: 0,
-                createdAt: Date.now(),
-              },
-            },
-          }));
         }
       },
-      removeSite: async (url, sync = true) => {
-        const normalizedUrl = normalizeUrl(url);
-        const site = Object.values(get().sites).find((s) =>
-          doesHostMatch(s.url, normalizedUrl)
-        );
 
-        if (!site) return;
+      removeSite: async (url) => {
+        const normalizedUrl = normalizeUrl(url);
+        const entry = Object.values(get().sites).find(
+          (s) => s.url === normalizedUrl && s.blocked
+        );
+        if (!entry) return;
 
         set((state) => {
-          const newSites = { ...state.sites };
-          delete newSites[site.id];
-          return { sites: newSites };
+          const copy = { ...state.sites };
+          delete copy[entry.id];
+          return { sites: copy };
         });
 
         const user = useAuthStore.getState().user;
         const syncStore = useSyncStore.getState();
-
-        if (sync && user && !site.id.startsWith("local_")) {
-          if (syncStore.isOnline) {
-            try {
-              await siteBlockerApi.removeBlockedSite(site.id);
-            } catch (e) {
-              console.error(e);
-            }
-          } else {
-            syncStore.addToQueue("site-blocker", {
-              type: "delete",
-              entityId: site.id,
-              data: { id: site.id },
-            });
-          }
-
+        if (user?.isPro) {
+          syncStore.addToQueue("site-blocker", {
+            type: "delete",
+            entityId: entry.id,
+            data: {},
+          });
           if (syncStore.isOnline) processSyncQueue();
         }
       },
+
       toggleSite: async (url) => {
         const normalizedUrl = normalizeUrl(url);
-        const site = Object.values(get().sites).find((s) =>
-          doesHostMatch(s.url, normalizedUrl)
+        const entry = Object.values(get().sites).find(
+          (s) => s.url === normalizedUrl && s.blocked
         );
-
-        if (site?.blocked) {
+        if (entry) {
           await get().removeSite(url);
         } else {
           await get().addSite(url);
         }
       },
-      incrementStreak: (url) => {
-        const normalizedUrl = normalizeUrl(url);
-        const site = Object.values(get().sites).find((s) =>
-          doesHostMatch(s.url, normalizedUrl)
-        );
 
-        if (!site) return;
-
-        set((state) => ({
-          sites: {
-            ...state.sites,
-            [site.id]: {
-              ...site,
-              streak: (site.streak || 0) + 1,
-            },
-          },
-        }));
-      },
-      loadFromServer: async () => {
+      initializeStore: async () => {
         const user = useAuthStore.getState().user;
+        if (!user?.isPro) return;
         const syncStore = useSyncStore.getState();
-
-        if (!user || !user.isPro) return;
-
         if (syncStore.isOnline) {
-          await processSyncQueue();
+          await get().syncWithServer();
         }
-
-        if (syncStore.isOnline) {
-          try {
-            const sites = await siteBlockerApi.getBlockedSites();
-            // Merge remote with local in case of offline additions
-            const localArray = Object.values(get().sites);
-            const remoteArray = sites.map((s) => ({
-              id: s.id,
-              url: normalizeUrl(s.url),
-              blocked: true,
-              streak: 0,
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-            }));
-            const merged = lwwMergeById(
-              localArray.map((s) => ({ ...s, updatedAt: s.createdAt })),
-              remoteArray
-            );
-            set({
-              sites: Object.fromEntries(merged.map((m) => [m.id, m])),
-            });
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        startAutoSync();
       },
-      _hasHydrated: false,
-      setHasHydrated: (state) => set({ _hasHydrated: state }),
+
+      syncWithServer: async () => {
+        const user = useAuthStore.getState().user;
+        if (!user?.isPro) return;
+        const syncStore = useSyncStore.getState();
+        try {
+          await processSyncQueue();
+          const server = await siteBlockerApi.getBlockedSites();
+          if (!server || server.length === 0) {
+            // Keep local if server has nothing
+            syncStore.setLastSyncTime("site-blocker", Date.now());
+            return;
+          }
+          const current = get().sites;
+          const next = { ...current } as Record<string, SiteBlockState>;
+          for (const s of server) {
+            const normalized = normalizeUrl(s.url);
+            const existing = Object.values(next).find((e) => e.url === normalized);
+            if (existing) {
+              if (existing.id !== s.id) {
+                delete next[existing.id];
+                next[s.id] = { ...existing, id: s.id, blocked: true };
+              } else {
+                next[s.id] = { ...existing, blocked: true };
+              }
+            } else {
+              next[s.id] = {
+                id: s.id,
+                url: normalized,
+                blocked: true,
+                streak: 0,
+                createdAt: Date.now(),
+              };
+            }
+          }
+          set({ sites: next });
+          syncStore.setLastSyncTime("site-blocker", Date.now());
+        } catch (e) {
+          console.error("Site-blocker sync failed:", e);
+          syncStore.setSyncing("site-blocker", false);
+        }
+      },
     }),
     {
       name: "meelio:local:site-blocker",
       storage: createJSONStorage(() => ({
         getItem: async (name) => {
-          if (chrome?.storage?.local) {
-            const result = await chrome.storage.local.get(name);
+          const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
+          if (anyGlobal?.chrome?.storage?.local) {
+            const result = await anyGlobal.chrome.storage.local.get(name);
             return result[name];
           }
           return null;
         },
         setItem: async (name, value) => {
-          if (chrome?.storage?.local) {
-            await chrome.storage.local.set({ [name]: value });
+          const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
+          if (anyGlobal?.chrome?.storage?.local) {
+            await anyGlobal.chrome.storage.local.set({ [name]: value });
           }
         },
         removeItem: async (name) => {
-          if (chrome?.storage?.local) {
-            await chrome.storage.local.remove(name);
+          const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
+          if (anyGlobal?.chrome?.storage?.local) {
+            await anyGlobal.chrome.storage.local.remove(name);
           }
         },
       })),
       version: 1,
-      partialize: (state) => ({
-        sites: state.sites,
-      }),
-     
+      partialize: (state) => ({ sites: state.sites }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
-        const user = useAuthStore.getState().user;
-        if (user) {
-          state?.loadFromServer();
+        const auth = useAuthStore.getState();
+        if (auth?.user?.isPro) {
+          state?.initializeStore?.();
         }
       },
     }
   )
 );
+
+// Kick a sync when auth store hydrates or when a user becomes Pro
+try {
+  let prevIsPro = !!useAuthStore.getState().user?.isPro;
+  let prevHydrated = !!useAuthStore.getState()._hasHydrated;
+  useAuthStore.subscribe((s) => {
+    const currIsPro = !!s.user?.isPro;
+    const currHydrated = !!s._hasHydrated;
+    const becameReady = currHydrated && (!prevHydrated || currIsPro !== prevIsPro);
+    prevIsPro = currIsPro;
+    prevHydrated = currHydrated;
+    if (becameReady && currIsPro) {
+      const blocker = useSiteBlockerStore.getState();
+      blocker.initializeStore();
+    }
+  });
+} catch (err) {
+  // ignore subscription issues in non-browser contexts
+}

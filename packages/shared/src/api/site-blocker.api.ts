@@ -1,10 +1,11 @@
 import { axios } from "../api/axios";
 import { useAuthStore } from "../stores/auth.store";
 
-export interface SiteBlocker {
+export interface SiteBlockerDto {
   id: string;
   url: string;
   category?: string;
+  isBlocked: boolean;
 }
 
 function checkPro() {
@@ -15,13 +16,13 @@ function checkPro() {
 }
 
 export const siteBlockerApi = {
-  async getBlockedSites(): Promise<SiteBlocker[]> {
+  async getBlockedSites(): Promise<SiteBlockerDto[]> {
     checkPro();
     const res = await axios.get("/v1/site-blockers");
     return res.data;
   },
 
-  async addBlockedSite(url: string, category?: string): Promise<SiteBlocker> {
+  async addBlockedSite(url: string, category?: string): Promise<SiteBlockerDto> {
     checkPro();
     const res = await axios.post("/v1/site-blockers", { url, category });
     return res.data;
@@ -35,7 +36,7 @@ export const siteBlockerApi = {
   async bulkSync(payload: {
     creates?: Array<{ clientId?: string; url: string; category?: string }>;
     deletes?: Array<{ id?: string; clientId?: string }>;
-  }): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; deleted: string[] }> {
+  }): Promise<{ created: Array<SiteBlockerDto & { clientId?: string }>; deleted: string[] }> {
     checkPro();
     const res = await axios.post(`/v1/site-blockers/bulk`, payload);
     return res.data;

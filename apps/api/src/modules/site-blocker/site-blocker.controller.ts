@@ -2,9 +2,24 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "@/utils/catch-async";
 import { siteBlockerService } from "./site-blocker.service";
+import { SiteBlocker } from "@/db/schema/site-blocker.schema";
 import { IUser } from "@/types/interfaces/resources";
 
 export const siteBlockerController = {
+  // Map DB row to response DTO with isBlocked instead of enabled
+  _toDto(row: SiteBlocker) {
+    const { id, url, category, enabled, createdAt, updatedAt, deletedAt, userId } = row as any;
+    return {
+      id,
+      url,
+      category,
+      isBlocked: !!enabled,
+      createdAt,
+      updatedAt,
+      deletedAt,
+      userId,
+    };
+  },
   /**
    * Get site blockers for the authenticated user
    */
@@ -21,7 +36,9 @@ export const siteBlockerController = {
       user.id,
       category as string | undefined,
     );
-    return res.status(httpStatus.OK).json(siteBlockers);
+    return res
+      .status(httpStatus.OK)
+      .json(siteBlockers.map(siteBlockerController._toDto));
   }),
 
   /**
@@ -34,7 +51,7 @@ export const siteBlockerController = {
       id,
       user.id
     );
-    return res.status(httpStatus.OK).json(siteBlocker);
+    return res.status(httpStatus.OK).json(siteBlockerController._toDto(siteBlocker));
   }),
 
   /**
@@ -52,7 +69,7 @@ export const siteBlockerController = {
       return res.status(httpStatus.OK).json({ removed: true });
     } else {
       // Site was added
-      return res.status(httpStatus.CREATED).json(result);
+      return res.status(httpStatus.CREATED).json(siteBlockerController._toDto(result));
     }
   }),
 
@@ -67,7 +84,7 @@ export const siteBlockerController = {
       user.id,
       req.body
     );
-    return res.status(httpStatus.OK).json(siteBlocker);
+    return res.status(httpStatus.OK).json(siteBlockerController._toDto(siteBlocker));
   }),
 
   /**
@@ -84,6 +101,10 @@ export const siteBlockerController = {
     const user = req.user as IUser;
     const { creates = [], updates = [], deletes = [] } = req.body || {};
     const result = await siteBlockerService.bulkSync(user.id, { creates, updates, deletes });
-    return res.status(httpStatus.OK).json(result);
+    return res.status(httpStatus.OK).json({
+      created: result.created.map((r) => ({ ...siteBlockerController._toDto(r), clientId: (r as any).clientId })),
+      updated: result.updated.map(siteBlockerController._toDto),
+      deleted: result.deleted,
+    });
   }),
 };

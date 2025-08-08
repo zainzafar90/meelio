@@ -2,13 +2,11 @@ export interface SiteBlocker {
   id: string;
   userId: string;
   url: string;
-  isBlocked: boolean;
-  blockPattern: string;
-  scheduleEnabled: boolean;
-  scheduleStart?: string;
-  scheduleEnd?: string;
+  category?: string;
+  enabled: boolean;
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number | null;
 }
 
 export interface BackgroundMetadata {

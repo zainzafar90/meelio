@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +17,7 @@ import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { toast } from "sonner";
+import { SyncStatus } from "../../sync-status";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -51,6 +52,7 @@ export function SiteBlockerSheet() {
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {t("site-blocker.title")}
           </h2>
+          <SyncStatus entityType="site-blocker" />
         </div>
 
         {isExtension ? (
@@ -104,14 +106,20 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const { sites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
+  const { sites, addSite, toggleSite, removeSite, initializeStore } = useSiteBlockerStore(
     useShallow((state) => ({
       sites: state.sites,
       addSite: state.addSite,
       toggleSite: state.toggleSite,
       removeSite: state.removeSite,
+      initializeStore: state.initializeStore,
     }))
   );
+
+  // Ensure local DB is loaded and server sync runs if online
+  useEffect(() => {
+    initializeStore();
+  }, [initializeStore]);
 
   const onBlockSites = useCallback(
     async (sites: string[]) => {

@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { SiteBlocker, SiteBlockerInsert, siteBlockers } from "@/db/schema/site-blocker.schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
@@ -21,7 +21,7 @@ export const siteBlockerService = {
     return await db
       .select()
       .from(siteBlockers)
-      .where(and(...conditions, eq(siteBlockers.deletedAt, null)));
+      .where(and(...conditions, isNull(siteBlockers.deletedAt)));
   },
 
   /**
