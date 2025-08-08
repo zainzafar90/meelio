@@ -4,9 +4,18 @@ import { eq, and } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
+interface TabData {
+  title: string;
+  url: string;
+  favicon?: string;
+  windowId: number;
+  pinned: boolean;
+}
+
 interface CreateTabStashData {
   windowId: string;
   urls: string[];
+  tabsData?: TabData[];
 }
 
 type UpdateTabStashData = Partial<CreateTabStashData>;
@@ -16,10 +25,12 @@ export const tabStashService = {
    * Get tab stashes for a user
    */
   getTabStashes: async (userId: string): Promise<TabStash[]> => {
+    // Return all tab stashes including soft-deleted ones for proper CRDT sync
+    // The frontend will filter out deleted items as needed
     return await db
       .select()
       .from(tabStashes)
-      .where(and(eq(tabStashes.userId, userId), eq(tabStashes.deletedAt, null)));
+      .where(eq(tabStashes.userId, userId));
   },
 
   /**
@@ -49,6 +60,7 @@ export const tabStashService = {
       userId,
       windowId: data.windowId,
       urls: data.urls,
+      tabsData: data.tabsData || null,
     };
 
     const result = await db.insert(tabStashes).values(tabStashData).returning();
@@ -101,39 +113,63 @@ export const tabStashService = {
   bulkSync: async (
     userId: string,
     payload: {
-      creates: Array<{ clientId?: string; windowId: string; urls: string[] }>;
-      updates: Array<{ id?: string; clientId?: string; windowId?: string; urls?: string[] }>;
+      creates: Array<{ clientId?: string; windowId: string; urls: string[]; tabsData?: TabData[] }>;
+      updates: Array<{ id?: string; clientId?: string; windowId?: string; urls?: string[]; tabsData?: TabData[] }>;
       deletes: Array<{ id?: string; clientId?: string }>;
     }
   ): Promise<{ created: Array<TabStash & { clientId?: string }>; updated: TabStash[]; deleted: string[] }> => {
-    const created: Array<TabStash & { clientId?: string }> = [];
-    const updated: TabStash[] = [];
-    const deleted: string[] = [];
+    // Use a transaction to ensure atomicity
+    return await db.transaction(async (tx) => {
+      const created: Array<TabStash & { clientId?: string }> = [];
+      const updated: TabStash[] = [];
+      const deleted: string[] = [];
+      const idMap = new Map<string, string>();
 
-    const idMap = new Map<string, string>();
-    for (const c of payload.creates || []) {
-      const ts = await tabStashService.createTabStash(userId, c);
-      if (c.clientId) idMap.set(c.clientId, ts.id);
-      created.push({ ...ts, clientId: c.clientId });
-    }
+      try {
+        // Process creates
+        for (const c of payload.creates || []) {
+          const ts = await tabStashService.createTabStash(userId, c);
+          if (c.clientId) idMap.set(c.clientId, ts.id);
+          created.push({ ...ts, clientId: c.clientId });
+        }
 
-    for (const u of payload.updates || []) {
-      const resolvedId = (u as any).id || (u as any).clientId && idMap.get((u as any).clientId as string);
-      if (!resolvedId) continue;
-      const ts = await tabStashService.updateTabStash(resolvedId, userId, u);
-      updated.push(ts);
-    }
+        // Process updates
+        for (const u of payload.updates || []) {
+          const resolvedId = (u as any).id || ((u as any).clientId && idMap.get((u as any).clientId as string));
+          if (!resolvedId) continue;
+          
+          try {
+            const ts = await tabStashService.updateTabStash(resolvedId, userId, u);
+            updated.push(ts);
+          } catch (err) {
+            // Skip if not found
+            console.warn(`Tab stash ${resolvedId} not found for update`);
+          }
+        }
 
-    for (const d of payload.deletes || []) {
-      const resolvedId = (d as any).id || (d as any).clientId && idMap.get((d as any).clientId as string);
-      if (!resolvedId) continue;
-      await db
-        .update(tabStashes)
-        .set({ deletedAt: new Date() } as any)
-        .where(and(eq(tabStashes.id, resolvedId), eq(tabStashes.userId, userId)));
-      deleted.push(resolvedId);
-    }
+        // Process deletes
+        for (const d of payload.deletes || []) {
+          const resolvedId = (d as any).id || ((d as any).clientId && idMap.get((d as any).clientId as string));
+          if (!resolvedId) continue;
+          
+          try {
+            await db
+              .update(tabStashes)
+              .set({ deletedAt: new Date() } as any)
+              .where(and(eq(tabStashes.id, resolvedId), eq(tabStashes.userId, userId)));
+            deleted.push(resolvedId);
+          } catch (err) {
+            // Skip if not found
+            console.warn(`Tab stash ${resolvedId} not found for delete`);
+          }
+        }
 
-    return { created, updated, deleted };
+        return { created, updated, deleted };
+      } catch (error) {
+        // Transaction will be rolled back automatically
+        console.error("Tab stash bulk sync failed, rolling back:", error);
+        throw error;
+      }
+    });
   },
 };

@@ -3,6 +3,7 @@ import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { tabStashController } from "@/modules/tab-stash";
 import { tabStashValidation } from "@/modules/tab-stash/tab-stash.validation";
+import { tabStashBulkValidation } from "@/modules/tab-stash/tab-stash-bulk.validation";
 
 const router = express.Router();
 
@@ -15,7 +16,12 @@ router
     tabStashController.createTabStash
   );
 
-router.post("/bulk", auth(), tabStashController.bulkSync);
+router.post(
+  "/bulk", 
+  auth(), 
+  validate(tabStashBulkValidation.bulkSync),
+  tabStashController.bulkSync
+);
 
 router
   .route("/:id")

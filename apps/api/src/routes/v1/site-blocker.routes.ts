@@ -3,6 +3,7 @@ import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { siteBlockerController } from "@/modules/site-blocker";
 import { siteBlockerValidation } from "@/modules/site-blocker/site-blocker.validation";
+import { siteBlockerBulkValidation } from "@/modules/site-blocker/site-blocker-bulk.validation";
 
 const router = express.Router();
 
@@ -15,7 +16,12 @@ router
     siteBlockerController.createSiteBlocker
   );
 
-router.post("/bulk", auth(), siteBlockerController.bulkSync);
+router.post(
+  "/bulk", 
+  auth(), 
+  validate(siteBlockerBulkValidation.bulkSync),
+  siteBlockerController.bulkSync
+);
 
 router
   .route("/:id")

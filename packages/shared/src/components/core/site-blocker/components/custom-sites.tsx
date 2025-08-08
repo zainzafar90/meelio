@@ -4,7 +4,7 @@ import { SiteItem } from "./site-item";
 interface SiteState {
   id: string;
   url: string;
-  blocked: boolean;
+  isBlocked: boolean;
 }
 
 interface CustomSitesProps {
@@ -37,7 +37,7 @@ export const CustomBlockedSites = ({
               name: site.url,
               url: site.url,
             }}
-            isBlocked={site.blocked}
+            isBlocked={site.isBlocked}
             onToggle={onToggleSite}
           />
         ))}

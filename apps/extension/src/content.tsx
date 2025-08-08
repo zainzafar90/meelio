@@ -12,10 +12,11 @@ import { pauseAllVideos, startAutoPause } from "./utils/media.utils";
 interface SiteBlockState {
   id: string;
   url: string;
-  blocked?: boolean;
+  isBlocked: boolean;
   streak: number;
   createdAt: number;
-  updatedAt?: number;
+  updatedAt: number;
+  deletedAt?: number | null;
 }
 
 type SiteBlockMap = Record<string, SiteBlockState>;
@@ -53,7 +54,7 @@ const getCurrentSite = () => {
 const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
   const host = getCurrentSite();
   return Object.values(sites).find(
-    (site) => site.blocked && doesHostMatch(host, site.url)
+    (site) => site.isBlocked && doesHostMatch(host, site.url)
   );
 };
 
@@ -106,7 +107,7 @@ const PlasmoOverlay = () => {
     // Update local storage to unblock the site
     const updatedSite = {
       ...matchingSite,
-      blocked: false,
+      isBlocked: false,
       streak: 0,
       updatedAt: Date.now(),
     };

@@ -100,17 +100,44 @@ async function processSyncQueue() {
 
     // Reconcile local DB and state
     await db.transaction("rw", db.tasks, async () => {
-      for (const [clientId, serverId] of idMap) {
-        await db.tasks.update(clientId, { id: serverId });
-        useTaskStore.setState((state) => ({
-          tasks: state.tasks.map((t) => (t.id === clientId ? { ...t, id: serverId } : t)),
-        }));
+      // Handle created tasks - update client IDs to server IDs and normalize timestamps
+      for (const created of result.created) {
+        if (created.clientId && created.id !== created.clientId) {
+          // Delete the temporary client ID entry
+          await db.tasks.delete(created.clientId);
+          
+          // Add with server ID and normalized timestamps
+          const normalizedTask = {
+            ...created,
+            createdAt: new Date(created.createdAt).getTime(),
+            updatedAt: new Date(created.updatedAt).getTime(),
+            deletedAt: created.deletedAt ? new Date(created.deletedAt).getTime() : null,
+            dueDate: created.dueDate ? new Date(created.dueDate).toISOString() : undefined,
+          };
+          await db.tasks.add(normalizedTask as any);
+          
+          useTaskStore.setState((state) => ({
+            tasks: state.tasks.map((t) => 
+              t.id === created.clientId ? { ...normalizedTask, id: created.id } : t
+            ),
+          }));
+        }
       }
+      
       for (const d of result.deleted) {
         await db.tasks.update(d, { deletedAt: Date.now(), updatedAt: Date.now() });
       }
+      
       for (const u of result.updated) {
-        await db.tasks.update(u.id, u as any);
+        // Convert server timestamps to milliseconds
+        const normalizedUpdate = {
+          ...u,
+          createdAt: new Date(u.createdAt).getTime(),
+          updatedAt: new Date(u.updatedAt).getTime(),
+          deletedAt: u.deletedAt ? new Date(u.deletedAt).getTime() : null,
+          dueDate: u.dueDate ? new Date(u.dueDate).toISOString() : undefined,
+        };
+        await db.tasks.update(u.id, normalizedUpdate as any);
       }
     });
 
@@ -461,12 +488,22 @@ export const useTaskStore = create<TaskState>()(
         await processSyncQueue();
 
         const serverTasks = await taskApi.getTasks();
+        
+        // Convert server Date objects to milliseconds for proper CRDT sync
+        const normalizedServerTasks = serverTasks.map(task => ({
+          ...task,
+          createdAt: new Date(task.createdAt).getTime(),
+          updatedAt: new Date(task.updatedAt).getTime(),
+          deletedAt: task.deletedAt ? new Date(task.deletedAt).getTime() : null,
+          dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : undefined,
+        }));
+        
         const localTasks = await db.tasks
           .where("userId")
           .equals(user.id)
           .toArray();
 
-        const mergedTasks = lwwMergeById<Task>(localTasks as any, serverTasks as any);
+        const mergedTasks = lwwMergeById<Task>(localTasks as any, normalizedServerTasks as any);
 
         await db.transaction("rw", db.tasks, async () => {
           await db.tasks.where("userId").equals(user.id).delete();

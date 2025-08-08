@@ -26,7 +26,18 @@ async function processSyncQueue() {
   for (const op of queue) {
     if (op.type === "create") {
       const session = op.data.session as TabSession;
-      creates.push({ clientId: session.id, windowId: session.id, urls: session.tabs.map((t) => t.url) });
+      creates.push({ 
+        clientId: session.id, 
+        windowId: session.id, 
+        urls: session.tabs.map((t) => t.url),
+        tabsData: session.tabs.map((t) => ({
+          title: t.title,
+          url: t.url,
+          favicon: t.favicon,
+          windowId: t.windowId,
+          pinned: t.pinned
+        }))
+      });
     } else if (op.type === "update") {
       // not used yet
     } else if (op.type === "delete") {
@@ -198,18 +209,29 @@ export const useTabStashStore = create<TabStashState>()(
           if (syncStore.isOnline) {
             try {
               const remote = await tabStashApi.getTabStashes();
-              const remoteSessions: TabSession[] = remote.map((r) => ({
-                id: r.id,
-                name: new Date(r.createdAt).toLocaleString(),
-                timestamp: new Date(r.createdAt).getTime(),
-                windowCount: 1,
-                tabs: r.urls.map((url) => ({
-                  title: url,
-                  url,
-                  windowId: parseInt(r.windowId) || 0,
-                  pinned: false,
-                })),
-              }));
+              // Filter out soft-deleted items and convert timestamps
+              const remoteSessions: TabSession[] = remote
+                .filter(r => !r.deletedAt)  // Filter out deleted items
+                .map((r) => ({
+                  id: r.id,
+                  name: new Date(r.createdAt).toLocaleString(),
+                  timestamp: new Date(r.updatedAt || r.createdAt).getTime(),  // Use updatedAt if available
+                  windowCount: 1,
+                  tabs: r.tabsData && r.tabsData.length > 0 
+                    ? r.tabsData.map((tab) => ({
+                        title: tab.title,
+                        url: tab.url,
+                        favicon: tab.favicon,
+                        windowId: tab.windowId,
+                        pinned: tab.pinned,
+                      }))
+                    : r.urls.map((url) => ({  // Fallback for old data without tabsData
+                        title: url,
+                        url,
+                        windowId: parseInt(r.windowId) || 0,
+                        pinned: false,
+                      })),
+                }));
               const merged = lwwMergeById(
                 get().sessions.map((s) => ({ ...s, updatedAt: s.timestamp })),
                 remoteSessions.map((s) => ({ ...s, updatedAt: s.timestamp }))

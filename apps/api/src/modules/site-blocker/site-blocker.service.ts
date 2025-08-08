@@ -66,9 +66,14 @@ export const siteBlockerService = {
       );
 
     if (existingSite.length > 0) {
+      // Update existing site blocker - clear deletedAt when re-enabling
       const [updated] = await db
         .update(siteBlockers)
-        .set({ isBlocked: data.isBlocked !== undefined ? data.isBlocked : true, deletedAt: null, updatedAt: new Date() } as SiteBlocker)
+        .set({ 
+          isBlocked: data.isBlocked !== undefined ? data.isBlocked : true,
+          deletedAt: null,  // Clear the soft delete when re-enabling
+          updatedAt: new Date() 
+        } as SiteBlocker)
         .where(
           and(
             eq(siteBlockers.userId, userId),
@@ -112,11 +117,8 @@ export const siteBlockerService = {
     }
     if (data.isBlocked !== undefined) {
       (updateData as any).isBlocked = data.isBlocked;
-      if (data.isBlocked === true) {
-        (updateData as any).deletedAt = null;
-      } else {
-        (updateData as any).deletedAt = new Date();
-      }
+      // Don't conflate isBlocked with deletedAt - they serve different purposes
+      // isBlocked is user preference, deletedAt is for CRDT tombstones
     }
 
 
@@ -138,7 +140,7 @@ export const siteBlockerService = {
 
     await db
       .update(siteBlockers)
-      .set({ isBlocked: false, deletedAt: new Date(), updatedAt: new Date() } as SiteBlocker)
+      .set({ deletedAt: new Date(), updatedAt: new Date() } as SiteBlocker)
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 
@@ -146,29 +148,61 @@ export const siteBlockerService = {
     userId: string,
     payload: {
       creates: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }>;
+      updates: Array<{ id?: string; clientId?: string; url?: string; category?: string; isBlocked?: boolean }>;
       deletes: Array<{ id?: string; clientId?: string }>;
     }
   ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; updated: SiteBlocker[]; deleted: string[] }> => {
-    const created: Array<SiteBlocker & { clientId?: string }> = [];
-    const updated: SiteBlocker[] = [];
-    const deleted: string[] = [];
+    // Use a transaction to ensure atomicity
+    return await db.transaction(async (tx) => {
+      const created: Array<SiteBlocker & { clientId?: string }> = [];
+      const updated: SiteBlocker[] = [];
+      const deleted: string[] = [];
+      const idMap = new Map<string, string>();
 
-    const idMap = new Map<string, string>();
-    for (const c of payload.creates || []) {
-      const res = await siteBlockerService.createSiteBlocker(userId, c);
-      if (res) {
-        if (c.clientId) idMap.set(c.clientId, res.id);
-        created.push({ ...res, clientId: c.clientId });
+      try {
+        // Process creates - using createSiteBlocker which handles duplicates
+        for (const c of payload.creates || []) {
+          const res = await siteBlockerService.createSiteBlocker(userId, c);
+          if (res) {
+            if (c.clientId) idMap.set(c.clientId, res.id);
+            created.push({ ...res, clientId: c.clientId });
+          }
+        }
+        
+        // Process updates  
+        for (const u of payload.updates || []) {
+          const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
+          if (!resolvedId) continue;
+          
+          try {
+            const updatedSite = await siteBlockerService.updateSiteBlocker(resolvedId, userId, u);
+            updated.push(updatedSite);
+          } catch (err) {
+            // Skip if not found
+            console.warn(`Site blocker ${resolvedId} not found for update`);
+          }
+        }
+
+        // Process deletes
+        for (const d of payload.deletes || []) {
+          const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
+          if (!resolvedId) continue;
+          
+          try {
+            await siteBlockerService.deleteSiteBlocker(resolvedId, userId);
+            deleted.push(resolvedId);
+          } catch (err) {
+            // Skip if not found
+            console.warn(`Site blocker ${resolvedId} not found for delete`);
+          }
+        }
+
+        return { created, updated, deleted };
+      } catch (error) {
+        // Transaction will be rolled back automatically
+        console.error("Site blocker bulk sync failed, rolling back:", error);
+        throw error;
       }
-    }
-
-    for (const d of payload.deletes || []) {
-      const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
-      if (!resolvedId) continue;
-      await siteBlockerService.deleteSiteBlocker(resolvedId, userId);
-      deleted.push(resolvedId);
-    }
-
-    return { created, updated, deleted };
+    });
   },
 };

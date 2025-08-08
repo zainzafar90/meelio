@@ -158,7 +158,7 @@ const ExtensionSiteBlockerContent = () => {
       (s) => s.url.toLowerCase() === site.toLowerCase()
     );
 
-    if (existingSite && existingSite.blocked) {
+    if (existingSite && existingSite.isBlocked) {
       toast.error(
         t("site-blocker.already-blocked", "Site is already blocked"),
         {
@@ -188,7 +188,7 @@ const ExtensionSiteBlockerContent = () => {
   };
 
   const blockedSiteUrls = Object.values(sites)
-    .filter((site) => site.blocked)
+    .filter((site) => site.isBlocked)
     .map((site) => site.url);
 
   return (
