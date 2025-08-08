@@ -70,7 +70,7 @@ import {
 
 export interface SiteCategory {
   name: string;
-  enabled: boolean;
+  isBlocked: boolean;
   key: string;
   icon: string;
 }
@@ -81,7 +81,7 @@ export interface Site {
   name: string;
   icon?: SimpleIcon;
   order?: number;
-  enabled?: boolean;
+  isBlocked?: boolean;
   groupId?: string;
   defaultKey?: string;
   defaultDeleted?: boolean;
@@ -90,61 +90,61 @@ export interface Site {
 export const SITE_CATEGORIES: SiteCategory[] = [
   {
     name: "Entertainment",
-    enabled: true,
+    isBlocked: true,
     key: "entertainment-group",
     icon: "🎥",
   },
   {
     name: "Social",
-    enabled: true,
+    isBlocked: true,
     key: "social-group",
     icon: "💬",
   },
   {
     name: "Games",
-    enabled: true,
+    isBlocked: true,
     key: "games-group",
     icon: "🚀",
   },
   {
     name: "Creativity",
-    enabled: false,
+    isBlocked: false,
     key: "creativity-group",
     icon: "🎨",
   },
   {
     name: "Education",
-    enabled: false,
+    isBlocked: false,
     key: "education-group",
     icon: "🌍",
   },
   {
     name: "Health & Fitness",
-    enabled: false,
+    isBlocked: false,
     key: "health-fitness-group",
     icon: "🏃",
   },
   {
     name: "Information & Reading",
-    enabled: true,
+    isBlocked: true,
     key: "information-group",
     icon: "📚",
   },
   {
     name: "Productivity & Finance",
-    enabled: false,
+    isBlocked: false,
     key: "productivity-finance-group",
     icon: "💼",
   },
   {
     name: "Shopping & Food",
-    enabled: true,
+    isBlocked: true,
     key: "shopping-food-group",
     icon: "🛍️",
   },
   {
     name: "Travel",
-    enabled: false,
+    isBlocked: false,
     key: "travel-group",
     icon: "✈️",
   },
@@ -415,7 +415,7 @@ export function generateSiteConfigs() {
       url: site.url,
       name: site.name,
       order: sites.length - 1 - index,
-      enabled: true,
+      isBlocked: true,
       groupId,
       defaultKey: `${site.name.toLowerCase().replace(/\s+/g, "-")}-website`,
       defaultDeleted: false,

@@ -68,7 +68,7 @@ export const siteBlockerService = {
     if (existingSite.length > 0) {
       const [updated] = await db
         .update(siteBlockers)
-        .set({ enabled: true, deletedAt: null, updatedAt: new Date() })
+        .set({ isBlocked: true, deletedAt: null, updatedAt: new Date() } as SiteBlocker)
         .where(
           and(
             eq(siteBlockers.userId, userId),
@@ -83,7 +83,7 @@ export const siteBlockerService = {
       userId,
       url: normalizedUrl,
       category: data.category,
-      enabled: true,
+      isBlocked: true,
     };
 
     const result = await db.insert(siteBlockers).values(insertData).returning();
@@ -110,9 +110,9 @@ export const siteBlockerService = {
     if (data.category !== undefined) {
       updateData.category = data.category;
     }
-    if (data.enabled !== undefined) {
-      (updateData as any).enabled = data.enabled;
-      if (data.enabled === true) {
+    if (data.isBlocked !== undefined) {
+      (updateData as any).isBlocked = data.isBlocked;
+      if (data.isBlocked === true) {
         (updateData as any).deletedAt = null;
       } else {
         (updateData as any).deletedAt = new Date();
@@ -138,7 +138,7 @@ export const siteBlockerService = {
 
     await db
       .update(siteBlockers)
-      .set({ enabled: false, deletedAt: new Date(), updatedAt: new Date() })
+      .set({ isBlocked: false, deletedAt: new Date(), updatedAt: new Date() } as SiteBlocker)
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 

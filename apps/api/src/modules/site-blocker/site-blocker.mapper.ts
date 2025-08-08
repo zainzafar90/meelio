@@ -14,13 +14,13 @@ export interface SiteBlockerDto {
 
 export const siteBlockerMapper = {
   toDto(entity: SiteBlocker & { clientId?: string }): SiteBlockerDto {
-    const { id, url, category, enabled, createdAt, updatedAt, deletedAt, userId, clientId } = entity as any;
+    const { id, url, category, is_blocked, createdAt, updatedAt, deletedAt, userId, clientId } = entity as any;
     
     return {
       id,
       url,
       category,
-      isBlocked: !!enabled,
+      isBlocked: !!is_blocked,
       createdAt: createdAt?.toISOString?.() ?? createdAt,
       updatedAt: updatedAt?.toISOString?.() ?? updatedAt,
       deletedAt: deletedAt ? deletedAt?.toISOString?.() : null,

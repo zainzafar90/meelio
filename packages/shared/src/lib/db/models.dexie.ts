@@ -3,7 +3,7 @@ export interface SiteBlocker {
   userId: string;
   url: string;
   category?: string;
-  enabled: boolean;
+  isBlocked: boolean;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number | null;

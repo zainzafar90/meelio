@@ -8,6 +8,6 @@ export const siteBlockerValidation = {
   updateSiteBlocker: Joi.object().keys({
     url: Joi.string().optional(),
     category: Joi.string().optional(),
-    enabled: Joi.boolean().optional(),
+    isBlocked: Joi.boolean().optional(),
   }),
 };

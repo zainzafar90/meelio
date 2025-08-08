@@ -11,7 +11,7 @@ export const siteBlockers = pgTable(
     userId: text("user_id").notNull(),
     category: text("category"),
     url: text("url").notNull(),
-    enabled: boolean("enabled").notNull().default(true),
+    isBlocked: boolean("is_blocked").notNull().default(true),
     createdAt,
     updatedAt,
     deletedAt,
