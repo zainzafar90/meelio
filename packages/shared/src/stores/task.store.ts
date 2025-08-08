@@ -5,6 +5,7 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { SyncState, useSyncStore } from "./sync.store";
+import { lwwMergeById } from "../utils/sync.utils";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -460,44 +461,12 @@ export const useTaskStore = create<TaskState>()(
         await processSyncQueue();
 
         const serverTasks = await taskApi.getTasks();
-
         const localTasks = await db.tasks
           .where("userId")
           .equals(user.id)
           .toArray();
 
-        const serverTasksMap = new Map(serverTasks.map(task => [task.id, task]));
-        const localTasksMap = new Map(localTasks.map(task => [task.id, task]));
-
-        const mergedById = new Map<string, Task>();
-
-        const lwwMerge = (a: Task, b: Task): Task => {
-          const aDel = a.deletedAt ?? 0;
-          const bDel = b.deletedAt ?? 0;
-          if (aDel !== bDel) return aDel > bDel ? a : b; // newer delete wins
-          if (a.updatedAt !== b.updatedAt) return a.updatedAt > b.updatedAt ? a : b; // newer update wins
-          return b; // tie-breaker prefer server when b is server
-        };
-
-        // Merge ids that exist on server
-        for (const serverTask of serverTasks) {
-          const localTask = localTasksMap.get(serverTask.id);
-          if (localTask) {
-            mergedById.set(serverTask.id, lwwMerge(localTask, serverTask));
-          } else {
-            mergedById.set(serverTask.id, serverTask);
-          }
-        }
-
-        // Handle locals not on server
-        for (const localTask of localTasks) {
-          if (!mergedById.has(localTask.id)) {
-            mergedById.set(localTask.id, localTask);
-          }
-        }
-
-        // Final list, filtering out tombstoned items from UI/state
-        const mergedTasks = Array.from(mergedById.values());
+        const mergedTasks = lwwMergeById<Task>(localTasks as any, serverTasks as any);
 
         await db.transaction("rw", db.tasks, async () => {
           await db.tasks.where("userId").equals(user.id).delete();

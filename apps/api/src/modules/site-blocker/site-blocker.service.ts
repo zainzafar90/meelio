@@ -66,23 +66,32 @@ export const siteBlockerService = {
       );
 
     if (existingSite.length > 0) {
-      // Remove the existing site blocker
       await db
         .update(siteBlockers)
-        .set({ deletedAt: new Date() } as any)
+        .set({ enabled: true, deletedAt: null } as any)
         .where(
           and(
             eq(siteBlockers.userId, userId),
             eq(siteBlockers.url, normalizedUrl)
           )
         );
-      return null;
+      const [row] = await db
+        .select()
+        .from(siteBlockers)
+        .where(
+          and(
+            eq(siteBlockers.userId, userId),
+            eq(siteBlockers.url, normalizedUrl)
+          )
+        );
+      return row ?? null;
     }
 
     const insertData = {
       userId,
       url: normalizedUrl,
       category: data.category,
+      enabled: true,
     };
 
     const result = await db.insert(siteBlockers).values(insertData).returning();
@@ -109,6 +118,14 @@ export const siteBlockerService = {
     if (data.category !== undefined) {
       updateData.category = data.category;
     }
+    if (data.enabled !== undefined) {
+      (updateData as any).enabled = data.enabled;
+      if (data.enabled === true) {
+        (updateData as any).deletedAt = null;
+      } else {
+        (updateData as any).deletedAt = new Date();
+      }
+    }
 
 
     const result = await db
@@ -129,7 +146,7 @@ export const siteBlockerService = {
 
     await db
       .update(siteBlockers)
-      .set({ deletedAt: new Date() } as SiteBlocker)
+      .set({ enabled: false, deletedAt: new Date() } as any)
       .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
   },
 
@@ -139,8 +156,9 @@ export const siteBlockerService = {
       creates: Array<{ clientId?: string; url: string; category?: string }>;
       deletes: Array<{ id?: string; clientId?: string }>;
     }
-  ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; deleted: string[] }> => {
+  ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; updated: SiteBlocker[]; deleted: string[] }> => {
     const created: Array<SiteBlocker & { clientId?: string }> = [];
+    const updated: SiteBlocker[] = [];
     const deleted: string[] = [];
 
     const idMap = new Map<string, string>();
@@ -159,6 +177,6 @@ export const siteBlockerService = {
       deleted.push(resolvedId);
     }
 
-    return { created, deleted };
+    return { created, updated, deleted };
   },
 };

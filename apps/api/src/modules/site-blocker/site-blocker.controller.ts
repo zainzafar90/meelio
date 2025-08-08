@@ -82,8 +82,8 @@ export const siteBlockerController = {
 
   bulkSync: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { creates = [], deletes = [] } = req.body || {};
-    const result = await siteBlockerService.bulkSync(user.id, { creates, deletes });
+    const { creates = [], updates = [], deletes = [] } = req.body || {};
+    const result = await siteBlockerService.bulkSync(user.id, { creates, updates, deletes });
     return res.status(httpStatus.OK).json(result);
   }),
 };
