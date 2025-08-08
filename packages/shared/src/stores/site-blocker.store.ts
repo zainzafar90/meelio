@@ -76,7 +76,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         if (user?.isPro) {
           try {
             const result = await siteBlockerApi.bulkSync({
-              creates: [{ clientId: tempId, url: normalizedUrl, category }],
+              creates: [{ clientId: tempId, url: normalizedUrl, category, isBlocked: true }],
             });
             
             // Update local state with server ID
@@ -88,7 +88,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
                 copy[created.id] = {
                   id: created.id,
                   url: normalizedUrl,
-                  blocked: true,
+                  blocked: created.isBlocked,
                   streak: 0,
                   createdAt,
                 };
@@ -168,12 +168,12 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         if (toAdd.length === 0) return;
         
         // Generate temp IDs and optimistically update
-        const creates: Array<{ clientId: string; url: string; category?: string }> = [];
+        const creates: Array<{ clientId: string; url: string; category?: string; isBlocked?: boolean }> = [];
         const newSites: Record<string, SiteBlockState> = {};
         
         for (const url of toAdd) {
           const tempId = `temp_${generateUUID()}`;
-          creates.push({ clientId: tempId, url, category });
+          creates.push({ clientId: tempId, url, category, isBlocked: true });
           newSites[tempId] = {
             id: tempId,
             url,
@@ -203,7 +203,7 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
                     copy[created.id] = {
                       id: created.id,
                       url: normalizeUrl(created.url),
-                      blocked: true,
+                      blocked: created.isBlocked,
                       streak: 0,
                       createdAt: newSites[created.clientId]?.createdAt || Date.now(),
                     };
@@ -286,11 +286,10 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           
           // Convert server data to local format
           const serverSites: SiteBlockState[] = server
-            .filter(site => site.isBlocked)
             .map(site => ({
               id: site.id,
               url: normalizeUrl(site.url),
-              blocked: true,
+              blocked: site.isBlocked,
               streak: 0,
               createdAt: new Date(site.createdAt).getTime(),
               updatedAt: new Date(site.updatedAt).getTime(),

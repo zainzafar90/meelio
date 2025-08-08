@@ -68,7 +68,7 @@ export const siteBlockerService = {
     if (existingSite.length > 0) {
       const [updated] = await db
         .update(siteBlockers)
-        .set({ isBlocked: true, deletedAt: null, updatedAt: new Date() } as SiteBlocker)
+        .set({ isBlocked: data.isBlocked !== undefined ? data.isBlocked : true, deletedAt: null, updatedAt: new Date() } as SiteBlocker)
         .where(
           and(
             eq(siteBlockers.userId, userId),
@@ -83,7 +83,7 @@ export const siteBlockerService = {
       userId,
       url: normalizedUrl,
       category: data.category,
-      isBlocked: true,
+      isBlocked: data.isBlocked !== undefined ? data.isBlocked : true,
     };
 
     const result = await db.insert(siteBlockers).values(insertData).returning();
@@ -145,7 +145,7 @@ export const siteBlockerService = {
   bulkSync: async (
     userId: string,
     payload: {
-      creates: Array<{ clientId?: string; url: string; category?: string }>;
+      creates: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }>;
       deletes: Array<{ id?: string; clientId?: string }>;
     }
   ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; updated: SiteBlocker[]; deleted: string[] }> => {

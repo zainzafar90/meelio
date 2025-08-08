@@ -37,7 +37,7 @@ export const siteBlockerApi = {
   },
 
   async bulkSync(payload: {
-    creates?: Array<{ clientId?: string; url: string; category?: string }>;
+    creates?: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }>;
     deletes?: Array<{ id?: string; clientId?: string }>;
   }): Promise<{ created: Array<SiteBlockerDto & { clientId?: string }>; deleted: string[] }> {
     checkPro();
