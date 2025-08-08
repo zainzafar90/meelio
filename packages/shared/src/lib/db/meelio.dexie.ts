@@ -6,6 +6,7 @@ import type {
   DailySummary,
   Category,
   CachedSound,
+  Note,
 } from "./models.dexie";
 
 export class MeelioDB extends Dexie {
@@ -15,6 +16,7 @@ export class MeelioDB extends Dexie {
   focusStats!: Table<DailySummary>;
   categories!: Table<Category, string>;
   sounds!: Table<CachedSound, string>;
+  notes!: Table<Note, string>;
 
   constructor() {
     super("meelio");
@@ -107,6 +109,17 @@ export class MeelioDB extends Dexie {
         focusStats: "++id, date",
         categories: "id, userId, name, icon, type",
         sounds: "id, path, downloadedAt, lastAccessed",
+      });
+
+    this.version(8)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+        notes: "id, userId, createdAt",
       });
   }
 }

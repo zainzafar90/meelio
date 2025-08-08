@@ -43,6 +43,15 @@ export interface Category {
   updatedAt: number;
 }
 
+export interface Note {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface PomodoroSession {
   id?: number;
   timestamp: number;

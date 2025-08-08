@@ -6,14 +6,15 @@ export type EntityType =
   | "pomodoro"
   | "focus-time"
   | "tab-stash"
-  | "site-blocker";
+  | "site-blocker"
+  | "note";
 
 export interface SyncOperation {
   id: string;
   entityType: EntityType;
   type: "create" | "update" | "delete";
   entityId: string;
-  data?: any;
+  data?: unknown;
   retries: number;
 }
 
