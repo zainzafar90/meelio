@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 export type EntityType =
+  | "note"
   | "task"
   | "pomodoro"
   | "focus-time"

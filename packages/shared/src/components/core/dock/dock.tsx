@@ -70,6 +70,7 @@ export const Dock = () => {
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
+    toggleNotes,
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
@@ -92,6 +93,7 @@ export const Dock = () => {
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
+      toggleNotes: (state as any).toggleNotes,
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
@@ -169,6 +171,18 @@ export const Dock = () => {
               icon: Icons.taskList,
               activeIcon: Icons.taskListActive,
               onClick: toggleTasks,
+            },
+          ]
+        : []),
+      ...(((dockIconsVisible as any).notes ?? true)
+        ? [
+            {
+              id: "notes",
+              name: t("common.notes", { defaultValue: "Notes" }),
+              icon: Icons.page,
+              activeIcon: Icons.page,
+              onClick: toggleNotes,
+              requirePro: true,
             },
           ]
         : []),

@@ -4,9 +4,58 @@ export const noteValidation = {
   createNote: Joi.object().keys({
     title: Joi.string().required(),
     content: Joi.string().optional(),
+    categoryId: Joi.string().allow(null).optional(),
+    providerId: Joi.string().allow(null).optional(),
   }),
   updateNote: Joi.object().keys({
     title: Joi.string().optional(),
     content: Joi.string().optional(),
+    categoryId: Joi.string().allow(null).optional(),
+    providerId: Joi.string().allow(null).optional(),
+    deletedAt: Joi.alternatives().try(Joi.date(), Joi.allow(null)).optional(),
+  }),
+  bulkSync: Joi.object().keys({
+    creates: Joi.array()
+      .items(
+        Joi.object().keys({
+          clientId: Joi.string().optional(),
+          title: Joi.string().required(),
+          content: Joi.string().allow(null).optional(),
+          categoryId: Joi.string().allow(null).optional(),
+          providerId: Joi.string().allow(null).optional(),
+          updatedAt: Joi.date().optional(),
+        })
+      )
+      .optional()
+      .default([]),
+    updates: Joi.array()
+      .items(
+        Joi.object()
+          .keys({
+            id: Joi.string().optional(),
+            clientId: Joi.string().optional(),
+            title: Joi.string().optional(),
+            content: Joi.string().allow(null).optional(),
+            categoryId: Joi.string().allow(null).optional(),
+            providerId: Joi.string().allow(null).optional(),
+            updatedAt: Joi.date().optional(),
+            deletedAt: Joi.alternatives().try(Joi.date(), Joi.allow(null)).optional(),
+          })
+          .or("id", "clientId")
+      )
+      .optional()
+      .default([]),
+    deletes: Joi.array()
+      .items(
+        Joi.object()
+          .keys({
+            id: Joi.string().optional(),
+            clientId: Joi.string().optional(),
+            deletedAt: Joi.date().optional(),
+          })
+          .or("id", "clientId")
+      )
+      .optional()
+      .default([]),
   }),
 };

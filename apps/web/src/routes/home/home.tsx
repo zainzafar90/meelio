@@ -19,6 +19,7 @@ import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
 import { TaskListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
+import { NotesSheet } from "@repo/shared";
 import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
 import { api } from "@repo/shared";
@@ -126,6 +127,7 @@ const Content = () => {
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TaskListSheet />
+      <NotesSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />

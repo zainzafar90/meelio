@@ -21,6 +21,7 @@ import {
   SoundscapesSheet,
   Dock,
   SiteBlockerSheet,
+  NotesSheet,
   SimpleTimer
  } from "@repo/shared";
  import {CalendarDynamicIsland} from "@repo/shared";
@@ -73,6 +74,7 @@ const Content = () => {
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TaskListSheet />
+      <NotesSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />

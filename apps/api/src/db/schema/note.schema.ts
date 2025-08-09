@@ -1,8 +1,10 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, index } from "drizzle-orm/pg-core";
+import { pgTable, text, index, uuid, timestamp, boolean } from "drizzle-orm/pg-core";
 
-import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { createdAt, id, updatedAt, deletedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
+import { categories } from "./category.schema";
+import { providers } from "./provider.schema";
 
 export const notes = pgTable(
   "notes",
@@ -11,12 +13,18 @@ export const notes = pgTable(
     userId: text("user_id").notNull(),
     title: text("title").notNull(),
     content: text("content"),
+    pinned: boolean("pinned").notNull().default(false),
+    categoryId: uuid("category_id"),
+    providerId: uuid("provider_id"),
     createdAt,
     updatedAt,
+    deletedAt,
   },
   (table) => ({
     userIdIdx: index("idx_notes_user_id").on(table.userId),
     titleIdx: index("idx_notes_title").on(table.title),
+    categoryIdIdx: index("idx_notes_category_id").on(table.categoryId),
+    providerIdIdx: index("idx_notes_provider_id").on(table.providerId),
   })
 );
 

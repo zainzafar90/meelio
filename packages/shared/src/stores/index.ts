@@ -7,6 +7,7 @@ export * from "./settings.store";
 export * from "./sync.store";
 export * from "./soundscapes.store";
 export * from "./task.store";
+export * from "./note.store";
 export * from "./app.store";
 export * from "./calendar.store";
 

@@ -55,6 +55,13 @@ export const DockSettings = () => {
         isVisible: dockIconsVisible.tasks,
       },
       {
+        id: "notes",
+        name: t("common.notes", { defaultValue: "Notes" }),
+        description: t("settings.dock.notes.description", "Markdown notes"),
+        icon: Icons.page,
+        isVisible: (dockIconsVisible as any).notes ?? true,
+      },
+      {
         id: "siteBlocker",
         name: t("common.site-blocker"),
         description: t("settings.dock.site-blocker.description"),

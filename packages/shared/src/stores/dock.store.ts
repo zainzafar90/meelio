@@ -12,6 +12,7 @@ interface DockIconsVisibility {
   backgrounds: boolean;
   clock: boolean;
   calendar: boolean;
+  notes?: boolean;
 }
 
 interface DockState {
@@ -25,6 +26,7 @@ interface DockState {
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
   isCalendarVisible: boolean;
+  isNotesVisible?: boolean;
 
   // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
@@ -43,6 +45,7 @@ interface DockState {
   toggleSiteBlocker: () => void;
   toggleTabStash: () => void;
   toggleCalendar: () => void;
+  toggleNotes?: () => void;
 
   // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
@@ -54,6 +57,7 @@ interface DockState {
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
   setCalendarVisible: (visible: boolean) => void;
+  setNotesVisible?: (visible: boolean) => void;
 
   // Icon visibility setters
   setDockIconVisible: (
@@ -77,6 +81,7 @@ export const useDockStore = create<DockState>()(
       isGreetingsVisible: true,
       isSoundscapesVisible: false,
       isTasksVisible: false,
+      isNotesVisible: false,
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
@@ -93,6 +98,7 @@ export const useDockStore = create<DockState>()(
         backgrounds: true,
         clock: false,
         calendar: true,
+        notes: true,
       },
 
       showIconLabels: false,
@@ -153,6 +159,10 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isCalendarVisible: !state.isCalendarVisible }));
       },
 
+      toggleNotes: () => {
+        set((state) => ({ isNotesVisible: !(state as any).isNotesVisible }));
+      },
+
       // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
@@ -190,6 +200,10 @@ export const useDockStore = create<DockState>()(
         set({ isCalendarVisible: visible });
       },
 
+      setNotesVisible: (visible: boolean) => {
+        set({ isNotesVisible: visible } as any);
+      },
+
       // Icon visibility setter
       setDockIconVisible: (
         iconId: keyof DockIconsVisibility,
@@ -223,6 +237,7 @@ export const useDockStore = create<DockState>()(
           isSiteBlockerVisible: false,
           isTabStashVisible: false,
           isCalendarVisible: false,
+          isNotesVisible: false,
 
           // Don't reset icon visibility on reset
           currentOnboardingStep: -1,
@@ -232,11 +247,24 @@ export const useDockStore = create<DockState>()(
     {
       name: "meelio:local:dock",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
+      migrate: (persistedState: any, _version: number) => {
+        // Ensure Notes defaults are present for older persisted states
+        const state = { ...persistedState };
+        state.dockIconsVisible = state.dockIconsVisible || {};
+        if (state.dockIconsVisible.notes === undefined) {
+          state.dockIconsVisible.notes = true;
+        }
+        if (state.isNotesVisible === undefined) {
+          state.isNotesVisible = false;
+        }
+        return state;
+      },
       partialize: (state) => ({
         isTimerVisible: state.isTimerVisible,
         isBreathingVisible: state.isBreathingVisible,
         isGreetingsVisible: state.isGreetingsVisible,
+        isNotesVisible: state.isNotesVisible,
         dockIconsVisible: state.dockIconsVisible,
         currentOnboardingStep: state.currentOnboardingStep,
         showIconLabels: state.showIconLabels,
