@@ -179,8 +179,8 @@ export const Dock = () => {
             {
               id: "notes",
               name: t("common.notes", { defaultValue: "Notes" }),
-              icon: Icons.page,
-              activeIcon: Icons.page,
+              icon: Icons.note,
+              activeIcon: Icons.noteActive,
               onClick: toggleNotes,
               requirePro: true,
             },

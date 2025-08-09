@@ -305,7 +305,8 @@ export const Icons = {
       width="1em"
       {...props}
     >
-      <path
+   
+   <path
         fill="currentColor"
         opacity=".5"
         d="M17 22H7a3.003 3.003 0 0 1-3-3V7a3.003 3.003 0 0 1 3-3h10a3.003 3.003 0 0 1 3 3v12a3.003 3.003 0 0 1-3 3Z"
@@ -335,6 +336,42 @@ export const Icons = {
     </svg>
   ),
 
+  note: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" {...props}>
+       <path
+      fill="currentColor"
+      opacity=".5"
+      d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
+    />
+    <path
+      opacity="0.75"
+      fill="currentColor"
+      d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
+    />
+    <path
+      opacity="0.5"
+
+      fill="currentColor"
+      d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
+    />
+    
+    </svg>
+  ),
+  noteActive: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" {...props}>
+      <path
+      fill="currentColor"
+      d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
+    />
+    <path
+      fill="currentColor"
+      d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
+    />
+    <path
+      fill="currentColor"
+      d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
+    /></svg>
+  ),
   writer: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path
