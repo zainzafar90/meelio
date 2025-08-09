@@ -12,7 +12,7 @@ test.describe('Onboarding Flow', () => {
     await clearAuthData(page);
   });
   
-  test.skip('onboarding modal displays with correct data-testids', async ({ page, context }) => {
+  test('onboarding modal displays with correct data-testids', async ({ page, context }) => {
     const TEST_EMAIL = process.env.TEST_EMAIL || 'zainzafar90@gmail.com';
     
     await page.goto('http://localhost:4000');

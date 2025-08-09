@@ -5,7 +5,7 @@ import {
   TEST_EMAIL
 } from './helpers/auth.helper';
 
-test('magic link authentication', async ({ page, context }) => {
+test('Magic Link Authentication', async ({ page, context }) => {
   await page.goto(FRONTEND_URL);
   await page.waitForLoadState('networkidle');
   
