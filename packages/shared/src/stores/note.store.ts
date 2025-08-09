@@ -115,6 +115,14 @@ export const useNoteStore = create<NoteState>()(
     },
 
     addNote: async ({ title, content, categoryId, providerId }) => {
+      const MAX_NOTES = 500;
+      const MAX_NOTE_CHARS = 10000;
+      const truncateToChars = (text: string, maxChars: number) =>
+        typeof text === "string" ? text.slice(0, maxChars) : text as any;
+
+      if (get().notes.length >= MAX_NOTES) {
+        return undefined;
+      }
       const auth = useAuthStore.getState();
       const user = auth.user;
       const guestUser = auth.guestUser;
@@ -127,7 +135,7 @@ export const useNoteStore = create<NoteState>()(
         id,
         userId,
         title,
-        content: content ?? null,
+        content: typeof content === "string" ? truncateToChars(content, MAX_NOTE_CHARS) : null,
         categoryId: categoryId ?? null,
         providerId: providerId ?? null,
         createdAt: now,
@@ -142,7 +150,7 @@ export const useNoteStore = create<NoteState>()(
       syncStore.addToQueue("note", {
         type: "create",
         entityId: id,
-        data: { title, content, categoryId, providerId, updatedAt: now },
+        data: { title, content: note.content, categoryId, providerId, updatedAt: now },
       } as any);
 
       processSyncQueue();
@@ -151,14 +159,21 @@ export const useNoteStore = create<NoteState>()(
     },
 
     updateNote: async (id, payload) => {
+      const MAX_NOTE_CHARS = 10000;
+      const truncateToChars = (text: string, maxChars: number) =>
+        typeof text === "string" ? text.slice(0, maxChars) : text as any;
       const now = Date.now();
-      await db.notes.update(id, { ...payload, updatedAt: now } as any);
+      const toSave = { ...payload } as any;
+      if (typeof toSave.content === "string") {
+        toSave.content = truncateToChars(toSave.content, MAX_NOTE_CHARS);
+      }
+      await db.notes.update(id, { ...toSave, updatedAt: now } as any);
       set((s) => ({
-        notes: s.notes.map((n) => (n.id === id ? ({ ...n, ...payload, updatedAt: now } as any) : n)),
+        notes: s.notes.map((n) => (n.id === id ? ({ ...n, ...toSave, updatedAt: now } as any) : n)),
       }));
 
       const syncStore = useSyncStore.getState();
-      syncStore.addToQueue("note", { type: "update", entityId: id, data: { ...payload, updatedAt: now } } as any);
+      syncStore.addToQueue("note", { type: "update", entityId: id, data: { ...toSave, updatedAt: now } } as any);
       processSyncQueue();
     },
 

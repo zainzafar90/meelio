@@ -34,6 +34,14 @@ export const noteService = {
   },
 
   createNote: async (userId: string, data: any): Promise<Note> => {
+    // Enforce hard business limits
+    const existingCount = await db.query.notes.findMany({ where: and(eq(notes.userId, userId), eq(notes.deletedAt, null as any)) });
+    if (existingCount.length >= 500) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Maximum notes limit (500) reached");
+    }
+    if (typeof data.content === "string" && data.content.length > 10000) {
+      data.content = data.content.slice(0, 10000);
+    }
     const result = await db
       .insert(notes)
       .values({
@@ -62,7 +70,7 @@ export const noteService = {
     }
 
     if (data.content !== undefined) {
-      updateData.content = data.content;
+      updateData.content = typeof data.content === "string" ? data.content.slice(0, 10000) : data.content;
     }
 
     if (data.categoryId !== undefined) {
