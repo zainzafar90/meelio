@@ -7,7 +7,11 @@
     "build": "vite build",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview --port=5000",
-    "release": "standard-version"
+    "release": "standard-version",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "playwright test --headed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -44,6 +48,7 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
+    "@playwright/test": "^1.54.2",
     "@repo/eslint-config": "*",
     "@repo/prettier-config": "*",
     "@repo/tailwind-config": "*",
@@ -58,6 +63,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react-swc": "^3.3.2",
     "autoprefixer": "^10.4.15",
+    "dotenv": "^17.2.1",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
