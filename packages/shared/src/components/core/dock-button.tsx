@@ -9,6 +9,18 @@ import {
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
 
+const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
+  timer: "ring-red-500/70",
+  soundscapes: "ring-emerald-400/70",
+  breathepod: "ring-sky-400/70",
+  tasks: "ring-indigo-400/70",
+  notes: "ring-amber-400/70",
+  "site-blocker": "ring-purple-400/70",
+  "tab-stash": "ring-sky-400/70",
+  background: "ring-emerald-400/70",
+  home: "ring-blue-400/70",
+};
+
 export interface DockItem {
   id: string;
   name: string;
@@ -67,6 +79,12 @@ export const DockButton = ({
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
 
+  const shouldShowActiveRing =
+    isActive && !["calendar", "clock", "settings"].includes(item.id);
+  const ringClassName = shouldShowActiveRing
+    ? `ring-2 ${FEATURE_RING_CLASS_BY_ID[item.id] ?? "ring-white/60"}`
+    : "";
+
   const handleClick = () => {
     if (isDisabled) return;
 
@@ -84,6 +102,7 @@ export const DockButton = ({
               "cursor-pointer",
               "relative flex size-10 items-center justify-center rounded-xl shadow-lg",
               "bg-gradient-to-b from-zinc-800 to-zinc-900",
+              ringClassName,
               className
             )}
             onClick={handleClick}

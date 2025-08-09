@@ -85,6 +85,10 @@
       "title": "Task List",
       "description": "Keep track of your tasks and stay organized."
     },
+    "notes": {
+      "title": "Notes",
+      "description": "Capture quick thoughts in markdown-powered notes."
+    },
     "site-blocker": {
       "title": "Site Blocker",
       "description": "Block distracting websites during your focus sessions."

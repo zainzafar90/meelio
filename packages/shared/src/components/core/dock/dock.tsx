@@ -320,7 +320,7 @@ export const Dock = () => {
                       "relative",
                       currentOnboardingStep >= 0 &&
                         ONBOARDING_STEPS[currentOnboardingStep].position ===
-                          8 &&
+                          9 &&
                         item.id === "settings" &&
                         "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                     )}
