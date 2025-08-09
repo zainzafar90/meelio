@@ -49,6 +49,7 @@ function initState(): Omit<
   | "toggleNotifications"
   | "toggleSounds"
   | "toggleSoundscapes"
+  | "toggleAutoStartBreaks"
   | "updateRemaining"
   | "getLimitStatus"
   | "sync"
@@ -63,7 +64,7 @@ function initState(): Omit<
     isRunning: false,
     endTimestamp: null,
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: true, sounds: true, soundscapes: true },
+    settings: { notifications: true, sounds: true, soundscapes: true, autoStartBreaks: true },
     stats: { focusSec: 0, breakSec: 0 },
     dailyLimitSec: 120 * 60 * 60,
     unsyncedFocusSec: 0,
@@ -208,6 +209,12 @@ export const createTimerStore = (platform: TimerPlatform) => {
         const toggleSounds = () => {
           set((s) => ({
             settings: { ...s.settings, sounds: !s.settings.sounds },
+          }));
+        };
+
+        const toggleAutoStartBreaks = () => {
+          set((s) => ({
+            settings: { ...s.settings, autoStartBreaks: !s.settings.autoStartBreaks },
           }));
         };
 
@@ -381,6 +388,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           updateDurations,
           toggleNotifications,
           toggleSounds,
+          toggleAutoStartBreaks,
           toggleSoundscapes: () => set((s) => ({
             settings: { ...s.settings, soundscapes: !s.settings.soundscapes }
           })),

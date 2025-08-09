@@ -40,11 +40,13 @@ export interface TimerSettingsDialogProps {
   notifications: boolean;
   sounds: boolean;
   soundscapes?: boolean;
+  autoStartBreaks?: boolean;
   onSave: (values: {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
     soundscapes?: boolean;
+    autoStartBreaks?: boolean;
   }) => void;
 }
 
@@ -56,6 +58,7 @@ export function TimerSettingsDialog({
   notifications,
   sounds,
   soundscapes = true,
+  autoStartBreaks = true,
   onSave,
 }: TimerSettingsDialogProps) {
   const { t } = useTranslation();
@@ -97,6 +100,7 @@ export function TimerSettingsDialog({
         notifications,
         sounds,
         soundscapes,
+        autoStartBreaks,
       });
 
       onOpenChange(false);
@@ -117,6 +121,7 @@ export function TimerSettingsDialog({
       notifications: !notifications,
       sounds,
       soundscapes,
+      autoStartBreaks,
     });
   };
 
@@ -126,6 +131,7 @@ export function TimerSettingsDialog({
       notifications,
       sounds: !sounds,
       soundscapes,
+      autoStartBreaks,
     });
   };
 
@@ -135,6 +141,17 @@ export function TimerSettingsDialog({
       notifications,
       sounds,
       soundscapes: !soundscapes,
+      autoStartBreaks,
+    });
+  };
+
+  const handleAutoStartBreaksToggle = () => {
+    onSave({
+      durations: { focusMin, breakMin },
+      notifications,
+      sounds,
+      soundscapes,
+      autoStartBreaks: !autoStartBreaks,
     });
   };
 
@@ -237,9 +254,7 @@ export function TimerSettingsDialog({
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Timer notification</p>
-                <p className="text-sm text-muted-foreground">
-                  Show a notification when the timer completes
-                </p>
+                <p className="text-sm text-muted-foreground">Show a notification when the timer completes</p>
               </div>
               <Switch
                 size="sm"
@@ -272,14 +287,26 @@ export function TimerSettingsDialog({
             >
               <div className="space-y-1">
                 <p className="text-sm font-medium">Ambient soundscapes</p>
-                <p className="text-sm text-muted-foreground">
-                  Automatically play ambient sounds during focus sessions
-                </p>
+                <p className="text-sm text-muted-foreground">Automatically play ambient sounds during focus sessions</p>
               </div>
               <Switch
                 size="sm"
                 checked={!!soundscapes}
                 onCheckedChange={handleSoundscapesToggle}
+              />
+            </div>
+
+            <div
+              className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
+            >
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Auto Start Breaks</p>
+                <p className="text-sm text-muted-foreground">Automatically start the next stage when one completes</p>
+              </div>
+              <Switch
+                size="sm"
+                checked={!!autoStartBreaks}
+                onCheckedChange={handleAutoStartBreaksToggle}
               />
             </div>
 

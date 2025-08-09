@@ -13,6 +13,8 @@ export interface TimerSettings {
   sounds: boolean;
   // Controls whether ambient soundscapes auto-play during focus and are managed by the timer
   soundscapes: boolean;
+  // When true, automatically start breaks (and next focus) after stage completion
+  autoStartBreaks: boolean;
 }
 
 export interface TimerStats {
@@ -91,6 +93,7 @@ export interface TimerState {
   toggleNotifications: () => void;
   toggleSounds: () => void;
   toggleSoundscapes: () => void;
+  toggleAutoStartBreaks: () => void;
   updateRemaining: (remaining: number) => void;
   getLimitStatus: () => { isLimitReached: boolean; remainingSec: number };
   sync: () => Promise<void>;

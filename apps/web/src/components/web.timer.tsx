@@ -25,7 +25,8 @@ const useBackgroundMessages = (
   updateRemaining: (n: number) => void,
   completeStage: () => void,
   start: () => void,
-  getLimitStatus: () => { isLimitReached: boolean }
+  getLimitStatus: () => { isLimitReached: boolean },
+  autoStartBreaks: boolean
 ) => {
   useEffect(() => {
     // Listen to web worker messages through the platform
@@ -36,7 +37,7 @@ const useBackgroundMessages = (
           break;
         case "STAGE_COMPLETE":
           completeStage();
-          if (!getLimitStatus().isLimitReached) start();
+          if (autoStartBreaks && !getLimitStatus().isLimitReached) start();
           break;
         case "PAUSED":
           updateRemaining(msg.remaining);
@@ -48,7 +49,7 @@ const useBackgroundMessages = (
     });
     
     return cleanup;
-  }, [stage, durations, updateRemaining, completeStage, start, getLimitStatus]);
+  }, [stage, durations, updateRemaining, completeStage, start, getLimitStatus, autoStartBreaks]);
 };
 
 interface TimerViewProps {
@@ -260,6 +261,7 @@ const useTimerState = () => {
       toggleNotifications: state.toggleNotifications,
       toggleSounds: state.toggleSounds,
       toggleSoundscapes: state.toggleSoundscapes,
+      toggleAutoStartBreaks: state.toggleAutoStartBreaks,
       updateRemaining: state.updateRemaining,
       getLimitStatus: state.getLimitStatus,
       restore: state.restore,
@@ -291,7 +293,8 @@ const useTimerState = () => {
     store.updateRemaining,
     store.completeStage,
     store.start,
-    store.getLimitStatus
+    store.getLimitStatus,
+    store.settings.autoStartBreaks ?? true
   );
 
   useEffect(() => {
@@ -307,6 +310,7 @@ const useTimerState = () => {
     notifications: boolean;
     sounds: boolean;
     soundscapes?: boolean;
+    autoStartBreaks?: boolean;
   }) => {
     // Update durations
     store.updateDurations({ 
@@ -324,6 +328,9 @@ const useTimerState = () => {
     if (typeof settings.soundscapes === 'boolean' && settings.soundscapes !== store.settings.soundscapes) {
       store.toggleSoundscapes?.();
     }
+    if (typeof settings.autoStartBreaks === 'boolean' && settings.autoStartBreaks !== (store.settings.autoStartBreaks ?? true)) {
+      store.toggleAutoStartBreaks?.();
+    }
   };
 
   return {
@@ -336,6 +343,7 @@ const useTimerState = () => {
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
     soundscapes: store.settings.soundscapes ?? true,
+    autoStartBreaks: store.settings.autoStartBreaks ?? true,
   };
 };
 
@@ -350,6 +358,7 @@ export const WebTimer = () => {
     notifications,
     sounds,
     soundscapes,
+    autoStartBreaks,
   } = useTimerState();
   return (
     <>
@@ -380,6 +389,7 @@ export const WebTimer = () => {
         notifications={notifications}
         sounds={sounds}
         soundscapes={soundscapes}
+        autoStartBreaks={autoStartBreaks}
         onSave={handleSettingsChange}
       />
     </>
