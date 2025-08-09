@@ -259,6 +259,7 @@ const useTimerState = () => {
       updateDurations: state.updateDurations,
       toggleNotifications: state.toggleNotifications,
       toggleSounds: state.toggleSounds,
+      toggleSoundscapes: state.toggleSoundscapes,
       updateRemaining: state.updateRemaining,
       getLimitStatus: state.getLimitStatus,
       restore: state.restore,
@@ -305,6 +306,7 @@ const useTimerState = () => {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
+    soundscapes?: boolean;
   }) => {
     // Update durations
     store.updateDurations({ 
@@ -319,6 +321,9 @@ const useTimerState = () => {
     if (settings.sounds !== store.settings.sounds) {
       store.toggleSounds();
     }
+    if (typeof settings.soundscapes === 'boolean' && settings.soundscapes !== store.settings.soundscapes) {
+      store.toggleSoundscapes?.();
+    }
   };
 
   return {
@@ -330,6 +335,7 @@ const useTimerState = () => {
     settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
+    soundscapes: store.settings.soundscapes ?? true,
   };
 };
 
@@ -343,6 +349,7 @@ export const WebTimer = () => {
     settingsModal,
     notifications,
     sounds,
+    soundscapes,
   } = useTimerState();
   return (
     <>
@@ -372,6 +379,7 @@ export const WebTimer = () => {
         breakMin={store.durations[TimerStage.Break] / 60}
         notifications={notifications}
         sounds={sounds}
+        soundscapes={soundscapes}
         onSave={handleSettingsChange}
       />
     </>

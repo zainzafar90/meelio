@@ -11,6 +11,8 @@ export interface TimerDurations {
 export interface TimerSettings {
   notifications: boolean;
   sounds: boolean;
+  // Controls whether ambient soundscapes auto-play during focus and are managed by the timer
+  soundscapes: boolean;
 }
 
 export interface TimerStats {
@@ -88,6 +90,7 @@ export interface TimerState {
   ) => void;
   toggleNotifications: () => void;
   toggleSounds: () => void;
+  toggleSoundscapes: () => void;
   updateRemaining: (remaining: number) => void;
   getLimitStatus: () => { isLimitReached: boolean; remainingSec: number };
   sync: () => Promise<void>;
