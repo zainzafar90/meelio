@@ -17,15 +17,16 @@ import {
   Trash2, 
   ArrowLeft, 
   Edit3, 
-  Save, 
   X, 
   Volume2, 
   VolumeX,
   FileText,
-  Clock
+  Clock,
+  Grid3X3,
+  List
 } from "lucide-react";
 
-type ViewMode = 'list' | 'create' | 'edit' | 'view';
+type ViewMode = 'list' | 'create' | 'edit';
 
 export function NotesSheet() {
   const { t } = useTranslation();
@@ -61,13 +62,14 @@ export function NotesSheet() {
   );
 
   // State
-  const [viewMode, setViewMode] = useState<ViewMode>('view');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [noteTitle, setNoteTitle] = useState('');
   const [noteContent, setNoteContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [createdNoteId, setCreatedNoteId] = useState<string | null>(null);
+  const [isGridView, setIsGridView] = useState(true);
   
   // Constants
   const MAX_TITLE_LENGTH = 100;
@@ -115,9 +117,9 @@ export function NotesSheet() {
     }
   }, [isNotesVisible, initializeStore]);
 
-  // Load note data when viewing/editing
+  // Load note data when editing
   useEffect(() => {
-    if (selectedNote && (viewMode === 'view' || viewMode === 'edit')) {
+    if (selectedNote && viewMode === 'edit') {
       setNoteTitle(selectedNote.title);
       setNoteContent(selectedNote.content || '');
     }
@@ -154,8 +156,8 @@ export function NotesSheet() {
 
   const getNotePreview = (content: string | null | undefined) => {
     if (!content) return 'Empty note';
-    const preview = content.slice(0, 150).replace(/\n+/g, ' ');
-    return preview + (content.length > 150 ? '...' : '');
+    const preview = content.slice(0, 300).replace(/\n+/g, ' ');
+    return preview + (content.length > 300 ? '...' : '');
   };
 
   const getNoteColor = (id: string) => {
@@ -237,11 +239,7 @@ export function NotesSheet() {
 
   const handleViewNote = (noteId: string) => {
     setSelectedNoteId(noteId);
-    setViewMode('view');
-  };
-
-  const handleEditNote = () => {
-    setViewMode('edit');
+    setViewMode('edit'); // Always open in edit mode
   };
 
   const handleTogglePin = (noteId: string) => {
@@ -257,24 +255,48 @@ export function NotesSheet() {
   // Render list view
   const renderListView = () => (
     <div className="flex h-full flex-col">
-      {/* Search bar */}
+      {/* Search bar and view toggle */}
       <div className="border-b border-white/10 bg-zinc-800/50 p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search notes..."
-            className="pl-10 pr-10 bg-zinc-900/50 border-white/10"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search notes..."
+              className="pl-10 pr-10 bg-zinc-900/50 border-white/10"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+          
+          {/* View toggle buttons */}
+          <div className="flex rounded-lg bg-zinc-800/50 p-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsGridView(true)}
+              className={`h-8 w-8 p-0 ${isGridView ? 'bg-zinc-700' : ''}`}
+              title="Grid view"
             >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsGridView(false)}
+              className={`h-8 w-8 p-0 ${!isGridView ? 'bg-zinc-700' : ''}`}
+              title="List view"
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -299,12 +321,12 @@ export function NotesSheet() {
             )}
           </div>
         ) : (
-          <div className="columns-2 gap-4 space-y-4 [column-fill:_balance]">
+          <div className={isGridView ? "columns-2 gap-4 space-y-4 [column-fill:_balance]" : "space-y-4"}>
             {filteredNotes.map((note) => (
               <div
                 key={note.id}
                 onClick={() => handleViewNote(note.id)}
-                className={`group relative cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br ${getNoteColor(note.id)} p-4 transition-all hover:border-white/20`}
+                className={`group relative cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br ${getNoteColor(note.id)} p-4 transition-all hover:border-white/20 ${!isGridView ? 'flex items-start justify-between' : ''}`}
               >
                 {/* Note content */}
                 <div className="flex items-start justify-between gap-3">
@@ -317,7 +339,7 @@ export function NotesSheet() {
                         <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />
                       )}
                     </div>
-                    <p className="mb-2 text-sm text-white/60 line-clamp-2">
+                    <p className="mb-2 text-sm text-white/50 line-clamp-[10] ">
                       {getNotePreview(note.content)}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-white/40">
@@ -372,9 +394,8 @@ export function NotesSheet() {
     </div>
   );
 
-  // Render create/edit/view
+  // Render create/edit
   const renderNoteEditor = () => {
-    const isEditing = viewMode === 'edit' || viewMode === 'create';
     const isNewNote = viewMode === 'create';
 
     return (
@@ -403,28 +424,6 @@ export function NotesSheet() {
                   <Pin className={`h-4 w-4 ${selectedNote?.pinned ? 'fill-yellow-400 text-yellow-400' : ''}`} />
                   {selectedNote?.pinned ? 'Pinned' : 'Pin'}
                 </Button>
-
-                {viewMode === 'view' ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleEditNote}
-                    className="gap-1"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                    Edit
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setViewMode('view')}
-                    className="gap-1"
-                  >
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
-                )}
 
                 <Button
                   variant="ghost"
@@ -462,8 +461,7 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Note title..."
-              disabled={!isEditing}
-              className="mb-4 border-0 bg-transparent p-0 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0 disabled:cursor-default"
+              className="mb-4 border-0 bg-transparent p-0 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
             />
             
             <Textarea
@@ -475,8 +473,7 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Start writing..."
-              disabled={!isEditing}
-              className="min-h-[500px] resize-none border-0 bg-transparent p-0 placeholder:text-zinc-600 focus-visible:ring-0 disabled:cursor-default"
+              className="min-h-[500px] resize-none border-0 bg-transparent p-0 placeholder:text-zinc-600 focus-visible:ring-0"
               autoFocus={isNewNote}
             />
           </div>
@@ -494,14 +491,12 @@ export function NotesSheet() {
               <SheetTitle>
                 {viewMode === 'list' && 'Notes'}
                 {viewMode === 'create' && 'New Note'}
-                {viewMode === 'edit' && 'Edit Note'}
-                {viewMode === 'view' && selectedNote?.title}
+                {viewMode === 'edit' && (selectedNote?.title || 'Edit Note')}
               </SheetTitle>
               <SheetDescription>
                 {viewMode === 'list' && `${filteredNotes.length} notes`}
                 {viewMode === 'create' && (createdNoteId ? 'Auto-saving...' : 'Start typing to auto-save')}
-                {viewMode === 'edit' && 'Auto-saving changes...'}
-                {viewMode === 'view' && formatDate(selectedNote?.updatedAt || Date.now())}
+                {viewMode === 'edit' && formatDate(selectedNote?.updatedAt || Date.now())}
               </SheetDescription>
             </div>
             
