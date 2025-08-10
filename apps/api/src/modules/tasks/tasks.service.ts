@@ -1,9 +1,10 @@
 import { db } from "@/db";
-import { Task, tasks, providers, } from "@/db/schema";
+import { Task, tasks, providers } from "@/db/schema";
 import { eq, and, desc, asc, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 import { parseNullableDate } from "@/common/utils/date";
+import { tasksSyncService } from "./tasks-sync.service";
 
 
 interface TaskFilters {
@@ -266,6 +267,9 @@ export const tasksService = {
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 
+  /**
+   * Bulk sync operation - delegate to sync service
+   */
   async bulkSync(
     userId: string,
     payload: {
@@ -274,81 +278,7 @@ export const tasksService = {
       deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
     }
   ): Promise<{ created: Array<Task & { clientId?: string }>; updated: Task[]; deleted: string[] }> {
-    // Use a transaction to ensure atomicity
-    return await db.transaction(async (tx) => {
-      const created: Array<Task & { clientId?: string }> = [];
-      const updated: Task[] = [];
-      const deleted: string[] = [];
-      const idMap = new Map<string, string>();
-
-      try {
-        // Process creates
-        for (const c of payload.creates || []) {
-          const task = await tasksService.createTask(userId, {
-            title: c.title,
-            completed: c.completed,
-            pinned: c.pinned,
-            dueDate: c.dueDate ?? undefined,
-            categoryId: c.categoryId ?? undefined,
-            providerId: c.providerId ?? undefined,
-          });
-          if (c.clientId) idMap.set(c.clientId, task.id);
-          created.push({ ...task, clientId: c.clientId });
-        }
-
-        // Collapse multiple updates to the same id to the last one by updatedAt
-        const updateById = new Map<string, any>();
-        for (const u of payload.updates || []) {
-          // Prefer resolving via clientId mapping when available (create + update in same bulk)
-          const mappedId = u.clientId ? idMap.get(u.clientId) : undefined;
-          const resolvedId = mappedId || u.id;
-          if (!resolvedId) continue;
-          const prev = updateById.get(resolvedId);
-          if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
-            updateById.set(resolvedId, u);
-          }
-        }
-
-        // Process updates with LWW + delete precedence
-        for (const [resolvedId, u] of updateById) {
-          try {
-            const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
-            updated.push(task);
-          } catch (err) {
-            // Skip not found
-            console.warn(`Task ${resolvedId} not found for update`);
-          }
-        }
-
-        // Process deletes (set tombstone); resolve id with clientId mapping preferred
-        for (const d of payload.deletes || []) {
-          const mappedId = d.clientId ? idMap.get(d.clientId) : undefined;
-          const resolvedId = mappedId || d.id;
-          if (!resolvedId) {
-            console.warn("Bulk delete skipped: no id or resolvable clientId", d);
-            continue;
-          }
-          
-          try {
-            const delAt = d.deletedAt ? new Date(d.deletedAt as any) : new Date();
-            await db
-              .update(tasks)
-              .set({ deletedAt: delAt } as Task)
-              .where(and(eq(tasks.id, resolvedId), eq(tasks.userId, userId)));
-            deleted.push(resolvedId);
-          } catch (err) {
-            // Skip if not found
-            console.warn(`Task ${resolvedId} not found for delete`);
-          }
-        }
-
-        return { created, updated, deleted };
-      } catch (error) {
-        // Transaction will be rolled back automatically
-        console.error("Tasks bulk sync failed, rolling back:", error);
-        throw error;
-      }
-    });
+    return tasksSyncService.bulkSync(userId, payload);
   },
 
 };

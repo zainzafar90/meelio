@@ -5,8 +5,8 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { SyncState, useSyncStore } from "./sync.store";
-import { lwwMergeById } from "../utils/sync.utils";
-import { createEntitySync } from "../utils/sync-core";
+import { EntitySyncManager, createEntitySync } from "../utils/sync-core";
+import { createAdapter, normalizeDates } from "../utils/sync-adapters";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -55,21 +55,8 @@ interface TaskState {
   getNextPinnedTask: () => Task | undefined;
 }
 
-let taskEntitySync: ReturnType<typeof createEntitySync<any, any, any, any, any>> | null = null;
-
-async function processSyncQueue() {
-  if (!taskEntitySync) return;
-  return taskEntitySync.processQueue();
-}
-
-let autoSyncInterval: NodeJS.Timeout | null = null;
+let taskSyncManager: EntitySyncManager<Task, any, any, any, any> | null = null;
 let isInitializing = false;
-
-function startAutoSync() {
-  if (autoSyncInterval) clearInterval(autoSyncInterval);
-  // Hourly sync to keep server load light (eventual consistency)
-  autoSyncInterval = setInterval(() => processSyncQueue(), 60 * 60 * 1000);
-}
 
 export const useTaskStore = create<TaskState>()(
   subscribeWithSelector((set, get) => ({
@@ -160,8 +147,8 @@ export const useTaskStore = create<TaskState>()(
             data: newTask,
           });
 
-          if (syncStore.isOnline) {
-            processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
           }
         }
       } catch (error) {
@@ -209,7 +196,9 @@ export const useTaskStore = create<TaskState>()(
             data: updatedData,
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -241,7 +230,9 @@ export const useTaskStore = create<TaskState>()(
             data: { deletedAt },
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -296,8 +287,8 @@ export const useTaskStore = create<TaskState>()(
               data: welcomeTask,
             });
 
-            if (syncStore.isOnline) {
-              processSyncQueue();
+            if (syncStore.isOnline && taskSyncManager) {
+              taskSyncManager.processQueue();
             }
           }
         } catch (error) {
@@ -336,10 +327,6 @@ export const useTaskStore = create<TaskState>()(
 
       try {
         set({ isLoading: true, error: null });
-
-        if (user) {
-          startAutoSync();
-        }
 
         await get().loadFromLocal();
 
@@ -387,8 +374,8 @@ export const useTaskStore = create<TaskState>()(
     },
 
     syncWithServer: async () => {
-      if (!taskEntitySync) return;
-      await taskEntitySync.syncWithServer();
+      if (!taskSyncManager) return;
+      await taskSyncManager.syncWithServer();
     },
 
     togglePinTask: async (taskId) => {
@@ -455,7 +442,9 @@ export const useTaskStore = create<TaskState>()(
             data: updatedData,
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -507,52 +496,59 @@ export const useTaskStore = create<TaskState>()(
   }))
 );
 
-// Initialize taskEntitySync after store definition to avoid circular dependencies on useTaskStore
-taskEntitySync = createEntitySync<Task, any,
-  { clientId?: string; title: string; completed?: boolean; dueDate?: string; pinned?: boolean; categoryId?: string; providerId?: string; updatedAt?: number },
-  { id?: string; clientId?: string; title?: string; completed?: boolean; dueDate?: string; pinned?: boolean; categoryId?: string; providerId?: string; updatedAt?: number; deletedAt?: number | null },
-  { id?: string; clientId?: string; deletedAt?: number }
->({
-  entityKey: "task",
-  dbTable: db.tasks as any,
-  bulkSync: taskApi.bulkSync,
-  fetchAll: (() => taskApi.getTasks()),
-  normalizeFromServer: (t: any): Task => ({
-    ...t,
-    createdAt: new Date(t.createdAt).getTime(),
-    updatedAt: new Date(t.updatedAt).getTime(),
-    deletedAt: t.deletedAt ? new Date(t.deletedAt).getTime() : null,
-    dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : undefined,
-  }),
-  toCreatePayload: (op) => {
-    if (op.type !== "create") return null;
-    const d = op.data || {};
-    return {
-      clientId: op.entityId,
-      title: d.title,
-      completed: !!d.completed,
-      dueDate: d.dueDate,
-      pinned: !!d.pinned,
-      categoryId: d.categoryId,
-      providerId: d.providerId,
-      updatedAt: d.updatedAt,
-    };
-  },
-  toUpdatePayload: (op) => {
-    if (op.type !== "update") return null;
-    // Include clientId alongside id so the server can resolve
-    // same-transaction creates via idMap during bulk sync.
-    return { id: op.entityId, clientId: op.entityId, ...(op.data || {}) } as any;
-  },
-  toDeletePayload: (op) => {
-    if (op.type !== "delete") return null;
-    // Include clientId to allow server to remap deletes issued
-    // against a temporary client id within the same bulk.
-    return { id: op.entityId, clientId: op.entityId, deletedAt: op.data?.deletedAt } as any;
-  },
-  getUserId: () => useAuthStore.getState().user?.id,
-  inMemorySelector: () => useTaskStore.getState().tasks,
-  inMemorySetter: (list) => useTaskStore.setState({ tasks: list }),
+// Initialize task sync manager after store definition to avoid circular dependencies
+function initializeTaskSync() {
+  const taskAdapter = createAdapter<Task, any>({
+    entityKey: "task",
+    dbTable: db.tasks as any,
+    api: {
+      bulkSync: taskApi.bulkSync,
+      fetchAll: () => taskApi.getTasks(),
+    },
+    store: {
+      getUserId: () => useAuthStore.getState().user?.id,
+      getItems: () => useTaskStore.getState().tasks,
+      setItems: (list) => useTaskStore.setState({ tasks: list }),
+    },
+    normalizeFromServer: (t: any): Task => ({
+      ...normalizeDates(t),
+      dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : undefined,
+    }),
+    customTransformers: {
+      toCreatePayload: (op) => {
+        if (op.type !== "create") return null;
+        const d = op.data || {};
+        return {
+          clientId: op.entityId,
+          title: d.title,
+          completed: !!d.completed,
+          dueDate: d.dueDate,
+          pinned: !!d.pinned,
+          categoryId: d.categoryId,
+          providerId: d.providerId,
+          updatedAt: d.updatedAt,
+        };
+      },
+    },
+    options: {
+      autoSync: true,
+      syncInterval: 60 * 60 * 1000, // 1 hour
+      enableOptimisticUpdates: true,
+    },
+  });
+
+  taskSyncManager = createEntitySync(taskAdapter);
+}
+
+// Initialize on first authenticated user login
+useAuthStore.subscribe((state) => {
+  const user = state.user;
+  if (user && !taskSyncManager) {
+    initializeTaskSync();
+  } else if (!user && taskSyncManager) {
+    taskSyncManager.dispose();
+    taskSyncManager = null;
+  }
 });
 
 /**
