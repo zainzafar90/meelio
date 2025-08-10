@@ -4,7 +4,12 @@ import type { EntityType } from "../stores/sync.store";
 
 // Common date normalizer for server responses
 export function normalizeDates<T extends Record<string, any>>(item: T): T {
-  const normalized = { ...item };
+  const normalized: {
+    createdAt?: number;
+    updatedAt?: number;
+    deletedAt?: number;
+    dueDate?: string;
+  } = { ...item };
   
   if ('createdAt' in item && item.createdAt) {
     normalized.createdAt = new Date(item.createdAt).getTime();
@@ -19,7 +24,7 @@ export function normalizeDates<T extends Record<string, any>>(item: T): T {
     normalized.dueDate = new Date(item.dueDate).toISOString();
   }
   
-  return normalized;
+  return normalized as T;
 }
 
 // Standard payload transformers factory
