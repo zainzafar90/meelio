@@ -9,7 +9,9 @@ import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
+import { playTypewriterSound } from "../../../utils/sound.utils";
 import { Icons } from "../../icons";
+import { Volume2, VolumeX } from "lucide-react";
 
 
 export function NotesSheet() {
@@ -21,24 +23,29 @@ export function NotesSheet() {
     }))
   );
 
-  const { notes, initializeStore, addNote, updateNote } = useNoteStore(
+  const { notes, initializeStore, addNote, updateNote, enableTypingSound, setEnableTypingSound } = useNoteStore(
     useShallow((s) => ({
       notes: s.notes,
       initializeStore: s.initializeStore,
       addNote: s.addNote,
       updateNote: s.updateNote,
+      enableTypingSound: s.enableTypingSound,
+      setEnableTypingSound: s.setEnableTypingSound,
       
     }))
   );
 
-  useEffect(() => {
-    if (isNotesVisible) initializeStore();
-  }, [isNotesVisible, initializeStore]);
 
   const [query, setQuery] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
-  const active = useMemo(() => notes.find((n) => n.id === activeId) || null, [notes, activeId]);
   const [draftContent, setDraftContent] = useState<string>("");
+  const active = useMemo(() => notes.find((n) => n.id === activeId) || null, [notes, activeId]);
+  // Limits
+  const MAX_NOTE_CHARS = 10000; // characters
+  const MAX_NOTES = 500;
+
+  const creatingRef = useRef(false);
+  const saveTimer = useRef<number | null>(null);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return notes;
@@ -73,13 +80,12 @@ export function NotesSheet() {
     setDraftContent(active?.content || "");
   }, [active?.id]);
 
-  // Plain text editor; no overlay, no external deps
 
-  // Limits
-  const MAX_NOTE_CHARS = 10000; // characters
-  const MAX_NOTES = 500;
+  useEffect(() => {
+    if (isNotesVisible) initializeStore();
+  }, [isNotesVisible, initializeStore]);
 
-  const creatingRef = useRef(false);
+
   const handleCreate = async () => {
     if (creatingRef.current) return;
     creatingRef.current = true;
@@ -94,7 +100,6 @@ export function NotesSheet() {
     }
   };
 
-  const saveTimer = useRef<number | null>(null);
   const truncateToChars = (text: string, maxChars: number) =>
     typeof text === "string" ? text.slice(0, maxChars) : text;
 
@@ -181,6 +186,19 @@ export function NotesSheet() {
                 <div className="text-sm text-muted-foreground">{formatRelativeTime(active.updatedAt)}</div>
                 <div className="ml-auto flex items-center gap-2">
                   <NoteCharCount valueChars={getCharCount()} />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEnableTypingSound(!enableTypingSound)}
+                    title={enableTypingSound ? t("common.actions.mute", { defaultValue: "Mute" }) : t("common.actions.unmute", { defaultValue: "Unmute" })}
+                    aria-label={enableTypingSound ? t("common.actions.mute", { defaultValue: "Mute" }) : t("common.actions.unmute", { defaultValue: "Unmute" })}
+                  >
+                    {enableTypingSound ? (
+                      <Volume2 className="h-4 w-4" />
+                    ) : (
+                      <VolumeX className="h-4 w-4" />
+                    )}
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)} title={t("notes.pin", { defaultValue: "Pin" })}>
                     <Icons.star className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
                   </Button>
@@ -189,7 +207,10 @@ export function NotesSheet() {
               <Input
                 defaultValue={active.title}
                 onChange={(e) => scheduleSave(active.id, { title: e.target.value })}
-                className="border-none bg-transparent px-0 text-2xl font-semibold"
+                className="border-none bg-transparent px-0 text-2xl font-semibold focus-visible:ring-0 focus-visible:outline-none"
+                onKeyDown={(e) => {
+                  if (enableTypingSound) void playTypewriterSound(e.key);
+                }}
                 placeholder={t("notes.title.placeholder", { defaultValue: "Untitled" })}
               />
               <Textarea
@@ -199,7 +220,10 @@ export function NotesSheet() {
                   setDraftContent(value);
                   scheduleSave(active.id, { content: value });
                 }}
-                className="h-full resize-none border-none bg-transparent px-0 whitespace-pre-wrap"
+                className="h-full resize-none border-none bg-transparent px-0 whitespace-pre-wrap focus-visible:ring-0 focus-visible:outline-none"
+                onKeyDown={(e) => {
+                  if (enableTypingSound) void playTypewriterSound(e.key);
+                }}
                 placeholder={t("notes.content.placeholder", { defaultValue: "Start writing..." })}
                 maxLength={MAX_NOTE_CHARS}
               />

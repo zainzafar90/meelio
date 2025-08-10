@@ -70,6 +70,10 @@ export const generateNextVolumeForShuffle = () => {
 export const playTypewriterSound = async (key: string) => {
   let soundPath: string | null = null;
 
+  if (key === "Shift" || key === "Control" || key === "Alt" || key === "Meta" || key === "Tab" || key === "CapsLock") {
+    return;
+  }
+
   if (key === "Space") {
     soundPath = keyboardSounds.space;
   } else if (key === "Enter") {

@@ -12,6 +12,7 @@ interface NoteState {
   notes: Note[];
   isLoading: boolean;
   error: string | null;
+  enableTypingSound: boolean;
 
   initializeStore: () => Promise<void>;
 
@@ -20,6 +21,7 @@ interface NoteState {
   deleteNote: (id: string) => Promise<void>;
 
   syncWithServer: () => Promise<void>;
+  setEnableTypingSound: (enabled: boolean) => void;
 }
 
 let isProcessingSyncQueue = false;
@@ -89,10 +91,13 @@ async function processSyncQueue() {
 }
 
 export const useNoteStore = create<NoteState>()(
-  subscribeWithSelector((set, get) => ({
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
     notes: [],
     isLoading: false,
     error: null,
+    enableTypingSound: true,
 
     initializeStore: async () => {
       set({ isLoading: true, error: null });
@@ -216,6 +221,15 @@ export const useNoteStore = create<NoteState>()(
         syncStore.setSyncing("note", false);
       }
     },
-  }))
+
+    setEnableTypingSound: (enabled: boolean) => set({ enableTypingSound: enabled }),
+      }),
+      {
+        name: "meelio:local:notes:settings",
+        storage: createJSONStorage(() => localStorage),
+        partialize: (s) => ({ enableTypingSound: s.enableTypingSound }),
+      }
+    )
+  )
 );
 
