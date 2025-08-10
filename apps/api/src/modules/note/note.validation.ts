@@ -1,19 +1,6 @@
 import Joi from "joi";
 
 export const noteValidation = {
-  createNote: Joi.object().keys({
-    title: Joi.string().max(200).required(),
-    content: Joi.string().max(10000).allow(null).optional(),
-    categoryId: Joi.string().allow(null).optional(),
-    providerId: Joi.string().allow(null).optional(),
-  }),
-  updateNote: Joi.object().keys({
-    title: Joi.string().max(200).optional(),
-    content: Joi.string().max(10000).allow(null).optional(),
-    categoryId: Joi.string().allow(null).optional(),
-    providerId: Joi.string().allow(null).optional(),
-    deletedAt: Joi.alternatives().try(Joi.date(), Joi.allow(null)).optional(),
-  }),
   bulkSync: Joi.object().keys({
     creates: Joi.array()
       .items(

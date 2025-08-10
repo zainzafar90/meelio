@@ -7,47 +7,43 @@ function checkPro() {
   if (!isPro) throw new Error("Pro subscription required");
 }
 
-export interface CreateNoteDto {
-  title: string;
-  content?: string | null;
-  categoryId?: string | null;
-  providerId?: string | null;
-  updatedAt?: number;
-}
-
-export interface UpdateNoteDto {
-  title?: string;
-  content?: string | null;
-  categoryId?: string | null;
-  providerId?: string | null;
-  updatedAt?: number;
-  deletedAt?: number | null;
-}
-
 export const noteApi = {
+  /**
+   * Get all notes for full sync
+   */
   async getNotes(): Promise<Note[]> {
     checkPro();
     const res = await axios.get("/v1/notes");
     return res.data;
   },
-  async createNote(payload: CreateNoteDto): Promise<Note> {
-    checkPro();
-    const res = await axios.post("/v1/notes", payload);
-    return res.data;
-  },
-  async updateNote(id: string, payload: UpdateNoteDto): Promise<Note> {
-    checkPro();
-    const res = await axios.patch(`/v1/notes/${id}`, payload);
-    return res.data;
-  },
-  async deleteNote(id: string): Promise<void> {
-    checkPro();
-    await axios.delete(`/v1/notes/${id}`);
-  },
+
+  /**
+   * Bulk sync operation - handles creates, updates, and deletes
+   */
   async bulkSync(payload: {
-    creates?: Array<{ clientId?: string } & CreateNoteDto>;
-    updates?: Array<{ id?: string; clientId?: string } & UpdateNoteDto>;
-    deletes?: Array<{ id?: string; clientId?: string; deletedAt?: number }>;
+    creates?: Array<{ 
+      clientId?: string;
+      title: string;
+      content?: string | null;
+      categoryId?: string | null;
+      providerId?: string | null;
+      updatedAt?: number;
+    }>;
+    updates?: Array<{ 
+      id?: string; 
+      clientId?: string;
+      title?: string;
+      content?: string | null;
+      categoryId?: string | null;
+      providerId?: string | null;
+      updatedAt?: number;
+      deletedAt?: number | null;
+    }>;
+    deletes?: Array<{ 
+      id?: string; 
+      clientId?: string; 
+      deletedAt?: number;
+    }>;
   }): Promise<{
     created: Array<(Note & { clientId?: string })>;
     updated: Note[];
