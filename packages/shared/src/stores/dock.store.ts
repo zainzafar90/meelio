@@ -264,7 +264,6 @@ export const useDockStore = create<DockState>()(
         isTimerVisible: state.isTimerVisible,
         isBreathingVisible: state.isBreathingVisible,
         isGreetingsVisible: state.isGreetingsVisible,
-        isNotesVisible: state.isNotesVisible,
         dockIconsVisible: state.dockIconsVisible,
         currentOnboardingStep: state.currentOnboardingStep,
         showIconLabels: state.showIconLabels,

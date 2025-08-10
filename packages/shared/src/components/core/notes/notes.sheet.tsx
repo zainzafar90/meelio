@@ -161,7 +161,10 @@ export function NotesSheet() {
                     className={`mb-4 inline-block w-full align-top break-inside-avoid rounded-lg border p-4 text-left shadow-sm transition hover:brightness-110 ${colorFor(n.id)}`}
                     onClick={() => setActiveId(n.id)}
                   >
-                    <div className="mb-3 text-sm font-medium opacity-95">{n.title || "Untitled"}</div>
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium opacity-95">
+                      <span className="truncate">{n.title || "Untitled"}</span>
+                      {n.pinned && <Icons.pin className="h-3.5 w-3.5 text-yellow-400" />}
+                    </div>
                     {n.content && (
                       <div className="mb-3 text-xs/5 opacity-90 max-h-[300px] overflow-hidden whitespace-pre-wrap">
                         {n.content}
@@ -199,8 +202,14 @@ export function NotesSheet() {
                       <VolumeX className="h-4 w-4" />
                     )}
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)} title={t("notes.pin", { defaultValue: "Pin" })}>
-                    <Icons.star className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)}
+                    title={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
+                    aria-label={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
+                  >
+                    <Icons.pin className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
                   </Button>
                 </div>
               </div>
