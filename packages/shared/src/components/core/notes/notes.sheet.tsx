@@ -73,9 +73,9 @@ export function NotesSheet() {
   
   // Constants
   const MAX_TITLE_LENGTH = 100;
-  const MAX_CONTENT_LENGTH = 10000;
+  const MAX_CONTENT_LENGTH = 10_000;
   const MAX_NOTES = 500;
-  const AUTO_SAVE_DELAY = 500; // ms
+  const AUTO_SAVE_DELAY = 1_000; // ms
 
   // Refs
   const autoSaveTimeout = useRef<NodeJS.Timeout>();
