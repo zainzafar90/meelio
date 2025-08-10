@@ -67,3 +67,20 @@ export interface CachedSound {
   lastAccessed: number;
   downloadedAt: number;
 }
+
+export interface TabStash {
+  id: string;
+  userId: string;
+  windowId: string;
+  urls: string[];
+  tabsData?: Array<{
+    title: string;
+    url: string;
+    favicon?: string;
+    windowId: number;
+    pinned: boolean;
+  }> | null;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt?: number | null;
+}

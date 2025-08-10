@@ -6,6 +6,7 @@ import type {
   DailySummary,
   Category,
   CachedSound,
+  TabStash,
 } from "./models.dexie";
 import type { Note } from "./models.notes";
 
@@ -17,6 +18,7 @@ export class MeelioDB extends Dexie {
   categories!: Table<Category, string>;
   sounds!: Table<CachedSound, string>;
   notes!: Table<Note, string>;
+  tabStashes!: Table<TabStash, string>;
 
   constructor() {
     super("meelio");
@@ -143,6 +145,18 @@ export class MeelioDB extends Dexie {
         categories: "id, userId, name, icon, type",
         sounds: "id, path, downloadedAt, lastAccessed",
         notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
+      });
+
+    this.version(10)
+      .stores({
+        siteBlocker: "id, userId, url",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+        notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
+        tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
       });
   }
 }

@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { TabStash, TabStashInsert, tabStashes } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { TabStash, tabStashes } from "@/db/schema";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
@@ -12,112 +12,50 @@ interface TabData {
   pinned: boolean;
 }
 
-interface CreateTabStashData {
-  windowId: string;
-  urls: string[];
-  tabsData?: TabData[];
+interface TabStashUpdateData {
+  windowId?: string;
+  urls?: string[];
+  tabsData?: TabData[] | null;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
 }
-
-type UpdateTabStashData = Partial<CreateTabStashData>;
 
 export const tabStashService = {
   /**
-   * Get tab stashes for a user
+   * Get all tab stashes for a user (used for full sync)
    */
-  getTabStashes: async (userId: string): Promise<TabStash[]> => {
-    // Return all tab stashes including soft-deleted ones for proper CRDT sync
-    // The frontend will filter out deleted items as needed
-    return await db
-      .select()
-      .from(tabStashes)
-      .where(eq(tabStashes.userId, userId));
-  },
-
-  /**
-   * Get a tab stash by ID
-   */
-  getTabStashById: async (id: string, userId: string): Promise<TabStash> => {
+  async getTabStashes(userId: string): Promise<TabStash[]> {
     const result = await db
       .select()
       .from(tabStashes)
-      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
+      .where(and(
+        eq(tabStashes.userId, userId),
+        isNull(tabStashes.deletedAt)
+      ))
+      .orderBy(desc(tabStashes.createdAt));
 
-    if (result.length === 0) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Tab stash not found");
-    }
-
-    return result[0];
+    return result as any;
   },
 
   /**
-   * Create a tab stash
+   * Bulk sync operation for tab stashes
+   * Handles creates, updates, and deletes in a single transaction
    */
-  createTabStash: async (
-    userId: string,
-    data: CreateTabStashData
-  ): Promise<TabStash> => {
-    const result = await db.insert(tabStashes).values({
-      userId,
-      windowId: data.windowId,
-      urls: data.urls,
-      tabsData: data.tabsData || null,
-    } as TabStash).returning();
-
-    return result[0];
-  },
-
-  /**
-   * Update a tab stash
-   */
-  updateTabStash: async (
-    id: string,
-    userId: string,
-    data: UpdateTabStashData
-  ): Promise<TabStash> => {
-    // Check if tab stash exists
-    await tabStashService.getTabStashById(id, userId);
-
-    const updateData: Partial<TabStashInsert> = {};
-
-    if (data.windowId) {
-      updateData.windowId = data.windowId;
-    }
-
-    if (data.urls) {
-      updateData.urls = data.urls;
-    }
-
-    const result = await db
-      .update(tabStashes)
-      .set(updateData)
-      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)))
-      .returning();
-
-    return result[0];
-  },
-
-  /**
-   * Delete a tab stash
-   */
-  deleteTabStash: async (id: string, userId: string): Promise<void> => {
-    // Check if tab stash exists
-    await tabStashService.getTabStashById(id, userId);
-
-    await db
-      .update(tabStashes)
-      .set({ deletedAt: new Date() } as TabStash)
-      .where(and(eq(tabStashes.id, id), eq(tabStashes.userId, userId)));
-  },
-  bulkSync: async (
+  async bulkSync(
     userId: string,
     payload: {
-      creates: Array<{ clientId?: string; windowId: string; urls: string[]; tabsData?: TabData[] }>;
-      updates: Array<{ id?: string; clientId?: string; windowId?: string; urls?: string[]; tabsData?: TabData[] }>;
-      deletes: Array<{ id?: string; clientId?: string }>;
+      creates: Array<{ 
+        clientId?: string; 
+        windowId: string; 
+        urls: string[]; 
+        tabsData?: TabData[] | null;
+        updatedAt?: Date
+      }>;
+      updates: Array<({ id?: string; clientId?: string }) & TabStashUpdateData>;
+      deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
     }
-  ): Promise<{ created: Array<TabStash & { clientId?: string }>; updated: TabStash[]; deleted: string[] }> => {
-    // Use a transaction to ensure atomicity
-    return await db.transaction(async (tx) => {
+  ): Promise<{ created: Array<TabStash & { clientId?: string }>; updated: TabStash[]; deleted: string[] }> {
+    return await db.transaction(async () => {
       const created: Array<TabStash & { clientId?: string }> = [];
       const updated: TabStash[] = [];
       const deleted: string[] = [];
@@ -126,48 +64,163 @@ export const tabStashService = {
       try {
         // Process creates
         for (const c of payload.creates || []) {
-          const ts = await tabStashService.createTabStash(userId, c);
-          if (c.clientId) idMap.set(c.clientId, ts.id);
-          created.push({ ...ts, clientId: c.clientId });
+          const tabStash = await this._createTabStash(userId, {
+            windowId: c.windowId,
+            urls: c.urls,
+            tabsData: c.tabsData ?? undefined,
+          });
+          if (c.clientId) idMap.set(c.clientId, tabStash.id);
+          created.push({ ...tabStash, clientId: c.clientId });
         }
 
-        // Process updates
+        // Collapse multiple updates to the same id to the last one by updatedAt
+        const updateById = new Map<string, any>();
         for (const u of payload.updates || []) {
-          const resolvedId = (u as any).id || ((u as any).clientId && idMap.get((u as any).clientId as string));
+          const mappedId = u.clientId ? idMap.get(u.clientId) : undefined;
+          const resolvedId = mappedId || u.id;
           if (!resolvedId) continue;
           
+          const prev = updateById.get(resolvedId);
+          if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
+            updateById.set(resolvedId, u);
+          }
+        }
+
+        // Process updates with LWW + delete precedence
+        for (const [resolvedId, u] of updateById) {
           try {
-            const ts = await tabStashService.updateTabStash(resolvedId, userId, u);
-            updated.push(ts);
+            const tabStash = await this._updateTabStash(userId, resolvedId as string, u as any);
+            updated.push(tabStash);
           } catch (err) {
-            // Skip if not found
             console.warn(`Tab stash ${resolvedId} not found for update`);
           }
         }
 
-        // Process deletes
+        // Process deletes (set tombstone)
         for (const d of payload.deletes || []) {
-          const resolvedId = (d as any).id || ((d as any).clientId && idMap.get((d as any).clientId as string));
-          if (!resolvedId) continue;
+          const mappedId = d.clientId ? idMap.get(d.clientId) : undefined;
+          const resolvedId = mappedId || d.id;
+          if (!resolvedId) {
+            console.warn("Bulk delete skipped: no id or resolvable clientId", d);
+            continue;
+          }
           
           try {
+            const delAt = d.deletedAt ? new Date(d.deletedAt as any) : new Date();
             await db
               .update(tabStashes)
-              .set({ deletedAt: new Date() } as any)
+              .set({ deletedAt: delAt } as TabStash)
               .where(and(eq(tabStashes.id, resolvedId), eq(tabStashes.userId, userId)));
             deleted.push(resolvedId);
           } catch (err) {
-            // Skip if not found
             console.warn(`Tab stash ${resolvedId} not found for delete`);
           }
         }
 
         return { created, updated, deleted };
       } catch (error) {
-        // Transaction will be rolled back automatically
-        console.error("Tab stash bulk sync failed, rolling back:", error);
+        console.error("Tab stashes bulk sync failed, rolling back:", error);
         throw error;
       }
     });
+  },
+
+  // Private helper methods for bulk sync
+  async _createTabStash(
+    userId: string,
+    tabStashData: {
+      windowId: string;
+      urls: string[];
+      tabsData?: TabData[] | null | undefined;
+    }
+  ): Promise<TabStash> {
+    if (!tabStashData.windowId || !tabStashData.urls?.length) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "WindowId and urls are required");
+    }
+
+    // Enforce hard business limits
+    const existingCount = await db.query.tabStashes.findMany({ 
+      where: and(eq(tabStashes.userId, userId), isNull(tabStashes.deletedAt)) 
+    });
+    if (existingCount.length >= 100) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Maximum tab stashes limit (100) reached");
+    }
+
+    const insertData: any = {
+      userId,
+      windowId: tabStashData.windowId,
+      urls: tabStashData.urls,
+      tabsData: tabStashData.tabsData ?? null,
+    };
+
+    const result = await db.insert(tabStashes).values(insertData).returning();
+    return result[0];
+  },
+
+  async _updateTabStash(
+    userId: string,
+    tabStashId: string,
+    updateData: TabStashUpdateData
+  ): Promise<TabStash> {
+    // Load current tab stash for conflict handling
+    const current = await db.query.tabStashes.findFirst({
+      where: and(eq(tabStashes.id, tabStashId), eq(tabStashes.userId, userId)),
+    });
+
+    if (!current) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Tab stash not found");
+    }
+
+    const data: Partial<TabStash> = {};
+
+    // Build update data
+    if (updateData.windowId !== undefined) {
+      data.windowId = updateData.windowId;
+    }
+
+    if (updateData.urls !== undefined) {
+      data.urls = updateData.urls;
+    }
+
+    if (updateData.tabsData !== undefined) {
+      data.tabsData = updateData.tabsData;
+    }
+
+    if (updateData.deletedAt !== undefined) {
+      data.deletedAt = updateData.deletedAt;
+    }
+
+    // Conflict handling: delete precedence with LWW by timestamp
+    const incomingUpdatedAt = updateData.updatedAt
+      ? new Date(updateData.updatedAt)
+      : undefined;
+    
+    if (current.deletedAt) {
+      if (!incomingUpdatedAt || incomingUpdatedAt <= current.deletedAt) {
+        // Keep deletion, ignore update
+        return current;
+      }
+      // Newer update than deletion → resurrect by clearing deletedAt
+      (data as any).deletedAt = null;
+    }
+
+    if (Object.keys(data).length === 0) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "No valid update data provided"
+      );
+    }
+
+    const result = await db
+      .update(tabStashes)
+      .set(data)
+      .where(and(eq(tabStashes.id, tabStashId), eq(tabStashes.userId, userId)))
+      .returning();
+
+    if (!result.length) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Tab stash not found");
+    }
+
+    return result[0];
   },
 };

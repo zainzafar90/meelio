@@ -2,35 +2,21 @@ import express from "express";
 import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { tabStashController } from "@/modules/tab-stash";
-import { tabStashValidation } from "@/modules/tab-stash/tab-stash.validation";
-import { tabStashBulkValidation } from "@/modules/tab-stash/tab-stash-bulk.validation";
+import { tabStashValidation } from "@/modules/tab-stash/tab-stash-bulk.validation";
+import requirePro from "@/modules/auth/requirePro.middleware";
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(auth(), tabStashController.getTabStashes)
-  .post(
-    auth(),
-    validate(tabStashValidation.createTabStash),
-    tabStashController.createTabStash
-  );
+// Get all tab stashes for sync
+router.get("/", auth(), requirePro(), tabStashController.getTabStashes);
 
+// Bulk sync endpoint
 router.post(
-  "/bulk", 
-  auth(), 
-  validate(tabStashBulkValidation.bulkSync),
+  "/bulk",
+  auth(),
+  requirePro(),
+  validate(tabStashValidation.bulkSync),
   tabStashController.bulkSync
 );
-
-router
-  .route("/:id")
-  .get(auth(), tabStashController.getTabStash)
-  .patch(
-    auth(),
-    validate(tabStashValidation.updateTabStash),
-    tabStashController.updateTabStash
-  )
-  .delete(auth(), tabStashController.deleteTabStash);
 
 export default router;
