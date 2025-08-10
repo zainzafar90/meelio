@@ -47,7 +47,9 @@
       "next": "Next",
       "finish": "Finish",
       "toggle": "Toggle",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "mute": "Mute",
+      "unmute": "Unmute"
     },
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -62,6 +64,21 @@
         "saturday": "Sat",
         "sunday": "Sun"
       }
+    }
+  },
+  "notes": {
+    "sheet": {
+      "title": "Notes",
+      "description": "Capture quick notes"
+    },
+    "search": "Search notes",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "title": {
+      "placeholder": "Untitled"
+    },
+    "content": {
+      "placeholder": "Start writing..."
     }
   },
   "onboarding": {
