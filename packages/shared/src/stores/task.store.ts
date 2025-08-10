@@ -516,7 +516,7 @@ taskEntitySync = createEntitySync<Task, any,
   entityKey: "task",
   dbTable: db.tasks as any,
   bulkSync: taskApi.bulkSync,
-  fetchAll: taskApi.getTasks as any,
+  fetchAll: (() => taskApi.getTasks()),
   normalizeFromServer: (t: any): Task => ({
     ...t,
     createdAt: new Date(t.createdAt).getTime(),
@@ -540,11 +540,15 @@ taskEntitySync = createEntitySync<Task, any,
   },
   toUpdatePayload: (op) => {
     if (op.type !== "update") return null;
-    return { id: op.entityId, ...(op.data || {}) };
+    // Include clientId alongside id so the server can resolve
+    // same-transaction creates via idMap during bulk sync.
+    return { id: op.entityId, clientId: op.entityId, ...(op.data || {}) } as any;
   },
   toDeletePayload: (op) => {
     if (op.type !== "delete") return null;
-    return { id: op.entityId, deletedAt: op.data?.deletedAt };
+    // Include clientId to allow server to remap deletes issued
+    // against a temporary client id within the same bulk.
+    return { id: op.entityId, clientId: op.entityId, deletedAt: op.data?.deletedAt } as any;
   },
   getUserId: () => useAuthStore.getState().user?.id,
   inMemorySelector: () => useTaskStore.getState().tasks,

@@ -35,6 +35,7 @@ export const tasksBulkValidation = {
         updatedAt: Joi.date().optional(),
         deletedAt: Joi.alternatives().try(
           Joi.date(),
+          Joi.number(),
           Joi.allow(null)
         ).optional(),
       }).or('id', 'clientId') // At least one of id or clientId must be present
@@ -43,7 +44,10 @@ export const tasksBulkValidation = {
       Joi.object().keys({
         id: Joi.string().optional(),
         clientId: Joi.string().optional(),
-        deletedAt: Joi.date().optional(),
+        deletedAt: Joi.alternatives().try(
+          Joi.date(),
+          Joi.number()
+        ).optional(),
       }).or('id', 'clientId') // At least one of id or clientId must be present
     ).optional().default([]),
   }),

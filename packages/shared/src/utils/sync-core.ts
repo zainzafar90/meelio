@@ -136,11 +136,21 @@ export function createEntitySync<LocalT, RemoteT, CreatePayload, UpdatePayload, 
     try {
       await processQueue();
 
-      // Pull all (or delta when available) and LWW-merge
+      // Pull all and LWW-merge
       const remoteAll = await config.fetchAll();
       const normalizedRemote = remoteAll.map(config.normalizeFromServer);
 
+      // After push, if an item exists locally but not on server, mark as deleted locally (server is source for existence)
+      const remoteIdSet = new Set<string>((normalizedRemote as any[]).map((r) => r.id));
       const local = await config.dbTable.where("userId").equals(userId).toArray();
+      for (const item of local as any[]) {
+        if (!item.deletedAt && item.id && !remoteIdSet.has(item.id)) {
+          await config.dbTable.update(item.id, { deletedAt: Date.now(), updatedAt: Date.now() } as any);
+          (item as any).deletedAt = Date.now();
+          (item as any).updatedAt = Date.now();
+        }
+      }
+
       const merged = lwwMergeById<any>(local as any, normalizedRemote as any);
 
       // Replace user's rows with merged

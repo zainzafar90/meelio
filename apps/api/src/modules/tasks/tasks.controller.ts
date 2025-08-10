@@ -10,7 +10,7 @@ export const tasksController = {
    */
   getTasks: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
-    const { completed, dueDate, sortBy, sortOrder } = req.query;
+    const { completed, dueDate, sortBy, sortOrder } = req.query as any;
 
     const filters = {
       completed: completed === "true" ? true : completed === "false" ? false : undefined,

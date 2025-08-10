@@ -1,8 +1,9 @@
 import { db } from "@/db";
 import { Task, tasks, providers, } from "@/db/schema";
-import { eq, and, desc, asc, } from "drizzle-orm";
+import { eq, and, desc, asc, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
+import { parseNullableDate } from "@/common/utils/date";
 
 
 interface TaskFilters {
@@ -27,7 +28,10 @@ export const tasksService = {
   /**
    * Get tasks for a user with optional filters
    */
-  async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
+  async getTasks(
+    userId: string,
+    filters: TaskFilters 
+  ): Promise<Task[]> {
     const defaultProvider = await db.query.providers.findFirst({
       where: eq(providers.name, "meelio"),
     });
@@ -36,16 +40,16 @@ export const tasksService = {
     }
     const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
 
-    // Return all tasks including soft-deleted ones for proper CRDT sync
-    // The frontend will filter out deleted tasks as needed
-    const result = db.query.tasks.findMany({
-      where: and(...conditions),
-      orderBy: filters.sortBy
-        ? [filters.sortOrder === "desc" ? desc(tasks[filters.sortBy]) : asc(tasks[filters.sortBy])]
-        : [desc(tasks.createdAt)],
-    });
+    // Exclude soft-deleted by default unless explicitly requested
+    const where = and(...conditions, isNull(tasks.deletedAt));
 
-    return result;
+    const result = await db
+      .select()
+      .from(tasks)
+      .where(where)
+      .orderBy(asc(tasks.createdAt));
+
+    return result as any;
   },
 
   /**
@@ -123,32 +127,8 @@ export const tasksService = {
   /**
    * Parse and validate due date
    */
-  parseDate(
-    dueDate: string | number | null | undefined
-  ): Date | null | undefined {
-    if (dueDate === undefined) return undefined;
-    if (dueDate === null) return null;
-
-    try {
-      // Handle both ISO strings and timestamps (getTime() values)
-      const parsedDate =
-        typeof dueDate === "number" ? new Date(dueDate) : new Date(dueDate);
-
-      // Check if the date is valid
-      if (isNaN(parsedDate.getTime())) {
-        throw new ApiError(
-          httpStatus.BAD_REQUEST,
-          `Invalid date format: ${dueDate}`
-        );
-      }
-
-      return parsedDate;
-    } catch (error) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        `Invalid date format: ${dueDate}`
-      );
-    }
+  parseDate(dueDate: string | number | null | undefined): Date | null | undefined {
+    return parseNullableDate(dueDate, "dueDate");
   },
 
   /**
@@ -184,11 +164,15 @@ export const tasksService = {
 
 
     if (updateData.updatedAt !== undefined) {
-      data.updatedAt = updateData.updatedAt;
+      // updatedAt is server-managed; ignore client value
+      // kept for LWW checks elsewhere
     }
     
     if (updateData.deletedAt !== undefined) {
-      data.deletedAt = updateData.deletedAt;
+      const parsed = tasksService.parseDate(updateData.deletedAt as any);
+      if (parsed !== undefined) {
+        data.deletedAt = parsed;
+      }
     }
 
     if (updateData.dueDate !== undefined) {
@@ -207,7 +191,8 @@ export const tasksService = {
       data.providerId = updateData.providerId;
     }
 
-    delete data.updatedAt;
+    // ensure we never set updatedAt from client
+    delete (data as any).updatedAt;
 
     return data;
   },
@@ -220,13 +205,25 @@ export const tasksService = {
     taskId: string,
     updateData: TaskUpdateData
   ): Promise<Task> {
-    // Verify task exists
-    await this.getTaskById(userId, taskId);
+    // Load current for conflict handling
+    const current = await this.getTaskById(userId, taskId);
 
     // Build update data
     const data = tasksService._buildUpdateData(updateData);
 
-    console.log({ data });
+    // Conflict handling: delete precedence with LWW by timestamp
+    // If the row is tombstoned and incoming update is not strictly newer than deletedAt, ignore update
+    const incomingUpdatedAt = updateData.updatedAt
+      ? new Date(updateData.updatedAt)
+      : undefined;
+    if (current.deletedAt) {
+      if (!incomingUpdatedAt || incomingUpdatedAt <= current.deletedAt) {
+        // Keep deletion, ignore update
+        return current;
+      }
+      // Newer update than deletion → resurrect by clearing deletedAt
+      (data as any).deletedAt = null;
+    }
 
     // Validate we have something to update
     if (Object.keys(data).length === 0) {
@@ -302,15 +299,17 @@ export const tasksService = {
         // Collapse multiple updates to the same id to the last one by updatedAt
         const updateById = new Map<string, any>();
         for (const u of payload.updates || []) {
-          const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
+          // Prefer resolving via clientId mapping when available (create + update in same bulk)
+          const mappedId = u.clientId ? idMap.get(u.clientId) : undefined;
+          const resolvedId = mappedId || u.id;
           if (!resolvedId) continue;
           const prev = updateById.get(resolvedId);
           if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
             updateById.set(resolvedId, u);
           }
         }
-        
-        // Process updates
+
+        // Process updates with LWW + delete precedence
         for (const [resolvedId, u] of updateById) {
           try {
             const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
@@ -321,15 +320,20 @@ export const tasksService = {
           }
         }
 
-        // Process deletes
+        // Process deletes (set tombstone); resolve id with clientId mapping preferred
         for (const d of payload.deletes || []) {
-          const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
-          if (!resolvedId) continue;
+          const mappedId = d.clientId ? idMap.get(d.clientId) : undefined;
+          const resolvedId = mappedId || d.id;
+          if (!resolvedId) {
+            console.warn("Bulk delete skipped: no id or resolvable clientId", d);
+            continue;
+          }
           
           try {
+            const delAt = d.deletedAt ? new Date(d.deletedAt as any) : new Date();
             await db
               .update(tasks)
-              .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
+              .set({ deletedAt: delAt } as Task)
               .where(and(eq(tasks.id, resolvedId), eq(tasks.userId, userId)));
             deleted.push(resolvedId);
           } catch (err) {
