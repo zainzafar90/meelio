@@ -23,15 +23,16 @@ export function NotesSheet() {
     }))
   );
 
-  const { notes, initializeStore, addNote, updateNote, enableTypingSound, setEnableTypingSound } = useNoteStore(
+  const { notes, initializeStore, addNote, updateNote, deleteNote, togglePinNote, enableTypingSound, setEnableTypingSound } = useNoteStore(
     useShallow((s) => ({
       notes: s.notes,
       initializeStore: s.initializeStore,
       addNote: s.addNote,
       updateNote: s.updateNote,
+      deleteNote: s.deleteNote,
+      togglePinNote: s.togglePinNote,
       enableTypingSound: s.enableTypingSound,
       setEnableTypingSound: s.setEnableTypingSound,
-      
     }))
   );
 
@@ -205,11 +206,26 @@ export function NotesSheet() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)}
+                    onClick={() => togglePinNote(active.id)}
                     title={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
                     aria-label={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
                   >
                     <Icons.pin className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(t("notes.delete.confirm", { defaultValue: "Are you sure you want to delete this note?" }))) {
+                        deleteNote(active.id);
+                        setActiveId(null);
+                      }
+                    }}
+                    title={t("notes.delete", { defaultValue: "Delete note" })}
+                    aria-label={t("notes.delete", { defaultValue: "Delete note" })}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Icons.close className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
