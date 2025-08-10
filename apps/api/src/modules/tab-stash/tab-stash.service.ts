@@ -56,14 +56,12 @@ export const tabStashService = {
     userId: string,
     data: CreateTabStashData
   ): Promise<TabStash> => {
-    const tabStashData: TabStashInsert = {
+    const result = await db.insert(tabStashes).values({
       userId,
       windowId: data.windowId,
       urls: data.urls,
       tabsData: data.tabsData || null,
-    };
-
-    const result = await db.insert(tabStashes).values(tabStashData).returning();
+    } as TabStash).returning();
 
     return result[0];
   },

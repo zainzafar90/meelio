@@ -46,7 +46,9 @@
       "next": "Nächste",
       "finish": "Fertig",
       "toggle": "Umschalten",
-      "dismiss": "Schließen"
+      "dismiss": "Schließen",
+      "mute": "Stumm",
+      "unmute": "Laut"
     },
     "loading": "Wird geladen...",
     "error": "Etwas ist schiefgelaufen",
@@ -61,6 +63,21 @@
         "saturday": "Sa",
         "sunday": "So"
       }
+    }
+  },
+  "notes": {
+    "sheet": {
+      "title": "Notizen",
+      "description": "Schnelle Notizen erfassen"
+    },
+    "search": "Notizen suchen",
+    "pin": "Anheften",
+    "unpin": "Lösen",
+    "title": {
+      "placeholder": "Ohne Titel"
+    },
+    "content": {
+      "placeholder": "Beginne zu schreiben..."
     }
   },
   "onboarding": {

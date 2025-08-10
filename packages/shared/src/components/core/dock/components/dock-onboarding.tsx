@@ -62,6 +62,16 @@ export const ONBOARDING_STEPS = [
     position: 4, // Tasks
   },
   {
+    id: "notes",
+    titleKey: "onboarding.notes.title",
+    descriptionKey: "onboarding.notes.description",
+    icon: Icons.noteActive,
+    gradient: "from-amber-500/20 to-orange-500/20",
+    iconClass: "text-amber-400",
+    action: null,
+    position: 5, // Notes
+  },
+  {
     id: "site-blocker",
     titleKey: "onboarding.site-blocker.title",
     descriptionKey: "onboarding.site-blocker.description",
@@ -69,7 +79,7 @@ export const ONBOARDING_STEPS = [
     gradient: "from-purple-500/20 to-pink-500/20",
     iconClass: "text-purple-400",
     action: null,
-    position: 5, // Site Blocker
+    position: 6, // Site Blocker
   },
   {
     id: "tab-stash",
@@ -79,7 +89,7 @@ export const ONBOARDING_STEPS = [
     gradient: "from-sky-500/20 to-cyan-500/20",
     iconClass: "text-sky-400",
     action: null,
-    position: 6, // Tab Stash
+    position: 7, // Tab Stash
   },
   {
     id: "background",
@@ -89,7 +99,7 @@ export const ONBOARDING_STEPS = [
     gradient: "from-emerald-500/20 to-lime-500/20",
     iconClass: "text-emerald-400",
     action: null,
-    position: 7, // Background
+    position: 8, // Background
   },
   {
     id: "settings",
@@ -99,7 +109,7 @@ export const ONBOARDING_STEPS = [
     gradient: "from-slate-600/20 to-stone-400/20",
     iconClass: "text-slate-400",
     action: null,
-    position: 8, // Settings
+    position: 9, // Settings
   },
 ];
 

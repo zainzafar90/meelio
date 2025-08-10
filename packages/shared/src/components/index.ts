@@ -99,6 +99,9 @@ export * from "./core/task-list/components/create-task";
 export * from "./core/task-list/components/task-list";
 export * from "./core/task-list/tasks.sheet";
 
+// Notes
+export * from "./core/notes/notes.sheet";
+
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";
 

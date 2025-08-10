@@ -6,6 +6,7 @@
     "breathing": "Breathepod",
     "settings": "Settings",
     "tasks": "Tasks",
+    "notes": "Notes",
     "site-blocker": "Site Blocker",
     "background": "Background",
     "tab-stash": "Tab Stash",
@@ -46,7 +47,9 @@
       "next": "Next",
       "finish": "Finish",
       "toggle": "Toggle",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "mute": "Mute",
+      "unmute": "Unmute"
     },
     "loading": "Loading...",
     "error": "Something went wrong",
@@ -61,6 +64,21 @@
         "saturday": "Sat",
         "sunday": "Sun"
       }
+    }
+  },
+  "notes": {
+    "sheet": {
+      "title": "Notes",
+      "description": "Capture quick notes"
+    },
+    "search": "Search notes",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "title": {
+      "placeholder": "Untitled"
+    },
+    "content": {
+      "placeholder": "Start writing..."
     }
   },
   "onboarding": {
@@ -83,6 +101,10 @@
     "tasks": {
       "title": "Task List",
       "description": "Keep track of your tasks and stay organized."
+    },
+    "notes": {
+      "title": "Notes",
+      "description": "Capture quick thoughts in markdown-powered notes."
     },
     "site-blocker": {
       "title": "Site Blocker",

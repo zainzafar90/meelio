@@ -70,6 +70,7 @@ export const Dock = () => {
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
+    toggleNotes,
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
@@ -92,6 +93,7 @@ export const Dock = () => {
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
+      toggleNotes: (state as any).toggleNotes,
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
@@ -169,6 +171,18 @@ export const Dock = () => {
               icon: Icons.taskList,
               activeIcon: Icons.taskListActive,
               onClick: toggleTasks,
+            },
+          ]
+        : []),
+      ...(((dockIconsVisible as any).notes ?? true)
+        ? [
+            {
+              id: "notes",
+              name: t("common.notes", { defaultValue: "Notes" }),
+              icon: Icons.note,
+              activeIcon: Icons.noteActive,
+              onClick: toggleNotes,
+              requirePro: true,
             },
           ]
         : []),
@@ -306,7 +320,7 @@ export const Dock = () => {
                       "relative",
                       currentOnboardingStep >= 0 &&
                         ONBOARDING_STEPS[currentOnboardingStep].position ===
-                          8 &&
+                          9 &&
                         item.id === "settings" &&
                         "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                     )}
