@@ -23,7 +23,6 @@ router.post(
   auth(),
   requirePro(),
   validate(noteValidation.bulkSync),
-  // @ts-expect-error extend controller
   noteController.bulkSync
 );
 
