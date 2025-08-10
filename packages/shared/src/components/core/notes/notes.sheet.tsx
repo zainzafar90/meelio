@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@repo/ui/components/ui/sheet";
@@ -48,9 +46,12 @@ export function NotesSheet() {
     return notes.filter((n) => n.title.toLowerCase().includes(q) || (n.content || "").toLowerCase().includes(q));
   }, [notes, query]);
 
+  // Load saved text into draft on note change
   useEffect(() => {
     setDraftContent(active?.content || "");
   }, [active?.id]);
+
+  // Plain text editor; no overlay, no external deps
 
   // Limits
   const MAX_NOTE_CHARS = 10000; // characters
@@ -97,11 +98,9 @@ export function NotesSheet() {
   ];
   const colorFor = (id: string) => palette[Math.abs(id.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
 
-  const MarkdownPreview = ({ content }: { content: string }) => (
-    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-p:my-1 prose-li:my-0.5">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
-    </div>
-  );
+  const getCharCount = () => (draftContent || "").length;
+
+  // No markdown preview; plain text only
 
   const NoteCharCount = ({ valueChars }: { valueChars: number }) => (
     <span className="text-xs text-white/70">{valueChars}/{MAX_NOTE_CHARS}</span>
@@ -137,8 +136,8 @@ export function NotesSheet() {
                   >
                     <div className="mb-3 text-sm font-medium opacity-95">{n.title || "Untitled"}</div>
                     {n.content && (
-                      <div className="mb-3 text-xs/5 opacity-90">
-                        <MarkdownPreview content={n.content.slice(0, 300)} />
+                      <div className="mb-3 text-xs/5 opacity-90 max-h-[300px] overflow-hidden whitespace-pre-wrap">
+                        {n.content}
                       </div>
                     )}
                     <div className="text-[11px] opacity-70">{new Date(n.updatedAt).toLocaleDateString()}</div>
@@ -159,7 +158,7 @@ export function NotesSheet() {
                 </Button>
                 <div className="text-sm text-muted-foreground">{new Date(active.updatedAt).toLocaleDateString()}</div>
                 <div className="ml-auto flex items-center gap-2">
-                  <NoteCharCount valueChars={(active.content || "").length} />
+                  <NoteCharCount valueChars={getCharCount()} />
                   <Button variant="ghost" size="sm" onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)} title={t("notes.pin", { defaultValue: "Pin" })}>
                     <Icons.star className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
                   </Button>
@@ -171,34 +170,17 @@ export function NotesSheet() {
                 className="border-none bg-transparent px-0 text-2xl font-semibold"
                 placeholder={t("notes.title.placeholder", { defaultValue: "Untitled" })}
               />
-              <div className="relative min-h-[55vh] rounded-lg border border-white/10 bg-zinc-900/60">
-                <div className="pointer-events-none absolute inset-0 overflow-auto p-3">
-                  {draftContent ? (
-                    <MarkdownPreview content={draftContent} />
-                  ) : (
-                    <span className="text-white/40">
-                      {t("notes.content.placeholder", { defaultValue: "Start writing..." })}
-                    </span>
-                  )}
-                </div>
-                <Textarea
-                  value={draftContent}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setDraftContent(value);
-                    scheduleSave(active.id, { content: value });
-                  }}
-                  onScroll={(e) => {
-                    const overlay = (e.currentTarget.previousSibling as HTMLElement) || null;
-                    if (overlay) {
-                      (overlay as HTMLElement).scrollTop = e.currentTarget.scrollTop;
-                    }
-                  }}
-                  className="relative z-10 min-h-[55vh] resize-none border-none bg-transparent px-3 text-transparent caret-white selection:bg-white/20 focus-visible:ring-0"
-                  placeholder={t("notes.content.placeholder", { defaultValue: "Start writing..." })}
-                  maxLength={MAX_NOTE_CHARS}
-                />
-              </div>
+              <Textarea
+                value={draftContent}
+                onChange={(e) => {
+                  const value = e.target.value.slice(0, MAX_NOTE_CHARS);
+                  setDraftContent(value);
+                  scheduleSave(active.id, { content: value });
+                }}
+                className="min-h-[55vh] resize-none border-none bg-transparent px-0 whitespace-pre-wrap"
+                placeholder={t("notes.content.placeholder", { defaultValue: "Start writing..." })}
+                maxLength={MAX_NOTE_CHARS}
+              />
             </div>
           )}
         </div>
