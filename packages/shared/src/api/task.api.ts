@@ -8,6 +8,7 @@ export interface CreateTaskDto {
   pinned?: boolean;
   categoryId?: string;
   providerId?: string;
+  updatedAt?: number;
 }
 
 export interface UpdateTaskDto {
@@ -17,6 +18,8 @@ export interface UpdateTaskDto {
   pinned?: boolean;
   categoryId?: string;
   providerId?: string;
+  updatedAt?: number;
+  deletedAt?: number | null;
 }
 
 export const taskApi = {
@@ -42,5 +45,43 @@ export const taskApi = {
   // Delete a task
   async deleteTask(id: string): Promise<void> {
     await axios.delete(`/v1/tasks/${id}`);
-  }
+  },
+
+  // Bulk sync (create/update/delete in one request)
+  async bulkSync(payload: {
+    creates?: Array<{
+      clientId?: string;
+      title: string;
+      completed?: boolean;
+      dueDate?: string;
+      pinned?: boolean;
+      categoryId?: string;
+      providerId?: string;
+      updatedAt?: number;
+    }>;
+    updates?: Array<{
+      id?: string;
+      clientId?: string;
+      title?: string;
+      completed?: boolean;
+      dueDate?: string;
+      pinned?: boolean;
+      categoryId?: string;
+      providerId?: string;
+      updatedAt?: number;
+      deletedAt?: number | null;
+    }>;
+    deletes?: Array<{
+      id?: string;
+      clientId?: string;
+      deletedAt?: number;
+    }>;
+  }): Promise<{
+    created: Array<(Task & { clientId?: string })>;
+    updated: Task[];
+    deleted: string[];
+  }> {
+    const response = await axios.post(`/v1/tasks/bulk`, payload);
+    return response.data;
+  },
 };

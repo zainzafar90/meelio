@@ -92,3 +92,46 @@ export const addSimpleTimerBreakTime = async (seconds: number): Promise<Indexabl
 
   return db.focusStats.put(todaysSummary);
 };
+
+/**
+ * Utilities to rebuild daily summaries from session logs
+ */
+export const isFocusStatsEmpty = async (): Promise<boolean> => {
+  const count = await db.focusStats.count();
+  return count === 0;
+};
+
+export const backfillDailySummariesFromSessions = async (): Promise<void> => {
+  const sessions = await db.focusSessions.toArray();
+  if (!sessions.length) return;
+
+  const byDate = new Map<string, DailySummary>();
+  for (const s of sessions) {
+    const dateStr = new Date(s.timestamp).toISOString().split("T")[0];
+    let day = byDate.get(dateStr);
+    if (!day) {
+      day = {
+        date: dateStr,
+        focusSessions: 0,
+        breaks: 0,
+        totalFocusTime: 0,
+        totalBreakTime: 0,
+      };
+      byDate.set(dateStr, day);
+    }
+    const isFocus = s.stage === 0;
+    if (isFocus) {
+      day.focusSessions += 1;
+      day.totalFocusTime += s.duration;
+    } else {
+      day.breaks += 1;
+      day.totalBreakTime += s.duration;
+    }
+  }
+
+  const summaries = Array.from(byDate.values());
+  // Upsert summaries
+  for (const summary of summaries) {
+    await db.focusStats.put(summary);
+  }
+};

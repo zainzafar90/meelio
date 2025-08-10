@@ -2,13 +2,11 @@ export interface SiteBlocker {
   id: string;
   userId: string;
   url: string;
+  category?: string;
   isBlocked: boolean;
-  blockPattern: string;
-  scheduleEnabled: boolean;
-  scheduleStart?: string;
-  scheduleEnd?: string;
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number | null;
 }
 
 export interface BackgroundMetadata {
@@ -30,6 +28,7 @@ export interface Task {
   providerId?: string;
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number | null;
 }
 
 // Add Category model

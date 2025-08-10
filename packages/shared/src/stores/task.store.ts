@@ -5,6 +5,7 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { SyncState, useSyncStore } from "./sync.store";
+import { lwwMergeById } from "../utils/sync.utils";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -67,80 +68,84 @@ async function processSyncQueue() {
   isProcessingSyncQueue = true;
   syncStore.setSyncing("task", true);
 
-  for (const operation of queue) {
-    try {
-      switch (operation.type) {
-        case "create":
-          {
-            const created = await taskApi.createTask({
-              title: operation.data.title,
-              completed: operation.data.completed || false,
-              dueDate: operation.data.dueDate,
-              pinned: operation.data.pinned || false,
-              categoryId: operation.data.categoryId,
-            });
-
-            await db.tasks.update(operation.entityId, {
-              id: created.id,
-              completed: operation.data.completed || false
-            });
-
-            // Update React state with the new server-generated ID
-            useTaskStore.setState((state) => ({
-              tasks: state.tasks.map((task) =>
-                task.id === operation.entityId
-                  ? { ...task, id: created.id, completed: operation.data.completed || false }
-                  : task
-              ),
-            }));
-          }
-          break;
-
-        case "update":
-          {
-            const updated = await taskApi.updateTask(
-              operation.entityId,
-              operation.data
-            );
-
-            await db.tasks.update(operation.entityId, {
-              id: updated.id,
-              completed: operation.data.completed !== undefined ? operation.data.completed : updated.completed
-            });
-
-            // Update React state if the ID changed (unlikely but safe)
-            if (updated.id !== operation.entityId) {
-              useTaskStore.setState((state) => ({
-                tasks: state.tasks.map((task) =>
-                  task.id === operation.entityId
-                    ? { ...task, ...updated }
-                    : task
-                ),
-              }));
-            }
-          }
-          break;
-
-        case "delete":
-          {
-            await taskApi.deleteTask(operation.entityId);
-            await db.tasks.delete(operation.entityId);
-          }
-          break;
-      }
-
-      syncStore.removeFromQueue("task", operation.id);
-    } catch (error) {
-      console.error("Sync operation failed:", error);
-
-      const hasExceededRetryLimit = operation.retries >= 3;
-
-      if (hasExceededRetryLimit) {
-        syncStore.removeFromQueue("task", operation.id);
-      } else {
-        syncStore.incrementRetry("task", operation.id);
-      }
+  // Build bulk payload
+  const creates = [] as any[];
+  const updates = [] as any[];
+  const deletes = [] as any[];
+  for (const op of queue) {
+    if (op.type === "create") {
+      creates.push({
+        clientId: op.entityId,
+        title: op.data.title,
+        completed: !!op.data.completed,
+        dueDate: op.data.dueDate,
+        pinned: !!op.data.pinned,
+        categoryId: op.data.categoryId,
+        providerId: op.data.providerId,
+        updatedAt: op.data.updatedAt,
+      });
+    } else if (op.type === "update") {
+      updates.push({ id: op.entityId, ...op.data });
+    } else if (op.type === "delete") {
+      deletes.push({ id: op.entityId, deletedAt: op.data?.deletedAt });
     }
+  }
+
+  try {
+    const result = await taskApi.bulkSync({ creates, updates, deletes });
+    const idMap = new Map<string, string>();
+    for (const c of result.created) {
+      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
+    }
+
+    // Reconcile local DB and state
+    await db.transaction("rw", db.tasks, async () => {
+      // Handle created tasks - update client IDs to server IDs and normalize timestamps
+      for (const created of result.created) {
+        if (created.clientId && created.id !== created.clientId) {
+          // Delete the temporary client ID entry
+          await db.tasks.delete(created.clientId);
+          
+          // Add with server ID and normalized timestamps
+          const normalizedTask = {
+            ...created,
+            createdAt: new Date(created.createdAt).getTime(),
+            updatedAt: new Date(created.updatedAt).getTime(),
+            deletedAt: created.deletedAt ? new Date(created.deletedAt).getTime() : null,
+            dueDate: created.dueDate ? new Date(created.dueDate).toISOString() : undefined,
+          };
+          await db.tasks.add(normalizedTask as any);
+          
+          useTaskStore.setState((state) => ({
+            tasks: state.tasks.map((t) => 
+              t.id === created.clientId ? { ...normalizedTask, id: created.id } : t
+            ),
+          }));
+        }
+      }
+      
+      for (const d of result.deleted) {
+        await db.tasks.update(d, { deletedAt: Date.now(), updatedAt: Date.now() });
+      }
+      
+      for (const u of result.updated) {
+        // Convert server timestamps to milliseconds
+        const normalizedUpdate = {
+          ...u,
+          createdAt: new Date(u.createdAt).getTime(),
+          updatedAt: new Date(u.updatedAt).getTime(),
+          deletedAt: u.deletedAt ? new Date(u.deletedAt).getTime() : null,
+          dueDate: u.dueDate ? new Date(u.dueDate).toISOString() : undefined,
+        };
+        await db.tasks.update(u.id, normalizedUpdate as any);
+      }
+    });
+
+    // Clear queue upon success
+    for (const op of queue) syncStore.removeFromQueue("task", op.id);
+  } catch (error) {
+    console.error("Bulk task sync failed:", error);
+    // Leave queue for retry
   }
 
   syncStore.setSyncing("task", false);
@@ -202,6 +207,7 @@ export const useTaskStore = create<TaskState>()(
         providerId: task.providerId, // For now, we'll need to pass this from the backend
         createdAt: Date.now(),
         updatedAt: Date.now(),
+        deletedAt: null,
       };
 
       if (newTask.pinned) {
@@ -309,7 +315,9 @@ export const useTaskStore = create<TaskState>()(
       const syncStore = useSyncStore.getState();
 
       try {
-        await db.tasks.delete(taskId);
+        const deletedAt = Date.now();
+        // Soft delete locally (tombstone)
+        await db.tasks.update(taskId, { deletedAt, updatedAt: deletedAt });
 
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== taskId),
@@ -320,6 +328,7 @@ export const useTaskStore = create<TaskState>()(
           syncStore.addToQueue("task", {
             type: "delete",
             entityId: taskId,
+            data: { deletedAt },
           });
 
           if (syncStore.isOnline) processSyncQueue();
@@ -461,10 +470,10 @@ export const useTaskStore = create<TaskState>()(
       );
 
 
-      set({
-        tasks: localTasks,
-        lists: SYSTEM_LISTS,
-      });
+        set({
+          tasks: localTasks.filter(t => !t.deletedAt),
+          lists: SYSTEM_LISTS,
+        });
     },
 
     syncWithServer: async () => {
@@ -479,30 +488,22 @@ export const useTaskStore = create<TaskState>()(
         await processSyncQueue();
 
         const serverTasks = await taskApi.getTasks();
-
+        
+        // Convert server Date objects to milliseconds for proper CRDT sync
+        const normalizedServerTasks = serverTasks.map(task => ({
+          ...task,
+          createdAt: new Date(task.createdAt).getTime(),
+          updatedAt: new Date(task.updatedAt).getTime(),
+          deletedAt: task.deletedAt ? new Date(task.deletedAt).getTime() : null,
+          dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : undefined,
+        }));
+        
         const localTasks = await db.tasks
           .where("userId")
           .equals(user.id)
           .toArray();
 
-        const serverTasksMap = new Map(serverTasks.map(task => [task.id, task]));
-        const localTasksMap = new Map(localTasks.map(task => [task.id, task]));
-
-        const tasksToKeep = localTasks.filter(task => !serverTasksMap.has(task.id));
-
-        const mergedServerTasks = serverTasks.map(serverTask => {
-          const localTask = localTasksMap.get(serverTask.id);
-          if (localTask) {
-            return {
-              ...serverTask,
-              completed: localTask.completed,
-              pinned: localTask.pinned,
-            };
-          }
-          return serverTask;
-        });
-
-        const mergedTasks = [...mergedServerTasks, ...tasksToKeep];
+        const mergedTasks = lwwMergeById<Task>(localTasks as any, normalizedServerTasks as any);
 
         await db.transaction("rw", db.tasks, async () => {
           await db.tasks.where("userId").equals(user.id).delete();
@@ -511,7 +512,7 @@ export const useTaskStore = create<TaskState>()(
 
 
         set({
-          tasks: mergedTasks,
+          tasks: mergedTasks.filter(t => !t.deletedAt),
         });
 
         syncStore.setSyncing("task", false);

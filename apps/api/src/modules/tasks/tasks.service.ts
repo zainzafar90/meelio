@@ -20,6 +20,7 @@ interface TaskUpdateData {
   updatedAt?: Date;
   categoryId?: string | null;
   providerId?: string | null;
+  deletedAt?: Date | null;
 }
 
 export const tasksService = {
@@ -35,6 +36,8 @@ export const tasksService = {
     }
     const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
 
+    // Return all tasks including soft-deleted ones for proper CRDT sync
+    // The frontend will filter out deleted tasks as needed
     const result = db.query.tasks.findMany({
       where: and(...conditions),
       orderBy: filters.sortBy
@@ -183,6 +186,10 @@ export const tasksService = {
     if (updateData.updatedAt !== undefined) {
       data.updatedAt = updateData.updatedAt;
     }
+    
+    if (updateData.deletedAt !== undefined) {
+      data.deletedAt = updateData.deletedAt;
+    }
 
     if (updateData.dueDate !== undefined) {
       const parsedDate = tasksService.parseDate(updateData.dueDate);
@@ -255,9 +262,89 @@ export const tasksService = {
     // Verify task exists
     await this.getTaskById(userId, taskId);
 
+    // Soft delete: set deletedAt
     await db
-      .delete(tasks)
+      .update(tasks)
+      .set({ deletedAt: new Date() } as Task)
       .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
+  },
+
+  async bulkSync(
+    userId: string,
+    payload: {
+      creates: Array<{ clientId?: string; title: string; completed?: boolean; pinned?: boolean; dueDate?: string | number | null; categoryId?: string | null; providerId?: string | null; updatedAt?: Date }>;
+      updates: Array<({ id?: string; clientId?: string }) & TaskUpdateData>;
+      deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
+    }
+  ): Promise<{ created: Array<Task & { clientId?: string }>; updated: Task[]; deleted: string[] }> {
+    // Use a transaction to ensure atomicity
+    return await db.transaction(async (tx) => {
+      const created: Array<Task & { clientId?: string }> = [];
+      const updated: Task[] = [];
+      const deleted: string[] = [];
+      const idMap = new Map<string, string>();
+
+      try {
+        // Process creates
+        for (const c of payload.creates || []) {
+          const task = await tasksService.createTask(userId, {
+            title: c.title,
+            completed: c.completed,
+            pinned: c.pinned,
+            dueDate: c.dueDate ?? undefined,
+            categoryId: c.categoryId ?? undefined,
+            providerId: c.providerId ?? undefined,
+          });
+          if (c.clientId) idMap.set(c.clientId, task.id);
+          created.push({ ...task, clientId: c.clientId });
+        }
+
+        // Collapse multiple updates to the same id to the last one by updatedAt
+        const updateById = new Map<string, any>();
+        for (const u of payload.updates || []) {
+          const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
+          if (!resolvedId) continue;
+          const prev = updateById.get(resolvedId);
+          if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
+            updateById.set(resolvedId, u);
+          }
+        }
+        
+        // Process updates
+        for (const [resolvedId, u] of updateById) {
+          try {
+            const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
+            updated.push(task);
+          } catch (err) {
+            // Skip not found
+            console.warn(`Task ${resolvedId} not found for update`);
+          }
+        }
+
+        // Process deletes
+        for (const d of payload.deletes || []) {
+          const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
+          if (!resolvedId) continue;
+          
+          try {
+            await db
+              .update(tasks)
+              .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
+              .where(and(eq(tasks.id, resolvedId), eq(tasks.userId, userId)));
+            deleted.push(resolvedId);
+          } catch (err) {
+            // Skip if not found
+            console.warn(`Task ${resolvedId} not found for delete`);
+          }
+        }
+
+        return { created, updated, deleted };
+      } catch (error) {
+        // Transaction will be rolled back automatically
+        console.error("Tasks bulk sync failed, rolling back:", error);
+        throw error;
+      }
+    });
   },
 
 };

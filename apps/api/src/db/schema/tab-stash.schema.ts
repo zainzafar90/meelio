@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, index } from "drizzle-orm/pg-core";
+import { pgTable, text, index, jsonb } from "drizzle-orm/pg-core";
 
-import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { createdAt, id, updatedAt, deletedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
 
 export const tabStashes = pgTable(
@@ -11,8 +11,11 @@ export const tabStashes = pgTable(
     userId: text("user_id").notNull(),
     windowId: text("window_id").notNull(),
     urls: text("urls").array().notNull(),
+    // New field to store tab metadata (title, favicon, etc.)
+    tabsData: jsonb("tabs_data"),
     createdAt,
     updatedAt,
+    deletedAt,
   },
   (table) => ({
     userIdIdx: index("idx_tab_stashes_user_id").on(table.userId),

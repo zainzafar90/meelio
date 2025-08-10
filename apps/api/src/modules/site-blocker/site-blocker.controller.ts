@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { catchAsync } from "@/utils/catch-async";
 import { siteBlockerService } from "./site-blocker.service";
+import { siteBlockerMapper } from "./site-blocker.mapper";
 import { IUser } from "@/types/interfaces/resources";
 
 export const siteBlockerController = {
@@ -21,7 +22,9 @@ export const siteBlockerController = {
       user.id,
       category as string | undefined,
     );
-    return res.status(httpStatus.OK).json(siteBlockers);
+    return res
+      .status(httpStatus.OK)
+      .json(siteBlockerMapper.toDtoArray(siteBlockers));
   }),
 
   /**
@@ -34,7 +37,7 @@ export const siteBlockerController = {
       id,
       user.id
     );
-    return res.status(httpStatus.OK).json(siteBlocker);
+    return res.status(httpStatus.OK).json(siteBlockerMapper.toDto(siteBlocker));
   }),
 
   /**
@@ -52,7 +55,7 @@ export const siteBlockerController = {
       return res.status(httpStatus.OK).json({ removed: true });
     } else {
       // Site was added
-      return res.status(httpStatus.CREATED).json(result);
+      return res.status(httpStatus.CREATED).json(siteBlockerMapper.toDto(result));
     }
   }),
 
@@ -67,7 +70,7 @@ export const siteBlockerController = {
       user.id,
       req.body
     );
-    return res.status(httpStatus.OK).json(siteBlocker);
+    return res.status(httpStatus.OK).json(siteBlockerMapper.toDto(siteBlocker));
   }),
 
   /**
@@ -78,5 +81,16 @@ export const siteBlockerController = {
     const { id } = req.params;
     await siteBlockerService.deleteSiteBlocker(id, user.id);
     return res.status(httpStatus.NO_CONTENT).send();
+  }),
+
+  bulkSync: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { creates = [], updates = [], deletes = [] } = req.body || {};
+    const result = await siteBlockerService.bulkSync(user.id, { creates, updates, deletes });
+    return res.status(httpStatus.OK).json({
+      created: result.created.map(siteBlockerMapper.toDto),
+      updated: result.updated.map(siteBlockerMapper.toDto),
+      deleted: result.deleted,
+    });
   }),
 };

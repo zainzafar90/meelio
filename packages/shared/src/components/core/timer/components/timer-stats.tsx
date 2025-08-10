@@ -17,7 +17,7 @@ import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Bar, BarChart, XAxis } from "recharts";
 
-import { getWeeklySummary } from "../../../../lib/db/pomodoro.dexie";
+import { getWeeklySummary, isFocusStatsEmpty, backfillDailySummariesFromSessions } from "../../../../lib/db/pomodoro.dexie";
 import { MINUTE_IN_SECONDS } from "../../../../utils/common.utils";
 
 const chartConfig = {
@@ -39,6 +39,14 @@ export const TimerStats = memo(() => {
 
   useEffect(() => {
     const loadData = async () => {
+      // If summaries are missing, try to backfill from session logs
+      try {
+        if (await isFocusStatsEmpty()) {
+          await backfillDailySummariesFromSessions();
+        }
+      } catch (e) {
+        // Non-fatal; proceed to render whatever exists
+      }
       const weeklySummary = await getWeeklySummary();
       const formattedData = weeklySummary.map((day) => ({
         date: day.date,

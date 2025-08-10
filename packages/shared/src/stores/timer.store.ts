@@ -48,6 +48,8 @@ function initState(): Omit<
   | "updateDurations"
   | "toggleNotifications"
   | "toggleSounds"
+  | "toggleSoundscapes"
+  | "toggleAutoStartBreaks"
   | "updateRemaining"
   | "getLimitStatus"
   | "sync"
@@ -62,7 +64,7 @@ function initState(): Omit<
     isRunning: false,
     endTimestamp: null,
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: true, sounds: true },
+    settings: { notifications: true, sounds: true, soundscapes: true, autoStartBreaks: true },
     stats: { focusSec: 0, breakSec: 0 },
     dailyLimitSec: 120 * 60 * 60,
     unsyncedFocusSec: 0,
@@ -122,7 +124,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
           
           // Handle soundscapes when focus starts
-          if (state.stage === TimerStage.Focus) {
+          if (state.stage === TimerStage.Focus && (state.settings.soundscapes ?? true)) {
             const soundscapesState = useSoundscapesStore.getState();
             
             // Check if any soundscapes are currently playing
@@ -148,7 +150,9 @@ export const createTimerStore = (platform: TimerPlatform) => {
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
           
           // Pause soundscapes when timer is paused
-          useSoundscapesStore.getState().pausePlayingSounds();
+          if ((get().settings.soundscapes ?? true)) {
+            useSoundscapesStore.getState().pausePlayingSounds();
+          }
         };
 
         const reset = () => {
@@ -205,6 +209,12 @@ export const createTimerStore = (platform: TimerPlatform) => {
         const toggleSounds = () => {
           set((s) => ({
             settings: { ...s.settings, sounds: !s.settings.sounds },
+          }));
+        };
+
+        const toggleAutoStartBreaks = () => {
+          set((s) => ({
+            settings: { ...s.settings, autoStartBreaks: !s.settings.autoStartBreaks },
           }));
         };
 
@@ -357,7 +367,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           }
 
           // Pause soundscapes when switching to break
-          if (nextStage === TimerStage.Break) {
+          if (nextStage === TimerStage.Break && (get().settings.soundscapes ?? true)) {
             useSoundscapesStore.getState().pausePlayingSounds();
           }
 
@@ -378,6 +388,10 @@ export const createTimerStore = (platform: TimerPlatform) => {
           updateDurations,
           toggleNotifications,
           toggleSounds,
+          toggleAutoStartBreaks,
+          toggleSoundscapes: () => set((s) => ({
+            settings: { ...s.settings, soundscapes: !s.settings.soundscapes }
+          })),
           updateRemaining,
           getLimitStatus,
           sync,

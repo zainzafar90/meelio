@@ -72,7 +72,7 @@ export function SiteList({
       <h2 className="text-xl font-semibold text-white">Popular Sites</h2>
 
       <div className="space-y-2">
-        {SITE_CATEGORIES.filter((cat) => cat.enabled).map((category) => (
+        {SITE_CATEGORIES.filter((cat) => cat.isBlocked).map((category) => (
           <div
             key={category.key}
             className="rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/[0.075]"

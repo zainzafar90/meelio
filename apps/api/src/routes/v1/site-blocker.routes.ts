@@ -3,18 +3,25 @@ import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { siteBlockerController } from "@/modules/site-blocker";
 import { siteBlockerValidation } from "@/modules/site-blocker/site-blocker.validation";
+import { siteBlockerBulkValidation } from "@/modules/site-blocker/site-blocker-bulk.validation";
 
 const router = express.Router();
 
 router
   .route("/")
-  // TODO: add auth() here once we remove checkPro from site-blocker from extension
-  .get(siteBlockerController.getSiteBlockers)
+  .get(auth(), siteBlockerController.getSiteBlockers)
   .post(
     auth(),
     validate(siteBlockerValidation.createSiteBlocker),
     siteBlockerController.createSiteBlocker
   );
+
+router.post(
+  "/bulk", 
+  auth(), 
+  validate(siteBlockerBulkValidation.bulkSync),
+  siteBlockerController.bulkSync
+);
 
 router
   .route("/:id")

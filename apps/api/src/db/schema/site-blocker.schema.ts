@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, index } from "drizzle-orm/pg-core";
+import { pgTable, text, index, boolean } from "drizzle-orm/pg-core";
 
-import { createdAt, id, updatedAt } from "./helpers/date-helpers";
+import { createdAt, id, updatedAt, deletedAt } from "./helpers/date-helpers";
 import { users } from "./user.schema";
 
 export const siteBlockers = pgTable(
@@ -11,8 +11,10 @@ export const siteBlockers = pgTable(
     userId: text("user_id").notNull(),
     category: text("category"),
     url: text("url").notNull(),
+    isBlocked: boolean("is_blocked").notNull().default(true),
     createdAt,
     updatedAt,
+    deletedAt,
   },
   (table) => ({
     userIdIdx: index("idx_site_blockers_user_id").on(table.userId),

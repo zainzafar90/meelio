@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +17,7 @@ import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { toast } from "sonner";
+import { SyncStatus } from "../../sync-status";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -51,6 +52,7 @@ export function SiteBlockerSheet() {
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {t("site-blocker.title")}
           </h2>
+          <SyncStatus entityType="site-blocker" />
         </div>
 
         {isExtension ? (
@@ -104,27 +106,35 @@ export function SiteBlockerSheet() {
 const ExtensionSiteBlockerContent = () => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const { sites, addSite, toggleSite, removeSite } = useSiteBlockerStore(
+  const { sites, addSite, toggleSite, removeSite, bulkAddSites, bulkRemoveSites, initializeStore } = useSiteBlockerStore(
     useShallow((state) => ({
       sites: state.sites,
       addSite: state.addSite,
       toggleSite: state.toggleSite,
       removeSite: state.removeSite,
+      bulkAddSites: state.bulkAddSites,
+      bulkRemoveSites: state.bulkRemoveSites,
+      initializeStore: state.initializeStore,
     }))
   );
 
+  // Ensure local DB is loaded and server sync runs if online
+  useEffect(() => {
+    initializeStore();
+  }, [initializeStore]);
+
   const onBlockSites = useCallback(
     async (sites: string[]) => {
-      await Promise.all(sites.map((site) => addSite(site)));
+      await bulkAddSites(sites);
     },
-    [addSite]
+    [bulkAddSites]
   );
 
   const onUnblockSites = useCallback(
     async (sites: string[]) => {
-      await Promise.all(sites.map((site) => removeSite(site)));
+      await bulkRemoveSites(sites);
     },
-    [removeSite]
+    [bulkRemoveSites]
   );
 
   const addCustomSite = async () => {
@@ -148,7 +158,7 @@ const ExtensionSiteBlockerContent = () => {
       (s) => s.url.toLowerCase() === site.toLowerCase()
     );
 
-    if (existingSite && existingSite.blocked) {
+    if (existingSite && existingSite.isBlocked) {
       toast.error(
         t("site-blocker.already-blocked", "Site is already blocked"),
         {
@@ -177,8 +187,8 @@ const ExtensionSiteBlockerContent = () => {
     }
   };
 
-  const blockedSiteIds = Object.values(sites)
-    .filter((site) => site.blocked)
+  const blockedSiteUrls = Object.values(sites)
+    .filter((site) => site.isBlocked)
     .map((site) => site.url);
 
   return (
@@ -207,11 +217,11 @@ const ExtensionSiteBlockerContent = () => {
       <div className="flex-1 overflow-y-auto px-4 py-8">
         <div className="space-y-8">
           <CustomBlockedSites
-            blockedSites={blockedSiteIds}
+            sites={sites}
             onToggleSite={toggleSite}
           />
           <SiteList
-            blockedSites={blockedSiteIds}
+            blockedSites={blockedSiteUrls}
             onToggleSite={toggleSite}
             onBlockSites={onBlockSites}
             onUnblockSites={onUnblockSites}

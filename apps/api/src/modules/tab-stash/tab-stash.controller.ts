@@ -56,4 +56,11 @@ export const tabStashController = {
     await tabStashService.deleteTabStash(id, user.id);
     return res.status(httpStatus.NO_CONTENT).send();
   }),
+
+  bulkSync: catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IUser;
+    const { creates = [], updates = [], deletes = [] } = req.body || {};
+    const result = await tabStashService.bulkSync(user.id, { creates, updates, deletes });
+    return res.status(httpStatus.OK).json(result);
+  }),
 };

@@ -1,10 +1,14 @@
 import { axios } from "../api/axios";
 import { useAuthStore } from "../stores/auth.store";
 
-export interface SiteBlocker {
+export interface SiteBlockerDto {
   id: string;
   url: string;
   category?: string;
+  isBlocked: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 function checkPro() {
@@ -15,13 +19,13 @@ function checkPro() {
 }
 
 export const siteBlockerApi = {
-  async getBlockedSites(): Promise<SiteBlocker[]> {
+  async getBlockedSites(): Promise<SiteBlockerDto[]> {
     checkPro();
     const res = await axios.get("/v1/site-blockers");
     return res.data;
   },
 
-  async addBlockedSite(url: string, category?: string): Promise<SiteBlocker> {
+  async addBlockedSite(url: string, category?: string): Promise<SiteBlockerDto> {
     checkPro();
     const res = await axios.post("/v1/site-blockers", { url, category });
     return res.data;
@@ -30,5 +34,19 @@ export const siteBlockerApi = {
   async removeBlockedSite(id: string): Promise<void> {
     checkPro();
     await axios.delete(`/v1/site-blockers/${id}`);
+  },
+
+  async bulkSync(payload: {
+    creates?: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }>;
+    updates?: Array<{ id?: string; clientId?: string; url?: string; category?: string; isBlocked?: boolean }>;
+    deletes?: Array<{ id?: string; clientId?: string }>;
+  }): Promise<{ 
+    created: Array<SiteBlockerDto & { clientId?: string }>; 
+    updated: Array<SiteBlockerDto & { clientId?: string }>;
+    deleted: string[] 
+  }> {
+    checkPro();
+    const res = await axios.post(`/v1/site-blockers/bulk`, payload);
+    return res.data;
   },
 };

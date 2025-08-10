@@ -245,6 +245,7 @@ export const DockOnboarding = () => {
         role="dialog"
         aria-labelledby="onboarding-title"
         aria-describedby="onboarding-description"
+        data-testid="onboarding-modal"
       >
         <motion.div
           className={cn(
@@ -283,6 +284,7 @@ export const DockOnboarding = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
+              data-testid="onboarding-title"
             >
               {t(currentStepData.titleKey)}
             </motion.h3>
@@ -292,6 +294,7 @@ export const DockOnboarding = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
+              data-testid="onboarding-description"
             >
               {t(currentStepData.descriptionKey)}
             </motion.p>
@@ -311,6 +314,7 @@ export const DockOnboarding = () => {
                   aria-valuemin={1}
                   aria-valuemax={ONBOARDING_STEPS.length}
                   aria-label={`Step ${index + 1} of ${ONBOARDING_STEPS.length}`}
+                  data-testid={`onboarding-step-${index}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.1 * index }}
@@ -325,6 +329,7 @@ export const DockOnboarding = () => {
                 className="text-white/70 hover:text-white hover:bg-white/10"
                 onClick={handleSkip}
                 aria-label={t("common.actions.skip")}
+                data-testid="onboarding-skip"
               >
                 {t("common.actions.skip")}
               </Button>
@@ -336,6 +341,7 @@ export const DockOnboarding = () => {
                     onClick={handlePrevious}
                     className="text-white/70 hover:text-white hover:bg-white/10"
                     aria-label={t("common.actions.previous")}
+                    data-testid="onboarding-previous"
                   >
                     {t("common.actions.previous")}
                   </Button>
@@ -348,6 +354,11 @@ export const DockOnboarding = () => {
                     currentStep === ONBOARDING_STEPS.length - 1
                       ? t("common.actions.finish")
                       : t("common.actions.next")
+                  }
+                  data-testid={
+                    currentStep === ONBOARDING_STEPS.length - 1
+                      ? "onboarding-finish"
+                      : "onboarding-next"
                   }
                 >
                   {currentStep === ONBOARDING_STEPS.length - 1
