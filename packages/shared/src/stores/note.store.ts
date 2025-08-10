@@ -19,8 +19,9 @@ interface NoteState {
   loadFromLocal: () => Promise<void>;
   syncWithServer: () => Promise<void>;
 
-  addNote: (payload: { title: string; content?: string | null; categoryId?: string | null; providerId?: string | null }) => Promise<Note | undefined>;
-  updateNote: (id: string, payload: Partial<Pick<Note, "title" | "content" | "categoryId">>) => Promise<void>;
+  addNote: (payload: { title: string; content?: string | null; pinned?: boolean; categoryId?: string | null; providerId?: string | null }) => Promise<Note | undefined>;
+  updateNote: (id: string, payload: Partial<Pick<Note, "title" | "content" | "pinned" | "categoryId">>) => Promise<void>;
+  togglePinNote: (noteId: string) => Promise<void>;
   deleteNote: (id: string) => Promise<void>;
 
   setEnableTypingSound: (enabled: boolean) => void;
@@ -95,7 +96,7 @@ export const useNoteStore = create<NoteState>()(
           await noteSyncManager.syncWithServer();
         },
 
-        addNote: async ({ title, content, categoryId, providerId }) => {
+        addNote: async ({ title, content, pinned, categoryId, providerId }) => {
           const MAX_NOTES = 500;
           const MAX_NOTE_CHARS = 10000;
           const truncateToChars = (text: string, maxChars: number) =>
@@ -120,12 +121,39 @@ export const useNoteStore = create<NoteState>()(
             userId,
             title,
             content: typeof content === "string" ? truncateToChars(content, MAX_NOTE_CHARS) : null,
+            pinned: pinned ?? false,
             categoryId: categoryId ?? null,
             providerId: providerId ?? null,
             createdAt: now,
             updatedAt: now,
             deletedAt: null,
           };
+
+          // If creating a pinned note, unpin all others first
+          if (note.pinned) {
+            const pinnedNotes = get().notes.filter((n) => n.pinned);
+            await Promise.all(
+              pinnedNotes.map(async (n) => {
+                await db.notes.update(n.id, {
+                  pinned: false,
+                  updatedAt: Date.now(),
+                });
+                if (user?.isPro) {
+                  syncStore.addToQueue("note", {
+                    type: "update",
+                    entityId: n.id,
+                    data: { pinned: false, updatedAt: Date.now() },
+                  });
+                }
+              })
+            );
+
+            set((state) => ({
+              notes: state.notes.map((n) =>
+                n.pinned ? { ...n, pinned: false, updatedAt: Date.now() } : n
+              ),
+            }));
+          }
 
           try {
             await db.notes.add(note);
@@ -191,6 +219,76 @@ export const useNoteStore = create<NoteState>()(
           } catch (error) {
             set({
               error: error instanceof Error ? error.message : "Failed to update note",
+            });
+          }
+        },
+
+        togglePinNote: async (noteId) => {
+          const note = get().notes.find((n) => n.id === noteId);
+          if (!note) return;
+
+          const authState = useAuthStore.getState();
+          const user = authState.user;
+          const syncStore = useSyncStore.getState();
+          const updatedData = { pinned: !note.pinned, updatedAt: Date.now() };
+
+          const unpinOthers = async () => {
+            const pinnedNotes = get().notes.filter(
+              (n) => n.pinned && n.id !== noteId
+            );
+            await Promise.all(
+              pinnedNotes.map(async (n) => {
+                await db.notes.update(n.id, {
+                  pinned: false,
+                  updatedAt: Date.now(),
+                });
+                if (user?.isPro) {
+                  syncStore.addToQueue("note", {
+                    type: "update",
+                    entityId: n.id,
+                    data: { pinned: false, updatedAt: Date.now() },
+                  });
+                }
+              })
+            );
+
+            set((state) => ({
+              notes: state.notes.map((n) =>
+                n.pinned && n.id !== noteId
+                  ? { ...n, pinned: false, updatedAt: Date.now() }
+                  : n
+              ),
+            }));
+          };
+
+          try {
+            if (updatedData.pinned) {
+              await unpinOthers();
+            }
+
+            await db.notes.update(noteId, updatedData);
+
+            set((state) => ({
+              notes: state.notes.map((n) =>
+                n.id === noteId ? { ...n, ...updatedData } : n
+              ),
+            }));
+
+            // Only sync for Pro users
+            if (user?.isPro) {
+              syncStore.addToQueue("note", {
+                type: "update",
+                entityId: noteId,
+                data: updatedData,
+              });
+
+              if (syncStore.isOnline && noteSyncManager) {
+                noteSyncManager.processQueue();
+              }
+            }
+          } catch (error) {
+            set({
+              error: error instanceof Error ? error.message : "Failed to pin note",
             });
           }
         },
@@ -267,6 +365,7 @@ function initializeNoteSync() {
           clientId: op.entityId,
           title: d.title,
           content: d.content,
+          pinned: d.pinned,
           categoryId: d.categoryId,
           providerId: d.providerId,
           updatedAt: d.updatedAt,
@@ -279,6 +378,7 @@ function initializeNoteSync() {
           id: op.entityId,
           title: d.title,
           content: d.content,
+          pinned: d.pinned,
           categoryId: d.categoryId,
           updatedAt: d.updatedAt,
           deletedAt: d.deletedAt,
