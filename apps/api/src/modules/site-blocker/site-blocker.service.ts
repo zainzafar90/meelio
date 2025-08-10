@@ -1,208 +1,260 @@
 import { db } from "@/db";
-import { SiteBlocker, SiteBlockerInsert, siteBlockers } from "@/db/schema/site-blocker.schema";
-import { eq, and, isNull } from "drizzle-orm";
+import { SiteBlocker, siteBlockers } from "@/db/schema/site-blocker.schema";
+import { eq, and, desc, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 
+interface SiteBlockerUpdateData {
+  url?: string;
+  category?: string | null;
+  isBlocked?: boolean;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
+}
+
 export const siteBlockerService = {
   /**
-   * Get site blockers for a user
+   * Get all site blockers for a user (used for full sync)
    */
-  getSiteBlockers: async (
-    userId: string,
-    category?: string,
-  ): Promise<SiteBlocker[]> => {
-    const conditions = [eq(siteBlockers.userId, userId)];
-    
-    if (category) {
-      conditions.push(eq(siteBlockers.category, category));
-    }
-
-    return await db
-      .select()
-      .from(siteBlockers)
-      .where(and(...conditions, isNull(siteBlockers.deletedAt)));
-  },
-
-  /**
-   * Get a site blocker by ID
-   */
-  getSiteBlockerById: async (
-    id: string,
-    userId: string
-  ): Promise<SiteBlocker> => {
+  async getSiteBlockers(userId: string): Promise<SiteBlocker[]> {
     const result = await db
       .select()
       .from(siteBlockers)
-      .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
+      .where(and(
+        eq(siteBlockers.userId, userId),
+        isNull(siteBlockers.deletedAt)
+      ))
+      .orderBy(desc(siteBlockers.createdAt));
 
-    if (result.length === 0) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Site blocker not found");
-    }
-
-    return result[0];
+    return result as any;
   },
 
   /**
-   * Create or toggle a site blocker
+   * Bulk sync operation for site blockers
+   * Handles creates, updates, and deletes in a single transaction
    */
-  createSiteBlocker: async (
-    userId: string,
-    data: any
-  ): Promise<SiteBlocker | null> => {
-    // Normalize URL to prevent duplicates
-    const normalizedUrl = data.url
-      .replace(/^(https?:\/\/)?(www\.)?/, "")
-      .toLowerCase();
-
-    const existingSite = await db
-      .select()
-      .from(siteBlockers)
-      .where(
-        and(
-          eq(siteBlockers.userId, userId),
-          eq(siteBlockers.url, normalizedUrl)
-        )
-      );
-
-    if (existingSite.length > 0) {
-      // Update existing site blocker - clear deletedAt when re-enabling
-      const [updated] = await db
-        .update(siteBlockers)
-        .set({ 
-          isBlocked: data.isBlocked !== undefined ? data.isBlocked : true,
-          deletedAt: null,  // Clear the soft delete when re-enabling
-          updatedAt: new Date() 
-        } as SiteBlocker)
-        .where(
-          and(
-            eq(siteBlockers.userId, userId),
-            eq(siteBlockers.url, normalizedUrl)
-          )
-        )
-        .returning();
-      return updated ?? null;
-    }
-
-    const insertData = {
-      userId,
-      url: normalizedUrl,
-      category: data.category,
-      isBlocked: data.isBlocked !== undefined ? data.isBlocked : true,
-    };
-
-    const result = await db.insert(siteBlockers).values(insertData).returning();
-
-    return result[0];
-  },
-
-  /**
-   * Update a site blocker
-   */
-  updateSiteBlocker: async (
-    id: string,
-    userId: string,
-    data: any
-  ): Promise<SiteBlocker> => {
-    await siteBlockerService.getSiteBlockerById(id, userId);
-
-    const updateData = {} as Partial<SiteBlocker>;
-
-    if (data.url) {
-      updateData.url = data.url;
-    }
-
-    if (data.category !== undefined) {
-      updateData.category = data.category;
-    }
-    if (data.isBlocked !== undefined) {
-      (updateData as any).isBlocked = data.isBlocked;
-      // Don't conflate isBlocked with deletedAt - they serve different purposes
-      // isBlocked is user preference, deletedAt is for CRDT tombstones
-    }
-
-
-    const result = await db
-      .update(siteBlockers)
-      .set(updateData)
-      .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)))
-      .returning();
-
-    return result[0];
-  },
-
-  /**
-   * Delete a site blocker
-   */
-  deleteSiteBlocker: async (id: string, userId: string): Promise<void> => {
-    // Check if site blocker exists
-    await siteBlockerService.getSiteBlockerById(id, userId);
-
-    await db
-      .update(siteBlockers)
-      .set({ deletedAt: new Date(), updatedAt: new Date() } as SiteBlocker)
-      .where(and(eq(siteBlockers.id, id), eq(siteBlockers.userId, userId)));
-  },
-
-  bulkSync: async (
+  async bulkSync(
     userId: string,
     payload: {
-      creates: Array<{ clientId?: string; url: string; category?: string; isBlocked?: boolean }>;
-      updates: Array<{ id?: string; clientId?: string; url?: string; category?: string; isBlocked?: boolean }>;
-      deletes: Array<{ id?: string; clientId?: string }>;
+      creates: Array<{ 
+        clientId?: string; 
+        url: string; 
+        category?: string | null; 
+        isBlocked?: boolean;
+        updatedAt?: Date
+      }>;
+      updates: Array<({ id?: string; clientId?: string }) & SiteBlockerUpdateData>;
+      deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
     }
-  ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; updated: SiteBlocker[]; deleted: string[] }> => {
-    // Use a transaction to ensure atomicity
-    return await db.transaction(async (tx) => {
+  ): Promise<{ created: Array<SiteBlocker & { clientId?: string }>; updated: SiteBlocker[]; deleted: string[] }> {
+    return await db.transaction(async () => {
       const created: Array<SiteBlocker & { clientId?: string }> = [];
       const updated: SiteBlocker[] = [];
       const deleted: string[] = [];
       const idMap = new Map<string, string>();
 
       try {
-        // Process creates - using createSiteBlocker which handles duplicates
+        // Process creates
         for (const c of payload.creates || []) {
-          const res = await siteBlockerService.createSiteBlocker(userId, c);
-          if (res) {
-            if (c.clientId) idMap.set(c.clientId, res.id);
-            created.push({ ...res, clientId: c.clientId });
-          }
+          const siteBlocker = await this._createSiteBlocker(userId, {
+            url: c.url,
+            category: c.category ?? undefined,
+            isBlocked: c.isBlocked ?? true,
+          });
+          if (c.clientId) idMap.set(c.clientId, siteBlocker.id);
+          created.push({ ...siteBlocker, clientId: c.clientId });
         }
-        
-        // Process updates  
+
+        // Collapse multiple updates to the same id to the last one by updatedAt
+        const updateById = new Map<string, any>();
         for (const u of payload.updates || []) {
-          const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
+          const mappedId = u.clientId ? idMap.get(u.clientId) : undefined;
+          const resolvedId = mappedId || u.id;
           if (!resolvedId) continue;
           
+          const prev = updateById.get(resolvedId);
+          if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
+            updateById.set(resolvedId, u);
+          }
+        }
+
+        // Process updates with LWW + delete precedence
+        for (const [resolvedId, u] of updateById) {
           try {
-            const updatedSite = await siteBlockerService.updateSiteBlocker(resolvedId, userId, u);
-            updated.push(updatedSite);
+            const siteBlocker = await this._updateSiteBlocker(userId, resolvedId as string, u as any);
+            updated.push(siteBlocker);
           } catch (err) {
-            // Skip if not found
             console.warn(`Site blocker ${resolvedId} not found for update`);
           }
         }
 
-        // Process deletes
+        // Process deletes (set tombstone)
         for (const d of payload.deletes || []) {
-          const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
-          if (!resolvedId) continue;
+          const mappedId = d.clientId ? idMap.get(d.clientId) : undefined;
+          const resolvedId = mappedId || d.id;
+          if (!resolvedId) {
+            console.warn("Bulk delete skipped: no id or resolvable clientId", d);
+            continue;
+          }
           
           try {
-            await siteBlockerService.deleteSiteBlocker(resolvedId, userId);
+            const delAt = d.deletedAt ? new Date(d.deletedAt as any) : new Date();
+            await db
+              .update(siteBlockers)
+              .set({ deletedAt: delAt } as SiteBlocker)
+              .where(and(eq(siteBlockers.id, resolvedId), eq(siteBlockers.userId, userId)));
             deleted.push(resolvedId);
           } catch (err) {
-            // Skip if not found
             console.warn(`Site blocker ${resolvedId} not found for delete`);
           }
         }
 
         return { created, updated, deleted };
       } catch (error) {
-        // Transaction will be rolled back automatically
-        console.error("Site blocker bulk sync failed, rolling back:", error);
+        console.error("Site blockers bulk sync failed, rolling back:", error);
         throw error;
       }
     });
+  },
+
+  // Private helper methods for bulk sync
+  async _createSiteBlocker(
+    userId: string,
+    siteBlockerData: {
+      url: string;
+      category?: string | null | undefined;
+      isBlocked?: boolean;
+    }
+  ): Promise<SiteBlocker> {
+    if (!siteBlockerData.url?.trim()) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "URL is required");
+    }
+
+    // Normalize URL to prevent duplicates
+    const normalizedUrl = siteBlockerData.url
+      .replace(/^(https?:\/\/)?(www\.)?/, "")
+      .toLowerCase()
+      .trim();
+
+    // Check if site already exists
+    const existing = await db.query.siteBlockers.findFirst({
+      where: and(
+        eq(siteBlockers.userId, userId),
+        eq(siteBlockers.url, normalizedUrl)
+      ),
+    });
+
+    if (existing) {
+      // Update existing site blocker instead of creating duplicate
+      const updateData: Partial<SiteBlocker> = {
+        isBlocked: siteBlockerData.isBlocked ?? true,
+        deletedAt: null, // Clear soft delete when re-enabling
+        updatedAt: new Date(),
+      };
+
+      if (siteBlockerData.category !== undefined) {
+        updateData.category = siteBlockerData.category;
+      }
+
+      const result = await db
+        .update(siteBlockers)
+        .set(updateData)
+        .where(and(eq(siteBlockers.id, existing.id), eq(siteBlockers.userId, userId)))
+        .returning();
+
+      return result[0];
+    }
+
+    // Enforce hard business limits
+    const existingCount = await db.query.siteBlockers.findMany({ 
+      where: and(eq(siteBlockers.userId, userId), isNull(siteBlockers.deletedAt)) 
+    });
+    if (existingCount.length >= 500) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Maximum site blockers limit (500) reached");
+    }
+
+    const insertData: any = {
+      userId,
+      url: normalizedUrl,
+      category: siteBlockerData.category ?? null,
+      isBlocked: siteBlockerData.isBlocked ?? true,
+    };
+
+    const result = await db.insert(siteBlockers).values(insertData).returning();
+    return result[0];
+  },
+
+  async _updateSiteBlocker(
+    userId: string,
+    siteBlockerId: string,
+    updateData: SiteBlockerUpdateData
+  ): Promise<SiteBlocker> {
+    // Load current site blocker for conflict handling
+    const current = await db.query.siteBlockers.findFirst({
+      where: and(eq(siteBlockers.id, siteBlockerId), eq(siteBlockers.userId, userId)),
+    });
+
+    if (!current) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Site blocker not found");
+    }
+
+    const data: Partial<SiteBlocker> = {};
+
+    // Build update data
+    if (updateData.url !== undefined) {
+      const normalizedUrl = updateData.url
+        .replace(/^(https?:\/\/)?(www\.)?/, "")
+        .toLowerCase()
+        .trim();
+      if (!normalizedUrl) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "URL cannot be empty");
+      }
+      data.url = normalizedUrl;
+    }
+
+    if (updateData.category !== undefined) {
+      data.category = updateData.category;
+    }
+
+    if (updateData.isBlocked !== undefined) {
+      data.isBlocked = updateData.isBlocked;
+    }
+
+    if (updateData.deletedAt !== undefined) {
+      data.deletedAt = updateData.deletedAt;
+    }
+
+    // Conflict handling: delete precedence with LWW by timestamp
+    const incomingUpdatedAt = updateData.updatedAt
+      ? new Date(updateData.updatedAt)
+      : undefined;
+    
+    if (current.deletedAt) {
+      if (!incomingUpdatedAt || incomingUpdatedAt <= current.deletedAt) {
+        // Keep deletion, ignore update
+        return current;
+      }
+      // Newer update than deletion → resurrect by clearing deletedAt
+      (data as any).deletedAt = null;
+    }
+
+    if (Object.keys(data).length === 0) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "No valid update data provided"
+      );
+    }
+
+    const result = await db
+      .update(siteBlockers)
+      .set(data)
+      .where(and(eq(siteBlockers.id, siteBlockerId), eq(siteBlockers.userId, userId)))
+      .returning();
+
+    if (!result.length) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Site blocker not found");
+    }
+
+    return result[0];
   },
 };

@@ -2,35 +2,21 @@ import express from "express";
 import { validate } from "@/common/validate";
 import auth from "@/modules/auth/auth.middleware";
 import { siteBlockerController } from "@/modules/site-blocker";
-import { siteBlockerValidation } from "@/modules/site-blocker/site-blocker.validation";
-import { siteBlockerBulkValidation } from "@/modules/site-blocker/site-blocker-bulk.validation";
+import { siteBlockerValidation } from "@/modules/site-blocker/site-blocker-bulk.validation";
+import requirePro from "@/modules/auth/requirePro.middleware";
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(auth(), siteBlockerController.getSiteBlockers)
-  .post(
-    auth(),
-    validate(siteBlockerValidation.createSiteBlocker),
-    siteBlockerController.createSiteBlocker
-  );
+// Get all site blockers for sync
+router.get("/", auth(), requirePro(), siteBlockerController.getSiteBlockers);
 
+// Bulk sync endpoint
 router.post(
-  "/bulk", 
-  auth(), 
-  validate(siteBlockerBulkValidation.bulkSync),
+  "/bulk",
+  auth(),
+  requirePro(),
+  validate(siteBlockerValidation.bulkSync),
   siteBlockerController.bulkSync
 );
-
-router
-  .route("/:id")
-  .get(auth(), siteBlockerController.getSiteBlocker)
-  .patch(
-    auth(),
-    validate(siteBlockerValidation.updateSiteBlocker),
-    siteBlockerController.updateSiteBlocker
-  )
-  .delete(auth(), siteBlockerController.deleteSiteBlocker);
 
 export default router;
