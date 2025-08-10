@@ -142,7 +142,7 @@ export class MeelioDB extends Dexie {
         focusStats: "++id, date",
         categories: "id, userId, name, icon, type",
         sounds: "id, path, downloadedAt, lastAccessed",
-        notes: "id, userId, categoryId, createdAt, updatedAt, deletedAt",
+        notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
       });
   }
 }
