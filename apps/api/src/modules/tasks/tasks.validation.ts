@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const tasksBulkValidation = {
+export const tasksValidation = {
   bulkSync: Joi.object().keys({
     creates: Joi.array().items(
       Joi.object().keys({

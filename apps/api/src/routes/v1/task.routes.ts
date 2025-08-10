@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { tasksController } from "@/modules/tasks";
-import { tasksBulkValidation } from "@/modules/tasks/tasks-bulk.validation";
+import { tasksValidation } from "@/modules/tasks/tasks.validation";
 import { auth } from "@/modules/auth";
 import { validate } from "@/common/validate";
 
@@ -13,7 +13,7 @@ router.get("/", auth(), tasksController.getTasks);
 router.post(
   "/bulk", 
   auth(), 
-  validate(tasksBulkValidation.bulkSync),
+  validate(tasksValidation.bulkSync),
   tasksController.bulkSync
 );
 
