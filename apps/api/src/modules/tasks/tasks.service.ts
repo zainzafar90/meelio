@@ -74,7 +74,7 @@ export const tasksService = {
       try {
         // Process creates
         for (const c of payload.creates || []) {
-          const task = await tasksService._createTask(userId, {
+          const task = await this._createTask(userId, {
             title: c.title,
             completed: c.completed,
             pinned: c.pinned,
@@ -102,7 +102,7 @@ export const tasksService = {
         // Process updates with LWW + delete precedence
         for (const [resolvedId, u] of updateById) {
           try {
-            const task = await tasksService._updateTask(userId, resolvedId as string, u as any);
+            const task = await this._updateTask(userId, resolvedId as string, u as any);
             updated.push(task);
           } catch (err) {
             console.warn(`Task ${resolvedId} not found for update`);
@@ -284,44 +284,5 @@ export const tasksService = {
     }
 
     return result[0];
-  },
-
-  // Legacy methods - kept for backward compatibility but can be removed if not used
-  async getTaskById(userId: string, taskId: string): Promise<Task> {
-    const task = await db.query.tasks.findFirst({
-      where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
-    });
-
-    if (!task) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
-    }
-
-    return task;
-  },
-
-  async createTask(
-    userId: string,
-    taskData: Omit<TaskUpdateData, "updatedAt"> & { title: string }
-  ): Promise<Task> {
-    return tasksService._createTask(userId, taskData);
-  },
-
-  async updateTask(
-    userId: string,
-    taskId: string,
-    updateData: TaskUpdateData
-  ): Promise<Task> {
-    return tasksService._updateTask(userId, taskId, updateData);
-  },
-
-  async deleteTask(userId: string, taskId: string): Promise<void> {
-    await db.query.tasks.findFirst({
-      where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
-    });
-
-    await db
-      .update(tasks)
-      .set({ deletedAt: new Date() } as Task)
-      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
   },
 };
