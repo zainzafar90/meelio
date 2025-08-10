@@ -10,12 +10,27 @@ import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
 import { playTypewriterSound } from "../../../utils/sound.utils";
-import { Icons } from "../../icons";
-import { Volume2, VolumeX } from "lucide-react";
+import { 
+  Search, 
+  Plus, 
+  Pin, 
+  Trash2, 
+  ArrowLeft, 
+  Edit3, 
+  Save, 
+  X, 
+  Volume2, 
+  VolumeX,
+  FileText,
+  Clock
+} from "lucide-react";
 
+type ViewMode = 'list' | 'create' | 'edit' | 'view';
 
 export function NotesSheet() {
   const { t } = useTranslation();
+  
+  // Store hooks
   const { isNotesVisible, setNotesVisible } = useDockStore(
     useShallow((s) => ({
       isNotesVisible: (s as any).isNotesVisible,
@@ -23,7 +38,16 @@ export function NotesSheet() {
     }))
   );
 
-  const { notes, initializeStore, addNote, updateNote, deleteNote, togglePinNote, enableTypingSound, setEnableTypingSound } = useNoteStore(
+  const { 
+    notes, 
+    initializeStore, 
+    addNote, 
+    updateNote, 
+    deleteNote, 
+    togglePinNote, 
+    enableTypingSound, 
+    setEnableTypingSound 
+  } = useNoteStore(
     useShallow((s) => ({
       notes: s.notes,
       initializeStore: s.initializeStore,
@@ -36,227 +60,473 @@ export function NotesSheet() {
     }))
   );
 
-
-  const [query, setQuery] = useState("");
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [draftContent, setDraftContent] = useState<string>("");
-  const active = useMemo(() => notes.find((n) => n.id === activeId) || null, [notes, activeId]);
-  // Limits
-  const MAX_NOTE_CHARS = 10000; // characters
+  // State
+  const [viewMode, setViewMode] = useState<ViewMode>('view');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [createdNoteId, setCreatedNoteId] = useState<string | null>(null);
+  
+  // Constants
+  const MAX_TITLE_LENGTH = 100;
+  const MAX_CONTENT_LENGTH = 10000;
   const MAX_NOTES = 500;
+  const AUTO_SAVE_DELAY = 500; // ms
 
-  const creatingRef = useRef(false);
-  const saveTimer = useRef<number | null>(null);
+  // Refs
+  const autoSaveTimeout = useRef<NodeJS.Timeout>();
+  const isCreatingNote = useRef(false);
 
-  const filtered = useMemo(() => {
-    if (!query.trim()) return notes;
-    const q = query.toLowerCase();
-    return notes.filter((n) => n.title.toLowerCase().includes(q) || (n.content || "").toLowerCase().includes(q));
-  }, [notes, query]);
+  // Computed
+  const selectedNote = useMemo(
+    () => notes.find(n => n.id === selectedNoteId),
+    [notes, selectedNoteId]
+  );
 
-  const formatRelativeTime = (dateMs: number) => {
-    try {
-      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
-      const now = Date.now();
-      const diff = dateMs - now;
-      const sec = Math.round(diff / 1000);
-      const min = Math.round(sec / 60);
-      const hour = Math.round(min / 60);
-      const day = Math.round(hour / 24);
-      const month = Math.round(day / 30);
-      const year = Math.round(month / 12);
-      if (Math.abs(sec) < 45) return rtf.format(sec, "second");
-      if (Math.abs(min) < 45) return rtf.format(min, "minute");
-      if (Math.abs(hour) < 22) return rtf.format(hour, "hour");
-      if (Math.abs(day) < 26) return rtf.format(day, "day");
-      if (Math.abs(month) < 11) return rtf.format(month, "month");
-      return rtf.format(year, "year");
-    } catch {
-      return new Date(dateMs).toLocaleString();
+  const filteredNotes = useMemo(() => {
+    let filtered = [...notes];
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(note => 
+        note.title.toLowerCase().includes(query) || 
+        (note.content?.toLowerCase() || '').includes(query)
+      );
     }
-  };
 
-  // Load saved text into draft on note change
+    // Sort: pinned first, then by updated date
+    filtered.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return b.updatedAt - a.updatedAt;
+    });
+
+    return filtered;
+  }, [notes, searchQuery]);
+
+  // Initialize store when sheet opens
   useEffect(() => {
-    setDraftContent(active?.content || "");
-  }, [active?.id]);
-
-
-  useEffect(() => {
-    if (isNotesVisible) initializeStore();
+    if (isNotesVisible) {
+      initializeStore();
+      resetToList();
+    }
   }, [isNotesVisible, initializeStore]);
 
+  // Load note data when viewing/editing
+  useEffect(() => {
+    if (selectedNote && (viewMode === 'view' || viewMode === 'edit')) {
+      setNoteTitle(selectedNote.title);
+      setNoteContent(selectedNote.content || '');
+    }
+  }, [selectedNote, viewMode]);
 
-  const handleCreate = async () => {
-    if (creatingRef.current) return;
-    creatingRef.current = true;
-    try {
-      if (notes.length >= MAX_NOTES) {
-        return;
-      }
-      const created = await addNote({ title: "Untitled" });
-      if (created) setActiveId(created.id);
-    } finally {
-      creatingRef.current = false;
+  // Helper functions
+  const resetToList = () => {
+    setViewMode('list');
+    setSelectedNoteId(null);
+    setNoteTitle('');
+    setNoteContent('');
+    setSearchQuery('');
+    setCreatedNoteId(null);
+    isCreatingNote.current = false;
+    if (autoSaveTimeout.current) {
+      clearTimeout(autoSaveTimeout.current);
     }
   };
 
-  const truncateToChars = (text: string, maxChars: number) =>
-    typeof text === "string" ? text.slice(0, maxChars) : text;
+  const formatDate = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
 
-  const scheduleSave = (id: string, data: { title?: string; content?: string | null }) => {
-    if (saveTimer.current) window.clearTimeout(saveTimer.current);
-    saveTimer.current = window.setTimeout(() => {
-      if (typeof data.content === "string") {
-        const trimmed = truncateToChars(data.content, MAX_NOTE_CHARS);
-        updateNote(id, { ...data, content: trimmed } as any);
-      } else {
-        updateNote(id, data as any);
-      }
-    }, 500);
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
-  const palette = [
-    "bg-rose-300/35 border-rose-400/40 text-rose-50",
-    "bg-amber-300/35 border-amber-400/40 text-amber-50",
-    "bg-lime-300/35 border-lime-400/40 text-lime-50",
-    "bg-cyan-300/35 border-cyan-400/40 text-cyan-50",
-    "bg-violet-300/35 border-violet-400/40 text-violet-50",
-    "bg-pink-300/35 border-pink-400/40 text-pink-50",
-  ];
-  const colorFor = (id: string) => palette[Math.abs(id.split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % palette.length];
+  const getNotePreview = (content: string | null | undefined) => {
+    if (!content) return 'Empty note';
+    const preview = content.slice(0, 150).replace(/\n+/g, ' ');
+    return preview + (content.length > 150 ? '...' : '');
+  };
 
-  const getCharCount = () => (draftContent || "").length;
+  const getNoteColor = (id: string) => {
+    const colors = [
+      'from-blue-500/20 to-indigo-500/10',
+      'from-purple-500/20 to-pink-500/10',
+      'from-green-500/20 to-teal-500/10',
+      'from-orange-500/20 to-red-500/10',
+      'from-cyan-500/20 to-blue-500/10',
+      'from-rose-500/20 to-purple-500/10',
+    ];
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
+  };
 
-  // No markdown preview; plain text only
+  // Actions
+  const handleCreateNote = () => {
+    if (notes.length >= MAX_NOTES) {
+      alert(`Maximum ${MAX_NOTES} notes reached!`);
+      return;
+    }
+    setViewMode('create');
+    setNoteTitle('');
+    setNoteContent('');
+    setCreatedNoteId(null);
+    isCreatingNote.current = false;
+  };
 
-  const NoteCharCount = ({ valueChars }: { valueChars: number }) => (
-    <span className="text-xs text-white/70">{valueChars}/{MAX_NOTE_CHARS}</span>
+  const handleAutoSave = async (title: string, content: string) => {
+    if (autoSaveTimeout.current) {
+      clearTimeout(autoSaveTimeout.current);
+    }
+
+    autoSaveTimeout.current = setTimeout(async () => {
+      const trimmedTitle = title.trim() || 'Untitled';
+      const trimmedContent = content.trim();
+
+      if (viewMode === 'create' && !createdNoteId && !isCreatingNote.current) {
+        // Auto-create note on first keystroke
+        if (trimmedContent || trimmedTitle !== 'Untitled') {
+          isCreatingNote.current = true;
+          setIsSaving(true);
+          const newNote = await addNote({ title: trimmedTitle, content: trimmedContent });
+          setIsSaving(false);
+          isCreatingNote.current = false;
+          
+          if (newNote) {
+            setCreatedNoteId(newNote.id);
+            setSelectedNoteId(newNote.id);
+            // Stay in create mode but now we're updating the created note
+          }
+        }
+      } else if (createdNoteId || selectedNoteId) {
+        // Auto-update existing note
+        const noteId = createdNoteId || selectedNoteId;
+        if (noteId) {
+          setIsSaving(true);
+          await updateNote(noteId, {
+            title: trimmedTitle,
+            content: trimmedContent
+          });
+          setIsSaving(false);
+        }
+      }
+    }, AUTO_SAVE_DELAY);
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    const note = notes.find(n => n.id === noteId);
+    if (!note) return;
+
+    if (confirm(`Delete "${note.title}"? This cannot be undone.`)) {
+      deleteNote(noteId);
+      if (selectedNoteId === noteId) {
+        resetToList();
+      }
+    }
+  };
+
+  const handleViewNote = (noteId: string) => {
+    setSelectedNoteId(noteId);
+    setViewMode('view');
+  };
+
+  const handleEditNote = () => {
+    setViewMode('edit');
+  };
+
+  const handleTogglePin = (noteId: string) => {
+    togglePinNote(noteId);
+  };
+
+  const handleTypingSound = (key: string) => {
+    if (enableTypingSound) {
+      playTypewriterSound(key);
+    }
+  };
+
+  // Render list view
+  const renderListView = () => (
+    <div className="flex h-full flex-col">
+      {/* Search bar */}
+      <div className="border-b border-white/10 bg-zinc-800/50 p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search notes..."
+            className="pl-10 pr-10 bg-zinc-900/50 border-white/10"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Notes list */}
+      <div className="flex-1 overflow-auto p-4">
+        {filteredNotes.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center">
+            <FileText className="mb-4 h-12 w-12 text-zinc-600" />
+            <p className="mb-2 text-zinc-400">
+              {searchQuery ? 'No notes found' : 'No notes yet'}
+            </p>
+            <p className="mb-6 text-sm text-zinc-500">
+              {searchQuery ? 'Try a different search' : 'Create your first note'}
+            </p>
+            {!searchQuery && (
+              <PremiumFeature requirePro>
+                <Button onClick={handleCreateNote} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create Note
+                </Button>
+              </PremiumFeature>
+            )}
+          </div>
+        ) : (
+          <div className="columns-2 gap-4 space-y-4 [column-fill:_balance]">
+            {filteredNotes.map((note) => (
+              <div
+                key={note.id}
+                onClick={() => handleViewNote(note.id)}
+                className={`group relative cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br ${getNoteColor(note.id)} p-4 transition-all hover:border-white/20`}
+              >
+                {/* Note content */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-1 flex items-center gap-2">
+                      <h3 className="truncate font-medium text-white/90">
+                        {note.title}
+                      </h3>
+                      {note.pinned && (
+                        <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />
+                      )}
+                    </div>
+                    <p className="mb-2 text-sm text-white/60 line-clamp-2">
+                      {getNotePreview(note.content)}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-white/40">
+                      <Clock className="h-3 w-3" />
+                      <span>{formatDate(note.updatedAt)}</span>
+                      <span>•</span>
+                      <span>{(note.content?.length || 0).toLocaleString()} characters</span>
+                    </div>
+                  </div>
+
+                  {/* Quick actions */}
+                  <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTogglePin(note.id);
+                      }}
+                      className="rounded p-1.5 hover:bg-white/10"
+                      title={note.pinned ? 'Unpin' : 'Pin'}
+                    >
+                      <Pin className={`h-3.5 w-3.5 ${note.pinned ? 'fill-yellow-400 text-yellow-400' : 'text-white/60'}`} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteNote(note.id);
+                      }}
+                      className="rounded p-1.5 hover:bg-white/10"
+                      title="Delete"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-white/60 hover:text-red-400" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Floating action button */}
+      <PremiumFeature requirePro>
+        <Button
+          onClick={handleCreateNote}
+          disabled={notes.length >= MAX_NOTES}
+          className="absolute bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+          title={notes.length >= MAX_NOTES ? `Maximum ${MAX_NOTES} notes` : 'Create note'}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </PremiumFeature>
+    </div>
   );
+
+  // Render create/edit/view
+  const renderNoteEditor = () => {
+    const isEditing = viewMode === 'edit' || viewMode === 'create';
+    const isNewNote = viewMode === 'create';
+
+    return (
+      <div className="flex h-full flex-col">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between border-b border-white/10 bg-zinc-800/50 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetToList}
+              className="gap-1"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            
+            {!isNewNote && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleTogglePin(selectedNoteId!)}
+                  className="gap-1"
+                >
+                  <Pin className={`h-4 w-4 ${selectedNote?.pinned ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+                  {selectedNote?.pinned ? 'Pinned' : 'Pin'}
+                </Button>
+
+                {viewMode === 'view' ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleEditNote}
+                    className="gap-1"
+                  >
+                    <Edit3 className="h-4 w-4" />
+                    Edit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewMode('view')}
+                    className="gap-1"
+                  >
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </Button>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteNote(selectedNoteId!)}
+                  className="gap-1 hover:text-red-400"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-500">
+              {noteTitle.length}/{MAX_TITLE_LENGTH} • {noteContent.length.toLocaleString()}/{MAX_CONTENT_LENGTH.toLocaleString()}
+            </span>
+            
+            {isSaving && (
+              <span className="text-xs text-green-400">Saving...</span>
+            )}
+          </div>
+        </div>
+
+        {/* Editor */}
+        <div className="flex-1 overflow-auto p-6">
+          <div className="mx-auto max-w-3xl">
+            <Input
+              value={noteTitle}
+              onChange={(e) => {
+                const newTitle = e.target.value.slice(0, MAX_TITLE_LENGTH);
+                setNoteTitle(newTitle);
+                handleAutoSave(newTitle, noteContent);
+              }}
+              onKeyDown={(e) => handleTypingSound(e.key)}
+              placeholder="Note title..."
+              disabled={!isEditing}
+              className="mb-4 border-0 bg-transparent p-0 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0 disabled:cursor-default"
+            />
+            
+            <Textarea
+              value={noteContent}
+              onChange={(e) => {
+                const newContent = e.target.value.slice(0, MAX_CONTENT_LENGTH);
+                setNoteContent(newContent);
+                handleAutoSave(noteTitle, newContent);
+              }}
+              onKeyDown={(e) => handleTypingSound(e.key)}
+              placeholder="Start writing..."
+              disabled={!isEditing}
+              className="min-h-[500px] resize-none border-0 bg-transparent p-0 placeholder:text-zinc-600 focus-visible:ring-0 disabled:cursor-default"
+              autoFocus={isNewNote}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Sheet open={isNotesVisible} onOpenChange={setNotesVisible}>
-      <SheetContent side="right"         className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900 backdrop-blur-xl">
-        <SheetHeader className="px-6 pt-6">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900">
+        <SheetHeader className="border-b border-white/10 bg-zinc-800/50 px-6 py-4">
           <div className="flex items-center justify-between">
-            <SheetTitle>{t("notes.sheet.title", { defaultValue: "Notes" })}</SheetTitle>
-            <SheetDescription>
-            {t("notes.sheet.description", { defaultValue: "Capture quick notes" })}
-          </SheetDescription>
-            <SyncStatus entityType="note" />
+            <div>
+              <SheetTitle>
+                {viewMode === 'list' && 'Notes'}
+                {viewMode === 'create' && 'New Note'}
+                {viewMode === 'edit' && 'Edit Note'}
+                {viewMode === 'view' && selectedNote?.title}
+              </SheetTitle>
+              <SheetDescription>
+                {viewMode === 'list' && `${filteredNotes.length} notes`}
+                {viewMode === 'create' && (createdNoteId ? 'Auto-saving...' : 'Start typing to auto-save')}
+                {viewMode === 'edit' && 'Auto-saving changes...'}
+                {viewMode === 'view' && formatDate(selectedNote?.updatedAt || Date.now())}
+              </SheetDescription>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setEnableTypingSound(!enableTypingSound)}
+                className="h-8 w-8 p-0"
+              >
+                {enableTypingSound ? (
+                  <Volume2 className="h-4 w-4" />
+                ) : (
+                  <VolumeX className="h-4 w-4" />
+                )}
+              </Button>
+              <SyncStatus entityType="note" />
+            </div>
           </div>
         </SheetHeader>
-        <div className="relative flex-1 overflow-auto p-4">
-          {!active ? (
-            <>
-              <div className="mb-4 flex items-center gap-2">
-                <div className="relative flex-1 w-full">
-                  <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("notes.search", { defaultValue: "Search notes" })} className="pl-8" />
-                  <Icons.post className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="columns-2 gap-4 [column-fill:_balance-all]">
-                {filtered.map((n) => (
-                  <button
-                    key={n.id}
-                    className={`mb-4 inline-block w-full align-top break-inside-avoid rounded-lg border p-4 text-left shadow-sm transition hover:brightness-110 ${colorFor(n.id)}`}
-                    onClick={() => setActiveId(n.id)}
-                  >
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium opacity-95">
-                      <span className="truncate">{n.title || "Untitled"}</span>
-                      {n.pinned && <Icons.pin className="h-3.5 w-3.5 text-yellow-400" />}
-                    </div>
-                    {n.content && (
-                      <div className="mb-3 text-xs/5 opacity-90 max-h-[300px] overflow-hidden whitespace-pre-wrap">
-                        {n.content}
-                      </div>
-                    )}
-                    <div className="text-[11px] opacity-70">{formatRelativeTime(n.updatedAt)}</div>
-                  </button>
-                ))}
-              </div>
-              <PremiumFeature requirePro>
-                <Button onClick={async () => await handleCreate()} disabled={notes.length >= MAX_NOTES} className="fixed bottom-6 right-6 h-12 w-12 rounded-full p-0 shadow-lg">
-                  <Icons.add className="h-6 w-6" />
-                </Button>
-              </PremiumFeature>
-            </>
-          ) : (
-            <div className="mx-auto flex h-full w-full flex-col gap-4 pt-2">
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setActiveId(null)} className="h-8 w-8 p-0">
-                  <Icons.chevronLeft className="h-5 w-5" />
-                </Button>
-                <div className="text-sm text-muted-foreground">{formatRelativeTime(active.updatedAt)}</div>
-                <div className="ml-auto flex items-center gap-2">
-                  <NoteCharCount valueChars={getCharCount()} />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEnableTypingSound(!enableTypingSound)}
-                    title={enableTypingSound ? t("common.actions.mute", { defaultValue: "Mute" }) : t("common.actions.unmute", { defaultValue: "Unmute" })}
-                    aria-label={enableTypingSound ? t("common.actions.mute", { defaultValue: "Mute" }) : t("common.actions.unmute", { defaultValue: "Unmute" })}
-                  >
-                    {enableTypingSound ? (
-                      <Volume2 className="h-4 w-4" />
-                    ) : (
-                      <VolumeX className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => togglePinNote(active.id)}
-                    title={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
-                    aria-label={(active as any).pinned ? t("notes.unpin", { defaultValue: "Unpin" }) : t("notes.pin", { defaultValue: "Pin" })}
-                  >
-                    <Icons.pin className={`h-4 w-4 ${(active as any).pinned ? 'text-yellow-400' : 'text-muted-foreground'}`} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      if (confirm(t("notes.delete.confirm", { defaultValue: "Are you sure you want to delete this note?" }))) {
-                        deleteNote(active.id);
-                        setActiveId(null);
-                      }
-                    }}
-                    title={t("notes.delete", { defaultValue: "Delete note" })}
-                    aria-label={t("notes.delete", { defaultValue: "Delete note" })}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Icons.close className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-              <Input
-                defaultValue={active.title}
-                onChange={(e) => scheduleSave(active.id, { title: e.target.value })}
-                className="border-none bg-transparent px-0 text-2xl font-semibold focus-visible:ring-0 focus-visible:outline-none"
-                onKeyDown={(e) => {
-                  if (enableTypingSound) void playTypewriterSound(e.key);
-                }}
-                placeholder={t("notes.title.placeholder", { defaultValue: "Untitled" })}
-              />
-              <Textarea
-                value={draftContent}
-                onChange={(e) => {
-                  const value = e.target.value.slice(0, MAX_NOTE_CHARS);
-                  setDraftContent(value);
-                  scheduleSave(active.id, { content: value });
-                }}
-                className="h-full resize-none border-none bg-transparent px-0 whitespace-pre-wrap focus-visible:ring-0 focus-visible:outline-none"
-                onKeyDown={(e) => {
-                  if (enableTypingSound) void playTypewriterSound(e.key);
-                }}
-                placeholder={t("notes.content.placeholder", { defaultValue: "Start writing..." })}
-                maxLength={MAX_NOTE_CHARS}
-              />
-            </div>
-          )}
+
+        <div className="relative flex-1 overflow-hidden">
+          {viewMode === 'list' ? renderListView() : renderNoteEditor()}
         </div>
       </SheetContent>
     </Sheet>
   );
 }
-
