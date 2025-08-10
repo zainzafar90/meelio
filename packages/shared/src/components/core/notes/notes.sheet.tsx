@@ -46,6 +46,28 @@ export function NotesSheet() {
     return notes.filter((n) => n.title.toLowerCase().includes(q) || (n.content || "").toLowerCase().includes(q));
   }, [notes, query]);
 
+  const formatRelativeTime = (dateMs: number) => {
+    try {
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      const now = Date.now();
+      const diff = dateMs - now;
+      const sec = Math.round(diff / 1000);
+      const min = Math.round(sec / 60);
+      const hour = Math.round(min / 60);
+      const day = Math.round(hour / 24);
+      const month = Math.round(day / 30);
+      const year = Math.round(month / 12);
+      if (Math.abs(sec) < 45) return rtf.format(sec, "second");
+      if (Math.abs(min) < 45) return rtf.format(min, "minute");
+      if (Math.abs(hour) < 22) return rtf.format(hour, "hour");
+      if (Math.abs(day) < 26) return rtf.format(day, "day");
+      if (Math.abs(month) < 11) return rtf.format(month, "month");
+      return rtf.format(year, "year");
+    } catch {
+      return new Date(dateMs).toLocaleString();
+    }
+  };
+
   // Load saved text into draft on note change
   useEffect(() => {
     setDraftContent(active?.content || "");
@@ -140,7 +162,7 @@ export function NotesSheet() {
                         {n.content}
                       </div>
                     )}
-                    <div className="text-[11px] opacity-70">{new Date(n.updatedAt).toLocaleDateString()}</div>
+                    <div className="text-[11px] opacity-70">{formatRelativeTime(n.updatedAt)}</div>
                   </button>
                 ))}
               </div>
@@ -156,7 +178,7 @@ export function NotesSheet() {
                 <Button variant="ghost" size="sm" onClick={() => setActiveId(null)} className="h-8 w-8 p-0">
                   <Icons.chevronLeft className="h-5 w-5" />
                 </Button>
-                <div className="text-sm text-muted-foreground">{new Date(active.updatedAt).toLocaleDateString()}</div>
+                <div className="text-sm text-muted-foreground">{formatRelativeTime(active.updatedAt)}</div>
                 <div className="ml-auto flex items-center gap-2">
                   <NoteCharCount valueChars={getCharCount()} />
                   <Button variant="ghost" size="sm" onClick={() => scheduleSave(active.id, { pinned: !(active as any).pinned } as any)} title={t("notes.pin", { defaultValue: "Pin" })}>
@@ -177,7 +199,7 @@ export function NotesSheet() {
                   setDraftContent(value);
                   scheduleSave(active.id, { content: value });
                 }}
-                className="min-h-[55vh] resize-none border-none bg-transparent px-0 whitespace-pre-wrap"
+                className="h-full resize-none border-none bg-transparent px-0 whitespace-pre-wrap"
                 placeholder={t("notes.content.placeholder", { defaultValue: "Start writing..." })}
                 maxLength={MAX_NOTE_CHARS}
               />
