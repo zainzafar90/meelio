@@ -19,10 +19,14 @@ function checkPro() {
 }
 
 export const siteBlockerApi = {
-  async getBlockedSites(): Promise<SiteBlockerDto[]> {
-    checkPro();
+  async getSiteBlockers(): Promise<SiteBlockerDto[]> {
     const res = await axios.get("/v1/site-blockers");
     return res.data;
+  },
+
+  async getBlockedSites(): Promise<SiteBlockerDto[]> {
+    // Alias for backward compatibility
+    return siteBlockerApi.getSiteBlockers();
   },
 
   async addBlockedSite(url: string, category?: string): Promise<SiteBlockerDto> {

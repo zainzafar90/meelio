@@ -5,7 +5,8 @@ import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { SyncState, useSyncStore } from "./sync.store";
-import { lwwMergeById } from "../utils/sync.utils";
+import { EntitySyncManager, createEntitySync } from "../utils/sync-core";
+import { createAdapter, normalizeDates } from "../utils/sync-adapters";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -54,112 +55,8 @@ interface TaskState {
   getNextPinnedTask: () => Task | undefined;
 }
 
-let isProcessingSyncQueue = false;
-
-async function processSyncQueue() {
-  if (isProcessingSyncQueue) return;
-
-  const syncStore = useSyncStore.getState();
-  const queue = syncStore.getQueue("task");
-  const shouldSync = queue.length > 0 && syncStore.isOnline;
-
-  if (!shouldSync) return;
-
-  isProcessingSyncQueue = true;
-  syncStore.setSyncing("task", true);
-
-  // Build bulk payload
-  const creates = [] as any[];
-  const updates = [] as any[];
-  const deletes = [] as any[];
-  for (const op of queue) {
-    if (op.type === "create") {
-      creates.push({
-        clientId: op.entityId,
-        title: op.data.title,
-        completed: !!op.data.completed,
-        dueDate: op.data.dueDate,
-        pinned: !!op.data.pinned,
-        categoryId: op.data.categoryId,
-        providerId: op.data.providerId,
-        updatedAt: op.data.updatedAt,
-      });
-    } else if (op.type === "update") {
-      updates.push({ id: op.entityId, ...op.data });
-    } else if (op.type === "delete") {
-      deletes.push({ id: op.entityId, deletedAt: op.data?.deletedAt });
-    }
-  }
-
-  try {
-    const result = await taskApi.bulkSync({ creates, updates, deletes });
-    const idMap = new Map<string, string>();
-    for (const c of result.created) {
-      if (c.clientId && c.id !== c.clientId) idMap.set(c.clientId, c.id);
-    }
-
-    // Reconcile local DB and state
-    await db.transaction("rw", db.tasks, async () => {
-      // Handle created tasks - update client IDs to server IDs and normalize timestamps
-      for (const created of result.created) {
-        if (created.clientId && created.id !== created.clientId) {
-          // Delete the temporary client ID entry
-          await db.tasks.delete(created.clientId);
-          
-          // Add with server ID and normalized timestamps
-          const normalizedTask = {
-            ...created,
-            createdAt: new Date(created.createdAt).getTime(),
-            updatedAt: new Date(created.updatedAt).getTime(),
-            deletedAt: created.deletedAt ? new Date(created.deletedAt).getTime() : null,
-            dueDate: created.dueDate ? new Date(created.dueDate).toISOString() : undefined,
-          };
-          await db.tasks.add(normalizedTask as any);
-          
-          useTaskStore.setState((state) => ({
-            tasks: state.tasks.map((t) => 
-              t.id === created.clientId ? { ...normalizedTask, id: created.id } : t
-            ),
-          }));
-        }
-      }
-      
-      for (const d of result.deleted) {
-        await db.tasks.update(d, { deletedAt: Date.now(), updatedAt: Date.now() });
-      }
-      
-      for (const u of result.updated) {
-        // Convert server timestamps to milliseconds
-        const normalizedUpdate = {
-          ...u,
-          createdAt: new Date(u.createdAt).getTime(),
-          updatedAt: new Date(u.updatedAt).getTime(),
-          deletedAt: u.deletedAt ? new Date(u.deletedAt).getTime() : null,
-          dueDate: u.dueDate ? new Date(u.dueDate).toISOString() : undefined,
-        };
-        await db.tasks.update(u.id, normalizedUpdate as any);
-      }
-    });
-
-    // Clear queue upon success
-    for (const op of queue) syncStore.removeFromQueue("task", op.id);
-  } catch (error) {
-    console.error("Bulk task sync failed:", error);
-    // Leave queue for retry
-  }
-
-  syncStore.setSyncing("task", false);
-  syncStore.setLastSyncTime("task", Date.now());
-  isProcessingSyncQueue = false;
-}
-
-let autoSyncInterval: NodeJS.Timeout | null = null;
+let taskSyncManager: EntitySyncManager<Task, any, any, any, any> | null = null;
 let isInitializing = false;
-
-function startAutoSync() {
-  if (autoSyncInterval) clearInterval(autoSyncInterval);
-  autoSyncInterval = setInterval(() => processSyncQueue(), 5 * 60 * 1000);
-}
 
 export const useTaskStore = create<TaskState>()(
   subscribeWithSelector((set, get) => ({
@@ -250,8 +147,8 @@ export const useTaskStore = create<TaskState>()(
             data: newTask,
           });
 
-          if (syncStore.isOnline) {
-            processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
           }
         }
       } catch (error) {
@@ -299,7 +196,9 @@ export const useTaskStore = create<TaskState>()(
             data: updatedData,
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -331,7 +230,9 @@ export const useTaskStore = create<TaskState>()(
             data: { deletedAt },
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -386,8 +287,8 @@ export const useTaskStore = create<TaskState>()(
               data: welcomeTask,
             });
 
-            if (syncStore.isOnline) {
-              processSyncQueue();
+            if (syncStore.isOnline && taskSyncManager) {
+              taskSyncManager.processQueue();
             }
           }
         } catch (error) {
@@ -426,10 +327,6 @@ export const useTaskStore = create<TaskState>()(
 
       try {
         set({ isLoading: true, error: null });
-
-        if (user) {
-          startAutoSync();
-        }
 
         await get().loadFromLocal();
 
@@ -477,50 +374,8 @@ export const useTaskStore = create<TaskState>()(
     },
 
     syncWithServer: async () => {
-      const authState = useAuthStore.getState();
-      const user = authState.user;
-
-      if (!user) return;
-
-      const syncStore = useSyncStore.getState();
-
-      try {
-        await processSyncQueue();
-
-        const serverTasks = await taskApi.getTasks();
-        
-        // Convert server Date objects to milliseconds for proper CRDT sync
-        const normalizedServerTasks = serverTasks.map(task => ({
-          ...task,
-          createdAt: new Date(task.createdAt).getTime(),
-          updatedAt: new Date(task.updatedAt).getTime(),
-          deletedAt: task.deletedAt ? new Date(task.deletedAt).getTime() : null,
-          dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : undefined,
-        }));
-        
-        const localTasks = await db.tasks
-          .where("userId")
-          .equals(user.id)
-          .toArray();
-
-        const mergedTasks = lwwMergeById<Task>(localTasks as any, normalizedServerTasks as any);
-
-        await db.transaction("rw", db.tasks, async () => {
-          await db.tasks.where("userId").equals(user.id).delete();
-          await db.tasks.bulkAdd(mergedTasks);
-        });
-
-
-        set({
-          tasks: mergedTasks.filter(t => !t.deletedAt),
-        });
-
-        syncStore.setSyncing("task", false);
-        syncStore.setLastSyncTime("task", Date.now());
-      } catch (error) {
-        console.error("Sync failed:", error);
-        syncStore.setSyncing("task", false);
-      }
+      if (!taskSyncManager) return;
+      await taskSyncManager.syncWithServer();
     },
 
     togglePinTask: async (taskId) => {
@@ -587,7 +442,9 @@ export const useTaskStore = create<TaskState>()(
             data: updatedData,
           });
 
-          if (syncStore.isOnline) processSyncQueue();
+          if (syncStore.isOnline && taskSyncManager) {
+            taskSyncManager.processQueue();
+          }
         }
       } catch (error) {
         set({
@@ -639,6 +496,61 @@ export const useTaskStore = create<TaskState>()(
   }))
 );
 
+// Initialize task sync manager after store definition to avoid circular dependencies
+function initializeTaskSync() {
+  const taskAdapter = createAdapter<Task, any>({
+    entityKey: "task",
+    dbTable: db.tasks as any,
+    api: {
+      bulkSync: taskApi.bulkSync,
+      fetchAll: () => taskApi.getTasks(),
+    },
+    store: {
+      getUserId: () => useAuthStore.getState().user?.id,
+      getItems: () => useTaskStore.getState().tasks,
+      setItems: (list) => useTaskStore.setState({ tasks: list }),
+    },
+    normalizeFromServer: (t: any): Task => ({
+      ...normalizeDates(t),
+      dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : undefined,
+    }),
+    customTransformers: {
+      toCreatePayload: (op) => {
+        if (op.type !== "create") return null;
+        const d = op.data || {};
+        return {
+          clientId: op.entityId,
+          title: d.title,
+          completed: !!d.completed,
+          dueDate: d.dueDate,
+          pinned: !!d.pinned,
+          categoryId: d.categoryId,
+          providerId: d.providerId,
+          updatedAt: d.updatedAt,
+        };
+      },
+    },
+    options: {
+      autoSync: true,
+      syncInterval: 60 * 60 * 1000, // 1 hour
+      enableOptimisticUpdates: true,
+    },
+  });
+
+  taskSyncManager = createEntitySync(taskAdapter);
+}
+
+// Initialize on first authenticated user login
+useAuthStore.subscribe((state) => {
+  const user = state.user;
+  if (user && !taskSyncManager) {
+    initializeTaskSync();
+  } else if (!user && taskSyncManager) {
+    taskSyncManager.dispose();
+    taskSyncManager = null;
+  }
+});
+
 /**
   * ╔═══════════════════════════════════════════════════════════════════════╗
   * ║                    Handle Online Status Changes                       ║
@@ -656,9 +568,12 @@ const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
 
   if (canSync) {
     isSyncingOnReconnect = true;
-    processSyncQueue().finally(() => {
-      isSyncingOnReconnect = false;
-    });
+    useTaskStore
+      .getState()
+      .syncWithServer()
+      .finally(() => {
+        isSyncingOnReconnect = false;
+      });
   }
 };
 

@@ -62,11 +62,12 @@ const ExtensionTabStashContent = () => {
   const [selectedSession, setSelectedSession] = useState<TabSession | null>(
     null
   );
-  const { sessions, hasPermissions, checkPermissions } = useTabStashStore(
+  const { sessions, hasPermissions, checkPermissions, initializeStore } = useTabStashStore(
     useShallow((state) => ({
       sessions: state.sessions,
       hasPermissions: state.hasPermissions,
       checkPermissions: state.checkPermissions,
+      initializeStore: state.initializeStore,
     }))
   );
   const { isStashing, error, stashTabs, clearError } = useTabStash();
@@ -77,9 +78,9 @@ const ExtensionTabStashContent = () => {
 
   useEffect(() => {
     if (hasPermissions) {
-      useTabStashStore.getState().loadSessions();
+      initializeStore();
     }
-  }, [hasPermissions]);
+  }, [hasPermissions, initializeStore]);
 
   if (selectedSession) {
     return (

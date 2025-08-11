@@ -6,7 +6,7 @@ import { IUser } from "@/types/interfaces/resources";
 
 export const tabStashController = {
   /**
-   * Get tab stashes for the authenticated user
+   * Get all tab stashes for the authenticated user (for full sync)
    */
   getTabStashes: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
@@ -15,48 +15,8 @@ export const tabStashController = {
   }),
 
   /**
-   * Get a tab stash by ID
+   * Bulk sync operation - handles creates, updates, and deletes
    */
-  getTabStash: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const { id } = req.params;
-    const tabStash = await tabStashService.getTabStashById(id, user.id);
-    return res.status(httpStatus.OK).json(tabStash);
-  }),
-
-  /**
-   * Create a tab stash
-   */
-  createTabStash: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const tabStash = await tabStashService.createTabStash(user.id, req.body);
-    return res.status(httpStatus.CREATED).json(tabStash);
-  }),
-
-  /**
-   * Update a tab stash
-   */
-  updateTabStash: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const { id } = req.params;
-    const tabStash = await tabStashService.updateTabStash(
-      id,
-      user.id,
-      req.body
-    );
-    return res.status(httpStatus.OK).json(tabStash);
-  }),
-
-  /**
-   * Delete a tab stash
-   */
-  deleteTabStash: catchAsync(async (req: Request, res: Response) => {
-    const user = req.user as IUser;
-    const { id } = req.params;
-    await tabStashService.deleteTabStash(id, user.id);
-    return res.status(httpStatus.NO_CONTENT).send();
-  }),
-
   bulkSync: catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IUser;
     const { creates = [], updates = [], deletes = [] } = req.body || {};

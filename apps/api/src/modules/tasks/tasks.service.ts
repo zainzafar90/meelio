@@ -1,16 +1,9 @@
 import { db } from "@/db";
-import { Task, tasks, providers, } from "@/db/schema";
-import { eq, and, desc, asc, } from "drizzle-orm";
+import { Task, tasks, providers } from "@/db/schema";
+import { eq, and, asc, isNull } from "drizzle-orm";
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
-
-
-interface TaskFilters {
-  completed?: boolean;
-  dueDate?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-}
+import { parseNullableDate } from "@/common/utils/date";
 
 interface TaskUpdateData {
   title?: string;
@@ -25,260 +18,54 @@ interface TaskUpdateData {
 
 export const tasksService = {
   /**
-   * Get tasks for a user with optional filters
+   * Get all tasks for a user (used for full sync)
    */
-  async getTasks(userId: string, filters: TaskFilters): Promise<Task[]> {
+  async getTasks(userId: string): Promise<Task[]> {
     const defaultProvider = await db.query.providers.findFirst({
       where: eq(providers.name, "meelio"),
     });
+    
     if (!defaultProvider) {
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Default provider not found");
     }
-    const conditions = [eq(tasks.userId, userId), eq(tasks.providerId, defaultProvider?.id)];
-
-    // Return all tasks including soft-deleted ones for proper CRDT sync
-    // The frontend will filter out deleted tasks as needed
-    const result = db.query.tasks.findMany({
-      where: and(...conditions),
-      orderBy: filters.sortBy
-        ? [filters.sortOrder === "desc" ? desc(tasks[filters.sortBy]) : asc(tasks[filters.sortBy])]
-        : [desc(tasks.createdAt)],
-    });
-
-    return result;
-  },
-
-  /**
-   * Get a specific task by ID
-   */
-  async getTaskById(userId: string, taskId: string): Promise<Task> {
-    const task = await db.query.tasks.findFirst(
-      {
-        where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
-      }
-    )
-
-    if (!task) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
-    }
-
-    return task;
-  },
-
-
-  /**
-   * Create a new task
-   */
-  async createTask(
-    userId: string,
-    taskData: Omit<TaskUpdateData, "updatedAt"> & { title: string }
-  ): Promise<Task> {
-    if (!taskData.title?.trim()) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Title is required");
-    }
-
-    const parsedDueDate = tasksService.parseDate(taskData.dueDate);
-    const insertData: any = {
-      userId,
-      title: taskData.title,
-      completed: taskData.completed ?? false,
-      pinned: taskData.pinned ?? false,
-    };
-
-    // Only include dueDate if it's explicitly set
-    if (parsedDueDate !== undefined) {
-      insertData.dueDate = parsedDueDate;
-    }
-
-    // Handle categoryId
-    if (taskData.categoryId !== undefined) {
-      insertData.categoryId = taskData.categoryId;
-    }
-
-    // Handle providerId - if not provided, use default "meelio" provider
-    if (taskData.providerId !== undefined) {
-      insertData.providerId = taskData.providerId;
-    } else {
-      // Get the default "meelio" provider
-      const [meelioProvider] = await db
-        .select()
-        .from(providers)
-        .where(eq(providers.name, "meelio"))
-        .limit(1);
-
-      if (meelioProvider) {
-        insertData.providerId = meelioProvider.id;
-      }
-    }
-
-    // Handle pinned task logic
-    if (insertData.pinned) {
-      await tasksService._handlePinnedTask(userId, true);
-    }
-
-    const result = await db.insert(tasks).values(insertData).returning();
-    return result[0];
-  },
-
-  /**
-   * Parse and validate due date
-   */
-  parseDate(
-    dueDate: string | number | null | undefined
-  ): Date | null | undefined {
-    if (dueDate === undefined) return undefined;
-    if (dueDate === null) return null;
-
-    try {
-      // Handle both ISO strings and timestamps (getTime() values)
-      const parsedDate =
-        typeof dueDate === "number" ? new Date(dueDate) : new Date(dueDate);
-
-      // Check if the date is valid
-      if (isNaN(parsedDate.getTime())) {
-        throw new ApiError(
-          httpStatus.BAD_REQUEST,
-          `Invalid date format: ${dueDate}`
-        );
-      }
-
-      return parsedDate;
-    } catch (error) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        `Invalid date format: ${dueDate}`
-      );
-    }
-  },
-
-  /**
-   * Handle pinned task logic - ensure only one task is pinned per user
-   */
-  async _handlePinnedTask(userId: string, isPinned: boolean): Promise<void> {
-    if (isPinned) {
-      await db
-        .update(tasks)
-        .set({ pinned: false } as Task)
-        .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
-    }
-  },
-
-  /**
-   * Build update data object from input
-   */
-  _buildUpdateData(updateData: TaskUpdateData): Partial<Task> {
-    const data: Partial<Task> = {};
-
-    // Handle each field explicitly for better type safety
-    if (updateData.title !== undefined) {
-      data.title = updateData.title;
-    }
-
-    if (updateData.completed !== undefined) {
-      data.completed = updateData.completed;
-    }
-
-    if (updateData.pinned !== undefined) {
-      data.pinned = updateData.pinned;
-    }
-
-
-    if (updateData.updatedAt !== undefined) {
-      data.updatedAt = updateData.updatedAt;
-    }
     
-    if (updateData.deletedAt !== undefined) {
-      data.deletedAt = updateData.deletedAt;
-    }
-
-    if (updateData.dueDate !== undefined) {
-      const parsedDate = tasksService.parseDate(updateData.dueDate);
-      // Only set dueDate if parsing was successful or explicitly null
-      if (parsedDate !== undefined) {
-        data.dueDate = parsedDate;
-      }
-    }
-
-    if (updateData.categoryId !== undefined) {
-      data.categoryId = updateData.categoryId;
-    }
-
-    if (updateData.providerId !== undefined) {
-      data.providerId = updateData.providerId;
-    }
-
-    delete data.updatedAt;
-
-    return data;
-  },
-
-  /**
-   * Update an existing task
-   */
-  async updateTask(
-    userId: string,
-    taskId: string,
-    updateData: TaskUpdateData
-  ): Promise<Task> {
-    // Verify task exists
-    await this.getTaskById(userId, taskId);
-
-    // Build update data
-    const data = tasksService._buildUpdateData(updateData);
-
-    console.log({ data });
-
-    // Validate we have something to update
-    if (Object.keys(data).length === 0) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        "No valid update data provided"
-      );
-    }
-
-    // Handle pinned task logic
-    if (updateData.pinned !== undefined) {
-      await tasksService._handlePinnedTask(userId, updateData.pinned);
-    }
-
-    // Perform update
     const result = await db
-      .update(tasks)
-      .set(data)
-      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
-      .returning();
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          eq(tasks.userId, userId),
+          eq(tasks.providerId, defaultProvider.id),
+          isNull(tasks.deletedAt)
+        )
+      )
+      .orderBy(asc(tasks.createdAt));
 
-    if (!result.length) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
-    }
-
-    return result[0];
+    return result as any;
   },
 
   /**
-   * Delete a task
+   * Bulk sync operation for tasks
+   * Handles creates, updates, and deletes in a single transaction
    */
-  async deleteTask(userId: string, taskId: string): Promise<void> {
-    // Verify task exists
-    await this.getTaskById(userId, taskId);
-
-    // Soft delete: set deletedAt
-    await db
-      .update(tasks)
-      .set({ deletedAt: new Date() } as Task)
-      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
-  },
-
   async bulkSync(
     userId: string,
     payload: {
-      creates: Array<{ clientId?: string; title: string; completed?: boolean; pinned?: boolean; dueDate?: string | number | null; categoryId?: string | null; providerId?: string | null; updatedAt?: Date }>;
+      creates: Array<{ 
+        clientId?: string; 
+        title: string; 
+        completed?: boolean; 
+        pinned?: boolean; 
+        dueDate?: string | number | null; 
+        categoryId?: string | null; 
+        providerId?: string | null; 
+        updatedAt?: Date 
+      }>;
       updates: Array<({ id?: string; clientId?: string }) & TaskUpdateData>;
       deletes: Array<{ id?: string; clientId?: string; deletedAt?: Date }>;
     }
   ): Promise<{ created: Array<Task & { clientId?: string }>; updated: Task[]; deleted: string[] }> {
-    // Use a transaction to ensure atomicity
-    return await db.transaction(async (tx) => {
+    return await db.transaction(async () => {
       const created: Array<Task & { clientId?: string }> = [];
       const updated: Task[] = [];
       const deleted: string[] = [];
@@ -287,7 +74,7 @@ export const tasksService = {
       try {
         // Process creates
         for (const c of payload.creates || []) {
-          const task = await tasksService.createTask(userId, {
+          const task = await this._createTask(userId, {
             title: c.title,
             completed: c.completed,
             pinned: c.pinned,
@@ -302,49 +89,200 @@ export const tasksService = {
         // Collapse multiple updates to the same id to the last one by updatedAt
         const updateById = new Map<string, any>();
         for (const u of payload.updates || []) {
-          const resolvedId = u.id || (u.clientId && idMap.get(u.clientId));
+          const mappedId = u.clientId ? idMap.get(u.clientId) : undefined;
+          const resolvedId = mappedId || u.id;
           if (!resolvedId) continue;
+          
           const prev = updateById.get(resolvedId);
           if (!prev || ((u as any).updatedAt ?? 0) >= ((prev as any).updatedAt ?? 0)) {
             updateById.set(resolvedId, u);
           }
         }
-        
-        // Process updates
+
+        // Process updates with LWW + delete precedence
         for (const [resolvedId, u] of updateById) {
           try {
-            const task = await tasksService.updateTask(userId, resolvedId as string, u as any);
+            const task = await this._updateTask(userId, resolvedId as string, u as any);
             updated.push(task);
           } catch (err) {
-            // Skip not found
             console.warn(`Task ${resolvedId} not found for update`);
           }
         }
 
-        // Process deletes
+        // Process deletes (set tombstone)
         for (const d of payload.deletes || []) {
-          const resolvedId = d.id || (d.clientId && idMap.get(d.clientId));
-          if (!resolvedId) continue;
+          const mappedId = d.clientId ? idMap.get(d.clientId) : undefined;
+          const resolvedId = mappedId || d.id;
+          if (!resolvedId) {
+            console.warn("Bulk delete skipped: no id or resolvable clientId", d);
+            continue;
+          }
           
           try {
+            const delAt = d.deletedAt ? new Date(d.deletedAt as any) : new Date();
             await db
               .update(tasks)
-              .set({ deletedAt: d.deletedAt ?? new Date() } as Task)
+              .set({ deletedAt: delAt } as Task)
               .where(and(eq(tasks.id, resolvedId), eq(tasks.userId, userId)));
             deleted.push(resolvedId);
           } catch (err) {
-            // Skip if not found
             console.warn(`Task ${resolvedId} not found for delete`);
           }
         }
 
         return { created, updated, deleted };
       } catch (error) {
-        // Transaction will be rolled back automatically
         console.error("Tasks bulk sync failed, rolling back:", error);
         throw error;
       }
     });
   },
 
+  // Private helper methods for bulk sync
+  async _createTask(
+    userId: string,
+    taskData: {
+      title: string;
+      completed?: boolean;
+      pinned?: boolean;
+      dueDate?: string | number | null | undefined;
+      categoryId?: string | null | undefined;
+      providerId?: string | null | undefined;
+    }
+  ): Promise<Task> {
+    if (!taskData.title?.trim()) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Title is required");
+    }
+
+    const parsedDueDate = parseNullableDate(taskData.dueDate, "dueDate");
+    const insertData: any = {
+      userId,
+      title: taskData.title,
+      completed: taskData.completed ?? false,
+      pinned: taskData.pinned ?? false,
+    };
+
+    if (parsedDueDate !== undefined) {
+      insertData.dueDate = parsedDueDate;
+    }
+
+    if (taskData.categoryId !== undefined) {
+      insertData.categoryId = taskData.categoryId;
+    }
+
+    if (taskData.providerId !== undefined) {
+      insertData.providerId = taskData.providerId;
+    } else {
+      const defaultProvider = await db.query.providers.findFirst({
+        where: eq(providers.name, "meelio"),
+      });
+      if (defaultProvider) {
+        insertData.providerId = defaultProvider.id;
+      }
+    }
+
+    // Handle pinned task logic - only one can be pinned
+    if (insertData.pinned) {
+      await db
+        .update(tasks)
+        .set({ pinned: false } as Task)
+        .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
+    }
+
+    const result = await db.insert(tasks).values(insertData).returning();
+    return result[0];
+  },
+
+  async _updateTask(
+    userId: string,
+    taskId: string,
+    updateData: TaskUpdateData
+  ): Promise<Task> {
+    // Load current task for conflict handling
+    const current = await db.query.tasks.findFirst({
+      where: and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
+    });
+
+    if (!current) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
+    }
+
+    const data: Partial<Task> = {};
+
+    // Build update data
+    if (updateData.title !== undefined) {
+      data.title = updateData.title;
+    }
+
+    if (updateData.completed !== undefined) {
+      data.completed = updateData.completed;
+    }
+
+    if (updateData.pinned !== undefined) {
+      data.pinned = updateData.pinned;
+    }
+
+    if (updateData.deletedAt !== undefined) {
+      const parsed = parseNullableDate(updateData.deletedAt as any, "deletedAt");
+      if (parsed !== undefined) {
+        data.deletedAt = parsed;
+      }
+    }
+
+    if (updateData.dueDate !== undefined) {
+      const parsedDate = parseNullableDate(updateData.dueDate, "dueDate");
+      if (parsedDate !== undefined) {
+        data.dueDate = parsedDate;
+      }
+    }
+
+    if (updateData.categoryId !== undefined) {
+      data.categoryId = updateData.categoryId;
+    }
+
+    if (updateData.providerId !== undefined) {
+      data.providerId = updateData.providerId;
+    }
+
+    // Conflict handling: delete precedence with LWW by timestamp
+    const incomingUpdatedAt = updateData.updatedAt
+      ? new Date(updateData.updatedAt)
+      : undefined;
+    
+    if (current.deletedAt) {
+      if (!incomingUpdatedAt || incomingUpdatedAt <= current.deletedAt) {
+        // Keep deletion, ignore update
+        return current;
+      }
+      // Newer update than deletion → resurrect by clearing deletedAt
+      (data as any).deletedAt = null;
+    }
+
+    if (Object.keys(data).length === 0) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "No valid update data provided"
+      );
+    }
+
+    // Handle pinned task logic
+    if (updateData.pinned !== undefined && updateData.pinned) {
+      await db
+        .update(tasks)
+        .set({ pinned: false } as Task)
+        .where(and(eq(tasks.userId, userId), eq(tasks.pinned, true)));
+    }
+
+    const result = await db
+      .update(tasks)
+      .set(data)
+      .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)))
+      .returning();
+
+    if (!result.length) {
+      throw new ApiError(httpStatus.NOT_FOUND, "Task not found");
+    }
+
+    return result[0];
+  },
 };

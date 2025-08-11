@@ -7,17 +7,10 @@ import requirePro from "@/modules/auth/requirePro.middleware";
 
 const router = express.Router();
 
-router
-  .route("/")
-  .get(auth(), requirePro(), noteController.getNotes)
-  .post(auth(), requirePro(), validate(noteValidation.createNote), noteController.createNote);
+// Get all notes for sync
+router.get("/", auth(), requirePro(), noteController.getNotes);
 
-router
-  .route("/:id")
-  .get(auth(), requirePro(), noteController.getNote)
-  .patch(auth(), requirePro(), validate(noteValidation.updateNote), noteController.updateNote)
-  .delete(auth(), requirePro(), noteController.deleteNote);
-
+// Bulk sync endpoint
 router.post(
   "/bulk",
   auth(),
