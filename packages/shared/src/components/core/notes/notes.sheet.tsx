@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@repo/ui/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@repo/ui/components/ui/sheet";
 import { Input } from "@repo/ui/components/ui/input";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Button } from "@repo/ui/components/ui/button";
@@ -10,27 +16,27 @@ import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
 import { playTypewriterSound } from "../../../utils/sound.utils";
-import { 
-  Search, 
-  Plus, 
-  Pin, 
-  Trash2, 
-  ArrowLeft, 
-  Edit3, 
-  X, 
-  Volume2, 
+import {
+  Search,
+  Plus,
+  Pin,
+  Trash2,
+  ArrowLeft,
+  Edit3,
+  X,
+  Volume2,
   VolumeX,
   FileText,
   Clock,
   Grid3X3,
-  List
+  List,
 } from "lucide-react";
 
-type ViewMode = 'list' | 'create' | 'edit';
+type ViewMode = "list" | "create" | "edit";
 
 export function NotesSheet() {
   const { t } = useTranslation();
-  
+
   // Store hooks
   const { isNotesVisible, setNotesVisible } = useDockStore(
     useShallow((s) => ({
@@ -39,15 +45,15 @@ export function NotesSheet() {
     }))
   );
 
-  const { 
-    notes, 
-    initializeStore, 
-    addNote, 
-    updateNote, 
-    deleteNote, 
-    togglePinNote, 
-    enableTypingSound, 
-    setEnableTypingSound 
+  const {
+    notes,
+    initializeStore,
+    addNote,
+    updateNote,
+    deleteNote,
+    togglePinNote,
+    enableTypingSound,
+    setEnableTypingSound,
   } = useNoteStore(
     useShallow((s) => ({
       notes: s.notes,
@@ -62,15 +68,15 @@ export function NotesSheet() {
   );
 
   // State
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [noteTitle, setNoteTitle] = useState('');
-  const [noteContent, setNoteContent] = useState('');
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteContent, setNoteContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [createdNoteId, setCreatedNoteId] = useState<string | null>(null);
   const [isGridView, setIsGridView] = useState(true);
-  
+
   // Constants
   const MAX_TITLE_LENGTH = 100;
   const MAX_CONTENT_LENGTH = 10_000;
@@ -83,19 +89,20 @@ export function NotesSheet() {
 
   // Computed
   const selectedNote = useMemo(
-    () => notes.find(n => n.id === selectedNoteId),
+    () => notes.find((n) => n.id === selectedNoteId),
     [notes, selectedNoteId]
   );
 
   const filteredNotes = useMemo(() => {
     let filtered = [...notes];
-    
+
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(note => 
-        note.title.toLowerCase().includes(query) || 
-        (note.content?.toLowerCase() || '').includes(query)
+      filtered = filtered.filter(
+        (note) =>
+          note.title.toLowerCase().includes(query) ||
+          (note.content?.toLowerCase() || "").includes(query)
       );
     }
 
@@ -119,19 +126,19 @@ export function NotesSheet() {
 
   // Load note data when editing
   useEffect(() => {
-    if (selectedNote && viewMode === 'edit') {
+    if (selectedNote && viewMode === "edit") {
       setNoteTitle(selectedNote.title);
-      setNoteContent(selectedNote.content || '');
+      setNoteContent(selectedNote.content || "");
     }
   }, [selectedNote, viewMode]);
 
   // Helper functions
   const resetToList = () => {
-    setViewMode('list');
+    setViewMode("list");
     setSelectedNoteId(null);
-    setNoteTitle('');
-    setNoteContent('');
-    setSearchQuery('');
+    setNoteTitle("");
+    setNoteContent("");
+    setSearchQuery("");
     setCreatedNoteId(null);
     isCreatingNote.current = false;
     if (autoSaveTimeout.current) {
@@ -147,7 +154,7 @@ export function NotesSheet() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
@@ -155,21 +162,23 @@ export function NotesSheet() {
   };
 
   const getNotePreview = (content: string | null | undefined) => {
-    if (!content) return 'Empty note';
-    const preview = content.slice(0, 300).replace(/\n+/g, ' ');
-    return preview + (content.length > 300 ? '...' : '');
+    if (!content) return "Empty note";
+    const preview = content.slice(0, 300).replace(/\n+/g, " ");
+    return preview + (content.length > 300 ? "..." : "");
   };
 
   const getNoteColor = (id: string) => {
     const colors = [
-      'from-blue-500/20 to-indigo-500/10',
-      'from-purple-500/20 to-pink-500/10',
-      'from-green-500/20 to-teal-500/10',
-      'from-orange-500/20 to-red-500/10',
-      'from-cyan-500/20 to-blue-500/10',
-      'from-rose-500/20 to-purple-500/10',
+      "from-blue-500/20 to-indigo-500/10",
+      "from-purple-500/20 to-pink-500/10",
+      "from-green-500/20 to-teal-500/10",
+      "from-orange-500/20 to-red-500/10",
+      "from-cyan-500/20 to-blue-500/10",
+      "from-rose-500/20 to-purple-500/10",
     ];
-    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = id
+      .split("")
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return colors[hash % colors.length];
   };
 
@@ -179,9 +188,9 @@ export function NotesSheet() {
       alert(`Maximum ${MAX_NOTES} notes reached!`);
       return;
     }
-    setViewMode('create');
-    setNoteTitle('');
-    setNoteContent('');
+    setViewMode("create");
+    setNoteTitle("");
+    setNoteContent("");
     setCreatedNoteId(null);
     isCreatingNote.current = false;
   };
@@ -192,18 +201,21 @@ export function NotesSheet() {
     }
 
     autoSaveTimeout.current = setTimeout(async () => {
-      const trimmedTitle = title.trim() || 'Untitled';
+      const trimmedTitle = title.trim() || "Untitled";
       const trimmedContent = content.trim();
 
-      if (viewMode === 'create' && !createdNoteId && !isCreatingNote.current) {
+      if (viewMode === "create" && !createdNoteId && !isCreatingNote.current) {
         // Auto-create note on first keystroke
-        if (trimmedContent || trimmedTitle !== 'Untitled') {
+        if (trimmedContent || trimmedTitle !== "Untitled") {
           isCreatingNote.current = true;
           setIsSaving(true);
-          const newNote = await addNote({ title: trimmedTitle, content: trimmedContent });
+          const newNote = await addNote({
+            title: trimmedTitle,
+            content: trimmedContent,
+          });
           setIsSaving(false);
           isCreatingNote.current = false;
-          
+
           if (newNote) {
             setCreatedNoteId(newNote.id);
             setSelectedNoteId(newNote.id);
@@ -217,7 +229,7 @@ export function NotesSheet() {
           setIsSaving(true);
           await updateNote(noteId, {
             title: trimmedTitle,
-            content: trimmedContent
+            content: trimmedContent,
           });
           setIsSaving(false);
         }
@@ -226,7 +238,7 @@ export function NotesSheet() {
   };
 
   const handleDeleteNote = (noteId: string) => {
-    const note = notes.find(n => n.id === noteId);
+    const note = notes.find((n) => n.id === noteId);
     if (!note) return;
 
     if (confirm(`Delete "${note.title}"? This cannot be undone.`)) {
@@ -239,7 +251,7 @@ export function NotesSheet() {
 
   const handleViewNote = (noteId: string) => {
     setSelectedNoteId(noteId);
-    setViewMode('edit'); // Always open in edit mode
+    setViewMode("edit"); // Always open in edit mode
   };
 
   const handleTogglePin = (noteId: string) => {
@@ -268,21 +280,21 @@ export function NotesSheet() {
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
               >
                 <X className="h-4 w-4" />
               </button>
             )}
           </div>
-          
+
           {/* View toggle buttons */}
           <div className="flex rounded-lg bg-zinc-800/50 p-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsGridView(true)}
-              className={`h-8 w-8 p-0 ${isGridView ? 'bg-zinc-700' : ''}`}
+              className={`h-8 w-8 p-0 ${isGridView ? "bg-zinc-700" : ""}`}
               title="Grid view"
             >
               <Grid3X3 className="h-4 w-4" />
@@ -291,7 +303,7 @@ export function NotesSheet() {
               variant="ghost"
               size="sm"
               onClick={() => setIsGridView(false)}
-              className={`h-8 w-8 p-0 ${!isGridView ? 'bg-zinc-700' : ''}`}
+              className={`h-8 w-8 p-0 ${!isGridView ? "bg-zinc-700" : ""}`}
               title="List view"
             >
               <List className="h-4 w-4" />
@@ -306,10 +318,12 @@ export function NotesSheet() {
           <div className="flex h-full flex-col items-center justify-center">
             <FileText className="mb-4 h-12 w-12 text-zinc-600" />
             <p className="mb-2 text-zinc-400">
-              {searchQuery ? 'No notes found' : 'No notes yet'}
+              {searchQuery ? "No notes found" : "No notes yet"}
             </p>
             <p className="mb-6 text-sm text-zinc-500">
-              {searchQuery ? 'Try a different search' : 'Create your first note'}
+              {searchQuery
+                ? "Try a different search"
+                : "Create your first note"}
             </p>
             {!searchQuery && (
               <PremiumFeature requirePro>
@@ -321,12 +335,18 @@ export function NotesSheet() {
             )}
           </div>
         ) : (
-          <div className={isGridView ? "columns-2 gap-4 space-y-4 [column-fill:_balance]" : "space-y-4"}>
+          <div
+            className={
+              isGridView
+                ? "columns-2 gap-4 space-y-4 [column-fill:_balance]"
+                : "space-y-4"
+            }
+          >
             {filteredNotes.map((note) => (
               <div
                 key={note.id}
                 onClick={() => handleViewNote(note.id)}
-                className={`group relative cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br ${getNoteColor(note.id)} p-4 transition-all hover:border-white/20 ${!isGridView ? 'flex items-start justify-between' : ''}`}
+                className={`group relative cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br ${getNoteColor(note.id)} p-4 transition-all hover:border-white/20 ${!isGridView ? "flex items-start justify-between" : ""}`}
               >
                 {/* Note content */}
                 <div className="flex items-start justify-between gap-3">
@@ -346,7 +366,10 @@ export function NotesSheet() {
                       <Clock className="h-3 w-3" />
                       <span>{formatDate(note.updatedAt)}</span>
                       <span>•</span>
-                      <span>{(note.content?.length || 0).toLocaleString()} characters</span>
+                      <span>
+                        {(note.content?.length || 0).toLocaleString()}{" "}
+                        characters
+                      </span>
                     </div>
                   </div>
 
@@ -358,9 +381,11 @@ export function NotesSheet() {
                         handleTogglePin(note.id);
                       }}
                       className="rounded p-1.5 hover:bg-white/10"
-                      title={note.pinned ? 'Unpin' : 'Pin'}
+                      title={note.pinned ? "Unpin" : "Pin"}
                     >
-                      <Pin className={`h-3.5 w-3.5 ${note.pinned ? 'fill-yellow-400 text-yellow-400' : 'text-white/60'}`} />
+                      <Pin
+                        className={`h-3.5 w-3.5 ${note.pinned ? "fill-yellow-400 text-yellow-400" : "text-white/60"}`}
+                      />
                     </button>
                     <button
                       onClick={(e) => {
@@ -386,7 +411,11 @@ export function NotesSheet() {
           onClick={handleCreateNote}
           disabled={notes.length >= MAX_NOTES}
           className="absolute bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
-          title={notes.length >= MAX_NOTES ? `Maximum ${MAX_NOTES} notes` : 'Create note'}
+          title={
+            notes.length >= MAX_NOTES
+              ? `Maximum ${MAX_NOTES} notes`
+              : "Create note"
+          }
         >
           <Plus className="h-6 w-6" />
         </Button>
@@ -396,7 +425,7 @@ export function NotesSheet() {
 
   // Render create/edit
   const renderNoteEditor = () => {
-    const isNewNote = viewMode === 'create';
+    const isNewNote = viewMode === "create";
 
     return (
       <div className="flex h-full flex-col">
@@ -412,7 +441,7 @@ export function NotesSheet() {
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-            
+
             {!isNewNote && (
               <>
                 <Button
@@ -421,8 +450,10 @@ export function NotesSheet() {
                   onClick={() => handleTogglePin(selectedNoteId!)}
                   className="gap-1"
                 >
-                  <Pin className={`h-4 w-4 ${selectedNote?.pinned ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                  {selectedNote?.pinned ? 'Pinned' : 'Pin'}
+                  <Pin
+                    className={`h-4 w-4 ${selectedNote?.pinned ? "fill-yellow-400 text-yellow-400" : ""}`}
+                  />
+                  {selectedNote?.pinned ? "Pinned" : "Pin"}
                 </Button>
 
                 <Button
@@ -440,9 +471,11 @@ export function NotesSheet() {
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-zinc-500">
-              {noteTitle.length}/{MAX_TITLE_LENGTH} • {noteContent.length.toLocaleString()}/{MAX_CONTENT_LENGTH.toLocaleString()}
+              {noteTitle.length}/{MAX_TITLE_LENGTH} •{" "}
+              {noteContent.length.toLocaleString()}/
+              {MAX_CONTENT_LENGTH.toLocaleString()}
             </span>
-            
+
             {isSaving && (
               <span className="text-xs text-green-400">Saving...</span>
             )}
@@ -461,9 +494,9 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Note title..."
-              className="mb-4 border-0 bg-transparent p-0 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
+              className="mb-4 border-0 bg-transparent p-0 pl-2 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
             />
-            
+
             <Textarea
               value={noteContent}
               onChange={(e) => {
@@ -473,7 +506,7 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Start writing..."
-              className="min-h-[500px] resize-none border-0 bg-transparent p-0 placeholder:text-zinc-600 focus-visible:ring-0"
+              className="min-h-[500px] resize-none border-0 bg-transparent p-0 pl-3 pt-2 placeholder:text-zinc-600 focus-visible:ring-0"
               autoFocus={isNewNote}
             />
           </div>
@@ -484,22 +517,29 @@ export function NotesSheet() {
 
   return (
     <Sheet open={isNotesVisible} onOpenChange={setNotesVisible}>
-      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900">
+      <SheetContent
+        side="right"
+        className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900"
+      >
         <SheetHeader className="border-b border-white/10 bg-zinc-800/50 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <SheetTitle>
-                {viewMode === 'list' && 'Notes'}
-                {viewMode === 'create' && 'New Note'}
-                {viewMode === 'edit' && (selectedNote?.title || 'Edit Note')}
+                {viewMode === "list" && "Notes"}
+                {viewMode === "create" && "New Note"}
+                {viewMode === "edit" && (selectedNote?.title || "Edit Note")}
               </SheetTitle>
               <SheetDescription>
-                {viewMode === 'list' && `${filteredNotes.length} notes`}
-                {viewMode === 'create' && (createdNoteId ? 'Auto-saving...' : 'Start typing to auto-save')}
-                {viewMode === 'edit' && formatDate(selectedNote?.updatedAt || Date.now())}
+                {viewMode === "list" && `${filteredNotes.length} notes`}
+                {viewMode === "create" &&
+                  (createdNoteId
+                    ? "Auto-saving..."
+                    : "Start typing to auto-save")}
+                {viewMode === "edit" &&
+                  formatDate(selectedNote?.updatedAt || Date.now())}
               </SheetDescription>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -519,7 +559,7 @@ export function NotesSheet() {
         </SheetHeader>
 
         <div className="relative flex-1 overflow-hidden">
-          {viewMode === 'list' ? renderListView() : renderNoteEditor()}
+          {viewMode === "list" ? renderListView() : renderNoteEditor()}
         </div>
       </SheetContent>
     </Sheet>
