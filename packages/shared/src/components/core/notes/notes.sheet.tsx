@@ -461,7 +461,7 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Note title..."
-              className="mb-4 border-0 bg-transparent p-0 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
+              className="mb-4 border-0 bg-transparent p-2 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
             />
             
             <Textarea
@@ -473,7 +473,7 @@ export function NotesSheet() {
               }}
               onKeyDown={(e) => handleTypingSound(e.key)}
               placeholder="Start writing..."
-              className="min-h-[500px] resize-none border-0 bg-transparent p-0 placeholder:text-zinc-600 focus-visible:ring-0"
+              className="min-h-[500px] resize-none border-0 bg-transparent p-2 placeholder:text-zinc-600 focus-visible:ring-0"
               autoFocus={isNewNote}
             />
           </div>
