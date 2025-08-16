@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@repo/ui/components/ui/sheet";
 import { Input } from "@repo/ui/components/ui/input";
-import { Textarea } from "@repo/ui/components/ui/textarea";
 import { Button } from "@repo/ui/components/ui/button";
 import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
-import { playTypewriterSound } from "../../../utils/sound.utils";
+import MarkdownInlineEditor, { type StoragePort, type MarkdownNote } from "./markdown-inline-editor";
 import { 
   Search, 
   Plus, 
   Pin, 
   Trash2, 
   ArrowLeft, 
-  Edit3, 
   X, 
   Volume2, 
   VolumeX,
@@ -29,7 +26,6 @@ import {
 type ViewMode = 'list' | 'create' | 'edit';
 
 export function NotesSheet() {
-  const { t } = useTranslation();
   
   // Store hooks
   const { isNotesVisible, setNotesVisible } = useDockStore(
@@ -65,21 +61,13 @@ export function NotesSheet() {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
-  const [noteTitle, setNoteTitle] = useState('');
-  const [noteContent, setNoteContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [createdNoteId, setCreatedNoteId] = useState<string | null>(null);
   const [isGridView, setIsGridView] = useState(true);
+  const [editorKey, setEditorKey] = useState(0); // Force re-mount editor on note change
   
   // Constants
-  const MAX_TITLE_LENGTH = 100;
-  const MAX_CONTENT_LENGTH = 10_000;
   const MAX_NOTES = 500;
-  const AUTO_SAVE_DELAY = 1_000; // ms
-
-  // Refs
-  const autoSaveTimeout = useRef<NodeJS.Timeout>();
-  const isCreatingNote = useRef(false);
 
   // Computed
   const selectedNote = useMemo(
@@ -117,26 +105,36 @@ export function NotesSheet() {
     }
   }, [isNotesVisible, initializeStore]);
 
-  // Load note data when editing
-  useEffect(() => {
-    if (selectedNote && viewMode === 'edit') {
-      setNoteTitle(selectedNote.title);
-      setNoteContent(selectedNote.content || '');
-    }
-  }, [selectedNote, viewMode]);
+
+  // Create storage adapter for the markdown editor
+  const storageAdapter = useMemo((): StoragePort => ({
+    load: async (id: string): Promise<MarkdownNote | undefined> => {
+      const note = notes.find(n => n.id === id);
+      if (!note) return undefined;
+      return {
+        id: note.id,
+        title: note.title,
+        body: note.content || '',
+        updatedAt: note.updatedAt,
+      };
+    },
+    save: async (mdNote: MarkdownNote) => {
+      setIsSaving(true);
+      await updateNote(mdNote.id, {
+        title: mdNote.title,
+        content: mdNote.body,
+      });
+      setIsSaving(false);
+    },
+  }), [notes, updateNote]);
 
   // Helper functions
   const resetToList = () => {
     setViewMode('list');
     setSelectedNoteId(null);
-    setNoteTitle('');
-    setNoteContent('');
     setSearchQuery('');
     setCreatedNoteId(null);
-    isCreatingNote.current = false;
-    if (autoSaveTimeout.current) {
-      clearTimeout(autoSaveTimeout.current);
-    }
+    setEditorKey(prev => prev + 1); // Force editor re-mount
   };
 
   const formatDate = (timestamp: number) => {
@@ -174,56 +172,26 @@ export function NotesSheet() {
   };
 
   // Actions
-  const handleCreateNote = () => {
+  const handleCreateNote = async () => {
     if (notes.length >= MAX_NOTES) {
       alert(`Maximum ${MAX_NOTES} notes reached!`);
       return;
     }
-    setViewMode('create');
-    setNoteTitle('');
-    setNoteContent('');
-    setCreatedNoteId(null);
-    isCreatingNote.current = false;
-  };
-
-  const handleAutoSave = async (title: string, content: string) => {
-    if (autoSaveTimeout.current) {
-      clearTimeout(autoSaveTimeout.current);
+    
+    // Create a new note immediately
+    const newNote = await addNote({ 
+      title: 'Untitled', 
+      content: '' 
+    });
+    
+    if (newNote) {
+      setSelectedNoteId(newNote.id);
+      setCreatedNoteId(newNote.id);
+      setViewMode('edit');
+      setEditorKey(prev => prev + 1); // Force editor re-mount
     }
-
-    autoSaveTimeout.current = setTimeout(async () => {
-      const trimmedTitle = title.trim() || 'Untitled';
-      const trimmedContent = content.trim();
-
-      if (viewMode === 'create' && !createdNoteId && !isCreatingNote.current) {
-        // Auto-create note on first keystroke
-        if (trimmedContent || trimmedTitle !== 'Untitled') {
-          isCreatingNote.current = true;
-          setIsSaving(true);
-          const newNote = await addNote({ title: trimmedTitle, content: trimmedContent });
-          setIsSaving(false);
-          isCreatingNote.current = false;
-          
-          if (newNote) {
-            setCreatedNoteId(newNote.id);
-            setSelectedNoteId(newNote.id);
-            // Stay in create mode but now we're updating the created note
-          }
-        }
-      } else if (createdNoteId || selectedNoteId) {
-        // Auto-update existing note
-        const noteId = createdNoteId || selectedNoteId;
-        if (noteId) {
-          setIsSaving(true);
-          await updateNote(noteId, {
-            title: trimmedTitle,
-            content: trimmedContent
-          });
-          setIsSaving(false);
-        }
-      }
-    }, AUTO_SAVE_DELAY);
   };
+
 
   const handleDeleteNote = (noteId: string) => {
     const note = notes.find(n => n.id === noteId);
@@ -239,18 +207,15 @@ export function NotesSheet() {
 
   const handleViewNote = (noteId: string) => {
     setSelectedNoteId(noteId);
+    setCreatedNoteId(null);
     setViewMode('edit'); // Always open in edit mode
+    setEditorKey(prev => prev + 1); // Force editor re-mount
   };
 
   const handleTogglePin = (noteId: string) => {
     togglePinNote(noteId);
   };
 
-  const handleTypingSound = (key: string) => {
-    if (enableTypingSound) {
-      playTypewriterSound(key);
-    }
-  };
 
   // Render list view
   const renderListView = () => (
@@ -396,7 +361,7 @@ export function NotesSheet() {
 
   // Render create/edit
   const renderNoteEditor = () => {
-    const isNewNote = viewMode === 'create';
+    if (!selectedNoteId) return null;
 
     return (
       <div className="flex h-full flex-col">
@@ -413,70 +378,46 @@ export function NotesSheet() {
               Back
             </Button>
             
-            {!isNewNote && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleTogglePin(selectedNoteId!)}
-                  className="gap-1"
-                >
-                  <Pin className={`h-4 w-4 ${selectedNote?.pinned ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-                  {selectedNote?.pinned ? 'Pinned' : 'Pin'}
-                </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleTogglePin(selectedNoteId!)}
+              className="gap-1"
+            >
+              <Pin className={`h-4 w-4 ${selectedNote?.pinned ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              {selectedNote?.pinned ? 'Pinned' : 'Pin'}
+            </Button>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteNote(selectedNoteId!)}
-                  className="gap-1 hover:text-red-400"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </Button>
-              </>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleDeleteNote(selectedNoteId!)}
+              className="gap-1 hover:text-red-400"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </Button>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-500">
-              {noteTitle.length}/{MAX_TITLE_LENGTH} • {noteContent.length.toLocaleString()}/{MAX_CONTENT_LENGTH.toLocaleString()}
-            </span>
-            
             {isSaving && (
               <span className="text-xs text-green-400">Saving...</span>
             )}
           </div>
         </div>
 
-        {/* Editor */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="mx-auto max-w-3xl">
-            <Input
-              value={noteTitle}
-              onChange={(e) => {
-                const newTitle = e.target.value.slice(0, MAX_TITLE_LENGTH);
-                setNoteTitle(newTitle);
-                handleAutoSave(newTitle, noteContent);
+        {/* Markdown Editor */}
+        <div className="flex-1 overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-zinc-600">
+            <MarkdownInlineEditor
+              key={editorKey}
+              id={selectedNoteId}
+              port={storageAdapter}
+              initial={{
+                title: selectedNote?.title || 'Untitled',
+                body: selectedNote?.content || '',
+                updatedAt: selectedNote?.updatedAt || Date.now(),
               }}
-              onKeyDown={(e) => handleTypingSound(e.key)}
-              placeholder="Note title..."
-              className="mb-4 border-0 bg-transparent p-2 text-2xl font-bold placeholder:text-zinc-600 focus-visible:ring-0"
             />
-            
-            <Textarea
-              value={noteContent}
-              onChange={(e) => {
-                const newContent = e.target.value.slice(0, MAX_CONTENT_LENGTH);
-                setNoteContent(newContent);
-                handleAutoSave(noteTitle, newContent);
-              }}
-              onKeyDown={(e) => handleTypingSound(e.key)}
-              placeholder="Start writing..."
-              className="min-h-[500px] resize-none border-0 bg-transparent p-2 placeholder:text-zinc-600 focus-visible:ring-0"
-              autoFocus={isNewNote}
-            />
-          </div>
         </div>
       </div>
     );
@@ -484,7 +425,7 @@ export function NotesSheet() {
 
   return (
     <Sheet open={isNotesVisible} onOpenChange={setNotesVisible}>
-      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-xl border-l border-white/10 bg-zinc-900">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 p-0 sm:max-w-6xl border-l border-white/10 bg-zinc-900">
         <SheetHeader className="border-b border-white/10 bg-zinc-800/50 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
