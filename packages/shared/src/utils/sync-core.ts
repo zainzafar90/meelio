@@ -164,6 +164,21 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
     if (result.updated?.length) {
       const normalizedUpdates = result.updated.map(this.adapter.transformers.normalizeFromServer);
       await this.adapter.dbTable.bulkPut(normalizedUpdates as any);
+
+      // Update in-memory state to reflect any server-side resolutions
+      const updatesById = new Map<string, any>();
+      for (const u of normalizedUpdates as any[]) {
+        if (u && u.id) updatesById.set(u.id, u);
+      }
+      if (updatesById.size > 0) {
+        const current = this.adapter.store.getItems() as any[];
+        const merged = current.map((item) =>
+          item && item.id && updatesById.has(item.id)
+            ? { ...item, ...updatesById.get(item.id) }
+            : item
+        );
+        this.adapter.store.setItems(merged as any);
+      }
     }
 
     // Apply deletions (tombstone)
@@ -172,6 +187,14 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
         deletedAt: Date.now(), 
         updatedAt: Date.now() 
       } as any);
+    }
+
+    // Remove deleted items from in-memory state
+    if ((result.deleted?.length || 0) > 0) {
+      const deletedSet = new Set<string>(result.deleted as any);
+      const current = this.adapter.store.getItems() as any[];
+      const remaining = current.filter((item) => !(item && item.id && deletedSet.has(item.id)));
+      this.adapter.store.setItems(remaining as any);
     }
   }
 

@@ -376,10 +376,12 @@ function initializeNoteSync() {
         const d = op.data || {};
         return {
           id: op.entityId,
+          clientId: op.entityId,
           title: d.title,
           content: d.content,
           pinned: d.pinned,
           categoryId: d.categoryId,
+          providerId: d.providerId,
           updatedAt: d.updatedAt,
           deletedAt: d.deletedAt,
         };
@@ -433,3 +435,11 @@ const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
 };
 
 useSyncStore.subscribe(handleOnlineStatusChange);
+
+// Initialize immediately if already logged-in Pro user when this module loads
+(() => {
+  const user = useAuthStore.getState().user;
+  if (user?.isPro && !noteSyncManager) {
+    initializeNoteSync();
+  }
+})();

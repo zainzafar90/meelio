@@ -321,7 +321,6 @@ export default function MarkdownInlineEditor({ id, port, initial }: Props) {
         },
         includeChildren: true,
       }),
-      Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { rel: "noreferrer", target: "_blank" } }),
       TaskList,
       TaskItem.configure({ nested: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
