@@ -99,6 +99,7 @@ type Props = {
   id: NoteId;
   port?: StoragePort;
   initial?: Partial<MarkdownNote>;
+  onChange?: (title: string, body: string) => void;
 };
 
 // ── Menu (unchanged UI, small tweaks)
@@ -279,7 +280,7 @@ function MenuBar({ editor }: { editor: Editor }) {
   );
 }
 
-export default function MarkdownInlineEditor({ id, port, initial }: Props) {
+export default function MarkdownInlineEditor({ id, port, initial, onChange }: Props) {
   const storage = useMemo(() => port ?? localStoragePort(), [port]);
   const [note, setNote] = useState<MarkdownNote>(() => ({ ...newNote(id), ...initial }));
   const [saved, setSaved] = useState<{ title: string; body: string }>({
@@ -325,7 +326,7 @@ export default function MarkdownInlineEditor({ id, port, initial }: Props) {
       TaskItem.configure({ nested: true }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
-    content: initialHtml(note.title),
+    content: note.body || initialHtml(note.title),
     autofocus: "start",
     editorProps: {
       attributes: {
@@ -343,6 +344,7 @@ export default function MarkdownInlineEditor({ id, port, initial }: Props) {
       if (html === note.body) return;
       const title = extractTitle(html);
       setNote((n) => ({ ...n, title, body: html, updatedAt: now() }));
+      if (onChange) onChange(title, html);
     },
   });
 
@@ -361,6 +363,7 @@ export default function MarkdownInlineEditor({ id, port, initial }: Props) {
 
       setNote(savedNote);
       setSaved({ title: savedNote.title, body: savedNote.body });
+      if (onChange) onChange(savedNote.title, savedNote.body);
     })();
 
     return () => {

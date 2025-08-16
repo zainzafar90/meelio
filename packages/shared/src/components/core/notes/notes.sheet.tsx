@@ -186,39 +186,18 @@ export function NotesSheet() {
     return d.toLocaleDateString();
     };
 
-  const getNotePreview = (content?: string | null) => {
-    if (!content) return "Empty note";
-    
-    // Strip HTML tags and extract plain text
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = content;
-    const textContent = tempDiv.textContent || tempDiv.innerText || "";
-    
-    // Split into lines and get first two non-empty lines
-    const lines = textContent
-      .split(/\n+/)
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-    
-    if (lines.length === 0) return "Empty note";
-    
-    const [firstLine] = lines;
-    
-    return firstLine.substring(0, 150);
-  };
-
-  const getNoteColor = (id: string) => {
-    const colors = [
-      "from-blue-500/20 to-indigo-500/10",
-      "from-purple-500/20 to-pink-500/10",
-      "from-green-500/20 to-teal-500/10",
-      "from-orange-500/20 to-red-500/10",
-      "from-cyan-500/20 to-blue-500/10",
-      "from-rose-500/20 to-purple-500/10",
-    ];
-    const hash = id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
+  // const getNoteColor = (id: string) => {
+  //   const colors = [
+  //     "from-blue-500/20 to-indigo-500/10",
+  //     "from-purple-500/20 to-pink-500/10",
+  //     "from-green-500/20 to-teal-500/10",
+  //     "from-orange-500/20 to-red-500/10",
+  //     "from-cyan-500/20 to-blue-500/10",
+  //     "from-rose-500/20 to-purple-500/10",
+  //   ];
+  //   const hash = id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  //   return colors[hash % colors.length];
+  // };
 
   const handleCreateNote = async () => {
     if (notes.length >= MAX_NOTES) {
@@ -318,11 +297,7 @@ export function NotesSheet() {
                 <div className="flex-1 min-w-0">
                   <div className="mb-1 flex items-center gap-2">
                     <h3 className="truncate font-medium text-white/90">{note.title || "Untitled"}</h3>
-                    {note.pinned && (
-                      <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />
-                    )}
                   </div>
-                  {/* <p className="text-xs text-white/50 line-clamp-2">{getNotePreview(note.content)}</p> */}
                 </div>
                 <div className="absolute right-0 top-0 flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
@@ -351,7 +326,7 @@ export function NotesSheet() {
               </div>
               <div className="mt-1 flex items-center gap-2 text-[10px] text-white/40">
                 <Clock className="h-3 w-3" />
-                <span>{formatDate(note.updatedAt)}</span>
+                <span>{formatDate(note.updatedAt)}</span> · <span>{note.pinned && <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />}</span>
               </div>
             </div>
           ))
@@ -370,14 +345,14 @@ export function NotesSheet() {
       );
     }
 
+    // Prefer DB-backed note for accuracy, fall back to activeInitial/store snapshot
     const seed =
-      activeInitial ||
       (selectedNote && {
         id: selectedNote.id,
         title: selectedNote.title || "Untitled",
         content: selectedNote.content || "",
         updatedAt: selectedNote.updatedAt,
-      });
+      }) || activeInitial;
 
     if (!seed) return null;
 
@@ -423,6 +398,20 @@ export function NotesSheet() {
               body: seed.content,
               updatedAt: seed.updatedAt,
             }}
+            onChange={(title, body) => {
+              // Keep sidebar preview consistent with live editor content before debounce/save
+              setActiveInitial((prev) =>
+                prev && prev.id === seed.id ? { ...prev, title, content: body, updatedAt: Date.now() } : prev
+              );
+              if (!seed.id.startsWith("draft:")) {
+                // Optimistically update in-memory store so sidebar shows latest content immediately
+                useNoteStore.setState((s) => ({
+                  notes: s.notes.map((n) =>
+                    n.id === seed.id ? { ...n, title, content: body, updatedAt: Date.now() } : n
+                  ),
+                }));
+              }
+            }}
           />
         </div>
       </div>
@@ -431,10 +420,10 @@ export function NotesSheet() {
 
   return (
     <Sheet open={isNotesVisible} onOpenChange={setNotesVisible}>
-      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-6xl border-l border-white/10 bg-zinc-900">
+      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-full border-l border-white/10 bg-zinc-900">
         <SheetHeader className="border-b border-white/10 bg-zinc-800/50 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="sr-only">
               <SheetTitle>Notes</SheetTitle>
               <SheetDescription>{`${filteredNotes.length} notes`}</SheetDescription>
             </div>
