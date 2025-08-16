@@ -56,6 +56,11 @@ export const useNoteStore = create<NoteState>()(
           try {
             set({ isLoading: true, error: null });
 
+            // Ensure sync manager is ready for current Pro users even if auth store hasn't emitted
+            if (user?.isPro && !noteSyncManager) {
+              initializeNoteSync();
+            }
+
             await get().loadFromLocal();
 
             if (user?.isPro) {

@@ -15,8 +15,8 @@ import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
 import MarkdownInlineEditor, {
   type StoragePort,
-  type MarkdownNote,
 } from "./markdown-inline-editor";
+import { db } from "../../../lib/db/meelio.dexie";
 import {
   Search,
   Plus,
@@ -27,6 +27,7 @@ import {
   VolumeX,
   FileText,
   Clock,
+  Menu,
 } from "lucide-react";
 
 export function NotesSheet() {
@@ -60,7 +61,6 @@ export function NotesSheet() {
     }))
   );
 
-  // ── UI state
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [activeInitial, setActiveInitial] = useState<{
@@ -70,10 +70,10 @@ export function NotesSheet() {
     updatedAt: number;
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const MAX_NOTES = 500;
 
-  // ── Derived
   const filteredNotes = useMemo(() => {
     let filtered = [...notes];
     if (searchQuery.trim()) {
@@ -97,14 +97,12 @@ export function NotesSheet() {
     [notes, selectedNoteId]
   );
 
-  // ── Open/Init
   useEffect(() => {
     if (isNotesVisible) {
       initializeStore();
     }
   }, [isNotesVisible, initializeStore]);
 
-  // Default selection when notes load
   useEffect(() => {
     if (!selectedNoteId && notes.length > 0) {
       const n = notes[0];
@@ -113,29 +111,58 @@ export function NotesSheet() {
     }
   }, [notes, selectedNoteId]);
 
-  // ── Storage adapter (stable, no stale closures)
-  const storageAdapter = useMemo<StoragePort>(() => {
-    return {
-      load: async (id) => {
-        const st = useNoteStore.getState();
-        const n = st.notes.find((x) => x.id === id);
-        if (!n) return undefined;
-        return {
-          id: n.id,
-          title: n.title,
-          body: n.content || "",
-          updatedAt: n.updatedAt,
-        };
-      },
-      save: async (md) => {
-        setIsSaving(true);
-        await useNoteStore
-          .getState()
-          .updateNote(md.id, { title: md.title, content: md.body });
-        setIsSaving(false);
-      },
-    };
-  }, []);
+  const stripHtmlToText = (html: string): string => {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html || "";
+    return (tempDiv.textContent || tempDiv.innerText || "").trim();
+  };
+
+  const hasMeaningfulContent = (title: string, body: string): boolean => {
+    if (title && title.trim().length > 0) return true;
+    const text = stripHtmlToText(body);
+    return text.length > 0;
+  };
+
+  const creatingRef = useMemo(() => ({ current: false }), []);
+
+  const makeStoragePortFor = (id: string, initial: { title: string; body: string; updatedAt: number } | null): StoragePort => ({
+    load: async (_ignoredId) => {
+      if (id.startsWith("draft:")) {
+        return initial
+          ? { id, title: initial.title, body: initial.body, updatedAt: initial.updatedAt }
+          : undefined;
+      }
+      const n = await db.notes.get(id);
+      if (!n) return undefined;
+      return { id: n.id, title: n.title, body: n.content || "", updatedAt: n.updatedAt };
+    },
+    save: async (md) => {
+      if (id.startsWith("draft:")) {
+        if (!hasMeaningfulContent(md.title, md.body)) return;
+
+        if (creatingRef.current) return;
+        
+        creatingRef.current = true;
+        try {
+          setIsSaving(true);
+          const created = await useNoteStore.getState().addNote({ title: md.title || "Untitled", content: md.body });
+          if (created) {
+            setSelectedNoteId(created.id);
+            setActiveInitial({ id: created.id, title: created.title, content: created.content || "", updatedAt: created.updatedAt });
+          }
+        } finally {
+          setIsSaving(false);
+          creatingRef.current = false;
+        }
+        return;
+      }
+
+      // Existing note
+      setIsSaving(true);
+      await useNoteStore.getState().updateNote(id, { title: md.title, content: md.body });
+      setIsSaving(false);
+    },
+  });
 
   // ── Helpers
   const resetSelection = () => {
@@ -150,12 +177,15 @@ export function NotesSheet() {
     const mins = Math.floor(diffMs / 60000);
     const hrs = Math.floor(diffMs / 3600000);
     const days = Math.floor(diffMs / 86400000);
+
     if (mins < 1) return "Just now";
     if (mins < 60) return `${mins}m ago`;
     if (hrs < 24) return `${hrs}h ago`;
     if (days < 7) return `${days}d ago`;
+
     return d.toLocaleDateString();
     };
+
   const getNotePreview = (content?: string | null) => {
     if (!content) return "Empty note";
     
@@ -176,6 +206,7 @@ export function NotesSheet() {
     
     return firstLine.substring(0, 150);
   };
+
   const getNoteColor = (id: string) => {
     const colors = [
       "from-blue-500/20 to-indigo-500/10",
@@ -189,23 +220,14 @@ export function NotesSheet() {
     return colors[hash % colors.length];
   };
 
-  // ── Actions
   const handleCreateNote = async () => {
     if (notes.length >= MAX_NOTES) {
       alert(`Maximum ${MAX_NOTES} notes reached!`);
       return;
     }
-    const n = await addNote({ title: "", content: "" });
-    if (!n) return;
-
-    // Use the freshly created note as initial to avoid “first edit not saving”.
-    setSelectedNoteId(n.id);
-    setActiveInitial({
-      id: n.id,
-      title: n.title,
-      content: n.content || "",
-      updatedAt: n.updatedAt,
-    });
+    const draftId = `draft:${crypto.randomUUID()}`;
+    setSelectedNoteId(draftId);
+    setActiveInitial({ id: draftId, title: "", content: "", updatedAt: Date.now() });
   };
 
   const handleDeleteNote = (noteId: string) => {
@@ -214,7 +236,6 @@ export function NotesSheet() {
     if (confirm(`Delete "${n.title}"? This cannot be undone.`)) {
       deleteNote(noteId);
       if (selectedNoteId === noteId) {
-        // Select next available note
         const remaining = notes.filter((x) => x.id !== noteId);
         if (remaining.length > 0) {
           const next = remaining[0];
@@ -241,6 +262,7 @@ export function NotesSheet() {
           }
         : null
     );
+    if (isSidebarOpen) setSidebarOpen(false);
   };
 
   const handleTogglePin = (noteId: string) => togglePinNote(noteId);
@@ -292,7 +314,7 @@ export function NotesSheet() {
                 selectedNoteId === note.id ? "ring-1 ring-purple-400/40" : ""
               }`}
             >
-              <div className="flex items-start justify-between gap-2">
+              <div className="relative flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="mb-1 flex items-center gap-2">
                     <h3 className="truncate font-medium text-white/90">{note.title || "Untitled"}</h3>
@@ -300,9 +322,9 @@ export function NotesSheet() {
                       <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />
                     )}
                   </div>
-                  <p className="text-xs text-white/50 line-clamp-2">{getNotePreview(note.content)}</p>
+                  {/* <p className="text-xs text-white/50 line-clamp-2">{getNotePreview(note.content)}</p> */}
                 </div>
-                <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="absolute right-0 top-0 flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -395,7 +417,7 @@ export function NotesSheet() {
           <MarkdownInlineEditor
             key={seed.id}
             id={seed.id}
-            port={storageAdapter}
+            port={makeStoragePortFor(seed.id, { title: seed.title, body: seed.content, updatedAt: seed.updatedAt })}
             initial={{
               title: seed.title,
               body: seed.content,
@@ -421,6 +443,15 @@ export function NotesSheet() {
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => setSidebarOpen(true)}
+                className="h-8 w-8 p-0 sm:hidden"
+                title="Open list"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setEnableTypingSound(!enableTypingSound)}
                 className="h-8 w-8 p-0"
               >
@@ -437,12 +468,19 @@ export function NotesSheet() {
 
         <div className="relative flex-1 overflow-hidden">
           <div className="flex h-full">
-            {renderSidebar()}
+            <div className="hidden sm:flex">{renderSidebar()}</div>
             <div className="flex-1">
               {renderNoteEditor()}
             </div>
           </div>
         </div>
+
+        {/* Mobile sidebar (shadcn sheet) */}
+        <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-80 sm:hidden">
+            {renderSidebar()}
+          </SheetContent>
+        </Sheet>
       </SheetContent>
     </Sheet>
   );
