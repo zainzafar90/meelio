@@ -13,7 +13,7 @@
     "build:extension": "turbo run build --filter=extension",
     "package": "turbo run package --filter=extension",
     "start:api": "turbo run start --filter=api",
-    "start:web": "turbo run start --filter=web",
+    "preview": "turbo run preview --filter=web",
     "clean": "turbo run clean",
     "release": "turbo run release",
     "dev": "turbo run dev",
