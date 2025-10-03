@@ -2,11 +2,11 @@
 [phases.setup]
 nixpkgs = ["nodejs_22"]
 
+[phases.install]
+cmds = ["npm ci --workspace=web --include-workspace-root"]
+
 [phases.build]
-cmds = [
-  "npm ci",
-  "npm run build:web"
-]
+cmds = ["npm run build:web"]
 
 [start]
 cmd = "npx serve -s apps/web/dist -p $PORT"
