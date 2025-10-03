@@ -3,9 +3,11 @@
 nixpkgs = ["nodejs_22"]
 
 [phases.install]
+dependsOn = ["setup"]
 cmds = ["npm ci --workspace=web --include-workspace-root"]
 
 [phases.build]
+dependsOn = ["install"]
 cmds = ["npm run build:web"]
 
 [start]
