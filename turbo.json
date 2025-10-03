@@ -47,6 +47,10 @@
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_API_HOST"]
     },
+    "preview": {
+      "cache": false,
+      "persistent": true
+    },
     "test": {
       "outputs": ["coverage/**"],
       "dependsOn": []
