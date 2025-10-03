@@ -7,6 +7,9 @@ import { defineConfig, UserConfig } from "vite";
 
 export default defineConfig({
   base: "./",
+  preview: {
+    allowedHosts: ["app.meelio.io"],
+  },
   // build: {
   //   outDir: "dist",
   //   rollupOptions: {
