@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite --port=4000",
     "build": "vite build",
+    "start": "vite preview --host 0.0.0.0 --port ${PORT:-5000}",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview --port=5000",
     "release": "standard-version",

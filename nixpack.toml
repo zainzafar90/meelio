@@ -8,7 +8,7 @@ cmds = ["yarn install --frozen-lockfile"]
 
 [phases.build]
 dependsOn = ["install"]
-cmds = ["yarn build:web", "npm install -g serve"]
+cmds = ["yarn build:web"]
 
 [start]
-cmd = "serve -s apps/web/dist -p $PORT"
+cmd = "yarn start:web"
