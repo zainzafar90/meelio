@@ -9,7 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:api": "turbo run build --filter=api",
-    "build:web": "turbo run build --filter=web",
+    "build:web": "turbo run build --filter=web --filter=!api --filter=!extension",
     "build:extension": "turbo run build --filter=extension",
     "package": "turbo run package --filter=extension",
     "start:api": "turbo run start --filter=api",
