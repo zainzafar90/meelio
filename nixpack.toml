@@ -1,14 +1,14 @@
 # nixpacks.toml
 [phases.setup]
-nixpkgs = ["nodejs_22"]
+nixpkgs = ["nodejs_22", "yarn"]
 
 [phases.install]
 dependsOn = ["setup"]
-cmds = ["npm ci --workspace=web --include-workspace-root"]
+cmds = ["yarn install --frozen-lockfile"]
 
 [phases.build]
 dependsOn = ["install"]
-cmds = ["npm run build:web"]
+cmds = ["yarn build:web"]
 
 [start]
 cmd = "npx serve -s apps/web/dist -p $PORT"
