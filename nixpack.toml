@@ -11,4 +11,4 @@ dependsOn = ["install"]
 cmds = ["yarn build:web"]
 
 [start]
-cmd = "yarn workspace web preview"
+cmd = ["yarn preview"]
