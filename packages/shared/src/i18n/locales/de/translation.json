@@ -6,6 +6,7 @@
     "breathing": "Atempod",
     "settings": "Einstellungen",
     "tasks": "Aufgaben",
+    "notes": "Notizen",
     "site-blocker": "Seitenblocker",
     "background": "Hintergrund",
     "tab-stash": "Tab-Stash",
@@ -101,9 +102,13 @@
       "title": "Aufgabenliste",
       "description": "Bleib organisiert und halte deine Aufgaben im Auge."
     },
+    "notes": {
+      "title": "Notizen",
+      "description": "Erfasse schnelle Gedanken in Markdown-unterstützten Notizen."
+    },
     "site-blocker": {
       "title": "Seitenblocker",
-      "description": "Block websites to help you stay focused"
+      "description": "Blockiere ablenkende Websites während deiner Fokus-Sitzungen."
     },
     "tab-stash": {
       "title": "Tab Stash",
@@ -111,7 +116,7 @@
     },
     "background": {
       "title": "Hintergründe",
-      "description": "Personalize your workspace with beautiful backgrounds."
+      "description": "Personalisiere deinen Arbeitsbereich mit schönen Hintergründen."
     },
     "settings": {
       "title": "Einstellungen",
@@ -190,6 +195,11 @@
           "normal": "Aufgabe hinzufügen"
         }
       }
+    },
+    "category": {
+      "select": "Kategorie auswählen",
+      "none": "Keine Kategorie",
+      "manage": "Kategorien verwalten"
     }
   },
   "sidebar": {
@@ -450,12 +460,12 @@
   },
   "site-blocker": {
     "title": "Seitenblocker",
-    "description": "Block websites to help you stay focused",
-    "extension-only": "Site blocking functionality is only available in the browser extension.",
-    "get-extension": "Get the Extension",
-    "upgrade": "Upgrade to Pro",
-    "premium-feature-title": "Premium Site Blocker",
-    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused."
+    "description": "Blockiere Websites, um fokussiert zu bleiben",
+    "extension-only": "Die Funktion zum Blockieren von Websites ist nur in der Browser-Erweiterung verfügbar.",
+    "get-extension": "Erweiterung herunterladen",
+    "upgrade": "Auf Pro upgraden",
+    "premium-feature-title": "Premium Seitenblocker",
+    "premium-feature": "Upgrade auf Pro, um unbegrenzt ablenkende Websites zu blockieren und fokussiert zu bleiben."
   },
   "tab-stash": {
     "title": "Tab-Stash",
