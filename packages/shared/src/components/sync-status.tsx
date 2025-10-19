@@ -1,4 +1,4 @@
-import { Cloud, CloudOff, Loader2 } from "lucide-react";
+import { Circle, Cloud, CloudOff, Loader2 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 import { EntityType, useSyncStore } from "../stores/sync.store";
 
@@ -32,14 +32,12 @@ export function SyncStatus({
   return (
     <div className={cn("flex items-center gap-2 text-xs mr-6", className)}>
       {/* Sync Status */}
-      {isSyncing ? (
-        <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
-          <Loader2 className="h-3 w-3 animate-spin" />
-          <span>Syncing...</span>
-        </div>
-      ) : pendingCount > 0 ? (
-        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-          <span>{pendingCount} pending</span>
+      {isSyncing ? null : pendingCount > 0 ? (
+        <div className="relative">
+          <Circle className="h-3 w-3 text-amber-500" />
+          {pendingCount > 0 && (
+            <div className="absolute -top-1 -right-1 h-2 w-2 bg-amber-500 rounded-full animate-pulse" />
+          )}
         </div>
       ) : lastSyncTime ? (
         <span className="text-muted-foreground">
@@ -55,7 +53,7 @@ export function SyncStatus({
         )}
       >
         {isOnline ? (
-          <Cloud className="h-3 w-3" />
+          isSyncing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Cloud className="h-3 w-3" />
         ) : (
           <CloudOff className="h-3 w-3" />
         )}
