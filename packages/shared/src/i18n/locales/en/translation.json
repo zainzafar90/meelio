@@ -487,7 +487,10 @@
       "disconnect": "Disconnect",
       "nextEvent": "Next event",
       "joinMeeting": "Join Meeting",
-      "meetingLinkCopied": "Meeting link copied"
+      "meetingLinkCopied": "Meeting link copied",
+      "happeningNow": "Happening Now",
+      "today": "Today",
+      "upcoming": "Upcoming"
     }
   },
   "auth": {

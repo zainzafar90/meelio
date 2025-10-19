@@ -477,7 +477,10 @@
       "disconnect": "Verbindung trennen",
       "nextEvent": "Nächster Termin",
       "joinMeeting": "Meeting beitreten",
-      "meetingLinkCopied": "Meeting-Link kopiert"
+      "meetingLinkCopied": "Meeting-Link kopiert",
+      "happeningNow": "Gerade Jetzt",
+      "today": "Heute",
+      "upcoming": "Bevorstehend"
     }
   },
   "auth": {
