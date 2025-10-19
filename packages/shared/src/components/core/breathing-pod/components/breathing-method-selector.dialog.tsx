@@ -35,7 +35,7 @@ export const BreatheMethodSelectorDialog: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-32 flex flex-col items-center gap-2">
+      <div className="fixed bottom-32 flex flex-col items-center justify-center gap-2 -translate-x-1/2 left-1/2">
         <p className="text-white/50">
           <small> {selectedMethod.description}</small>
         </p>

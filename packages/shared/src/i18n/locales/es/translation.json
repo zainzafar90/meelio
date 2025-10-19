@@ -1,0 +1,521 @@
+{
+  "common": {
+    "home": "Inicio",
+    "pomodoro": "Pomodoro",
+    "soundscapes": "Paisajes Sonoros",
+    "breathing": "Breathepod",
+    "settings": "Configuración",
+    "tasks": "Tareas",
+    "notes": "Notas",
+    "site-blocker": "Bloqueador de Sitios",
+    "background": "Fondo",
+    "tab-stash": "Guardar Pestañas",
+    "clock": "Reloj",
+    "calendar": "Calendario",
+    "calendarData": {
+      "months": {
+        "short": {
+          "jan": "Ene",
+          "feb": "Feb",
+          "mar": "Mar",
+          "apr": "Abr",
+          "may": "May",
+          "jun": "Jun",
+          "jul": "Jul",
+          "aug": "Ago",
+          "sep": "Sep",
+          "oct": "Oct",
+          "nov": "Nov",
+          "dec": "Dic"
+        }
+      }
+    },
+    "actions": {
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "reset": "Restablecer",
+      "start": "Iniciar",
+      "stop": "Detener",
+      "skip": "Saltar",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "finish": "Finalizar",
+      "toggle": "Alternar",
+      "dismiss": "Descartar",
+      "mute": "Silenciar",
+      "unmute": "Activar sonido"
+    },
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "close": "Cerrar",
+    "weekdays": {
+      "short": {
+        "monday": "Lun",
+        "tuesday": "Mar",
+        "wednesday": "Mié",
+        "thursday": "Jue",
+        "friday": "Vie",
+        "saturday": "Sáb",
+        "sunday": "Dom"
+      }
+    }
+  },
+  "notes": {
+    "sheet": {
+      "title": "Notas",
+      "description": "Captura notas rápidas"
+    },
+    "search": "Buscar notas",
+    "pin": "Fijar",
+    "unpin": "Desfijar",
+    "title": {
+      "placeholder": "Sin título"
+    },
+    "content": {
+      "placeholder": "Empieza a escribir..."
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "¡Bienvenido a Meelio!",
+      "description": "Hagamos un recorrido rápido por tu panel de productividad."
+    },
+    "timer": {
+      "title": "Temporizador Pomodoro",
+      "description": "Mantén el enfoque con nuestro temporizador Pomodoro. Divide tu trabajo en sesiones concentradas."
+    },
+    "soundscapes": {
+      "title": "Paisajes Sonoros",
+      "description": "Sumérgete en sonidos ambientales relajantes para aumentar tu productividad."
+    },
+    "breathing": {
+      "title": "Ejercicios de Respiración",
+      "description": "Toma descansos conscientes con ejercicios de respiración guiados."
+    },
+    "tasks": {
+      "title": "Lista de Tareas",
+      "description": "Haz seguimiento de tus tareas y mantente organizado."
+    },
+    "notes": {
+      "title": "Notas",
+      "description": "Captura pensamientos rápidos en notas con formato markdown."
+    },
+    "site-blocker": {
+      "title": "Bloqueador de Sitios",
+      "description": "Bloquea sitios web que te distraen durante tus sesiones de concentración."
+    },
+    "tab-stash": {
+      "title": "Guardar Pestañas",
+      "description": "Despeja tu navegador guardando pestañas para más tarde."
+    },
+    "background": {
+      "title": "Fondos",
+      "description": "Personaliza tu espacio de trabajo con hermosos fondos."
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Personaliza Meelio según tus preferencias y flujo de trabajo."
+    }
+  },
+  "soundscapes": {
+    "dialog": {
+      "title": "Paisajes Sonoros",
+      "description": "Los paisajes sonoros son una colección de sonidos ambientales que te pueden ayudar a relajarte, concentrarte o dormir."
+    },
+    "player": {
+      "loading": "Cargando sonido...",
+      "error": "Error al cargar sonido",
+      "volume": "Volumen"
+    }
+  },
+  "home": {
+    "greetings": {
+      "morning": "☕ Buenos días",
+      "afternoon": "🌤️ Buenas tardes",
+      "evening": "🌿 Buenas tardes",
+      "night": "🌙 Buenas noches"
+    },
+    "quote": {
+      "text": "Tu vida está diseñada para obtener los resultados que estás obteniendo ahora. Lo sepas o no, tú eres el arquitecto",
+      "author": "Jim Rohn",
+      "aria": {
+        "quote": "Cita inspiradora",
+        "author": "Autor de la cita"
+      }
+    },
+    "layout": {
+      "main": {
+        "aria": "Área de contenido principal"
+      },
+      "footer": {
+        "aria": "Panel de aplicaciones"
+      }
+    }
+  },
+  "tasks": {
+    "sheet": {
+      "title": "Lista de Tareas",
+      "empty": "Aún no hay tareas",
+      "add": "Nueva Lista",
+      "description": "Mantente al tanto de tu trabajo, proyectos y objetivos.",
+      "input": {
+        "placeholder": "¿Qué hay que hacer?"
+      }
+    },
+    "item": {
+      "completed": "Completada",
+      "uncompleted": "Sin completar"
+    },
+    "list": {
+      "create": {
+        "title": "Crear Nueva Lista",
+        "description": "Crea una nueva lista para organizar tus tareas. Elige un emoji y dale un nombre.",
+        "emoji": {
+          "label": "Icono de Lista",
+          "selected": "Emoji seleccionado: {{emoji}}",
+          "select": "Seleccionar emoji {{emoji}}"
+        },
+        "name": {
+          "label": "Nombre de la Lista",
+          "placeholder": "Ingresa el nombre de la lista"
+        },
+        "button": "Crear Lista",
+        "tooltip": "¡Crea listas de tareas personalizadas ilimitadas y organiza tus tareas a tu manera!"
+      },
+      "empty": "Sin tareas",
+      "task": {
+        "add": {
+          "completed": "Agregar una tarea completada",
+          "normal": "Agregar una tarea"
+        }
+      }
+    },
+    "category": {
+      "select": "Seleccionar categoría",
+      "none": "Sin categoría",
+      "manage": "Administrar categorías"
+    }
+  },
+  "sidebar": {
+    "app": {
+      "title": "Meelio",
+      "sections": {
+        "productivity": "Productividad",
+        "wellbeing": "Bienestar"
+      },
+      "login": "Iniciar sesión",
+      "register": "Registrarse",
+      "account": "Cuenta",
+      "billing": "Facturación",
+      "upgradeToPro": "Actualizar a Pro",
+      "logout": "Cerrar sesión",
+      "toggle": "Alternar"
+    }
+  },
+  "breathing": {
+    "method": {
+      "title": "Método de Respiración",
+      "description": "Selecciona un método de respiración para ayudarte a relajar y concentrar",
+      "change": "Cambiar Método de Respiración",
+      "methods": {
+        "calmDown": {
+          "name": "Calmarse",
+          "description": "4-6 Exhalación Extendida",
+          "details": "Inhala por 4 segundos, exhala por 6 segundos"
+        },
+        "clearMind": {
+          "name": "Despejar la Mente",
+          "description": "4-4 Respiración Equilibrada",
+          "details": "Inhala por 4 segundos, exhala por 4 segundos"
+        },
+        "relaxDeeply": {
+          "name": "Relajarse Profundamente",
+          "description": "4-7-8 Respiración",
+          "details": "Inhala por 4 segundos, mantén por 7 segundos, exhala por 8 segundos"
+        },
+        "relieveStress": {
+          "name": "Aliviar el Estrés",
+          "description": "4-4-4-4 Respiración de Caja",
+          "details": "Inhala por 4 segundos, mantén por 4 segundos, exhala por 4 segundos, mantén por 4 segundos"
+        }
+      }
+    }
+  },
+  "timer": {
+    "stages": {
+      "focus": "Concentración",
+      "shortBreak": "Descanso Corto",
+      "longBreak": "Descanso Largo"
+    },
+    "stats": {
+      "title": "Estadísticas",
+      "description": "Tiempo de concentración y descansos de la semana",
+      "chart": {
+        "focus": "Concentración",
+        "breaks": "Descansos",
+        "minutes": "min",
+        "weekday": {
+          "format": "short"
+        }
+      }
+    },
+    "settings": {
+      "title": "Configuración",
+      "description": "Configura los ajustes del temporizador",
+      "timer": {
+        "title": "Temporizador",
+        "description": "Configura los ajustes del temporizador en minutos, los valores recomendados están entre 1 y 60 minutos."
+      },
+      "pomodoro": {
+        "label": "Pomodoro",
+        "shortBreak": "Descanso Corto",
+        "longBreak": "Descanso Largo"
+      },
+      "autoStart": {
+        "label": "Iniciar Descansos Automáticamente",
+        "description": "Iniciar descansos después de las sesiones de trabajo, es decir, después de 25 minutos de trabajo iniciar automáticamente un descanso de 5 minutos."
+      },
+      "sound": {
+        "label": "Habilitar Sonidos",
+        "description": "Reproducir sonidos cuando termine el temporizador y cuando inicien los descansos."
+      },
+      "reset": {
+        "label": "Restablecer Temporizador Pomodoro",
+        "description": "¿Estás seguro de que quieres restablecer el temporizador? Esto restablecerá el temporizador a la configuración predeterminada.",
+        "button": "Restablecer"
+      },
+      "toast": {
+        "success": "Configuración guardada",
+        "description": "Tu configuración ha sido guardada."
+      }
+    },
+    "reset": {
+      "title": "Restablecer Temporizador",
+      "description": "¿Estás seguro de que quieres restablecer el temporizador? Se perderá todo el progreso."
+    },
+    "limitReached": {
+      "toast": "¡Límite diario de 90 minutos alcanzado!",
+      "title": "Límite diario alcanzado",
+      "description": "¡Excelente trabajo hoy! Actualiza a Pro para tiempo ilimitado."
+    },
+    "controls": {
+      "focusMode": "Modo de concentración",
+      "breakMode": "Modo de descanso",
+      "reset": "Restablecer temporizador",
+      "startStop": "Iniciar/Detener temporizador",
+      "skipStage": "Saltar a la siguiente etapa"
+    }
+  },
+  "settings": {
+    "tabs": {
+      "comingSoon": "Esta pestaña aún no está disponible",
+      "generalDescription": "Administra la configuración de tu cuenta"
+    },
+    "dialog": {
+      "title": "Configuración",
+      "description": "Administra la configuración de tu cuenta"
+    },
+    "nav": {
+      "home": "Inicio",
+      "general": "General",
+      "notifications": "Notificaciones",
+      "appearance": "Apariencia",
+      "account": "Cuenta",
+      "billing": "Facturación",
+      "privacy": "Privacidad y visibilidad",
+      "advanced": "Avanzado",
+      "language": "Idioma",
+      "dock": "Panel",
+      "feedback": "Comentarios",
+      "timer": "Temporizador"
+    },
+    "general": {
+      "title": "General",
+      "description": "Configura los ajustes generales",
+      "mantraRotation": {
+        "title": "Rotación de Mantras",
+        "description": "Rotar mantras con saludos al cargar la página"
+      },
+      "wallpaperRotation": {
+        "title": "Rotación de Fondos",
+        "description": "Rotar fondos de pantalla nuevos cada día"
+      },
+      "onboardingReset": {
+        "title": "Tutorial",
+        "description": "Mostrar el recorrido del panel nuevamente",
+        "button": "Reiniciar",
+        "error": "Error al restablecer el tutorial"
+      },
+      "confettiOnComplete": {
+        "title": "Confeti al Completar Tareas",
+        "description": "Celebra las tareas completadas con confeti",
+        "error": "Error al actualizar la configuración"
+      },
+      "twelveHourClock": {
+        "title": "Reloj de 24 Horas",
+        "description": "Mostrar la hora en formato de 24 horas"
+      }
+    },
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Configura los ajustes de apariencia",
+      "themeUpdated": "Tema actualizado",
+      "theme": {
+        "label": "Tema",
+        "description": "Selecciona el tema para la aplicación",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Sistema"
+      }
+    },
+    "dock": {
+      "title": "Configuración del Panel",
+      "description": "Personaliza qué elementos aparecen en tu panel",
+      "visibility": {
+        "title": "Visibilidad de Elementos del Panel",
+        "description": "Controla qué elementos son visibles en el panel"
+      },
+      "show-icon-labels": {
+        "title": "Mostrar Etiquetas de Iconos",
+        "description": "Mostrar las etiquetas de los iconos en el panel"
+      },
+      "timer": {
+        "description": "Temporizador para sesiones de trabajo concentrado"
+      },
+      "soundscapes": {
+        "description": "Sonidos ambientales para ayudarte a concentrar"
+      },
+      "breathing": {
+        "description": "Ejercicios de respiración guiados"
+      },
+      "tasks": {
+        "description": "Gestión de tareas"
+      },
+      "site-blocker": {
+        "description": "Bloquea sitios web que distraen"
+      },
+      "tab-stash": {
+        "description": "Guarda y organiza pestañas del navegador"
+      },
+      "background": {
+        "description": "Cambia tu fondo de pantalla"
+      },
+      "clock": {
+        "description": "Hora y fecha del sistema"
+      },
+      "calendar": {
+        "description": "Vista de calendario y eventos"
+      }
+    },
+    "account": {
+      "description": "Administra la configuración de la cuenta y del sitio web.",
+      "updateError": "Error al actualizar la cuenta",
+      "nameUpdated": "Nombre actualizado",
+      "name": {
+        "label": "Nombre",
+        "description": "Por favor ingresa tu nombre",
+        "placeholder": "Juan Pérez"
+      }
+    },
+    "feedback": {
+      "title": "Comentarios",
+      "description": "Comparte tus comentarios con nosotros",
+      "button": "Compartir Comentarios"
+    },
+    "billing": {
+      "title": "Facturación",
+      "description": "Administra tu facturación"
+    },
+    "language": {
+      "title": "Idioma",
+      "description": "Selecciona tu idioma preferido"
+    }
+  },
+  "profile": {
+    "image": {
+      "alt": "Perfil"
+    },
+    "your-profile": "Tu perfil",
+    "meelio-version": "Versión de Meelio:"
+  },
+  "backgrounds": {
+    "title": "Cambiar Fondo",
+    "description": "Selecciona un fondo para cambiar el papel tapiz",
+    "addNew": "Agregar Nuevo Fondo",
+    "source": "Fuente",
+    "author": "Autor",
+    "liveWallpapers": "Fondos Animados",
+    "staticWallpapers": "Fondos Estáticos",
+    "resetToDefault": "Restablecer a Predeterminado",
+    "randomBackground": "Fondo Aleatorio",
+    "currentWallpaper": "Fondo Actual",
+    "searchPlaceholder": "Buscar fondos de pantalla...",
+    "allWallpapers": "Todos los Fondos"
+  },
+  "site-blocker": {
+    "title": "Bloqueador de Sitios",
+    "description": "Bloquea sitios web para ayudarte a mantener el enfoque",
+    "extension-only": "La funcionalidad de bloqueo de sitios solo está disponible en la extensión del navegador.",
+    "get-extension": "Obtener la Extensión",
+    "upgrade": "Actualizar a Pro",
+    "premium-feature-title": "Bloqueador de Sitios Premium",
+    "premium-feature": "Actualiza a Pro para bloquear sitios web ilimitados que te distraen y mantener el enfoque."
+  },
+  "tab-stash": {
+    "title": "Guardar Pestañas",
+    "description": "Guarda tus pestañas para más tarde",
+    "extension-only": "La funcionalidad de guardar pestañas solo está disponible en la extensión del navegador.",
+    "get-extension": "Obtener la Extensión",
+    "stash-all": "Guardar Todas las Ventanas",
+    "stash-current": "Guardar Ventana Actual",
+    "needs-permission": "Por favor otorga los permisos necesarios para usar la extensión.",
+    "grant-permission": "Otorgar Permiso",
+    "permissions-needed": "Se requieren permisos adicionales",
+    "permissions-description": "Necesitamos permiso para administrar tus pestañas para usar esta función"
+  },
+  "calendar": {
+    "sheet": {
+      "title": "Calendario",
+      "connect": "Conectar",
+      "connected": "Google Calendar habilitado",
+      "disconnect": "Desconectar",
+      "nextEvent": "Próximo evento",
+      "joinMeeting": "Unirse a la Reunión",
+      "meetingLinkCopied": "Enlace de reunión copiado",
+      "happeningNow": "Sucediendo Ahora",
+      "today": "Hoy",
+      "upcoming": "Próximos"
+    }
+  },
+  "auth": {
+    "verify": {
+      "verifying": "Verificando tu cuenta...",
+      "success": {
+        "title": "¡Verificación exitosa!",
+        "description": "Bienvenido de nuevo a Meelio."
+      },
+      "failed": {
+        "title": "Verificación fallida",
+        "description": "Tu enlace debe ser válido por 10 minutos. Por favor intenta nuevamente."
+      }
+    },
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "description": "Inicia sesión en tu cuenta de Meelio",
+      "register": "¿No tienes una cuenta? Regístrate",
+      "guest": "Continuar como Invitado"
+    },
+    "register": {
+      "title": "Crear una cuenta",
+      "description": "Proporciona tu correo electrónico para crear tu cuenta",
+      "login": "¿Ya tienes una cuenta? Inicia sesión",
+      "privacy": "Al hacer clic en continuar, aceptas nuestra Política de Privacidad."
+    }
+  }
+}

@@ -1,0 +1,521 @@
+{
+  "common": {
+    "home": "ホーム",
+    "pomodoro": "ポモドーロ",
+    "soundscapes": "サウンドスケープ",
+    "breathing": "呼吸法",
+    "settings": "設定",
+    "tasks": "タスク",
+    "notes": "ノート",
+    "site-blocker": "サイトブロッカー",
+    "background": "背景",
+    "tab-stash": "タブ保管",
+    "clock": "時計",
+    "calendar": "カレンダー",
+    "calendarData": {
+      "months": {
+        "short": {
+          "jan": "1月",
+          "feb": "2月",
+          "mar": "3月",
+          "apr": "4月",
+          "may": "5月",
+          "jun": "6月",
+          "jul": "7月",
+          "aug": "8月",
+          "sep": "9月",
+          "oct": "10月",
+          "nov": "11月",
+          "dec": "12月"
+        }
+      }
+    },
+    "actions": {
+      "play": "再生",
+      "pause": "一時停止",
+      "close": "閉じる",
+      "save": "保存",
+      "delete": "削除",
+      "edit": "編集",
+      "cancel": "キャンセル",
+      "confirm": "確認",
+      "reset": "リセット",
+      "start": "開始",
+      "stop": "停止",
+      "skip": "スキップ",
+      "previous": "前へ",
+      "next": "次へ",
+      "finish": "完了",
+      "toggle": "切り替え",
+      "dismiss": "閉じる",
+      "mute": "ミュート",
+      "unmute": "ミュート解除"
+    },
+    "loading": "読み込み中...",
+    "error": "問題が発生しました",
+    "close": "閉じる",
+    "weekdays": {
+      "short": {
+        "monday": "月",
+        "tuesday": "火",
+        "wednesday": "水",
+        "thursday": "木",
+        "friday": "金",
+        "saturday": "土",
+        "sunday": "日"
+      }
+    }
+  },
+  "notes": {
+    "sheet": {
+      "title": "ノート",
+      "description": "メモを素早く記録します"
+    },
+    "search": "ノートを検索",
+    "pin": "ピン留め",
+    "unpin": "ピン留め解除",
+    "title": {
+      "placeholder": "無題"
+    },
+    "content": {
+      "placeholder": "書き始めましょう..."
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Meelioへようこそ!",
+      "description": "生産性ドックの簡単なツアーを始めましょう。"
+    },
+    "timer": {
+      "title": "ポモドーロタイマー",
+      "description": "ポモドーロタイマーで集中力を維持しましょう。作業を集中セッションに分割します。"
+    },
+    "soundscapes": {
+      "title": "サウンドスケープ",
+      "description": "落ち着いた環境音に浸り、生産性を高めましょう。"
+    },
+    "breathing": {
+      "title": "呼吸エクササイズ",
+      "description": "ガイド付き呼吸エクササイズでマインドフルな休憩を取りましょう。"
+    },
+    "tasks": {
+      "title": "タスクリスト",
+      "description": "タスクを追跡し、整理整頓を保ちましょう。"
+    },
+    "notes": {
+      "title": "ノート",
+      "description": "Markdown対応のノートで素早く思考を記録しましょう。"
+    },
+    "site-blocker": {
+      "title": "サイトブロッカー",
+      "description": "集中セッション中に気を散らすウェブサイトをブロックします。"
+    },
+    "tab-stash": {
+      "title": "タブ保管",
+      "description": "後で使うタブを保管してブラウザを整理しましょう。"
+    },
+    "background": {
+      "title": "背景",
+      "description": "美しい背景でワークスペースをカスタマイズしましょう。"
+    },
+    "settings": {
+      "title": "設定",
+      "description": "Meelioをあなたの好みやワークフローに合わせてカスタマイズしましょう。"
+    }
+  },
+  "soundscapes": {
+    "dialog": {
+      "title": "サウンドスケープ",
+      "description": "サウンドスケープは、リラックス、集中、睡眠をサポートする環境音のコレクションです。"
+    },
+    "player": {
+      "loading": "サウンドを読み込み中...",
+      "error": "サウンドの読み込みエラー",
+      "volume": "音量"
+    }
+  },
+  "home": {
+    "greetings": {
+      "morning": "☕ おはようございます",
+      "afternoon": "🌤️ こんにちは",
+      "evening": "🌿 こんばんは",
+      "night": "🌙 おやすみなさい"
+    },
+    "quote": {
+      "text": "あなたの人生は、今得ている結果を得るように設計されています。あなたが気づいているかどうかに関わらず、あなた自身が設計者なのです",
+      "author": "ジム・ローン",
+      "aria": {
+        "quote": "インスピレーションを与える引用",
+        "author": "引用の著者"
+      }
+    },
+    "layout": {
+      "main": {
+        "aria": "メインコンテンツエリア"
+      },
+      "footer": {
+        "aria": "アプリケーションドック"
+      }
+    }
+  },
+  "tasks": {
+    "sheet": {
+      "title": "タスクリスト",
+      "empty": "まだタスクがありません",
+      "add": "新しいリスト",
+      "description": "仕事、プロジェクト、目標を管理しましょう。",
+      "input": {
+        "placeholder": "何をする必要がありますか?"
+      }
+    },
+    "item": {
+      "completed": "完了",
+      "uncompleted": "未完了"
+    },
+    "list": {
+      "create": {
+        "title": "新しいリストを作成",
+        "description": "タスクを整理するための新しいリストを作成します。絵文字を選んで名前を付けましょう。",
+        "emoji": {
+          "label": "リストアイコン",
+          "selected": "選択された絵文字: {{emoji}}",
+          "select": "絵文字 {{emoji}} を選択"
+        },
+        "name": {
+          "label": "リスト名",
+          "placeholder": "リスト名を入力"
+        },
+        "button": "リストを作成",
+        "tooltip": "無制限のカスタムタスクリストを作成し、あなたの方法でタスクを整理しましょう!"
+      },
+      "empty": "タスクがありません",
+      "task": {
+        "add": {
+          "completed": "完了したタスクを追加",
+          "normal": "タスクを追加"
+        }
+      }
+    },
+    "category": {
+      "select": "カテゴリーを選択",
+      "none": "カテゴリーなし",
+      "manage": "カテゴリーを管理"
+    }
+  },
+  "sidebar": {
+    "app": {
+      "title": "Meelio",
+      "sections": {
+        "productivity": "生産性",
+        "wellbeing": "ウェルビーイング"
+      },
+      "login": "ログイン",
+      "register": "登録",
+      "account": "アカウント",
+      "billing": "請求",
+      "upgradeToPro": "Proにアップグレード",
+      "logout": "ログアウト",
+      "toggle": "切り替え"
+    }
+  },
+  "breathing": {
+    "method": {
+      "title": "呼吸法",
+      "description": "リラックスと集中をサポートする呼吸法を選択してください",
+      "change": "呼吸法を変更",
+      "methods": {
+        "calmDown": {
+          "name": "落ち着く",
+          "description": "4-6 延長呼気",
+          "details": "4秒吸って、6秒吐きます"
+        },
+        "clearMind": {
+          "name": "心を澄ます",
+          "description": "4-4 均等呼吸",
+          "details": "4秒吸って、4秒吐きます"
+        },
+        "relaxDeeply": {
+          "name": "深くリラックス",
+          "description": "4-7-8 呼吸法",
+          "details": "4秒吸って、7秒止めて、8秒吐きます"
+        },
+        "relieveStress": {
+          "name": "ストレス解消",
+          "description": "4-4-4-4 ボックス呼吸",
+          "details": "4秒吸って、4秒止めて、4秒吐いて、4秒止めます"
+        }
+      }
+    }
+  },
+  "timer": {
+    "stages": {
+      "focus": "集中",
+      "shortBreak": "短い休憩",
+      "longBreak": "長い休憩"
+    },
+    "stats": {
+      "title": "統計",
+      "description": "今週の集中時間と休憩時間",
+      "chart": {
+        "focus": "集中",
+        "breaks": "休憩",
+        "minutes": "分",
+        "weekday": {
+          "format": "short"
+        }
+      }
+    },
+    "settings": {
+      "title": "設定",
+      "description": "タイマー設定を構成します",
+      "timer": {
+        "title": "タイマー",
+        "description": "タイマー設定を分単位で構成します。推奨値は1〜60分です。"
+      },
+      "pomodoro": {
+        "label": "ポモドーロ",
+        "shortBreak": "短い休憩",
+        "longBreak": "長い休憩"
+      },
+      "autoStart": {
+        "label": "休憩を自動開始",
+        "description": "作業セッション後に休憩を開始します。例えば、25分の作業時間後に自動的に5分の休憩を開始します。"
+      },
+      "sound": {
+        "label": "サウンドを有効化",
+        "description": "タイマー終了時と休憩開始時にサウンドを再生します。"
+      },
+      "reset": {
+        "label": "ポモドーロタイマーをリセット",
+        "description": "タイマーをリセットしてもよろしいですか?これによりタイマーがデフォルト設定にリセットされます。",
+        "button": "リセット"
+      },
+      "toast": {
+        "success": "設定を保存しました",
+        "description": "設定が保存されました。"
+      }
+    },
+    "reset": {
+      "title": "タイマーをリセット",
+      "description": "タイマーをリセットしてもよろしいですか?すべての進捗が失われます。"
+    },
+    "limitReached": {
+      "toast": "1日の90分制限に達しました!",
+      "title": "1日の制限に達しました",
+      "description": "今日はよく頑張りました!無制限に使用するにはProにアップグレードしてください。"
+    },
+    "controls": {
+      "focusMode": "集中モード",
+      "breakMode": "休憩モード",
+      "reset": "タイマーをリセット",
+      "startStop": "タイマーを開始/停止",
+      "skipStage": "次のステージにスキップ"
+    }
+  },
+  "settings": {
+    "tabs": {
+      "comingSoon": "このタブはまだ利用できません",
+      "generalDescription": "アカウント設定を管理します"
+    },
+    "dialog": {
+      "title": "設定",
+      "description": "アカウント設定を管理します"
+    },
+    "nav": {
+      "home": "ホーム",
+      "general": "一般",
+      "notifications": "通知",
+      "appearance": "外観",
+      "account": "アカウント",
+      "billing": "請求",
+      "privacy": "プライバシーと可視性",
+      "advanced": "詳細",
+      "language": "言語",
+      "dock": "ドック",
+      "feedback": "フィードバック",
+      "timer": "タイマー"
+    },
+    "general": {
+      "title": "一般",
+      "description": "一般設定を構成します",
+      "mantraRotation": {
+        "title": "マントラのローテーション",
+        "description": "ページ読み込み時に挨拶とマントラをローテーションします"
+      },
+      "wallpaperRotation": {
+        "title": "壁紙のローテーション",
+        "description": "毎日新しい壁紙をローテーションします"
+      },
+      "onboardingReset": {
+        "title": "オンボーディング",
+        "description": "ドックのオンボーディングツアーを再度表示します",
+        "button": "再開",
+        "error": "オンボーディングのリセットに失敗しました"
+      },
+      "confettiOnComplete": {
+        "title": "タスク完了の紙吹雪",
+        "description": "タスク完了時に紙吹雪でお祝いします",
+        "error": "設定の更新に失敗しました"
+      },
+      "twelveHourClock": {
+        "title": "24時間表示",
+        "description": "時刻を24時間形式で表示します"
+      }
+    },
+    "appearance": {
+      "title": "外観",
+      "description": "外観設定を構成します",
+      "themeUpdated": "テーマを更新しました",
+      "theme": {
+        "label": "テーマ",
+        "description": "アプリケーションのテーマを選択します",
+        "light": "ライト",
+        "dark": "ダーク",
+        "system": "システム"
+      }
+    },
+    "dock": {
+      "title": "ドック設定",
+      "description": "ドックに表示するアイテムをカスタマイズします",
+      "visibility": {
+        "title": "ドックアイテムの表示",
+        "description": "ドックに表示するアイテムを制御します"
+      },
+      "show-icon-labels": {
+        "title": "アイコンラベルを表示",
+        "description": "ドックのアイコンのラベルを表示します"
+      },
+      "timer": {
+        "description": "集中作業セッション用のタイマー"
+      },
+      "soundscapes": {
+        "description": "集中をサポートする環境音"
+      },
+      "breathing": {
+        "description": "ガイド付き呼吸エクササイズ"
+      },
+      "tasks": {
+        "description": "タスク管理"
+      },
+      "site-blocker": {
+        "description": "気を散らすウェブサイトをブロック"
+      },
+      "tab-stash": {
+        "description": "ブラウザタブの保存と整理"
+      },
+      "background": {
+        "description": "背景を変更"
+      },
+      "clock": {
+        "description": "システム時刻と日付"
+      },
+      "calendar": {
+        "description": "カレンダービューとイベント"
+      }
+    },
+    "account": {
+      "description": "アカウントとウェブサイトの設定を管理します。",
+      "updateError": "アカウントの更新エラー",
+      "nameUpdated": "名前を更新しました",
+      "name": {
+        "label": "名前",
+        "description": "お名前を入力してください",
+        "placeholder": "山田太郎"
+      }
+    },
+    "feedback": {
+      "title": "フィードバック",
+      "description": "フィードバックをお寄せください",
+      "button": "フィードバックを送信"
+    },
+    "billing": {
+      "title": "請求",
+      "description": "請求を管理します"
+    },
+    "language": {
+      "title": "言語",
+      "description": "優先言語を選択します"
+    }
+  },
+  "profile": {
+    "image": {
+      "alt": "プロフィール"
+    },
+    "your-profile": "あなたのプロフィール",
+    "meelio-version": "Meelioバージョン:"
+  },
+  "backgrounds": {
+    "title": "背景を変更",
+    "description": "壁紙を変更する背景を選択します",
+    "addNew": "新しい背景を追加",
+    "source": "ソース",
+    "author": "作者",
+    "liveWallpapers": "ライブ壁紙",
+    "staticWallpapers": "静的壁紙",
+    "resetToDefault": "デフォルトにリセット",
+    "randomBackground": "ランダム背景",
+    "currentWallpaper": "現在の壁紙",
+    "searchPlaceholder": "壁紙を検索...",
+    "allWallpapers": "すべての壁紙"
+  },
+  "site-blocker": {
+    "title": "サイトブロッカー",
+    "description": "集中力を維持するためにウェブサイトをブロックします",
+    "extension-only": "サイトブロック機能はブラウザ拡張機能でのみ利用できます。",
+    "get-extension": "拡張機能を取得",
+    "upgrade": "Proにアップグレード",
+    "premium-feature-title": "プレミアムサイトブロッカー",
+    "premium-feature": "Proにアップグレードして、無制限に気を散らすウェブサイトをブロックし、集中力を維持しましょう。"
+  },
+  "tab-stash": {
+    "title": "タブ保管",
+    "description": "後で使うタブを保管します",
+    "extension-only": "タブ保管機能はブラウザ拡張機能でのみ利用できます。",
+    "get-extension": "拡張機能を取得",
+    "stash-all": "すべてのウィンドウを保管",
+    "stash-current": "現在のウィンドウを保管",
+    "needs-permission": "拡張機能を使用するために必要な権限を付与してください。",
+    "grant-permission": "権限を付与",
+    "permissions-needed": "追加の権限が必要です",
+    "permissions-description": "この機能を使用するにはタブを管理する権限が必要です"
+  },
+  "calendar": {
+    "sheet": {
+      "title": "カレンダー",
+      "connect": "接続",
+      "connected": "Googleカレンダーが有効になりました",
+      "disconnect": "接続解除",
+      "nextEvent": "次のイベント",
+      "joinMeeting": "ミーティングに参加",
+      "meetingLinkCopied": "ミーティングリンクをコピーしました",
+      "happeningNow": "現在進行中",
+      "today": "今日",
+      "upcoming": "今後の予定"
+    }
+  },
+  "auth": {
+    "verify": {
+      "verifying": "アカウントを確認しています...",
+      "success": {
+        "title": "確認が完了しました!",
+        "description": "Meelioへようこそ。"
+      },
+      "failed": {
+        "title": "確認に失敗しました",
+        "description": "リンクは10分間有効です。もう一度お試しください。"
+      }
+    },
+    "login": {
+      "title": "おかえりなさい",
+      "description": "Meelioアカウントにサインインします",
+      "register": "アカウントをお持ちでない方は登録",
+      "guest": "ゲストとして続ける"
+    },
+    "register": {
+      "title": "アカウントを作成",
+      "description": "メールアドレスを入力してアカウントを作成します",
+      "login": "既にアカウントをお持ちの方はサインイン",
+      "privacy": "続けるをクリックすることで、プライバシーポリシーに同意したものとみなされます。"
+    }
+  }
+}
