@@ -56,11 +56,6 @@ export const useNoteStore = create<NoteState>()(
           try {
             set({ isLoading: true, error: null });
 
-            // Ensure sync manager is ready for current Pro users even if auth store hasn't emitted
-            if (user?.isPro && !noteSyncManager) {
-              initializeNoteSync();
-            }
-
             await get().loadFromLocal();
 
             if (user?.isPro) {
@@ -441,10 +436,8 @@ const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
 
 useSyncStore.subscribe(handleOnlineStatusChange);
 
-// Initialize immediately if already logged-in Pro user when this module loads
-(() => {
-  const user = useAuthStore.getState().user;
-  if (user?.isPro && !noteSyncManager) {
-    initializeNoteSync();
-  }
-})();
+// Initialize sync for already logged-in Pro users when module loads
+const user = useAuthStore.getState().user;
+if (user?.isPro && !noteSyncManager) {
+  initializeNoteSync();
+}

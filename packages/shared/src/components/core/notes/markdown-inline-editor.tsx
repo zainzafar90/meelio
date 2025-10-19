@@ -1,16 +1,16 @@
 // ─────────────────── Types
 type NoteId = string;
 
-type MarkdownNote = {
+type RichTextNote = {
   id: NoteId;
   title: string;
-  body: string; // html (from TipTap)
+  body: string; 
   updatedAt: number;
 };
 
 type StoragePort = {
-  load: (id: NoteId) => Promise<MarkdownNote | undefined>;
-  save: (note: MarkdownNote) => Promise<void>;
+  load: (id: NoteId) => Promise<RichTextNote | undefined>;
+  save: (note: RichTextNote) => Promise<void>;
 };
 
 // ─────────────────── Errors
@@ -22,9 +22,10 @@ class PersistError extends Error {
 }
 
 // ─────────────────── Pure utils (≤30 lines each)
+const MAX_TITLE_LENGTH = 100;
 const now = () => Date.now();
 
-const newNote = (id: NoteId): MarkdownNote => ({
+const newNote = (id: NoteId): RichTextNote => ({
   id,
   title: "",
   body: "",
@@ -34,25 +35,54 @@ const newNote = (id: NoteId): MarkdownNote => ({
 const saveDraft =
   (port: StoragePort, id: NoteId) =>
   async (title: string, body: string) => {
-    const note: MarkdownNote = { id, title, body, updatedAt: now() };
+    const note: RichTextNote = { id, title, body, updatedAt: now() };
     await port.save(note);
   };
 
-const extractTitle = (html: string): string => {
-  const h1 = html.match(/<h1[^>]*>(.*?)<\/h1>/i)?.[1] ?? "";
-  const txt = h1.replace(/<[^>]*>/g, "").trim();
-  if (txt) return txt.slice(0, 100);
-  const p = html.match(/<p[^>]*>(.*?)<\/p>/i)?.[1] ?? "";
-  return p.replace(/<[^>]*>/g, "").trim().slice(0, 100);
+const extractTitleFromEditor = (editor: any): string => {
+  const doc = editor.state.doc;
+
+  let titleText = "";
+  doc.descendants((node: any) => {
+    if (node.type.name === "heading" && node.textContent) {
+      titleText = node.textContent.trim();
+      return false;
+    }
+    return true;
+  });
+
+  if (!titleText) {
+    doc.descendants((node: any) => {
+      if (node.type.name === "paragraph" && node.textContent) {
+        titleText = node.textContent.trim();
+        return false;
+      }
+      return true;
+    });
+  }
+
+  return titleText.slice(0, MAX_TITLE_LENGTH);
 };
 
-const initialHtml = (title = "") => `<h1>${title}</h1><p></p>`;
+const initialHtml = (title = "") => {
+  const escaped = title.replace(/[&<>"']/g, (char) => {
+    const escapeMap: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return escapeMap[char];
+  });
+  return `<h1>${escaped}</h1><p></p>`;
+};
 
 // ─────────────────── Storage (injected default)
 const localStoragePort = (keyPrefix = "md_note_"): StoragePort => ({
   load: async (id) => {
     const raw = localStorage.getItem(keyPrefix + id);
-    return raw ? (JSON.parse(raw) as MarkdownNote) : undefined;
+    return raw ? (JSON.parse(raw) as RichTextNote) : undefined;
   },
   save: async (note) => {
     try {
@@ -98,7 +128,7 @@ import {
 type Props = {
   id: NoteId;
   port?: StoragePort;
-  initial?: Partial<MarkdownNote>;
+  initial?: Partial<RichTextNote>;
   onChange?: (title: string, body: string) => void;
 };
 
@@ -282,7 +312,7 @@ function MenuBar({ editor }: { editor: Editor }) {
 
 export default function MarkdownInlineEditor({ id, port, initial, onChange }: Props) {
   const storage = useMemo(() => port ?? localStoragePort(), [port]);
-  const [note, setNote] = useState<MarkdownNote>(() => ({ ...newNote(id), ...initial }));
+  const [note, setNote] = useState<RichTextNote>(() => ({ ...newNote(id), ...initial }));
   const [saved, setSaved] = useState<{ title: string; body: string }>({
     title: initial?.title ?? "",
     body: initial?.body ?? "",
@@ -342,7 +372,7 @@ export default function MarkdownInlineEditor({ id, port, initial, onChange }: Pr
       if (!transaction.docChanged) return;
       const html = editor.getHTML();
       if (html === note.body) return;
-      const title = extractTitle(html);
+      const title = extractTitleFromEditor(editor);
       setNote((n) => ({ ...n, title, body: html, updatedAt: now() }));
       if (onChange) onChange(title, html);
     },
@@ -398,4 +428,4 @@ export default function MarkdownInlineEditor({ id, port, initial, onChange }: Pr
   );
 }
 
-export { PersistError, localStoragePort, type MarkdownNote, type StoragePort, type NoteId };
+export { PersistError, localStoragePort, type RichTextNote, type StoragePort, type NoteId };

@@ -58,7 +58,7 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
 
   constructor(adapter: EntityAdapter<LocalT, RemoteT, CreatePayload, UpdatePayload, DeletePayload>) {
     this.adapter = adapter;
-    
+
     if (adapter.options?.autoSync) {
       this.startAutoSync(adapter.options.syncInterval || 3600000); // default 1 hour
     }
@@ -93,7 +93,7 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
     const creates: CreatePayload[] = [];
     const updates: UpdatePayload[] = [];
     const deletes: DeletePayload[] = [];
-    
+
     for (const op of queue) {
       if (op.type === "create") {
         const payload = this.adapter.transformers.toCreatePayload(op);
@@ -112,7 +112,7 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
 
       // Apply the sync results
       await this.applySyncResults(result, queue);
-      
+
       // Clear the processed queue
       for (const op of queue) {
         sync.removeFromQueue(this.adapter.entityKey, op.id);
@@ -132,7 +132,7 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
     queue: SyncOperation[]
   ): Promise<void> {
     const idMap = new Map<string, string>();
-    
+
     // Map clientId -> server id for created items
     for (const created of result.created) {
       const anyCreated = created as any;
@@ -147,7 +147,7 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
       if (anyCreated.clientId && anyCreated.id && anyCreated.id !== anyCreated.clientId) {
         try {
           await this.adapter.dbTable.delete(anyCreated.clientId);
-        } catch {}
+        } catch { }
         const normalized = this.adapter.transformers.normalizeFromServer(created);
         await this.adapter.dbTable.add(normalized);
 
@@ -163,38 +163,38 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
     // Apply updates
     if (result.updated?.length) {
       const normalizedUpdates = result.updated.map(this.adapter.transformers.normalizeFromServer);
-      await this.adapter.dbTable.bulkPut(normalizedUpdates as any);
+      await this.adapter.dbTable.bulkPut(normalizedUpdates);
 
       // Update in-memory state to reflect any server-side resolutions
-      const updatesById = new Map<string, any>();
-      for (const u of normalizedUpdates as any[]) {
-        if (u && u.id) updatesById.set(u.id, u);
+      const updatesById = new Map<string, LocalT>();
+      for (const u of normalizedUpdates) {
+        if (u && (u as any).id) updatesById.set((u as any).id, u);
       }
       if (updatesById.size > 0) {
-        const current = this.adapter.store.getItems() as any[];
+        const current = this.adapter.store.getItems();
         const merged = current.map((item) =>
-          item && item.id && updatesById.has(item.id)
-            ? { ...item, ...updatesById.get(item.id) }
+          item && (item as any).id && updatesById.has((item as any).id)
+            ? { ...item, ...updatesById.get((item as any).id) }
             : item
         );
-        this.adapter.store.setItems(merged as any);
+        this.adapter.store.setItems(merged);
       }
     }
 
     // Apply deletions (tombstone)
     for (const id of result.deleted || []) {
-      await this.adapter.dbTable.update(id as any, { 
-        deletedAt: Date.now(), 
-        updatedAt: Date.now() 
-      } as any);
+      await this.adapter.dbTable.update(id, {
+        deletedAt: Date.now(),
+        updatedAt: Date.now()
+      } as unknown as Partial<LocalT>);
     }
 
     // Remove deleted items from in-memory state
     if ((result.deleted?.length || 0) > 0) {
-      const deletedSet = new Set<string>(result.deleted as any);
-      const current = this.adapter.store.getItems() as any[];
-      const remaining = current.filter((item) => !(item && item.id && deletedSet.has(item.id)));
-      this.adapter.store.setItems(remaining as any);
+      const deletedSet = new Set<string>(result.deleted);
+      const current = this.adapter.store.getItems();
+      const remaining = current.filter((item) => !(item && (item as any).id && deletedSet.has((item as any).id)));
+      this.adapter.store.setItems(remaining);
     }
   }
 
@@ -214,12 +214,12 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
       // Mark local-only items as deleted (server is source of truth)
       const remoteIdSet = new Set<string>((normalizedRemote as any[]).map((r) => r.id));
       const local = await this.adapter.dbTable.where("userId").equals(userId).toArray();
-      
+
       for (const item of local as any[]) {
         if (!item.deletedAt && item.id && !remoteIdSet.has(item.id)) {
-          await this.adapter.dbTable.update(item.id, { 
-            deletedAt: Date.now(), 
-            updatedAt: Date.now() 
+          await this.adapter.dbTable.update(item.id, {
+            deletedAt: Date.now(),
+            updatedAt: Date.now()
           } as any);
           (item as any).deletedAt = Date.now();
           (item as any).updatedAt = Date.now();

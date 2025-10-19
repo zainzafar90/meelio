@@ -26,27 +26,22 @@ export function SyncStatus({
 
     if (diff < 60000) return "Synced";
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    console.log(diff);
     return `${Math.floor(diff / 3600000)}h ago`;
   };
 
   return (
     <div className={cn("flex items-center gap-2 text-xs mr-6", className)}>
       {/* Sync Status */}
-      {isSyncing ? (
-        <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
-          {/* <span>Syncing</span> */}
-        </div>
-      ) : pendingCount > 0 ? (
+      {isSyncing ? null : pendingCount > 0 ? (
         <div className="relative">
-            <Circle className="h-3 w-3 text-amber-500" />
-            {pendingCount > 0 && (
-              <div className="absolute -top-1 -right-1 h-2 w-2 bg-amber-500 rounded-full animate-pulse" />
-            )}
-          </div>
+          <Circle className="h-3 w-3 text-amber-500" />
+          {pendingCount > 0 && (
+            <div className="absolute -top-1 -right-1 h-2 w-2 bg-amber-500 rounded-full animate-pulse" />
+          )}
+        </div>
       ) : lastSyncTime ? (
         <span className="text-muted-foreground">
-          {/* {formatLastSync(lastSyncTime)} */}
+          {formatLastSync(lastSyncTime)}
         </span>
       ) : null}
 
