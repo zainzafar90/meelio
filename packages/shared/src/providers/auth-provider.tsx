@@ -29,6 +29,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       authenticateGuest: state.authenticateGuest,
       loading: state.loading,
       logout: state.logout,
+      lastSuccessfulAuth: state.lastSuccessfulAuth,
+      updateLastSuccessfulAuth: state.updateLastSuccessfulAuth,
       _hasHydrated: state._hasHydrated,
       setHasHydrated: state.setHasHydrated,
     }))
@@ -79,9 +81,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
               authStore.authenticate(user.data);
               authStore.authenticateGuest(null as any);
+              authStore.updateLastSuccessfulAuth();
             }
           } catch (error) {
-            authStore.authenticate(null as any);
+            // Check if user was authenticated within the last 24 hours
+            const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            const lastAuth = authStore.lastSuccessfulAuth;
+
+            // Only log out if:
+            // 1. There's no lastSuccessfulAuth timestamp (first time user), OR
+            // 2. Last successful auth was more than 24 hours ago
+            if (!lastAuth || now - lastAuth > TWENTY_FOUR_HOURS_MS) {
+              authStore.authenticate(null as any);
+            } else {
+              // User is within grace period, keep them logged in
+            }
           }
         }, DELAY);
       })();

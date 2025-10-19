@@ -10,10 +10,12 @@ export type AuthState = {
   user: AuthUser | null;
   guestUser: GuestUser | null;
   loading: boolean;
+  lastSuccessfulAuth: number | null;
   authenticate: (user: AuthUser) => void;
   authenticateGuest: (user: GuestUser) => void;
   logout: () => void;
   logoutUser: () => void;
+  updateLastSuccessfulAuth: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
 };
@@ -24,6 +26,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       guestUser: null,
       loading: true,
+      lastSuccessfulAuth: null,
       _hasHydrated: false,
       setHasHydrated: (state) => {
         set({
@@ -40,17 +43,20 @@ export const useAuthStore = create<AuthState>()(
         })),
       logout: () => {
         useCategoryStore.getState().reset();
-        set(() => ({ user: null, guestUser: null }));
+        set(() => ({ user: null, guestUser: null, lastSuccessfulAuth: null }));
       },
       logoutUser: () => {
         useCategoryStore.getState().reset();
-        set(() => ({ user: null }));
+        set(() => ({ user: null, lastSuccessfulAuth: null }));
+      },
+      updateLastSuccessfulAuth: () => {
+        set({ lastSuccessfulAuth: Date.now() });
       },
     }),
     {
       name: "meelio:local:user",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       skipHydration: false,
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
@@ -58,9 +64,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-// useAuthStore.subscribe((state) => {
-//   if (!state.user && !state.guestUser) {
-//     useBackgroundStore.getState().resetToDefault();
-//   }
-// });
