@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 import { ApiError } from "@/common/errors/api-error";
 import { db } from "@/db";
+import { logger } from "@repo/logger";
 
 import { Provider, VerificationTokenType } from "@/types/enums.types";
 import { Moment } from "moment";
@@ -522,11 +523,137 @@ const verifyMagicLink = async (
   }
 };
 
+/**
+ * Refresh auth tokens using refresh token
+ * @param {string} refreshToken
+ * @returns {Promise<IAccessAndRefreshTokens>}
+ */
+const refreshAuthTokens = async (
+  refreshToken: string,
+): Promise<IAccessAndRefreshTokens & { sessionId: string }> => {
+  try {
+    const payload = await verifyJwtToken(refreshToken);
+
+    if (payload.type !== "refresh") {
+      logger.warn("Token refresh failed: Invalid token type");
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Invalid token type",
+      );
+    }
+
+    const session = payload.sessionId
+      ? await verifySession(payload.sessionId)
+      : await db.query.sessions.findFirst({
+        where: and(
+          eq(sessions.refreshToken, refreshToken),
+          eq(sessions.blacklisted, false),
+        ),
+      });
+
+    if (!session) {
+      logger.warn(`Token refresh failed: Session not found or expired - sessionId: ${payload.sessionId}`);
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Session not found or expired",
+      );
+    }
+
+    if (session.refreshToken !== refreshToken) {
+      logger.error(`SECURITY: Refresh token reuse detected - blacklisting session ${session.id} for user ${session.userId} (provider: ${session.provider})`);
+
+      await db
+        .update(sessions)
+        .set({ blacklisted: true } as Partial<SessionInsertTable>)
+        .where(eq(sessions.id, session.id));
+
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Refresh token has already been used or is invalid",
+      );
+    }
+
+    if (session.refreshTokenExpires && new Date() > new Date(session.refreshTokenExpires)) {
+      logger.info(`Token refresh failed: Refresh token expired for session ${session.id}, user ${session.userId}`);
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Refresh token has expired",
+      );
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, session.userId),
+    });
+
+    if (!user) {
+      logger.error(`Token refresh failed: User not found - userId: ${session.userId}, sessionId: ${session.id}`);
+      throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    const accessExpiration = moment().add(
+      config.jwt.accessExpirationMinutes,
+      "minutes",
+    );
+    const refreshExpiration = moment().add(
+      config.jwt.refreshExpirationDays,
+      "days",
+    );
+
+    const newAccessToken = generateToken(
+      user.id!,
+      accessExpiration,
+      "access",
+      session.id,
+    );
+    const newRefreshToken = generateToken(
+      user.id!,
+      refreshExpiration,
+      "refresh",
+      session.id,
+    );
+
+    await db
+      .update(sessions)
+      .set({
+        accessToken: newAccessToken,
+        accessTokenExpires: accessExpiration.toDate(),
+        refreshToken: newRefreshToken,
+        refreshTokenExpires: refreshExpiration.toDate(),
+      } as Partial<SessionInsertTable>)
+      .where(eq(sessions.id, session.id));
+
+    logger.info(`Token refresh successful for user ${user.id}, session ${session.id}`);
+
+    return {
+      access: {
+        token: newAccessToken,
+        expires: accessExpiration.toDate(),
+      },
+      refresh: {
+        token: newRefreshToken,
+        expires: refreshExpiration.toDate(),
+      },
+      sessionId: session.id,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    logger.error(`Unexpected error during token refresh: ${error instanceof Error ? error.message : String(error)}`);
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Token refresh failed due to server error"
+    );
+  }
+};
+
 export const accountService = {
   getUserAccount,
   updateUserAccount,
   generateToken,
   generateAuthTokens,
+  refreshAuthTokens,
   ensureAccountExists,
   logoutSession,
   logoutAllUserSessions,
