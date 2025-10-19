@@ -11,7 +11,7 @@ const envVarsSchema = Joi.object()
     DB_URL: Joi.string().required().description("Database url"),
     JWT_SECRET: Joi.string().required().description("JWT secret key"),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number()
-      .default(2)
+      .default(30)
       .description("minutes after which access tokens expire"),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number()
       .default(30)
