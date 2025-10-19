@@ -900,7 +900,7 @@
     "@babel/preset-modules" "0.1.6-no-external-plugins"
     babel-plugin-polyfill-corejs2 "^0.4.10"
     babel-plugin-polyfill-corejs3 "^0.11.0"
-    babel-plugin-polyfill-regenerator "^0.6.1"
+    babel-plugin-polyfill-regenerator "^0.6.5"
     core-js-compat "^3.40.0"
     semver "^6.3.1"
 
@@ -6426,7 +6426,7 @@ babel-plugin-polyfill-corejs3@^0.11.0:
     "@babel/helper-define-polyfill-provider" "^0.6.3"
     core-js-compat "^3.40.0"
 
-babel-plugin-polyfill-regenerator@^0.6.1:
+babel-plugin-polyfill-regenerator@^0.6.5:
   version "0.6.4"
   resolved "https://registry.yarnpkg.com/babel-plugin-polyfill-regenerator/-/babel-plugin-polyfill-regenerator-0.6.4.tgz#428c615d3c177292a22b4f93ed99e358d7906a9b"
   integrity sha512-7gD3pRadPrbjhjLyxebmx/WrFYcuSjZ0XbdUujQMZ/fcE9oeewk2U/7PCvez84UeuK3oSjmPZ0Ch0dlupQvGzw==
@@ -7384,7 +7384,7 @@ css-tree@^1.1.2, css-tree@^1.1.3:
   integrity sha512-tRpdppF7TRazZrjJ6v3stzv93qxRcSsFmW6cX0Zm2NVKpxE1WV1HblnghVv9TreireHkqI/VDEsfolRF1p6y7Q==
   dependencies:
     mdn-data "2.0.14"
-    source-map "^0.6.1"
+    source-map "^0.6.5"
 
 css-tree@^2.3.1:
   version "2.3.1"
@@ -9401,7 +9401,7 @@ handlebars@^4.7.7:
   dependencies:
     minimist "^1.2.5"
     neo-async "^2.6.2"
-    source-map "^0.6.1"
+    source-map "^0.6.5"
     wordwrap "^1.0.0"
   optionalDependencies:
     uglify-js "^3.1.4"
@@ -10071,7 +10071,7 @@ istanbul-lib-source-maps@^4.0.0:
   dependencies:
     debug "^4.1.1"
     istanbul-lib-coverage "^3.0.0"
-    source-map "^0.6.1"
+    source-map "^0.6.5"
 
 istanbul-reports@^3.1.3:
   version "3.1.7"
@@ -13590,9 +13590,9 @@ source-map@0.8.0-beta.0, source-map@^0.8.0-beta.0:
   dependencies:
     whatwg-url "^7.0.0"
 
-source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
+source-map@^0.6.0, source-map@^0.6.5, source-map@~0.6.0:
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.5.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
 sourcemap-codec@^1.4.8:

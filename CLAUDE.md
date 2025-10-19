@@ -11,12 +11,14 @@ Meelio is a productivity and focus application built as a Turborepo monorepo wit
 ### Applications (`apps/`)
 
 - **api**: Express.js REST API server
+
   - PostgreSQL database with Drizzle ORM
   - JWT & Google OAuth authentication via Passport.js
   - Lemon Squeezy integration for billing
   - Module-based architecture (auth, billing, tasks, notes, focus-sessions, site-blocker, etc.)
 
 - **web**: React web application
+
   - Built with Vite + React Router
   - Playwright for E2E testing
   - PWA capabilities via vite-plugin-pwa
@@ -30,6 +32,7 @@ Meelio is a productivity and focus application built as a Turborepo monorepo wit
 ### Shared Packages (`packages/`)
 
 - **@repo/shared**: Core business logic, API clients, hooks, stores (Zustand), types, utilities
+
   - Exports organized by domain: `api/*`, `components/*`, `hooks/*`, `stores/*`, `types/*`, `utils/*`
   - Uses Zustand for state management
   - Dexie for IndexedDB operations
@@ -149,17 +152,20 @@ yarn clean          # Clean all build artifacts
 - **Entry point**: `src/index.ts` → `src/server.ts`
 - **Routing**: All routes under `/v1/*` namespace (see `src/routes/v1/index.ts`)
 - **Module structure**: Each feature module in `src/modules/` contains:
+
   - `*.controller.ts` - Request handlers
   - `*.service.ts` - Business logic
   - `*.validation.ts` - Request validation schemas (Joi)
   - `*.routes.ts` - Route definitions
 
 - **Database**:
+
   - Drizzle ORM with PostgreSQL
   - Schema definitions in `src/db/schema/`
   - Migration files in `src/db/drizzle/`
 
 - **Authentication**:
+
   - JWT strategy (local auth)
   - Google OAuth strategy
   - Both configured via Passport.js
@@ -177,6 +183,7 @@ yarn clean          # Clean all build artifacts
 
 - **Framework**: Plasmo (handles manifest v3 complexity)
 - **Entry points**:
+
   - `src/newtab.tsx` - New tab page
   - `src/popup.tsx` - Extension popup
   - `src/background.ts` - Background service worker
@@ -205,6 +212,7 @@ When adding features that should work in both web and extension, add them to `@r
 ### API (`apps/api/.env`)
 
 Required variables (see `apps/api/.env.example`):
+
 - `NODE_ENV` - Environment (development/production)
 - `PORT` - Server port (default: 3000)
 - `DB_URL` - PostgreSQL connection string
@@ -217,6 +225,7 @@ Required variables (see `apps/api/.env.example`):
 - SMTP settings for email
 
 Database setup example:
+
 ```bash
 docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -d -p 5433:5432 postgres
 ```
@@ -248,6 +257,7 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
 ## Development Workflow
 
 1. **Adding a new feature module to API**:
+
    - Create module directory in `apps/api/src/modules/{feature}/`
    - Add schema to `apps/api/src/db/schema/{feature}.schema.ts`
    - Export schema in `apps/api/src/db/schema/index.ts`
@@ -257,6 +267,7 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
    - Register routes in `apps/api/src/routes/v1/index.ts`
 
 2. **Adding a new feature to web/extension**:
+
    - Add shared logic (stores, hooks, API clients) to `packages/shared/src/`
    - Add UI components to `packages/ui/src/` (if reusable) or app-specific `src/components/`
    - Update routes in respective app's router
@@ -268,5 +279,5 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
 
 ## Version Management
 
-- All packages share the same version number (currently 0.6.1)
+- All packages share the same version number (currently 0.6.5)
 - Web app uses `standard-version` for changelog/releases: `yarn release`
