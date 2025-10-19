@@ -4,6 +4,7 @@ import { validate } from "@/common/validate";
 import { auth } from "@/modules/auth";
 import { accountController } from "@/modules/auth/auth.controller";
 import { accountValidation } from "@/modules/auth/auth.validation";
+import { authLimiter } from "@/utils/rate-limiter";
 
 const router: Router = express.Router();
 
@@ -17,11 +18,6 @@ router.post(
   validate(accountValidation.login),
   accountController.login
 );
-// router.post(
-//   "/guest",
-//   validate(accountValidation.registerGuest),
-//   accountController.registerGuest
-// );
 router.post(
   "/forgot-password",
   validate(accountValidation.forgotPassword),
@@ -69,5 +65,6 @@ router.put(
   accountController.updateAccount
 );
 router.post("/logout", auth(), accountController.logout);
+router.post("/refresh-tokens", authLimiter as any, accountController.refreshTokens);
 
 export default router;

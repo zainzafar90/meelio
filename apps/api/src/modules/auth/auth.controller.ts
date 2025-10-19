@@ -134,6 +134,21 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const refreshTokens = catchAsync(async (req: Request, res: Response) => {
+  const refreshToken = cookieService.getRefreshCookieToken(req);
+
+  if (!refreshToken) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Refresh token not found");
+  }
+
+  const tokens = await accountService.refreshAuthTokens(refreshToken);
+  cookieService.setResponseCookie(res, tokens);
+
+  res.status(httpStatus.OK).send({
+    success: true,
+  });
+});
+
 const googleAuth = (state: string) => googleAuthenticatePassport(state);
 
 const googleAuthCallback = catchAsync(
@@ -226,6 +241,7 @@ export const accountController = {
   getAccount,
   updateAccount,
   logout,
+  refreshTokens,
   register,
   // registerGuest,
   login,
