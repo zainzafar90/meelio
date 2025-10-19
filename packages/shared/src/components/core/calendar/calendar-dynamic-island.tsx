@@ -5,20 +5,25 @@ import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { getCalendarColor } from "../../../utils/calendar-colors";
-import { isEventHappening, isAllDayEvent } from "../../../utils/calendar-date.utils";
+import {
+  isEventHappening,
+  isAllDayEvent,
+  isEventToday,
+} from "../../../utils/calendar-date.utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
 import type { CalendarEvent } from "../../../api/google-calendar.api";
 
 export const CalendarDynamicIsland = () => {
-  const { getMinutesUntilNextEvent, nextEvent, token, events } = useCalendarStore(
-    useShallow((state) => ({
-      getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
-      nextEvent: state.nextEvent,
-      token: state.token,
-      events: state.events,
-    }))
-  );
+  const { getMinutesUntilNextEvent, nextEvent, token, events } =
+    useCalendarStore(
+      useShallow((state) => ({
+        getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
+        nextEvent: state.nextEvent,
+        token: state.token,
+        events: state.events,
+      }))
+    );
 
   const { setCalendarVisible } = useDockStore(
     useShallow((state) => ({
@@ -54,14 +59,20 @@ export const CalendarDynamicIsland = () => {
   // Check if we should keep showing a recently started event
   useEffect(() => {
     const now = Date.now();
-    
+
     const recentlyStartedEvent = events.find((event) => {
-      const eventStart = new Date(event.start.dateTime || event.start.date || "");
+      const eventStart = new Date(
+        event.start.dateTime || event.start.date || ""
+      );
       const eventEnd = new Date(event.end.dateTime || event.end.date || "");
       const timeSinceStart = now - eventStart.getTime();
-      
+
       // Event started within threshold and hasn't ended
-      return timeSinceStart >= 0 && timeSinceStart <= RECENTLY_STARTED_THRESHOLD_MS && now < eventEnd.getTime();
+      return (
+        timeSinceStart >= 0 &&
+        timeSinceStart <= RECENTLY_STARTED_THRESHOLD_MS &&
+        now < eventEnd.getTime()
+      );
     });
 
     // Priority: nextEvent (upcoming/ongoing) > recentlyStartedEvent > null
@@ -118,9 +129,9 @@ export const CalendarDynamicIsland = () => {
         onClick={handleClick}
       >
         <div className="flex justify-center w-full mt-4">
-            <span className="truncate max-w-32 text-xs text-zinc-400">
-              No Events
-            </span>
+          <span className="truncate max-w-32 text-xs text-zinc-400">
+            No Events
+          </span>
         </div>
       </div>
     );
@@ -128,9 +139,17 @@ export const CalendarDynamicIsland = () => {
 
   const isHappening = isEventHappening(displayEvent);
   const isAllDay = isAllDayEvent(displayEvent);
-  const timeText = isHappening ? "Now" : isAllDay ? "Today" : formatTime(minutesLeft);
+  const timeText = isHappening
+    ? "Now"
+    : isAllDay
+      ? "Today"
+      : formatTime(minutesLeft);
 
-  const eventColor = displayEvent ? getCalendarColor(displayEvent.colorId) : "#6b7280";
+  const eventIsToday = displayEvent ? isEventToday(displayEvent) : false;
+  const eventColor =
+    displayEvent && eventIsToday
+      ? getCalendarColor(displayEvent.colorId)
+      : "#6b7280";
 
   const handleClick = () => {
     setCalendarVisible(true);
@@ -150,7 +169,11 @@ export const CalendarDynamicIsland = () => {
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={displayEvent ? `${displayEvent.summary}-${eventColor}-${displayEvent.id}` : "no-events"}
+          key={
+            displayEvent
+              ? `${displayEvent.summary}-${eventColor}-${displayEvent.id}`
+              : "no-events"
+          }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -160,7 +183,9 @@ export const CalendarDynamicIsland = () => {
             <div
               className={cn(
                 "size-2.5 rounded-full flex-shrink-0",
-                displayEvent && ((minutesLeft !== null && minutesLeft < 10) || isHappening) && "animate-pulse"
+                displayEvent &&
+                  ((minutesLeft !== null && minutesLeft < 10) || isHappening) &&
+                  "animate-pulse"
               )}
               style={{ backgroundColor: eventColor }}
               aria-hidden="true"

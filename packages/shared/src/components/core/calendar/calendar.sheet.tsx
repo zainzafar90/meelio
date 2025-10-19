@@ -6,6 +6,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@repo/ui/components/ui/sheet";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@repo/ui/components/ui/collapsible";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
@@ -18,13 +23,14 @@ import {
 } from "../../../api/calendar.api";
 import { CalendarEvent } from "../../../api/google-calendar.api";
 import { getCalendarColor } from "../../../utils/calendar-colors";
-import { 
-  getEventStartDate, 
-  getEventEndDate, 
+import {
+  getEventStartDate,
+  getEventEndDate,
   isEventHappening,
-  isAllDayEvent 
+  isAllDayEvent,
+  isEventToday,
 } from "../../../utils/calendar-date.utils";
-import { Copy, Bell, Share } from "lucide-react";
+import { Copy, Bell, Share, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 /**
@@ -62,7 +68,7 @@ export const CalendarSheet = () => {
       const now = new Date();
       const eventStart = getEventStartDate(event);
       const eventEnd = getEventEndDate(event);
-      
+
       // Handle all-day events
       if (isAllDayEvent(event)) {
         if (isEventHappening(event, now)) {
@@ -74,22 +80,22 @@ export const CalendarSheet = () => {
         if (days === 1) return "Tomorrow";
         return `${days} days remaining`;
       }
-      
+
       // Check if event is currently happening
       if (isEventHappening(event, now)) {
         const endDiffMs = eventEnd.getTime() - now.getTime();
         const endMinutes = Math.floor(endDiffMs / (1000 * 60));
-        
+
         if (endMinutes <= 0) return "Ending now";
         if (endMinutes < 60) return `${endMinutes} minutes left`;
-        
+
         const endHours = Math.floor(endMinutes / 60);
         return `${endHours} hours left`;
       }
-      
+
       // Event is in the future
       const startDiffMs = eventStart.getTime() - now.getTime();
-      
+
       if (startDiffMs <= 0) return "Now";
 
       const minutes = Math.floor(startDiffMs / (1000 * 60));
@@ -131,12 +137,12 @@ export const CalendarSheet = () => {
       if (isAllDayEvent(event)) {
         const startDate = formatDate(start);
         const endDate = formatDate(end);
-        
+
         // Single day all-day event
         if (start.toDateString() === end.toDateString()) {
           return `${startDate} • All day`;
         }
-        
+
         // Multi-day all-day event
         return `${startDate} – ${endDate}`;
       }
@@ -181,30 +187,43 @@ export const CalendarSheet = () => {
     return null;
   };
 
-  const getUpcomingEvents = (): CalendarEvent[] => {
+  const categorizeEvents = () => {
     const now = new Date();
-    return events
-      .filter((event) => {
-        try {
-          // Keep events visible until their end time has passed
-          const eventEnd = getEventEndDate(event);
-          return eventEnd > now;
-        } catch (error) {
-          console.error("Error parsing event date:", error);
-          return false;
+    const happeningNow: CalendarEvent[] = [];
+    const today: CalendarEvent[] = [];
+    const upcoming: CalendarEvent[] = [];
+
+    events.forEach((event) => {
+      try {
+        const eventEnd = getEventEndDate(event);
+
+        if (eventEnd <= now) return;
+
+        if (isEventHappening(event, now)) {
+          happeningNow.push(event);
+        } else if (isEventToday(event, now)) {
+          today.push(event);
+        } else {
+          upcoming.push(event);
         }
-      })
-      .sort((a, b) => {
-        try {
-          const aStart = getEventStartDate(a);
-          const bStart = getEventStartDate(b);
-          return aStart.getTime() - bStart.getTime();
-        } catch (error) {
-          console.error("Error sorting events:", error);
-          return 0;
-        }
-      })
-      .slice(0, 10); // Show max 10 events
+      } catch (error) {
+        console.error("Error categorizing event:", error);
+      }
+    });
+
+    const sortByStart = (a: CalendarEvent, b: CalendarEvent) => {
+      try {
+        return getEventStartDate(a).getTime() - getEventStartDate(b).getTime();
+      } catch {
+        return 0;
+      }
+    };
+
+    return {
+      happeningNow: happeningNow.sort(sortByStart),
+      today: today.sort(sortByStart),
+      upcoming: upcoming.sort(sortByStart).slice(0, 10),
+    };
   };
 
   const handleConnect = async () => {
@@ -251,7 +270,7 @@ export const CalendarSheet = () => {
 
         {isGuestMode ? (
           <div className="flex flex-col gap-4">
-            <PromotionalLoginButton 
+            <PromotionalLoginButton
               variant="minimal"
               title="Sign in to unlock Calendar"
               subtitle="Connect your Google Calendar and sync events"
@@ -268,77 +287,14 @@ export const CalendarSheet = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col gap-6 flex-1 overflow-y-auto">
-              {getUpcomingEvents().length === 0 ? (
-                <div className="text-sm text-muted-foreground text-center py-8">
-                  No upcoming events
-                </div>
-              ) : (
-                getUpcomingEvents().map((event) => {
-                  const eventColor = getCalendarColor(event.colorId);
-                  const meetingLink = getMeetingLink(event);
-
-                  return (
-                    <div
-                      key={event.id}
-                      className="space-y-4 p-4 rounded-2xl bg-card border border-border/50"
-                    >
-                      {/* Event Title with Color and Join Button */}
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div
-                            className="size-3 rounded-md flex-shrink-0"
-                            style={{ backgroundColor: eventColor }}
-                          />
-                          <h4 className="text-sm font-semibold text-card-foreground truncate">
-                            {event.summary || "Untitled Event"}
-                          </h4>
-                        </div>
-                        {meetingLink && (
-                          <Button
-                            size="sm"
-                            className="h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-                            onClick={() => window.open(meetingLink, "_blank")}
-                          >
-                            <Share className="w-3 h-3 mr-1" />
-                            Join
-                          </Button>
-                        )}
-                      </div>
-
-                      {/* Event Time */}
-                      <p className="text-sm text-muted-foreground">
-                        {formatEventTime(event)}
-                      </p>
-
-                      {/* Meeting Link */}
-                      {meetingLink && (
-                        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-muted-foreground font-mono">
-                            {meetingLink.replace("https://", "")}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-8 w-8 p-0"
-                            onClick={() => copyMeetingLink(meetingLink)}
-                            title="Copy meeting link"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )}
-
-                      {/* Time Reminder */}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Bell className="w-4 h-4" />
-                        <span>{formatTimeRemaining(event)}</span>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+            <EventsList
+              categorizeEvents={categorizeEvents}
+              formatEventTime={formatEventTime}
+              formatTimeRemaining={formatTimeRemaining}
+              getMeetingLink={getMeetingLink}
+              copyMeetingLink={copyMeetingLink}
+              getCalendarColor={getCalendarColor}
+            />
           </div>
         ) : (
           <Button onClick={handleConnect} disabled={loading}>
@@ -347,5 +303,243 @@ export const CalendarSheet = () => {
         )}
       </SheetContent>
     </Sheet>
+  );
+};
+
+interface EventsListProps {
+  categorizeEvents: () => {
+    happeningNow: CalendarEvent[];
+    today: CalendarEvent[];
+    upcoming: CalendarEvent[];
+  };
+  formatEventTime: (event: CalendarEvent) => string;
+  formatTimeRemaining: (event: CalendarEvent) => string;
+  getMeetingLink: (event: CalendarEvent) => string | null;
+  copyMeetingLink: (link: string) => Promise<void>;
+  getCalendarColor: (colorId?: string) => string;
+}
+
+const EventsList: React.FC<EventsListProps> = ({
+  categorizeEvents,
+  formatEventTime,
+  formatTimeRemaining,
+  getMeetingLink,
+  copyMeetingLink,
+  getCalendarColor,
+}) => {
+  const { t } = useTranslation();
+  const { happeningNow, today, upcoming } = categorizeEvents();
+  const [happeningNowOpen, setHappeningNowOpen] = useState(true);
+  const [upcomingOpen, setUpcomingOpen] = useState(false);
+
+  const totalEvents = happeningNow.length + today.length + upcoming.length;
+
+  if (totalEvents === 0) {
+    return (
+      <div className="text-sm text-muted-foreground text-center py-8">
+        No upcoming events
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 flex-1 overflow-y-auto">
+      {happeningNow.length > 0 && (
+        <Collapsible open={happeningNowOpen} onOpenChange={setHappeningNowOpen}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+            <span className="text-sm font-semibold text-card-foreground">
+              {t("calendar.sheet.happeningNow")} ({happeningNow.length})
+            </span>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${
+                happeningNowOpen ? "transform rotate-180" : ""
+              }`}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-3 mt-2">
+            {happeningNow.map((event) => (
+              <CompactEventCard
+                key={event.id}
+                event={event}
+                formatTimeRemaining={formatTimeRemaining}
+                getMeetingLink={getMeetingLink}
+                getCalendarColor={getCalendarColor}
+              />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {today.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between w-full p-2">
+            <span className="text-sm font-semibold text-card-foreground">
+              {t("calendar.sheet.today")} ({today.length})
+            </span>
+          </div>
+          <div className="flex flex-col gap-4 mt-2">
+            {today.map((event) => (
+              <FullEventCard
+                key={event.id}
+                event={event}
+                formatEventTime={formatEventTime}
+                formatTimeRemaining={formatTimeRemaining}
+                getMeetingLink={getMeetingLink}
+                copyMeetingLink={copyMeetingLink}
+                getCalendarColor={getCalendarColor}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {upcoming.length > 0 && (
+        <Collapsible open={upcomingOpen} onOpenChange={setUpcomingOpen}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+            <span className="text-sm font-semibold text-card-foreground">
+              {t("calendar.sheet.upcoming")} ({upcoming.length})
+            </span>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${
+                upcomingOpen ? "transform rotate-180" : ""
+              }`}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="flex flex-col gap-4 mt-2">
+            {upcoming.map((event) => (
+              <FullEventCard
+                key={event.id}
+                event={event}
+                formatEventTime={formatEventTime}
+                formatTimeRemaining={formatTimeRemaining}
+                getMeetingLink={getMeetingLink}
+                copyMeetingLink={copyMeetingLink}
+                getCalendarColor={getCalendarColor}
+              />
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+    </div>
+  );
+};
+
+interface CompactEventCardProps {
+  event: CalendarEvent;
+  formatTimeRemaining: (event: CalendarEvent) => string;
+  getMeetingLink: (event: CalendarEvent) => string | null;
+  getCalendarColor: (colorId?: string) => string;
+}
+
+const CompactEventCard: React.FC<CompactEventCardProps> = ({
+  event,
+  formatTimeRemaining,
+  getMeetingLink,
+  getCalendarColor,
+}) => {
+  const eventColor = getCalendarColor(event.colorId);
+  const meetingLink = getMeetingLink(event);
+
+  return (
+    <div className="flex items-center justify-between p-3 rounded-lg bg-card border border-border/50">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div
+          className="size-2.5 rounded-full flex-shrink-0 animate-pulse"
+          style={{ backgroundColor: eventColor }}
+        />
+        <div className="flex flex-col gap-1 flex-1 min-w-0">
+          <h4 className="text-sm font-medium text-card-foreground truncate">
+            {event.summary || "Untitled Event"}
+          </h4>
+          <span className="text-xs text-muted-foreground">
+            {formatTimeRemaining(event)}
+          </span>
+        </div>
+      </div>
+      {meetingLink && (
+        <Button
+          size="sm"
+          className="h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-full flex-shrink-0"
+          onClick={() => window.open(meetingLink, "_blank")}
+        >
+          <Share className="w-3 h-3 mr-1" />
+          Join
+        </Button>
+      )}
+    </div>
+  );
+};
+
+interface FullEventCardProps {
+  event: CalendarEvent;
+  formatEventTime: (event: CalendarEvent) => string;
+  formatTimeRemaining: (event: CalendarEvent) => string;
+  getMeetingLink: (event: CalendarEvent) => string | null;
+  copyMeetingLink: (link: string) => Promise<void>;
+  getCalendarColor: (colorId?: string) => string;
+}
+
+const FullEventCard: React.FC<FullEventCardProps> = ({
+  event,
+  formatEventTime,
+  formatTimeRemaining,
+  getMeetingLink,
+  copyMeetingLink,
+  getCalendarColor,
+}) => {
+  const eventColor = getCalendarColor(event.colorId);
+  const meetingLink = getMeetingLink(event);
+
+  return (
+    <div className="space-y-4 p-4 rounded-2xl bg-card border border-border/50">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div
+            className="size-3 rounded-md flex-shrink-0"
+            style={{ backgroundColor: eventColor }}
+          />
+          <h4 className="text-sm font-semibold text-card-foreground truncate">
+            {event.summary || "Untitled Event"}
+          </h4>
+        </div>
+        {meetingLink && (
+          <Button
+            size="sm"
+            className="h-7 px-3 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-full"
+            onClick={() => window.open(meetingLink, "_blank")}
+          >
+            <Share className="w-3 h-3 mr-1" />
+            Join
+          </Button>
+        )}
+      </div>
+
+      {/* Event Time */}
+      <p className="text-sm text-muted-foreground">{formatEventTime(event)}</p>
+
+      {/* Meeting Link */}
+      {meetingLink && (
+        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+          <span className="text-sm text-muted-foreground font-mono">
+            {meetingLink.replace("https://", "")}
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 w-8 p-0"
+            onClick={() => copyMeetingLink(meetingLink)}
+            title="Copy meeting link"
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Time Reminder */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Bell className="w-4 h-4" />
+        <span>{formatTimeRemaining(event)}</span>
+      </div>
+    </div>
   );
 };

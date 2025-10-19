@@ -3,10 +3,10 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
 import { getCalendarToken } from "../api/calendar.api";
 import { useAuthStore } from "../stores/auth.store";
-import { 
-  getEventStartDate, 
-  getEventEndDate, 
-  getMinutesUntilEvent 
+import {
+  getEventStartDate,
+  getEventEndDate,
+  getMinutesUntilEvent
 } from "../utils/calendar-date.utils";
 
 export const REFRESH_THRESHOLD_MS = 15 * 60 * 1000;
@@ -21,6 +21,7 @@ export interface CalendarState {
   events: CalendarEvent[];
   eventsLastFetched: number | null;
   nextEvent: CalendarEvent | null;
+  lastSuccessfulSync: number | null;
   setToken: (token: string, expiresAt: number) => void;
   setConnectedEmail: (email: string) => void;
   clearCalendar: () => void;
@@ -30,6 +31,7 @@ export interface CalendarState {
   getNextEvent: () => CalendarEvent | null;
   getMinutesUntilNextEvent: () => number | null;
   getSmartCacheDuration: () => number;
+  updateLastSuccessfulSync: () => void;
 }
 
 // Removed shouldRefreshToken - backend handles token refresh automatically
@@ -43,6 +45,7 @@ export const useCalendarStore = create<CalendarState>()(
       events: [],
       eventsLastFetched: null,
       nextEvent: null,
+      lastSuccessfulSync: null,
       setToken: (token, expiresAt) => {
         set({ token, expiresAt });
       },
@@ -57,7 +60,11 @@ export const useCalendarStore = create<CalendarState>()(
           events: [],
           eventsLastFetched: null,
           nextEvent: null,
+          lastSuccessfulSync: null,
         });
+      },
+      updateLastSuccessfulSync: () => {
+        set({ lastSuccessfulSync: Date.now() });
       },
       initializeToken: async () => {
         const { user } = useAuthStore.getState();
@@ -70,9 +77,11 @@ export const useCalendarStore = create<CalendarState>()(
           if (accessToken && expiresAt) {
             const expiryTime = new Date(expiresAt).getTime();
             set({ token: accessToken, expiresAt: expiryTime });
+            get().updateLastSuccessfulSync();
           }
         } catch (error) {
           console.error("Failed to initialize calendar token:", error);
+          // Don't clear calendar here - let grace period handle it
         }
       },
       refreshToken: async () => {
@@ -163,13 +172,24 @@ export const useCalendarStore = create<CalendarState>()(
             eventsLastFetched: Date.now(),
             nextEvent: activeEvents[0] || null,
           });
+          get().updateLastSuccessfulSync();
         } catch (error: any) {
           console.error("Failed to load events:", error);
+
+          const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+          const now = Date.now();
+          const lastSync = get().lastSuccessfulSync;
+
           if (
             error.message?.includes("401") ||
             error.message?.includes("Failed to fetch events")
           ) {
-            get().clearCalendar();
+            if (!lastSync || (now - lastSync) > ONE_DAY_MS) {
+              get().clearCalendar();
+            } else {
+              // Within grace period, keep existing data
+              console.log('Calendar sync failed but within 1-hour grace period, keeping existing data');
+            }
           }
         }
       },
