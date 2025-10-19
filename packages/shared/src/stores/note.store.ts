@@ -436,7 +436,6 @@ const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
 
 useSyncStore.subscribe(handleOnlineStatusChange);
 
-// Initialize sync for already logged-in Pro users when module loads
 const user = useAuthStore.getState().user;
 if (user?.isPro && !noteSyncManager) {
   initializeNoteSync();

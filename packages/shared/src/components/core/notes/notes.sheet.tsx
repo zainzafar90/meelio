@@ -442,12 +442,18 @@ export function NotesSheet() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setEnableTypingSound(!enableTypingSound)}
-                className="h-8 w-8 p-0"
+                className="h-8 px-3 gap-2"
               >
                 {enableTypingSound ? (
-                  <Volume2 className="h-4 w-4" />
+                  <>
+                    <Volume2 className="h-4 w-4" />
+                    <span className="text-xs">Mute sound</span>
+                  </>
                 ) : (
-                  <VolumeX className="h-4 w-4" />
+                  <>
+                    <VolumeX className="h-4 w-4" />
+                    <span className="text-xs">Unmute sound</span>
+                  </>
                 )}
               </Button>
               <SyncStatus entityType="note" />

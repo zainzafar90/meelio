@@ -165,7 +165,6 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
       const normalizedUpdates = result.updated.map(this.adapter.transformers.normalizeFromServer);
       await this.adapter.dbTable.bulkPut(normalizedUpdates);
 
-      // Update in-memory state to reflect any server-side resolutions
       const updatesById = new Map<string, LocalT>();
       for (const u of normalizedUpdates) {
         if (u && (u as any).id) updatesById.set((u as any).id, u);
@@ -181,7 +180,6 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
       }
     }
 
-    // Apply deletions (tombstone)
     for (const id of result.deleted || []) {
       await this.adapter.dbTable.update(id, {
         deletedAt: Date.now(),
@@ -189,7 +187,6 @@ export class EntitySyncManager<LocalT, RemoteT, CreatePayload, UpdatePayload, De
       } as unknown as Partial<LocalT>);
     }
 
-    // Remove deleted items from in-memory state
     if ((result.deleted?.length || 0) > 0) {
       const deletedSet = new Set<string>(result.deleted);
       const current = this.adapter.store.getItems();
@@ -255,7 +252,6 @@ export function createEntitySync<LocalT, RemoteT, CreatePayload, UpdatePayload, 
   return new EntitySyncManager(adapter);
 }
 
-// Helper function to create standard payload transformers
 export function createStandardTransformers<T extends { id: string }>() {
   return {
     toCreatePayload: (op: SyncOperation) => {
