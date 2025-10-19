@@ -279,5 +279,5 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
 
 ## Version Management
 
-- All packages share the same version number (currently 0.6.5)
+- All packages share the same version number (currently 0.6.6)
 - Web app uses `standard-version` for changelog/releases: `yarn release`
