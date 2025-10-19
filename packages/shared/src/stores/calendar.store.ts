@@ -135,9 +135,9 @@ export const useCalendarStore = create<CalendarState>()(
           return;
         }
 
-        try {
-          const eventsResponse = await fetchCalendarEvents(token);
-          // Extract Google account email from calendar response
+        const fetchAndProcessEvents = async (accessToken: string) => {
+          const eventsResponse = await fetchCalendarEvents(accessToken);
+
           const googleEmail = eventsResponse.summary || null;
           if (googleEmail && googleEmail !== get().connectedEmail) {
             set({ connectedEmail: googleEmail });
@@ -147,7 +147,7 @@ export const useCalendarStore = create<CalendarState>()(
           const now = new Date();
 
           const activeEvents = events
-            .filter((event) => {
+            .filter((event: CalendarEvent) => {
               try {
                 const eventEnd = getEventEndDate(event);
                 return eventEnd > now;
@@ -156,7 +156,7 @@ export const useCalendarStore = create<CalendarState>()(
                 return false;
               }
             })
-            .sort((a, b) => {
+            .sort((a: CalendarEvent, b: CalendarEvent) => {
               try {
                 const aStart = getEventStartDate(a);
                 const bStart = getEventStartDate(b);
@@ -173,7 +173,28 @@ export const useCalendarStore = create<CalendarState>()(
             nextEvent: activeEvents[0] || null,
           });
           get().updateLastSuccessfulSync();
+        };
+
+        try {
+          await fetchAndProcessEvents(token);
         } catch (error: any) {
+          const is401Error = error.message?.includes("401");
+
+          if (is401Error) {
+            console.log("Google token expired, attempting refresh...");
+            try {
+              await get().refreshToken();
+              const refreshedToken = get().token;
+
+              if (refreshedToken) {
+                await fetchAndProcessEvents(refreshedToken);
+                return;
+              }
+            } catch (refreshError) {
+              console.error("Failed to refresh Google token:", refreshError);
+            }
+          }
+
           console.error("Failed to load events:", error);
 
           const ONE_DAY_MS = 24 * 60 * 60 * 1000;
