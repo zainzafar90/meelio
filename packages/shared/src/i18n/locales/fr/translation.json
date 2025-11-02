@@ -10,6 +10,7 @@
     "site-blocker": "Bloqueur de sites",
     "background": "Arrière-plan",
     "tab-stash": "Rangement d'onglets",
+    "bookmarks": "Favoris",
     "clock": "Horloge",
     "calendar": "Calendrier",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "Rangement d'onglets",
       "description": "Désencombrez votre navigateur en rangeant vos onglets pour plus tard."
+    },
+    "bookmarks": {
+      "title": "Favoris",
+      "description": "Accédez et gérez les favoris de votre navigateur."
     },
     "background": {
       "title": "Arrière-plans",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "Enregistrer et organiser les onglets du navigateur"
       },
+      "bookmarks": {
+        "description": "Accéder à vos favoris"
+      },
       "background": {
         "description": "Changer votre arrière-plan"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "Accorder la permission",
     "permissions-needed": "Permissions supplémentaires requises",
     "permissions-description": "Nous avons besoin de la permission de gérer vos onglets pour utiliser cette fonctionnalité"
+  },
+  "bookmarks": {
+    "title": "Favoris",
+    "description": "Gérer vos favoris",
+    "extension-only": "Les favoris ne sont disponibles que dans l'extension",
+    "get-extension": "Obtenir l'extension",
+    "needs-permission": "Permission de favoris requise",
+    "grant-permission": "Accorder la permission",
+    "empty": "Aucun favori trouvé",
+    "refresh": "Actualiser",
+    "links": "liens",
+    "folders": "dossiers"
   },
   "calendar": {
     "sheet": {

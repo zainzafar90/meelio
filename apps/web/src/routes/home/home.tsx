@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   Clock,
   TabStashSheet,
+  BookmarksSheet,
   CalendarSheet,
   CalendarDynamicIsland,
   useDockStore,
@@ -131,6 +132,7 @@ const Content = () => {
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <BookmarksSheet />
       <CalendarSheet />
     </main>
   );

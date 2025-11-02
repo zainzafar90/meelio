@@ -273,7 +273,7 @@ User Action → Store → Local DB → Optimistic Update
 1. ✅ Phase 1: Decouple Timer - Complete (event-driven architecture, timer events system)
 2. ✅ Phase 2: Simplify Sync - Complete (created functional sync-manager.ts, removed class-based approach)
 3. ⏳ Phase 3.1: Weather Feature - In Progress (needs backend API endpoint for 7-day forecast)
-4. ⏳ Phase 3.2: Bookmarks/Links - Next (Chrome bookmarks API integration)
+4. ✅ Phase 3.2: Bookmarks/Links - Complete (Chrome bookmarks API, offline-first with IndexedDB caching, dock integration)
 5. ⏳ Phase 3.3: Tab Groups - Pending (extend tab stash with chrome.tabsGroups)
 6. ⏳ Phase 3.4: Custom Photo Upload - Pending (needs backend API)
 7. ⏳ Phase 3.5: Metrics/Countdowns - Pending (frontend-only feature)

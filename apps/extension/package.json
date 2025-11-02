@@ -122,7 +122,8 @@
       "notifications"
     ],
     "optional_permissions": [
-      "tabs"
+      "tabs",
+      "bookmarks"
     ]
   }
 }

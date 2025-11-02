@@ -10,6 +10,7 @@
     "site-blocker": "Блокировка сайтов",
     "background": "Фон",
     "tab-stash": "Сохранённые вкладки",
+    "bookmarks": "Закладки",
     "clock": "Часы",
     "calendar": "Календарь",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "Сохранение вкладок",
       "description": "Очистите браузер, сохранив вкладки на потом."
+    },
+    "bookmarks": {
+      "title": "Закладки",
+      "description": "Доступ к закладкам браузера и управление ими."
     },
     "background": {
       "title": "Фоны",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "Сохранение и организация вкладок браузера"
       },
+      "bookmarks": {
+        "description": "Доступ к вашим закладкам"
+      },
       "background": {
         "description": "Изменение фона"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "Предоставить разрешение",
     "permissions-needed": "Требуются дополнительные разрешения",
     "permissions-description": "Нам нужно разрешение на управление вкладками для использования этой функции"
+  },
+  "bookmarks": {
+    "title": "Закладки",
+    "description": "Управление закладками",
+    "extension-only": "Закладки доступны только в расширении",
+    "get-extension": "Получить расширение",
+    "needs-permission": "Требуется разрешение на закладки",
+    "grant-permission": "Предоставить разрешение",
+    "empty": "Закладки не найдены",
+    "refresh": "Обновить",
+    "links": "ссылки",
+    "folders": "папки"
   },
   "calendar": {
     "sheet": {

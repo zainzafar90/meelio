@@ -84,3 +84,18 @@ export interface TabStash {
   updatedAt: number;
   deletedAt?: number | null;
 }
+
+export interface CachedBookmark {
+  id: string;
+  userId: string;
+  chromeId: string;
+  title: string;
+  url?: string;
+  parentId?: string;
+  index?: number;
+  favicon?: string;
+  dateAdded: number;
+  dateGroupModified?: number;
+  cachedAt: number;
+  deletedAt?: number | null;
+}

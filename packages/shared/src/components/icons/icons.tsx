@@ -5,6 +5,7 @@ import {
   ArrowRight,
   Bell,
   Book,
+  Bookmark,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -417,6 +418,10 @@ export const Icons = {
         d="M21 22a.997.997 0 0 1-.707-.293l-18-18a1 1 0 0 1 1.414-1.414l18 18A1 1 0 0 1 21 22Z"
       />
     </svg>
+  ),
+  bookmark: Bookmark,
+  bookmarkActive: ({ ...props }: LucideProps) => (
+    <Bookmark {...props} fill="currentColor" />
   ),
   tabStash: ({ ...props }: LucideProps) => (
     <svg

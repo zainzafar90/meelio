@@ -10,6 +10,7 @@
     "site-blocker": "Bloqueador de Sites",
     "background": "Plano de Fundo",
     "tab-stash": "Guardar Abas",
+    "bookmarks": "Favoritos",
     "clock": "Relógio",
     "calendar": "Calendário",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "Guardar Abas",
       "description": "Organize seu navegador guardando abas para depois."
+    },
+    "bookmarks": {
+      "title": "Favoritos",
+      "description": "Acesse e gerencie os favoritos do seu navegador."
     },
     "background": {
       "title": "Planos de Fundo",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "Salvar e organizar abas do navegador"
       },
+      "bookmarks": {
+        "description": "Acesse seus favoritos"
+      },
       "background": {
         "description": "Alterar seu plano de fundo"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "Conceder Permissão",
     "permissions-needed": "Permissões adicionais necessárias",
     "permissions-description": "Precisamos de permissão para gerenciar suas abas para usar este recurso"
+  },
+  "bookmarks": {
+    "title": "Favoritos",
+    "description": "Gerenciar seus favoritos",
+    "extension-only": "Favoritos disponíveis apenas na extensão",
+    "get-extension": "Obter a Extensão",
+    "needs-permission": "Permissão de favoritos necessária",
+    "grant-permission": "Conceder Permissão",
+    "empty": "Nenhum favorito encontrado",
+    "refresh": "Atualizar",
+    "links": "links",
+    "folders": "pastas"
   },
   "calendar": {
     "sheet": {

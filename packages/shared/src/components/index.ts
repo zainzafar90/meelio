@@ -108,6 +108,9 @@ export * from "./core/site-blocker/site-blocker.sheet";
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";
 
+// Bookmarks
+export * from "./core/bookmarks/bookmarks.sheet";
+
 // ------------- ICONS -------------
 export * from "./icons";
 

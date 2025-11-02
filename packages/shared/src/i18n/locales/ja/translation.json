@@ -10,6 +10,7 @@
     "site-blocker": "サイトブロッカー",
     "background": "背景",
     "tab-stash": "タブ保管",
+    "bookmarks": "ブックマーク",
     "clock": "時計",
     "calendar": "カレンダー",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "タブ保管",
       "description": "後で使うタブを保管してブラウザを整理しましょう。"
+    },
+    "bookmarks": {
+      "title": "ブックマーク",
+      "description": "ブラウザのブックマークにアクセスして管理します。"
     },
     "background": {
       "title": "背景",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "ブラウザタブの保存と整理"
       },
+      "bookmarks": {
+        "description": "ブックマークにアクセス"
+      },
       "background": {
         "description": "背景を変更"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "権限を付与",
     "permissions-needed": "追加の権限が必要です",
     "permissions-description": "この機能を使用するにはタブを管理する権限が必要です"
+  },
+  "bookmarks": {
+    "title": "ブックマーク",
+    "description": "ブックマークを管理",
+    "extension-only": "ブックマークは拡張機能でのみ利用可能",
+    "get-extension": "拡張機能を取得",
+    "needs-permission": "ブックマーク権限が必要",
+    "grant-permission": "権限を付与",
+    "empty": "ブックマークが見つかりません",
+    "refresh": "更新",
+    "links": "リンク",
+    "folders": "フォルダ"
   },
   "calendar": {
     "sheet": {

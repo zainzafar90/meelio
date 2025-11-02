@@ -10,6 +10,7 @@
     "site-blocker": "Seitenblocker",
     "background": "Hintergrund",
     "tab-stash": "Tab-Stash",
+    "bookmarks": "Lesezeichen",
     "clock": "Uhr",
     "calendar": "Kalender",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "Tab Stash",
       "description": "Entscheide dich für deine Browser-Tabs und stecke sie für später zurück."
+    },
+    "bookmarks": {
+      "title": "Lesezeichen",
+      "description": "Zugriff auf und Verwaltung Ihrer Browser-Lesezeichen."
     },
     "background": {
       "title": "Hintergründe",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "Browser-Tabs speichern und organisieren"
       },
+      "bookmarks": {
+        "description": "Auf deine Lesezeichen zugreifen"
+      },
       "background": {
         "description": "Ändere deinen Hintergrund"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "Berechtigung gewähren",
     "permissions-needed": "Zusätzliche Berechtigungen erforderlich",
     "permissions-description": "Wir benötigen Berechtigungen, um Ihre Registerkarten zu verwalten, um diese Funktion zu verwenden"
+  },
+  "bookmarks": {
+    "title": "Lesezeichen",
+    "description": "Verwalte deine Lesezeichen",
+    "extension-only": "Lesezeichen sind nur in der Erweiterung verfügbar",
+    "get-extension": "Erweiterung erhalten",
+    "needs-permission": "Lesezeichen-Berechtigung erforderlich",
+    "grant-permission": "Berechtigung gewähren",
+    "empty": "Keine Lesezeichen gefunden",
+    "refresh": "Aktualisieren",
+    "links": "Links",
+    "folders": "Ordner"
   },
   "calendar": {
     "sheet": {

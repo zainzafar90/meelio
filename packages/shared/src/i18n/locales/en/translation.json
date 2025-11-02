@@ -10,6 +10,7 @@
     "site-blocker": "Site Blocker",
     "background": "Background",
     "tab-stash": "Tab Stash",
+    "bookmarks": "Bookmarks",
     "clock": "Clock",
     "calendar": "Calendar",
     "calendarData": {
@@ -113,6 +114,10 @@
     "tab-stash": {
       "title": "Tab Stash",
       "description": "Declutter your browser by stashing away tabs for later."
+    },
+    "bookmarks": {
+      "title": "Bookmarks",
+      "description": "Access and manage your browser bookmarks."
     },
     "background": {
       "title": "Backgrounds",
@@ -403,6 +408,9 @@
       "tab-stash": {
         "description": "Save and organize browser tabs"
       },
+      "bookmarks": {
+        "description": "Access your bookmarks"
+      },
       "background": {
         "description": "Change your background"
       },
@@ -478,6 +486,18 @@
     "grant-permission": "Grant Permission",
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "description": "Manage your bookmarks",
+    "extension-only": "Bookmarks available in extension only",
+    "get-extension": "Get the Extension",
+    "needs-permission": "Bookmarks permission required",
+    "grant-permission": "Grant Permission",
+    "empty": "No bookmarks found",
+    "refresh": "Refresh",
+    "links": "links",
+    "folders": "folders"
   },
   "calendar": {
     "sheet": {

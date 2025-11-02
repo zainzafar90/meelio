@@ -13,6 +13,7 @@ interface DockIconsVisibility {
   clock: boolean;
   calendar: boolean;
   notes?: boolean;
+  bookmarks?: boolean;
 }
 
 interface DockState {
@@ -27,6 +28,7 @@ interface DockState {
   isTabStashVisible: boolean;
   isCalendarVisible: boolean;
   isNotesVisible?: boolean;
+  isBookmarksVisible?: boolean;
 
   // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
@@ -46,6 +48,7 @@ interface DockState {
   toggleTabStash: () => void;
   toggleCalendar: () => void;
   toggleNotes?: () => void;
+  toggleBookmarks?: () => void;
 
   // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
@@ -58,6 +61,7 @@ interface DockState {
   setTabStashVisible: (visible: boolean) => void;
   setCalendarVisible: (visible: boolean) => void;
   setNotesVisible?: (visible: boolean) => void;
+  setBookmarksVisible?: (visible: boolean) => void;
 
   // Icon visibility setters
   setDockIconVisible: (
@@ -86,6 +90,7 @@ export const useDockStore = create<DockState>()(
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
       isCalendarVisible: false,
+      isBookmarksVisible: false,
 
       // Icon visibility in dock - all visible by default
       dockIconsVisible: {
@@ -99,6 +104,7 @@ export const useDockStore = create<DockState>()(
         clock: false,
         calendar: true,
         notes: true,
+        bookmarks: true,
       },
 
       showIconLabels: false,
@@ -163,6 +169,10 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isNotesVisible: !(state as any).isNotesVisible }));
       },
 
+      toggleBookmarks: () => {
+        set((state) => ({ isBookmarksVisible: !(state as any).isBookmarksVisible }));
+      },
+
       // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
@@ -204,6 +214,10 @@ export const useDockStore = create<DockState>()(
         set({ isNotesVisible: visible } as any);
       },
 
+      setBookmarksVisible: (visible: boolean) => {
+        set({ isBookmarksVisible: visible } as any);
+      },
+
       // Icon visibility setter
       setDockIconVisible: (
         iconId: keyof DockIconsVisibility,
@@ -238,6 +252,7 @@ export const useDockStore = create<DockState>()(
           isTabStashVisible: false,
           isCalendarVisible: false,
           isNotesVisible: false,
+          isBookmarksVisible: false,
 
           // Don't reset icon visibility on reset
           currentOnboardingStep: -1,
@@ -257,6 +272,12 @@ export const useDockStore = create<DockState>()(
         }
         if (state.isNotesVisible === undefined) {
           state.isNotesVisible = false;
+        }
+        if (state.dockIconsVisible.bookmarks === undefined) {
+          state.dockIconsVisible.bookmarks = true;
+        }
+        if (state.isBookmarksVisible === undefined) {
+          state.isBookmarksVisible = false;
         }
         return state;
       },
