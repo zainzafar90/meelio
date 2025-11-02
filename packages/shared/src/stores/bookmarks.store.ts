@@ -192,7 +192,7 @@ const buildTreeFromCache = (cached: CachedBookmark[]): BookmarkNode[] => {
                 }
                 parent.children.push(node);
             } else {
-                rootNodes.push(node);
+                console.warn(`Orphaned bookmark node detected: "${node.title}" (id: ${node.id}) with missing parent (parentId: ${node.parentId}). This node will be excluded from the tree until the next sync.`);
             }
         }
     });
@@ -391,7 +391,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 requestPermissions: async () => {
                     const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
                     console.log("requestPermissions called, isExtension:", isExtension, "inExtension:", inExtension);
-                    
+
                     if (!inExtension) {
                         console.warn("Not in extension environment");
                         set({ hasPermissions: false });
@@ -446,7 +446,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                         return granted;
                     } catch (error) {
                         console.error("Failed to request bookmarks permission:", error);
-                        
+
                         if (chrome.bookmarks) {
                             console.log("Trying direct access as fallback...");
                             try {
@@ -459,7 +459,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                                 console.error("Direct access also failed:", directError);
                             }
                         }
-                        
+
                         set({ hasPermissions: false });
                         return false;
                     }
