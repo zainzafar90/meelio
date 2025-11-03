@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Sheet,
@@ -8,13 +8,17 @@ import {
   SheetTitle,
 } from "@repo/ui/components/ui/sheet";
 import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
 import { useDockStore } from "../../../stores/dock.store";
 import { useWeatherStore } from "../../../stores/weather.store";
+import { useAuthStore } from "../../../stores/auth.store";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useShallow } from "zustand/shallow";
 import { Icons } from "../../../components/icons/icons";
-import { RefreshCw, MapPin, Cloud } from "lucide-react";
+import { RefreshCw, MapPin, Cloud, Search, Settings } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import { api } from "../../../api";
+import { toast } from "sonner";
 
 export function WeatherSheet() {
   const { t } = useTranslation();
@@ -61,25 +65,100 @@ const WeatherContent = () => {
     current,
     forecast,
     locationName,
+    locationKey,
     isLoading,
     error,
     initializeStore,
     refreshWeather,
+    setLocation,
   } = useWeatherStore(
     useShallow((state) => ({
       current: state.current,
       forecast: state.forecast,
       locationName: state.locationName,
+      locationKey: state.locationKey,
       isLoading: state.isLoading,
       error: state.error,
       initializeStore: state.initializeStore,
       refreshWeather: state.refreshWeather,
+      setLocation: state.setLocation,
     }))
   );
+
+  const { user } = useAuthStore(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     initializeStore();
   }, [initializeStore]);
+
+
+  const handleSearchLocations = async () => {
+    if (!searchQuery.trim()) {
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await api.weather.searchLocations({ q: searchQuery });
+      setSearchResults(response.data || []);
+    } catch (error: any) {
+      toast.error(t("weather.search-error", { defaultValue: "Failed to search locations" }), {
+        description: error?.response?.data?.message || error?.message,
+      });
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectLocation = async (location: { key: string; displayName: string }) => {
+    setIsSaving(true);
+    try {
+      await api.settings.settingsApi.updateWeatherSettings({
+        locationKey: location.key,
+        locationName: location.displayName,
+      });
+
+      setLocation(location.key, location.displayName);
+      
+      const updatedUser = {
+        ...user,
+        settings: {
+          ...user?.settings,
+          weather: {
+            locationKey: location.key,
+            locationName: location.displayName,
+          },
+        },
+        locationKey: location.key,
+        locationName: location.displayName,
+      };
+      useAuthStore.getState().authenticate(updatedUser as any);
+
+      await refreshWeather();
+      setIsSearchOpen(false);
+      setSearchQuery("");
+      setSearchResults([]);
+
+      toast.success(t("weather.location-saved", { defaultValue: "Location saved successfully" }));
+    } catch (error: any) {
+      toast.error(t("weather.save-error", { defaultValue: "Failed to save location" }), {
+        description: error?.response?.data?.message || error?.message,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -126,7 +205,16 @@ const WeatherContent = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex items-center justify-between border-b border-white/10 p-4">
+      <div className="flex items-center justify-between border-b border-white/10 p-4 gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsSearchOpen(!isSearchOpen)}
+          className="flex items-center gap-2"
+        >
+          <Settings className="h-4 w-4" />
+          {locationName ? locationName : t("weather.set-location", { defaultValue: "Set Location" })}
+        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -137,13 +225,56 @@ const WeatherContent = () => {
           <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
           {t("weather.refresh", { defaultValue: "Refresh" })}
         </Button>
-        {locationName && (
-          <div className="flex items-center gap-2 text-sm text-white/60">
-            <MapPin className="h-4 w-4" />
-            {locationName}
-          </div>
-        )}
       </div>
+
+      {isSearchOpen && (
+        <div className="border-b border-white/10 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchLocations();
+                  }
+                }}
+                placeholder={t("weather.search-placeholder", { defaultValue: "Search for a city..." })}
+                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+              />
+            </div>
+            <Button
+              onClick={handleSearchLocations}
+              disabled={isSearching || !searchQuery.trim()}
+              size="sm"
+            >
+              {isSearching ? (
+                <Icons.spinner className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {searchResults.map((location) => (
+                <Button
+                  key={location.key}
+                  variant="ghost"
+                  onClick={() => handleSelectLocation(location)}
+                  disabled={isSaving}
+                  className="w-full justify-start text-left text-white/80 hover:text-white hover:bg-white/10"
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {location.displayName}
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {current && (

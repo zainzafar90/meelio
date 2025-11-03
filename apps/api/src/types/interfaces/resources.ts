@@ -65,11 +65,17 @@ export interface ICalendarSettings {
   enabled: boolean;
 }
 
+export interface IWeatherSettings {
+  locationKey?: string;
+  locationName?: string;
+}
+
 export interface IUserSettings {
   pomodoro: IPomodoroSettings;
   onboardingCompleted: boolean;
   task: ITaskSettings;
   calendar: ICalendarSettings;
+  weather?: IWeatherSettings;
 }
 
 export interface IUser {

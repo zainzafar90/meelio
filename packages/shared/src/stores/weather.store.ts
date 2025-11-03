@@ -5,6 +5,7 @@ import type { CachedWeather } from "../lib/db/models.dexie";
 import { api } from "../api";
 import type { WeatherData, ForecastDay, WeatherForecast } from "../types/weather.types";
 import { generateUUID } from "../utils/common.utils";
+import { useAuthStore } from "./auth.store";
 
 interface WeatherState {
     current: WeatherData | null;
@@ -93,10 +94,22 @@ export const useWeatherStore = create<WeatherState>()(
                     set({ isLoading: true, error: null });
 
                     try {
+                        const authState = useAuthStore.getState();
+                        const user = authState.user;
+                        const accountLocationKey = (user as any)?.locationKey;
+                        const accountLocationName = (user as any)?.locationName;
+
+                        if (accountLocationKey && accountLocationKey !== state.locationKey) {
+                            set({ locationKey: accountLocationKey, locationName: accountLocationName || null });
+                        }
+
                         await get().loadFromLocal();
 
-                        if (shouldRefresh(state.lastUpdated) && state.locationKey) {
-                            await get().fetchWeather(state.locationKey, state.locationName || undefined);
+                        const currentState = get();
+                        const locationToUse = currentState.locationKey || DEFAULT_LOCATION_KEY;
+
+                        if (shouldRefresh(currentState.lastUpdated) && locationToUse) {
+                            await get().fetchWeather(locationToUse, currentState.locationName || undefined);
                         }
                     } catch (error) {
                         console.error("Failed to initialize weather store:", error);

@@ -78,6 +78,14 @@ class SettingsService {
       };
     }
 
+    if (updates.weather) {
+      newSettings.weather = {
+        ...DEFAULT_SETTINGS.weather,
+        ...currentSettings.weather,
+        ...updates.weather,
+      };
+    }
+
     Object.assign(user, { settings: newSettings });
     await db.update(users).set(user).where(eq(users.id, userId));
 

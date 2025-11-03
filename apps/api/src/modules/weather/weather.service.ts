@@ -44,6 +44,11 @@ interface AccuWeatherLocation {
   };
 }
 
+interface AccuWeatherLocationSearchResult extends AccuWeatherLocation {
+  Type: string;
+  Rank: number;
+}
+
 interface AccuWeatherForecastDay {
   Date: string;
   EpochDate: number;
@@ -282,5 +287,53 @@ export const weatherService = {
       locationKey: locationId,
       locationName: locationInfo.LocalizedName || locationInfo.EnglishName,
     };
+  },
+
+  async searchLocations(query: string) {
+    if (!config.accuWeather.apiKey) {
+      throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, "Weather service is not configured. Please configure ACCUWEATHER_API_KEY.");
+    }
+
+    if (!query || query.trim().length === 0) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Search query is required");
+    }
+
+    const url = `${ACCUWEATHER_BASE_URL}/locations/v1/cities/search?apikey=${config.accuWeather.apiKey}&q=${encodeURIComponent(query)}&language=en-us&details=false`;
+
+    try {
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        const errorMessage = errorText || "AccuWeather service unavailable";
+
+        if (response.status === 401 || response.status === 403) {
+          const enhancedMessage = errorMessage && errorMessage !== "AccuWeather service unavailable"
+            ? `Invalid AccuWeather API key: ${errorMessage}. Please verify your ACCUWEATHER_API_KEY in apps/api/.env and restart the server.`
+            : "Invalid AccuWeather API key. Please verify your ACCUWEATHER_API_KEY in apps/api/.env and restart the server.";
+          throw new ApiError(httpStatus.UNAUTHORIZED, enhancedMessage);
+        }
+        if (response.status === 503 || response.status === 502) {
+          throw new ApiError(httpStatus.BAD_GATEWAY, "AccuWeather service is temporarily unavailable. Please try again later.");
+        }
+        throw new ApiError(httpStatus.BAD_GATEWAY, `AccuWeather API error (${response.status}): ${errorMessage}`);
+      }
+
+      const data = (await response.json()) as AccuWeatherLocationSearchResult[];
+
+      return data.map((location) => ({
+        key: location.Key,
+        localizedName: location.LocalizedName,
+        englishName: location.EnglishName,
+        country: location.Country.EnglishName,
+        administrativeArea: location.AdministrativeArea.EnglishName,
+        displayName: `${location.LocalizedName}, ${location.AdministrativeArea.EnglishName}, ${location.Country.EnglishName}`,
+      }));
+    } catch (error) {
+      if (error instanceof ApiError) {
+        throw error;
+      }
+      throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to search locations");
+    }
   },
 };

@@ -5,6 +5,7 @@ const router = Router();
 
 router.get("/", weatherController.getWeather);
 router.get("/forecast", weatherController.getForecast);
+router.get("/locations/search", weatherController.searchLocations);
 
 export default router;
 
