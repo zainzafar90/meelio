@@ -516,7 +516,15 @@
     "tomorrow": "Tomorrow",
     "refresh": "Refresh",
     "empty": "No weather data available",
-    "retry": "Retry"
+    "retry": "Retry",
+    "premium-feature-title": "Premium Weather",
+    "premium-feature": "Weather forecasts and location search are available for Pro users",
+    "upgrade": "Upgrade to Pro",
+    "set-location": "Set Location",
+    "search-placeholder": "Search for a city...",
+    "search-error": "Failed to search locations",
+    "location-saved": "Location saved successfully",
+    "save-error": "Failed to save location"
   },
   "calendar": {
     "sheet": {

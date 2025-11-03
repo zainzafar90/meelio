@@ -11,6 +11,7 @@
     "background": "Фон",
     "tab-stash": "Сохранённые вкладки",
     "bookmarks": "Закладки",
+    "weather": "Погода",
     "clock": "Часы",
     "calendar": "Календарь",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Закладки",
       "description": "Доступ к закладкам браузера и управление ими."
+    },
+    "weather": {
+      "title": "Погода",
+      "description": "Просмотр текущей погоды и прогноза на 5 дней."
     },
     "background": {
       "title": "Фоны",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Доступ к вашим закладкам"
       },
+      "weather": {
+        "description": "Просмотр текущей погоды и прогноза"
+      },
       "background": {
         "description": "Изменение фона"
       },
@@ -498,6 +506,25 @@
     "refresh": "Обновить",
     "links": "ссылки",
     "folders": "папки"
+  },
+  "weather": {
+    "title": "Погода",
+    "description": "Текущая погода и прогноз на 5 дней",
+    "current": "Текущая",
+    "forecast": "Прогноз на 5 дней",
+    "today": "Сегодня",
+    "tomorrow": "Завтра",
+    "refresh": "Обновить",
+    "empty": "Данные о погоде недоступны",
+    "retry": "Повторить попытку",
+    "premium-feature-title": "Премиум погода",
+    "premium-feature": "Прогнозы погоды и поиск местоположений доступны для пользователей Pro",
+    "upgrade": "Обновить до Pro",
+    "set-location": "Установить местоположение",
+    "search-placeholder": "Поиск города...",
+    "search-error": "Ошибка поиска местоположений",
+    "location-saved": "Местоположение успешно сохранено",
+    "save-error": "Ошибка сохранения местоположения"
   },
   "calendar": {
     "sheet": {

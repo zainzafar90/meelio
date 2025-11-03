@@ -5,13 +5,11 @@ import {
   ArrowRight,
   Bell,
   Book,
-  Bookmark,
   Check,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
   CloudRainWind,
-  Cloud,
   Coffee,
   Command,
   File,
@@ -255,14 +253,29 @@ export const Icons = {
   ),
   pomodoro: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <path fill="currentColor" d="M12 4c6.928 0 11.258 7.5 7.794 13.5A8.998 8.998 0 0 1 12 22C5.072 22 .742 14.5 4.206 8.5A8.998 8.998 0 0 1 12 4Z"  opacity=".3"></path>
-      <path fill="currentColor" d="M7.366 2.971A1 1 0 0 1 7 4.337a10.063 10.063 0 0 0-2.729 2.316 1 1 0 1 1-1.544-1.27 12.046 12.046 0 0 1 3.271-2.777 1 1 0 0 1 1.367.365h.001ZM18 2.606a12.044 12.044 0 0 1 3.272 2.776 1 1 0 0 1-1.544 1.27 10.042 10.042 0 0 0-2.729-2.315 1 1 0 0 1 1.002-1.731H18ZM12 8a1 1 0 0 0-.993.883L11 9v3.986c-.003.222.068.44.202.617l.09.104 2.106 2.105a1 1 0 0 0 1.498-1.32l-.084-.094L13 12.586V9a1 1 0 0 0-1-1Z" opacity="0.7"></path>
+      <path
+        fill="currentColor"
+        d="M12 4c6.928 0 11.258 7.5 7.794 13.5A8.998 8.998 0 0 1 12 22C5.072 22 .742 14.5 4.206 8.5A8.998 8.998 0 0 1 12 4Z"
+        opacity=".3"
+      ></path>
+      <path
+        fill="currentColor"
+        d="M7.366 2.971A1 1 0 0 1 7 4.337a10.063 10.063 0 0 0-2.729 2.316 1 1 0 1 1-1.544-1.27 12.046 12.046 0 0 1 3.271-2.777 1 1 0 0 1 1.367.365h.001ZM18 2.606a12.044 12.044 0 0 1 3.272 2.776 1 1 0 0 1-1.544 1.27 10.042 10.042 0 0 0-2.729-2.315 1 1 0 0 1 1.002-1.731H18ZM12 8a1 1 0 0 0-.993.883L11 9v3.986c-.003.222.068.44.202.617l.09.104 2.106 2.105a1 1 0 0 0 1.498-1.32l-.084-.094L13 12.586V9a1 1 0 0 0-1-1Z"
+        opacity="0.7"
+      ></path>
     </svg>
   ),
   pomodoroActive: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
-      <path fill="currentColor" d="M12 4c6.928 0 11.258 7.5 7.794 13.5A8.998 8.998 0 0 1 12 22C5.072 22 .742 14.5 4.206 8.5A8.998 8.998 0 0 1 12 4Z"  opacity=".9"></path>
-      <path fill="#999" d="M7.366 2.971A1 1 0 0 1 7 4.337a10.063 10.063 0 0 0-2.729 2.316 1 1 0 1 1-1.544-1.27 12.046 12.046 0 0 1 3.271-2.777 1 1 0 0 1 1.367.365h.001ZM18 2.606a12.044 12.044 0 0 1 3.272 2.776 1 1 0 0 1-1.544 1.27 10.042 10.042 0 0 0-2.729-2.315 1 1 0 0 1 1.002-1.731H18ZM12 8a1 1 0 0 0-.993.883L11 9v3.986c-.003.222.068.44.202.617l.09.104 2.106 2.105a1 1 0 0 0 1.498-1.32l-.084-.094L13 12.586V9a1 1 0 0 0-1-1Z"></path>
+      <path
+        fill="currentColor"
+        d="M12 4c6.928 0 11.258 7.5 7.794 13.5A8.998 8.998 0 0 1 12 22C5.072 22 .742 14.5 4.206 8.5A8.998 8.998 0 0 1 12 4Z"
+        opacity=".9"
+      ></path>
+      <path
+        fill="#999"
+        d="M7.366 2.971A1 1 0 0 1 7 4.337a10.063 10.063 0 0 0-2.729 2.316 1 1 0 1 1-1.544-1.27 12.046 12.046 0 0 1 3.271-2.777 1 1 0 0 1 1.367.365h.001ZM18 2.606a12.044 12.044 0 0 1 3.272 2.776 1 1 0 0 1-1.544 1.27 10.042 10.042 0 0 0-2.729-2.315 1 1 0 0 1 1.002-1.731H18ZM12 8a1 1 0 0 0-.993.883L11 9v3.986c-.003.222.068.44.202.617l.09.104 2.106 2.105a1 1 0 0 0 1.498-1.32l-.084-.094L13 12.586V9a1 1 0 0 0-1-1Z"
+      ></path>
     </svg>
   ),
   breathing: (props: LucideProps) => (
@@ -309,8 +322,7 @@ export const Icons = {
       width="1em"
       {...props}
     >
-   
-   <path
+      <path
         fill="currentColor"
         opacity=".5"
         d="M17 22H7a3.003 3.003 0 0 1-3-3V7a3.003 3.003 0 0 1 3-3h10a3.003 3.003 0 0 1 3 3v12a3.003 3.003 0 0 1-3 3Z"
@@ -341,40 +353,49 @@ export const Icons = {
   ),
 
   note: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" {...props}>
-       <path
-      fill="currentColor"
-      opacity=".5"
-      d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
-    />
-    <path
-      opacity="0.75"
-      fill="currentColor"
-      d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
-    />
-    <path
-      opacity="0.5"
-
-      fill="currentColor"
-      d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
-    />
-    
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <path
+        fill="currentColor"
+        opacity=".5"
+        d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
+      />
+      <path
+        opacity="0.75"
+        fill="currentColor"
+        d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
+      />
+      <path
+        opacity="0.5"
+        fill="currentColor"
+        d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
+      />
     </svg>
   ),
   noteActive: ({ ...props }: LucideProps) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1em" {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
       <path
-      fill="currentColor"
-      d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
-    />
-    <path
-      fill="currentColor"
-      d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
-    />
-    <path
-      fill="currentColor"
-      d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
-    /></svg>
+        fill="currentColor"
+        d="M3 16.75V21h4.25l9.7-9.7-4.25-4.25L3 16.75Z"
+      />
+      <path
+        fill="currentColor"
+        d="M20.66 7.34a1 1 0 0 0 0-1.41l-2.59-2.59a1 1 0 0 0-1.41 0l-1.84 1.84 4.25 4.25 1.59-1.59Z"
+      />
+      <path
+        fill="currentColor"
+        d="M18.75 5.25l.35.9.9.35-.9.35-.35.9-.35-.9-.9-.35.9-.35.35-.9Z"
+      />
+    </svg>
   ),
   writer: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
@@ -420,13 +441,108 @@ export const Icons = {
       />
     </svg>
   ),
-  bookmark: Bookmark,
-  bookmarkActive: ({ ...props }: LucideProps) => (
-    <Bookmark {...props} fill="currentColor" />
+  bookmark: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
+      <path
+        fill="currentColor"
+        opacity=".15"
+        d="M37 6c0-1.1-.9-2-2-2H13c-1.1 0-2 .9-2 2v4h26V6z"
+      />
+      <rect
+        x="11"
+        y="10"
+        width="26"
+        height="8"
+        fill="currentColor"
+        opacity=".25"
+      />
+      <rect
+        x="11"
+        y="18"
+        width="26"
+        height="12"
+        fill="currentColor"
+        opacity=".35"
+      />
+
+      <path
+        fill="currentColor"
+        opacity=".5"
+        d="M11 41.72c0 .996 1.092 1.606 1.94 1.084L24 35.998l11.06 6.806c.848.522 1.94-.088 1.94-1.084V30H11v11.72z"
+      />
+      <path
+        fill="currentColor"
+        opacity="0.75"
+        d="M38 14.8l2.6 5.9 6.5.7-4.8 4.3 1.3 6.4L38 30.2l-5.6 3.3 1.3-6.4-4.8-4.3 6.5-.7 2.6-5.9z"
+      />
+    </svg>
   ),
-  weather: Cloud,
+
+  bookmarkActive: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
+      <path
+        fill="currentColor"
+        opacity=".55"
+        d="M37 6c0-1.1-.9-2-2-2H13c-1.1 0-2 .9-2 2v4h26V6z"
+      />
+      <rect
+        x="11"
+        y="10"
+        width="26"
+        height="8"
+        fill="currentColor"
+        opacity=".65"
+      />
+      <rect
+        x="11"
+        y="18"
+        width="26"
+        height="12"
+        fill="currentColor"
+        opacity=".75"
+      />
+
+      <path
+        fill="currentColor"
+        opacity="1"
+        d="M11 41.72c0 .996 1.092 1.606 1.94 1.084L24 35.998l11.06 6.806c.848.522 1.94-.088 1.94-1.084V30H11v11.72z"
+      />
+      <path
+        fill="currentColor"
+        d="M38 14.8l2.6 5.9 6.5.7-4.8 4.3 1.3 6.4L38 30.2l-5.6 3.3 1.3-6.4-4.8-4.3 6.5-.7 2.6-5.9z"
+      />
+    </svg>
+  ),
+  weather: ({ ...props }: LucideProps) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" {...props}>
+      <circle cx="180" cy="180" r="100" fill="currentColor" opacity=".5" />
+      <path
+        fill="currentColor"
+        opacity="0.5"
+        d="M340 220a100 100 0 0 0-197 25 70 70 0 0 0 7 140h220a80 80 0 0 0-30-155z"
+      />
+      <path
+        fill="currentColor"
+        opacity="0.5"
+        d="M150 380h200a70 70 0 0 0 0-140h-5a95 95 0 0 0-187 25 60 60 0 0 0-8 115z"
+      />
+    </svg>
+  ),
+
   weatherActive: ({ ...props }: LucideProps) => (
-    <Cloud {...props} fill="currentColor" />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" {...props}>
+      <circle cx="180" cy="180" r="100" fill="currentColor" opacity=".9" />
+      <path
+        fill="currentColor"
+        opacity="1"
+        d="M340 220a100 100 0 0 0-197 25 70 70 0 0 0 7 140h220a80 80 0 0 0-30-155z"
+      />
+      <path
+        fill="currentColor"
+        opacity="0.5"
+        d="M150 380h200a70 70 0 0 0 0-140h-5a95 95 0 0 0-187 25 60 60 0 0 0-8 115z"
+      />
+    </svg>
   ),
   tabStash: ({ ...props }: LucideProps) => (
     <svg

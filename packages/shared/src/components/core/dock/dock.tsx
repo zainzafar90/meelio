@@ -124,9 +124,9 @@ export const Dock = () => {
       BASE_STATIC_DOCK_ITEMS.map((item) =>
         item.id === "calendar"
           ? { ...item, onClick: toggleCalendar, isActive: isCalendarVisible }
-          : item,
+          : item
       ),
-    [toggleCalendar, isCalendarVisible],
+    [toggleCalendar, isCalendarVisible]
   );
 
   const items = useMemo(
@@ -237,6 +237,7 @@ export const Dock = () => {
               icon: Icons.weather,
               activeIcon: Icons.weatherActive,
               onClick: toggleWeather,
+              requirePro: true,
             },
           ]
         : []),
@@ -421,7 +422,7 @@ export const Dock = () => {
               if (item.requirePro) {
                 return (
                   <PremiumFeature
-                  key={item.id}
+                    key={item.id}
                     requirePro={item.requirePro}
                     tooltipClassName="top-2 right-2"
                     fallback={

@@ -117,6 +117,15 @@ export const DockButton = ({
             role="button"
           >
             <IconComponent className="size-6 text-white" />
+            {item.requirePro && (
+              <span
+                className={cn(
+                  "absolute -top-1 -right-2 z-10 bg-sky-600 text-[6px] font-bold uppercase tracking-wider text-white/90 px-1 py-0.5 rounded border border-white/10"
+                )}
+              >
+                Pro
+              </span>
+            )}
             {isActive && (
               <div className="absolute -bottom-3 h-1 w-1 rounded-full bg-zinc-500" />
             )}

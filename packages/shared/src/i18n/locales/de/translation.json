@@ -11,6 +11,7 @@
     "background": "Hintergrund",
     "tab-stash": "Tab-Stash",
     "bookmarks": "Lesezeichen",
+    "weather": "Wetter",
     "clock": "Uhr",
     "calendar": "Kalender",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Lesezeichen",
       "description": "Zugriff auf und Verwaltung Ihrer Browser-Lesezeichen."
+    },
+    "weather": {
+      "title": "Wetter",
+      "description": "Aktuelles Wetter und 5-Tage-Vorhersage anzeigen."
     },
     "background": {
       "title": "Hintergründe",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Auf deine Lesezeichen zugreifen"
       },
+      "weather": {
+        "description": "Aktuelles Wetter und Vorhersage anzeigen"
+      },
       "background": {
         "description": "Ändere deinen Hintergrund"
       },
@@ -498,6 +506,25 @@
     "refresh": "Aktualisieren",
     "links": "Links",
     "folders": "Ordner"
+  },
+  "weather": {
+    "title": "Wetter",
+    "description": "Aktuelles Wetter und 5-Tage-Vorhersage",
+    "current": "Aktuell",
+    "forecast": "5-Tage-Vorhersage",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "refresh": "Aktualisieren",
+    "empty": "Keine Wetterdaten verfügbar",
+    "retry": "Erneut versuchen",
+    "premium-feature-title": "Premium Wetter",
+    "premium-feature": "Wettervorhersagen und Standortsuche sind für Pro-Benutzer verfügbar",
+    "upgrade": "Auf Pro upgraden",
+    "set-location": "Standort festlegen",
+    "search-placeholder": "Nach einer Stadt suchen...",
+    "search-error": "Standortsuche fehlgeschlagen",
+    "location-saved": "Standort erfolgreich gespeichert",
+    "save-error": "Standort konnte nicht gespeichert werden"
   },
   "calendar": {
     "sheet": {

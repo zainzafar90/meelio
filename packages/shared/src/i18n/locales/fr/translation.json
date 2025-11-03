@@ -11,6 +11,7 @@
     "background": "Arrière-plan",
     "tab-stash": "Rangement d'onglets",
     "bookmarks": "Favoris",
+    "weather": "Météo",
     "clock": "Horloge",
     "calendar": "Calendrier",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Favoris",
       "description": "Accédez et gérez les favoris de votre navigateur."
+    },
+    "weather": {
+      "title": "Météo",
+      "description": "Voir la météo actuelle et les prévisions sur 5 jours."
     },
     "background": {
       "title": "Arrière-plans",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Accéder à vos favoris"
       },
+      "weather": {
+        "description": "Voir la météo actuelle et les prévisions"
+      },
       "background": {
         "description": "Changer votre arrière-plan"
       },
@@ -498,6 +506,25 @@
     "refresh": "Actualiser",
     "links": "liens",
     "folders": "dossiers"
+  },
+  "weather": {
+    "title": "Météo",
+    "description": "Météo actuelle et prévisions sur 5 jours",
+    "current": "Actuel",
+    "forecast": "Prévisions sur 5 jours",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "refresh": "Actualiser",
+    "empty": "Aucune donnée météo disponible",
+    "retry": "Réessayer",
+    "premium-feature-title": "Météo Premium",
+    "premium-feature": "Les prévisions météo et la recherche d'emplacements sont disponibles pour les utilisateurs Pro",
+    "upgrade": "Passer à Pro",
+    "set-location": "Définir l'emplacement",
+    "search-placeholder": "Rechercher une ville...",
+    "search-error": "Échec de la recherche d'emplacements",
+    "location-saved": "Emplacement enregistré avec succès",
+    "save-error": "Échec de l'enregistrement de l'emplacement"
   },
   "calendar": {
     "sheet": {

@@ -19,6 +19,7 @@ import { RefreshCw, MapPin, Cloud, Search, Settings } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { api } from "../../../api";
 import { toast } from "sonner";
+import { PremiumFeature } from "../../../components/common/premium-feature";
 
 export function WeatherSheet() {
   const { t } = useTranslation();
@@ -53,7 +54,50 @@ export function WeatherSheet() {
           </h2>
         </div>
 
-        <WeatherContent />
+        <PremiumFeature
+          requirePro={true}
+          fallback={
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+              <div className="flex flex-col items-center">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4 border border-white/10">
+                  <Icons.proMember className="w-8 h-8 text-white/80" />
+                </div>
+                <div className="text-lg text-white font-medium mb-2">
+                  {t(
+                    "weather.premium-feature-title",
+                    "Premium Weather"
+                  )}
+                </div>
+                <div className="text-white/70 max-w-md mb-6">
+                  {t(
+                    "weather.premium-feature",
+                    "Weather forecasts and location search are available for Pro users"
+                  )}
+                </div>
+
+                <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/10 w-full max-w-md mb-6">
+                  <div className="text-sm font-medium text-white mb-2">
+                    Pro Feature
+                  </div>
+                  <div className="text-xs text-white/70">
+                    Weather is available for Pro users
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="default"
+                className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                onClick={() => {
+                  window.location.href = "/settings/billing";
+                }}
+              >
+                {t("weather.upgrade", "Upgrade to Pro")}
+              </Button>
+            </div>
+          }
+        >
+          <WeatherContent />
+        </PremiumFeature>
       </SheetContent>
     </Sheet>
   );

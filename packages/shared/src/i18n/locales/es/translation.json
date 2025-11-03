@@ -11,6 +11,7 @@
     "background": "Fondo",
     "tab-stash": "Guardar Pestañas",
     "bookmarks": "Marcadores",
+    "weather": "Clima",
     "clock": "Reloj",
     "calendar": "Calendario",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Marcadores",
       "description": "Accede y administra los marcadores de tu navegador."
+    },
+    "weather": {
+      "title": "Clima",
+      "description": "Ver el clima actual y el pronóstico de 5 días."
     },
     "background": {
       "title": "Fondos",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Accede a tus marcadores"
       },
+      "weather": {
+        "description": "Ver el clima actual y el pronóstico"
+      },
       "background": {
         "description": "Cambia tu fondo de pantalla"
       },
@@ -498,6 +506,25 @@
     "refresh": "Actualizar",
     "links": "enlaces",
     "folders": "carpetas"
+  },
+  "weather": {
+    "title": "Clima",
+    "description": "Clima actual y pronóstico de 5 días",
+    "current": "Actual",
+    "forecast": "Pronóstico de 5 días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "refresh": "Actualizar",
+    "empty": "No hay datos del clima disponibles",
+    "retry": "Reintentar",
+    "premium-feature-title": "Clima Premium",
+    "premium-feature": "Los pronósticos del clima y la búsqueda de ubicaciones están disponibles para usuarios Pro",
+    "upgrade": "Actualizar a Pro",
+    "set-location": "Establecer ubicación",
+    "search-placeholder": "Buscar una ciudad...",
+    "search-error": "Error al buscar ubicaciones",
+    "location-saved": "Ubicación guardada exitosamente",
+    "save-error": "Error al guardar la ubicación"
   },
   "calendar": {
     "sheet": {

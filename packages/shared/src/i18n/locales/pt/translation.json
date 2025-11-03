@@ -11,6 +11,7 @@
     "background": "Plano de Fundo",
     "tab-stash": "Guardar Abas",
     "bookmarks": "Favoritos",
+    "weather": "Clima",
     "clock": "Relógio",
     "calendar": "Calendário",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Favoritos",
       "description": "Acesse e gerencie os favoritos do seu navegador."
+    },
+    "weather": {
+      "title": "Clima",
+      "description": "Ver o clima atual e a previsão de 5 dias."
     },
     "background": {
       "title": "Planos de Fundo",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Acesse seus favoritos"
       },
+      "weather": {
+        "description": "Ver o clima atual e a previsão"
+      },
       "background": {
         "description": "Alterar seu plano de fundo"
       },
@@ -498,6 +506,25 @@
     "refresh": "Atualizar",
     "links": "links",
     "folders": "pastas"
+  },
+  "weather": {
+    "title": "Clima",
+    "description": "Clima atual e previsão de 5 dias",
+    "current": "Atual",
+    "forecast": "Previsão de 5 dias",
+    "today": "Hoje",
+    "tomorrow": "Amanhã",
+    "refresh": "Atualizar",
+    "empty": "Nenhum dado climático disponível",
+    "retry": "Tentar novamente",
+    "premium-feature-title": "Clima Premium",
+    "premium-feature": "Previsões meteorológicas e pesquisa de localização disponíveis para usuários Pro",
+    "upgrade": "Atualizar para Pro",
+    "set-location": "Definir localização",
+    "search-placeholder": "Pesquisar uma cidade...",
+    "search-error": "Falha ao pesquisar localizações",
+    "location-saved": "Localização salva com sucesso",
+    "save-error": "Falha ao salvar localização"
   },
   "calendar": {
     "sheet": {
