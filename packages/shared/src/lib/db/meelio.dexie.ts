@@ -8,6 +8,7 @@ import type {
   CachedSound,
   TabStash,
   CachedBookmark,
+  CachedWeather,
 } from "./models.dexie";
 import type { Note } from "./models.notes";
 
@@ -21,6 +22,7 @@ export class MeelioDB extends Dexie {
   notes!: Table<Note, string>;
   tabStashes!: Table<TabStash, string>;
   bookmarks!: Table<CachedBookmark, string>;
+  weather!: Table<CachedWeather, string>;
 
   constructor() {
     super("meelio");
@@ -184,6 +186,20 @@ export class MeelioDB extends Dexie {
         notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
         tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
         bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
+      });
+
+    this.version(13)
+      .stores({
+        siteBlocker: "id, userId, url, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+        notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
+        tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
+        bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
+        weather: "id, locationKey, cachedAt",
       });
   }
 }

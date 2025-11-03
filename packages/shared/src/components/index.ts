@@ -110,6 +110,7 @@ export * from "./core/tab-stash/tab-stash.sheet";
 
 // Bookmarks
 export * from "./core/bookmarks/bookmarks.sheet";
+export * from "./core/weather/weather.sheet";
 
 // ------------- ICONS -------------
 export * from "./icons";

@@ -76,10 +76,12 @@ export const Dock = () => {
     toggleTabStash,
     toggleCalendar,
     toggleBookmarks,
+    toggleWeather,
     resetDock,
     dockIconsVisible,
     isCalendarVisible,
     isBookmarksVisible,
+    isWeatherVisible,
   } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
@@ -101,9 +103,11 @@ export const Dock = () => {
       toggleTabStash: state.toggleTabStash,
       toggleCalendar: state.toggleCalendar,
       toggleBookmarks: (state as any).toggleBookmarks,
+      toggleWeather: (state as any).toggleWeather,
       dockIconsVisible: state.dockIconsVisible,
       isCalendarVisible: state.isCalendarVisible,
       isBookmarksVisible: (state as any).isBookmarksVisible,
+      isWeatherVisible: (state as any).isWeatherVisible,
     }))
   );
 
@@ -225,6 +229,17 @@ export const Dock = () => {
             },
           ]
         : []),
+      ...(((dockIconsVisible as any).weather ?? true)
+        ? [
+            {
+              id: "weather",
+              name: t("common.weather", { defaultValue: "Weather" }),
+              icon: Icons.weather,
+              activeIcon: Icons.weatherActive,
+              onClick: toggleWeather,
+            },
+          ]
+        : []),
       ...(dockIconsVisible.backgrounds
         ? [
             {
@@ -249,6 +264,7 @@ export const Dock = () => {
       toggleBackgrounds,
       toggleCalendar,
       toggleBookmarks,
+      toggleWeather,
       dockIconsVisible,
     ]
   );

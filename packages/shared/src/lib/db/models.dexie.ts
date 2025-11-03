@@ -99,3 +99,12 @@ export interface CachedBookmark {
   cachedAt: number;
   deletedAt?: number | null;
 }
+
+export interface CachedWeather {
+  id: string;
+  locationKey: string;
+  locationName: string;
+  currentWeather: string;
+  forecast: string;
+  cachedAt: number;
+}

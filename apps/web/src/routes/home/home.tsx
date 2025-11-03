@@ -6,6 +6,7 @@ import {
   Clock,
   TabStashSheet,
   BookmarksSheet,
+  WeatherSheet,
   CalendarSheet,
   CalendarDynamicIsland,
   useDockStore,
@@ -133,6 +134,7 @@ const Content = () => {
       <SiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
+      <WeatherSheet />
       <CalendarSheet />
     </main>
   );

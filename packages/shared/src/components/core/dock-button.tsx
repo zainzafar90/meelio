@@ -18,6 +18,7 @@ const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
   "site-blocker": "ring-purple-400/70",
   "tab-stash": "ring-sky-400/70",
   bookmarks: "ring-blue-400/70",
+  weather: "ring-cyan-400/70",
   background: "ring-emerald-400/70",
   home: "ring-blue-400/70",
 };
@@ -53,6 +54,7 @@ export const DockButton = ({
     isBackgroundsVisible,
     isTabStashVisible,
     isBookmarksVisible,
+    isWeatherVisible,
     showIconLabels,
   } = useDockStore(
     useShallow((state) => ({
@@ -64,7 +66,8 @@ export const DockButton = ({
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
-      isBookmarksVisible: state.isBookmarksVisible,
+      isBookmarksVisible: (state as any).isBookmarksVisible,
+      isWeatherVisible: (state as any).isWeatherVisible,
       showIconLabels: state.showIconLabels,
     }))
   );
@@ -78,7 +81,8 @@ export const DockButton = ({
     (item.id === "site-blocker" && isSiteBlockerVisible) ||
     (item.id === "background" && isBackgroundsVisible) ||
     (item.id === "tab-stash" && isTabStashVisible) ||
-    (item.id === "bookmarks" && isBookmarksVisible);
+    (item.id === "bookmarks" && isBookmarksVisible) ||
+    (item.id === "weather" && isWeatherVisible);
   const isActive = item.isActive ?? derivedActive;
 
   const IconComponent = isActive ? item.activeIcon : item.icon;

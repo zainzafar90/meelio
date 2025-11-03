@@ -9,3 +9,11 @@ export function getWeather({
 }): Promise<AxiosResponse> {
   return axios.get(`/v1/weather?locationId=${locationId}`);
 }
+
+export function getWeatherForecast({
+  locationId,
+}: {
+  locationId: string;
+}): Promise<AxiosResponse> {
+  return axios.get(`/v1/weather/forecast?locationId=${locationId}`);
+}

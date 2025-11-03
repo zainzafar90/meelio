@@ -42,6 +42,9 @@ const envVarsSchema = Joi.object()
     LEMON_SQUEEZY_STORE_ID: Joi.string()
       .required()
       .description("Lemon Squeezy store id"),
+    ACCUWEATHER_API_KEY: Joi.string()
+      .required()
+      .description("AccuWeather API key"),
     CLIENT_URL: Joi.string().required().description("Client url"),
   })
   .unknown();
@@ -92,6 +95,9 @@ const config = {
     signingSecret: envVars.LEMON_SQUEEZY_SIGNING_SECRET,
     apiKey: envVars.LEMON_SQUEEZY_API_KEY,
     storeId: envVars.LEMON_SQUEEZY_STORE_ID,
+  },
+  accuWeather: {
+    apiKey: envVars.ACCUWEATHER_API_KEY || "",
   },
   clientUrl: envVars.CLIENT_URL,
 };

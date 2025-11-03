@@ -14,6 +14,7 @@ interface DockIconsVisibility {
   calendar: boolean;
   notes?: boolean;
   bookmarks?: boolean;
+  weather?: boolean;
 }
 
 interface DockState {
@@ -29,6 +30,7 @@ interface DockState {
   isCalendarVisible: boolean;
   isNotesVisible?: boolean;
   isBookmarksVisible?: boolean;
+  isWeatherVisible?: boolean;
 
   // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
@@ -49,6 +51,7 @@ interface DockState {
   toggleCalendar: () => void;
   toggleNotes?: () => void;
   toggleBookmarks?: () => void;
+  toggleWeather?: () => void;
 
   // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
@@ -62,6 +65,7 @@ interface DockState {
   setCalendarVisible: (visible: boolean) => void;
   setNotesVisible?: (visible: boolean) => void;
   setBookmarksVisible?: (visible: boolean) => void;
+  setWeatherVisible?: (visible: boolean) => void;
 
   // Icon visibility setters
   setDockIconVisible: (
@@ -91,6 +95,7 @@ export const useDockStore = create<DockState>()(
       isTabStashVisible: false,
       isCalendarVisible: false,
       isBookmarksVisible: false,
+      isWeatherVisible: false,
 
       // Icon visibility in dock - all visible by default
       dockIconsVisible: {
@@ -105,6 +110,7 @@ export const useDockStore = create<DockState>()(
         calendar: true,
         notes: true,
         bookmarks: true,
+        weather: true,
       },
 
       showIconLabels: false,
@@ -173,6 +179,10 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isBookmarksVisible: !(state as any).isBookmarksVisible }));
       },
 
+      toggleWeather: () => {
+        set((state) => ({ isWeatherVisible: !(state as any).isWeatherVisible }));
+      },
+
       // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
@@ -218,6 +228,10 @@ export const useDockStore = create<DockState>()(
         set({ isBookmarksVisible: visible } as any);
       },
 
+      setWeatherVisible: (visible: boolean) => {
+        set({ isWeatherVisible: visible } as any);
+      },
+
       // Icon visibility setter
       setDockIconVisible: (
         iconId: keyof DockIconsVisibility,
@@ -253,6 +267,7 @@ export const useDockStore = create<DockState>()(
           isCalendarVisible: false,
           isNotesVisible: false,
           isBookmarksVisible: false,
+          isWeatherVisible: false,
 
           // Don't reset icon visibility on reset
           currentOnboardingStep: -1,
@@ -278,6 +293,12 @@ export const useDockStore = create<DockState>()(
         }
         if (state.isBookmarksVisible === undefined) {
           state.isBookmarksVisible = false;
+        }
+        if (state.dockIconsVisible.weather === undefined) {
+          state.dockIconsVisible.weather = true;
+        }
+        if (state.isWeatherVisible === undefined) {
+          state.isWeatherVisible = false;
         }
         return state;
       },

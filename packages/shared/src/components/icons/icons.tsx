@@ -11,6 +11,7 @@ import {
   ChevronRight,
   ChevronUp,
   CloudRainWind,
+  Cloud,
   Coffee,
   Command,
   File,
@@ -422,6 +423,10 @@ export const Icons = {
   bookmark: Bookmark,
   bookmarkActive: ({ ...props }: LucideProps) => (
     <Bookmark {...props} fill="currentColor" />
+  ),
+  weather: Cloud,
+  weatherActive: ({ ...props }: LucideProps) => (
+    <Cloud {...props} fill="currentColor" />
   ),
   tabStash: ({ ...props }: LucideProps) => (
     <svg

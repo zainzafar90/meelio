@@ -9,6 +9,7 @@ import {
   Clock, 
   TabStashSheet,
   BookmarksSheet,
+  WeatherSheet,
   CalendarSheet,
   useAuthStore,
   useDockStore,
@@ -80,6 +81,7 @@ const Content = () => {
       <SiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
+      <WeatherSheet />
       <CalendarSheet />
     </main>
   );

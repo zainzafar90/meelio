@@ -11,6 +11,7 @@
     "background": "Background",
     "tab-stash": "Tab Stash",
     "bookmarks": "Bookmarks",
+    "weather": "Weather",
     "clock": "Clock",
     "calendar": "Calendar",
     "calendarData": {
@@ -118,6 +119,10 @@
     "bookmarks": {
       "title": "Bookmarks",
       "description": "Access and manage your browser bookmarks."
+    },
+    "weather": {
+      "title": "Weather",
+      "description": "View current weather and 5-day forecast."
     },
     "background": {
       "title": "Backgrounds",
@@ -411,6 +416,9 @@
       "bookmarks": {
         "description": "Access your bookmarks"
       },
+      "weather": {
+        "description": "View current weather and forecast"
+      },
       "background": {
         "description": "Change your background"
       },
@@ -498,6 +506,17 @@
     "refresh": "Refresh",
     "links": "links",
     "folders": "folders"
+  },
+  "weather": {
+    "title": "Weather",
+    "description": "Current weather and 5-day forecast",
+    "current": "Current",
+    "forecast": "5-Day Forecast",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "refresh": "Refresh",
+    "empty": "No weather data available",
+    "retry": "Retry"
   },
   "calendar": {
     "sheet": {
