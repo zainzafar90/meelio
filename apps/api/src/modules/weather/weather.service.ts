@@ -1,6 +1,13 @@
 import httpStatus from "http-status";
 import { ApiError } from "@/common/errors/api-error";
 import { config } from "@/config/config";
+import {
+  locationSearchCache,
+  locationInfoCache,
+  currentWeatherCache,
+  forecastCache,
+  type LocationSearchResult,
+} from "@/utils/weather-cache";
 
 interface AccuWeatherCurrentCondition {
   LocalObservationDateTime: string;
@@ -96,6 +103,16 @@ interface AccuWeatherForecastResponse {
 const ACCUWEATHER_BASE_URL = "http://dataservice.accuweather.com";
 
 const getLocationInfo = async (locationKey: string): Promise<AccuWeatherLocation> => {
+  const cacheKey = `location:${locationKey}`;
+  const cached = locationInfoCache.get(cacheKey);
+
+  if (cached) {
+    console.log(`[Weather Service] Location info retrieved from cache: ${locationKey}`);
+    return cached;
+  }
+
+  console.log(`[Weather Service] Fetching location info from API: ${locationKey}`);
+
   if (!config.accuWeather.apiKey) {
     throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, "Weather service is not configured. Please configure ACCUWEATHER_API_KEY.");
   }
@@ -113,6 +130,8 @@ const getLocationInfo = async (locationKey: string): Promise<AccuWeatherLocation
     }
 
     const data = (await response.json()) as AccuWeatherLocation;
+    locationInfoCache.set(cacheKey, data);
+    console.log(`[Weather Service] Location info fetched and cached: ${locationKey}`);
     return data;
   } catch (error) {
     if (error instanceof ApiError) {
@@ -123,6 +142,16 @@ const getLocationInfo = async (locationKey: string): Promise<AccuWeatherLocation
 };
 
 const getCurrentConditions = async (locationKey: string): Promise<AccuWeatherCurrentCondition> => {
+  const cacheKey = `current:${locationKey}`;
+  const cached = currentWeatherCache.get(cacheKey);
+
+  if (cached) {
+    console.log(`[Weather Service] Current weather retrieved from cache: ${locationKey}`);
+    return cached;
+  }
+
+  console.log(`[Weather Service] Fetching current weather from API: ${locationKey}`);
+
   if (!config.accuWeather.apiKey) {
     throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, "Weather service is not configured. Please configure ACCUWEATHER_API_KEY.");
   }
@@ -157,7 +186,10 @@ const getCurrentConditions = async (locationKey: string): Promise<AccuWeatherCur
       throw new ApiError(httpStatus.NOT_FOUND, "No current conditions found");
     }
 
-    return data[0];
+    const currentCondition = data[0];
+    currentWeatherCache.set(cacheKey, currentCondition);
+    console.log(`[Weather Service] Current weather fetched and cached: ${locationKey}`);
+    return currentCondition;
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -167,6 +199,16 @@ const getCurrentConditions = async (locationKey: string): Promise<AccuWeatherCur
 };
 
 const getForecast = async (locationKey: string): Promise<AccuWeatherForecastResponse> => {
+  const cacheKey = `forecast:${locationKey}`;
+  const cached = forecastCache.get(cacheKey);
+
+  if (cached) {
+    console.log(`[Weather Service] Forecast retrieved from cache: ${locationKey}`);
+    return cached;
+  }
+
+  console.log(`[Weather Service] Fetching forecast from API: ${locationKey}`);
+
   if (!config.accuWeather.apiKey) {
     throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, "Weather service is not configured. Please configure ACCUWEATHER_API_KEY.");
   }
@@ -200,6 +242,8 @@ const getForecast = async (locationKey: string): Promise<AccuWeatherForecastResp
     }
 
     const data = (await response.json()) as AccuWeatherForecastResponse;
+    forecastCache.set(cacheKey, data);
+    console.log(`[Weather Service] Forecast fetched and cached: ${locationKey}`);
     return data;
   } catch (error) {
     if (error instanceof ApiError) {
@@ -289,7 +333,7 @@ export const weatherService = {
     };
   },
 
-  async searchLocations(query: string) {
+  async searchLocations(query: string): Promise<LocationSearchResult[]> {
     if (!config.accuWeather.apiKey) {
       throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, "Weather service is not configured. Please configure ACCUWEATHER_API_KEY.");
     }
@@ -297,6 +341,17 @@ export const weatherService = {
     if (!query || query.trim().length === 0) {
       throw new ApiError(httpStatus.BAD_REQUEST, "Search query is required");
     }
+
+    const normalizedQuery = query.trim().toLowerCase();
+    const cacheKey = `search:${normalizedQuery}`;
+    const cached = locationSearchCache.get(cacheKey);
+
+    if (cached) {
+      console.log(`[Weather Service] Location search retrieved from cache: "${query}"`);
+      return cached;
+    }
+
+    console.log(`[Weather Service] Searching locations from API: "${query}"`);
 
     const url = `${ACCUWEATHER_BASE_URL}/locations/v1/cities/search?apikey=${config.accuWeather.apiKey}&q=${encodeURIComponent(query)}&language=en-us&details=false`;
 
@@ -321,7 +376,7 @@ export const weatherService = {
 
       const data = (await response.json()) as AccuWeatherLocationSearchResult[];
 
-      return data.map((location) => ({
+      const results = data.map((location) => ({
         key: location.Key,
         localizedName: location.LocalizedName,
         englishName: location.EnglishName,
@@ -329,6 +384,10 @@ export const weatherService = {
         administrativeArea: location.AdministrativeArea.EnglishName,
         displayName: `${location.LocalizedName}, ${location.AdministrativeArea.EnglishName}, ${location.Country.EnglishName}`,
       }));
+
+      locationSearchCache.set(cacheKey, results);
+      console.log(`[Weather Service] Location search completed and cached: "${query}" (${results.length} results)`);
+      return results;
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;

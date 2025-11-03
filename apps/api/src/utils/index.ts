@@ -3,3 +3,4 @@ import { pick } from './pick';
 import { authLimiter } from './rate-limiter';
 
 export { catchAsync, pick, authLimiter };
+export * from './weather-cache';

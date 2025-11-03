@@ -54,10 +54,10 @@ export class MeelioDB extends Dexie {
             delete task.is_focus;
             delete task.status;
 
-            if (task.completed === undefined) {
-              task.completed = false;
-            }
-          });
+          if (task.completed === undefined) {
+            task.completed = false;
+          }
+        });
       });
 
     this.version(3)
