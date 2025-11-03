@@ -2,6 +2,7 @@
 export * from "./auth/auth-container";
 export * from "./auth/star-field";
 export * from "./auth/user-auth-form";
+export * from "./auth/first-signin-dialog";
 
 // ------------- COMMON COMPONENTS -------------
 export * from "./common/blurhash";
@@ -111,6 +112,9 @@ export * from "./core/tab-stash/tab-stash.sheet";
 // Bookmarks
 export * from "./core/bookmarks/bookmarks.sheet";
 export * from "./core/weather/weather.sheet";
+
+// Search
+export * from "./core/search";
 
 // ------------- ICONS -------------
 export * from "./icons";

@@ -9,6 +9,7 @@ import {
   WeatherSheet,
   CalendarSheet,
   CalendarDynamicIsland,
+  SearchPopover,
   useDockStore,
   useAuthStore,
 } from "@repo/shared";
@@ -183,6 +184,7 @@ const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
+      <SearchPopover />
     </div>
   );
 };

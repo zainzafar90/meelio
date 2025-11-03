@@ -445,7 +445,7 @@ export const Icons = {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
       <path
         fill="currentColor"
-        opacity=".15"
+        opacity=".75"
         d="M37 6c0-1.1-.9-2-2-2H13c-1.1 0-2 .9-2 2v4h26V6z"
       />
       <rect
@@ -454,7 +454,7 @@ export const Icons = {
         width="26"
         height="8"
         fill="currentColor"
-        opacity=".25"
+        opacity=".5"
       />
       <rect
         x="11"
@@ -467,7 +467,7 @@ export const Icons = {
 
       <path
         fill="currentColor"
-        opacity=".5"
+        opacity=".25"
         d="M11 41.72c0 .996 1.092 1.606 1.94 1.084L24 35.998l11.06 6.806c.848.522 1.94-.088 1.94-1.084V30H11v11.72z"
       />
       <path
@@ -482,7 +482,7 @@ export const Icons = {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" {...props}>
       <path
         fill="currentColor"
-        opacity=".55"
+        opacity="1"
         d="M37 6c0-1.1-.9-2-2-2H13c-1.1 0-2 .9-2 2v4h26V6z"
       />
       <rect
@@ -491,7 +491,7 @@ export const Icons = {
         width="26"
         height="8"
         fill="currentColor"
-        opacity=".65"
+        opacity=".75"
       />
       <rect
         x="11"
@@ -499,12 +499,12 @@ export const Icons = {
         width="26"
         height="12"
         fill="currentColor"
-        opacity=".75"
+        opacity=".65"
       />
 
       <path
         fill="currentColor"
-        opacity="1"
+        opacity="0.5"
         d="M11 41.72c0 .996 1.092 1.606 1.94 1.084L24 35.998l11.06 6.806c.848.522 1.94-.088 1.94-1.084V30H11v11.72z"
       />
       <path

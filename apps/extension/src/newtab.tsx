@@ -24,7 +24,8 @@ import {
   Dock,
   SiteBlockerSheet,
   NotesSheet,
-  SimpleTimer
+  SimpleTimer,
+  SearchPopover
  } from "@repo/shared";
  import {CalendarDynamicIsland} from "@repo/shared";
 import { useAppStore } from "@repo/shared";
@@ -130,6 +131,7 @@ const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
+      <SearchPopover />
     </div>
   );
 };
