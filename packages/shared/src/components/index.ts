@@ -2,7 +2,6 @@
 export * from "./auth/auth-container";
 export * from "./auth/star-field";
 export * from "./auth/user-auth-form";
-export * from "./auth/first-signin-dialog";
 
 // ------------- COMMON COMPONENTS -------------
 export * from "./common/blurhash";
