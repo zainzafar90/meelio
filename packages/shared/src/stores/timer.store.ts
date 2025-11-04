@@ -110,9 +110,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           if (state.stage === TimerStage.Focus) {
             const limitStatus = getLimitStatus();
             if (limitStatus.isLimitReached) {
-              console.log(
-                "❌ Cannot start focus timer: Today's limit reached. Try again tomorrow!"
-              );
+              // "❌ Cannot start focus timer: Today's limit reached. Try again tomorrow!"
               return;
             }
           }
@@ -257,7 +255,6 @@ export const createTimerStore = (platform: TimerPlatform) => {
 
               const limitStatus = getLimitStatus();
               if (limitStatus.isLimitReached) {
-                console.log("⚠️ Today's focus limit reached, pausing timer");
                 pause();
                 platform.showNotification(
                   "Daily Focus Limit Reached 🎯",
@@ -377,9 +374,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           if (nextStage === TimerStage.Focus) {
             const limitStatus = getLimitStatus();
             if (limitStatus.isLimitReached) {
-              console.log(
-                "⚠️ Today's focus limit reached after stage completion"
-              );
+              // "⚠️ Today's focus limit reached after stage completion"
               platform.showNotification(
                 "Today's Focus Complete! 🎉",
                 "You've completed today's focus goal. Enjoy your break - see you tomorrow!"

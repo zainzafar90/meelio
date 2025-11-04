@@ -15,8 +15,6 @@ interface SearchState {
   recentSearches: RecentSearch[];
   addRecentSearch: (query: string, engine: SearchEngineName) => void;
   clearRecentSearches: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useSearchStore = create<SearchState>()(
@@ -37,14 +35,11 @@ export const useSearchStore = create<SearchState>()(
           (s) => !(s.query === newSearch.query && s.engine === newSearch.engine)
         );
 
-        // Limit to 5 most recent searches (FIFO queue)
         const updated = [newSearch, ...filtered].slice(0, 5);
 
         set({ recentSearches: updated });
       },
       clearRecentSearches: () => set({ recentSearches: [] }),
-      _hasHydrated: false,
-      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: "meelio:local:search",
@@ -54,9 +49,7 @@ export const useSearchStore = create<SearchState>()(
         selectedEngine: state.selectedEngine,
         recentSearches: state.recentSearches,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
+
     }
   )
 );

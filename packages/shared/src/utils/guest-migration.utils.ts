@@ -186,12 +186,6 @@ const migrateGuestPomodoroSessions = async (): Promise<MigrationResult> => {
       return { success: true, migratedCount: 0 };
     }
 
-    // The focus time will sync automatically when user logs in
-    // No need to manually create sessions here
-    console.log(
-      `✅ Guest had ${Math.floor(guestFocusTime / 60)} minutes of focus time`
-    );
-
     return {
       success: true,
       migratedCount: 1,

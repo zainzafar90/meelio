@@ -110,6 +110,8 @@ export * from "./core/tab-stash/tab-stash.sheet";
 
 // Bookmarks
 export * from "./core/bookmarks/bookmarks.sheet";
+
+// Weather
 export * from "./core/weather/weather.sheet";
 
 // Search

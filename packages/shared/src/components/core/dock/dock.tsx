@@ -97,17 +97,17 @@ export const Dock = () => {
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
-      toggleNotes: (state as any).toggleNotes,
+      toggleNotes: state.toggleNotes,
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
       toggleCalendar: state.toggleCalendar,
-      toggleBookmarks: (state as any).toggleBookmarks,
-      toggleWeather: (state as any).toggleWeather,
+      toggleBookmarks: state.toggleBookmarks,
+      toggleWeather: state.toggleWeather,
       dockIconsVisible: state.dockIconsVisible,
       isCalendarVisible: state.isCalendarVisible,
-      isBookmarksVisible: (state as any).isBookmarksVisible,
-      isWeatherVisible: (state as any).isWeatherVisible,
+      isBookmarksVisible: state.isBookmarksVisible,
+      isWeatherVisible: state.isWeatherVisible,
     }))
   );
 
@@ -182,7 +182,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(((dockIconsVisible as any).notes ?? true)
+      ...((dockIconsVisible.notes ?? true)
         ? [
             {
               id: "notes",
@@ -218,7 +218,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(((dockIconsVisible as any).bookmarks ?? true)
+      ...(dockIconsVisible.bookmarks
         ? [
             {
               id: "bookmarks",
@@ -229,7 +229,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(((dockIconsVisible as any).weather ?? true)
+      ...(dockIconsVisible.weather
         ? [
             {
               id: "weather",
@@ -400,7 +400,9 @@ export const Dock = () => {
                 (item.id === "tasks" && isTasksVisible) ||
                 (item.id === "site-blocker" && isSiteBlockerVisible) ||
                 (item.id === "background" && isBackgroundsVisible) ||
-                (item.id === "tab-stash" && isTabStashVisible);
+                (item.id === "tab-stash" && isTabStashVisible) ||
+                (item.id === "bookmarks" && isBookmarksVisible) ||
+                (item.id === "weather" && isWeatherVisible);
 
               const IconComponent = (
                 isActive ? item.activeIcon : item.icon

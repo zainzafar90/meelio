@@ -13,7 +13,10 @@ import {
 } from "@repo/ui/components/ui/select";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
-import { useSearchStore, type SearchEngineName } from "../../../stores/search.store";
+import {
+  useSearchStore,
+  type SearchEngineName,
+} from "../../../stores/search.store";
 
 export interface SearchEngine {
   name: string;
@@ -52,7 +55,6 @@ export const SEARCH_ENGINES: SearchEngine[] = [
     url: "https://yandex.com/search/?text=%s",
     icon: "https://www.google.com/s2/favicons?domain=yandex.com&sz=64",
   },
-
 ];
 
 type EngineIconProps = {
@@ -66,11 +68,23 @@ const EngineIcon = ({ src, alt, size = 16, className }: EngineIconProps) => {
   const [error, setError] = useState(false);
   const style = { width: size, height: size } as const;
   return error ? (
-    <div className={cn("inline-flex items-center justify-center rounded bg-white/10 text-white/80", className)} style={style}>
+    <div
+      className={cn(
+        "inline-flex items-center justify-center rounded bg-white/10 text-white/80",
+        className
+      )}
+      style={style}
+    >
       {alt.charAt(0)}
     </div>
   ) : (
-    <img src={src} alt={alt} onError={() => setError(true)} className={cn(className)} style={style} />
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setError(true)}
+      className={cn(className)}
+      style={style}
+    />
   );
 };
 
@@ -79,16 +93,21 @@ export const SearchPopover = () => {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { selectedEngine, setSelectedEngine, recentSearches, addRecentSearch, clearRecentSearches } =
-    useSearchStore(
-      useShallow((state) => ({
-        selectedEngine: state.selectedEngine,
-        setSelectedEngine: state.setSelectedEngine,
-        recentSearches: state.recentSearches,
-        addRecentSearch: state.addRecentSearch,
-        clearRecentSearches: state.clearRecentSearches,
-      }))
-    );
+  const {
+    selectedEngine,
+    setSelectedEngine,
+    recentSearches,
+    addRecentSearch,
+    clearRecentSearches,
+  } = useSearchStore(
+    useShallow((state) => ({
+      selectedEngine: state.selectedEngine,
+      setSelectedEngine: state.setSelectedEngine,
+      recentSearches: state.recentSearches,
+      addRecentSearch: state.addRecentSearch,
+      clearRecentSearches: state.clearRecentSearches,
+    }))
+  );
 
   const engine = selectedEngine;
 
@@ -96,7 +115,6 @@ export const SearchPopover = () => {
     search.query.toLowerCase().includes(query.toLowerCase())
   );
 
-  // Reset selected index when filtered searches change
   useEffect(() => {
     setSelectedIndex(-1);
   }, [filteredRecentSearches.length, query]);
@@ -153,7 +171,6 @@ export const SearchPopover = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      // If a recent search is selected, use it
       if (selectedIndex >= 0 && selectedIndex < filteredRecentSearches.length) {
         handleSearch(filteredRecentSearches[selectedIndex].query);
       } else {
@@ -222,7 +239,12 @@ export const SearchPopover = () => {
                   )}
                 </div>
                 {filteredRecentSearches.length > 0 ? (
-                  <ul className="max-h-48 overflow-y-auto" id="recent-searches-list" role="listbox" aria-label="Recent searches">
+                  <ul
+                    className="max-h-48 overflow-y-auto"
+                    id="recent-searches-list"
+                    role="listbox"
+                    aria-label="Recent searches"
+                  >
                     {filteredRecentSearches.map((search, index) => (
                       <li
                         key={index}
@@ -235,10 +257,12 @@ export const SearchPopover = () => {
                         )}
                         onClick={() => handleRecentSearchClick(search.query)}
                       >
-                        <Clock className={cn(
-                          "size-5 flex-none text-gray-500 group-hover:text-white",
-                          selectedIndex === index && "text-white"
-                        )} />
+                        <Clock
+                          className={cn(
+                            "size-5 flex-none text-gray-500 group-hover:text-white",
+                            selectedIndex === index && "text-white"
+                          )}
+                        />
                         <EngineIcon
                           src={
                             SEARCH_ENGINES.find((e) => e.name === search.engine)
@@ -251,10 +275,14 @@ export const SearchPopover = () => {
                         <span className="ml-3 flex-auto truncate">
                           {search.query}
                         </span>
-                        <span className={cn(
-                          "ml-3 flex-none text-gray-400",
-                          selectedIndex === index ? "inline" : "hidden group-hover:inline"
-                        )}>
+                        <span
+                          className={cn(
+                            "ml-3 flex-none text-gray-400",
+                            selectedIndex === index
+                              ? "inline"
+                              : "hidden group-hover:inline"
+                          )}
+                        >
                           Search with {search.engine}
                         </span>
                       </li>
@@ -301,8 +329,15 @@ export const SearchPopover = () => {
                     <SelectValue>
                       {selectedEngineConfig && (
                         <div className="flex items-center gap-1.5">
-                          <EngineIcon src={selectedEngineConfig.icon} alt={selectedEngineConfig.name} size={16} className="rounded flex-shrink-0" />
-                          <span className="text-white font-medium">{selectedEngineConfig.name}</span>
+                          <EngineIcon
+                            src={selectedEngineConfig.icon}
+                            alt={selectedEngineConfig.name}
+                            size={16}
+                            className="rounded flex-shrink-0"
+                          />
+                          <span className="text-white font-medium">
+                            {selectedEngineConfig.name}
+                          </span>
                         </div>
                       )}
                     </SelectValue>
@@ -315,7 +350,12 @@ export const SearchPopover = () => {
                         className="text-white hover:bg-white/5 focus:bg-white/5 data-[highlighted]:bg-white/5 data-[highlighted]:text-white"
                       >
                         <div className="flex items-center gap-2 w-full">
-                          <EngineIcon src={searchEngine.icon} alt={searchEngine.name} size={16} className="rounded" />
+                          <EngineIcon
+                            src={searchEngine.icon}
+                            alt={searchEngine.name}
+                            size={16}
+                            className="rounded"
+                          />
                           <span>{searchEngine.name}</span>
                         </div>
                       </SelectItem>
