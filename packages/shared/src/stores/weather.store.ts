@@ -1,9 +1,17 @@
 import { create } from "zustand";
-import { subscribeWithSelector, persist, createJSONStorage } from "zustand/middleware";
+import {
+    subscribeWithSelector,
+    persist,
+    createJSONStorage,
+} from "zustand/middleware";
 import { db } from "../lib/db/meelio.dexie";
 import type { CachedWeather } from "../lib/db/models.dexie";
 import { api } from "../api";
-import type { WeatherData, ForecastDay, WeatherForecast } from "../types/weather.types";
+import type {
+    WeatherData,
+    ForecastDay,
+    WeatherForecast,
+} from "../types/weather.types";
 import { generateUUID } from "../utils/common.utils";
 import { useAuthStore } from "./auth.store";
 
@@ -28,7 +36,9 @@ interface WeatherState {
 const DEFAULT_LOCATION_KEY = "328328";
 const CACHE_DURATION = 3 * 60 * 60 * 1000;
 
-const cacheWeather = async (weatherForecast: WeatherForecast): Promise<void> => {
+const cacheWeather = async (
+    weatherForecast: WeatherForecast
+): Promise<void> => {
     const cached: CachedWeather = {
         id: generateUUID(),
         locationKey: weatherForecast.locationKey,
@@ -46,7 +56,9 @@ const cacheWeather = async (weatherForecast: WeatherForecast): Promise<void> => 
     await db.weather.add(cached);
 };
 
-const loadFromCache = async (locationKey: string): Promise<WeatherForecast | null> => {
+const loadFromCache = async (
+    locationKey: string
+): Promise<WeatherForecast | null> => {
     const cached = await db.weather
         .where("locationKey")
         .equals(locationKey)
@@ -99,21 +111,36 @@ export const useWeatherStore = create<WeatherState>()(
                         const accountLocationKey = (user as any)?.locationKey;
                         const accountLocationName = (user as any)?.locationName;
 
-                        if (accountLocationKey && accountLocationKey !== state.locationKey) {
-                            set({ locationKey: accountLocationKey, locationName: accountLocationName || null });
+                        if (
+                            accountLocationKey &&
+                            accountLocationKey !== state.locationKey
+                        ) {
+                            set({
+                                locationKey: accountLocationKey,
+                                locationName: accountLocationName || null,
+                            });
                         }
 
                         await get().loadFromLocal();
 
                         const currentState = get();
-                        const locationToUse = currentState.locationKey || DEFAULT_LOCATION_KEY;
+                        const locationToUse =
+                            currentState.locationKey || DEFAULT_LOCATION_KEY;
 
                         if (shouldRefresh(currentState.lastUpdated) && locationToUse) {
-                            await get().fetchWeather(locationToUse, currentState.locationName || undefined);
+                            await get().fetchWeather(
+                                locationToUse,
+                                currentState.locationName || undefined
+                            );
                         }
                     } catch (error) {
                         console.error("Failed to initialize weather store:", error);
-                        set({ error: error instanceof Error ? error.message : "Failed to initialize weather" });
+                        set({
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : "Failed to initialize weather",
+                        });
                     } finally {
                         set({ isLoading: false });
                     }
@@ -143,15 +170,23 @@ export const useWeatherStore = create<WeatherState>()(
                     set({ isLoading: true, error: null });
 
                     try {
-                        const currentResponse = await api.weather.getWeather({ locationId: locationKey });
+                        const currentResponse = await api.weather.getWeather({
+                            locationId: locationKey,
+                        });
                         const current = currentResponse.data as WeatherData;
 
                         const forecast = await (async (): Promise<ForecastDay[]> => {
                             try {
-                                const forecastResponse = await api.weather.getWeatherForecast({ locationId: locationKey });
-                                return (forecastResponse.data?.DailyForecasts || []) as ForecastDay[];
+                                const forecastResponse = await api.weather.getWeatherForecast({
+                                    locationId: locationKey,
+                                });
+                                return (forecastResponse.data?.DailyForecasts ||
+                                    []) as ForecastDay[];
                             } catch (forecastError) {
-                                console.warn("Forecast endpoint not available, continuing with current weather only:", forecastError);
+                                console.warn(
+                                    "Forecast endpoint not available, continuing with current weather only:",
+                                    forecastError
+                                );
                                 return [];
                             }
                         })();
@@ -180,7 +215,10 @@ export const useWeatherStore = create<WeatherState>()(
                     } catch (error) {
                         console.error("Failed to fetch weather:", error);
                         set({
-                            error: error instanceof Error ? error.message : "Failed to fetch weather",
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : "Failed to fetch weather",
                             isLoading: false,
                         });
                     }
@@ -190,7 +228,10 @@ export const useWeatherStore = create<WeatherState>()(
                     const state = get();
                     if (!state.locationKey) return;
 
-                    await get().fetchWeather(state.locationKey, state.locationName || undefined);
+                    await get().fetchWeather(
+                        state.locationKey,
+                        state.locationName || undefined
+                    );
                 },
 
                 setLocation: (locationKey: string, locationName?: string) => {
@@ -217,4 +258,3 @@ export const useWeatherStore = create<WeatherState>()(
         )
     )
 );
-
