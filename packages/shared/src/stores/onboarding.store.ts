@@ -12,20 +12,12 @@ interface OnboardingState {
   resetOnboardingWithSync: () => Promise<void>;
   triggerOnboardingUpdate: (completed: boolean) => Promise<void>;
   syncWithUserSettings: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
   persist(
     (set, get) => ({
       hasDockOnboardingCompleted: false,
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
       setDockOnboardingCompleted: () =>
         set({ hasDockOnboardingCompleted: true }),
       setDockOnboardingCompletedWithSync: async () => {
@@ -110,9 +102,6 @@ export const useOnboardingStore = create<OnboardingState>()(
       storage: createJSONStorage(() => localStorage),
       version: 2,
       skipHydration: false,
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

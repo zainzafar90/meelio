@@ -14,7 +14,6 @@ interface BookmarksState {
     isLoading: boolean;
     error: string | null;
     lastSyncAt: number | null;
-    _hasHydrated: boolean;
 
     initializeStore: () => Promise<void>;
     loadFromLocal: () => Promise<void>;
@@ -31,8 +30,6 @@ interface BookmarksState {
     addFolder: (folder: Omit<BookmarkFolder, "id" | "children">) => Promise<void>;
     updateFolder: (id: string, updates: Partial<BookmarkFolder>) => Promise<void>;
     deleteFolder: (id: string) => Promise<void>;
-
-    setHasHydrated: (state: boolean) => void;
 }
 
 const CHROME_BOOKMARKS_ROOT = "0";
@@ -252,11 +249,6 @@ export const useBookmarksStore = create<BookmarksState>()(
                 isLoading: false,
                 error: null,
                 lastSyncAt: null,
-                _hasHydrated: false,
-
-                setHasHydrated: (state) => {
-                    set({ _hasHydrated: state });
-                },
 
                 initializeStore: async () => {
                     const authState = useAuthStore.getState();
@@ -594,7 +586,6 @@ export const useBookmarksStore = create<BookmarksState>()(
                     lastSyncAt: s.lastSyncAt,
                 }),
                 onRehydrateStorage: () => (state) => {
-                    state?.setHasHydrated(true);
                     if (state && state.hasPermissions) {
                         state.initializeStore();
                     }

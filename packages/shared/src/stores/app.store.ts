@@ -17,8 +17,6 @@ interface AppState {
   setWallpaperRotationEnabled: (enabled: boolean) => void;
   setTwelveHourClock: (enabled: boolean) => void;
   initializeApp: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -46,12 +44,6 @@ export const useAppStore = create<AppState>()(
           set({ version });
         }
       },
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
     }),
     {
       name: "meelio:local:app",
@@ -72,7 +64,6 @@ export const useAppStore = create<AppState>()(
         if (state) {
           state.initializeApp();
         }
-        state?.setHasHydrated(true);
       },
     }
   )

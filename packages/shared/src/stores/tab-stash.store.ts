@@ -21,7 +21,6 @@ interface TabStashState {
   hasPermissions: boolean;
   isLoading: boolean;
   error: string | null;
-  _hasHydrated: boolean;
 
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
@@ -35,7 +34,6 @@ interface TabStashState {
   clearAllSessions: () => void;
   checkPermissions: () => Promise<boolean>;
   requestPermissions: () => Promise<boolean>;
-  setHasHydrated: (state: boolean) => void;
 }
 
 let tabStashSyncManager: EntitySyncManager<TabStash, any, any, any, any> | null = null;
@@ -49,11 +47,6 @@ export const useTabStashStore = create<TabStashState>()(
         hasPermissions: false,
         isLoading: false,
         error: null,
-        _hasHydrated: false,
-
-        setHasHydrated: (state) => {
-          set({ _hasHydrated: state });
-        },
 
         initializeStore: async () => {
           const authState = useAuthStore.getState();
@@ -329,7 +322,6 @@ export const useTabStashStore = create<TabStashState>()(
         }),
         partialize: (s) => ({ hasPermissions: s.hasPermissions }),
         onRehydrateStorage: () => (state) => {
-          state?.setHasHydrated(true);
           if (state) {
             state.checkPermissions();
           }

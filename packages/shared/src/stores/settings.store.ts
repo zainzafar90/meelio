@@ -18,8 +18,6 @@ interface SettingsState {
   openSettings: () => void;
   closeSettings: () => void;
   setTab: (tab: SettingsTab) => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -30,12 +28,6 @@ export const useSettingsStore = create<SettingsState>()(
       openSettings: () => set({ isOpen: true }),
       closeSettings: () => set({ isOpen: false }),
       setTab: (tab) => set({ currentTab: tab }),
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
     }),
     {
       name: "meelio:local:settings",
@@ -44,9 +36,6 @@ export const useSettingsStore = create<SettingsState>()(
       partialize: (state) => ({
         currentTab: state.currentTab,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

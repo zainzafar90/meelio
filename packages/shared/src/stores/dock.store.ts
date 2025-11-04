@@ -76,8 +76,6 @@ interface DockState {
   setCurrentOnboardingStep: (step: number) => void;
   setShowIconLabels: (visible: boolean) => void;
   reset: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useDockStore = create<DockState>()(
@@ -116,13 +114,6 @@ export const useDockStore = create<DockState>()(
       showIconLabels: false,
 
       currentOnboardingStep: -1,
-
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
 
       // Modal toggle functions
       toggleTimer: () => {
@@ -310,9 +301,6 @@ export const useDockStore = create<DockState>()(
         currentOnboardingStep: state.currentOnboardingStep,
         showIconLabels: state.showIconLabels,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

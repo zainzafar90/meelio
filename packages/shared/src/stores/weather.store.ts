@@ -23,14 +23,12 @@ interface WeatherState {
     isLoading: boolean;
     error: string | null;
     lastUpdated: number | null;
-    _hasHydrated: boolean;
 
     initializeStore: () => Promise<void>;
     loadFromLocal: () => Promise<void>;
     fetchWeather: (locationKey: string, locationName?: string) => Promise<void>;
     refreshWeather: () => Promise<void>;
     setLocation: (locationKey: string, locationName?: string) => void;
-    setHasHydrated: (state: boolean) => void;
 }
 
 const DEFAULT_LOCATION_KEY = "328328";
@@ -97,7 +95,6 @@ export const useWeatherStore = create<WeatherState>()(
                 isLoading: false,
                 error: null,
                 lastUpdated: null,
-                _hasHydrated: false,
 
                 initializeStore: async () => {
                     const state = get();
@@ -237,10 +234,6 @@ export const useWeatherStore = create<WeatherState>()(
                 setLocation: (locationKey: string, locationName?: string) => {
                     set({ locationKey, locationName: locationName || null });
                 },
-
-                setHasHydrated: (state: boolean) => {
-                    set({ _hasHydrated: state });
-                },
             }),
             {
                 name: "meelio:local:weather",
@@ -251,9 +244,6 @@ export const useWeatherStore = create<WeatherState>()(
                     locationKey: state.locationKey,
                     locationName: state.locationName,
                 }),
-                onRehydrateStorage: () => (state) => {
-                    state?.setHasHydrated(true);
-                },
             }
         )
     )
