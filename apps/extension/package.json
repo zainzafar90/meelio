@@ -123,6 +123,7 @@
     ],
     "optional_permissions": [
       "tabs",
+      "tabGroups",
       "bookmarks"
     ]
   }

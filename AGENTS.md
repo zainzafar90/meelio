@@ -204,20 +204,15 @@ This section outlines the architectural improvements to simplify Meelio, fix bre
 - Use `chrome.tabsGroups` API
 - Update UI to show grouped tabs
 
-##### 3.4 Custom Photo Upload
+##### 3.4 Metrics/Countdowns
 
-- Add photo upload API endpoint
-- Create photos store
-- Add photo selector component
-- Integrate with background system
-
-##### 3.5 Metrics/Countdowns
-
-- Create metrics store
+- Add metrics/countdowns API endpoints
+- Create metrics store with sync
 - Add countdown timer component
 - Add analytics/metrics display
+- Persist countdowns to backend
 
-##### 3.6 Focus Mode
+##### 3.5 Focus Mode
 
 - Separate from timer
 - Create focus mode store
@@ -272,10 +267,9 @@ User Action → Store → Local DB → Optimistic Update
 
 1. ✅ Phase 1: Decouple Timer - Complete (event-driven architecture, timer events system)
 2. ✅ Phase 2: Simplify Sync - Complete (created functional sync-manager.ts, removed class-based approach)
-3. ⏳ Phase 3.1: Weather Feature - In Progress (needs backend API endpoint for 7-day forecast)
+3. ✅ Phase 3.1: Weather Feature - Complete (7-day forecast API, weather store, component with forecast, offline caching)
 4. ✅ Phase 3.2: Bookmarks/Links - Complete (Chrome bookmarks API, offline-first with IndexedDB caching, dock integration)
-5. ⏳ Phase 3.3: Tab Groups - Pending (extend tab stash with chrome.tabsGroups)
-6. ⏳ Phase 3.4: Custom Photo Upload - Pending (needs backend API)
-7. ⏳ Phase 3.5: Metrics/Countdowns - Pending (frontend-only feature)
-8. ⏳ Phase 3.6: Focus Mode - Pending (separate from timer, integrate with site blocker)
-9. ⏳ Phase 4: Chrome APIs - Pending (bookmarks, tabsGroups, notifications, alarms)
+5. ✅ Phase 3.3: Tab Groups - Complete (tab stash with chrome.tabsGroups support)
+6. ⏳ Phase 3.4: Metrics/Countdowns - Pending (backend API + frontend store/components)
+7. ⏳ Phase 3.5: Focus Mode - Pending (separate from timer, integrate with site blocker)
+8. ⏳ Phase 4: Chrome APIs - Pending (bookmarks, tabsGroups, notifications, alarms)

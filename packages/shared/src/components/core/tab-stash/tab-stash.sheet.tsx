@@ -62,6 +62,7 @@ const ExtensionTabStashContent = () => {
   const [selectedSession, setSelectedSession] = useState<TabSession | null>(
     null
   );
+  const [windowCount, setWindowCount] = useState(1);
   const { sessions, hasPermissions, checkPermissions, initializeStore } = useTabStashStore(
     useShallow((state) => ({
       sessions: state.sessions,
@@ -82,6 +83,28 @@ const ExtensionTabStashContent = () => {
     }
   }, [hasPermissions, initializeStore]);
 
+  useEffect(() => {
+    const updateWindowCount = async () => {
+      if (!chrome?.windows) return;
+      const windows = await chrome.windows.getAll();
+      setWindowCount(windows.length);
+    };
+
+    updateWindowCount();
+
+    const handleWindowChange = () => updateWindowCount();
+
+    if (chrome?.windows) {
+      chrome.windows.onCreated.addListener(handleWindowChange);
+      chrome.windows.onRemoved.addListener(handleWindowChange);
+
+      return () => {
+        chrome.windows.onCreated.removeListener(handleWindowChange);
+        chrome.windows.onRemoved.removeListener(handleWindowChange);
+      };
+    }
+  }, []);
+
   if (selectedSession) {
     return (
       <SessionView
@@ -101,7 +124,8 @@ const ExtensionTabStashContent = () => {
             variant="outline"
             className="flex-1"
             onClick={() => stashTabs("all")}
-            disabled={!hasPermissions || isStashing}
+            disabled={!hasPermissions || isStashing || windowCount <= 1}
+            title={windowCount <= 1 ? t("tab-stash.need-multiple-windows", "Open multiple windows to use Stash All") : undefined}
           >
             {t("tab-stash.stash-all")}
           </Button>

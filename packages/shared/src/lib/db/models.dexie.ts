@@ -1,3 +1,5 @@
+import { TabGroup, TabInfo } from "../../types/tab-stash.types";
+
 export interface SiteBlocker {
   id: string;
   userId: string;
@@ -73,13 +75,7 @@ export interface TabStash {
   userId: string;
   windowId: string;
   urls: string[];
-  tabsData?: Array<{
-    title: string;
-    url: string;
-    favicon?: string;
-    windowId: number;
-    pinned: boolean;
-  }> | null;
+  tabsData?: TabInfo[] | null;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number | null;

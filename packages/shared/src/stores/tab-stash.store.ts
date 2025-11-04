@@ -12,7 +12,8 @@ import type { TabSession, TabInfo } from "../types/tab-stash.types";
 import {
   checkTabPermissions,
   groupTabsByWindow,
-  restoreTabsToWindow,
+  restoreTabsToWindowWithGroups,
+  restoreTabsToExistingWindow,
 } from "../components/core/tab-stash/utils/tab-stash.utils";
 
 interface TabStashState {
@@ -30,7 +31,7 @@ interface TabStashState {
   removeSession: (sessionId: string) => Promise<void>;
   renameSession: (sessionId: string, newName: string) => void;
   restoreSession: (sessionId: string) => Promise<void>;
-  
+
   clearAllSessions: () => void;
   checkPermissions: () => Promise<boolean>;
   requestPermissions: () => Promise<boolean>;
@@ -38,7 +39,7 @@ interface TabStashState {
 }
 
 let tabStashSyncManager: EntitySyncManager<TabStash, any, any, any, any> | null = null;
-let isInitializing = false;
+let initializationPromise: Promise<void> | null = null;
 
 export const useTabStashStore = create<TabStashState>()(
   subscribeWithSelector(
@@ -62,35 +63,38 @@ export const useTabStashStore = create<TabStashState>()(
 
           if (!userId) return;
 
-          if (isInitializing) {
-            return;
+          // Return existing initialization promise if already initializing
+          if (initializationPromise) {
+            return initializationPromise;
           }
 
-          isInitializing = true;
+          initializationPromise = (async () => {
+            try {
+              set({ isLoading: true, error: null });
 
-          try {
-            set({ isLoading: true, error: null });
+              // Check permissions
+              await get().checkPermissions();
 
-            // Check permissions
-            await get().checkPermissions();
+              // Load from local database
+              await get().loadFromLocal();
 
-            // Load from local database
-            await get().loadFromLocal();
-
-            // Sync with server for Pro users
-            if (user?.isPro) {
-              const syncStore = useSyncStore.getState();
-              if (syncStore.isOnline) {
-                await get().syncWithServer();
+              // Sync with server for Pro users
+              if (user?.isPro) {
+                const syncStore = useSyncStore.getState();
+                if (syncStore.isOnline) {
+                  await get().syncWithServer();
+                }
               }
+            } catch (error: any) {
+              console.error("Failed to initialize tab stash store:", error);
+              set({ error: error?.message || "Failed to initialize store" });
+            } finally {
+              set({ isLoading: false });
+              initializationPromise = null;
             }
-          } catch (error: any) {
-            console.error("Failed to initialize tab stash store:", error);
-            set({ error: error?.message || "Failed to initialize store" });
-          } finally {
-            set({ isLoading: false });
-            isInitializing = false;
-          }
+          })();
+
+          return initializationPromise;
         },
 
         loadFromLocal: async () => {
@@ -106,7 +110,6 @@ export const useTabStashStore = create<TabStashState>()(
             .equals(userId)
             .toArray();
 
-          // Convert TabStash to TabSession format
           const sessions: TabSession[] = localTabStashes
             .filter(ts => !ts.deletedAt)
             .map(ts => ({
@@ -116,18 +119,20 @@ export const useTabStashStore = create<TabStashState>()(
               windowCount: 1,
               tabs: ts.tabsData && ts.tabsData.length > 0
                 ? ts.tabsData.map(tab => ({
-                    title: tab.title,
-                    url: tab.url,
-                    favicon: tab.favicon,
-                    windowId: tab.windowId,
-                    pinned: tab.pinned,
-                  }))
+                  title: tab.title,
+                  url: tab.url,
+                  favicon: tab.favicon,
+                  windowId: tab.windowId,
+                  pinned: tab.pinned,
+                  groupId: tab.groupId,
+                  groupData: tab.groupData,
+                }))
                 : ts.urls.map(url => ({
-                    title: url,
-                    url,
-                    windowId: parseInt(ts.windowId) || 0,
-                    pinned: false,
-                  })),
+                  title: url,
+                  url,
+                  windowId: parseInt(ts.windowId) || 0,
+                  pinned: false,
+                })),
             }));
 
           set({ sessions });
@@ -140,7 +145,7 @@ export const useTabStashStore = create<TabStashState>()(
 
         addSession: async (session: TabSession) => {
           const MAX_TAB_STASHES = 100;
-          
+
           if (get().sessions.length >= MAX_TAB_STASHES) {
             return undefined;
           }
@@ -158,7 +163,7 @@ export const useTabStashStore = create<TabStashState>()(
           const tabStash: TabStash = {
             id,
             userId,
-            windowId: id, // Use ID as windowId for now
+            windowId: id,
             urls: session.tabs.map(t => t.url),
             tabsData: session.tabs.map(t => ({
               title: t.title,
@@ -166,6 +171,8 @@ export const useTabStashStore = create<TabStashState>()(
               favicon: t.favicon,
               windowId: t.windowId,
               pinned: t.pinned,
+              groupId: t.groupId,
+              groupData: t.groupData,
             })),
             createdAt: now,
             updatedAt: now,
@@ -174,7 +181,7 @@ export const useTabStashStore = create<TabStashState>()(
 
           try {
             await db.tabStashes.add(tabStash);
-            
+
             // Update local state
             const newSession: TabSession = {
               ...session,
@@ -252,7 +259,7 @@ export const useTabStashStore = create<TabStashState>()(
             const hasPermissions = await checkTabPermissions();
             if (!hasPermissions) {
               const granted = await chrome.permissions.request({
-                permissions: ["tabs"],
+                permissions: ["tabs", "tabGroups"],
               });
               if (!granted) {
                 throw new Error("Required permissions not granted");
@@ -260,12 +267,21 @@ export const useTabStashStore = create<TabStashState>()(
               set({ hasPermissions: true });
             }
 
-            const tabsByWindow = groupTabsByWindow(session.tabs);
+            const currentWindow = await chrome.windows.getCurrent();
 
-            // Create each window with its tabs
-            for (const tabs of Object.values(tabsByWindow)) {
-              await restoreTabsToWindow(tabs);
+            const tabsByWindow = groupTabsByWindow(session.tabs);
+            const windowGroups = Object.entries(tabsByWindow).sort(([a], [b]) => parseInt(a) - parseInt(b));
+
+            if (windowGroups.length === 0) return;
+
+            const [windowId1, firstWindowTabs] = windowGroups[0];
+            await restoreTabsToExistingWindow(currentWindow.id!, firstWindowTabs);
+
+            for (let i = 1; i < windowGroups.length; i++) {
+              const [windowId, tabs] = windowGroups[i];
+              await restoreTabsToWindowWithGroups(tabs);
             }
+
           } catch (error) {
             console.error("Error restoring session:", error);
             throw error;
@@ -284,7 +300,7 @@ export const useTabStashStore = create<TabStashState>()(
 
         requestPermissions: async () => {
           const granted = await chrome.permissions.request({
-            permissions: ["tabs"],
+            permissions: ["tabs", "tabGroups"],
           });
           set({ hasPermissions: granted });
           return granted;
@@ -342,7 +358,6 @@ function initializeTabStashSync() {
     store: {
       getUserId: () => useAuthStore.getState().user?.id,
       getItems: () => {
-        // Convert sessions back to TabStash format
         const sessions = useTabStashStore.getState().sessions;
         return sessions.map(s => ({
           id: s.id,
@@ -355,6 +370,8 @@ function initializeTabStashSync() {
             favicon: t.favicon,
             windowId: t.windowId,
             pinned: t.pinned,
+            groupId: t.groupId,
+            groupData: t.groupData,
           })),
           createdAt: s.timestamp,
           updatedAt: s.timestamp,
@@ -362,7 +379,6 @@ function initializeTabStashSync() {
         }));
       },
       setItems: (list) => {
-        // Convert TabStash back to TabSession format
         const sessions: TabSession[] = list.map(ts => ({
           id: ts.id,
           name: new Date(ts.createdAt).toLocaleString(),
@@ -370,18 +386,20 @@ function initializeTabStashSync() {
           windowCount: 1,
           tabs: ts.tabsData && ts.tabsData.length > 0
             ? ts.tabsData.map(tab => ({
-                title: tab.title,
-                url: tab.url,
-                favicon: tab.favicon,
-                windowId: tab.windowId,
-                pinned: tab.pinned,
-              }))
+              title: tab.title,
+              url: tab.url,
+              favicon: tab.favicon,
+              windowId: tab.windowId,
+              pinned: tab.pinned,
+              groupId: tab.groupId,
+              groupData: tab.groupData,
+            }))
             : ts.urls.map(url => ({
-                title: url,
-                url,
-                windowId: parseInt(ts.windowId) || 0,
-                pinned: false,
-              })),
+              title: url,
+              url,
+              windowId: parseInt(ts.windowId) || 0,
+              pinned: false,
+            })),
         }));
         useTabStashStore.setState({ sessions });
       },
