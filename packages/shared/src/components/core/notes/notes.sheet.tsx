@@ -13,9 +13,9 @@ import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import { SyncStatus } from "../../sync-status";
-import MarkdownInlineEditor, {
+import NoteEditor, {
   type StoragePort,
-} from "./markdown-inline-editor";
+} from "./note-editor";
 import { db } from "../../../lib/db/meelio.dexie";
 import {
   Search,
@@ -42,8 +42,6 @@ export function NotesSheet() {
   const {
     notes,
     initializeStore,
-    addNote,
-    updateNote,
     deleteNote,
     togglePinNote,
     enableTypingSound,
@@ -52,8 +50,6 @@ export function NotesSheet() {
     useShallow((s) => ({
       notes: s.notes,
       initializeStore: s.initializeStore,
-      addNote: s.addNote,
-      updateNote: s.updateNote,
       deleteNote: s.deleteNote,
       togglePinNote: s.togglePinNote,
       enableTypingSound: s.enableTypingSound,
@@ -111,41 +107,34 @@ export function NotesSheet() {
     }
   }, [notes, selectedNoteId]);
 
-  const stripHtmlToText = (html: string): string => {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html || "";
-    return (tempDiv.textContent || tempDiv.innerText || "").trim();
-  };
-
-  const hasMeaningfulContent = (title: string, body: string): boolean => {
+  const hasMeaningfulContent = (title: string, content: string): boolean => {
     if (title && title.trim().length > 0) return true;
-    const text = stripHtmlToText(body);
-    return text.length > 0;
+    return content.trim().length > 0;
   };
 
   const creatingRef = useMemo(() => ({ current: false }), []);
 
-  const makeStoragePortFor = (id: string, initial: { title: string; body: string; updatedAt: number } | null): StoragePort => ({
+  const makeStoragePortFor = (id: string, initial: { title: string; content: string; updatedAt: number } | null): StoragePort => ({
     load: async (_ignoredId) => {
       if (id.startsWith("draft:")) {
         return initial
-          ? { id, title: initial.title, body: initial.body, updatedAt: initial.updatedAt }
+          ? { id, title: initial.title, content: initial.content, updatedAt: initial.updatedAt }
           : undefined;
       }
       const n = await db.notes.get(id);
       if (!n) return undefined;
-      return { id: n.id, title: n.title, body: n.content || "", updatedAt: n.updatedAt };
+      return { id: n.id, title: n.title, content: n.content || "", updatedAt: n.updatedAt };
     },
-    save: async (md) => {
+    save: async (note) => {
       if (id.startsWith("draft:")) {
-        if (!hasMeaningfulContent(md.title, md.body)) return;
+        if (!hasMeaningfulContent(note.title, note.content)) return;
 
         if (creatingRef.current) return;
-        
+
         creatingRef.current = true;
         try {
           setIsSaving(true);
-          const created = await useNoteStore.getState().addNote({ title: md.title || "Untitled", content: md.body });
+          const created = await useNoteStore.getState().addNote({ title: note.title || "Untitled", content: note.content });
           if (created) {
             setSelectedNoteId(created.id);
             setActiveInitial({ id: created.id, title: created.title, content: created.content || "", updatedAt: created.updatedAt });
@@ -159,7 +148,7 @@ export function NotesSheet() {
 
       // Existing note
       setIsSaving(true);
-      await useNoteStore.getState().updateNote(id, { title: md.title, content: md.body });
+      await useNoteStore.getState().updateNote(id, { title: note.title, content: note.content });
       setIsSaving(false);
     },
   });
@@ -389,28 +378,20 @@ export function NotesSheet() {
         </div>
 
         <div className="flex-1 overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-zinc-600">
-          <MarkdownInlineEditor
+          <NoteEditor
             key={seed.id}
             id={seed.id}
-            port={makeStoragePortFor(seed.id, { title: seed.title, body: seed.content, updatedAt: seed.updatedAt })}
+            port={makeStoragePortFor(seed.id, { title: seed.title, content: seed.content, updatedAt: seed.updatedAt })}
             initial={{
               title: seed.title,
-              body: seed.content,
+              content: seed.content,
               updatedAt: seed.updatedAt,
             }}
-            onChange={(title, body) => {
-              // Keep sidebar preview consistent with live editor content before debounce/save
+            onChange={(title, content) => {
+              // Only update if this is still the active note
               setActiveInitial((prev) =>
-                prev && prev.id === seed.id ? { ...prev, title, content: body, updatedAt: Date.now() } : prev
+                prev && prev.id === seed.id ? { ...prev, title, content, updatedAt: Date.now() } : prev
               );
-              if (!seed.id.startsWith("draft:")) {
-                // Optimistically update in-memory store so sidebar shows latest content immediately
-                useNoteStore.setState((s) => ({
-                  notes: s.notes.map((n) =>
-                    n.id === seed.id ? { ...n, title, content: body, updatedAt: Date.now() } : n
-                  ),
-                }));
-              }
             }}
           />
         </div>
