@@ -246,7 +246,6 @@ export const useDockStore = create<DockState>()(
 
       reset: () => {
         set({
-          // Reset modal visibility
           isTimerVisible: false,
           isBreathingVisible: false,
           isGreetingsVisible: true,
@@ -268,9 +267,8 @@ export const useDockStore = create<DockState>()(
     {
       name: "meelio:local:dock",
       storage: createJSONStorage(() => localStorage),
-      version: 3,
+      version: 4,
       migrate: (persistedState: any, _version: number) => {
-        // Ensure Notes defaults are present for older persisted states
         const state = { ...persistedState };
         state.dockIconsVisible = state.dockIconsVisible || {};
         if (state.dockIconsVisible.notes === undefined) {

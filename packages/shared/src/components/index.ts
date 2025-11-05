@@ -41,6 +41,9 @@ export * from "./core/dock/components/settings.dock";
 export * from "./core/dock/components/weather.dock";
 export * from "./core/calendar/calendar.sheet";
 
+// App Launcher
+export * from "./core/app-launcher";
+
 // Greeting
 export * from "./core/greetings/greetings-mantras";
 

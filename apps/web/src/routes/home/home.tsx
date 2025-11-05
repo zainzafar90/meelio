@@ -12,6 +12,7 @@ import {
   SearchPopover,
   useDockStore,
   useAuthStore,
+  AppLauncher,
 } from "@repo/shared";
 import { Background } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -128,6 +129,7 @@ const Content = () => {
     >
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
+      <AppLauncher />
       <SoundscapesSheet />
       <TaskListSheet />
       <NotesSheet />

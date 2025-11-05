@@ -2,13 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, LayoutGrid } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useAppLauncherStore } from "../../../stores/app-launcher.store";
 import { useShallow } from "zustand/shallow";
 
 import { CalendarDock } from "./components/calendar.dock";
@@ -119,6 +120,8 @@ export const Dock = () => {
     }))
   );
 
+  const { toggle: toggleLauncher } = useAppLauncherStore();
+
   const staticItems = useMemo(
     () =>
       BASE_STATIC_DOCK_ITEMS.map((item) =>
@@ -137,6 +140,13 @@ export const Dock = () => {
         icon: Logo,
         activeIcon: Logo,
         onClick: () => resetDock(),
+      },
+      {
+        id: "launcher",
+        name: "App Launcher",
+        icon: () => <LayoutGrid className="size-6 text-white" />,
+        activeIcon: () => <LayoutGrid className="size-6 text-white" />,
+        onClick: toggleLauncher,
       },
       ...(dockIconsVisible.timer
         ? [
@@ -256,6 +266,7 @@ export const Dock = () => {
     [
       t,
       resetDock,
+      toggleLauncher,
       toggleTimer,
       toggleSoundscapes,
       toggleBreathing,
