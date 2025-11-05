@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Home } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
@@ -78,6 +78,7 @@ export const Dock = () => {
     toggleCalendar,
     toggleBookmarks,
     toggleWeather,
+    resetDock,
     dockIconsVisible,
     isCalendarVisible,
     isBookmarksVisible,
@@ -92,6 +93,7 @@ export const Dock = () => {
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
       currentOnboardingStep: state.currentOnboardingStep,
+      resetDock: state.reset,
       toggleTimer: state.toggleTimer,
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
@@ -137,6 +139,13 @@ export const Dock = () => {
         name: t("common.home"),
         icon: Logo,
         activeIcon: Logo,
+        onClick: resetDock,
+      },
+      {
+        id: "launcher",
+        name: "App Launcher",
+        icon: Icons.launcher,
+        activeIcon: Icons.launcherActive,
         onClick: toggleLauncher,
       },
       ...(dockIconsVisible.timer
@@ -257,6 +266,7 @@ export const Dock = () => {
     [
       t,
       toggleLauncher,
+      resetDock,
       toggleTimer,
       toggleSoundscapes,
       toggleBreathing,

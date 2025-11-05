@@ -9,15 +9,11 @@ import { ProfileFooter } from "./profile-footer";
 import { Search, X } from "lucide-react";
 
 export const AppLauncher = () => {
-  const { isVisible, close, toggle, searchQuery, setSearchQuery, clearSearch } =
+  const { isVisible, close, searchQuery, setSearchQuery, clearSearch } =
     useAppLauncherStore();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        toggle();
-      }
       if (e.key === "Escape" && isVisible) {
         e.preventDefault();
         close();
@@ -26,7 +22,7 @@ export const AppLauncher = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isVisible, close, toggle]);
+  }, [isVisible, close]);
 
   if (!isVisible) return null;
 
