@@ -187,6 +187,7 @@ export class MeelioDB extends Dexie {
         tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
         bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
       });
+
     this.version(13)
       .stores({
         siteBlocker: "id, userId, url, createdAt, updatedAt, deletedAt",
