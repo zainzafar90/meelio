@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "meelio:local:user",
       storage: createJSONStorage(() => localStorage),
-      version: 4,
+      version: 3,
       skipHydration: false,
     }
   )
