@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { AuthUser } from "../types";
 import { GuestUser } from "../types";
 import { createJSONStorage, persist } from "zustand/middleware";
-// import { useBackgroundStore } from "./background.store";
 import { useCategoryStore } from "./category.store";
 
 export type AuthState = {
