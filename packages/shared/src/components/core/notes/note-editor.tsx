@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
 
-// ─────────────────── Types
 type NoteId = string;
 
 type SimpleNote = {
@@ -16,7 +15,6 @@ type StoragePort = {
   save: (note: SimpleNote) => Promise<void>;
 };
 
-// ─────────────────── Pure utils
 const MAX_TITLE_LENGTH = 200;
 const now = () => Date.now();
 
@@ -33,7 +31,6 @@ const extractTitleFromContent = (content: string): string => {
   return (firstLine?.trim() || "Untitled").slice(0, MAX_TITLE_LENGTH);
 };
 
-// ─────────────────── Storage
 const localStoragePort = (keyPrefix = "simple_note_"): StoragePort => ({
   load: async (id) => {
     const raw = localStorage.getItem(keyPrefix + id);
@@ -44,7 +41,6 @@ const localStoragePort = (keyPrefix = "simple_note_"): StoragePort => ({
   },
 });
 
-// ─────────────────── Component Props
 type Props = {
   id: NoteId;
   port?: StoragePort;
@@ -63,9 +59,11 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
   const saveTimerRef = useRef<number | null>(null);
   const typingTimerRef = useRef<number | null>(null);
   const loadOnceRef = useRef(false);
-  const lastSavedRef = useRef({ title: initial?.title || "", content: initial?.content || "" });
+  const lastSavedRef = useRef({
+    title: initial?.title || "",
+    content: initial?.content || "",
+  });
 
-  // Load note from storage once
   useEffect(() => {
     if (loadOnceRef.current) return;
     loadOnceRef.current = true;
@@ -74,36 +72,37 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
       const savedNote = await storage.load(id);
       if (savedNote) {
         setContent(savedNote.content);
-        lastSavedRef.current = { title: savedNote.title, content: savedNote.content };
+        lastSavedRef.current = {
+          title: savedNote.title,
+          content: savedNote.content,
+        };
       } else if (initial) {
         setContent(initial.content || "");
-        lastSavedRef.current = { title: initial.title || "", content: initial.content || "" };
+        lastSavedRef.current = {
+          title: initial.title || "",
+          content: initial.content || "",
+        };
       }
     })();
   }, [id, storage, initial]);
 
-  // Handle content change
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
     setContent(newContent);
 
-    // Typing indicator for zen mode
     setIsTyping(true);
     if (typingTimerRef.current) window.clearTimeout(typingTimerRef.current);
     typingTimerRef.current = window.setTimeout(() => {
       setIsTyping(false);
     }, 2000) as unknown as number;
 
-    // Extract title and notify parent
     const title = extractTitleFromContent(newContent);
     if (onChange) {
       onChange(title, newContent);
     }
 
-    // Debounced save
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     saveTimerRef.current = window.setTimeout(async () => {
-      // Only save if content actually changed
       if (newContent !== lastSavedRef.current.content) {
         const note: SimpleNote = {
           id,
@@ -117,15 +116,12 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
     }, 800) as unknown as number;
   };
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + Shift + F: Toggle zen mode
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "f") {
         e.preventDefault();
         setIsZenMode((v) => !v);
       }
-      // Esc: Exit zen mode
       if (e.key === "Escape" && isZenMode) {
         setIsZenMode(false);
       }
@@ -135,7 +131,6 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isZenMode]);
 
-  // Auto-hide toolbar in zen mode when typing
   useEffect(() => {
     if (isZenMode) {
       setShowToolbar(!isTyping);
@@ -161,7 +156,9 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
       {/* Toolbar */}
       <div
         className={`border-b border-zinc-800 bg-zinc-950 transition-all duration-300 ${
-          showToolbar ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full h-0 overflow-hidden"
+          showToolbar
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-full h-0 overflow-hidden"
         }`}
       >
         <div className="flex items-center justify-end h-12 px-4">
@@ -172,7 +169,11 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
             }`}
             title="Toggle Zen Mode (Cmd+Shift+F)"
           >
-            {isZenMode ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+            {isZenMode ? (
+              <Minimize2 className="size-4" />
+            ) : (
+              <Maximize2 className="size-4" />
+            )}
             <span className="text-sm">Zen</span>
           </button>
         </div>
@@ -207,4 +208,4 @@ export default function NoteEditor({ id, port, initial, onChange }: Props) {
   );
 }
 
-export { localStoragePort, type SimpleNote, type StoragePort, type NoteId };
+export { type StoragePort };
