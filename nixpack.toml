@@ -3,7 +3,11 @@ nixpkgs = ["nodejs_22", "yarn"]
 
 [phases.install]
 dependsOn = ["setup"]
-cmds = ["yarn install --frozen-lockfile"]
+cmds = [
+  "git fetch origin main",
+  "git reset --hard origin/main",
+  "yarn install --frozen-lockfile"
+]
 
 [phases.build]
 dependsOn = ["install"]
