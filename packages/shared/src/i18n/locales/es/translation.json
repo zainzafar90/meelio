@@ -10,6 +10,8 @@
     "site-blocker": "Bloqueador de Sitios",
     "background": "Fondo",
     "tab-stash": "Guardar Pestañas",
+    "bookmarks": "Marcadores",
+    "weather": "Clima",
     "clock": "Reloj",
     "calendar": "Calendario",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "Guardar Pestañas",
       "description": "Despeja tu navegador guardando pestañas para más tarde."
+    },
+    "bookmarks": {
+      "title": "Marcadores",
+      "description": "Accede y administra los marcadores de tu navegador."
+    },
+    "weather": {
+      "title": "Clima",
+      "description": "Ver el clima actual y el pronóstico de 5 días."
     },
     "background": {
       "title": "Fondos",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "Guarda y organiza pestañas del navegador"
       },
+      "bookmarks": {
+        "description": "Accede a tus marcadores"
+      },
+      "weather": {
+        "description": "Ver el clima actual y el pronóstico"
+      },
       "background": {
         "description": "Cambia tu fondo de pantalla"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "Otorgar Permiso",
     "permissions-needed": "Se requieren permisos adicionales",
     "permissions-description": "Necesitamos permiso para administrar tus pestañas para usar esta función"
+  },
+  "bookmarks": {
+    "title": "Marcadores",
+    "description": "Administra tus marcadores",
+    "extension-only": "Los marcadores solo están disponibles en la extensión",
+    "get-extension": "Obtener la Extensión",
+    "needs-permission": "Se requiere permiso de marcadores",
+    "grant-permission": "Otorgar Permiso",
+    "empty": "No se encontraron marcadores",
+    "refresh": "Actualizar",
+    "links": "enlaces",
+    "folders": "carpetas"
+  },
+  "weather": {
+    "title": "Clima",
+    "description": "Clima actual y pronóstico de 5 días",
+    "current": "Actual",
+    "forecast": "Pronóstico de 5 días",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "refresh": "Actualizar",
+    "empty": "No hay datos del clima disponibles",
+    "retry": "Reintentar",
+    "premium-feature-title": "Clima Premium",
+    "premium-feature": "Los pronósticos del clima y la búsqueda de ubicaciones están disponibles para usuarios Pro",
+    "upgrade": "Actualizar a Pro",
+    "set-location": "Establecer ubicación",
+    "search-placeholder": "Buscar una ciudad...",
+    "search-error": "Error al buscar ubicaciones",
+    "location-saved": "Ubicación guardada exitosamente",
+    "save-error": "Error al guardar la ubicación"
   },
   "calendar": {
     "sheet": {

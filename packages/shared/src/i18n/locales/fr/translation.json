@@ -10,6 +10,8 @@
     "site-blocker": "Bloqueur de sites",
     "background": "Arrière-plan",
     "tab-stash": "Rangement d'onglets",
+    "bookmarks": "Favoris",
+    "weather": "Météo",
     "clock": "Horloge",
     "calendar": "Calendrier",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "Rangement d'onglets",
       "description": "Désencombrez votre navigateur en rangeant vos onglets pour plus tard."
+    },
+    "bookmarks": {
+      "title": "Favoris",
+      "description": "Accédez et gérez les favoris de votre navigateur."
+    },
+    "weather": {
+      "title": "Météo",
+      "description": "Voir la météo actuelle et les prévisions sur 5 jours."
     },
     "background": {
       "title": "Arrière-plans",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "Enregistrer et organiser les onglets du navigateur"
       },
+      "bookmarks": {
+        "description": "Accéder à vos favoris"
+      },
+      "weather": {
+        "description": "Voir la météo actuelle et les prévisions"
+      },
       "background": {
         "description": "Changer votre arrière-plan"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "Accorder la permission",
     "permissions-needed": "Permissions supplémentaires requises",
     "permissions-description": "Nous avons besoin de la permission de gérer vos onglets pour utiliser cette fonctionnalité"
+  },
+  "bookmarks": {
+    "title": "Favoris",
+    "description": "Gérer vos favoris",
+    "extension-only": "Les favoris ne sont disponibles que dans l'extension",
+    "get-extension": "Obtenir l'extension",
+    "needs-permission": "Permission de favoris requise",
+    "grant-permission": "Accorder la permission",
+    "empty": "Aucun favori trouvé",
+    "refresh": "Actualiser",
+    "links": "liens",
+    "folders": "dossiers"
+  },
+  "weather": {
+    "title": "Météo",
+    "description": "Météo actuelle et prévisions sur 5 jours",
+    "current": "Actuel",
+    "forecast": "Prévisions sur 5 jours",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "refresh": "Actualiser",
+    "empty": "Aucune donnée météo disponible",
+    "retry": "Réessayer",
+    "premium-feature-title": "Météo Premium",
+    "premium-feature": "Les prévisions météo et la recherche d'emplacements sont disponibles pour les utilisateurs Pro",
+    "upgrade": "Passer à Pro",
+    "set-location": "Définir l'emplacement",
+    "search-placeholder": "Rechercher une ville...",
+    "search-error": "Échec de la recherche d'emplacements",
+    "location-saved": "Emplacement enregistré avec succès",
+    "save-error": "Échec de l'enregistrement de l'emplacement"
   },
   "calendar": {
     "sheet": {

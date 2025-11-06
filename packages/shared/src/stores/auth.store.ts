@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { AuthUser } from "../types";
 import { GuestUser } from "../types";
 import { createJSONStorage, persist } from "zustand/middleware";
-// import { useBackgroundStore } from "./background.store";
 import { useCategoryStore } from "./category.store";
 
 export type AuthState = {
@@ -16,8 +15,6 @@ export type AuthState = {
   logout: () => void;
   logoutUser: () => void;
   updateLastSuccessfulAuth: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -27,12 +24,6 @@ export const useAuthStore = create<AuthState>()(
       guestUser: null,
       loading: true,
       lastSuccessfulAuth: null,
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
       authenticate: (user: AuthUser) =>
         set((state) => ({ ...state, user, loading: false })),
       authenticateGuest: (user: GuestUser) =>
@@ -58,9 +49,6 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       version: 3,
       skipHydration: false,
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

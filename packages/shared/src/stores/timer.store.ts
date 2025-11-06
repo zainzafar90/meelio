@@ -13,8 +13,7 @@ import {
   addSimpleTimerBreakTime,
 } from "../lib/db/pomodoro.dexie";
 import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
-import { useSoundscapesStore } from "./soundscapes.store";
-import { Category } from "../types/category";
+import { timerEvents } from "../utils/timer-events";
 import { soundSyncService } from "../services/sound-sync.service";
 
 const playCompletionSound = async (
@@ -111,9 +110,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           if (state.stage === TimerStage.Focus) {
             const limitStatus = getLimitStatus();
             if (limitStatus.isLimitReached) {
-              console.log(
-                "❌ Cannot start focus timer: Today's limit reached. Try again tomorrow!"
-              );
+              // "❌ Cannot start focus timer: Today's limit reached. Try again tomorrow!"
               return;
             }
           }
@@ -122,41 +119,41 @@ export const createTimerStore = (platform: TimerPlatform) => {
           const end = deps.now() + duration * 1000;
           deps.postMessage?.({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
-          
-          // Handle soundscapes when focus starts
-          if (state.stage === TimerStage.Focus && (state.settings.soundscapes ?? true)) {
-            const soundscapesState = useSoundscapesStore.getState();
-            
-            // Check if any soundscapes are currently playing
-            const hasPlayingSounds = soundscapesState.sounds.some(sound => sound.playing);
-            
-            if (hasPlayingSounds) {
-              // If soundscapes are already playing, let them continue
-              soundscapesState.resumePausedSounds();
-            } else {
-              // If no soundscapes are playing, auto-start productivity sounds
-              soundscapesState.playCategory(Category.Productivity);
-            }
-          }
+
+          timerEvents.emit({
+            type: 'timer:start',
+            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
+            duration,
+            remaining: duration,
+            data: {
+              soundscapesEnabled: state.settings.soundscapes ?? true,
+            },
+          });
         };
 
         const pause = () => {
-          const end = get().endTimestamp;
+          const state = get();
+          const end = state.endTimestamp;
           const remain =
             end !== null
               ? Math.max(0, Math.ceil((end - deps.now()) / 1000))
               : null;
           deps.postMessage?.({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
-          
-          // Pause soundscapes when timer is paused
-          if ((get().settings.soundscapes ?? true)) {
-            useSoundscapesStore.getState().pausePlayingSounds();
-          }
+
+          timerEvents.emit({
+            type: 'timer:pause',
+            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
+            remaining: remain ?? undefined,
+            data: {
+              soundscapesEnabled: state.settings.soundscapes ?? true,
+            },
+          });
         };
 
         const reset = () => {
-          const duration = get().durations[TimerStage.Focus];
+          const state = get();
+          const duration = state.durations[TimerStage.Focus];
           deps.postMessage?.({ type: "RESET" });
           set({
             stage: TimerStage.Focus,
@@ -165,6 +162,14 @@ export const createTimerStore = (platform: TimerPlatform) => {
             stats: { focusSec: 0, breakSec: 0 },
             unsyncedFocusSec: 0,
             prevRemaining: duration,
+          });
+
+          timerEvents.emit({
+            type: 'timer:reset',
+            stage: 'focus',
+            data: {
+              soundscapesEnabled: state.settings.soundscapes ?? true,
+            },
           });
         };
 
@@ -207,6 +212,16 @@ export const createTimerStore = (platform: TimerPlatform) => {
               duration: d[stageKey]!,
             });
           }
+
+          timerEvents.emit({
+            type: 'timer:duration-update',
+            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
+            duration: d.focus ?? d.break ?? state.durations[state.stage],
+            data: {
+              focus: d.focus ?? state.durations[TimerStage.Focus],
+              break: d.break ?? state.durations[TimerStage.Break],
+            },
+          });
         };
 
         const toggleNotifications = () => {
@@ -238,12 +253,9 @@ export const createTimerStore = (platform: TimerPlatform) => {
               const focus = s.stats.focusSec + diff;
               const unsynced = s.unsyncedFocusSec + diff;
 
-              // Check if limit is reached
               const limitStatus = getLimitStatus();
               if (limitStatus.isLimitReached) {
-                console.log("⚠️ Today's focus limit reached, pausing timer");
                 pause();
-                // Show notification about limit reached
                 platform.showNotification(
                   "Daily Focus Limit Reached 🎯",
                   "You've hit today's focus limit! Take a well-deserved break. Your limit resets tomorrow."
@@ -308,12 +320,11 @@ export const createTimerStore = (platform: TimerPlatform) => {
             set((state) => ({
               stats: {
                 ...state.stats,
-                focusSec: 0, // Reset focus time to 0
-                breakSec: 0, // Reset break time to 0
+                focusSec: 0,
+                breakSec: 0,
               },
             }));
 
-            // Save the reset date
             localStorage.setItem("meelio:simple-timer:lastReset", todayStr);
           }
         };
@@ -338,7 +349,6 @@ export const createTimerStore = (platform: TimerPlatform) => {
           const finishedStage = state.stage;
           const completedDuration = state.durations[finishedStage];
 
-          // Save completed stage to database
           if (finishedStage === TimerStage.Focus) {
             addSimpleTimerFocusTime(completedDuration).catch((error) => {
               console.error("Failed to save focus time to database:", error);
@@ -349,28 +359,22 @@ export const createTimerStore = (platform: TimerPlatform) => {
             });
           }
 
-          // Play sound and show notification
           playCompletionSound(state.settings.sounds).catch(console.error);
           showCompletionNotification(
             finishedStage,
             state.settings.notifications
           );
 
-          // Switch to next stage
           const nextStage =
             finishedStage === TimerStage.Focus
               ? TimerStage.Break
               : TimerStage.Focus;
           const duration = state.durations[nextStage];
 
-          // Check if we're switching to focus and limit is reached
           if (nextStage === TimerStage.Focus) {
             const limitStatus = getLimitStatus();
             if (limitStatus.isLimitReached) {
-              console.log(
-                "⚠️ Today's focus limit reached after stage completion"
-              );
-              // Show special notification
+              // "⚠️ Today's focus limit reached after stage completion"
               platform.showNotification(
                 "Today's Focus Complete! 🎉",
                 "You've completed today's focus goal. Enjoy your break - see you tomorrow!"
@@ -378,16 +382,29 @@ export const createTimerStore = (platform: TimerPlatform) => {
             }
           }
 
-          // Pause soundscapes when switching to break
-          if (nextStage === TimerStage.Break && (get().settings.soundscapes ?? true)) {
-            useSoundscapesStore.getState().pausePlayingSounds();
-          }
+          timerEvents.emit({
+            type: 'timer:complete',
+            stage: finishedStage === TimerStage.Focus ? 'focus' : 'break',
+            duration: completedDuration,
+            data: {
+              nextStage: nextStage === TimerStage.Focus ? 'focus' : 'break',
+              soundscapesEnabled: state.settings.soundscapes ?? true,
+            },
+          });
 
           set({
             stage: nextStage,
             isRunning: false,
             endTimestamp: null,
             prevRemaining: duration,
+          });
+
+          timerEvents.emit({
+            type: 'timer:stage-change',
+            stage: nextStage === TimerStage.Focus ? 'focus' : 'break',
+            data: {
+              soundscapesEnabled: get().settings.soundscapes ?? true,
+            },
           });
         };
 
@@ -437,24 +454,45 @@ export const createTimerStore = (platform: TimerPlatform) => {
   );
 };
 
-// Create singleton stores for each platform
-let extensionStore: ReturnType<typeof createTimerStore> | null = null;
-let webStore: ReturnType<typeof createTimerStore> | null = null;
+const createStoreRegistry = () => {
+  const registry = {
+    extensionStore: null as ReturnType<typeof createTimerStore> | null,
+    webStore: null as ReturnType<typeof createTimerStore> | null,
+  };
+
+  return {
+    getExtensionStore: () => registry.extensionStore,
+    setExtensionStore: (store: ReturnType<typeof createTimerStore>) => {
+      registry.extensionStore = store;
+    },
+    getWebStore: () => registry.webStore,
+    setWebStore: (store: ReturnType<typeof createTimerStore>) => {
+      registry.webStore = store;
+    },
+  };
+};
+
+const storeRegistry = createStoreRegistry();
 
 export const useTimerStore = () => {
   const platform = getTimerPlatform();
-  
-  // Check if we're in extension or web context
+
   const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
-  
+
   if (isExtension) {
+    const extensionStore = storeRegistry.getExtensionStore();
     if (!extensionStore) {
-      extensionStore = createTimerStore(platform);
+      const newStore = createTimerStore(platform);
+      storeRegistry.setExtensionStore(newStore);
+      return newStore;
     }
     return extensionStore;
   } else {
+    const webStore = storeRegistry.getWebStore();
     if (!webStore) {
-      webStore = createTimerStore(platform);
+      const newStore = createTimerStore(platform);
+      storeRegistry.setWebStore(newStore);
+      return newStore;
     }
     return webStore;
   }

@@ -31,8 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout: state.logout,
       lastSuccessfulAuth: state.lastSuccessfulAuth,
       updateLastSuccessfulAuth: state.updateLastSuccessfulAuth,
-      _hasHydrated: state._hasHydrated,
-      setHasHydrated: state.setHasHydrated,
     }))
   );
 

@@ -26,4 +26,11 @@ export const settingsApi = {
     const response = await axios.patch("/v1/settings/calendar", calendarSettings);
     return response.data.settings;
   },
+
+  updateWeatherSettings: async (weatherSettings: { locationKey?: string; locationName?: string }) => {
+    const response = await axios.patch("/v1/settings", {
+      weather: weatherSettings,
+    });
+    return response.data.settings;
+  },
 };

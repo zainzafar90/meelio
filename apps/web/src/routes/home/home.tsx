@@ -5,10 +5,14 @@ import { useEffect, useState } from "react";
 import {
   Clock,
   TabStashSheet,
+  BookmarksSheet,
+  WeatherSheet,
   CalendarSheet,
   CalendarDynamicIsland,
+  SearchPopover,
   useDockStore,
   useAuthStore,
+  AppLauncher,
 } from "@repo/shared";
 import { Background } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -125,12 +129,15 @@ const Content = () => {
     >
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
+      <AppLauncher />
       <SoundscapesSheet />
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <BookmarksSheet />
+      <WeatherSheet />
       <CalendarSheet />
     </main>
   );
@@ -179,6 +186,7 @@ const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
+      <SearchPopover />
     </div>
   );
 };

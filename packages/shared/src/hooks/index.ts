@@ -7,5 +7,6 @@ export * from "./use-previous";
 export * from "./use-timer";
 export * from "./use-document-title";
 export * from "./use-calendar";
+export * from "./use-weather";
 export * from "./use-wallpaper-search";
 export * from "./use-debounced-value";

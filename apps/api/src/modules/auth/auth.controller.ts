@@ -209,10 +209,15 @@ const getAccount = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
+  const locationKey = account.user.settings?.weather?.locationKey;
+  const locationName = account.user.settings?.weather?.locationName;
+
   return res.send({
     ...account.user,
     isPro: account.isPro,
     subscriptionId: account.subscriptionId,
+    locationKey,
+    locationName,
   });
 });
 

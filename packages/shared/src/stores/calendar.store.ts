@@ -226,6 +226,7 @@ export const useCalendarStore = create<CalendarState>()(
     }),
     {
       name: "meelio:local:calendar",
+      version: 1,
       storage: createJSONStorage(() => localStorage),
     }
   )

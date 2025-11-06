@@ -10,6 +10,8 @@
     "site-blocker": "サイトブロッカー",
     "background": "背景",
     "tab-stash": "タブ保管",
+    "bookmarks": "ブックマーク",
+    "weather": "天気",
     "clock": "時計",
     "calendar": "カレンダー",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "タブ保管",
       "description": "後で使うタブを保管してブラウザを整理しましょう。"
+    },
+    "bookmarks": {
+      "title": "ブックマーク",
+      "description": "ブラウザのブックマークにアクセスして管理します。"
+    },
+    "weather": {
+      "title": "天気",
+      "description": "現在の天気と5日間の予報を表示します。"
     },
     "background": {
       "title": "背景",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "ブラウザタブの保存と整理"
       },
+      "bookmarks": {
+        "description": "ブックマークにアクセス"
+      },
+      "weather": {
+        "description": "現在の天気と予報を表示"
+      },
       "background": {
         "description": "背景を変更"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "権限を付与",
     "permissions-needed": "追加の権限が必要です",
     "permissions-description": "この機能を使用するにはタブを管理する権限が必要です"
+  },
+  "bookmarks": {
+    "title": "ブックマーク",
+    "description": "ブックマークを管理",
+    "extension-only": "ブックマークは拡張機能でのみ利用可能",
+    "get-extension": "拡張機能を取得",
+    "needs-permission": "ブックマーク権限が必要",
+    "grant-permission": "権限を付与",
+    "empty": "ブックマークが見つかりません",
+    "refresh": "更新",
+    "links": "リンク",
+    "folders": "フォルダ"
+  },
+  "weather": {
+    "title": "天気",
+    "description": "現在の天気と5日間の予報",
+    "current": "現在",
+    "forecast": "5日間の予報",
+    "today": "今日",
+    "tomorrow": "明日",
+    "refresh": "更新",
+    "empty": "天気データが利用できません",
+    "retry": "再試行",
+    "premium-feature-title": "プレミアム天気",
+    "premium-feature": "天気予報と位置検索はProユーザーに利用可能です",
+    "upgrade": "Proにアップグレード",
+    "set-location": "場所を設定",
+    "search-placeholder": "都市を検索...",
+    "search-error": "位置検索に失敗しました",
+    "location-saved": "場所が正常に保存されました",
+    "save-error": "場所の保存に失敗しました"
   },
   "calendar": {
     "sheet": {

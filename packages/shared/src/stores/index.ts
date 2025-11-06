@@ -10,5 +10,6 @@ export * from "./task.store";
 export * from "./note.store";
 export * from "./app.store";
 export * from "./calendar.store";
+export * from "./search.store";
 
 export { useTimerStore, createTimerStore } from "./timer.store";

@@ -10,6 +10,8 @@
     "site-blocker": "حاجب المواقع",
     "background": "الخلفية",
     "tab-stash": "حفظ الألسنة",
+    "bookmarks": "الإشارات المرجعية",
+    "weather": "الطقس",
     "clock": "الساعة",
     "calendar": "التقويم",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "حفظ الألسنة",
       "description": "نظّف متصفحك بحفظ الألسنة لوقت لاحق."
+    },
+    "bookmarks": {
+      "title": "الإشارات المرجعية",
+      "description": "الوصول إلى وإدارة إشارات المتصفح المرجعية الخاصة بك."
+    },
+    "weather": {
+      "title": "الطقس",
+      "description": "عرض الطقس الحالي والتنبؤ لمدة 5 أيام."
     },
     "background": {
       "title": "الخلفيات",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "حفظ وتنظيم ألسنة المتصفح"
       },
+      "bookmarks": {
+        "description": "الوصول إلى الإشارات المرجعية الخاصة بك"
+      },
+      "weather": {
+        "description": "عرض الطقس الحالي والتنبؤ"
+      },
       "background": {
         "description": "تغيير الخلفية"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "منح الإذن",
     "permissions-needed": "مطلوب أذونات إضافية",
     "permissions-description": "نحتاج إلى إذن لإدارة ألسنتك لاستخدام هذه الميزة"
+  },
+  "bookmarks": {
+    "title": "الإشارات المرجعية",
+    "description": "إدارة الإشارات المرجعية الخاصة بك",
+    "extension-only": "الإشارات المرجعية متاحة فقط في الامتداد",
+    "get-extension": "احصل على الامتداد",
+    "needs-permission": "إذن الإشارات المرجعية مطلوب",
+    "grant-permission": "منح الإذن",
+    "empty": "لم يتم العثور على إشارات مرجعية",
+    "refresh": "تحديث",
+    "links": "روابط",
+    "folders": "مجلدات"
+  },
+  "weather": {
+    "title": "الطقس",
+    "description": "الطقس الحالي والتنبؤ لمدة 5 أيام",
+    "current": "الحالي",
+    "forecast": "التنبؤ لمدة 5 أيام",
+    "today": "اليوم",
+    "tomorrow": "غداً",
+    "refresh": "تحديث",
+    "empty": "لا توجد بيانات الطقس متاحة",
+    "retry": "إعادة المحاولة",
+    "premium-feature-title": "الطقس المميز",
+    "premium-feature": "تنبؤات الطقس والبحث عن المواقع متاحة لمستخدمي Pro",
+    "upgrade": "الترقية إلى Pro",
+    "set-location": "تعيين الموقع",
+    "search-placeholder": "البحث عن مدينة...",
+    "search-error": "فشل البحث عن المواقع",
+    "location-saved": "تم حفظ الموقع بنجاح",
+    "save-error": "فشل حفظ الموقع"
   },
   "calendar": {
     "sheet": {

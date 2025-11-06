@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { useTabStashStore } from "../../../../stores/tab-stash.store";
-import { TabInfo, TabSession } from "src/types/tab-stash.types";
+import {
+  TabInfo,
+  TabSession,
+  TabGroup,
+  TabGroupColor,
+} from "src/types/tab-stash.types";
 import {
   filterValidTabs,
   requestTabPermissions,
 } from "../utils/tab-stash.utils";
 import { useShallow } from "zustand/shallow";
 import { useTranslation } from "react-i18next";
+import { generateUUID } from "../../../../utils/common.utils";
 
 const formatSessionName = (date: Date): string => {
   try {
@@ -37,6 +43,7 @@ export const useTabStash = () => {
     favicon: tab.favIconUrl,
     windowId: tab.windowId,
     pinned: tab.pinned,
+    groupId: tab.groupId,
   });
 
   const stashTabs = async (scope: "all" | "current") => {
@@ -44,33 +51,90 @@ export const useTabStash = () => {
     setError(null);
 
     try {
-      const [currentTab, windows] = await Promise.all([
-        chrome.tabs.getCurrent(),
-        scope === "all"
-          ? chrome.windows.getAll({ populate: true })
-          : [await chrome.windows.getCurrent({ populate: true })],
-      ]);
+      const currentTab = await chrome.tabs.getCurrent();
+      const extensionTabId = currentTab?.id;
 
-      const tabsToStash = windows.flatMap((window) =>
+      const allWindows = scope === "all"
+        ? await chrome.windows.getAll({ populate: true })
+        : [await chrome.windows.getCurrent({ populate: true })];
+
+      if (scope === "all" && allWindows.length <= 1) {
+        setError(
+          t("tab-stash.no-other-windows", "No other windows to stash. Open additional windows first.")
+        );
+        return;
+      }
+
+      const groupDataMap: Record<string, TabGroup> = {};
+
+      for (const window of allWindows) {
+        const windowTabs = window.tabs || [];
+        const windowGroupIds = new Set<number>();
+
+        windowTabs.forEach((tab) => {
+          if (tab.groupId && tab.groupId !== -1) {
+            windowGroupIds.add(tab.groupId);
+          }
+        });
+
+        for (const groupId of Array.from(windowGroupIds)) {
+          try {
+            const group = await chrome.tabGroups.get(groupId);
+            const groupKey = `${window.id}-${groupId}`;
+            groupDataMap[groupKey] = {
+              id: group.id,
+              title: group.title,
+              color: group.color as TabGroupColor,
+              collapsed: group.collapsed,
+            };
+          } catch (error) {
+            console.warn(`Failed to get group ${groupId}:`, error);
+          }
+        }
+      }
+
+      const tabsToStash = allWindows.flatMap((window) =>
         filterValidTabs(
           (window.tabs || []).map(mapChromeTabToTabInfo),
-          currentTab?.id
+          extensionTabId
         )
       );
 
       if (tabsToStash.length === 0) {
         setError(
-          "No stashable tabs found. Extension tabs and empty pages are excluded."
+          t("tab-stash.no-tabs", "No tabs to stash.")
         );
         return;
       }
 
+      const seenGroups = new Set<string>();
+      const processedTabs = tabsToStash.map((tab) => {
+        if (tab.groupId && tab.groupId !== -1) {
+          const groupKey = `${tab.windowId}-${tab.groupId}`;
+          const groupData = groupDataMap[groupKey];
+
+          if (groupData) {
+            const isFirstInGroup = !seenGroups.has(groupKey);
+            seenGroups.add(groupKey);
+
+            if (isFirstInGroup) {
+              return {
+                ...tab,
+                groupData,
+              };
+            }
+          }
+        }
+        return tab;
+      });
+
       const newSession: TabSession = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         name: formatSessionName(new Date()),
         timestamp: Date.now(),
-        tabs: tabsToStash,
-        windowCount: windows.length,
+        tabs: processedTabs,
+        windowCount: allWindows.length,
+        groups: Object.keys(groupDataMap).length > 0 ? groupDataMap : undefined,
       };
 
       await addSession(newSession);
@@ -89,7 +153,9 @@ export const useTabStash = () => {
       }
     } catch (error) {
       console.error("Tab stashing failed:", error);
-      setError("Failed to stash tabs. Please try again.");
+      setError(
+        t("tab-stash.stash-failed", "Failed to stash tabs. Please try again.")
+      );
     } finally {
       setIsStashing(false);
     }

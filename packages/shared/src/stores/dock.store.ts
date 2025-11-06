@@ -13,6 +13,8 @@ interface DockIconsVisibility {
   clock: boolean;
   calendar: boolean;
   notes?: boolean;
+  bookmarks?: boolean;
+  weather?: boolean;
 }
 
 interface DockState {
@@ -27,6 +29,8 @@ interface DockState {
   isTabStashVisible: boolean;
   isCalendarVisible: boolean;
   isNotesVisible?: boolean;
+  isBookmarksVisible?: boolean;
+  isWeatherVisible?: boolean;
 
   // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
@@ -46,6 +50,8 @@ interface DockState {
   toggleTabStash: () => void;
   toggleCalendar: () => void;
   toggleNotes?: () => void;
+  toggleBookmarks?: () => void;
+  toggleWeather?: () => void;
 
   // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
@@ -58,6 +64,8 @@ interface DockState {
   setTabStashVisible: (visible: boolean) => void;
   setCalendarVisible: (visible: boolean) => void;
   setNotesVisible?: (visible: boolean) => void;
+  setBookmarksVisible?: (visible: boolean) => void;
+  setWeatherVisible?: (visible: boolean) => void;
 
   // Icon visibility setters
   setDockIconVisible: (
@@ -68,8 +76,6 @@ interface DockState {
   setCurrentOnboardingStep: (step: number) => void;
   setShowIconLabels: (visible: boolean) => void;
   reset: () => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useDockStore = create<DockState>()(
@@ -86,6 +92,8 @@ export const useDockStore = create<DockState>()(
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
       isCalendarVisible: false,
+      isBookmarksVisible: false,
+      isWeatherVisible: false,
 
       // Icon visibility in dock - all visible by default
       dockIconsVisible: {
@@ -99,18 +107,13 @@ export const useDockStore = create<DockState>()(
         clock: false,
         calendar: true,
         notes: true,
+        bookmarks: true,
+        weather: true,
       },
 
       showIconLabels: false,
 
       currentOnboardingStep: -1,
-
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
 
       // Modal toggle functions
       toggleTimer: () => {
@@ -163,6 +166,14 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isNotesVisible: !(state as any).isNotesVisible }));
       },
 
+      toggleBookmarks: () => {
+        set((state) => ({ isBookmarksVisible: !(state as any).isBookmarksVisible }));
+      },
+
+      toggleWeather: () => {
+        set((state) => ({ isWeatherVisible: !(state as any).isWeatherVisible }));
+      },
+
       // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
@@ -204,6 +215,14 @@ export const useDockStore = create<DockState>()(
         set({ isNotesVisible: visible } as any);
       },
 
+      setBookmarksVisible: (visible: boolean) => {
+        set({ isBookmarksVisible: visible } as any);
+      },
+
+      setWeatherVisible: (visible: boolean) => {
+        set({ isWeatherVisible: visible } as any);
+      },
+
       // Icon visibility setter
       setDockIconVisible: (
         iconId: keyof DockIconsVisibility,
@@ -227,7 +246,6 @@ export const useDockStore = create<DockState>()(
 
       reset: () => {
         set({
-          // Reset modal visibility
           isTimerVisible: false,
           isBreathingVisible: false,
           isGreetingsVisible: true,
@@ -238,6 +256,8 @@ export const useDockStore = create<DockState>()(
           isTabStashVisible: false,
           isCalendarVisible: false,
           isNotesVisible: false,
+          isBookmarksVisible: false,
+          isWeatherVisible: false,
 
           // Don't reset icon visibility on reset
           currentOnboardingStep: -1,
@@ -247,9 +267,8 @@ export const useDockStore = create<DockState>()(
     {
       name: "meelio:local:dock",
       storage: createJSONStorage(() => localStorage),
-      version: 3,
+      version: 5,
       migrate: (persistedState: any, _version: number) => {
-        // Ensure Notes defaults are present for older persisted states
         const state = { ...persistedState };
         state.dockIconsVisible = state.dockIconsVisible || {};
         if (state.dockIconsVisible.notes === undefined) {
@@ -257,6 +276,18 @@ export const useDockStore = create<DockState>()(
         }
         if (state.isNotesVisible === undefined) {
           state.isNotesVisible = false;
+        }
+        if (state.dockIconsVisible.bookmarks === undefined) {
+          state.dockIconsVisible.bookmarks = true;
+        }
+        if (state.isBookmarksVisible === undefined) {
+          state.isBookmarksVisible = false;
+        }
+        if (state.dockIconsVisible.weather === undefined) {
+          state.dockIconsVisible.weather = true;
+        }
+        if (state.isWeatherVisible === undefined) {
+          state.isWeatherVisible = false;
         }
         return state;
       },
@@ -268,9 +299,6 @@ export const useDockStore = create<DockState>()(
         currentOnboardingStep: state.currentOnboardingStep,
         showIconLabels: state.showIconLabels,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

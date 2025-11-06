@@ -18,8 +18,6 @@ interface MantraStore {
   mantras: string[];
   updateMantra: () => void;
   setIsMantraVisible: (isVisible: boolean) => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 export const useMantraStore = create<MantraStore>()(
@@ -28,16 +26,6 @@ export const useMantraStore = create<MantraStore>()(
       currentMantra: mantras[0].text,
       mantras: mantras.map((mantra) => mantra.text),
       isMantraVisible: false,
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-        if (state) {
-          const index = getSeedIndexByDate(mantras.length);
-          set({ currentMantra: mantras[index].text });
-        }
-      },
       updateMantra: () => {
         const index = getSeedIndexByDate(mantras.length);
         set({ currentMantra: mantras[index].text });
@@ -50,7 +38,10 @@ export const useMantraStore = create<MantraStore>()(
       storage: createJSONStorage(() => localStorage),
       version: 3,
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
+        if (state) {
+          const index = getSeedIndexByDate(mantras.length);
+          state.updateMantra();
+        }
       },
     }
   )
@@ -68,8 +59,6 @@ export const useMantraStore = create<MantraStore>()(
 interface GreetingStore {
   greeting: string;
   updateGreeting: (time: Date, t: (key: string) => string) => void;
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 const getGreeting = (hour: number, t: (key: string) => string) => {
@@ -83,12 +72,6 @@ export const useGreetingStore = create<GreetingStore>()(
   persist(
     (set) => ({
       greeting: "",
-      _hasHydrated: false,
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state,
-        });
-      },
       updateGreeting: (time, t) => {
         const hour = time.getHours();
         const newGreeting = getGreeting(hour, t);
@@ -101,9 +84,6 @@ export const useGreetingStore = create<GreetingStore>()(
       storage: createJSONStorage(() => localStorage),
       version: 2,
       skipHydration: false,
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-      },
     }
   )
 );

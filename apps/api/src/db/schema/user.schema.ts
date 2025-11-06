@@ -30,6 +30,10 @@ export const DEFAULT_SETTINGS: IUserSettings = {
   calendar: {
     enabled: false,
   },
+  weather: {
+    locationKey: undefined,
+    locationName: undefined,
+  },
 };
 
 const EnumUserRole = customType<{

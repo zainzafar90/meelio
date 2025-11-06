@@ -3,11 +3,13 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 
-import { 
-  AppProvider, 
-  AuthContainer, 
-  Clock, 
+import {
+  AppProvider,
+  AuthContainer,
+  Clock,
   TabStashSheet,
+  BookmarksSheet,
+  WeatherSheet,
   CalendarSheet,
   useAuthStore,
   useDockStore,
@@ -22,7 +24,9 @@ import {
   Dock,
   SiteBlockerSheet,
   NotesSheet,
-  SimpleTimer
+  SimpleTimer,
+  SearchPopover,
+  AppLauncher
  } from "@repo/shared";
  import {CalendarDynamicIsland} from "@repo/shared";
 import { useAppStore } from "@repo/shared";
@@ -72,12 +76,15 @@ const Content = () => {
     >
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
+      <AppLauncher />
       <SoundscapesSheet />
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
       <SiteBlockerSheet />
       <TabStashSheet />
+      <BookmarksSheet />
+      <WeatherSheet />
       <CalendarSheet />
     </main>
   );
@@ -126,6 +133,7 @@ const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
+      <SearchPopover />
     </div>
   );
 };

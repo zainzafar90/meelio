@@ -23,9 +23,6 @@ interface SiteBlockerState {
   removeSite: (url: string) => Promise<void>;
   bulkAddSites: (urls: string[], category?: string) => Promise<void>;
   bulkRemoveSites: (urls: string[]) => Promise<void>;
-
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
 }
 
 let siteBlockerSyncManager: EntitySyncManager<SiteBlocker, any, any, any, any> | null = null;
@@ -48,11 +45,6 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
         sites: [],
         isLoading: false,
         error: null,
-        _hasHydrated: false,
-
-        setHasHydrated: (state) => {
-          set({ _hasHydrated: state });
-        },
 
         initializeStore: async () => {
           const authState = useAuthStore.getState();
@@ -476,12 +468,10 @@ export const useSiteBlockerStore = create<SiteBlockerState>()(
           },
         })),
         version: 2,
-        partialize: (state) => ({ 
+        partialize: (state) => ({
           sites: state.sites,
-          _hasHydrated: state._hasHydrated 
         }),
         onRehydrateStorage: () => (state) => {
-          state?.setHasHydrated(true);
           // Always initialize store on rehydration to load from IndexedDB
           // This ensures Chrome storage and IndexedDB stay in sync
           state?.initializeStore?.();

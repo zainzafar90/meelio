@@ -41,6 +41,9 @@ export * from "./core/dock/components/settings.dock";
 export * from "./core/dock/components/weather.dock";
 export * from "./core/calendar/calendar.sheet";
 
+// App Launcher
+export * from "./core/app-launcher";
+
 // Greeting
 export * from "./core/greetings/greetings-mantras";
 
@@ -107,6 +110,15 @@ export * from "./core/site-blocker/site-blocker.sheet";
 
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";
+
+// Bookmarks
+export * from "./core/bookmarks/bookmarks.sheet";
+
+// Weather
+export * from "./core/weather/weather.sheet";
+
+// Search
+export * from "./core/search";
 
 // ------------- ICONS -------------
 export * from "./icons";

@@ -327,7 +327,8 @@ export const useNoteStore = create<NoteState>()(
         setEnableTypingSound: (enabled: boolean) => set({ enableTypingSound: enabled }),
       }),
       {
-        name: "meelio:local:notes:settings",
+        name: "meelio:local:notes",
+        version: 2,
         storage: createJSONStorage(() => localStorage),
         partialize: (s) => ({ enableTypingSound: s.enableTypingSound }),
       }

@@ -367,10 +367,10 @@ export const useTaskStore = create<TaskState>()(
       );
 
 
-        set({
-          tasks: localTasks.filter(t => !t.deletedAt),
-          lists: SYSTEM_LISTS,
-        });
+      set({
+        tasks: localTasks.filter(t => !t.deletedAt),
+        lists: SYSTEM_LISTS,
+      });
     },
 
     syncWithServer: async () => {

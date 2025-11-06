@@ -2,13 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Home } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useAppLauncherStore } from "../../../stores/app-launcher.store";
 import { useShallow } from "zustand/shallow";
 
 import { CalendarDock } from "./components/calendar.dock";
@@ -75,9 +76,13 @@ export const Dock = () => {
     toggleBackgrounds,
     toggleTabStash,
     toggleCalendar,
+    toggleBookmarks,
+    toggleWeather,
     resetDock,
     dockIconsVisible,
     isCalendarVisible,
+    isBookmarksVisible,
+    isWeatherVisible,
   } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
@@ -93,13 +98,17 @@ export const Dock = () => {
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
-      toggleNotes: (state as any).toggleNotes,
+      toggleNotes: state.toggleNotes,
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
       toggleCalendar: state.toggleCalendar,
+      toggleBookmarks: state.toggleBookmarks,
+      toggleWeather: state.toggleWeather,
       dockIconsVisible: state.dockIconsVisible,
       isCalendarVisible: state.isCalendarVisible,
+      isBookmarksVisible: state.isBookmarksVisible,
+      isWeatherVisible: state.isWeatherVisible,
     }))
   );
 
@@ -111,14 +120,16 @@ export const Dock = () => {
     }))
   );
 
+  const { toggle: toggleLauncher } = useAppLauncherStore();
+
   const staticItems = useMemo(
     () =>
       BASE_STATIC_DOCK_ITEMS.map((item) =>
         item.id === "calendar"
           ? { ...item, onClick: toggleCalendar, isActive: isCalendarVisible }
-          : item,
+          : item
       ),
-    [toggleCalendar, isCalendarVisible],
+    [toggleCalendar, isCalendarVisible]
   );
 
   const items = useMemo(
@@ -128,7 +139,14 @@ export const Dock = () => {
         name: t("common.home"),
         icon: Logo,
         activeIcon: Logo,
-        onClick: () => resetDock(),
+        onClick: resetDock,
+      },
+      {
+        id: "launcher",
+        name: "App Launcher",
+        icon: Icons.launcher,
+        activeIcon: Icons.launcherActive,
+        onClick: toggleLauncher,
       },
       ...(dockIconsVisible.timer
         ? [
@@ -174,7 +192,7 @@ export const Dock = () => {
             },
           ]
         : []),
-      ...(((dockIconsVisible as any).notes ?? true)
+      ...((dockIconsVisible.notes ?? true)
         ? [
             {
               id: "notes",
@@ -210,6 +228,28 @@ export const Dock = () => {
             },
           ]
         : []),
+      ...(dockIconsVisible.bookmarks
+        ? [
+            {
+              id: "bookmarks",
+              name: t("common.bookmarks", { defaultValue: "Bookmarks" }),
+              icon: Icons.bookmark,
+              activeIcon: Icons.bookmarkActive,
+              onClick: toggleBookmarks,
+            },
+          ]
+        : []),
+      ...(dockIconsVisible.weather
+        ? [
+            {
+              id: "weather",
+              name: t("common.weather", { defaultValue: "Weather" }),
+              icon: Icons.weather,
+              activeIcon: Icons.weatherActive,
+              onClick: toggleWeather,
+            },
+          ]
+        : []),
       ...(dockIconsVisible.backgrounds
         ? [
             {
@@ -224,6 +264,7 @@ export const Dock = () => {
     ],
     [
       t,
+      toggleLauncher,
       resetDock,
       toggleTimer,
       toggleSoundscapes,
@@ -233,6 +274,8 @@ export const Dock = () => {
       toggleTabStash,
       toggleBackgrounds,
       toggleCalendar,
+      toggleBookmarks,
+      toggleWeather,
       dockIconsVisible,
     ]
   );
@@ -367,7 +410,9 @@ export const Dock = () => {
                 (item.id === "tasks" && isTasksVisible) ||
                 (item.id === "site-blocker" && isSiteBlockerVisible) ||
                 (item.id === "background" && isBackgroundsVisible) ||
-                (item.id === "tab-stash" && isTabStashVisible);
+                (item.id === "tab-stash" && isTabStashVisible) ||
+                (item.id === "bookmarks" && isBookmarksVisible) ||
+                (item.id === "weather" && isWeatherVisible);
 
               const IconComponent = (
                 isActive ? item.activeIcon : item.icon
@@ -389,7 +434,7 @@ export const Dock = () => {
               if (item.requirePro) {
                 return (
                   <PremiumFeature
-                  key={item.id}
+                    key={item.id}
                     requirePro={item.requirePro}
                     tooltipClassName="top-2 right-2"
                     fallback={

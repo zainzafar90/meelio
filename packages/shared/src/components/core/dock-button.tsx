@@ -17,6 +17,8 @@ const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
   notes: "ring-amber-400/70",
   "site-blocker": "ring-purple-400/70",
   "tab-stash": "ring-sky-400/70",
+  bookmarks: "ring-blue-400/70",
+  weather: "ring-cyan-400/70",
   background: "ring-emerald-400/70",
   home: "ring-blue-400/70",
 };
@@ -51,6 +53,8 @@ export const DockButton = ({
     isSiteBlockerVisible,
     isBackgroundsVisible,
     isTabStashVisible,
+    isBookmarksVisible,
+    isWeatherVisible,
     showIconLabels,
   } = useDockStore(
     useShallow((state) => ({
@@ -58,10 +62,12 @@ export const DockButton = ({
       isSoundscapesVisible: state.isSoundscapesVisible,
       isBreathingVisible: state.isBreathingVisible,
       isTasksVisible: state.isTasksVisible,
-      isNotesVisible: (state as any).isNotesVisible,
+      isNotesVisible: state.isNotesVisible,
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
+      isBookmarksVisible: (state as any).isBookmarksVisible,
+      isWeatherVisible: (state as any).isWeatherVisible,
       showIconLabels: state.showIconLabels,
     }))
   );
@@ -74,7 +80,9 @@ export const DockButton = ({
     (item.id === "notes" && isNotesVisible) ||
     (item.id === "site-blocker" && isSiteBlockerVisible) ||
     (item.id === "background" && isBackgroundsVisible) ||
-    (item.id === "tab-stash" && isTabStashVisible);
+    (item.id === "tab-stash" && isTabStashVisible) ||
+    (item.id === "bookmarks" && isBookmarksVisible) ||
+    (item.id === "weather" && isWeatherVisible);
   const isActive = item.isActive ?? derivedActive;
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
@@ -109,6 +117,15 @@ export const DockButton = ({
             role="button"
           >
             <IconComponent className="size-6 text-white" />
+            {item.requirePro && (
+              <span
+                className={cn(
+                  "absolute -top-1 -right-2 z-10 bg-sky-600 text-[6px] font-bold uppercase tracking-wider text-white/90 px-1 py-0.5 rounded border border-white/10"
+                )}
+              >
+                Pro
+              </span>
+            )}
             {isActive && (
               <div className="absolute -bottom-3 h-1 w-1 rounded-full bg-zinc-500" />
             )}

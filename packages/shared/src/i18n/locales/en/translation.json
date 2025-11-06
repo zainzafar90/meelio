@@ -10,6 +10,8 @@
     "site-blocker": "Site Blocker",
     "background": "Background",
     "tab-stash": "Tab Stash",
+    "bookmarks": "Bookmarks",
+    "weather": "Weather",
     "clock": "Clock",
     "calendar": "Calendar",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "Tab Stash",
       "description": "Declutter your browser by stashing away tabs for later."
+    },
+    "bookmarks": {
+      "title": "Bookmarks",
+      "description": "Access and manage your browser bookmarks."
+    },
+    "weather": {
+      "title": "Weather",
+      "description": "View current weather and 5-day forecast."
     },
     "background": {
       "title": "Backgrounds",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "Save and organize browser tabs"
       },
+      "bookmarks": {
+        "description": "Access your bookmarks"
+      },
+      "weather": {
+        "description": "View current weather and forecast"
+      },
       "background": {
         "description": "Change your background"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "Grant Permission",
     "permissions-needed": "Additional permissions required",
     "permissions-description": "We need permission to manage your tabs to use this feature"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "description": "Manage your bookmarks",
+    "extension-only": "Bookmarks available in extension only",
+    "get-extension": "Get the Extension",
+    "needs-permission": "Bookmarks permission required",
+    "grant-permission": "Grant Permission",
+    "empty": "No bookmarks found",
+    "refresh": "Refresh",
+    "links": "links",
+    "folders": "folders"
+  },
+  "weather": {
+    "title": "Weather",
+    "description": "Current weather and 5-day forecast",
+    "current": "Current",
+    "forecast": "5-Day Forecast",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "refresh": "Refresh",
+    "empty": "No weather data available",
+    "retry": "Retry",
+    "premium-feature-title": "Premium Weather",
+    "premium-feature": "Weather forecasts and location search are available for Pro users",
+    "upgrade": "Upgrade to Pro",
+    "set-location": "Set Location",
+    "search-placeholder": "Search for a city...",
+    "search-error": "Failed to search locations",
+    "location-saved": "Location saved successfully",
+    "save-error": "Failed to save location"
   },
   "calendar": {
     "sheet": {

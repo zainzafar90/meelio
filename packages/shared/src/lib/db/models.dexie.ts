@@ -1,3 +1,5 @@
+import { TabGroup, TabInfo } from "../../types/tab-stash.types";
+
 export interface SiteBlocker {
   id: string;
   userId: string;
@@ -73,14 +75,32 @@ export interface TabStash {
   userId: string;
   windowId: string;
   urls: string[];
-  tabsData?: Array<{
-    title: string;
-    url: string;
-    favicon?: string;
-    windowId: number;
-    pinned: boolean;
-  }> | null;
+  tabsData?: TabInfo[] | null;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number | null;
+}
+
+export interface CachedBookmark {
+  id: string;
+  userId: string;
+  chromeId: string;
+  title: string;
+  url?: string;
+  parentId?: string;
+  index?: number;
+  favicon?: string;
+  dateAdded: number;
+  dateGroupModified?: number;
+  cachedAt: number;
+  deletedAt?: number | null;
+}
+
+export interface CachedWeather {
+  id: string;
+  locationKey: string;
+  locationName: string;
+  currentWeather: string;
+  forecast: string;
+  cachedAt: number;
 }

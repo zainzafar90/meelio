@@ -10,6 +10,8 @@
     "site-blocker": "网站拦截",
     "background": "背景",
     "tab-stash": "标签收纳",
+    "bookmarks": "书签",
+    "weather": "天气",
     "clock": "时钟",
     "calendar": "日历",
     "calendarData": {
@@ -113,6 +115,14 @@
     "tab-stash": {
       "title": "标签收纳",
       "description": "整理浏览器，收纳标签以便稍后使用。"
+    },
+    "bookmarks": {
+      "title": "书签",
+      "description": "访问和管理浏览器书签。"
+    },
+    "weather": {
+      "title": "天气",
+      "description": "查看当前天气和5天预报。"
     },
     "background": {
       "title": "背景",
@@ -403,6 +413,12 @@
       "tab-stash": {
         "description": "保存和整理浏览器标签"
       },
+      "bookmarks": {
+        "description": "访问您的书签"
+      },
+      "weather": {
+        "description": "查看当前天气和预报"
+      },
       "background": {
         "description": "更改背景"
       },
@@ -478,6 +494,37 @@
     "grant-permission": "授予权限",
     "permissions-needed": "需要额外权限",
     "permissions-description": "我们需要管理标签的权限才能使用此功能"
+  },
+  "bookmarks": {
+    "title": "书签",
+    "description": "管理您的书签",
+    "extension-only": "书签仅在扩展中可用",
+    "get-extension": "获取扩展",
+    "needs-permission": "需要书签权限",
+    "grant-permission": "授予权限",
+    "empty": "未找到书签",
+    "refresh": "刷新",
+    "links": "链接",
+    "folders": "文件夹"
+  },
+  "weather": {
+    "title": "天气",
+    "description": "当前天气和5天预报",
+    "current": "当前",
+    "forecast": "5天预报",
+    "today": "今天",
+    "tomorrow": "明天",
+    "refresh": "刷新",
+    "empty": "没有可用的天气数据",
+    "retry": "重试",
+    "premium-feature-title": "高级天气",
+    "premium-feature": "天气预报和位置搜索可供Pro用户使用",
+    "upgrade": "升级到Pro",
+    "set-location": "设置位置",
+    "search-placeholder": "搜索城市...",
+    "search-error": "搜索位置失败",
+    "location-saved": "位置已成功保存",
+    "save-error": "保存位置失败"
   },
   "calendar": {
     "sheet": {
