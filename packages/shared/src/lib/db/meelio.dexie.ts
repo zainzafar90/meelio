@@ -186,7 +186,6 @@ export class MeelioDB extends Dexie {
         notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
         tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
         bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
-        weather: "id, locationKey, cachedAt",
       });
     this.version(13)
       .stores({
