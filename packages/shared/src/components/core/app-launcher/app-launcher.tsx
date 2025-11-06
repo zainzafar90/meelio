@@ -32,7 +32,7 @@ export const AppLauncher = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 h-full w-full z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md overflow-auto p-4"
+        className="fixed inset-0 h-full w-full z-[100] flex items-center justify-center bg-background/70 backdrop-blur-md overflow-auto p-4"
         onClick={close}
       >
         <motion.div
@@ -41,7 +41,7 @@ export const AppLauncher = () => {
           exit={{ opacity: 0, scale: 0.96 }}
           transition={{ duration: 0.2 }}
           onClick={(e) => e.stopPropagation()}
-          className="relative flex w-full max-w-4xl flex-col max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800/40 via-zinc-900/50 to-black/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] backdrop-blur-3xl"
+          className="relative flex w-full max-w-4xl flex-col max-h-[90vh] overflow-y-auto rounded-2xl border bg-card/95 shadow-[0_8px_32px_0_hsl(var(--background)/0.4)] backdrop-blur-3xl"
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
@@ -51,18 +51,18 @@ export const AppLauncher = () => {
         >
           <div className="flex items-center justify-between p-8">
             <div className="relative hidden md:block w-full">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/50" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search"
-                className="w-full rounded-lg border border-white/10 bg-white/5 py-4 pl-9 pr-9 text-sm text-white placeholder:text-white/50 backdrop-blur-xl transition-all focus:border-white/20 focus:bg-white/10 focus:outline-none"
+                className="w-full rounded-lg border bg-muted/30 py-4 pl-9 pr-9 text-sm text-card-foreground placeholder:text-muted-foreground backdrop-blur-xl transition-all focus:border-accent focus:bg-muted/50 focus:outline-none"
               />
               {searchQuery && (
                 <button
                   onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 transition-colors hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-card-foreground"
                 >
                   <X className="size-3.5" />
                 </button>
@@ -75,7 +75,7 @@ export const AppLauncher = () => {
             onAppClick={() => close()}
           />
 
-          <div className="bg-zinc-900/50 border-t border-white/5 p-8">
+          <div className="bg-muted/20 border-t p-8">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
               <WeatherWidget />
               <MediaWidget />

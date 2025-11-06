@@ -235,7 +235,7 @@ export const PinnedAppsGrid = ({
   return (
     <div className="px-0 pb-8">
       {filteredApps.length === 0 && (
-        <div className="col-span-full text-center text-white/50 text-sm">
+        <div className="col-span-full text-center text-muted-foreground text-sm">
           No apps found. Try a different search.
         </div>
       )}
@@ -249,12 +249,12 @@ export const PinnedAppsGrid = ({
                   className="group flex flex-col items-center gap-2"
                 >
                   <div className="relative">
-                    <div className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-white/20 group-hover:bg-white/10 sm:size-16">
-                      <app.icon className="size-7 text-white" />
+                    <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-accent group-hover:bg-muted sm:size-16">
+                      <app.icon className="size-7 text-card-foreground" />
                     </div>
                     <Crown className="absolute -right-1 -top-1 size-3.5 text-amber-400 drop-shadow-lg sm:size-4" />
                   </div>
-                  <span className="line-clamp-2 text-center text-[10px] leading-tight text-white/90 sm:text-[11px]">
+                  <span className="line-clamp-2 text-center text-[10px] leading-tight text-card-foreground sm:text-[11px]">
                     {app.name}
                   </span>
                 </button>
@@ -264,10 +264,10 @@ export const PinnedAppsGrid = ({
                 onClick={app.onClick}
                 className="group flex flex-col items-center gap-2"
               >
-                <div className="flex size-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-white/20 group-hover:bg-white/10 sm:size-16">
-                  <app.icon className="size-7 text-white" />
+                <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-accent group-hover:bg-muted sm:size-16">
+                  <app.icon className="size-7 text-card-foreground" />
                 </div>
-                <span className="line-clamp-2 text-center text-[10px] leading-tight text-white/90 sm:text-[11px]">
+                <span className="line-clamp-2 text-center text-[10px] leading-tight text-card-foreground sm:text-[11px]">
                   {app.name}
                 </span>
               </button>

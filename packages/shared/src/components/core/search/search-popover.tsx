@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search as SearchIcon, Clock, X } from "lucide-react";
+import { Search as SearchIcon, Clock } from "lucide-react";
 import { useShallow } from "zustand/shallow";
 
 import { Dialog, DialogContent } from "@repo/ui/components/ui/dialog";
@@ -121,7 +121,7 @@ export const SearchPopover = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const isMac = navigator.userAgent.includes("Mac");
       const isMod = isMac ? e.metaKey : e.ctrlKey;
 
       if (isMod && e.key === "k") {
@@ -193,13 +193,13 @@ export const SearchPopover = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent
-        className="max-w-2xl bg-gradient-to-b from-zinc-900/50 via-black/60 to-black/80 backdrop-blur-3xl border-white/10 p-0"
+        className="max-w-2xl bg-popover/95 backdrop-blur-3xl border p-0"
         showClose={false}
       >
         <div className="flex flex-col">
-          <div className="relative border-b border-white/10">
+          <div className="relative border-b">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-              <SearchIcon className="h-5 w-5 text-white/40" />
+              <SearchIcon className="h-5 w-5 text-muted-foreground" />
             </div>
             <Input
               ref={inputRef}
@@ -208,7 +208,7 @@ export const SearchPopover = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="h-12 pl-11 pr-4 bg-transparent border-0 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-12 pl-11 pr-4 bg-transparent border-0 text-popover-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
               autoFocus
               role="combobox"
               aria-expanded={!query && filteredRecentSearches.length > 0}
@@ -220,11 +220,11 @@ export const SearchPopover = () => {
             />
           </div>
 
-          <div className="divide-y divide-white/10">
+          <div className="divide-y">
             {query ? null : (
               <div className="p-4">
                 <div className="mb-2 flex items-center justify-between px-3">
-                  <h2 className="text-xs font-semibold text-white/90">
+                  <h2 className="text-xs font-semibold text-popover-foreground">
                     Recent searches
                   </h2>
                   {filteredRecentSearches.length > 0 && (
@@ -232,7 +232,7 @@ export const SearchPopover = () => {
                       variant="ghost"
                       size="sm"
                       onClick={clearRecentSearches}
-                      className="h-6 px-2 text-xs text-white/60 hover:text-white hover:bg-white/5"
+                      className="h-6 px-2 text-xs"
                     >
                       Clear all
                     </Button>
@@ -252,15 +252,15 @@ export const SearchPopover = () => {
                         role="option"
                         aria-selected={selectedIndex === index}
                         className={cn(
-                          "group flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white",
-                          selectedIndex === index && "bg-white/10 text-white"
+                          "group flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-popover-foreground/70 hover:bg-accent/10 hover:text-popover-foreground",
+                          selectedIndex === index && "bg-accent/20 text-popover-foreground"
                         )}
                         onClick={() => handleRecentSearchClick(search.query)}
                       >
                         <Clock
                           className={cn(
-                            "size-5 flex-none text-white/40 group-hover:text-white",
-                            selectedIndex === index && "text-white"
+                            "size-5 flex-none text-muted-foreground group-hover:text-popover-foreground",
+                            selectedIndex === index && "text-popover-foreground"
                           )}
                         />
                         <EngineIcon
@@ -277,7 +277,7 @@ export const SearchPopover = () => {
                         </span>
                         <span
                           className={cn(
-                            "ml-3 flex-none text-white/50",
+                            "ml-3 flex-none text-muted-foreground",
                             selectedIndex === index
                               ? "inline"
                               : "hidden group-hover:inline"
@@ -289,33 +289,31 @@ export const SearchPopover = () => {
                     ))}
                   </ul>
                 ) : (
-                  <p className="px-3 text-sm text-white/50">
+                  <p className="px-3 text-sm text-muted-foreground">
                     No recent searches
                   </p>
                 )}
               </div>
             )}
-            <div className="flex items-center justify-between gap-2 bg-zinc-900/50 px-4 py-2.5 text-xs text-white/70">
+            <div className="flex items-center justify-between gap-2 bg-muted/30 px-4 py-2.5 text-xs text-popover-foreground/70">
               <div className="flex items-center gap-2">
                 <span>Press</span>
-                <kbd className="flex size-5 items-center justify-center rounded border border-white/10 bg-white/5 font-semibold text-white">
-                  {navigator.platform.toUpperCase().indexOf("MAC") >= 0
-                    ? "⌘"
-                    : "Ctrl"}
+                <kbd className="flex size-5 items-center justify-center rounded border bg-muted/50 font-semibold text-popover-foreground">
+                  {navigator.userAgent.includes("Mac") ? "⌘" : "Ctrl"}
                 </kbd>
                 <span>+</span>
-                <kbd className="flex size-5 items-center justify-center rounded border border-white/10 bg-white/5 font-semibold text-white">
+                <kbd className="flex size-5 items-center justify-center rounded border bg-muted/50 font-semibold text-popover-foreground">
                   K
                 </kbd>
                 <span>to open,</span>
-                <kbd className="flex items-center justify-center rounded border border-white/10 bg-white/5 px-1.5 py-0.5 font-semibold text-white">
+                <kbd className="flex items-center justify-center rounded border bg-muted/50 px-1.5 py-0.5 font-semibold text-popover-foreground">
                   Enter
                 </kbd>
                 <span>to search</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-white/50">Search with:</span>
+                <span className="text-muted-foreground">Search with:</span>
                 <Select
                   value={engine}
                   onValueChange={(value) =>
@@ -323,7 +321,7 @@ export const SearchPopover = () => {
                   }
                 >
                   <SelectTrigger
-                    className="h-7 w-auto gap-1.5 border-0 bg-transparent px-2 hover:bg-white/5 focus:ring-0 focus:ring-offset-0 data-[state=open]:bg-white/5"
+                    className="h-7 w-auto gap-1.5 border-0 bg-transparent px-2 hover:bg-accent/10 focus:ring-0 focus:ring-offset-0 data-[state=open]:bg-accent/10"
                     aria-label="Select search engine"
                   >
                     <SelectValue>
@@ -335,19 +333,18 @@ export const SearchPopover = () => {
                             size={16}
                             className="rounded flex-shrink-0"
                           />
-                          <span className="text-white font-medium">
+                          <span className="text-popover-foreground font-medium">
                             {selectedEngineConfig.name}
                           </span>
                         </div>
                       )}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-white/10">
+                  <SelectContent className="bg-popover border">
                     {SEARCH_ENGINES.map((searchEngine) => (
                       <SelectItem
                         key={searchEngine.name}
                         value={searchEngine.name}
-                        className="text-white hover:bg-white/5 focus:bg-white/5 data-[highlighted]:bg-white/5 data-[highlighted]:text-white"
                       >
                         <div className="flex items-center gap-2 w-full">
                           <EngineIcon

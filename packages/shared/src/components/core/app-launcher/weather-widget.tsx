@@ -65,7 +65,7 @@ export const WeatherWidget = () => {
         );
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-blue-400/20 bg-gradient-to-br from-blue-400/25 via-blue-500/20 to-blue-600/15 p-5 shadow-lg backdrop-blur-xl">
+    <div className="flex flex-col gap-4 rounded-2xl border bg-gradient-to-br from-blue-400/20 via-blue-500/15 to-blue-600/10 p-5 shadow-lg backdrop-blur-xl">
       <div className="flex items-center justify-between gap-6">
         <div className="flex items-center gap-2">
           <div className="flex-shrink-0">
@@ -76,11 +76,11 @@ export const WeatherWidget = () => {
                 className="size-10 drop-shadow-lg"
               />
             ) : (
-              <Icons.weather className="size-10 text-white/90 drop-shadow-lg" />
+              <Icons.weather className="size-10 text-card-foreground drop-shadow-lg" />
             )}
           </div>
           <div className="flex items-start">
-            <span className="text-5xl font-light text-white drop-shadow-lg">
+            <span className="text-5xl font-light text-card-foreground drop-shadow-lg">
               {displayTemp}
             </span>
             <div className="mt-1 flex flex-col">
@@ -91,8 +91,8 @@ export const WeatherWidget = () => {
                 }}
                 className={`text-sm font-medium transition-colors ${
                   tempUnit === "C"
-                    ? "text-white"
-                    : "text-white/40 hover:text-white/80"
+                    ? "text-card-foreground"
+                    : "text-muted-foreground hover:text-card-foreground/80"
                 }`}
               >
                 °C
@@ -104,8 +104,8 @@ export const WeatherWidget = () => {
                 }}
                 className={`text-sm transition-colors ${
                   tempUnit === "F"
-                    ? "text-white"
-                    : "text-white/40 hover:text-white/80"
+                    ? "text-card-foreground"
+                    : "text-muted-foreground hover:text-card-foreground/80"
                 }`}
               >
                 °F
@@ -115,23 +115,23 @@ export const WeatherWidget = () => {
         </div>
 
         <div className="flex flex-col items-end gap-1 min-w-0">
-          <h3 className="text-sm font-semibold text-white truncate max-w-[120px]">
+          <h3 className="text-sm font-semibold text-card-foreground truncate max-w-[120px]">
             {locationName}
           </h3>
-          <p className="text-xs text-white/80 truncate max-w-[120px]">
+          <p className="text-xs text-card-foreground/80 truncate max-w-[120px]">
             {currentWeather.weatherText}
           </p>
         </div>
       </div>
 
       {forecast.length > 0 && (
-        <div className="mt-4 flex w-full items-center justify-between gap-2 overflow-x-auto rounded-lg bg-black/20 py-4">
+        <div className="mt-4 flex w-full items-center justify-between gap-2 overflow-x-auto rounded-lg bg-muted/30 py-4">
           {forecast.slice(0, 5).map((day) => (
             <div
               key={day.date}
               className="flex flex-1 flex-col items-center gap-2"
             >
-              <p className="text-[10px] font-medium text-white/70">
+              <p className="text-[10px] font-medium text-card-foreground/70">
                 {formatForecastDay(day.date)}
               </p>
 
@@ -145,13 +145,13 @@ export const WeatherWidget = () => {
 
               {tempUnit === "C" ? (
                 <>
-                  <p className="text-[10px] font-medium text-white/70">
+                  <p className="text-[10px] font-medium text-card-foreground/70">
                     {day.temperature.min.metric.value}°
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-[10px] font-medium text-white/70">
+                  <p className="text-[10px] font-medium text-card-foreground/70">
                     {day.temperature.min.imperial.value}°F
                   </p>
                 </>
