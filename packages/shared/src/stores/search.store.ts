@@ -44,7 +44,7 @@ export const useSearchStore = create<SearchState>()(
     {
       name: "meelio:local:search",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 1,
       partialize: (state) => ({
         selectedEngine: state.selectedEngine,
         recentSearches: state.recentSearches,

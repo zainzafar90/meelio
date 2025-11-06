@@ -265,12 +265,12 @@ export const useWeatherStore = create<WeatherState>()(
                 name: "meelio:local:weather",
                 storage: createJSONStorage(() => localStorage),
                 version: 1,
-                skipHydration: false,
                 partialize: (state) => ({
                     locationKey: state.locationKey,
                     locationName: state.locationName,
                 }),
             }
         )
-    )
+    ),
+
 );

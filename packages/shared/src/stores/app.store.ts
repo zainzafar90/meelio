@@ -48,7 +48,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "meelio:local:app",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       skipHydration: false,
       partialize: (s) => ({
         platform: s.platform,

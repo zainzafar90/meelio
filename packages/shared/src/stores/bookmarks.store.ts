@@ -563,7 +563,8 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
             }),
             {
-                name: "meelio:local:bookmarks:settings",
+                name: "meelio:local:bookmarks",
+                version: 1,
                 storage: createJSONStorage(() => {
                     if (chrome?.storage?.local) {
                         return {

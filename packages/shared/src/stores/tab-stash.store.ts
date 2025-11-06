@@ -300,9 +300,9 @@ export const useTabStashStore = create<TabStashState>()(
         },
       }),
       {
-        name: "meelio:local:tab-stash:settings",
+        name: "meelio:local:tab-stash",
+        version: 1,
         storage: createJSONStorage(() => {
-          // Use Chrome storage if available (extension environment)
           if (chrome?.storage?.local) {
             return {
               getItem: async (name) => {
@@ -317,7 +317,6 @@ export const useTabStashStore = create<TabStashState>()(
               },
             };
           }
-          // Fallback to localStorage (web environment)
           return localStorage;
         }),
         partialize: (s) => ({ hasPermissions: s.hasPermissions }),
@@ -432,7 +431,6 @@ function initializeTabStashSync() {
   tabStashSyncManager = createEntitySync(tabStashAdapter);
 }
 
-// Initialize on first Pro user login
 useAuthStore.subscribe((state) => {
   const user = state.user;
   if (user?.isPro && !tabStashSyncManager) {

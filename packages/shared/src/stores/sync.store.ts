@@ -125,6 +125,7 @@ export const useSyncStore = create<SyncState>()(
     {
       name: "meelio:local:sync",
       storage: createJSONStorage(() => localStorage),
+      version: 1,
       partialize: (state) => ({
         queues: state.queues,
         lastSyncTimes: state.lastSyncTimes,
