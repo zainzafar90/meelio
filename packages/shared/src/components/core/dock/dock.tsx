@@ -247,7 +247,6 @@ export const Dock = () => {
               icon: Icons.weather,
               activeIcon: Icons.weatherActive,
               onClick: toggleWeather,
-              requirePro: true,
             },
           ]
         : []),

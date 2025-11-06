@@ -157,7 +157,7 @@ const buildAppsList = (
         toggleFunctions.weather?.();
         onAppClick();
       },
-      isPro: true,
+      isPro: false,
     });
   }
 
@@ -243,7 +243,25 @@ export const PinnedAppsGrid = ({
         {filteredApps.slice(0, 18).map((app) => (
           <div key={app.id} className="flex flex-col items-center">
             {app.isPro ? (
-              <PremiumFeature requirePro={true}>
+              <PremiumFeature
+                requirePro={true}
+                fallback={
+                  <button
+                    disabled
+                    className="group flex flex-col items-center gap-2 opacity-60 cursor-not-allowed"
+                  >
+                    <div className="relative">
+                      <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/30 shadow-lg backdrop-blur-md sm:size-16">
+                        <app.icon className="size-7 text-muted-foreground" />
+                      </div>
+                      <Crown className="absolute -right-1 -top-1 size-3.5 text-amber-400 drop-shadow-lg sm:size-4" />
+                    </div>
+                    <span className="line-clamp-2 text-center text-[10px] leading-tight text-muted-foreground sm:text-[11px]">
+                      {app.name}
+                    </span>
+                  </button>
+                }
+              >
                 <button
                   onClick={app.onClick}
                   className="group flex flex-col items-center gap-2"

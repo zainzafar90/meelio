@@ -5,9 +5,9 @@ import { weatherController } from "@/modules/weather";
 
 const router = Router();
 
-router.get("/", auth(), requirePro(), weatherController.getWeather);
-router.get("/forecast", auth(), requirePro(), weatherController.getForecast);
-router.get("/locations/search", auth(), requirePro(), weatherController.searchLocations);
+router.get("/", auth(), weatherController.getWeather);
+router.get("/forecast", auth(), weatherController.getForecast);
+router.get("/locations/search", auth(), weatherController.searchLocations);
 
 export default router;
 

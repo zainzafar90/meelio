@@ -1,28 +1,13 @@
 import { useState } from "react";
 import { useShallow } from "zustand/shallow";
+import { Crown } from "lucide-react";
 
 import { useWeatherStore } from "../../../stores/weather.store";
 import { Icons } from "../../icons/icons";
+import { PremiumFeature } from "../../common/premium-feature";
 
 const getWeatherIcon = (icon: number): string => {
   return `https://www.accuweather.com/assets/images/weather-icons/v2a/${icon}.svg`;
-};
-
-const formatForecastDay = (dateString: string): string => {
-  const date = new Date(dateString);
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  if (date.toDateString() === today.toDateString()) {
-    return "Today";
-  }
-  if (date.toDateString() === tomorrow.toDateString()) {
-    return "Tomorrow";
-  }
-  return date.toLocaleDateString("en-US", {
-    weekday: "short",
-  });
 };
 
 const convertToFahrenheit = (celsius: number): number => {
@@ -34,14 +19,14 @@ export const WeatherWidget = () => {
 
   const {
     current: currentWeather,
-    locationName,
     forecast,
+    locationName,
     locationKey,
   } = useWeatherStore(
     useShallow((state) => ({
       current: state.current,
-      locationName: state.locationName,
       forecast: state.forecast,
+      locationName: state.locationName,
       locationKey: state.locationKey,
     }))
   );
@@ -119,40 +104,90 @@ export const WeatherWidget = () => {
       </div>
 
       {forecast.length > 0 && (
-        <div className="mt-4 flex w-full items-center justify-between gap-2 overflow-x-auto rounded-lg bg-muted/30 py-4">
-          {forecast.slice(0, 5).map((day) => (
-            <div
-              key={day.date}
-              className="flex flex-1 flex-col items-center gap-2"
-            >
-              <p className="text-[10px] font-medium text-card-foreground/70">
-                {formatForecastDay(day.date)}
-              </p>
-
-              {day.day?.icon && (
-                <img
-                  src={getWeatherIcon(day.day.icon)}
-                  alt={day.day.iconPhrase}
-                  className="size-8"
-                />
-              )}
-
-              {tempUnit === "C" ? (
-                <>
-                  <p className="text-[10px] font-medium text-card-foreground/70">
-                    {day.temperature.min.metric.value}°
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-[10px] font-medium text-card-foreground/70">
-                    {day.temperature.min.imperial.value}°F
-                  </p>
-                </>
-              )}
+        <PremiumFeature
+          requirePro={true}
+          fallback={
+            <div className="relative">
+              <div className="relative">
+                <div className="space-y-1.5 blur-[2px] pointer-events-none select-none">
+                  {[1, 2, 3].map((day) => (
+                    <div
+                      key={day}
+                      className="flex items-center justify-between rounded-lg bg-white/5 p-2 border border-white/10"
+                    >
+                      <div className="flex items-center gap-2 flex-1">
+                        <div className="text-xs text-card-foreground/40 w-12">
+                          Day {day}
+                        </div>
+                        <div className="h-5 w-5 rounded-full bg-white/10" />
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-card-foreground/40">
+                        <span>12°</span>
+                        <span>24°</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900/40 via-blue-800/30 to-blue-700/20 backdrop-blur-[1px] rounded-lg">
+                  <div className="text-center px-3 py-2">
+                    <Crown className="h-5 w-5 text-amber-400 mx-auto mb-1.5" />
+                    <p className="text-xs text-card-foreground/90 font-medium">
+                      Upgrade for Forecast
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
+          }
+        >
+          <div className="space-y-1.5">
+            {forecast.slice(0, 3).map((day) => {
+              const date = new Date(day.date);
+              const today = new Date();
+              const tomorrow = new Date(today);
+              tomorrow.setDate(tomorrow.getDate() + 1);
+
+              let dayLabel = "";
+              if (date.toDateString() === today.toDateString()) {
+                dayLabel = "Today";
+              } else if (date.toDateString() === tomorrow.toDateString()) {
+                dayLabel = "Tomorrow";
+              } else {
+                dayLabel = date.toLocaleDateString("en-US", {
+                  weekday: "short",
+                });
+              }
+
+              return (
+                <div
+                  key={day.date}
+                  className="flex items-center justify-between rounded-lg bg-white/5 p-2 border border-white/10"
+                >
+                  <div className="flex items-center gap-2 flex-1">
+                    <div className="text-xs text-card-foreground w-12">
+                      {dayLabel}
+                    </div>
+                    {day.day.icon && (
+                      <img
+                        src={getWeatherIcon(day.day.icon)}
+                        alt={day.day.iconPhrase}
+                        className="h-5 w-5"
+                      />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-card-foreground">
+                    <span className="text-card-foreground/60">
+                      {Math.round(day.temperature.min.metric.value)}°
+                    </span>
+                    <span className="font-medium">
+                      {Math.round(day.temperature.max.metric.value)}°
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </PremiumFeature>
       )}
     </div>
   );

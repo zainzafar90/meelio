@@ -15,11 +15,11 @@ import { useAuthStore } from "../../../stores/auth.store";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useShallow } from "zustand/shallow";
 import { Icons } from "../../../components/icons/icons";
-import { RefreshCw, MapPin, Cloud, Search, Settings } from "lucide-react";
+import { RefreshCw, MapPin, Cloud, Search, Settings, Crown } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { api } from "../../../api";
 import { toast } from "sonner";
-import { PremiumFeature } from "../../../components/common/premium-feature";
+import { PremiumFeature } from "../../common/premium-feature";
 
 export function WeatherSheet() {
   const { t } = useTranslation();
@@ -54,50 +54,7 @@ export function WeatherSheet() {
           </h2>
         </div>
 
-        <PremiumFeature
-          requirePro={true}
-          fallback={
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
-              <div className="flex flex-col items-center">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4 border border-white/10">
-                  <Icons.proMember className="w-8 h-8 text-white/80" />
-                </div>
-                <div className="text-lg text-white font-medium mb-2">
-                  {t(
-                    "weather.premium-feature-title",
-                    "Premium Weather"
-                  )}
-                </div>
-                <div className="text-white/70 max-w-md mb-6">
-                  {t(
-                    "weather.premium-feature",
-                    "Weather forecasts and location search are available for Pro users"
-                  )}
-                </div>
-
-                <div className="bg-zinc-800/50 p-4 rounded-lg border border-white/10 w-full max-w-md mb-6">
-                  <div className="text-sm font-medium text-white mb-2">
-                    Pro Feature
-                  </div>
-                  <div className="text-xs text-white/70">
-                    Weather is available for Pro users
-                  </div>
-                </div>
-              </div>
-              <Button
-                variant="default"
-                className="bg-white/10 hover:bg-white/20 text-white border border-white/20"
-                onClick={() => {
-                  window.location.href = "/settings/billing";
-                }}
-              >
-                {t("weather.upgrade", "Upgrade to Pro")}
-              </Button>
-            </div>
-          }
-        >
-          <WeatherContent />
-        </PremiumFeature>
+        <WeatherContent />
       </SheetContent>
     </Sheet>
   );
@@ -339,43 +296,90 @@ const WeatherContent = () => {
         )}
 
         {forecast.length > 0 && (
-          <div>
-            <div className="text-sm text-white/60 mb-4">
-              {t("weather.forecast", { defaultValue: "5-Day Forecast" })}
-            </div>
-            <div className="space-y-2">
-              {forecast.slice(0, 5).map((day) => (
-                <div
-                  key={day.date}
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="text-sm font-medium text-white w-20">
-                      {formatDate(day.date)}
-                    </div>
-                    {day.day.icon && (
-                      <img
-                        src={getWeatherIcon(day.day.icon)}
-                        alt={day.day.iconPhrase}
-                        className="h-8 w-8"
-                      />
-                    )}
-                    <div className="text-sm text-white/80 flex-1">
-                      {day.day.iconPhrase}
-                    </div>
+          <PremiumFeature
+            requirePro={true}
+            fallback={
+              <div className="relative">
+                <div className="text-sm text-white/60 mb-4 flex items-center justify-between">
+                  <span>{t("weather.forecast", { defaultValue: "5-Day Forecast" })}</span>
+                  <Crown className="h-4 w-4 text-amber-400" />
+                </div>
+                <div className="relative">
+                  <div className="space-y-2 blur-sm pointer-events-none select-none">
+                    {[1, 2, 3, 4, 5].map((day) => (
+                      <div
+                        key={day}
+                        className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4"
+                      >
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="text-sm font-medium text-white/60 w-20">
+                            Day {day}
+                          </div>
+                          <div className="h-8 w-8 rounded-full bg-white/10" />
+                          <div className="text-sm text-white/60 flex-1">
+                            Weather conditions
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-white/60">
+                          <span>12°</span>
+                          <span className="font-medium">24°</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-white">
-                    <span className="text-white/60">
-                      {day.temperature.min.metric.value}°
-                    </span>
-                    <span className="font-medium">
-                      {day.temperature.max.metric.value}°
-                    </span>
+                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/60 backdrop-blur-[2px] rounded-lg">
+                    <div className="text-center px-6 py-4">
+                      <Crown className="h-8 w-8 text-amber-400 mx-auto mb-3" />
+                      <p className="text-white font-medium mb-1">
+                        {t("weather.forecast-pro-title", { defaultValue: "5-Day Forecast" })}
+                      </p>
+                      <p className="text-sm text-white/60">
+                        {t("weather.forecast-pro", { defaultValue: "Upgrade to Pro to unlock detailed weather forecasts" })}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </div>
+            }
+          >
+            <div>
+              <div className="text-sm text-white/60 mb-4">
+                {t("weather.forecast", { defaultValue: "5-Day Forecast" })}
+              </div>
+              <div className="space-y-2">
+                {forecast.slice(0, 5).map((day) => (
+                  <div
+                    key={day.date}
+                    className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="text-sm font-medium text-white w-20">
+                        {formatDate(day.date)}
+                      </div>
+                      {day.day.icon && (
+                        <img
+                          src={getWeatherIcon(day.day.icon)}
+                          alt={day.day.iconPhrase}
+                          className="h-8 w-8"
+                        />
+                      )}
+                      <div className="text-sm text-white/80 flex-1">
+                        {day.day.iconPhrase}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-white">
+                      <span className="text-white/60">
+                        {day.temperature.min.metric.value}°
+                      </span>
+                      <span className="font-medium">
+                        {day.temperature.max.metric.value}°
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          </PremiumFeature>
         )}
 
         {!current && !isLoading && (
