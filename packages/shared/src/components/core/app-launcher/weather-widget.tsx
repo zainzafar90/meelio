@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useShallow } from "zustand/shallow";
 
 import { useWeatherStore } from "../../../stores/weather.store";
@@ -36,23 +36,17 @@ export const WeatherWidget = () => {
     current: currentWeather,
     locationName,
     forecast,
-    initializeStore,
+    locationKey,
   } = useWeatherStore(
     useShallow((state) => ({
       current: state.current,
       locationName: state.locationName,
       forecast: state.forecast,
-      initializeStore: state.initializeStore,
+      locationKey: state.locationKey,
     }))
   );
 
-  useEffect(() => {
-    if (!currentWeather) {
-      initializeStore();
-    }
-  }, [currentWeather, initializeStore]);
-
-  if (!currentWeather) {
+  if (!locationKey || !currentWeather) {
     return null;
   }
 

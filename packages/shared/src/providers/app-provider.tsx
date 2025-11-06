@@ -14,6 +14,7 @@ import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
 import { TelemetryProvider } from "./telemetry-provider";
 import { useCalendar } from "../hooks/use-calendar";
+import { useWeather } from "../hooks/use-weather";
 import { initializeSoundscapesTimerIntegration, cleanupSoundscapesTimerIntegration } from "../stores/soundscapes-timer-integration";
 
 type AppProviderProps = {
@@ -25,6 +26,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const hasPlayingSounds = sounds.some((sound) => sound.playing);
 
   useCalendar();
+  useWeather();
 
   useEffect(() => {
     initializeSoundscapesTimerIntegration();

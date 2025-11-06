@@ -29,10 +29,13 @@ interface WeatherState {
     fetchWeather: (locationKey: string, locationName?: string) => Promise<void>;
     refreshWeather: () => Promise<void>;
     setLocation: (locationKey: string, locationName?: string) => void;
+    startAutoRefresh: () => void;
+    stopAutoRefresh: () => void;
 }
 
-const DEFAULT_LOCATION_KEY = "328328";
 const CACHE_DURATION = 3 * 60 * 60 * 1000;
+
+let refreshInterval: NodeJS.Timeout | null = null;
 
 const cacheWeather = async (
     weatherForecast: WeatherForecast
@@ -90,7 +93,7 @@ export const useWeatherStore = create<WeatherState>()(
             (set, get) => ({
                 current: null,
                 forecast: [],
-                locationKey: DEFAULT_LOCATION_KEY,
+                locationKey: null,
                 locationName: null,
                 isLoading: false,
                 error: null,
@@ -121,14 +124,16 @@ export const useWeatherStore = create<WeatherState>()(
                         await get().loadFromLocal();
 
                         const currentState = get();
-                        const locationToUse =
-                            currentState.locationKey || DEFAULT_LOCATION_KEY;
 
-                        if (shouldRefresh(currentState.lastUpdated) && locationToUse) {
+                        if (currentState.locationKey && shouldRefresh(currentState.lastUpdated)) {
                             await get().fetchWeather(
-                                locationToUse,
+                                currentState.locationKey,
                                 currentState.locationName || undefined
                             );
+                        }
+
+                        if (currentState.locationKey) {
+                            get().startAutoRefresh();
                         }
                     } catch (error) {
                         console.error("Failed to initialize weather store:", error);
@@ -145,10 +150,10 @@ export const useWeatherStore = create<WeatherState>()(
 
                 loadFromLocal: async () => {
                     const state = get();
-                    const locationKey = state.locationKey || DEFAULT_LOCATION_KEY;
+                    if (!state.locationKey) return;
 
                     try {
-                        const cached = await loadFromCache(locationKey);
+                        const cached = await loadFromCache(state.locationKey);
                         if (cached) {
                             set({
                                 current: cached.current,
@@ -233,6 +238,27 @@ export const useWeatherStore = create<WeatherState>()(
 
                 setLocation: (locationKey: string, locationName?: string) => {
                     set({ locationKey, locationName: locationName || null });
+                    get().startAutoRefresh();
+                },
+
+                startAutoRefresh: () => {
+                    if (refreshInterval) {
+                        clearInterval(refreshInterval);
+                    }
+
+                    refreshInterval = setInterval(async () => {
+                        const state = get();
+                        if (shouldRefresh(state.lastUpdated) && state.locationKey) {
+                            await get().refreshWeather();
+                        }
+                    }, CACHE_DURATION);
+                },
+
+                stopAutoRefresh: () => {
+                    if (refreshInterval) {
+                        clearInterval(refreshInterval);
+                        refreshInterval = null;
+                    }
                 },
             }),
             {

@@ -145,25 +145,29 @@ const WeatherContent = () => {
     initializeStore();
   }, [initializeStore]);
 
-
-  const handleSearchLocations = async () => {
+  useEffect(() => {
     if (!searchQuery.trim()) {
+      setSearchResults([]);
       return;
     }
 
-    setIsSearching(true);
-    try {
-      const response = await api.weather.searchLocations({ q: searchQuery });
-      setSearchResults(response.data || []);
-    } catch (error: any) {
-      toast.error(t("weather.search-error", { defaultValue: "Failed to search locations" }), {
-        description: error?.response?.data?.message || error?.message,
-      });
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+    const timeoutId = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const response = await api.weather.searchLocations({ q: searchQuery });
+        setSearchResults(response.data || []);
+      } catch (error: any) {
+        toast.error(t("weather.search-error", { defaultValue: "Failed to search locations" }), {
+          description: error?.response?.data?.message || error?.message,
+        });
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, t]);
 
   const handleSelectLocation = async (location: { key: string; displayName: string }) => {
     setIsSaving(true);
@@ -273,32 +277,17 @@ const WeatherContent = () => {
 
       {isSearchOpen && (
         <div className="border-b border-white/10 p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearchLocations();
-                  }
-                }}
-                placeholder={t("weather.search-placeholder", { defaultValue: "Search for a city..." })}
-                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
-            </div>
-            <Button
-              onClick={handleSearchLocations}
-              disabled={isSearching || !searchQuery.trim()}
-              size="sm"
-            >
-              {isSearching ? (
-                <Icons.spinner className="h-4 w-4 animate-spin" />
-              ) : (
-                <Search className="h-4 w-4" />
-              )}
-            </Button>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
+            {isSearching && (
+              <Icons.spinner className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-white/40" />
+            )}
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("weather.search-placeholder", { defaultValue: "Search for a city..." })}
+              className="pl-9 pr-9 bg-white/5 border-white/10 text-white placeholder:text-white/40"
+            />
           </div>
 
           {searchResults.length > 0 && (
