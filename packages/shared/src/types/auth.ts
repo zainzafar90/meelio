@@ -20,6 +20,10 @@ export interface UserSettings {
   calendar: {
     enabled: boolean;
   };
+  weather?: {
+    locationKey?: string;
+    locationName?: string;
+  };
 }
 
 export type AuthUser = {
@@ -34,6 +38,8 @@ export type AuthUser = {
   isPro: boolean;
   subscriptionId?: string;
   settings?: UserSettings;
+  locationKey?: string;
+  locationName?: string;
 };
 
 export interface GuestUser {

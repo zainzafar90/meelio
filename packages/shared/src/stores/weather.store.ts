@@ -108,8 +108,8 @@ export const useWeatherStore = create<WeatherState>()(
                     try {
                         const authState = useAuthStore.getState();
                         const user = authState.user;
-                        const accountLocationKey = (user as any)?.locationKey;
-                        const accountLocationName = (user as any)?.locationName;
+                        const accountLocationKey = user?.locationKey;
+                        const accountLocationName = user?.locationName;
 
                         if (
                             accountLocationKey &&

@@ -43,6 +43,10 @@ export const userUtils = {
           ...DEFAULT_SETTINGS.calendar,
           ...userSettings.calendar,
         },
+        weather: {
+          ...DEFAULT_SETTINGS.weather,
+          ...userSettings.weather,
+        },
       } as typeof safeUser.settings;
     }
 
