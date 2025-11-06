@@ -188,6 +188,19 @@ export class MeelioDB extends Dexie {
         bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
         weather: "id, locationKey, cachedAt",
       });
+    this.version(13)
+      .stores({
+        siteBlocker: "id, userId, url, createdAt, updatedAt, deletedAt",
+        tasks: "id, userId, completed, category, dueDate, pinned, createdAt, updatedAt, deletedAt",
+        focusSessions: "++id, timestamp",
+        focusStats: "++id, date",
+        categories: "id, userId, name, icon, type",
+        sounds: "id, path, downloadedAt, lastAccessed",
+        notes: "id, userId, categoryId, providerId, createdAt, updatedAt, deletedAt",
+        tabStashes: "id, userId, windowId, createdAt, updatedAt, deletedAt",
+        bookmarks: "id, userId, chromeId, parentId, cachedAt, deletedAt",
+        weather: "id, locationKey, cachedAt",
+      });
   }
 }
 
