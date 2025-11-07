@@ -43,6 +43,7 @@ const envVarsSchema = Joi.object()
       .required()
       .description("Lemon Squeezy store id"),
     ACCUWEATHER_API_KEY: Joi.string()
+      .required()
       .description("AccuWeather API key"),
     CLIENT_URL: Joi.string().required().description("Client url"),
   })
