@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import {
@@ -50,6 +50,12 @@ export const CalendarSheet = () => {
   );
 
   const isConnected = !!icsUrl;
+
+  useEffect(() => {
+    if (isCalendarVisible && icsUrl) {
+      loadEvents(true);
+    }
+  }, [isCalendarVisible, icsUrl, loadEvents]);
 
   const formatTimeRemaining = (event: CalendarEvent): string => {
     try {

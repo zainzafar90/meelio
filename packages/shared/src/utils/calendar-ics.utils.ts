@@ -4,7 +4,15 @@ import type { CalendarEvent } from "../types/calendar.types";
 export async function fetchICSCalendar(icsUrl: string): Promise<CalendarEvent[]> {
   const normalizedUrl = normalizeICSUrl(icsUrl);
 
-  const response = await fetch(normalizedUrl);
+  const urlWithCacheBust = new URL(normalizedUrl);
+  urlWithCacheBust.searchParams.set('_cb', Date.now().toString());
+
+  const response = await fetch(urlWithCacheBust.toString(), {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch calendar: ${response.status}`);
   }

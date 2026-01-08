@@ -8,9 +8,9 @@ import {
   getMinutesUntilEvent,
 } from "../utils/calendar-date.utils";
 
-const BASE_CACHE_DURATION = 5 * 60 * 1000;
-const MAX_CACHE_DURATION = 30 * 60 * 1000;
-const MIN_CACHE_DURATION = 60 * 1000;
+const BASE_CACHE_DURATION = 2 * 60 * 1000;
+const MAX_CACHE_DURATION = 10 * 60 * 1000;
+const MIN_CACHE_DURATION = 30 * 1000;
 
 export interface CalendarState {
   icsUrl: string | null;
