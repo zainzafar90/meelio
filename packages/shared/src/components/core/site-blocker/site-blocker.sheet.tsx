@@ -17,7 +17,6 @@ import { Icons } from "../../../components/icons";
 import { useShallow } from "zustand/shallow";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { toast } from "sonner";
-import { SyncStatus } from "../../sync-status";
 
 const isExtension =
   typeof chrome !== "undefined" && chrome.storage !== undefined;
@@ -52,7 +51,6 @@ export function SiteBlockerSheet() {
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             {t("site-blocker.title")}
           </h2>
-          <SyncStatus entityType="site-blocker" />
         </div>
 
         {isExtension ? (

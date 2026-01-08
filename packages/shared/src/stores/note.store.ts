@@ -3,10 +3,6 @@ import { subscribeWithSelector, persist, createJSONStorage } from "zustand/middl
 import { db } from "../lib/db/meelio.dexie";
 import type { Note } from "../lib/db/models.notes";
 import { useAuthStore } from "./auth.store";
-import { SyncState, useSyncStore } from "./sync.store";
-import { EntitySyncManager, createEntitySync } from "../utils/sync-core";
-import { createAdapter, normalizeDates } from "../utils/sync-adapters";
-import { noteApi } from "../api/note.api";
 import { generateUUID } from "../utils/common.utils";
 
 interface NoteState {
@@ -17,7 +13,6 @@ interface NoteState {
 
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
-  syncWithServer: () => Promise<void>;
 
   addNote: (payload: { title: string; content?: string | null; pinned?: boolean; categoryId?: string | null; providerId?: string | null }) => Promise<Note | undefined>;
   updateNote: (id: string, payload: Partial<Pick<Note, "title" | "content" | "pinned" | "categoryId">>) => Promise<void>;
@@ -27,7 +22,6 @@ interface NoteState {
   setEnableTypingSound: (enabled: boolean) => void;
 }
 
-let noteSyncManager: EntitySyncManager<Note, any, any, any, any> | null = null;
 let isInitializing = false;
 
 export const useNoteStore = create<NoteState>()(
@@ -55,15 +49,7 @@ export const useNoteStore = create<NoteState>()(
 
           try {
             set({ isLoading: true, error: null });
-
             await get().loadFromLocal();
-
-            if (user?.isPro) {
-              const syncStore = useSyncStore.getState();
-              if (syncStore.isOnline) {
-                await get().syncWithServer();
-              }
-            }
           } catch (error: any) {
             console.error("Failed to initialize note store:", error);
             set({ error: error?.message || "Failed to initialize store" });
@@ -91,11 +77,6 @@ export const useNoteStore = create<NoteState>()(
           });
         },
 
-        syncWithServer: async () => {
-          if (!noteSyncManager) return;
-          await noteSyncManager.syncWithServer();
-        },
-
         addNote: async ({ title, content, pinned, categoryId, providerId }) => {
           const MAX_NOTES = 500;
           const MAX_NOTE_CHARS = 10000;
@@ -112,7 +93,6 @@ export const useNoteStore = create<NoteState>()(
           const userId = user?.id || guestUser?.id;
           if (!userId) return;
 
-          const syncStore = useSyncStore.getState();
           const now = Date.now();
           const id = generateUUID();
 
@@ -129,7 +109,6 @@ export const useNoteStore = create<NoteState>()(
             deletedAt: null,
           };
 
-          // If creating a pinned note, unpin all others first
           if (note.pinned) {
             const pinnedNotes = get().notes.filter((n) => n.pinned);
             await Promise.all(
@@ -138,13 +117,6 @@ export const useNoteStore = create<NoteState>()(
                   pinned: false,
                   updatedAt: Date.now(),
                 });
-                if (user?.isPro) {
-                  syncStore.addToQueue("note", {
-                    type: "update",
-                    entityId: n.id,
-                    data: { pinned: false, updatedAt: Date.now() },
-                  });
-                }
               })
             );
 
@@ -158,20 +130,6 @@ export const useNoteStore = create<NoteState>()(
           try {
             await db.notes.add(note);
             set((s) => ({ notes: [note, ...s.notes] }));
-
-            // Only sync for Pro users
-            if (user?.isPro) {
-              syncStore.addToQueue("note", {
-                type: "create",
-                entityId: id,
-                data: note,
-              });
-
-              if (syncStore.isOnline && noteSyncManager) {
-                noteSyncManager.processQueue();
-              }
-            }
-
             return note;
           } catch (error) {
             set({
@@ -186,10 +144,6 @@ export const useNoteStore = create<NoteState>()(
           const truncateToChars = (text: string, maxChars: number) =>
             typeof text === "string" ? text.slice(0, maxChars) : text as any;
 
-          const authState = useAuthStore.getState();
-          const user = authState.user;
-          const syncStore = useSyncStore.getState();
-
           const now = Date.now();
           const toSave = { ...payload } as any;
           if (typeof toSave.content === "string") {
@@ -203,19 +157,6 @@ export const useNoteStore = create<NoteState>()(
             set((s) => ({
               notes: s.notes.map((n) => (n.id === id ? { ...n, ...updatedData } : n)),
             }));
-
-            // Only sync for Pro users
-            if (user?.isPro) {
-              syncStore.addToQueue("note", {
-                type: "update",
-                entityId: id,
-                data: updatedData,
-              });
-
-              if (syncStore.isOnline && noteSyncManager) {
-                noteSyncManager.processQueue();
-              }
-            }
           } catch (error) {
             set({
               error: error instanceof Error ? error.message : "Failed to update note",
@@ -227,9 +168,6 @@ export const useNoteStore = create<NoteState>()(
           const note = get().notes.find((n) => n.id === noteId);
           if (!note) return;
 
-          const authState = useAuthStore.getState();
-          const user = authState.user;
-          const syncStore = useSyncStore.getState();
           const updatedData = { pinned: !note.pinned, updatedAt: Date.now() };
 
           const unpinOthers = async () => {
@@ -242,13 +180,6 @@ export const useNoteStore = create<NoteState>()(
                   pinned: false,
                   updatedAt: Date.now(),
                 });
-                if (user?.isPro) {
-                  syncStore.addToQueue("note", {
-                    type: "update",
-                    entityId: n.id,
-                    data: { pinned: false, updatedAt: Date.now() },
-                  });
-                }
               })
             );
 
@@ -273,19 +204,6 @@ export const useNoteStore = create<NoteState>()(
                 n.id === noteId ? { ...n, ...updatedData } : n
               ),
             }));
-
-            // Only sync for Pro users
-            if (user?.isPro) {
-              syncStore.addToQueue("note", {
-                type: "update",
-                entityId: noteId,
-                data: updatedData,
-              });
-
-              if (syncStore.isOnline && noteSyncManager) {
-                noteSyncManager.processQueue();
-              }
-            }
           } catch (error) {
             set({
               error: error instanceof Error ? error.message : "Failed to pin note",
@@ -294,29 +212,10 @@ export const useNoteStore = create<NoteState>()(
         },
 
         deleteNote: async (id) => {
-          const authState = useAuthStore.getState();
-          const user = authState.user;
-          const syncStore = useSyncStore.getState();
-
           try {
             const deletedAt = Date.now();
-            // Soft delete locally (tombstone)
             await db.notes.update(id, { deletedAt, updatedAt: deletedAt });
-
             set((s) => ({ notes: s.notes.filter((n) => n.id !== id) }));
-
-            // Only sync for Pro users
-            if (user?.isPro) {
-              syncStore.addToQueue("note", {
-                type: "delete",
-                entityId: id,
-                data: { deletedAt },
-              });
-
-              if (syncStore.isOnline && noteSyncManager) {
-                noteSyncManager.processQueue();
-              }
-            }
           } catch (error) {
             set({
               error: error instanceof Error ? error.message : "Failed to delete note",
@@ -335,109 +234,3 @@ export const useNoteStore = create<NoteState>()(
     )
   )
 );
-
-/**
- * ╔═══════════════════════════════════════════════════════════════════════╗
- * ║                    Note Sync Manager Initialization                   ║
- * ╠═══════════════════════════════════════════════════════════════════════╣
- * ║  Sets up the note sync manager with proper adapters and               ║
- * ║  configuration for offline-first synchronization.                     ║
- * ╚═══════════════════════════════════════════════════════════════════════╝
- */
-function initializeNoteSync() {
-  const noteAdapter = createAdapter<Note, any>({
-    entityKey: "note",
-    dbTable: db.notes as any,
-    api: {
-      bulkSync: noteApi.bulkSync,
-      fetchAll: () => noteApi.getNotes(),
-    },
-    store: {
-      getUserId: () => useAuthStore.getState().user?.id,
-      getItems: () => useNoteStore.getState().notes,
-      setItems: (list) => useNoteStore.setState({ notes: list }),
-    },
-    normalizeFromServer: (n: any): Note => normalizeDates(n),
-    customTransformers: {
-      toCreatePayload: (op) => {
-        if (op.type !== "create") return null;
-        const d = op.data || {};
-        return {
-          clientId: op.entityId,
-          title: d.title,
-          content: d.content,
-          pinned: d.pinned,
-          categoryId: d.categoryId,
-          providerId: d.providerId,
-          updatedAt: d.updatedAt,
-        };
-      },
-      toUpdatePayload: (op) => {
-        if (op.type !== "update") return null;
-        const d = op.data || {};
-        return {
-          id: op.entityId,
-          clientId: op.entityId,
-          title: d.title,
-          content: d.content,
-          pinned: d.pinned,
-          categoryId: d.categoryId,
-          providerId: d.providerId,
-          updatedAt: d.updatedAt,
-          deletedAt: d.deletedAt,
-        };
-      },
-    },
-    options: {
-      autoSync: true,
-      syncInterval: 60 * 60 * 1000, // 1 hour
-      enableOptimisticUpdates: true,
-    },
-  });
-
-  noteSyncManager = createEntitySync(noteAdapter);
-}
-
-// Initialize on first Pro user login
-useAuthStore.subscribe((state) => {
-  const user = state.user;
-  if (user?.isPro && !noteSyncManager) {
-    initializeNoteSync();
-  } else if ((!user || !user.isPro) && noteSyncManager) {
-    noteSyncManager.dispose();
-    noteSyncManager = null;
-  }
-});
-
-/**
- * ╔═══════════════════════════════════════════════════════════════════════╗
- * ║                    Handle Online Status Changes                       ║
- * ╠═══════════════════════════════════════════════════════════════════════╣
- * ║  Triggers sync queue processing when transitioning from offline       ║
- * ║  to online. Ensures no concurrent syncs are running.                  ║
- * ╚═══════════════════════════════════════════════════════════════════════╝
- */
-let isSyncingOnReconnect = false;
-
-const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
-  const justCameOnline = state.isOnline && !prevState.isOnline;
-  const isProUser = useAuthStore.getState().user?.isPro;
-  const canSync = justCameOnline && isProUser && !isSyncingOnReconnect;
-
-  if (canSync) {
-    isSyncingOnReconnect = true;
-    useNoteStore
-      .getState()
-      .syncWithServer()
-      .finally(() => {
-        isSyncingOnReconnect = false;
-      });
-  }
-};
-
-useSyncStore.subscribe(handleOnlineStatusChange);
-
-const user = useAuthStore.getState().user;
-if (user?.isPro && !noteSyncManager) {
-  initializeNoteSync();
-}

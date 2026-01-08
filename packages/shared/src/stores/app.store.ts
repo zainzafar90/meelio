@@ -10,12 +10,14 @@ interface AppState {
   mantraRotationEnabled: boolean;
   wallpaperRotationEnabled: boolean;
   twelveHourClock: boolean;
+  confettiOnComplete: boolean;
   setPlatform: (platform: "extension" | "web") => void;
   setVersion: (version: string) => void;
   incrementMantraRotationCount: () => void;
   setMantraRotation: (enabled: boolean) => void;
   setWallpaperRotationEnabled: (enabled: boolean) => void;
   setTwelveHourClock: (enabled: boolean) => void;
+  setConfettiOnComplete: (enabled: boolean) => void;
   initializeApp: () => void;
 }
 
@@ -28,6 +30,7 @@ export const useAppStore = create<AppState>()(
       mantraRotationEnabled: true,
       wallpaperRotationEnabled: true,
       twelveHourClock: true,
+      confettiOnComplete: true,
       setPlatform: (platform) => set({ platform }),
       setVersion: (version) => set({ version }),
       incrementMantraRotationCount: () =>
@@ -38,6 +41,7 @@ export const useAppStore = create<AppState>()(
       setWallpaperRotationEnabled: (enabled) =>
         set({ wallpaperRotationEnabled: enabled }),
       setTwelveHourClock: (enabled) => set({ twelveHourClock: enabled }),
+      setConfettiOnComplete: (enabled) => set({ confettiOnComplete: enabled }),
       initializeApp: () => {
         const version = localStorage.getItem("meelio:local:version");
         if (version) {
@@ -48,7 +52,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "meelio:local:app",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       skipHydration: false,
       partialize: (s) => ({
         platform: s.platform,
@@ -56,7 +60,15 @@ export const useAppStore = create<AppState>()(
         mantraRotationEnabled: s.mantraRotationEnabled,
         wallpaperRotationEnabled: s.wallpaperRotationEnabled,
         twelveHourClock: s.twelveHourClock,
+        confettiOnComplete: s.confettiOnComplete,
       }),
+      migrate: (persistedState: any, _version: number) => {
+        const state = { ...persistedState };
+        if (state.confettiOnComplete === undefined) {
+          state.confettiOnComplete = true;
+        }
+        return state;
+      },
       onRehydrateStorage: () => (state) => {
         if (state && state.mantraRotationEnabled) {
           state.incrementMantraRotationCount();

@@ -1,93 +1,65 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { CalendarEvent, fetchCalendarEvents } from "../api/google-calendar.api";
-import { getCalendarToken } from "../api/calendar.api";
-import { useAuthStore } from "../stores/auth.store";
+import type { CalendarEvent } from "../types/calendar.types";
+import { fetchICSCalendar, validateICSUrl } from "../utils/calendar-ics.utils";
 import {
   getEventStartDate,
   getEventEndDate,
-  getMinutesUntilEvent
+  getMinutesUntilEvent,
 } from "../utils/calendar-date.utils";
 
-export const REFRESH_THRESHOLD_MS = 15 * 60 * 1000;
-const BASE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-const MAX_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
-const MIN_CACHE_DURATION = 60 * 1000; // 1 minute
+const BASE_CACHE_DURATION = 5 * 60 * 1000;
+const MAX_CACHE_DURATION = 30 * 60 * 1000;
+const MIN_CACHE_DURATION = 60 * 1000;
 
 export interface CalendarState {
-  token: string | null;
-  expiresAt: number | null;
-  connectedEmail: string | null;
+  icsUrl: string | null;
   events: CalendarEvent[];
   eventsLastFetched: number | null;
   nextEvent: CalendarEvent | null;
-  lastSuccessfulSync: number | null;
-  setToken: (token: string, expiresAt: number) => void;
-  setConnectedEmail: (email: string) => void;
+  loading: boolean;
+  error: string | null;
+  setIcsUrl: (url: string | null) => Promise<void>;
   clearCalendar: () => void;
-  initializeToken: () => Promise<void>;
-  refreshToken: () => Promise<void>;
   loadEvents: (force?: boolean) => Promise<void>;
   getNextEvent: () => CalendarEvent | null;
   getMinutesUntilNextEvent: () => number | null;
   getSmartCacheDuration: () => number;
-  updateLastSuccessfulSync: () => void;
 }
-
-// Removed shouldRefreshToken - backend handles token refresh automatically
 
 export const useCalendarStore = create<CalendarState>()(
   persist(
     (set, get) => ({
-      token: null,
-      expiresAt: null,
-      connectedEmail: null,
+      icsUrl: null,
       events: [],
       eventsLastFetched: null,
       nextEvent: null,
-      lastSuccessfulSync: null,
-      setToken: (token, expiresAt) => {
-        set({ token, expiresAt });
+      loading: false,
+      error: null,
+
+      setIcsUrl: async (url) => {
+        if (url && !validateICSUrl(url)) {
+          set({ error: "Invalid calendar URL" });
+          return;
+        }
+
+        set({ icsUrl: url, error: null });
+
+        if (url) {
+          await get().loadEvents(true);
+        } else {
+          set({ events: [], nextEvent: null, eventsLastFetched: null });
+        }
       },
-      setConnectedEmail: (email) => {
-        set({ connectedEmail: email });
-      },
+
       clearCalendar: () => {
         set({
-          token: null,
-          expiresAt: null,
-          connectedEmail: null,
+          icsUrl: null,
           events: [],
           eventsLastFetched: null,
           nextEvent: null,
-          lastSuccessfulSync: null,
+          error: null,
         });
-      },
-      updateLastSuccessfulSync: () => {
-        set({ lastSuccessfulSync: Date.now() });
-      },
-      initializeToken: async () => {
-        const { user } = useAuthStore.getState();
-        if (!user) return;
-
-        try {
-          const response = await getCalendarToken();
-          const { accessToken, expiresAt } = response.data;
-
-          if (accessToken && expiresAt) {
-            const expiryTime = new Date(expiresAt).getTime();
-            set({ token: accessToken, expiresAt: expiryTime });
-            get().updateLastSuccessfulSync();
-          }
-        } catch (error) {
-          console.error("Failed to initialize calendar token:", error);
-          // Don't clear calendar here - let grace period handle it
-        }
-      },
-      refreshToken: async () => {
-        // Backend handles token refresh automatically
-        // This method exists for compatibility but delegates to initializeToken
-        return get().initializeToken();
       },
 
       getSmartCacheDuration: () => {
@@ -111,17 +83,13 @@ export const useCalendarStore = create<CalendarState>()(
           return Math.min(MAX_CACHE_DURATION, timeUntilEvent / 4);
         }
       },
+
       loadEvents: async (force = false) => {
-        const { user } = useAuthStore.getState();
-        if (!user) return;
+        const { icsUrl, eventsLastFetched, loading } = get();
 
-        // Only load events when calendar features are enabled
-        const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
-        if (!calendarEnabled) return;
+        if (!icsUrl || loading) return;
 
-        const { eventsLastFetched, token } = get();
         const cacheDuration = get().getSmartCacheDuration();
-
         if (
           !force &&
           eventsLastFetched &&
@@ -130,104 +98,66 @@ export const useCalendarStore = create<CalendarState>()(
           return;
         }
 
-        // Use existing token, don't initialize unnecessarily
-        if (!token) {
-          return;
-        }
+        set({ loading: true, error: null });
 
-        const fetchAndProcessEvents = async (accessToken: string) => {
-          const eventsResponse = await fetchCalendarEvents(accessToken);
-
-          const googleEmail = eventsResponse.summary || null;
-          if (googleEmail && googleEmail !== get().connectedEmail) {
-            set({ connectedEmail: googleEmail });
-          }
-
-          const events = eventsResponse.items || [];
+        try {
+          const events = await fetchICSCalendar(icsUrl);
           const now = new Date();
 
           const activeEvents = events
-            .filter((event: CalendarEvent) => {
+            .filter((event) => {
               try {
                 const eventEnd = getEventEndDate(event);
                 return eventEnd > now;
-              } catch (error) {
-                console.error("Error parsing event date:", error);
+              } catch {
                 return false;
               }
             })
-            .sort((a: CalendarEvent, b: CalendarEvent) => {
+            .sort((a, b) => {
               try {
                 const aStart = getEventStartDate(a);
                 const bStart = getEventStartDate(b);
                 return aStart.getTime() - bStart.getTime();
-              } catch (error) {
-                console.error("Error sorting events:", error);
+              } catch {
                 return 0;
               }
             });
 
           set({
-            events,
+            events: activeEvents,
             eventsLastFetched: Date.now(),
             nextEvent: activeEvents[0] || null,
+            loading: false,
           });
-          get().updateLastSuccessfulSync();
-        };
-
-        try {
-          await fetchAndProcessEvents(token);
-        } catch (error: any) {
-          const is401Error = error.message?.includes("401");
-
-          if (is401Error) {
-            console.log("Google token expired, attempting refresh...");
-            try {
-              await get().refreshToken();
-              const refreshedToken = get().token;
-
-              if (refreshedToken) {
-                await fetchAndProcessEvents(refreshedToken);
-                return;
-              }
-            } catch (refreshError) {
-              console.error("Failed to refresh Google token:", refreshError);
-            }
-          }
-
-          console.error("Failed to load events:", error);
-
-          const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-          const now = Date.now();
-          const lastSync = get().lastSuccessfulSync;
-
-          if (
-            error.message?.includes("401") ||
-            error.message?.includes("Failed to fetch events")
-          ) {
-            if (!lastSync || (now - lastSync) > ONE_DAY_MS) {
-              get().clearCalendar();
-            } else {
-              // Within grace period, keep existing data
-              console.log('Calendar sync failed but within 1-hour grace period, keeping existing data');
-            }
-          }
+        } catch (error) {
+          console.error("Failed to load calendar events:", error);
+          set({
+            error: error instanceof Error ? error.message : "Failed to load events",
+            loading: false,
+          });
         }
       },
+
       getNextEvent: () => {
         return get().nextEvent;
       },
+
       getMinutesUntilNextEvent: () => {
         const { nextEvent } = get();
         if (!nextEvent) return null;
-
         return getMinutesUntilEvent(nextEvent);
       },
     }),
     {
       name: "meelio:local:calendar",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        icsUrl: state.icsUrl,
+        events: state.events,
+        eventsLastFetched: state.eventsLastFetched,
+        nextEvent: state.nextEvent,
+      }),
     }
   )
 );

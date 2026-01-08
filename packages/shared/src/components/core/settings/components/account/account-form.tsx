@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { api } from "../../../../../api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -18,7 +17,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { AuthUser } from "../../../../../types/auth";
+import { LocalUser } from "../../../../../types/auth";
 import { Icons } from "../../../../../components/icons/icons";
 import { useAuthStore } from "../../../../../stores/auth.store";
 import { useShallow } from "zustand/shallow";
@@ -32,13 +31,14 @@ const accountFormSchema = z.object({
     .max(30, {
       message: "Name must not be longer than 30 characters.",
     }),
+  avatarUrl: z.string().url().optional().or(z.literal("")),
 });
 
 type AccountFormValues = z.infer<typeof accountFormSchema>;
 
-export const AccountForm = ({ user }: { user: AuthUser }) => {
+export const AccountForm = ({ user }: { user: LocalUser }) => {
   const { t } = useTranslation();
-  const authenticate = useAuthStore(useShallow((state) => state.authenticate));
+  const updateUser = useAuthStore(useShallow((state) => state.updateUser));
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
@@ -46,6 +46,7 @@ export const AccountForm = ({ user }: { user: AuthUser }) => {
     resolver: zodResolver(accountFormSchema as any),
     defaultValues: {
       name: user?.name || "",
+      avatarUrl: user?.avatarUrl || "",
     },
   });
 
@@ -53,10 +54,10 @@ export const AccountForm = ({ user }: { user: AuthUser }) => {
     setIsSaving(true);
 
     try {
-      const response = await api.auth.updateAccount({
+      updateUser({
         name: data.name,
+        avatarUrl: data.avatarUrl || undefined,
       });
-      authenticate(response as AuthUser);
       toast.success(t("settings.account.nameUpdated"));
     } catch (error) {
       toast.error(t("common.error"), {
@@ -86,6 +87,26 @@ export const AccountForm = ({ user }: { user: AuthUser }) => {
               </FormControl>
               <FormDescription>
                 {t("settings.account.name.description")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="avatarUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Picture URL</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://example.com/avatar.jpg"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Enter a URL to an image to use as your profile picture
               </FormDescription>
               <FormMessage />
             </FormItem>

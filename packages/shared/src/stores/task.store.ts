@@ -1,12 +1,9 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import { taskApi } from "../api/task.api";
 import { Task } from "../lib/db/models.dexie";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
-import { SyncState, useSyncStore } from "./sync.store";
-import { EntitySyncManager, createEntitySync } from "../utils/sync-core";
-import { createAdapter, normalizeDates } from "../utils/sync-adapters";
+import { useAppStore } from "./app.store";
 import { useCategoryStore } from "./category.store";
 import { generateUUID } from "../utils/common.utils";
 import { launchConfetti } from "../utils/confetti.utils";
@@ -49,13 +46,11 @@ interface TaskState {
 
   initializeStore: () => Promise<void>;
   loadFromLocal: () => Promise<void>;
-  syncWithServer: () => Promise<void>;
   loadCategoriesAsLists: () => Promise<void>;
 
   getNextPinnedTask: () => Task | undefined;
 }
 
-let taskSyncManager: EntitySyncManager<Task, any, any, any, any> | null = null;
 let isInitializing = false;
 
 export const useTaskStore = create<TaskState>()(
@@ -77,10 +72,8 @@ export const useTaskStore = create<TaskState>()(
         return;
       }
 
-      const syncStore = useSyncStore.getState();
       const activeListId = get().activeListId;
 
-      // If the active list is a category (not a system list), assign it to the task
       let categoryId = task.categoryId;
       if (activeListId && !["all", "today", "completed"].includes(activeListId)) {
         categoryId = activeListId;
@@ -101,7 +94,7 @@ export const useTaskStore = create<TaskState>()(
         pinned: task.pinned ?? false,
         dueDate: normalizedDueDate,
         categoryId,
-        providerId: task.providerId, // For now, we'll need to pass this from the backend
+        providerId: task.providerId,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         deletedAt: null,
@@ -115,13 +108,6 @@ export const useTaskStore = create<TaskState>()(
               pinned: false,
               updatedAt: Date.now(),
             });
-            if (user) {
-              syncStore.addToQueue("task", {
-                type: "update",
-                entityId: t.id,
-                data: { pinned: false, updatedAt: Date.now() },
-              });
-            }
           })
         );
 
@@ -139,18 +125,6 @@ export const useTaskStore = create<TaskState>()(
           tasks: [...state.tasks, newTask],
           error: null,
         }));
-
-        if (user) {
-          syncStore.addToQueue("task", {
-            type: "create",
-            entityId: newTask.id,
-            data: newTask,
-          });
-
-          if (syncStore.isOnline && taskSyncManager) {
-            taskSyncManager.processQueue();
-          }
-        }
       } catch (error) {
         set({
           error: error instanceof Error ? error.message : "Failed to add task",
@@ -163,8 +137,6 @@ export const useTaskStore = create<TaskState>()(
       if (!task) return;
 
       const authState = useAuthStore.getState();
-      const user = authState.user;
-      const syncStore = useSyncStore.getState();
       const updatedData = {
         completed: !task.completed,
         updatedAt: Date.now(),
@@ -181,23 +153,9 @@ export const useTaskStore = create<TaskState>()(
         }));
 
         if (updatedData.completed) {
-          const confettiEnabled =
-            authState.user?.settings?.task?.confettiOnComplete ?? false;
+          const confettiEnabled = useAppStore.getState().confettiOnComplete;
           if (confettiEnabled) {
             launchConfetti();
-          }
-        }
-
-        // Only sync for authenticated users
-        if (user) {
-          syncStore.addToQueue("task", {
-            type: "update",
-            entityId: taskId,
-            data: updatedData,
-          });
-
-          if (syncStore.isOnline && taskSyncManager) {
-            taskSyncManager.processQueue();
           }
         }
       } catch (error) {
@@ -209,31 +167,13 @@ export const useTaskStore = create<TaskState>()(
     },
 
     deleteTask: async (taskId) => {
-      const authState = useAuthStore.getState();
-      const user = authState.user;
-      const syncStore = useSyncStore.getState();
-
       try {
         const deletedAt = Date.now();
-        // Soft delete locally (tombstone)
         await db.tasks.update(taskId, { deletedAt, updatedAt: deletedAt });
 
         set((state) => ({
           tasks: state.tasks.filter((t) => t.id !== taskId),
         }));
-
-        // Only sync for authenticated users
-        if (user) {
-          syncStore.addToQueue("task", {
-            type: "delete",
-            entityId: taskId,
-            data: { deletedAt },
-          });
-
-          if (syncStore.isOnline && taskSyncManager) {
-            taskSyncManager.processQueue();
-          }
-        }
       } catch (error) {
         set({
           error:
@@ -241,7 +181,6 @@ export const useTaskStore = create<TaskState>()(
         });
       }
     },
-
 
     addList: async (list) => {
       const authState = useAuthStore.getState();
@@ -277,20 +216,6 @@ export const useTaskStore = create<TaskState>()(
           set((state) => ({
             tasks: [...state.tasks, welcomeTask],
           }));
-
-          // Only sync for authenticated users
-          if (user) {
-            const syncStore = useSyncStore.getState();
-            syncStore.addToQueue("task", {
-              type: "create",
-              entityId: welcomeTask.id,
-              data: welcomeTask,
-            });
-
-            if (syncStore.isOnline && taskSyncManager) {
-              taskSyncManager.processQueue();
-            }
-          }
         } catch (error) {
           console.error("Failed to create welcome task:", error);
         }
@@ -329,15 +254,6 @@ export const useTaskStore = create<TaskState>()(
         set({ isLoading: true, error: null });
 
         await get().loadFromLocal();
-
-        if (user) {
-          const syncStore = useSyncStore.getState();
-          if (syncStore.isOnline) {
-            await get().syncWithServer();
-          }
-        }
-
-        // Load categories as lists after potential sync
         await get().loadCategoriesAsLists();
       } catch (error: any) {
         console.error("Failed to initialize task store:", error);
@@ -361,36 +277,21 @@ export const useTaskStore = create<TaskState>()(
         .equals(userId)
         .toArray();
 
-      await Promise.all(
-        localTasks.map(async (task) => {
-        })
-      );
-
-
       set({
         tasks: localTasks.filter(t => !t.deletedAt),
         lists: SYSTEM_LISTS,
       });
     },
 
-    syncWithServer: async () => {
-      if (!taskSyncManager) return;
-      await taskSyncManager.syncWithServer();
-    },
-
     togglePinTask: async (taskId) => {
       const task = get().tasks.find((t) => t.id === taskId);
       if (!task) return;
 
-      // Don't allow pinning completed tasks
       if (task.completed && !task.pinned) {
         toast.warning("You can't pin a completed task");
         return;
       }
 
-      const authState = useAuthStore.getState();
-      const user = authState.user;
-      const syncStore = useSyncStore.getState();
       const updatedData = { pinned: !task.pinned, updatedAt: Date.now() };
 
       const unpinOthers = async () => {
@@ -403,13 +304,6 @@ export const useTaskStore = create<TaskState>()(
               pinned: false,
               updatedAt: Date.now(),
             });
-            if (user) {
-              syncStore.addToQueue("task", {
-                type: "update",
-                entityId: t.id,
-                data: { pinned: false, updatedAt: Date.now() },
-              });
-            }
           })
         );
 
@@ -434,18 +328,6 @@ export const useTaskStore = create<TaskState>()(
             t.id === taskId ? { ...t, ...updatedData } : t
           ),
         }));
-
-        if (user) {
-          syncStore.addToQueue("task", {
-            type: "update",
-            entityId: taskId,
-            data: updatedData,
-          });
-
-          if (syncStore.isOnline && taskSyncManager) {
-            taskSyncManager.processQueue();
-          }
-        }
       } catch (error) {
         set({
           error: error instanceof Error ? error.message : "Failed to pin task",
@@ -459,7 +341,6 @@ export const useTaskStore = create<TaskState>()(
         const user = authState.user;
         const guestUser = authState.guestUser;
 
-        // Only load categories if we have a user (guest or authenticated)
         if (user || guestUser) {
           await useCategoryStore.getState().loadCategories();
           const categories = useCategoryStore.getState().categories;
@@ -475,14 +356,12 @@ export const useTaskStore = create<TaskState>()(
             lists: [...SYSTEM_LISTS, ...categoryLists]
           }));
         } else {
-          // No user, just show system lists
           set(() => ({
             lists: SYSTEM_LISTS
           }));
         }
       } catch (error) {
         console.error("Failed to load categories as lists:", error);
-        // Fallback to system lists only
         set(() => ({
           lists: SYSTEM_LISTS
         }));
@@ -495,87 +374,3 @@ export const useTaskStore = create<TaskState>()(
     },
   }))
 );
-
-// Initialize task sync manager after store definition to avoid circular dependencies
-function initializeTaskSync() {
-  const taskAdapter = createAdapter<Task, any>({
-    entityKey: "task",
-    dbTable: db.tasks as any,
-    api: {
-      bulkSync: taskApi.bulkSync,
-      fetchAll: () => taskApi.getTasks(),
-    },
-    store: {
-      getUserId: () => useAuthStore.getState().user?.id,
-      getItems: () => useTaskStore.getState().tasks,
-      setItems: (list) => useTaskStore.setState({ tasks: list }),
-    },
-    normalizeFromServer: (t: any): Task => ({
-      ...normalizeDates(t),
-      dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : undefined,
-    }),
-    customTransformers: {
-      toCreatePayload: (op) => {
-        if (op.type !== "create") return null;
-        const d = op.data || {};
-        return {
-          clientId: op.entityId,
-          title: d.title,
-          completed: !!d.completed,
-          dueDate: d.dueDate,
-          pinned: !!d.pinned,
-          categoryId: d.categoryId,
-          providerId: d.providerId,
-          updatedAt: d.updatedAt,
-        };
-      },
-    },
-    options: {
-      autoSync: true,
-      syncInterval: 60 * 60 * 1000, // 1 hour
-      enableOptimisticUpdates: true,
-    },
-  });
-
-  taskSyncManager = createEntitySync(taskAdapter);
-}
-
-// Initialize on first authenticated user login
-useAuthStore.subscribe((state) => {
-  const user = state.user;
-  if (user && !taskSyncManager) {
-    initializeTaskSync();
-  } else if (!user && taskSyncManager) {
-    taskSyncManager.dispose();
-    taskSyncManager = null;
-  }
-});
-
-/**
-  * ╔═══════════════════════════════════════════════════════════════════════╗
-  * ║                    Handle Online Status Changes                       ║
-  * ╠═══════════════════════════════════════════════════════════════════════╣
-  * ║  Triggers sync queue processing when transitioning from offline       ║
-  * ║  to online. Ensures no concurrent syncs are running.                  ║
-  * ╚═══════════════════════════════════════════════════════════════════════╝
-***/
-let isSyncingOnReconnect = false;
-
-const handleOnlineStatusChange = (state: SyncState, prevState: SyncState) => {
-  const justCameOnline = state.isOnline && !prevState.isOnline;
-  const isAuthenticated = useAuthStore.getState().user;
-  const canSync = justCameOnline && isAuthenticated && !isSyncingOnReconnect;
-
-  if (canSync) {
-    isSyncingOnReconnect = true;
-    useTaskStore
-      .getState()
-      .syncWithServer()
-      .finally(() => {
-        isSyncingOnReconnect = false;
-      });
-  }
-};
-
-useSyncStore.subscribe(handleOnlineStatusChange);
-

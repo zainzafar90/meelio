@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Logomark } from "../common/logo";
-import { UserAuthForm } from "./user-auth-form";
 import { AuthLayout } from "./auth-layout";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
@@ -15,15 +14,11 @@ import { useAuthStore } from "../../stores/auth.store";
 import { Icons } from "../icons";
 import { useShallow } from "zustand/shallow";
 
-type AuthMode = "login" | "guest";
-
 interface AuthContainerProps {
-  defaultMode?: AuthMode;
   onClose?: () => void;
 }
 
 export const AuthContainer = (props: AuthContainerProps) => {
-  const { defaultMode = "login" } = props;
   const { user, guestUser, authenticateGuest } = useAuthStore(
     useShallow((state) => ({
       user: state.user,
@@ -33,15 +28,10 @@ export const AuthContainer = (props: AuthContainerProps) => {
   );
   const { t } = useTranslation();
 
-  const [mode, setMode] = useState<AuthMode>(defaultMode);
   const [guestName, setGuestName] = useState<string>(
     user?.name || guestUser?.name || ""
   );
   const [guestNameError, setGuestNameError] = useState<string>("");
-
-  const handleSwitchToGuestMode = () => {
-    setMode("guest");
-  };
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,74 +53,14 @@ export const AuthContainer = (props: AuthContainerProps) => {
       authenticateGuest(guestUser);
 
       toast.info(`Welcome, ${guestName}!`, {
-        description:
-          "As a guest, your data will be stored locally, and won't be synced across devices.",
+        description: "Your data will be stored locally on this device.",
         duration: 5000,
         position: "top-center",
       });
     } catch (error) {
       toast.error(t("common.error"), {
-        description: "Unable to create guest account. Please try again.",
+        description: "Unable to create account. Please try again.",
       });
-    }
-  };
-
-  const renderGuestForm = () => {
-    return (
-      <form onSubmit={handleGuestSubmit} className="grid gap-4">
-        <div className="grid gap-2">
-          <div className="grid gap-1">
-            <p className="text-sm text-gray-300 mb-2">
-              What should we call you?
-            </p>
-            <Label className="sr-only" htmlFor="guestName">
-              Guest Name
-            </Label>
-            <Input
-              id="guestName"
-              placeholder="First name or nickname"
-              type="text"
-              autoCapitalize="words"
-              autoComplete="name"
-              autoCorrect="off"
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              onBlur={() => {
-                if (!guestName.trim()) {
-                  setGuestNameError("Name is required");
-                } else {
-                  setGuestNameError("");
-                }
-              }}
-            />
-            {guestNameError && (
-              <p className="px-1 text-xs text-red-600">{guestNameError}</p>
-            )}
-          </div>
-          <Button className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
-            Continue as Guest
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="text-gray-300 hover:text-white"
-            onClick={() => setMode("login")}
-          >
-            Back
-          </Button>
-        </div>
-      </form>
-    );
-  };
-
-  const renderForm = () => {
-    switch (mode) {
-      case "login":
-        return <UserAuthForm onGuestContinue={handleSwitchToGuestMode} />;
-      case "guest":
-        return renderGuestForm();
-      default:
-        return null;
     }
   };
 
@@ -153,7 +83,41 @@ export const AuthContainer = (props: AuthContainerProps) => {
             </h1>
           </div>
           <div className="mx-auto flex w-full flex-col justify-center space-y-4">
-            {renderForm()}
+            <form onSubmit={handleGuestSubmit} className="grid gap-4">
+              <div className="grid gap-2">
+                <div className="grid gap-1">
+                  <p className="text-sm text-gray-300 mb-2">
+                    What should we call you?
+                  </p>
+                  <Label className="sr-only" htmlFor="guestName">
+                    Your Name
+                  </Label>
+                  <Input
+                    id="guestName"
+                    placeholder="First name or nickname"
+                    type="text"
+                    autoCapitalize="words"
+                    autoComplete="name"
+                    autoCorrect="off"
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    onBlur={() => {
+                      if (!guestName.trim()) {
+                        setGuestNameError("Name is required");
+                      } else {
+                        setGuestNameError("");
+                      }
+                    }}
+                  />
+                  {guestNameError && (
+                    <p className="px-1 text-xs text-red-600">{guestNameError}</p>
+                  )}
+                </div>
+                <Button className={cn(buttonVariants({ size: "lg" }), "mt-2")}>
+                  Get Started
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

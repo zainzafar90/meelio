@@ -9,8 +9,8 @@ import {
   Clock,
   TabStashSheet,
   BookmarksSheet,
-  WeatherSheet,
   CalendarSheet,
+  CalendarDynamicIsland,
   useAuthStore,
   useDockStore,
   TaskListSheet,
@@ -26,9 +26,7 @@ import {
   NotesSheet,
   SimpleTimer,
   SearchPopover,
-  AppLauncher
  } from "@repo/shared";
- import {CalendarDynamicIsland} from "@repo/shared";
 import { useAppStore } from "@repo/shared";
 
 import "./style.css";
@@ -76,7 +74,6 @@ const Content = () => {
     >
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
-      <AppLauncher />
       <SoundscapesSheet />
       <TaskListSheet />
       <NotesSheet />
@@ -84,7 +81,6 @@ const Content = () => {
       <SiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
-      <WeatherSheet />
       <CalendarSheet />
     </main>
   );

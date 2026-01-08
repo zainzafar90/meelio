@@ -3,7 +3,6 @@ import { useShallow } from "zustand/shallow";
 
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
-import { useAuthStore } from "../../../stores/auth.store";
 import { getCalendarColor } from "../../../utils/calendar-colors";
 import {
   isEventHappening,
@@ -12,32 +11,27 @@ import {
 } from "../../../utils/calendar-date.utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
-import type { CalendarEvent } from "../../../api/google-calendar.api";
+import type { CalendarEvent } from "../../../types/calendar.types";
 
 export const CalendarDynamicIsland = () => {
-  const { getMinutesUntilNextEvent, nextEvent, token, events } =
+  const { getMinutesUntilNextEvent, nextEvent, icsUrl, events } =
     useCalendarStore(
       useShallow((state) => ({
         getMinutesUntilNextEvent: state.getMinutesUntilNextEvent,
         nextEvent: state.nextEvent,
-        token: state.token,
+        icsUrl: state.icsUrl,
         events: state.events,
       }))
     );
 
-  const { setCalendarVisible } = useDockStore(
+  const { setCalendarVisible, dockIconsVisible } = useDockStore(
     useShallow((state) => ({
       setCalendarVisible: state.setCalendarVisible,
+      dockIconsVisible: state.dockIconsVisible,
     }))
   );
 
-  const { user } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
-    }))
-  );
-
-  const calendarEnabled = user?.settings?.calendar?.enabled ?? false;
+  const calendarEnabled = dockIconsVisible.calendar ?? true;
 
   const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
   const [displayEvent, setDisplayEvent] = useState<CalendarEvent | null>(null);
@@ -54,9 +48,8 @@ export const CalendarDynamicIsland = () => {
     return () => clearInterval(interval);
   }, [getMinutesUntilNextEvent, nextEvent]);
 
-  const RECENTLY_STARTED_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
+  const RECENTLY_STARTED_THRESHOLD_MS = 10 * 60 * 1000;
 
-  // Check if we should keep showing a recently started event
   useEffect(() => {
     const now = Date.now();
 
@@ -67,7 +60,6 @@ export const CalendarDynamicIsland = () => {
       const eventEnd = new Date(event.end.dateTime || event.end.date || "");
       const timeSinceStart = now - eventStart.getTime();
 
-      // Event started within threshold and hasn't ended
       return (
         timeSinceStart >= 0 &&
         timeSinceStart <= RECENTLY_STARTED_THRESHOLD_MS &&
@@ -75,11 +67,10 @@ export const CalendarDynamicIsland = () => {
       );
     });
 
-    // Priority: nextEvent (upcoming/ongoing) > recentlyStartedEvent > null
     setDisplayEvent(nextEvent || recentlyStartedEvent || null);
   }, [nextEvent, events, RECENTLY_STARTED_THRESHOLD_MS]);
 
-  if (!token || !calendarEnabled) {
+  if (!icsUrl || !calendarEnabled) {
     return null;
   }
 
@@ -116,7 +107,6 @@ export const CalendarDynamicIsland = () => {
     return `${years}y`;
   };
 
-  // Show "No Events" if no event or event is more than 24 hours away
   if (!displayEvent || minutesLeft === null || minutesLeft > 24 * 60) {
     const handleClick = () => {
       setCalendarVisible(true);
@@ -137,7 +127,8 @@ export const CalendarDynamicIsland = () => {
     );
   }
 
-  const isHappening = isEventHappening(displayEvent);
+  const now = new Date();
+  const isHappening = isEventHappening(displayEvent, now);
   const isAllDay = isAllDayEvent(displayEvent);
   const timeText = isHappening
     ? "Now"
@@ -145,7 +136,7 @@ export const CalendarDynamicIsland = () => {
       ? "Today"
       : formatTime(minutesLeft);
 
-  const eventIsToday = displayEvent ? isEventToday(displayEvent) : false;
+  const eventIsToday = displayEvent ? isEventToday(displayEvent, now) : false;
   const eventColor =
     displayEvent && eventIsToday
       ? getCalendarColor(displayEvent.colorId)

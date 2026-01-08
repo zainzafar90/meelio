@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { api } from "../api";
 import { db } from "../lib/db/meelio.dexie";
 import { useAuthStore } from "./auth.store";
 import { generateUUID } from "../utils/common.utils";
@@ -28,7 +27,6 @@ interface CategoryState {
   reset: () => void;
 }
 
-
 export const useCategoryStore = create<CategoryState>()(
   persist(
     (set, get) => ({
@@ -41,7 +39,6 @@ export const useCategoryStore = create<CategoryState>()(
         if (state.isLoading) return;
 
         const { user, guestUser } = useAuthStore.getState();
-        const isGuest = !!guestUser && !user;
         const userId = user?.id || guestUser?.id;
 
         if (!userId) {
@@ -52,19 +49,7 @@ export const useCategoryStore = create<CategoryState>()(
         set({ isLoading: true, error: null });
 
         try {
-          let categories: LocalCategory[];
-
-          if (isGuest) {
-            categories = await db.categories.where("userId").equals(userId).toArray() as LocalCategory[];
-          } else {
-            const apiCats = await api.categories.categoryApi.getCategories();
-            categories = apiCats.map(cat => ({
-              ...cat,
-              createdAt: new Date(cat.createdAt).getTime(),
-              updatedAt: new Date(cat.updatedAt).getTime(),
-            })) as LocalCategory[];
-          }
-
+          const categories = await db.categories.where("userId").equals(userId).toArray() as LocalCategory[];
           set({ categories, isLoading: false });
         } catch (error) {
           set({
@@ -76,7 +61,6 @@ export const useCategoryStore = create<CategoryState>()(
 
       createCategory: async (data: { name: string; icon?: string }) => {
         const { user, guestUser } = useAuthStore.getState();
-        const isGuest = !!guestUser && !user;
         const userId = user?.id || guestUser?.id;
 
         if (!userId) throw new Error("No user found");
@@ -95,28 +79,13 @@ export const useCategoryStore = create<CategoryState>()(
           updatedAt: Date.now(),
         };
 
-        if (isGuest) {
-          await db.categories.add(newCat);
-        } else {
-          const created = await api.categories.categoryApi.createCategory({
-            name: newCat.name,
-            icon: newCat.icon
-          });
-          newCat.id = created.id;
-          newCat.userId = created.userId;
-          newCat.icon = created.icon;
-          newCat.type = created.type;
-          newCat.createdAt = new Date(created.createdAt).getTime();
-          newCat.updatedAt = new Date(created.updatedAt).getTime();
-        }
-
+        await db.categories.add(newCat);
         set(state => ({ categories: [...state.categories, newCat] }));
         return newCat;
       },
 
       updateCategory: async (id: string, data: { name: string; icon?: string }) => {
         const { user, guestUser } = useAuthStore.getState();
-        const isGuest = !!guestUser && !user;
         const userId = user?.id || guestUser?.id;
 
         if (!userId) throw new Error("No user found");
@@ -130,14 +99,7 @@ export const useCategoryStore = create<CategoryState>()(
           updatedAt: Date.now()
         };
 
-        if (isGuest) {
-          await db.categories.update(id, updates);
-        } else {
-          await api.categories.categoryApi.updateCategory(id, {
-            name: updates.name,
-            icon: updates.icon
-          });
-        }
+        await db.categories.update(id, updates);
 
         set(state => ({
           categories: state.categories.map(c =>
@@ -147,14 +109,7 @@ export const useCategoryStore = create<CategoryState>()(
       },
 
       deleteCategory: async (id: string) => {
-        const { user, guestUser } = useAuthStore.getState();
-        const isGuest = !!guestUser && !user;
-
-        if (isGuest) {
-          await db.categories.delete(id);
-        } else {
-          await api.categories.categoryApi.deleteCategory(id);
-        }
+        await db.categories.delete(id);
 
         set(state => ({
           categories: state.categories.filter(c => c.id !== id)

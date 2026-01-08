@@ -14,37 +14,21 @@ export interface PomodoroSettings {
 export interface UserSettings {
   pomodoro: PomodoroSettings;
   onboardingCompleted: boolean;
-  task: {
-    confettiOnComplete: boolean;
-  };
-  calendar: {
-    enabled: boolean;
-  };
-  weather?: {
-    locationKey?: string;
-    locationName?: string;
-  };
 }
 
-export type AuthUser = {
+export type LocalUser = {
   id: string;
   name: string;
-  email: string;
-  isEmailVerified: boolean;
-  role: AuthRole;
-  image?: string;
-  provider?: string;
-  providerId?: string;
-  isPro: boolean;
-  subscriptionId?: string;
+  avatarUrl?: string;
+  createdAt: number;
   settings?: UserSettings;
-  locationKey?: string;
-  locationName?: string;
 };
+
+export type AuthUser = LocalUser;
 
 export interface GuestUser {
   id: string;
-  name: string;
+  name?: string;
   role: AuthRole;
-  createdAt: string;
+  createdAt?: string;
 }

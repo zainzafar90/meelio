@@ -17,39 +17,32 @@ import {
   SidebarTrigger,
 } from "@repo/ui/components/ui/sidebar";
 import {
-  CreditCard,
   Home,
   Paintbrush,
   User,
   Languages,
   Anchor,
   MessageCircle,
-  // Timer,
+  HardDrive,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { ProfileDropdown } from "./components/user-profile/profile-dropdown";
 import { AccountSettings } from "./tabs/account-settings";
 import { AppearanceSettings } from "./tabs/appearance-settings";
-import { BillingSettings } from "./tabs/billing-settings";
 import { GeneralSettings } from "./tabs/general-settings";
 import { LanguageSettings } from "./tabs/language-settings";
 import { DockSettings } from "./tabs/dock-settings";
-// import { TimerSettings } from "./tabs/timer-settings";
-import { api } from "../../../api";
+import { DataSettings } from "./tabs/data-settings";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore } from "../../../stores/settings.store";
-import { useAuthStore } from "../../../stores/auth.store";
-import { clearLocalData } from "../../../utils/clear-data.utils";
 import { useShallow } from "zustand/shallow";
-import { PromotionalLoginButton } from "./components/common/promotional-login-button";
 import { FeedbackSettings } from "./tabs/feedback-settings";
 
 type SettingsNavItem = {
   id: SettingsTab;
   name: string;
-  requiresLogin?: boolean;
   icon: React.ComponentType<{ className?: string }>;
 };
 
@@ -57,12 +50,11 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "general", name: "general", icon: Home },
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
-  // { id: "timer", name: "timer", icon: Timer },
   { id: "dock", name: "dock", icon: Anchor },
   { id: "feedback", name: "feedback", icon: MessageCircle },
-  { id: "account", name: "account", icon: User, requiresLogin: true },
-  { id: "billing", name: "billing", icon: CreditCard, requiresLogin: true },
-] as const;
+  { id: "account", name: "account", icon: User },
+  { id: "data", name: "data", icon: HardDrive },
+];
 
 export function SettingsDialog() {
   const { t } = useTranslation();
@@ -74,16 +66,6 @@ export function SettingsDialog() {
       setTab: state.setTab,
     }))
   );
-  const { user, guestUser, logout } = useAuthStore(
-    useShallow((state) => state)
-  );
-
-  const signOut = async () => {
-    logout();
-    await clearLocalData();
-    closeSettings();
-    await api.auth.logoutAccount();
-  };
 
   const renderTabContent = () => {
     switch (currentTab) {
@@ -93,16 +75,14 @@ export function SettingsDialog() {
         return <AppearanceSettings />;
       case "language":
         return <LanguageSettings />;
-      // case "timer":
-      //   return <TimerSettings />;
       case "dock":
         return <DockSettings />;
       case "account":
         return <AccountSettings />;
-      case "billing":
-        return <BillingSettings />;
       case "feedback":
         return <FeedbackSettings />;
+      case "data":
+        return <DataSettings onClose={closeSettings} />;
       default:
         return null;
     }
@@ -119,7 +99,6 @@ export function SettingsDialog() {
         </DialogDescription>
         <SidebarProvider className="flex h-full w-full items-start">
           <Sidebar collapsible="icon" className="hidden md:flex">
-            {/* User Profile */}
             <SidebarHeader>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -128,19 +107,11 @@ export function SettingsDialog() {
               </SidebarMenu>
             </SidebarHeader>
 
-            {/* Sidebar Navigation Items */}
             <SidebarContent>
-              {!user && guestUser && (
-                <SidebarGroup>
-                  <PromotionalLoginButton variant="compact" />
-                </SidebarGroup>
-              )}
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {SETTINGS_NAV.filter(
-                      (item) => !item.requiresLogin || user
-                    ).map((item) => (
+                    {SETTINGS_NAV.map((item) => (
                       <SidebarMenuItem key={item.id}>
                         <SidebarMenuButton
                           onClick={() => setTab(item.id)}
@@ -151,14 +122,6 @@ export function SettingsDialog() {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
-                    {user && (
-                      <SidebarMenuItem>
-                        <SidebarMenuButton onClick={() => void signOut()}>
-                          <Icons.logout className="h-4 w-4" />
-                          <span>Logout</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    )}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>

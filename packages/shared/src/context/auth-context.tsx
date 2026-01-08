@@ -7,5 +7,6 @@ export const AuthContext = React.createContext<AuthState>({
   guestUser: null,
   authenticate: () => console.warn("NOOP"),
   authenticateGuest: () => console.warn("NOOP"),
+  updateUser: () => console.warn("NOOP"),
   logout: () => console.warn("NOOP"),
 });

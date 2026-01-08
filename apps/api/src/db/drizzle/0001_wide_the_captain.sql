@@ -1,1 +1,0 @@
-ALTER TABLE "task_categories" ADD COLUMN "icon" text;

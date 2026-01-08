@@ -5,6 +5,8 @@ import {
   ArrowRight,
   Bell,
   Book,
+  Calendar,
+  CalendarCheck,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -612,6 +614,8 @@ export const Icons = {
       <path opacity=".25" d="M22 6H6V5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v1z" />
     </svg>
   ),
+  calendar: Calendar,
+  calendarActive: CalendarCheck,
   play: ({ ...props }: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>
       <path

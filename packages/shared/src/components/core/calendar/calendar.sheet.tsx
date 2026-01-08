@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
+import { Input } from "@repo/ui/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -15,13 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 import { useDockStore } from "../../../stores/dock.store";
 import { useCalendarStore } from "../../../stores/calendar.store";
-import { useAuthStore } from "../../../stores/auth.store";
-import { PromotionalLoginButton } from "../settings/components/common/promotional-login-button";
-import {
-  getCalendarAuthUrl,
-  deleteCalendarToken,
-} from "../../../api/calendar.api";
-import { CalendarEvent } from "../../../api/google-calendar.api";
+import type { CalendarEvent } from "../../../types/calendar.types";
 import { getCalendarColor } from "../../../utils/calendar-colors";
 import {
   getEventStartDate,
@@ -30,38 +25,31 @@ import {
   isAllDayEvent,
   isEventToday,
 } from "../../../utils/calendar-date.utils";
-import { Copy, Bell, Share, ChevronDown } from "lucide-react";
+import { Copy, Bell, Share, ChevronDown, Calendar, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
-/**
- * Connect Calendar and persist token
- */
 export const CalendarSheet = () => {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
   const { isCalendarVisible, setCalendarVisible } = useDockStore(
     useShallow((state) => ({
       isCalendarVisible: state.isCalendarVisible,
       setCalendarVisible: state.setCalendarVisible,
     }))
   );
-  const { token, events, connectedEmail, clearCalendar } = useCalendarStore(
+  const { icsUrl, events, loading, error, setIcsUrl, clearCalendar, loadEvents } = useCalendarStore(
     useShallow((state) => ({
-      token: state.token,
+      icsUrl: state.icsUrl,
       events: state.events,
-      connectedEmail: state.connectedEmail,
+      loading: state.loading,
+      error: state.error,
+      setIcsUrl: state.setIcsUrl,
       clearCalendar: state.clearCalendar,
-    }))
-  );
-  const { user, guestUser } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
-      guestUser: state.guestUser,
+      loadEvents: state.loadEvents,
     }))
   );
 
-  const isConnected = !!token;
-  const isGuestMode = guestUser && !user;
+  const isConnected = !!icsUrl;
 
   const formatTimeRemaining = (event: CalendarEvent): string => {
     try {
@@ -69,7 +57,6 @@ export const CalendarSheet = () => {
       const eventStart = getEventStartDate(event);
       const eventEnd = getEventEndDate(event);
 
-      // Handle all-day events
       if (isAllDayEvent(event)) {
         if (isEventHappening(event, now)) {
           return "All day";
@@ -81,7 +68,6 @@ export const CalendarSheet = () => {
         return `${days} days remaining`;
       }
 
-      // Check if event is currently happening
       if (isEventHappening(event, now)) {
         const endDiffMs = eventEnd.getTime() - now.getTime();
         const endMinutes = Math.floor(endDiffMs / (1000 * 60));
@@ -93,7 +79,6 @@ export const CalendarSheet = () => {
         return `${endHours} hours left`;
       }
 
-      // Event is in the future
       const startDiffMs = eventStart.getTime() - now.getTime();
 
       if (startDiffMs <= 0) return "Now";
@@ -133,26 +118,21 @@ export const CalendarSheet = () => {
         });
       };
 
-      // Handle all-day events
       if (isAllDayEvent(event)) {
         const startDate = formatDate(start);
         const endDate = formatDate(end);
 
-        // Single day all-day event
         if (start.toDateString() === end.toDateString()) {
           return `${startDate} • All day`;
         }
 
-        // Multi-day all-day event
         return `${startDate} – ${endDate}`;
       }
 
-      // Same day event with times
       if (start.toDateString() === end.toDateString()) {
         return `${formatDate(start)} • ${formatTime(start)} – ${formatTime(end)}`;
       }
 
-      // Multi-day event with times
       return `${formatDate(start)} ${formatTime(start)} – ${formatDate(end)} ${formatTime(end)}`;
     } catch (error) {
       console.error("Error formatting event time:", error);
@@ -162,25 +142,21 @@ export const CalendarSheet = () => {
 
   const copyMeetingLink = async (link: string) => {
     await navigator.clipboard.writeText(link);
-    toast.success(t("calendar.sheet.meetingLinkCopied"));
+    toast.success(t("calendar.sheet.meetingLinkCopied", { defaultValue: "Meeting link copied" }));
   };
 
   const getMeetingLink = (event: CalendarEvent): string | null => {
-    // Check hangoutLink first
     if (event.hangoutLink) {
       return event.hangoutLink;
     }
 
-    // Check conferenceData
-    if (event.conferenceData?.entryPoints?.length > 0) {
+    if (event.conferenceData?.entryPoints?.length) {
       const videoEntry = event.conferenceData.entryPoints.find(
         (entry) => entry.entryPointType === "video"
       );
       if (videoEntry?.uri) {
         return videoEntry.uri;
       }
-
-      // Fallback to first entry point
       return event.conferenceData.entryPoints[0].uri;
     }
 
@@ -227,25 +203,17 @@ export const CalendarSheet = () => {
   };
 
   const handleConnect = async () => {
-    setLoading(true);
-    try {
-      const response = await getCalendarAuthUrl();
-      window.location.href = response.data.authUrl;
-    } catch (error) {
-      console.error("Calendar authorization failed:", error);
-    } finally {
-      setLoading(false);
-    }
+    if (!urlInput.trim()) return;
+    await setIcsUrl(urlInput.trim());
+    setUrlInput("");
   };
 
-  const handleDisconnect = async () => {
-    try {
-      await deleteCalendarToken();
-      clearCalendar();
-      setCalendarVisible(false);
-    } catch (error) {
-      console.error("Failed to disconnect calendar:", error);
-    }
+  const handleDisconnect = () => {
+    clearCalendar();
+  };
+
+  const handleRefresh = () => {
+    loadEvents(true);
   };
 
   return (
@@ -256,36 +224,31 @@ export const CalendarSheet = () => {
       >
         <SheetHeader>
           <SheetTitle>
-            {t("calendar.sheet.title")}
-            {connectedEmail && (
-              <div className="text-sm font-normal text-muted-foreground mt-1">
-                Connected as{" "}
-                <span className="font-medium text-blue-600">
-                  {connectedEmail}
-                </span>
-              </div>
-            )}
+            {t("calendar.sheet.title", { defaultValue: "Calendar" })}
           </SheetTitle>
         </SheetHeader>
 
-        {isGuestMode ? (
-          <div className="flex flex-col gap-4">
-            <PromotionalLoginButton
-              variant="minimal"
-              title="Sign in to unlock Calendar"
-              subtitle="Connect your Google Calendar and sync events"
-            />
-          </div>
-        ) : isConnected ? (
+        {isConnected ? (
           <div className="flex flex-col gap-4 flex-1 overflow-hidden">
             <div className="flex items-center justify-between p-2">
               <div className="text-sm text-green-600">
-                ✓ {t("calendar.sheet.connected")}
+                ✓ {t("calendar.sheet.connected", { defaultValue: "Connected" })}
               </div>
-              <Button onClick={handleDisconnect} variant="outline" size="sm">
-                {t("calendar.sheet.disconnect")}
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={handleRefresh} variant="outline" size="sm" disabled={loading}>
+                  <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                </Button>
+                <Button onClick={handleDisconnect} variant="outline" size="sm">
+                  {t("calendar.sheet.disconnect", { defaultValue: "Disconnect" })}
+                </Button>
+              </div>
             </div>
+
+            {error && (
+              <div className="text-sm text-red-500 p-2 bg-red-50 dark:bg-red-900/20 rounded">
+                {error}
+              </div>
+            )}
 
             <EventsList
               categorizeEvents={categorizeEvents}
@@ -297,9 +260,34 @@ export const CalendarSheet = () => {
             />
           </div>
         ) : (
-          <Button onClick={handleConnect} disabled={loading}>
-            {loading ? t("common.loading") : t("calendar.sheet.connect")}
-          </Button>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+              <Calendar className="h-8 w-8 text-muted-foreground" />
+              <div className="text-sm text-muted-foreground">
+                {t("calendar.sheet.connectDescription", {
+                  defaultValue: "Enter your calendar's ICS URL to view events. You can find this in your calendar settings (Google Calendar: Settings → Integrate calendar → Secret address in iCal format)."
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Input
+                placeholder="https://calendar.google.com/calendar/ical/..."
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                className="text-sm"
+              />
+              <Button onClick={handleConnect} disabled={loading || !urlInput.trim()}>
+                {loading ? t("common.loading", { defaultValue: "Loading..." }) : t("calendar.sheet.connect", { defaultValue: "Connect Calendar" })}
+              </Button>
+            </div>
+
+            {error && (
+              <div className="text-sm text-red-500 p-2 bg-red-50 dark:bg-red-900/20 rounded">
+                {error}
+              </div>
+            )}
+          </div>
         )}
       </SheetContent>
     </Sheet>
@@ -337,7 +325,7 @@ const EventsList: React.FC<EventsListProps> = ({
   if (totalEvents === 0) {
     return (
       <div className="text-sm text-muted-foreground text-center py-8">
-        No upcoming events
+        {t("calendar.sheet.noEvents", { defaultValue: "No upcoming events" })}
       </div>
     );
   }
@@ -348,7 +336,7 @@ const EventsList: React.FC<EventsListProps> = ({
         <Collapsible open={happeningNowOpen} onOpenChange={setHappeningNowOpen}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.happeningNow")} ({happeningNow.length})
+              {t("calendar.sheet.happeningNow", { defaultValue: "Happening Now" })} ({happeningNow.length})
             </span>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
@@ -374,7 +362,7 @@ const EventsList: React.FC<EventsListProps> = ({
         <div>
           <div className="flex items-center justify-between w-full p-2">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.today")} ({today.length})
+              {t("calendar.sheet.today", { defaultValue: "Today" })} ({today.length})
             </span>
           </div>
           <div className="flex flex-col gap-4 mt-2">
@@ -397,7 +385,7 @@ const EventsList: React.FC<EventsListProps> = ({
         <Collapsible open={upcomingOpen} onOpenChange={setUpcomingOpen}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.upcoming")} ({upcoming.length})
+              {t("calendar.sheet.upcoming", { defaultValue: "Upcoming" })} ({upcoming.length})
             </span>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
@@ -514,19 +502,17 @@ const FullEventCard: React.FC<FullEventCardProps> = ({
         )}
       </div>
 
-      {/* Event Time */}
       <p className="text-sm text-muted-foreground">{formatEventTime(event)}</p>
 
-      {/* Meeting Link */}
       {meetingLink && (
         <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-          <span className="text-sm text-muted-foreground font-mono">
+          <span className="text-sm text-muted-foreground font-mono truncate flex-1">
             {meetingLink.replace("https://", "")}
           </span>
           <Button
             size="sm"
             variant="ghost"
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 flex-shrink-0"
             onClick={() => copyMeetingLink(meetingLink)}
             title="Copy meeting link"
           >
@@ -535,7 +521,6 @@ const FullEventCard: React.FC<FullEventCardProps> = ({
         </div>
       )}
 
-      {/* Time Reminder */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Bell className="w-4 h-4" />
         <span>{formatTimeRemaining(event)}</span>

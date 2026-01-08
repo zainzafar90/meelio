@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { useAppLauncherStore } from "../../../stores/app-launcher.store";
 import { PinnedAppsGrid } from "./pinned-apps-grid";
-import { WeatherWidget } from "./weather-widget";
 import { MediaWidget } from "./media-widget";
 import { ProfileFooter } from "./profile-footer";
 import { Search, X } from "lucide-react";
@@ -76,8 +75,7 @@ export const AppLauncher = () => {
           />
 
           <div className="bg-muted/20 border-t p-8">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
-              <WeatherWidget />
+            <div className="grid grid-cols-1 gap-3 md:gap-4">
               <MediaWidget />
             </div>
           </div>

@@ -2,23 +2,21 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal, Home } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
-import { useAppLauncherStore } from "../../../stores/app-launcher.store";
 import { useShallow } from "zustand/shallow";
 
-import { CalendarDock } from "./components/calendar.dock";
 import { SettingsDock } from "./components/settings.dock";
 import { ClockDock } from "./components/clock.dock";
+import { CalendarDock } from "./components/calendar.dock";
 import { DockButton } from "../dock-button";
 import { DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
-import { PremiumFeature } from "../../../components/common/premium-feature";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
 
@@ -30,17 +28,17 @@ const BASE_STATIC_DOCK_ITEMS: {
   isStatic: boolean;
 }[] = [
   {
-    id: "clock",
-    name: "Clock",
-    icon: ClockDock,
-    activeIcon: ClockDock,
-    isStatic: true,
-  },
-  {
     id: "calendar",
     name: "Calendar",
     icon: CalendarDock,
     activeIcon: CalendarDock,
+    isStatic: true,
+  },
+  {
+    id: "clock",
+    name: "Clock",
+    icon: ClockDock,
+    activeIcon: ClockDock,
     isStatic: true,
   },
   {
@@ -75,14 +73,10 @@ export const Dock = () => {
     toggleSiteBlocker,
     toggleBackgrounds,
     toggleTabStash,
-    toggleCalendar,
     toggleBookmarks,
-    toggleWeather,
     resetDock,
     dockIconsVisible,
-    isCalendarVisible,
     isBookmarksVisible,
-    isWeatherVisible,
   } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
@@ -92,6 +86,7 @@ export const Dock = () => {
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
+      isCalendarVisible: state.isCalendarVisible,
       currentOnboardingStep: state.currentOnboardingStep,
       resetDock: state.reset,
       toggleTimer: state.toggleTimer,
@@ -102,13 +97,9 @@ export const Dock = () => {
       toggleSiteBlocker: state.toggleSiteBlocker,
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
-      toggleCalendar: state.toggleCalendar,
       toggleBookmarks: state.toggleBookmarks,
-      toggleWeather: state.toggleWeather,
       dockIconsVisible: state.dockIconsVisible,
-      isCalendarVisible: state.isCalendarVisible,
       isBookmarksVisible: state.isBookmarksVisible,
-      isWeatherVisible: state.isWeatherVisible,
     }))
   );
 
@@ -120,16 +111,9 @@ export const Dock = () => {
     }))
   );
 
-  const { toggle: toggleLauncher } = useAppLauncherStore();
-
   const staticItems = useMemo(
-    () =>
-      BASE_STATIC_DOCK_ITEMS.map((item) =>
-        item.id === "calendar"
-          ? { ...item, onClick: toggleCalendar, isActive: isCalendarVisible }
-          : item
-      ),
-    [toggleCalendar, isCalendarVisible]
+    () => BASE_STATIC_DOCK_ITEMS,
+    []
   );
 
   const items = useMemo(
@@ -140,13 +124,6 @@ export const Dock = () => {
         icon: Logo,
         activeIcon: Logo,
         onClick: resetDock,
-      },
-      {
-        id: "launcher",
-        name: "App Launcher",
-        icon: Icons.launcher,
-        activeIcon: Icons.launcherActive,
-        onClick: toggleLauncher,
       },
       ...(dockIconsVisible.timer
         ? [
@@ -200,7 +177,6 @@ export const Dock = () => {
               icon: Icons.note,
               activeIcon: Icons.noteActive,
               onClick: toggleNotes,
-              requirePro: true,
             },
           ]
         : []),
@@ -212,7 +188,6 @@ export const Dock = () => {
               icon: Icons.siteBlocker,
               activeIcon: Icons.siteBlockerActive,
               onClick: toggleSiteBlocker,
-              requirePro: true,
             },
           ]
         : []),
@@ -224,7 +199,6 @@ export const Dock = () => {
               icon: Icons.tabStash,
               activeIcon: Icons.tabStashActive,
               onClick: toggleTabStash,
-              requirePro: true,
             },
           ]
         : []),
@@ -236,17 +210,6 @@ export const Dock = () => {
               icon: Icons.bookmark,
               activeIcon: Icons.bookmarkActive,
               onClick: toggleBookmarks,
-            },
-          ]
-        : []),
-      ...(dockIconsVisible.weather
-        ? [
-            {
-              id: "weather",
-              name: t("common.weather", { defaultValue: "Weather" }),
-              icon: Icons.weather,
-              activeIcon: Icons.weatherActive,
-              onClick: toggleWeather,
             },
           ]
         : []),
@@ -264,7 +227,6 @@ export const Dock = () => {
     ],
     [
       t,
-      toggleLauncher,
       resetDock,
       toggleTimer,
       toggleSoundscapes,
@@ -273,9 +235,7 @@ export const Dock = () => {
       toggleSiteBlocker,
       toggleTabStash,
       toggleBackgrounds,
-      toggleCalendar,
       toggleBookmarks,
-      toggleWeather,
       dockIconsVisible,
     ]
   );
@@ -333,26 +293,17 @@ export const Dock = () => {
                       "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                   )}
                 >
-                  {item.requirePro ? (
-                    <PremiumFeature
-                      requirePro={item.requirePro}
-                      fallback={<DockButton item={item} isDisabled={true} />}
-                    >
-                      <DockButton item={item} />
-                    </PremiumFeature>
-                  ) : (
-                    <DockButton item={item} />
-                  )}
+                  <DockButton item={item} />
                 </div>
               ))}
             </div>
 
             <div className="flex items-center gap-2 border-l border-white/10 pl-3">
               {staticItems.map((item) => {
-                if (
-                  (item.id === "clock" && !dockIconsVisible.clock) ||
-                  (item.id === "calendar" && !dockIconsVisible.calendar)
-                ) {
+                if (item.id === "clock" && !dockIconsVisible.clock) {
+                  return null;
+                }
+                if (item.id === "calendar" && !(dockIconsVisible.calendar ?? true)) {
                   return null;
                 }
 
@@ -368,13 +319,9 @@ export const Dock = () => {
                         "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                     )}
                   >
-                    {item.id === "calendar" ? (
-                      <DockButton item={item} />
-                    ) : (
-                      <div className="flex items-center justify-center">
-                        <item.icon />
-                      </div>
-                    )}
+                    <div className="flex items-center justify-center">
+                      <item.icon />
+                    </div>
                   </div>
                 );
               })}
@@ -402,7 +349,7 @@ export const Dock = () => {
             ref={dropdownRef}
             className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
           >
-            {dropdownItems.map((item, index) => {
+            {dropdownItems.map((item) => {
               const isActive =
                 (item.id === "timer" && isTimerVisible) ||
                 (item.id === "soundscapes" && isSoundscapesVisible) ||
@@ -411,8 +358,7 @@ export const Dock = () => {
                 (item.id === "site-blocker" && isSiteBlockerVisible) ||
                 (item.id === "background" && isBackgroundsVisible) ||
                 (item.id === "tab-stash" && isTabStashVisible) ||
-                (item.id === "bookmarks" && isBookmarksVisible) ||
-                (item.id === "weather" && isWeatherVisible);
+                (item.id === "bookmarks" && isBookmarksVisible);
 
               const IconComponent = (
                 isActive ? item.activeIcon : item.icon
@@ -428,34 +374,6 @@ export const Dock = () => {
                     <IconComponent className="size-5" />
                     <span className="text-xs">{item.name}</span>
                   </SidebarTrigger>
-                );
-              }
-
-              if (item.requirePro) {
-                return (
-                  <PremiumFeature
-                    key={item.id}
-                    requirePro={item.requirePro}
-                    tooltipClassName="top-2 right-2"
-                    fallback={
-                      <button
-                        key={`${index}-fallback`}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                      >
-                        <IconComponent className="size-5" />
-                        <span className="text-xs">{item.name}</span>
-                      </button>
-                    }
-                  >
-                    <button
-                      key={index}
-                      className="flex w-full items-center gap-2.5 px-3 py-2 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                      onClick={item.onClick}
-                    >
-                      <IconComponent className="size-5" />
-                      <span className="text-xs">{item.name}</span>
-                    </button>
-                  </PremiumFeature>
                 );
               }
 

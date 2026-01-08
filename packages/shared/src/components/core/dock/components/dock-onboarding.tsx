@@ -121,12 +121,11 @@ export const DockOnboarding = () => {
       user: state.user,
     }))
   );
-  const { hasDockOnboardingCompleted, setDockOnboardingCompletedWithSync } =
+  const { hasDockOnboardingCompleted, setDockOnboardingCompleted } =
     useOnboardingStore(
       useShallow((state) => ({
         hasDockOnboardingCompleted: state.hasDockOnboardingCompleted,
-        setDockOnboardingCompletedWithSync:
-          state.setDockOnboardingCompletedWithSync,
+        setDockOnboardingCompleted: state.setDockOnboardingCompleted,
       }))
     );
   const {
@@ -164,13 +163,13 @@ export const DockOnboarding = () => {
   const handleNext = useCallback(async () => {
     if (currentStep === ONBOARDING_STEPS.length - 1) {
       setCurrentOnboardingStep(-1); // Reset highlight
-      await setDockOnboardingCompletedWithSync();
+      setDockOnboardingCompleted();
     } else {
       setCurrentStep((prev) => prev + 1);
     }
   }, [
     currentStep,
-    setDockOnboardingCompletedWithSync,
+    setDockOnboardingCompleted,
     setCurrentOnboardingStep,
   ]);
 
@@ -196,10 +195,10 @@ export const DockOnboarding = () => {
       actionFn?.();
     }
     setCurrentOnboardingStep(-1); // Reset highlight
-    await setDockOnboardingCompletedWithSync();
+    setDockOnboardingCompleted();
   }, [
     currentStep,
-    setDockOnboardingCompletedWithSync,
+    setDockOnboardingCompleted,
     setCurrentOnboardingStep,
     toggleTimer,
     toggleSoundscapes,

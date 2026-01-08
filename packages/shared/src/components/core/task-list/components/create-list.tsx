@@ -20,18 +20,10 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { useTaskStore } from "../../../../stores/task.store";
-import { useAuthStore } from "../../../../stores/auth.store";
 import { useCategoryStore } from "../../../../stores/category.store";
-import { useSyncStore } from "../../../../stores/sync.store";
-import { PremiumFeature } from "../../../common/premium-feature";
 import { toast } from "sonner";
 
 import { useShallow } from "zustand/shallow";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/ui/tooltip";
 
 const emojis = [
   "📝",
@@ -66,17 +58,10 @@ export function CreateList({ children }: CreateListProps) {
   const [selectedEmoji, setSelectedEmoji] = useState("📝");
   const { t } = useTranslation();
 
-  const { lists, setActiveList, loadCategoriesAsLists } = useTaskStore(
+  const { setActiveList, loadCategoriesAsLists } = useTaskStore(
     useShallow((state) => ({
-      lists: state.lists,
       setActiveList: state.setActiveList,
       loadCategoriesAsLists: state.loadCategoriesAsLists,
-    }))
-  );
-
-  const { user } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
     }))
   );
 
@@ -86,32 +71,16 @@ export function CreateList({ children }: CreateListProps) {
     }))
   );
 
-  const customListCount = lists.filter((list) => list.type === "custom").length;
-  const freeListLimit = 0;
-  const canCreateMoreLists = user?.isPro || customListCount < freeListLimit;
-
-  const syncStore = useSyncStore();
-  const isOnline = syncStore.isOnline;
-
   const handleCreate = async () => {
     if (!name.trim()) return;
 
-    if (!isOnline) {
-      toast.error("You can't create categories in offline mode");
-      return;
-    }
-
     try {
-      // Create category on backend
       const category = await createCategory({
         name: name.trim(),
         icon: selectedEmoji,
       });
 
-      // Reload categories as lists in task store
       await loadCategoriesAsLists();
-
-      // Set the new category as active
       setActiveList(category.id);
 
       setName("");
@@ -122,28 +91,6 @@ export function CreateList({ children }: CreateListProps) {
       toast.error("Failed to create category");
     }
   };
-
-  if (!canCreateMoreLists) {
-    return (
-      <PremiumFeature
-        requirePro={true}
-        fallback={
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button className="w-full">
-                <Plus className="h-4 w-4" /> {t("tasks.list.create.button")}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Create custom lists and organize your tasks your way!</p>
-            </TooltipContent>
-          </Tooltip>
-        }
-      >
-        {children}
-      </PremiumFeature>
-    );
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -190,7 +137,7 @@ export function CreateList({ children }: CreateListProps) {
                   ))}
                 </div>
               </PopoverContent>
-            </Popover> 
+            </Popover>
 
             <div className="flex w-full items-center gap-2">
               <Label htmlFor="name" className="sr-only">

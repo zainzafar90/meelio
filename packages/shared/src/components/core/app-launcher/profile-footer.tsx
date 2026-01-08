@@ -22,9 +22,9 @@ export const ProfileFooter = ({ onClose }: ProfileFooterProps) => {
     <div className="border-t bg-muted/30 backdrop-blur-2xl px-8 py-4">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 sm:gap-3">
-          {user?.image ? (
+          {user?.avatarUrl ? (
             <img
-              src={user.image}
+              src={user.avatarUrl}
               alt={userName}
               className="size-8 rounded-full object-cover ring-2 ring-border sm:size-10"
             />

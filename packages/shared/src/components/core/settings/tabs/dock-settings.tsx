@@ -76,6 +76,13 @@ export const DockSettings = () => {
         isVisible: dockIconsVisible.tabStash,
       },
       {
+        id: "calendar",
+        name: t("common.calendar", { defaultValue: "Calendar" }),
+        description: t("settings.dock.calendar.description", { defaultValue: "View upcoming events" }),
+        icon: Icons.calendar,
+        isVisible: (dockIconsVisible as any).calendar ?? true,
+      },
+      {
         id: "backgrounds",
         name: t("common.background"),
         description: t("settings.dock.background.description"),
@@ -88,13 +95,6 @@ export const DockSettings = () => {
         description: t("settings.dock.clock.description", "System clock"),
         icon: Icons.worldClock,
         isVisible: dockIconsVisible.clock,
-      },
-      {
-        id: "calendar",
-        name: t("common.calendar"),
-        description: t("settings.dock.calendar.description", "Calendar view"),
-        icon: Icons.moodTracker,
-        isVisible: dockIconsVisible.calendar,
       },
     ]);
   }, [t, dockIconsVisible]);

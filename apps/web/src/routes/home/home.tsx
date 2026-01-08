@@ -1,18 +1,15 @@
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   Clock,
   TabStashSheet,
   BookmarksSheet,
-  WeatherSheet,
   CalendarSheet,
   CalendarDynamicIsland,
   SearchPopover,
   useDockStore,
   useAuthStore,
-  AppLauncher,
 } from "@repo/shared";
 import { Background } from "@repo/shared";
 import { BackgroundSelectorSheet } from "@repo/shared";
@@ -26,64 +23,29 @@ import { Dock } from "@repo/shared";
 import { NotesSheet } from "@repo/shared";
 import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
-import { api } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
 import { WebTimer } from "@/components/web.timer";
 import { SiteBlockerSheet } from "@repo/shared";
-import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
-  const { user, guestUser, loading, authenticate } = useAuthStore(
+  const { user, guestUser, loading } = useAuthStore(
     useShallow((state) => ({
       user: state.user,
       guestUser: state.guestUser,
       loading: state.loading,
-      authenticate: state.authenticate,
-      authenticateGuest: state.authenticateGuest,
-      logout: state.logout,
     })),
   );
-  const [searchParams] = useSearchParams();
-  const [isVerifying, setIsVerifying] = useState(false);
   const { t } = useTranslation();
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      const token = searchParams.get("token");
-      if (!token) return;
-
-      setIsVerifying(true);
-      try {
-        const { data: user } = await api.auth.verifyMagicLink({
-          token,
-        });
-        authenticate(user);
-        toast.success(t("auth.verify.success.title"), {
-          description: t("auth.verify.success.description"),
-        });
-        searchParams.delete("token");
-        window.history.replaceState({}, "", window.location.pathname);
-      } catch (e) {
-        toast.error(t("auth.verify.failed.title"), {
-          description: t("auth.verify.failed.description"),
-        });
-      } finally {
-        setIsVerifying(false);
-      }
-    };
-
-    verifyToken();
-  }, [searchParams, authenticate]);
-
-  if (loading || isVerifying) {
+  if (loading) {
     return (
       <>
         <Background />
 
         <PageSkeleton>
           <h3 className="text-foreground font-medium">
-            {isVerifying ? t("auth.verify.verifying") : t("common.loading")}
+            {t("common.loading")}
           </h3>
         </PageSkeleton>
       </>
@@ -129,7 +91,6 @@ const Content = () => {
     >
       {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
       {isBreathingVisible && <BreathingContent />}
-      <AppLauncher />
       <SoundscapesSheet />
       <TaskListSheet />
       <NotesSheet />
@@ -137,7 +98,6 @@ const Content = () => {
       <SiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
-      <WeatherSheet />
       <CalendarSheet />
     </main>
   );

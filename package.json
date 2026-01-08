@@ -8,29 +8,20 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "build:api": "turbo run build --filter=api",
-    "build:web": "turbo run build --filter=web --filter=!api --filter=!extension",
+    "build:web": "turbo run build --filter=web --filter=!extension",
     "build:extension": "turbo run build --filter=extension",
     "package": "turbo run package --filter=extension",
-    "start:api": "turbo run start --filter=api",
     "preview": "turbo run preview --filter=web",
     "clean": "turbo run clean",
     "release": "turbo run release",
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "test": "turbo run test",
-    "db:generate:name": "cd apps/api && npx drizzle-kit generate --name=$name",
-    "db:generate": "cd apps/api && npx drizzle-kit generate",
-    "db:migrate": "cd apps/api && npx drizzle-kit migrate",
-    "db:studio": "cd apps/api && npx drizzle-kit studio",
-    "db:seed": "cd apps/api && npx tsx ./src/db/seed.ts",
-    "db:up": "npm run db:generate && npm run db:migrate",
-    "db:push": "cd apps/api && npx drizzle-kit push",
-    "db:export": "cd apps/api && npx drizzle-kit export"
+    "test": "turbo run test"
   },
   "dependencies": {
-    "canvas-confetti": "^1.9.1"
+    "canvas-confetti": "^1.9.1",
+    "ical.js": "^2.2.1"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

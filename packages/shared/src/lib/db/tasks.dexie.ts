@@ -12,7 +12,7 @@ export const getTasksByCategory = async (category: string): Promise<Task[]> => {
 export const getCategories = async (): Promise<string[]> => {
   const tasks = await db.tasks.toArray();
   const categories = tasks
-    .map(t => t.category)
+    .map(t => t.categoryId)
     .filter((c): c is string => c !== null && c !== undefined);
   return [...new Set(categories)];
 };

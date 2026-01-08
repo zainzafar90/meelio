@@ -6,11 +6,11 @@ export type SettingsTab =
   | "general"
   | "appearance"
   | "account"
-  | "billing"
   | "language"
   | "dock"
   | "feedback"
-  | "timer";
+  | "timer"
+  | "data";
 
 interface SettingsState {
   isOpen: boolean;

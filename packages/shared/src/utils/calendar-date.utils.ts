@@ -1,80 +1,51 @@
-import { CalendarEvent } from "../api/google-calendar.api";
+import type { CalendarEvent } from "../types/calendar.types";
 
-export const getEventStartDate = (event: CalendarEvent): Date => {
-  const dateString = event.start.dateTime || event.start.date;
-  if (!dateString) {
-    throw new Error("Event has no valid start date");
+export function getEventStartDate(event: CalendarEvent): Date {
+  if (event.start.dateTime) {
+    return new Date(event.start.dateTime);
   }
-
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    throw new Error(`Invalid start date format: ${dateString}`);
+  if (event.start.date) {
+    return new Date(event.start.date + "T00:00:00");
   }
+  throw new Error("Event has no start date");
+}
 
-  return date;
-};
-
-export const getEventEndDate = (event: CalendarEvent): Date => {
-  const dateString = event.end.dateTime || event.end.date;
-  if (!dateString) {
-    throw new Error("Event has no valid end date");
+export function getEventEndDate(event: CalendarEvent): Date {
+  if (event.end.dateTime) {
+    return new Date(event.end.dateTime);
   }
-
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    throw new Error(`Invalid end date format: ${dateString}`);
+  if (event.end.date) {
+    const endDate = new Date(event.end.date + "T00:00:00");
+    endDate.setDate(endDate.getDate() - 1);
+    endDate.setHours(23, 59, 59, 999);
+    return endDate;
   }
+  throw new Error("Event has no end date");
+}
 
-  if (event.end.date && !event.end.dateTime) {
-    date.setMilliseconds(date.getMilliseconds() - 1);
-  }
+export function isAllDayEvent(event: CalendarEvent): boolean {
+  return !event.start.dateTime && !!event.start.date;
+}
 
-  return date;
-};
+export function isEventHappening(event: CalendarEvent, now: Date): boolean {
+  const start = getEventStartDate(event);
+  const end = getEventEndDate(event);
+  return now >= start && now <= end;
+}
 
-export const isEventHappening = (event: CalendarEvent, now: Date = new Date()): boolean => {
-  try {
-    const start = getEventStartDate(event);
-    const end = getEventEndDate(event);
-    return now >= start && now < end;
-  } catch {
-    return false;
-  }
-};
+export function isEventToday(event: CalendarEvent, now: Date): boolean {
+  const eventStart = getEventStartDate(event);
+  return (
+    eventStart.getDate() === now.getDate() &&
+    eventStart.getMonth() === now.getMonth() &&
+    eventStart.getFullYear() === now.getFullYear()
+  );
+}
 
-export const isAllDayEvent = (event: CalendarEvent): boolean => {
-  return !event.start.dateTime && !event.end.dateTime &&
-    !!event.start.date && !!event.end.date;
-};
-
-export const getMinutesUntilEvent = (event: CalendarEvent, now: Date = new Date()): number => {
-  try {
-    const start = getEventStartDate(event);
-    const end = getEventEndDate(event);
-
-    if (now >= start && now < end) {
-      const diffMs = end.getTime() - now.getTime();
-      return Math.max(0, Math.floor(diffMs / (1000 * 60)));
-    }
-
-    const diffMs = start.getTime() - now.getTime();
-    return Math.max(0, Math.floor(diffMs / (1000 * 60)));
-  } catch {
-    return 0;
-  }
-};
-
-export const isEventToday = (event: CalendarEvent, now: Date = new Date()): boolean => {
-  try {
-    const start = getEventStartDate(event);
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    return start >= today && start < tomorrow;
-  } catch {
-    return false;
-  }
-};
+export function getMinutesUntilEvent(event: CalendarEvent): number | null {
+  const start = getEventStartDate(event);
+  const now = new Date();
+  const diffMs = start.getTime() - now.getTime();
+  if (diffMs < 0) return null;
+  return Math.floor(diffMs / (1000 * 60));
+}

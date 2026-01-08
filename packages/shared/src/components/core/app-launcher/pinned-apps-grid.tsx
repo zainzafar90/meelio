@@ -1,17 +1,14 @@
-import { Crown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 
 import { useDockStore } from "../../../stores/dock.store";
 import { Icons } from "../../icons/icons";
-import { PremiumFeature } from "../../common/premium-feature";
 
 interface App {
   id: string;
   name: string;
   icon: React.ComponentType<{ className?: string }>;
   onClick: () => void;
-  isPro?: boolean;
 }
 
 interface PinnedAppsGridProps {
@@ -29,7 +26,6 @@ const buildAppsList = (
     siteBlocker?: boolean;
     tabStash?: boolean;
     bookmarks?: boolean;
-    weather?: boolean;
     backgrounds?: boolean;
   },
   toggleFunctions: {
@@ -41,7 +37,6 @@ const buildAppsList = (
     siteBlocker?: () => void;
     tabStash?: () => void;
     bookmarks?: () => void;
-    weather?: () => void;
     backgrounds?: () => void;
   },
   onAppClick: () => void,
@@ -106,7 +101,6 @@ const buildAppsList = (
         toggleFunctions.notes?.();
         onAppClick();
       },
-      isPro: true,
     });
   }
 
@@ -119,7 +113,6 @@ const buildAppsList = (
         toggleFunctions.siteBlocker?.();
         onAppClick();
       },
-      isPro: true,
     });
   }
 
@@ -132,7 +125,6 @@ const buildAppsList = (
         toggleFunctions.tabStash?.();
         onAppClick();
       },
-      isPro: true,
     });
   }
 
@@ -145,19 +137,6 @@ const buildAppsList = (
         toggleFunctions.bookmarks?.();
         onAppClick();
       },
-    });
-  }
-
-  if (dockIconsVisible.weather) {
-    apps.push({
-      id: "weather",
-      name: t("common.weather", { defaultValue: "Weather" }),
-      icon: Icons.weather,
-      onClick: () => {
-        toggleFunctions.weather?.();
-        onAppClick();
-      },
-      isPro: false,
     });
   }
 
@@ -192,7 +171,6 @@ export const PinnedAppsGrid = ({
     toggleBackgrounds,
     toggleTabStash,
     toggleBookmarks,
-    toggleWeather,
     dockIconsVisible,
   } = useDockStore(
     useShallow((state) => ({
@@ -205,7 +183,6 @@ export const PinnedAppsGrid = ({
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
       toggleBookmarks: state.toggleBookmarks,
-      toggleWeather: state.toggleWeather,
       dockIconsVisible: state.dockIconsVisible,
     }))
   );
@@ -221,7 +198,6 @@ export const PinnedAppsGrid = ({
       siteBlocker: toggleSiteBlocker,
       tabStash: toggleTabStash,
       bookmarks: toggleBookmarks,
-      weather: toggleWeather,
       backgrounds: toggleBackgrounds,
     },
     onAppClick,
@@ -242,54 +218,17 @@ export const PinnedAppsGrid = ({
       <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-6 md:gap-6">
         {filteredApps.slice(0, 18).map((app) => (
           <div key={app.id} className="flex flex-col items-center">
-            {app.isPro ? (
-              <PremiumFeature
-                requirePro={true}
-                fallback={
-                  <button
-                    disabled
-                    className="group flex flex-col items-center gap-2 opacity-60 cursor-not-allowed"
-                  >
-                    <div className="relative">
-                      <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/30 shadow-lg backdrop-blur-md sm:size-16">
-                        <app.icon className="size-7 text-muted-foreground" />
-                      </div>
-                      <Crown className="absolute -right-1 -top-1 size-3.5 text-amber-400 drop-shadow-lg sm:size-4" />
-                    </div>
-                    <span className="line-clamp-2 text-center text-[10px] leading-tight text-muted-foreground sm:text-[11px]">
-                      {app.name}
-                    </span>
-                  </button>
-                }
-              >
-                <button
-                  onClick={app.onClick}
-                  className="group flex flex-col items-center gap-2"
-                >
-                  <div className="relative">
-                    <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-accent group-hover:bg-muted sm:size-16">
-                      <app.icon className="size-7 text-card-foreground" />
-                    </div>
-                    <Crown className="absolute -right-1 -top-1 size-3.5 text-amber-400 drop-shadow-lg sm:size-4" />
-                  </div>
-                  <span className="line-clamp-2 text-center text-[10px] leading-tight text-card-foreground sm:text-[11px]">
-                    {app.name}
-                  </span>
-                </button>
-              </PremiumFeature>
-            ) : (
-              <button
-                onClick={app.onClick}
-                className="group flex flex-col items-center gap-2"
-              >
-                <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-accent group-hover:bg-muted sm:size-16">
-                  <app.icon className="size-7 text-card-foreground" />
-                </div>
-                <span className="line-clamp-2 text-center text-[10px] leading-tight text-card-foreground sm:text-[11px]">
-                  {app.name}
-                </span>
-              </button>
-            )}
+            <button
+              onClick={app.onClick}
+              className="group flex flex-col items-center gap-2"
+            >
+              <div className="flex size-10 items-center justify-center rounded-xl border bg-muted/50 shadow-lg backdrop-blur-md transition-all group-hover:scale-105 group-hover:border-accent group-hover:bg-muted sm:size-16">
+                <app.icon className="size-7 text-card-foreground" />
+              </div>
+              <span className="line-clamp-2 text-center text-[10px] leading-tight text-card-foreground sm:text-[11px]">
+                {app.name}
+              </span>
+            </button>
           </div>
         ))}
       </div>

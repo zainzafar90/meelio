@@ -6,12 +6,7 @@ import { useOnboardingStore } from "../stores/onboarding.store";
 import { useAppStore } from "../stores/app.store";
 import { useSettingsStore } from "../stores/settings.store";
 import { useMantraStore, useGreetingStore } from "../stores/greetings.store";
-import { useCalendarStore } from "../stores/calendar.store";
-import { useWeatherStore } from "../stores/weather.store";
 
-/**
- * Clear all persisted state and IndexedDB data.
- */
 export async function clearLocalData() {
   try {
     useAuthStore.persist?.clearStorage?.();
@@ -22,8 +17,6 @@ export async function clearLocalData() {
     useSettingsStore.persist?.clearStorage?.();
     useMantraStore.persist?.clearStorage?.();
     useGreetingStore.persist?.clearStorage?.();
-    useCalendarStore.persist?.clearStorage?.();
-    useWeatherStore.persist?.clearStorage?.();
 
     localStorage.removeItem("meelio:simple-timer");
     localStorage.removeItem("meelio:simple-timer:lastReset");

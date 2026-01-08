@@ -1,4 +1,3 @@
-export * from "./calendar-colors";
 export * from "./clear-data.utils";
 export * from "./common.utils";
 export * from "./env.utils";

@@ -288,25 +288,13 @@ export const createTimerStore = (platform: TimerPlatform) => {
         };
 
         const getLimitStatus = () => {
-          const auth = useAuthStore.getState();
-          const isPro = !!auth.user?.isPro;
-          const limit = isPro ? Infinity : get().dailyLimitSec;
-          const used = get().stats.focusSec;
           return {
-            isLimitReached: used >= limit,
-            remainingSec: Math.max(0, limit - used),
+            isLimitReached: false,
+            remainingSec: Infinity,
           };
         };
 
         const sync = async () => {
-          const auth = useAuthStore.getState();
-          if (!auth.user?.isPro) return;
-          const settings = get().settings;
-          try {
-            await deps.pushSettings(settings);
-          } catch (error) {
-            console.error("sync settings failed", error);
-          }
         };
 
         const checkDailyReset = () => {

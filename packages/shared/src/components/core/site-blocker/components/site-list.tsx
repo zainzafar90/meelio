@@ -45,7 +45,6 @@ export function SiteList({
       user: state.user,
     }))
   );
-  const isPro = user?.isPro || false;
 
   const toggleCategory = (categoryKey: string) => {
     setExpandedCategories((prev) =>
@@ -146,11 +145,9 @@ export function SiteList({
                     site={site}
                     isBlocked={blockedSites.includes(site.url)}
                     onToggle={(siteUrl) => {
-                      if (blockedSites.includes(siteUrl) || isPro) {
-                        onToggleSite(siteUrl);
-                      }
+                      onToggleSite(siteUrl);
                     }}
-                    disabled={!blockedSites.includes(site.url) && !isPro}
+                    disabled={false}
                   />
                 ))}
               </div>

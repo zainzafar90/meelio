@@ -1,14 +1,9 @@
 import { SITE_LIST } from "../data/site-list";
 import { SiteItem } from "./site-item";
-
-interface SiteState {
-  id: string;
-  url: string;
-  isBlocked: boolean;
-}
+import type { SiteBlocker } from "../../../../lib/db/models.dexie";
 
 interface CustomSitesProps {
-  sites: Record<string, SiteState>;
+  sites: SiteBlocker[];
   onToggleSite: (site: string) => void;
 }
 
@@ -16,8 +11,7 @@ export const CustomBlockedSites = ({
   sites,
   onToggleSite,
 }: CustomSitesProps) => {
-  // Get all custom sites (not in the predefined SITE_LIST)
-  const customSites = Object.values(sites).filter(
+  const customSites = sites.filter(
     (site) =>
       !Object.values(SITE_LIST)
         .flat()

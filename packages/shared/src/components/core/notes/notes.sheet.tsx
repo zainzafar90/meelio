@@ -12,7 +12,6 @@ import { Button } from "@repo/ui/components/ui/button";
 import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
-import { SyncStatus } from "../../sync-status";
 import NoteEditor, {
   type StoragePort,
 } from "./note-editor";
@@ -437,7 +436,6 @@ export function NotesSheet() {
                   </>
                 )}
               </Button>
-              <SyncStatus entityType="note" />
             </div>
           </div>
         </SheetHeader>

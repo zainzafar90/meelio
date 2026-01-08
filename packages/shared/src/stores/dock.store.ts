@@ -11,14 +11,12 @@ interface DockIconsVisibility {
   tabStash: boolean;
   backgrounds: boolean;
   clock: boolean;
-  calendar: boolean;
   notes?: boolean;
   bookmarks?: boolean;
-  weather?: boolean;
+  calendar?: boolean;
 }
 
 interface DockState {
-  // Feature modal visibility state
   isTimerVisible: boolean;
   isBreathingVisible: boolean;
   isGreetingsVisible: boolean;
@@ -27,19 +25,16 @@ interface DockState {
   isBackgroundsVisible: boolean;
   isSiteBlockerVisible: boolean;
   isTabStashVisible: boolean;
-  isCalendarVisible: boolean;
   isNotesVisible?: boolean;
   isBookmarksVisible?: boolean;
-  isWeatherVisible?: boolean;
+  isCalendarVisible?: boolean;
 
-  // Icon visibility in dock (as a single object)
   dockIconsVisible: DockIconsVisibility;
 
   currentOnboardingStep: number;
 
   showIconLabels: boolean;
 
-  // Modal toggle functions
   toggleTimer: () => void;
   toggleBreathing: () => void;
   toggleGreetings: () => void;
@@ -48,12 +43,10 @@ interface DockState {
   toggleBackgrounds: () => void;
   toggleSiteBlocker: () => void;
   toggleTabStash: () => void;
-  toggleCalendar: () => void;
   toggleNotes?: () => void;
   toggleBookmarks?: () => void;
-  toggleWeather?: () => void;
+  toggleCalendar?: () => void;
 
-  // Modal visibility setters
   setTimerVisible: (visible: boolean) => void;
   setBreathingVisible: (visible: boolean) => void;
   setGreetingsVisible: (visible: boolean) => void;
@@ -62,12 +55,10 @@ interface DockState {
   setBackgroundsVisible: (visible: boolean) => void;
   setSiteBlockerVisible: (visible: boolean) => void;
   setTabStashVisible: (visible: boolean) => void;
-  setCalendarVisible: (visible: boolean) => void;
   setNotesVisible?: (visible: boolean) => void;
   setBookmarksVisible?: (visible: boolean) => void;
-  setWeatherVisible?: (visible: boolean) => void;
+  setCalendarVisible?: (visible: boolean) => void;
 
-  // Icon visibility setters
   setDockIconVisible: (
     iconId: keyof DockIconsVisibility,
     visible: boolean
@@ -81,7 +72,6 @@ interface DockState {
 export const useDockStore = create<DockState>()(
   persist(
     (set) => ({
-      // Feature modal visibility state
       isTimerVisible: false,
       isBreathingVisible: false,
       isGreetingsVisible: true,
@@ -91,11 +81,9 @@ export const useDockStore = create<DockState>()(
       isBackgroundsVisible: false,
       isSiteBlockerVisible: false,
       isTabStashVisible: false,
-      isCalendarVisible: false,
       isBookmarksVisible: false,
-      isWeatherVisible: false,
+      isCalendarVisible: false,
 
-      // Icon visibility in dock - all visible by default
       dockIconsVisible: {
         timer: true,
         breathing: true,
@@ -105,17 +93,15 @@ export const useDockStore = create<DockState>()(
         tabStash: true,
         backgrounds: true,
         clock: false,
-        calendar: true,
         notes: true,
         bookmarks: true,
-        weather: true,
+        calendar: true,
       },
 
       showIconLabels: false,
 
       currentOnboardingStep: -1,
 
-      // Modal toggle functions
       toggleTimer: () => {
         set((state) => {
           return {
@@ -158,10 +144,6 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isTabStashVisible: !state.isTabStashVisible }));
       },
 
-      toggleCalendar: () => {
-        set((state) => ({ isCalendarVisible: !state.isCalendarVisible }));
-      },
-
       toggleNotes: () => {
         set((state) => ({ isNotesVisible: !(state as any).isNotesVisible }));
       },
@@ -170,11 +152,10 @@ export const useDockStore = create<DockState>()(
         set((state) => ({ isBookmarksVisible: !(state as any).isBookmarksVisible }));
       },
 
-      toggleWeather: () => {
-        set((state) => ({ isWeatherVisible: !(state as any).isWeatherVisible }));
+      toggleCalendar: () => {
+        set((state) => ({ isCalendarVisible: !(state as any).isCalendarVisible }));
       },
 
-      // Modal visibility setters
       setTimerVisible: (visible: boolean) => {
         set({ isTimerVisible: visible });
       },
@@ -207,10 +188,6 @@ export const useDockStore = create<DockState>()(
         set({ isTabStashVisible: visible });
       },
 
-      setCalendarVisible: (visible: boolean) => {
-        set({ isCalendarVisible: visible });
-      },
-
       setNotesVisible: (visible: boolean) => {
         set({ isNotesVisible: visible } as any);
       },
@@ -219,11 +196,10 @@ export const useDockStore = create<DockState>()(
         set({ isBookmarksVisible: visible } as any);
       },
 
-      setWeatherVisible: (visible: boolean) => {
-        set({ isWeatherVisible: visible } as any);
+      setCalendarVisible: (visible: boolean) => {
+        set({ isCalendarVisible: visible } as any);
       },
 
-      // Icon visibility setter
       setDockIconVisible: (
         iconId: keyof DockIconsVisibility,
         visible: boolean
@@ -254,12 +230,10 @@ export const useDockStore = create<DockState>()(
           isBackgroundsVisible: false,
           isSiteBlockerVisible: false,
           isTabStashVisible: false,
-          isCalendarVisible: false,
           isNotesVisible: false,
           isBookmarksVisible: false,
-          isWeatherVisible: false,
+          isCalendarVisible: false,
 
-          // Don't reset icon visibility on reset
           currentOnboardingStep: -1,
         });
       },
@@ -267,7 +241,7 @@ export const useDockStore = create<DockState>()(
     {
       name: "meelio:local:dock",
       storage: createJSONStorage(() => localStorage),
-      version: 5,
+      version: 7,
       migrate: (persistedState: any, _version: number) => {
         const state = { ...persistedState };
         state.dockIconsVisible = state.dockIconsVisible || {};
@@ -283,12 +257,14 @@ export const useDockStore = create<DockState>()(
         if (state.isBookmarksVisible === undefined) {
           state.isBookmarksVisible = false;
         }
-        if (state.dockIconsVisible.weather === undefined) {
-          state.dockIconsVisible.weather = true;
+        if (state.dockIconsVisible.calendar === undefined) {
+          state.dockIconsVisible.calendar = true;
         }
-        if (state.isWeatherVisible === undefined) {
-          state.isWeatherVisible = false;
+        if (state.isCalendarVisible === undefined) {
+          state.isCalendarVisible = false;
         }
+        delete state.dockIconsVisible.weather;
+        delete state.isWeatherVisible;
         return state;
       },
       partialize: (state) => ({
