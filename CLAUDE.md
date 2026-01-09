@@ -49,79 +49,79 @@ Meelio is a productivity and focus application built as a Turborepo monorepo wit
 
 ```bash
 # Build all apps and packages
-yarn build
+pnpm build
 
 # Build specific apps
-yarn build:api
-yarn build:web
-yarn build:extension
+pnpm build:api
+pnpm build:web
+pnpm build:extension
 
 # Build extension for all browsers
-cd apps/extension && npm run build:all
+cd apps/extension && pnpm run build:all
 ```
 
 ### Development
 
 ```bash
 # Run all apps in development mode
-yarn dev
+pnpm dev
 
 # Run specific apps
-yarn start:api      # API server (dev mode)
-yarn preview        # Web app preview (production build)
-cd apps/web && yarn dev          # Web app (dev mode, port 4000)
-cd apps/extension && yarn dev    # Extension (dev mode)
+pnpm start:api      # API server (dev mode)
+pnpm preview        # Web app preview (production build)
+cd apps/web && pnpm dev          # Web app (dev mode, port 4000)
+cd apps/extension && pnpm dev    # Extension (dev mode)
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-yarn test
+pnpm test
 
 # Web app E2E tests (Playwright)
-cd apps/web && yarn test           # Run tests
-cd apps/web && yarn test:ui        # Run with UI
-cd apps/web && yarn test:debug     # Run in debug mode
-cd apps/web && yarn test:headed    # Run in headed mode
+cd apps/web && pnpm test           # Run tests
+cd apps/web && pnpm test:ui        # Run with UI
+cd apps/web && pnpm test:debug     # Run in debug mode
+cd apps/web && pnpm test:headed    # Run in headed mode
 
 # API tests (Jest)
-cd apps/api && yarn test
+cd apps/api && pnpm test
 ```
 
 ### Linting & Formatting
 
 ```bash
-yarn lint           # Lint all packages
-yarn format         # Format all TypeScript/TSX/MD files with Prettier
+pnpm lint           # Lint all packages
+pnpm format         # Format all TypeScript/TSX/MD files with Prettier
 ```
 
 ### Database (Drizzle ORM)
 
 ```bash
 # Generate migration with name
-yarn db:generate:name name=migration_name
+pnpm db:generate:name name=migration_name
 
 # Generate migration (auto-named)
-yarn db:generate
+pnpm db:generate
 
 # Run migrations
-yarn db:migrate
+pnpm db:migrate
 
 # Open Drizzle Studio
-yarn db:studio
+pnpm db:studio
 
 # Seed database
-yarn db:seed
+pnpm db:seed
 
 # Push schema changes directly (dev only)
-yarn db:push
+pnpm db:push
 
 # Generate + migrate
-yarn db:up
+pnpm db:up
 
 # Export schema
-yarn db:export
+pnpm db:export
 ```
 
 Database configuration is in `apps/api/drizzle.config.ts`. All schema files are in `apps/api/src/db/schema/`.
@@ -129,17 +129,17 @@ Database configuration is in `apps/api/drizzle.config.ts`. All schema files are 
 ### Package Extension
 
 ```bash
-yarn package        # Package default target
-cd apps/extension && npm run package:all      # Package for all browsers
-cd apps/extension && npm run package:chrome   # Package for Chrome
-cd apps/extension && npm run package:firefox  # Package for Firefox
+pnpm package        # Package default target
+cd apps/extension && pnpm run package:all      # Package for all browsers
+cd apps/extension && pnpm run package:chrome   # Package for Chrome
+cd apps/extension && pnpm run package:firefox  # Package for Firefox
 # Similarly: package:edge, package:brave, package:opera, package:safari
 ```
 
 ### Cleanup
 
 ```bash
-yarn clean          # Clean all build artifacts
+pnpm clean          # Clean all build artifacts
 ```
 
 ## Architecture Notes
@@ -240,7 +240,7 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
 - **Icons**: Lucide React
 - **Testing**: Jest (API), Playwright (web E2E)
 - **Build System**: Turborepo
-- **Package Manager**: Yarn (v1.22.19)
+- **Package Manager**: pnpm (v9.15.4)
 - **Authentication**: Passport.js (JWT + Google OAuth)
 - **Billing**: Lemon Squeezy
 - **Browser Extension**: Plasmo framework
@@ -253,8 +253,8 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
    - Create module directory in `apps/api/src/modules/{feature}/`
    - Add schema to `apps/api/src/db/schema/{feature}.schema.ts`
    - Export schema in `apps/api/src/db/schema/index.ts`
-   - Generate migration: `yarn db:generate:name name=add_{feature}`
-   - Run migration: `yarn db:migrate`
+   - Generate migration: `pnpm db:generate:name name=add_{feature}`
+   - Run migration: `pnpm db:migrate`
    - Create controller, service, validation, and routes files
    - Register routes in `apps/api/src/routes/v1/index.ts`
 
@@ -264,11 +264,11 @@ docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -
    - Update routes in respective app's router
 
 3. **Before committing**:
-   - Run `yarn lint` to check for linting errors
-   - Run `yarn test` to ensure tests pass
-   - Run `yarn build` to verify build succeeds
+   - Run `pnpm lint` to check for linting errors
+   - Run `pnpm test` to ensure tests pass
+   - Run `pnpm build` to verify build succeeds
 
 ## Version Management
 
 - All packages share the same version number (currently 0.7.0)
-- Web app uses `standard-version` for changelog/releases: `yarn release`
+- Web app uses `standard-version` for changelog/releases: `pnpm release`
