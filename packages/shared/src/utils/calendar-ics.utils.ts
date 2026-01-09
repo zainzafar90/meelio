@@ -1,16 +1,18 @@
 import ICAL from "ical.js";
 import type { CalendarEvent } from "../types/calendar.types";
 
-export async function fetchICSCalendar(icsUrl: string): Promise<CalendarEvent[]> {
+export async function fetchICSCalendar(
+  icsUrl: string,
+): Promise<CalendarEvent[]> {
   const normalizedUrl = normalizeICSUrl(icsUrl);
 
   const urlWithCacheBust = new URL(normalizedUrl);
-  urlWithCacheBust.searchParams.set('_cb', Date.now().toString());
+  urlWithCacheBust.searchParams.set("_cb", Date.now().toString());
 
   const response = await fetch(urlWithCacheBust.toString(), {
-    cache: 'no-store',
+    cache: "no-store",
     headers: {
-      'Cache-Control': 'no-cache',
+      "Cache-Control": "no-cache",
     },
   });
   if (!response.ok) {
@@ -47,9 +49,13 @@ export function parseICSData(icsData: string): CalendarEvent[] {
 
         if (occurrenceStart >= now || isEventOngoing(event, occurrenceStart)) {
           const duration = event.duration;
-          const occurrenceEnd = new Date(occurrenceStart.getTime() + duration.toSeconds() * 1000);
+          const occurrenceEnd = new Date(
+            occurrenceStart.getTime() + duration.toSeconds() * 1000,
+          );
 
-          events.push(createCalendarEvent(event, occurrenceStart, occurrenceEnd, count));
+          events.push(
+            createCalendarEvent(event, occurrenceStart, occurrenceEnd, count),
+          );
           count++;
         }
 
@@ -74,11 +80,16 @@ export function parseICSData(icsData: string): CalendarEvent[] {
 
 function isEventOngoing(event: ICAL.Event, occurrenceStart: Date): boolean {
   const duration = event.duration;
-  const occurrenceEnd = new Date(occurrenceStart.getTime() + duration.toSeconds() * 1000);
+  const occurrenceEnd = new Date(
+    occurrenceStart.getTime() + duration.toSeconds() * 1000,
+  );
   return occurrenceEnd >= new Date();
 }
 
-function extractMeetingLink(description?: string, location?: string): string | undefined {
+function extractMeetingLink(
+  description?: string,
+  location?: string,
+): string | undefined {
   const textToSearch = `${description || ""} ${location || ""}`;
 
   const meetingPatterns = [
@@ -103,12 +114,13 @@ function createCalendarEvent(
   event: ICAL.Event,
   startDate: Date,
   endDate: Date,
-  occurrenceIndex?: number
+  occurrenceIndex?: number,
 ): CalendarEvent {
   const isAllDay = event.startDate?.isDate ?? false;
-  const id = occurrenceIndex !== undefined
-    ? `${event.uid}-${occurrenceIndex}`
-    : event.uid;
+  const id =
+    occurrenceIndex !== undefined
+      ? `${event.uid}-${occurrenceIndex}`
+      : event.uid;
 
   const description = event.description || undefined;
   const location = event.location || undefined;
@@ -125,7 +137,8 @@ function createCalendarEvent(
     end: isAllDay
       ? { date: endDate.toISOString().split("T")[0] }
       : { dateTime: endDate.toISOString() },
-    status: event.component.getFirstPropertyValue("status") as string || undefined,
+    status:
+      (event.component.getFirstPropertyValue("status") as string) || undefined,
     hangoutLink: meetingLink,
   };
 }
@@ -133,7 +146,11 @@ function createCalendarEvent(
 export function validateICSUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === "https:" || parsed.protocol === "http:" || parsed.protocol === "webcal:";
+    return (
+      parsed.protocol === "https:" ||
+      parsed.protocol === "http:" ||
+      parsed.protocol === "webcal:"
+    );
   } catch {
     return false;
   }
