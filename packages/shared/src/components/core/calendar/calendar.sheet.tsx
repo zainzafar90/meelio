@@ -25,7 +25,15 @@ import {
   isAllDayEvent,
   isEventToday,
 } from "../../../utils/calendar-date.utils";
-import { Copy, Bell, Share, ChevronDown, Calendar, RefreshCw, ExternalLink } from "lucide-react";
+import {
+  Copy,
+  Bell,
+  Share,
+  ChevronDown,
+  Calendar,
+  RefreshCw,
+  ExternalLink,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const CalendarSheet = () => {
@@ -35,9 +43,17 @@ export const CalendarSheet = () => {
     useShallow((state) => ({
       isCalendarVisible: state.isCalendarVisible,
       setCalendarVisible: state.setCalendarVisible,
-    }))
+    })),
   );
-  const { icsUrl, events, loading, error, setIcsUrl, clearCalendar, loadEvents } = useCalendarStore(
+  const {
+    icsUrl,
+    events,
+    loading,
+    error,
+    setIcsUrl,
+    clearCalendar,
+    loadEvents,
+  } = useCalendarStore(
     useShallow((state) => ({
       icsUrl: state.icsUrl,
       events: state.events,
@@ -46,7 +62,7 @@ export const CalendarSheet = () => {
       setIcsUrl: state.setIcsUrl,
       clearCalendar: state.clearCalendar,
       loadEvents: state.loadEvents,
-    }))
+    })),
   );
 
   const isConnected = !!icsUrl;
@@ -148,7 +164,11 @@ export const CalendarSheet = () => {
 
   const copyMeetingLink = async (link: string) => {
     await navigator.clipboard.writeText(link);
-    toast.success(t("calendar.sheet.meetingLinkCopied", { defaultValue: "Meeting link copied" }));
+    toast.success(
+      t("calendar.sheet.meetingLinkCopied", {
+        defaultValue: "Meeting link copied",
+      }),
+    );
   };
 
   const getMeetingLink = (event: CalendarEvent): string | null => {
@@ -158,7 +178,7 @@ export const CalendarSheet = () => {
 
     if (event.conferenceData?.entryPoints?.length) {
       const videoEntry = event.conferenceData.entryPoints.find(
-        (entry) => entry.entryPointType === "video"
+        (entry) => entry.entryPointType === "video",
       );
       if (videoEntry?.uri) {
         return videoEntry.uri;
@@ -235,23 +255,32 @@ export const CalendarSheet = () => {
         </SheetHeader>
 
         {isConnected ? (
-          <div className="flex flex-col gap-4 flex-1 overflow-hidden">
-            <div className="flex items-center justify-between p-2">
-              <div className="text-sm text-green-600">
-                ✓ {t("calendar.sheet.connected", { defaultValue: "Connected" })}
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleRefresh} variant="outline" size="sm" disabled={loading}>
-                  <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-                </Button>
-                <Button onClick={handleDisconnect} variant="outline" size="sm">
-                  {t("calendar.sheet.disconnect", { defaultValue: "Disconnect" })}
-                </Button>
-              </div>
+          <div className="flex flex-col gap-3 flex-1 overflow-hidden">
+            <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/30 border border-border/50">
+              <div className="size-2 rounded-full bg-green-500" />
+              <span className="text-sm text-muted-foreground flex-1">
+                {t("calendar.sheet.connected", { defaultValue: "Connected" })}
+              </span>
+              <button
+                onClick={handleRefresh}
+                disabled={loading}
+                className="p-1.5 rounded-md hover:bg-muted transition-colors disabled:opacity-50"
+              >
+                <RefreshCw
+                  className={`size-3.5 text-muted-foreground ${loading ? "animate-spin" : ""}`}
+                />
+              </button>
+              <button
+                tabIndex={-1}
+                onClick={handleDisconnect}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t("calendar.sheet.disconnect", { defaultValue: "Disconnect" })}
+              </button>
             </div>
 
             {error && (
-              <div className="text-sm text-red-500 p-2 bg-red-50 dark:bg-red-900/20 rounded">
+              <div className="text-sm text-red-500 px-3 py-2 bg-red-500/10 border border-red-500/20 rounded-lg">
                 {error}
               </div>
             )}
@@ -272,34 +301,52 @@ export const CalendarSheet = () => {
                 <Calendar className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-base font-semibold text-foreground mb-1">
-                {t("calendar.sheet.connectTitle", { defaultValue: "Connect Your Calendar" })}
+                {t("calendar.sheet.connectTitle", {
+                  defaultValue: "Connect Your Calendar",
+                })}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {t("calendar.sheet.connectSubtitle", { defaultValue: "View your events right from your new tab" })}
+                {t("calendar.sheet.connectSubtitle", {
+                  defaultValue: "View your events right from your new tab",
+                })}
               </p>
             </div>
 
             <div className="space-y-3">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("calendar.sheet.howToConnect", { defaultValue: "How to get your ICS URL" })}
+                {t("calendar.sheet.howToConnect", {
+                  defaultValue: "How to get your ICS URL",
+                })}
               </p>
               <div className="space-y-2">
                 <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
-                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">1</span>
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">
+                    1
+                  </span>
                   <p className="text-sm text-muted-foreground">
-                    {t("calendar.sheet.step1", { defaultValue: "Open Google Calendar settings" })}
+                    {t("calendar.sheet.step1", {
+                      defaultValue: "Open Google Calendar settings",
+                    })}
                   </p>
                 </div>
                 <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
-                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">2</span>
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">
+                    2
+                  </span>
                   <p className="text-sm text-muted-foreground">
-                    {t("calendar.sheet.step2", { defaultValue: "Select your calendar → Integrate calendar" })}
+                    {t("calendar.sheet.step2", {
+                      defaultValue: "Select your calendar → Integrate calendar",
+                    })}
                   </p>
                 </div>
                 <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
-                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">3</span>
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">
+                    3
+                  </span>
                   <p className="text-sm text-muted-foreground">
-                    {t("calendar.sheet.step3", { defaultValue: "Copy \"Secret address in iCal format\"" })}
+                    {t("calendar.sheet.step3", {
+                      defaultValue: 'Copy "Secret address in iCal format"',
+                    })}
                   </p>
                 </div>
               </div>
@@ -310,7 +357,9 @@ export const CalendarSheet = () => {
                 className="inline-flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-400 transition-colors"
               >
                 <ExternalLink className="size-3" />
-                {t("calendar.sheet.openSettings", { defaultValue: "Open Google Calendar Settings" })}
+                {t("calendar.sheet.openSettings", {
+                  defaultValue: "Open Google Calendar Settings",
+                })}
               </a>
             </div>
 
@@ -321,8 +370,15 @@ export const CalendarSheet = () => {
                 onChange={(e) => setUrlInput(e.target.value)}
                 className="text-sm"
               />
-              <Button onClick={handleConnect} disabled={loading || !urlInput.trim()}>
-                {loading ? t("common.loading", { defaultValue: "Loading..." }) : t("calendar.sheet.connect", { defaultValue: "Connect Calendar" })}
+              <Button
+                onClick={handleConnect}
+                disabled={loading || !urlInput.trim()}
+              >
+                {loading
+                  ? t("common.loading", { defaultValue: "Loading..." })
+                  : t("calendar.sheet.connect", {
+                      defaultValue: "Connect Calendar",
+                    })}
               </Button>
             </div>
 
@@ -368,8 +424,18 @@ const EventsList: React.FC<EventsListProps> = ({
 
   if (totalEvents === 0) {
     return (
-      <div className="text-sm text-muted-foreground text-center py-8">
-        {t("calendar.sheet.noEvents", { defaultValue: "No upcoming events" })}
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="size-10 rounded-xl bg-muted/50 flex items-center justify-center mb-3">
+          <Calendar className="size-5 text-muted-foreground" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {t("calendar.sheet.noEvents", { defaultValue: "No upcoming events" })}
+        </p>
+        <p className="text-xs text-muted-foreground/60 mt-1">
+          {t("calendar.sheet.noEventsHint", {
+            defaultValue: "Your schedule is clear",
+          })}
+        </p>
       </div>
     );
   }
@@ -380,7 +446,10 @@ const EventsList: React.FC<EventsListProps> = ({
         <Collapsible open={happeningNowOpen} onOpenChange={setHappeningNowOpen}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.happeningNow", { defaultValue: "Happening Now" })} ({happeningNow.length})
+              {t("calendar.sheet.happeningNow", {
+                defaultValue: "Happening Now",
+              })}{" "}
+              ({happeningNow.length})
             </span>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
@@ -406,7 +475,8 @@ const EventsList: React.FC<EventsListProps> = ({
         <div>
           <div className="flex items-center justify-between w-full p-2">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.today", { defaultValue: "Today" })} ({today.length})
+              {t("calendar.sheet.today", { defaultValue: "Today" })} (
+              {today.length})
             </span>
           </div>
           <div className="flex flex-col gap-4 mt-2">
@@ -429,7 +499,8 @@ const EventsList: React.FC<EventsListProps> = ({
         <Collapsible open={upcomingOpen} onOpenChange={setUpcomingOpen}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
             <span className="text-sm font-semibold text-card-foreground">
-              {t("calendar.sheet.upcoming", { defaultValue: "Upcoming" })} ({upcoming.length})
+              {t("calendar.sheet.upcoming", { defaultValue: "Upcoming" })} (
+              {upcoming.length})
             </span>
             <ChevronDown
               className={`h-4 w-4 transition-transform ${
