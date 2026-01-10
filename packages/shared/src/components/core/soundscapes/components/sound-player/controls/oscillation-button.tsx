@@ -10,7 +10,6 @@ import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
 import { useInterval } from "../../../../../../hooks/use-interval";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
-import { PremiumFeature } from "../../../../../../components/common/premium-feature";
 import {
   generateNextVolumeForOscillation,
   OSCILLATION_INTERVAL_MS,
@@ -78,30 +77,5 @@ export const OscillationButton = () => {
     </Tooltip>
   );
 
-  return (
-    <div className="relative">
-      <PremiumFeature
-        requirePro={true}
-        fallback={
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 "
-                aria-label="Premium Feature: Oscillation"
-              >
-                <div className="absolute -inset-4 md:hidden" />
-                <Icons.oscillation className="size-6" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Oscillation mode (Premium feature)</p>
-            </TooltipContent>
-          </Tooltip>
-        }
-      >
-        {oscillationButtonContent}
-      </PremiumFeature>
-    </div>
-  );
+  return <div className="relative">{oscillationButtonContent}</div>;
 };

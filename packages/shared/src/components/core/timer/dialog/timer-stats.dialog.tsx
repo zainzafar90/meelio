@@ -11,7 +11,6 @@ import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { t } from "i18next";
 
 import { TimerExpandedContent } from "../components/timer-expanded-content";
-import { PremiumFeature } from "../../../common/premium-feature";
 
 interface TimerStatsDialogProps {
   isOpen: boolean;
@@ -39,21 +38,12 @@ export const TimerStatsDialog = ({
             </DialogDescription>
           </DialogHeader>
         </VisuallyHidden>
-        <PremiumFeature
-          requirePro={true}
-          features={[
-            "Weekly focus statistics",
-            "Track focus vs break time patterns",
-            "And unlock more Pro features...",
-          ]}
-        >
-          <TimerExpandedContent />
-          <DialogFooter className="sm:justify-between">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              {t("common.actions.close")}
-            </Button>
-          </DialogFooter>
-        </PremiumFeature>
+        <TimerExpandedContent />
+        <DialogFooter className="sm:justify-between">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t("common.actions.close")}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

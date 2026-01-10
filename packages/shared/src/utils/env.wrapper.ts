@@ -1,11 +1,5 @@
 export type Environment = {
-  serverUrl: string;
-  cdnUrl:string;
-  lemonSqueezyMonthlyVariantId: string;
-  lemonSqueezyYearlyVariantId: string;
-  lemonSqueezyLifetimeVariantId: string;
-  posthogKey: string;
-  posthogHost: string;
+  cdnUrl: string;
   dev: boolean | string;
 };
 
@@ -29,23 +23,7 @@ export class EnvWrapper {
   private getWebEnv(): Environment {
     return {
       // @ts-ignore - Vite specific
-      serverUrl: import.meta.env.VITE_SERVER_URL || "",
-      // @ts-ignore - Vite specific
       cdnUrl: import.meta.env.VITE_CDN_URL || "",
-      lemonSqueezyMonthlyVariantId:
-        // @ts-ignore - Vite specific
-        import.meta.env.VITE_LEMON_SQUEEZY_MONTHLY_VARIANT_ID || "",
-      lemonSqueezyYearlyVariantId:
-        // @ts-ignore - Vite specific
-        import.meta.env.VITE_LEMON_SQUEEZY_YEARLY_VARIANT_ID || "",
-      lemonSqueezyLifetimeVariantId:
-        // @ts-ignore - Vite specific
-        import.meta.env.VITE_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
-      posthogKey:
-        // @ts-ignore - Vite specific
-        import.meta.env.VITE_APP_PUBLIC_POSTHOG_KEY || "",
-      // @ts-ignore - Vite specific
-      posthogHost: import.meta.env.VITE_APP_PUBLIC_POSTHOG_HOST || "",
       // @ts-ignore - Vite specific
       dev: import.meta.env.DEV || false,
     };
@@ -53,16 +31,7 @@ export class EnvWrapper {
 
   private getExtensionEnv(): Environment {
     return {
-      serverUrl: process.env.PLASMO_PUBLIC_SERVER_URL || "",
       cdnUrl: process.env.PLASMO_PUBLIC_CDN_URL || "",
-      lemonSqueezyMonthlyVariantId:
-        process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_MONTHLY_VARIANT_ID || "",
-      lemonSqueezyYearlyVariantId:
-        process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_YEARLY_VARIANT_ID || "",
-      lemonSqueezyLifetimeVariantId:
-        process.env.PLASMO_PUBLIC_LEMON_SQUEEZY_LIFETIME_VARIANT_ID || "",
-      posthogKey: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_KEY || "",
-      posthogHost: process.env.PLASMO_PUBLIC_APP_PUBLIC_POSTHOG_HOST || "",
       dev: process.env.PLASMO_PUBLIC_DEV || false,
     };
   }

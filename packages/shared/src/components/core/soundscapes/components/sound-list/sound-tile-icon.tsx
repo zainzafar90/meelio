@@ -6,7 +6,6 @@ import { Sound } from "../../../../../types";
 import { cn } from "../../../../../lib";
 import { RipplesEffect } from "../../../../../components";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
-import { useTelemetry } from "../../../../../lib/telemetry/use-telemetry";
 import { useShallow } from "zustand/shallow";
 
 type Props = {
@@ -14,7 +13,6 @@ type Props = {
 };
 
 export const SoundTileIcon: React.FC<Props> = ({ sound }) => {
-  const { soundPlayed, soundStopped } = useTelemetry();
   const { setVolumeForSound, toggleSoundState } = useSoundscapesStore(
     useShallow((state) => ({
       setVolumeForSound: state.setVolumeForSound,
@@ -23,12 +21,6 @@ export const SoundTileIcon: React.FC<Props> = ({ sound }) => {
   );
 
   const handleToggle = () => {
-    if (typeof window === "undefined") return;
-    if (sound.playing) {
-      soundStopped(sound);
-    } else {
-      soundPlayed(sound);
-    }
     toggleSoundState(sound.id);
   };
 

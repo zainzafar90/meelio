@@ -12,7 +12,6 @@ import { SoundPlayer } from "../components/core/soundscapes/components/sound-pla
 import { SoundSyncInitializer } from "../components/core/soundscapes/sound-sync-initializer";
 import { AuthProvider } from "./auth-provider";
 import { i18n } from "../i18n";
-import { TelemetryProvider } from "./telemetry-provider";
 import { initializeSoundscapesTimerIntegration, cleanupSoundscapesTimerIntegration } from "../stores/soundscapes-timer-integration";
 
 type AppProviderProps = {
@@ -36,16 +35,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
         <AuthProvider>
-          <TelemetryProvider>
-            <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
-              <TooltipProvider>
-                {children}
-                <SoundSyncInitializer />
-                {hasPlayingSounds && <SoundPlayer />}
-                <Toaster richColors />
-              </TooltipProvider>
-            </ThemeProvider>
-          </TelemetryProvider>
+          <ThemeProvider storageKey="ui-theme" defaultTheme="dark">
+            <TooltipProvider>
+              {children}
+              <SoundSyncInitializer />
+              {hasPlayingSounds && <SoundPlayer />}
+              <Toaster richColors />
+            </TooltipProvider>
+          </ThemeProvider>
         </AuthProvider>
       </BrowserRouter>
     </I18nextProvider>

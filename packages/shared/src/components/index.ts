@@ -7,7 +7,6 @@ export * from "./common/blurhash";
 export * from "./common/connection-warning";
 export * from "./common/container";
 export * from "./common/logo";
-export * from "./common/premium-feature";
 export * from "./common/ripple-effects";
 export * from "./common/theme-provider";
 

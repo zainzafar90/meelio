@@ -1,6 +1,5 @@
 import { cn } from "@repo/ui/lib/utils";
 import { Category, CategoryType } from "../../../../../types";
-import { useTelemetry } from "../../../../../lib/telemetry/use-telemetry";
 import { CategoryIcons } from "../../../../../components/icons/category-icons";
 import { Icons } from "../../../../../components/icons";
 import { useSoundscapesStore } from "../../../../../stores/soundscapes.store";
@@ -10,7 +9,6 @@ interface CategoryItemProps {
   category: CategoryType;
 }
 export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
-  const { categoryPlayed, categoryStopped } = useTelemetry();
   const { playCategory, playRandom, activeCategoryId } = useSoundscapesStore(
     useShallow((state) => ({
       playCategory: state.playCategory,
@@ -33,13 +31,6 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category }) => {
 
   const handleToggle = () => {
     playCategorySound(category.name as Category);
-
-    if (typeof window === "undefined") return;
-    if (isActiveCategory(category.name as Category)) {
-      categoryStopped(category.name as Category);
-    } else {
-      categoryPlayed(category.name as Category);
-    }
   };
 
   return (

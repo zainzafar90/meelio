@@ -3,7 +3,6 @@ import { useShallow } from "zustand/shallow";
 import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
-import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
 import NoteEditor, { type StoragePort } from "./note-editor";
@@ -482,11 +481,9 @@ export function NotesSheet() {
                 </button>
               )}
             </div>
-            <PremiumFeature requirePro>
-              <Button onClick={handleCreateNote} size="sm" className="h-9 w-9 p-0">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </PremiumFeature>
+            <Button onClick={handleCreateNote} size="sm" className="h-9 w-9 p-0">
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
@@ -498,12 +495,10 @@ export function NotesSheet() {
                 {searchQuery ? "No notes found" : "No notes yet"}
               </p>
               {!searchQuery && (
-                <PremiumFeature requirePro>
-                  <Button onClick={handleCreateNote} size="sm" className="mt-3 gap-1.5">
-                    <Plus className="h-4 w-4" />
-                    New Note
-                  </Button>
-                </PremiumFeature>
+                <Button onClick={handleCreateNote} size="sm" className="mt-3 gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  New Note
+                </Button>
               )}
             </div>
           ) : (

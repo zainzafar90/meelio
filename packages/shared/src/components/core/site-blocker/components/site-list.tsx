@@ -2,14 +2,6 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight, Ban, Plus } from "lucide-react";
 import { SiteItem } from "./site-item";
 import { SITE_LIST, SITE_CATEGORIES } from "../data/site-list";
-import { PremiumFeature } from "../../../../components/common/premium-feature";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/ui/tooltip";
-import { useAuthStore } from "../../../../stores/auth.store";
-import { useShallow } from "zustand/shallow";
 
 export interface Site {
   id: string;
@@ -40,11 +32,6 @@ export function SiteList({
   onUnblockSites,
 }: SiteListProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
-  const { user } = useAuthStore(
-    useShallow((state) => ({
-      user: state.user,
-    }))
-  );
 
   const toggleCategory = (categoryKey: string) => {
     setExpandedCategories((prev) =>
@@ -92,49 +79,25 @@ export function SiteList({
                 )}
               </button>
 
-              {isGroupBlocked(category.key, blockedSites) ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleGroupBlock(category.key);
-                  }}
-                  className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60 hover:bg-white/[0.075]"
-                >
-                  <Ban className="h-4 w-4 text-red-500" />
-                  <span>Unblock All</span>
-                </button>
-              ) : (
-                <PremiumFeature
-                  requirePro={true}
-                  fallback={
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/30 opacity-60 cursor-not-allowed"
-                          disabled
-                        >
-                          <Plus className="h-4 w-4" />
-                          <span>Block All</span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Site blocking requires a Pro subscription.</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  }
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleGroupBlock(category.key);
-                    }}
-                    className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60 hover:bg-white/[0.075]"
-                  >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleGroupBlock(category.key);
+                }}
+                className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60 hover:bg-white/[0.075]"
+              >
+                {isGroupBlocked(category.key, blockedSites) ? (
+                  <>
+                    <Ban className="h-4 w-4 text-red-500" />
+                    <span>Unblock All</span>
+                  </>
+                ) : (
+                  <>
                     <Plus className="h-4 w-4" />
                     <span>Block All</span>
-                  </button>
-                </PremiumFeature>
-              )}
+                  </>
+                )}
+              </button>
             </div>
 
             {expandedCategories.includes(category.key) && (

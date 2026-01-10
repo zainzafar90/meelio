@@ -11,7 +11,6 @@ import { cn } from "../../../../../../lib";
 import { Icons } from "../../../../../../components/icons";
 import { useInterval } from "../../../../../../hooks/use-interval";
 import { useSoundscapesStore } from "../../../../../../stores/soundscapes.store";
-import { PremiumFeature } from "../../../../../../components/common/premium-feature";
 import {
   generateNextVolumeForShuffle,
   SHUFFLE_SOUNDS_INTERVAL_MS,
@@ -101,30 +100,5 @@ export const ShuffleButton = () => {
     </Tooltip>
   );
 
-  return (
-    <div className="relative">
-      <PremiumFeature
-        requirePro={true}
-        fallback={
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className="focus:ring-muted-background group relative flex size-9 items-center justify-center rounded-md text-foreground/30 opacity-60 "
-                aria-label="Premium Feature: Shuffle"
-              >
-                <div className="absolute -inset-4 md:hidden" />
-                <Icons.shuffle className="size-6" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Shuffle mode (Premium feature)</p>
-            </TooltipContent>
-          </Tooltip>
-        }
-      >
-        {shuffleButtonContent}
-      </PremiumFeature>
-    </div>
-  );
+  return <div className="relative">{shuffleButtonContent}</div>;
 };
