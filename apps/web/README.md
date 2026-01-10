@@ -1,30 +1,61 @@
+# Meelio Web App
+
+A Vite + React web application for productivity and focus.
+
 ## Getting Started
 
-First, run the development server
-
 ```bash
-yarn dev
+# Install dependencies (from monorepo root)
+pnpm install
+
+# Run development server (port 4000)
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4000](http://localhost:4000) with your browser.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Development
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```bash
+# Development server
+pnpm dev
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+# Production build
+pnpm build
 
-## Learn More
+# Preview production build
+pnpm preview
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn/foundations/about-nextjs) - an interactive Next.js tutorial.
+```bash
+# Run E2E tests (Playwright)
+pnpm test
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+# Run tests with UI
+pnpm test:ui
 
-## Deploy on Vercel
+# Run tests in debug mode
+pnpm test:debug
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_source=github.com&utm_medium=referral&utm_campaign=turborepo-readme) from the creators of Next.js.
+# Run tests in headed mode
+pnpm test:headed
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Technology Stack
+
+- [Vite](https://vitejs.dev/) - Build tool
+- [React](https://reactjs.org/) - UI framework
+- [React Router](https://reactrouter.com/) - Routing
+- [Zustand](https://zustand-demo.pmnd.rs/) - State management
+- [Dexie](https://dexie.org/) - IndexedDB wrapper
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Playwright](https://playwright.dev/) - E2E testing
+
+## Data Storage
+
+All data is stored locally in the browser:
+
+- **IndexedDB**: Tasks, notes, focus sessions, sounds cache
+- **localStorage**: User preferences, theme, settings

@@ -117,159 +117,30 @@ If you encounter code that violates these standards:
 3. Maintain existing functionality during refactoring
 4. Update related code to match the new patterns
 
-## Architecture Improvements Plan
+## Architecture Notes
 
-This section outlines the architectural improvements to simplify Meelio, fix breaking issues, and add missing features to match Momentum Dash functionality.
+### Data Storage (Offline-First)
 
-### Current Issues
+All data is stored locally - there is no backend server:
 
-#### 1. Timer Architecture Issues
-
-- **Problem**: Timer store is tightly coupled with soundscapes store
-- **Impact**: Changes to timer break soundscapes functionality
-- **Solution**: Decouple using event-driven architecture
-
-#### 2. Complex Sync Engine
-
-- **Problem**: EntitySyncManager is complex and hard to debug
-- **Impact**: Site blocker and other features have unpredictable sync behavior
-- **Solution**: Simplify with unified feature store pattern
-
-#### 3. Missing Features
-
-- Weather: Only current weather, no 7-day forecast
-- Bookmarks/Links: Not implemented
-- Tab Groups: Tab stash doesn't handle groups
-- Custom Photo Upload: Not implemented
-- Metrics/Countdowns: Not implemented
-- Focus Mode: Mixed with timer, needs separation
-
-### Improvement Plan
-
-#### Phase 1: Decouple Timer (Priority: HIGH) ✅
-
-**Goal**: Make timer changes independent of other features
-
-**Changes**:
-
-1. Create timer events system (start, pause, complete, etc.)
-2. Soundscapes listens to timer events instead of direct calls
-3. Separate timer logic from soundscapes control
-4. Fix platform implementation to support both web and extension
-
-**Files to modify**:
-
-- `packages/shared/src/stores/timer.store.ts`
-- `packages/shared/src/stores/soundscapes.store.ts`
-- `packages/shared/src/lib/timer.platform.ts`
-- `packages/shared/src/components/timer.tsx`
-
-#### Phase 2: Simplify Sync Engine (Priority: HIGH)
-
-**Goal**: Make sync more predictable and easier to debug
-
-**Changes**:
-
-1. Create unified feature store base class/pattern
-2. Simplify EntitySyncManager or create simpler alternative
-3. Add better error handling and logging
-4. Make sync operations more atomic
-
-**Files to modify**:
-
-- `packages/shared/src/utils/sync-core.ts`
-- `packages/shared/src/stores/site-blocker.store.ts`
-- `packages/shared/src/stores/note.store.ts`
-- `packages/shared/src/stores/task.store.ts`
-
-#### Phase 3: Add Missing Features (Priority: MEDIUM)
-
-##### 3.1 Weather Feature
-
-- Add 7-day forecast API endpoint
-- Create weather store
-- Add weather component with today + forecast
-- Cache weather data offline
-
-##### 3.2 Bookmarks/Links Feature
-
-- Integrate Chrome bookmarks API
-- Create bookmarks store
-- Add bookmarks UI component
-- Sync bookmarks (if needed)
-
-##### 3.3 Tab Groups Support
-
-- Extend tab stash to handle Chrome tab groups
-- Use `chrome.tabsGroups` API
-- Update UI to show grouped tabs
-
-##### 3.4 Metrics/Countdowns
-
-- Add metrics/countdowns API endpoints
-- Create metrics store with sync
-- Add countdown timer component
-- Add analytics/metrics display
-- Persist countdowns to backend
-
-##### 3.5 Focus Mode
-
-- Separate from timer
-- Create focus mode store
-- Add focus mode UI
-- Integrate with site blocker
-
-#### Phase 4: Chrome Native APIs (Priority: MEDIUM)
-
-**Goal**: Better use of Chrome APIs for better integration
-
-**APIs to integrate**:
-
-- `chrome.bookmarks` - For bookmarks feature
-- `chrome.tabsGroups` - For tab groups
-- `chrome.storage` - Already used, optimize further
-- `chrome.notifications` - Improve notifications
-- `chrome.alarms` - For better background tasks
-
-### Data Flow Improvements
-
-**Current Flow (Complex)**:
-
-```
-User Action → Store → Sync Manager → API → Server
-                      ↓
-                  Queue → Retry → Sync
-```
-
-**Improved Flow (Simple)**:
-
-```
-User Action → Store → Local DB → Optimistic Update
-                      ↓
-                  Background Sync → Server
-```
-
-### Storage Strategy
-
-**Current**:
-
-- Mixed use of localStorage, IndexedDB, Chrome storage
-- Inconsistent patterns
-
-**Improved**:
-
-- **IndexedDB**: All entity data (tasks, notes, site blockers, etc.)
-- **localStorage**: Simple preferences only
+- **IndexedDB (via Dexie)**: Primary storage for all user data
+- **localStorage**: Zustand store persistence for preferences
 - **Chrome Storage**: Extension-specific settings
-- **Cookies**: Session/auth only (if needed)
 
-### Implementation Status
+### Adding New Features
 
-1. ✅ Phase 1: Decouple Timer - Complete (event-driven architecture, timer events system)
-2. ✅ Phase 2: Simplify Sync - Complete (created functional sync-manager.ts, removed class-based approach)
-3. ✅ Phase 3.1: Weather Feature - Complete (7-day forecast API, weather store, component with forecast, offline caching)
-4. ✅ Phase 3.2: Bookmarks/Links - Complete (Chrome bookmarks API, offline-first with IndexedDB caching, dock integration)
-5. ✅ Phase 3.3: Tab Groups - Complete (tab stash with chrome.tabsGroups support)
-6. ⏳ Phase 3.4: Metrics/Countdowns - Pending (backend API + frontend store/components)
-7. ⏳ Phase 3.5: Focus Mode - Pending (separate from timer, integrate with site blocker)
-8. ⏳ Phase 4: Chrome APIs - Pending (bookmarks, tabsGroups, notifications, alarms)
+1. Add Dexie table in `packages/shared/src/lib/db/meelio.dexie.ts` if data persistence needed
+2. Create Zustand store in `packages/shared/src/stores/`
+3. Add components to `packages/shared/src/components/`
+4. Use IndexedDB for data, localStorage for preferences
+
+### Feature Implementation Status
+
+1. ✅ Timer: Event-driven architecture with soundscapes integration
+2. ✅ Weather: 7-day forecast with offline caching
+3. ✅ Bookmarks: Chrome bookmarks API with IndexedDB caching
+4. ✅ Tab Groups: Tab stash with chrome.tabsGroups support
+5. ✅ Soundscapes: Progressive download with IndexedDB caching
+6. ✅ Notes: Local storage with Dexie
+7. ✅ Tasks: Local storage with Dexie
+8. ✅ Site Blocker: Local storage with Dexie

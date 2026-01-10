@@ -1,72 +1,95 @@
-# Meelio Monorepo
+# Meelio
 
-This is an official Docker starter Turborepo.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-docker
-```
+A productivity and focus application built as a Turborepo monorepo. Meelio is **fully offline-first** - all data is stored locally using IndexedDB and localStorage.
 
 ## What's inside?
 
 This Turborepo includes the following:
 
-### Apps and Packages
+### Apps
 
-- `web`: a [Next.js](https://nextjs.org/) app
-- `api`: an [Express](https://expressjs.com/) server
-- `@repo/ui`: a React component library
-- `@repo/logger`: Isomorphic logger (a small wrapper around console.log)
+- `web`: A [Vite](https://vitejs.dev/) + [React](https://reactjs.org/) web application
+- `extension`: A [Plasmo](https://docs.plasmo.com/) browser extension
+
+### Packages
+
+- `@repo/shared`: Core business logic, stores, hooks, and components shared between web and extension
+- `@repo/ui`: A React component library (shadcn/ui based)
+- `@repo/logger`: Isomorphic logger utility
 - `@repo/eslint-config`: ESLint presets
-- `@repo/typescript-config`: tsconfig.json's used throughout the monorepo
+- `@repo/typescript-config`: TypeScript configurations
+- `@repo/tailwind-config`: Tailwind CSS configuration
+- `@repo/prettier-config`: Prettier configuration
 - `@repo/jest-presets`: Jest configurations
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-### Docker
+## Getting Started
 
-This repo is configured to be built with Docker, and Docker compose. To build all apps in this repo:
+### Prerequisites
 
-```
+- Node.js 18+
+- pnpm 9.15+
+
+### Installation
+
+```bash
 # Install dependencies
-yarn install
+pnpm install
 
-# Create a network, which allows containers to communicate
-# with each other, by using their container name as a hostname
-docker network create app_network
+# Run development servers
+pnpm dev
 
-# Build prod using new BuildKit engine
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml build
-
-# Start prod in detached mode
-docker-compose -f docker-compose.yml up -d
+# Build all apps
+pnpm build
 ```
 
-Open http://localhost:3000.
+### Development
 
-To shutdown all running containers:
+```bash
+# Web app (port 4000)
+cd apps/web && pnpm dev
 
+# Browser extension
+cd apps/extension && pnpm dev
 ```
-# Stop all running containers
-docker kill $(docker ps -q) && docker rm $(docker ps -a -q)
+
+### Building
+
+```bash
+# Build everything
+pnpm build
+
+# Build specific apps
+pnpm build:web
+pnpm build:extension
 ```
 
-### Remote Caching
+## Features
 
-This example includes optional remote caching. In the Dockerfiles of the apps, uncomment the build arguments for `TURBO_TEAM` and `TURBO_TOKEN`. Then, pass these build arguments to your Docker build.
+- **Timer/Pomodoro**: Focus sessions with customizable work/break intervals
+- **Soundscapes**: Ambient sounds for focus (offline-capable)
+- **Tasks**: Todo list with local persistence
+- **Notes**: Markdown notes with local storage
+- **Site Blocker**: Block distracting websites (extension only)
+- **Tab Stash**: Save and restore browser tabs (extension only)
+- **Bookmarks**: Quick access to bookmarks (extension only)
+- **Calendar**: ICS calendar integration
+- **Backgrounds**: Customizable backgrounds and themes
 
-You can test this behavior using a command like:
+## Technology Stack
 
-`docker build -f apps/web/Dockerfile . --build-arg TURBO_TEAM=“your-team-name” --build-arg TURBO_TOKEN=“your-token“ --no-cache`
+- **Frontend**: React 18, Vite, React Router
+- **State**: Zustand with localStorage persistence
+- **Database**: Dexie (IndexedDB)
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Build**: Turborepo, pnpm
+- **Extension**: Plasmo framework
+- **i18n**: i18next
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
+## Utilities
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
-- [Jest](https://jestjs.io) test runner for all things JavaScript
 - [Prettier](https://prettier.io) for code formatting
+- [Playwright](https://playwright.dev/) for E2E testing

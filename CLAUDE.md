@@ -4,17 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Meelio is a productivity and focus application built as a Turborepo monorepo with three main applications: a web app (Next.js/Vite + React), a browser extension (Plasmo), and an Express API backend. The codebase uses TypeScript throughout and shares common code via workspace packages.
+Meelio is a productivity and focus application built as a Turborepo monorepo with two main applications: a web app (Vite + React) and a browser extension (Plasmo). The application is **fully offline-first** - all data is stored locally using IndexedDB (Dexie) and localStorage. There is no backend server or user accounts.
 
 ## Project Structure
 
 ### Applications (`apps/`)
-
-- **api**: Express.js REST API server
-  - PostgreSQL database with Drizzle ORM
-  - JWT & Google OAuth authentication via Passport.js
-  - Lemon Squeezy integration for billing
-  - Module-based architecture (auth, billing, tasks, notes, focus-sessions, site-blocker, etc.)
 
 - **web**: React web application
   - Built with Vite + React Router
@@ -29,11 +23,10 @@ Meelio is a productivity and focus application built as a Turborepo monorepo wit
 
 ### Shared Packages (`packages/`)
 
-- **@repo/shared**: Core business logic, API clients, hooks, stores (Zustand), types, utilities
-  - Exports organized by domain: `api/*`, `components/*`, `hooks/*`, `stores/*`, `types/*`, `utils/*`
-  - Uses Zustand for state management
-  - Dexie for IndexedDB operations
-  - React Query for server state
+- **@repo/shared**: Core business logic, hooks, stores (Zustand), types, utilities
+  - Exports organized by domain: `components/*`, `hooks/*`, `stores/*`, `types/*`, `utils/*`
+  - Uses Zustand for state management with localStorage persistence
+  - Dexie for IndexedDB operations (offline data storage)
 
 - **@repo/ui**: Reusable React components (shadcn/ui based)
 - **@repo/logger**: Isomorphic logging utility
@@ -52,7 +45,6 @@ Meelio is a productivity and focus application built as a Turborepo monorepo wit
 pnpm build
 
 # Build specific apps
-pnpm build:api
 pnpm build:web
 pnpm build:extension
 
@@ -67,8 +59,7 @@ cd apps/extension && pnpm run build:all
 pnpm dev
 
 # Run specific apps
-pnpm start:api      # API server (dev mode)
-pnpm preview        # Web app preview (production build)
+pnpm preview                     # Web app preview (production build)
 cd apps/web && pnpm dev          # Web app (dev mode, port 4000)
 cd apps/extension && pnpm dev    # Extension (dev mode)
 ```
@@ -84,9 +75,6 @@ cd apps/web && pnpm test           # Run tests
 cd apps/web && pnpm test:ui        # Run with UI
 cd apps/web && pnpm test:debug     # Run in debug mode
 cd apps/web && pnpm test:headed    # Run in headed mode
-
-# API tests (Jest)
-cd apps/api && pnpm test
 ```
 
 ### Linting & Formatting
@@ -95,36 +83,6 @@ cd apps/api && pnpm test
 pnpm lint           # Lint all packages
 pnpm format         # Format all TypeScript/TSX/MD files with Prettier
 ```
-
-### Database (Drizzle ORM)
-
-```bash
-# Generate migration with name
-pnpm db:generate:name name=migration_name
-
-# Generate migration (auto-named)
-pnpm db:generate
-
-# Run migrations
-pnpm db:migrate
-
-# Open Drizzle Studio
-pnpm db:studio
-
-# Seed database
-pnpm db:seed
-
-# Push schema changes directly (dev only)
-pnpm db:push
-
-# Generate + migrate
-pnpm db:up
-
-# Export schema
-pnpm db:export
-```
-
-Database configuration is in `apps/api/drizzle.config.ts`. All schema files are in `apps/api/src/db/schema/`.
 
 ### Package Extension
 
@@ -143,28 +101,6 @@ pnpm clean          # Clean all build artifacts
 ```
 
 ## Architecture Notes
-
-### API Server (`apps/api`)
-
-- **Entry point**: `src/index.ts` → `src/server.ts`
-- **Routing**: All routes under `/v1/*` namespace (see `src/routes/v1/index.ts`)
-- **Module structure**: Each feature module in `src/modules/` contains:
-  - `*.controller.ts` - Request handlers
-  - `*.service.ts` - Business logic
-  - `*.validation.ts` - Request validation schemas (Joi)
-  - `*.routes.ts` - Route definitions
-
-- **Database**:
-  - Drizzle ORM with PostgreSQL
-  - Schema definitions in `src/db/schema/`
-  - Migration files in `src/db/drizzle/`
-
-- **Authentication**:
-  - JWT strategy (local auth)
-  - Google OAuth strategy
-  - Both configured via Passport.js
-
-- **Key modules**: auth, billing, subscription (Lemon Squeezy), user, tasks, notes, mantras, focus-sessions, site-blocker, tab-stash, calendar, settings, categories
 
 ### Web App (`apps/web`)
 
@@ -189,83 +125,76 @@ pnpm clean          # Clean all build artifacts
 
 Critical package that contains most of the business logic shared between web and extension:
 
-- **API clients**: `src/api/*` - Axios-based API clients for each resource
-- **Stores**: `src/stores/*` - Zustand stores for global state
+- **Stores**: `src/stores/*` - Zustand stores for global state (persisted to localStorage)
 - **Hooks**: `src/hooks/*` - Reusable React hooks
 - **Types**: `src/types/*` - TypeScript type definitions
 - **Utils**: `src/utils/*` - Utility functions
 - **Components**: `src/components/*` - Shared React components
 - **i18n**: `src/i18n/*` - Internationalization setup
 - **Providers**: `src/providers/*` - React context providers
+- **Database**: `src/lib/db/*` - Dexie (IndexedDB) database for offline data
 
 When adding features that should work in both web and extension, add them to `@repo/shared`.
 
+## Data Storage (Offline-First)
+
+All data is stored locally - there is no backend server:
+
+- **IndexedDB (via Dexie)**: Primary storage for all user data
+  - Tasks, notes, focus sessions, site blockers, bookmarks, tab stashes
+  - Sound files cached for offline playback
+  - Located in `packages/shared/src/lib/db/meelio.dexie.ts`
+
+- **localStorage**: Zustand store persistence
+  - User preferences, settings, UI state
+  - Theme, dock configuration, timer settings
+
+- **Chrome Storage**: Extension-specific settings (when running as extension)
+
 ## Environment Variables
-
-### API (`apps/api/.env`)
-
-Required variables (see `apps/api/.env.example`):
-
-- `NODE_ENV` - Environment (development/production)
-- `PORT` - Server port (default: 3000)
-- `DB_URL` - PostgreSQL connection string
-- `JWT_SECRET` - JWT signing secret
-- `JWT_ACCESS_EXPIRATION_MINUTES` - Access token expiry (default: 1440)
-- `JWT_REFRESH_EXPIRATION_DAYS` - Refresh token expiry (default: 30)
-- `CLIENT_URL` - Frontend URL for CORS
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` - Google OAuth credentials
-- `LEMON_SQUEEZY_SIGNING_SECRET`, `LEMON_SQUEEZY_API_KEY`, `LEMON_SQUEEZY_STORE_ID` - Billing integration
-- SMTP settings for email
-
-Database setup example:
-
-```bash
-docker run --name meelio -e POSTGRES_PASSWORD=password -e POSTGRES_DB=meeliodb -d -p 5433:5432 postgres
-```
 
 ### Web (`apps/web/.env`)
 
-- `NEXT_PUBLIC_API_HOST` - API server URL
+- `VITE_CDN_URL` - CDN URL for sound files
+- `VITE_DEV` - Development mode flag
+
+### Extension (`apps/extension/.env`)
+
+- `PLASMO_PUBLIC_CDN_URL` - CDN URL for sound files
+- `PLASMO_PUBLIC_DEV` - Development mode flag
 
 ## Technology Stack
 
 - **Languages**: TypeScript throughout
 - **Frontend**: React 18, React Router, Vite
-- **Backend**: Express.js, Node.js
-- **Database**: PostgreSQL with Drizzle ORM
-- **State Management**: Zustand
+- **State Management**: Zustand with localStorage persistence
+- **Local Database**: Dexie (IndexedDB wrapper)
 - **Forms**: React Hook Form + Zod validation
 - **Styling**: Tailwind CSS
 - **UI Components**: Custom components based on shadcn/ui patterns
 - **Icons**: Lucide React
-- **Testing**: Jest (API), Playwright (web E2E)
+- **Testing**: Playwright (web E2E)
 - **Build System**: Turborepo
 - **Package Manager**: pnpm (v9.15.4)
-- **Authentication**: Passport.js (JWT + Google OAuth)
-- **Billing**: Lemon Squeezy
 - **Browser Extension**: Plasmo framework
 - **Animations**: Framer Motion, GSAP
 - **i18n**: i18next + react-i18next
 
 ## Development Workflow
 
-1. **Adding a new feature module to API**:
-   - Create module directory in `apps/api/src/modules/{feature}/`
-   - Add schema to `apps/api/src/db/schema/{feature}.schema.ts`
-   - Export schema in `apps/api/src/db/schema/index.ts`
-   - Generate migration: `pnpm db:generate:name name=add_{feature}`
-   - Run migration: `pnpm db:migrate`
-   - Create controller, service, validation, and routes files
-   - Register routes in `apps/api/src/routes/v1/index.ts`
-
-2. **Adding a new feature to web/extension**:
-   - Add shared logic (stores, hooks, API clients) to `packages/shared/src/`
+1. **Adding a new feature to web/extension**:
+   - Add shared logic (stores, hooks) to `packages/shared/src/`
    - Add UI components to `packages/ui/src/` (if reusable) or app-specific `src/components/`
    - Update routes in respective app's router
+   - Add Dexie table if data persistence needed
+
+2. **Adding a new data entity**:
+   - Add Dexie table in `packages/shared/src/lib/db/meelio.dexie.ts`
+   - Create Zustand store in `packages/shared/src/stores/`
+   - Use IndexedDB for data, localStorage for preferences
 
 3. **Before committing**:
    - Run `pnpm lint` to check for linting errors
-   - Run `pnpm test` to ensure tests pass
    - Run `pnpm build` to verify build succeeds
 
 ## Version Management
