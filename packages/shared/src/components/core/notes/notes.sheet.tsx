@@ -1,36 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useShallow } from "zustand/shallow";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@repo/ui/components/ui/sheet";
+import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { PremiumFeature } from "../../common/premium-feature";
 import { useDockStore } from "../../../stores/dock.store";
 import { useNoteStore } from "../../../stores/note.store";
-import NoteEditor, {
-  type StoragePort,
-} from "./note-editor";
+import NoteEditor, { type StoragePort } from "./note-editor";
 import { db } from "../../../lib/db/meelio.dexie";
+import { Search, Plus, Pin, Trash2, X, FileText, ChevronLeft, Keyboard } from "lucide-react";
 import {
-  Search,
-  Plus,
-  Pin,
-  Trash2,
-  X,
-  Volume2,
-  VolumeX,
-  FileText,
-  Clock,
-  Menu,
-} from "lucide-react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@repo/ui/components/ui/popover";
 
 export function NotesSheet() {
-  // ── Store
   const { isNotesVisible, setNotesVisible } = useDockStore(
     useShallow((s) => ({
       isNotesVisible: (s as any).isNotesVisible,
@@ -38,21 +23,12 @@ export function NotesSheet() {
     }))
   );
 
-  const {
-    notes,
-    initializeStore,
-    deleteNote,
-    togglePinNote,
-    enableTypingSound,
-    setEnableTypingSound,
-  } = useNoteStore(
+  const { notes, initializeStore, deleteNote, togglePinNote } = useNoteStore(
     useShallow((s) => ({
       notes: s.notes,
       initializeStore: s.initializeStore,
       deleteNote: s.deleteNote,
       togglePinNote: s.togglePinNote,
-      enableTypingSound: s.enableTypingSound,
-      setEnableTypingSound: s.setEnableTypingSound,
     }))
   );
 
@@ -65,7 +41,7 @@ export function NotesSheet() {
     updatedAt: number;
   } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
 
   const MAX_NOTES = 500;
 
@@ -95,16 +71,49 @@ export function NotesSheet() {
   useEffect(() => {
     if (isNotesVisible) {
       initializeStore();
+    } else {
+      setShowEditor(false);
+      setSelectedNoteId(null);
     }
   }, [isNotesVisible, initializeStore]);
 
   useEffect(() => {
-    if (!selectedNoteId && notes.length > 0) {
-      const n = notes[0];
-      setSelectedNoteId(n.id);
-      setActiveInitial({ id: n.id, title: n.title, content: n.content || "", updatedAt: n.updatedAt });
-    }
-  }, [notes, selectedNoteId]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isNotesVisible) return;
+
+      const isMod = e.metaKey || e.ctrlKey;
+
+      if (e.key === "Escape") {
+        const isMobile = window.innerWidth < 640;
+        if (isMobile && showEditor) {
+          setShowEditor(false);
+        } else {
+          setNotesVisible(false);
+        }
+        return;
+      }
+
+      if (isMod && e.key === "n") {
+        e.preventDefault();
+        handleCreateNote();
+        return;
+      }
+
+      if (isMod && e.key === "p" && selectedNoteId && !selectedNoteId.startsWith("draft:")) {
+        e.preventDefault();
+        togglePinNote(selectedNoteId);
+        return;
+      }
+
+      if (isMod && e.key === "Backspace" && selectedNoteId && !selectedNoteId.startsWith("draft:")) {
+        e.preventDefault();
+        handleDeleteNote(selectedNoteId);
+        return;
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isNotesVisible, showEditor, setNotesVisible, selectedNoteId, togglePinNote]);
 
   const hasMeaningfulContent = (title: string, content: string): boolean => {
     if (title && title.trim().length > 0) return true;
@@ -113,8 +122,11 @@ export function NotesSheet() {
 
   const creatingRef = useMemo(() => ({ current: false }), []);
 
-  const makeStoragePortFor = (id: string, initial: { title: string; content: string; updatedAt: number } | null): StoragePort => ({
-    load: async (_ignoredId) => {
+  const makeStoragePortFor = (
+    id: string,
+    initial: { title: string; content: string; updatedAt: number } | null
+  ): StoragePort => ({
+    load: async () => {
       if (id.startsWith("draft:")) {
         return initial
           ? { id, title: initial.title, content: initial.content, updatedAt: initial.updatedAt }
@@ -127,16 +139,22 @@ export function NotesSheet() {
     save: async (note) => {
       if (id.startsWith("draft:")) {
         if (!hasMeaningfulContent(note.title, note.content)) return;
-
         if (creatingRef.current) return;
-
         creatingRef.current = true;
         try {
           setIsSaving(true);
-          const created = await useNoteStore.getState().addNote({ title: note.title || "Untitled", content: note.content });
+          const created = await useNoteStore.getState().addNote({
+            title: note.title || "Untitled",
+            content: note.content,
+          });
           if (created) {
             setSelectedNoteId(created.id);
-            setActiveInitial({ id: created.id, title: created.title, content: created.content || "", updatedAt: created.updatedAt });
+            setActiveInitial({
+              id: created.id,
+              title: created.title,
+              content: created.content || "",
+              updatedAt: created.updatedAt,
+            });
           }
         } finally {
           setIsSaving(false);
@@ -144,19 +162,11 @@ export function NotesSheet() {
         }
         return;
       }
-
-      // Existing note
       setIsSaving(true);
       await useNoteStore.getState().updateNote(id, { title: note.title, content: note.content });
       setIsSaving(false);
     },
   });
-
-  // ── Helpers
-  const resetSelection = () => {
-    setSelectedNoteId(null);
-    setActiveInitial(null);
-  };
 
   const formatDate = (ts: number) => {
     const d = new Date(ts);
@@ -165,27 +175,19 @@ export function NotesSheet() {
     const mins = Math.floor(diffMs / 60000);
     const hrs = Math.floor(diffMs / 3600000);
     const days = Math.floor(diffMs / 86400000);
-
     if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins}m ago`;
-    if (hrs < 24) return `${hrs}h ago`;
-    if (days < 7) return `${days}d ago`;
-
+    if (mins < 60) return `${mins}m`;
+    if (hrs < 24) return `${hrs}h`;
+    if (days < 7) return `${days}d`;
     return d.toLocaleDateString();
-    };
+  };
 
-  // const getNoteColor = (id: string) => {
-  //   const colors = [
-  //     "from-blue-500/20 to-indigo-500/10",
-  //     "from-purple-500/20 to-pink-500/10",
-  //     "from-green-500/20 to-teal-500/10",
-  //     "from-orange-500/20 to-red-500/10",
-  //     "from-cyan-500/20 to-blue-500/10",
-  //     "from-rose-500/20 to-purple-500/10",
-  //   ];
-  //   const hash = id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  //   return colors[hash % colors.length];
-  // };
+  const getPreview = (content: string | null | undefined): string => {
+    if (!content) return "";
+    const lines = content.trim().split("\n").slice(1);
+    const preview = lines.find((l) => l.trim().length > 0)?.trim() || "";
+    return preview.length > 60 ? preview.slice(0, 60) + "..." : preview;
+  };
 
   const handleCreateNote = async () => {
     if (notes.length >= MAX_NOTES) {
@@ -195,12 +197,13 @@ export function NotesSheet() {
     const draftId = `draft:${crypto.randomUUID()}`;
     setSelectedNoteId(draftId);
     setActiveInitial({ id: draftId, title: "", content: "", updatedAt: Date.now() });
+    setShowEditor(true);
   };
 
   const handleDeleteNote = (noteId: string) => {
     const n = notes.find((x) => x.id === noteId);
     if (!n) return;
-    if (confirm(`Delete "${n.title}"? This cannot be undone.`)) {
+    if (confirm(`Delete "${n.title}"?`)) {
       deleteNote(noteId);
       if (selectedNoteId === noteId) {
         const remaining = notes.filter((x) => x.id !== noteId);
@@ -209,253 +212,354 @@ export function NotesSheet() {
           setSelectedNoteId(next.id);
           setActiveInitial({ id: next.id, title: next.title, content: next.content || "", updatedAt: next.updatedAt });
         } else {
-          resetSelection();
+          setSelectedNoteId(null);
+          setActiveInitial(null);
+          setShowEditor(false);
         }
       }
     }
   };
 
-  const handleViewNote = (noteId: string) => {
+  const handleSelectNote = (noteId: string) => {
     const n = notes.find((x) => x.id === noteId);
     setSelectedNoteId(noteId);
-    // Seed initial from current store snapshot so first load is consistent.
     setActiveInitial(
-      n
-        ? {
-            id: n.id,
-            title: n.title,
-            content: n.content || "",
-            updatedAt: n.updatedAt,
-          }
-        : null
+      n ? { id: n.id, title: n.title, content: n.content || "", updatedAt: n.updatedAt } : null
     );
-    if (isSidebarOpen) setSidebarOpen(false);
+    setShowEditor(true);
   };
 
-  const handleTogglePin = (noteId: string) => togglePinNote(noteId);
+  const handleBack = () => {
+    setShowEditor(false);
+  };
 
-  // ── Sidebar (list)
-  const renderSidebar = () => (
-    <div className="flex h-full flex-col border-r border-white/10 w-full max-w-sm">
-      <div className="border-b border-white/10 bg-zinc-800/50 p-3">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search notes..."
-              className="pl-10 pr-10 bg-zinc-900/50 border-white/10"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-          <PremiumFeature requirePro>
-            <Button onClick={handleCreateNote} size="sm" className="gap-2">
-              <Plus className="h-4 w-4" />
-              New
-            </Button>
-          </PremiumFeature>
-        </div>
-      </div>
+  const isMac = typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const modKey = isMac ? "⌘" : "Ctrl";
 
-      <div className="flex-1 overflow-auto p-3 space-y-2">
-        {filteredNotes.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-center px-4">
-            <FileText className="mb-4 h-12 w-12 text-zinc-600" />
-            <p className="mb-2 text-zinc-400">{searchQuery ? "No notes found" : "No notes yet"}</p>
-            <p className="mb-6 text-sm text-zinc-500">{searchQuery ? "Try a different search" : "Create your first note"}</p>
-          </div>
-        ) : (
-          filteredNotes.map((note) => (
-            <div
-              key={note.id}
-              onClick={() => handleViewNote(note.id)}
-              className={`group cursor-pointer rounded-md border border-white/10 bg-zinc-900/50 hover:bg-zinc-900 p-3 transition-colors ${
-                selectedNoteId === note.id ? "ring-1 ring-purple-400/40" : ""
-              }`}
-            >
-              <div className="relative flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <div className="mb-1 flex items-center gap-2">
-                    <h3 className="truncate font-medium text-white/90">{note.title || "Untitled"}</h3>
-                  </div>
-                </div>
-                <div className="absolute right-0 top-0 flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTogglePin(note.id);
-                    }}
-                    className="rounded p-1 hover:bg-white/10"
-                    title={note.pinned ? "Unpin" : "Pin"}
-                  >
-                    <Pin
-                      className={`h-3.5 w-3.5 ${note.pinned ? "fill-yellow-400 text-yellow-400" : "text-white/60"}`}
-                    />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteNote(note.id);
-                    }}
-                    className="rounded p-1 hover:bg-white/10"
-                    title="Delete"
-                  >
-                    <Trash2 className="h-3.5 w-3.5 text-white/60 hover:text-red-400" />
-                  </button>
-                </div>
-              </div>
-              <div className="mt-1 flex items-center gap-2 text-[10px] text-white/40">
-                <Clock className="h-3 w-3" />
-                <span>{formatDate(note.updatedAt)}</span> · <span>{note.pinned && <Pin className="h-3 w-3 flex-shrink-0 fill-yellow-400 text-yellow-400" />}</span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+  const Kbd = ({ children }: { children: React.ReactNode }) => (
+    <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-800 border border-zinc-700 rounded shadow-sm">
+      {children}
+    </kbd>
   );
 
-  // ── Editor view (right panel)
-  const renderNoteEditor = () => {
-    if (!selectedNoteId) {
-      return (
-        <div className="flex h-full items-center justify-center text-zinc-500">
-          Select a note to start editing
-        </div>
-      );
-    }
-
-    // Prefer DB-backed note for accuracy, fall back to activeInitial/store snapshot
-    const seed =
-      (selectedNote && {
-        id: selectedNote.id,
-        title: selectedNote.title || "Untitled",
-        content: selectedNote.content || "",
-        updatedAt: selectedNote.updatedAt,
-      }) || activeInitial;
-
-    if (!seed) return null;
-
-    return (
-      <div className="flex h-full flex-col">
-        <div className="flex items-center justify-between border-b border-white/10 bg-zinc-800/50 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTogglePin(selectedNoteId)}
-              className="gap-1"
-            >
-              <Pin
-                className={`h-4 w-4 ${selectedNote?.pinned ? "fill-yellow-400 text-yellow-400" : ""}`}
-              />
-              {selectedNote?.pinned ? "Pinned" : "Pin"}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDeleteNote(selectedNoteId)}
-              className="gap-1 hover:text-red-400"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
+  const ShortcutsPopover = () => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button className="p-2 rounded hover:bg-white/5 text-zinc-500 hover:text-white transition-colors">
+          <Keyboard className="h-4 w-4" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-56 p-3 bg-zinc-900 border-white/10" align="end">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-500 mb-3 font-medium">Keyboard Shortcuts</p>
+        <div className="text-xs space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-300">New note</span>
+            <div className="flex items-center gap-1">
+              <Kbd>{modKey}</Kbd>
+              <Kbd>N</Kbd>
+            </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            {isSaving && <span className="text-xs text-green-400">Saving...</span>}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-300">Pin note</span>
+            <div className="flex items-center gap-1">
+              <Kbd>{modKey}</Kbd>
+              <Kbd>P</Kbd>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-300">Delete note</span>
+            <div className="flex items-center gap-1">
+              <Kbd>{modKey}</Kbd>
+              <Kbd>⌫</Kbd>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-300">Zen mode</span>
+            <div className="flex items-center gap-1">
+              <Kbd>{modKey}</Kbd>
+              <Kbd>⇧</Kbd>
+              <Kbd>F</Kbd>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-300">Close</span>
+            <Kbd>Esc</Kbd>
           </div>
         </div>
+      </PopoverContent>
+    </Popover>
+  );
 
-        <div className="flex-1 overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-zinc-600">
-          <NoteEditor
-            key={seed.id}
-            id={seed.id}
-            port={makeStoragePortFor(seed.id, { title: seed.title, content: seed.content, updatedAt: seed.updatedAt })}
-            initial={{
-              title: seed.title,
-              content: seed.content,
-              updatedAt: seed.updatedAt,
-            }}
-            onChange={(title, content) => {
-              // Only update if this is still the active note
-              setActiveInitial((prev) =>
-                prev && prev.id === seed.id ? { ...prev, title, content, updatedAt: Date.now() } : prev
-              );
-            }}
-          />
-        </div>
-      </div>
-    );
-  };
+  if (!isNotesVisible) return null;
+
+  const seed =
+    selectedNote
+      ? { id: selectedNote.id, title: selectedNote.title || "Untitled", content: selectedNote.content || "", updatedAt: selectedNote.updatedAt }
+      : activeInitial;
 
   return (
-    <Sheet open={isNotesVisible} onOpenChange={setNotesVisible}>
-      <SheetContent className="flex w-full flex-col gap-0 p-0 sm:max-w-full border-l border-white/10 bg-zinc-900">
-        <SheetHeader className="border-b border-white/10 bg-zinc-800/50 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="sr-only">
-              <SheetTitle>Notes</SheetTitle>
-              <SheetDescription>{`${filteredNotes.length} notes`}</SheetDescription>
-            </div>
+    <AnimatePresence>
+      {isNotesVisible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-50 bg-zinc-950"
+        >
+          {/* Mobile: show either list or editor */}
+          <div className="sm:hidden h-full">
+            <AnimatePresence mode="wait">
+              {!showEditor ? (
+                <motion.div
+                  key="list"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className="h-full flex flex-col"
+                >
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                    <h1 className="text-lg font-semibold text-white">Notes</h1>
+                    <div className="flex items-center">
+                      <ShortcutsPopover />
+                      <Button variant="ghost" size="sm" onClick={() => setNotesVisible(false)} className="h-8 w-8 p-0">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {renderNotesList()}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="editor"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className="h-full flex flex-col"
+                >
+                  <div className="flex items-center justify-between px-2 py-2 border-b border-white/5">
+                    <Button variant="ghost" size="sm" onClick={handleBack} className="gap-1 h-8 text-xs">
+                      <ChevronLeft className="h-4 w-4" />
+                      Back
+                    </Button>
+                    <div className="flex items-center gap-1">
+                      {selectedNoteId && !selectedNoteId.startsWith("draft:") && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => togglePinNote(selectedNoteId)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Pin className={`h-4 w-4 ${selectedNote?.pinned ? "fill-yellow-400 text-yellow-400" : ""}`} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteNote(selectedNoteId)}
+                            className="h-8 w-8 p-0 hover:text-red-400"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    {seed && (
+                      <NoteEditor
+                        key={seed.id}
+                        id={seed.id}
+                        port={makeStoragePortFor(seed.id, seed)}
+                        initial={seed}
+                        onChange={(title, content) => {
+                          setActiveInitial((prev) =>
+                            prev && prev.id === seed.id ? { ...prev, title, content, updatedAt: Date.now() } : prev
+                          );
+                        }}
+                      />
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(true)}
-                className="h-8 w-8 p-0 sm:hidden"
-                title="Open list"
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEnableTypingSound(!enableTypingSound)}
-                className="h-8 px-3 gap-2"
-              >
-                {enableTypingSound ? (
-                  <>
-                    <Volume2 className="h-4 w-4" />
-                    <span className="text-xs">Mute sound</span>
-                  </>
-                ) : (
-                  <>
-                    <VolumeX className="h-4 w-4" />
-                    <span className="text-xs">Unmute sound</span>
-                  </>
-                )}
-              </Button>
+          {/* Desktop: side by side */}
+          <div className="hidden sm:flex h-full">
+            <div className="w-80 border-r border-white/5 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                <h1 className="text-lg font-semibold text-white">Notes</h1>
+                <div className="flex items-center">
+                  <ShortcutsPopover />
+                  <Button variant="ghost" size="sm" onClick={() => setNotesVisible(false)} className="h-8 w-8 p-0">
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {renderNotesList()}
+            </div>
+            <div className="flex-1 flex flex-col">
+              {seed ? (
+                <>
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
+                    <div className="flex items-center gap-1">
+                      {!selectedNoteId?.startsWith("draft:") && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => selectedNoteId && togglePinNote(selectedNoteId)}
+                            className="gap-1.5 h-8 text-xs"
+                          >
+                            <Pin className={`h-3.5 w-3.5 ${selectedNote?.pinned ? "fill-yellow-400 text-yellow-400" : ""}`} />
+                            {selectedNote?.pinned ? "Pinned" : "Pin"}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => selectedNoteId && handleDeleteNote(selectedNoteId)}
+                            className="gap-1.5 h-8 text-xs hover:text-red-400"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Delete
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    {isSaving && <span className="text-[10px] text-emerald-400/80">Saving...</span>}
+                  </div>
+                  <div className="flex-1 overflow-auto">
+                    <NoteEditor
+                      key={seed.id}
+                      id={seed.id}
+                      port={makeStoragePortFor(seed.id, seed)}
+                      initial={seed}
+                      onChange={(title, content) => {
+                        setActiveInitial((prev) =>
+                          prev && prev.id === seed.id ? { ...prev, title, content, updatedAt: Date.now() } : prev
+                        );
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <FileText className="h-8 w-8 text-zinc-600 mx-auto mb-2" />
+                    <p className="text-sm text-zinc-500">Select a note</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </SheetHeader>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
-        <div className="relative flex-1 overflow-hidden">
-          <div className="flex h-full">
-            <div className="hidden sm:flex">{renderSidebar()}</div>
-            <div className="flex-1">
-              {renderNoteEditor()}
+  function renderNotesList() {
+    return (
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="p-3 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="pl-10 pr-8 bg-zinc-800/50 border-white/5 h-9"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
+            <PremiumFeature requirePro>
+              <Button onClick={handleCreateNote} size="sm" className="h-9 w-9 p-0">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </PremiumFeature>
           </div>
         </div>
 
-        {/* Mobile sidebar (shadcn sheet) */}
-        <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-80 sm:hidden">
-            {renderSidebar()}
-          </SheetContent>
-        </Sheet>
-      </SheetContent>
-    </Sheet>
-  );
+        <div className="flex-1 overflow-auto p-2">
+          {filteredNotes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center px-4">
+              <FileText className="h-10 w-10 text-zinc-600 mb-3" />
+              <p className="text-sm text-zinc-400 mb-1">
+                {searchQuery ? "No notes found" : "No notes yet"}
+              </p>
+              {!searchQuery && (
+                <PremiumFeature requirePro>
+                  <Button onClick={handleCreateNote} size="sm" className="mt-3 gap-1.5">
+                    <Plus className="h-4 w-4" />
+                    New Note
+                  </Button>
+                </PremiumFeature>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {filteredNotes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => handleSelectNote(note.id)}
+                  className={`group cursor-pointer rounded-lg p-3 transition-colors ${
+                    selectedNoteId === note.id
+                      ? "bg-purple-500/10"
+                      : "hover:bg-white/5"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        {note.pinned && <Pin className="h-3 w-3 text-yellow-400 fill-yellow-400 shrink-0" />}
+                        <h3 className="truncate text-sm font-medium text-white/90">
+                          {note.title || "Untitled"}
+                        </h3>
+                      </div>
+                      {getPreview(note.content) && (
+                        <p className="text-xs text-white/40 truncate mt-1">
+                          {getPreview(note.content)}
+                        </p>
+                      )}
+                      <p className="text-[10px] text-white/30 mt-1.5">{formatDate(note.updatedAt)}</p>
+                    </div>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePinNote(note.id);
+                        }}
+                        className="p-1.5 rounded hover:bg-white/10"
+                      >
+                        <Pin className={`h-3 w-3 ${note.pinned ? "fill-yellow-400 text-yellow-400" : "text-white/40"}`} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteNote(note.id);
+                        }}
+                        className="p-1.5 rounded hover:bg-white/10"
+                      >
+                        <Trash2 className="h-3 w-3 text-white/40 hover:text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 }
