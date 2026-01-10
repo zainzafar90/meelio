@@ -6,7 +6,7 @@
   "description": "Focus, calm & productivity with every new tab",
   "author": "zainzafar90@gmail.com",
   "scripts": {
-    "dev": "plasmo dev",
+    "dev": "rm -rf .plasmo && rm -rf build && plasmo dev",
     "build": "plasmo build",
     "build:all": "npm run build:firefox && npm run build:edge && npm run build:chrome && npm run build:opera && npm run build:safari",
     "build:edge": "plasmo build --target=edge-mv3",

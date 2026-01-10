@@ -1,64 +1,55 @@
 import { useEffect } from "react";
 import { useDockStore } from "../stores/dock.store";
 
-export function useDockShortcuts() {
+type DockStoreToggleKey =
+  | "toggleTimer"
+  | "toggleBreathing"
+  | "toggleSoundscapes"
+  | "toggleTasks"
+  | "toggleNotes"
+  | "toggleSiteBlocker"
+  | "toggleTabStash"
+  | "toggleBookmarks"
+  | "toggleBackgrounds"
+  | "toggleCalendar";
+
+const SHORTCUT_KEY_TO_TOGGLE: Record<string, DockStoreToggleKey> = {
+  "1": "toggleTimer",
+  "2": "toggleBreathing",
+  "3": "toggleSoundscapes",
+  "4": "toggleTasks",
+  "5": "toggleNotes",
+  "6": "toggleSiteBlocker",
+  "7": "toggleTabStash",
+  "8": "toggleBookmarks",
+  "9": "toggleBackgrounds",
+  "0": "toggleCalendar",
+};
+
+function isInputElement(element: Element | null): boolean {
+  if (!element) return false;
+  return (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element.getAttribute("contenteditable") === "true"
+  );
+}
+
+export function useDockShortcuts(): void {
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    function handleKeyDown(e: KeyboardEvent): void {
       const isMod = e.metaKey || e.ctrlKey;
       if (!isMod) return;
 
-      const activeElement = document.activeElement;
-      const isInInput = activeElement instanceof HTMLInputElement ||
-        activeElement instanceof HTMLTextAreaElement ||
-        activeElement?.getAttribute("contenteditable") === "true";
+      if (isInputElement(document.activeElement)) return;
 
-      if (isInInput) return;
+      const toggleKey = SHORTCUT_KEY_TO_TOGGLE[e.key];
+      if (!toggleKey) return;
 
+      e.preventDefault();
       const store = useDockStore.getState();
-
-      switch (e.key) {
-        case "1":
-          e.preventDefault();
-          store.toggleTimer();
-          break;
-        case "2":
-          e.preventDefault();
-          store.toggleBreathing();
-          break;
-        case "3":
-          e.preventDefault();
-          store.toggleSoundscapes();
-          break;
-        case "4":
-          e.preventDefault();
-          store.toggleTasks();
-          break;
-        case "5":
-          e.preventDefault();
-          store.toggleNotes();
-          break;
-        case "6":
-          e.preventDefault();
-          store.toggleSiteBlocker();
-          break;
-        case "7":
-          e.preventDefault();
-          store.toggleTabStash();
-          break;
-        case "8":
-          e.preventDefault();
-          store.toggleBookmarks();
-          break;
-        case "9":
-          e.preventDefault();
-          store.toggleBackgrounds();
-          break;
-        case "0":
-          e.preventDefault();
-          store.toggleCalendar();
-          break;
-      }
-    };
+      store[toggleKey]();
+    }
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);

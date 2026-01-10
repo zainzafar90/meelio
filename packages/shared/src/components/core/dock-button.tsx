@@ -1,6 +1,6 @@
 import { cn } from "@repo/ui/lib/utils";
 import { useDockStore } from "../../stores/dock.store";
-import { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { useShallow } from "zustand/shallow";
 import {
   Tooltip,
@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { isMacPlatform } from "../../utils/common.utils";
 
 const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
   timer: "ring-red-500/70",
@@ -48,28 +49,27 @@ export interface DockItem {
   requirePro?: boolean;
 }
 
-export const DockButton = ({
-  item,
-  isDisabled,
-  className,
-}: {
+interface DockButtonProps {
   item: DockItem;
   isDisabled?: boolean;
   className?: string;
-}) => {
-  const {
-    isTimerVisible,
-    isSoundscapesVisible,
-    isBreathingVisible,
-    isTasksVisible,
-    isNotesVisible,
-    isSiteBlockerVisible,
-    isBackgroundsVisible,
-    isTabStashVisible,
-    isBookmarksVisible,
-    isWeatherVisible,
-    showIconLabels,
-  } = useDockStore(
+}
+
+const VISIBILITY_STATE_BY_ID: Record<string, string> = {
+  timer: "isTimerVisible",
+  soundscapes: "isSoundscapesVisible",
+  breathepod: "isBreathingVisible",
+  tasks: "isTasksVisible",
+  notes: "isNotesVisible",
+  "site-blocker": "isSiteBlockerVisible",
+  background: "isBackgroundsVisible",
+  "tab-stash": "isTabStashVisible",
+  bookmarks: "isBookmarksVisible",
+  weather: "isWeatherVisible",
+};
+
+export function DockButton({ item, isDisabled, className }: DockButtonProps): React.ReactElement {
+  const { showIconLabels, ...visibilityStates } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       isSoundscapesVisible: state.isSoundscapesVisible,
@@ -85,17 +85,10 @@ export const DockButton = ({
     }))
   );
 
-  const derivedActive =
-    (item.id === "timer" && isTimerVisible) ||
-    (item.id === "soundscapes" && isSoundscapesVisible) ||
-    (item.id === "breathepod" && isBreathingVisible) ||
-    (item.id === "tasks" && isTasksVisible) ||
-    (item.id === "notes" && isNotesVisible) ||
-    (item.id === "site-blocker" && isSiteBlockerVisible) ||
-    (item.id === "background" && isBackgroundsVisible) ||
-    (item.id === "tab-stash" && isTabStashVisible) ||
-    (item.id === "bookmarks" && isBookmarksVisible) ||
-    (item.id === "weather" && isWeatherVisible);
+  const visibilityKey = VISIBILITY_STATE_BY_ID[item.id];
+  const derivedActive = visibilityKey
+    ? (visibilityStates as Record<string, boolean>)[visibilityKey]
+    : false;
   const isActive = item.isActive ?? derivedActive;
 
   const IconComponent = isActive ? item.activeIcon : item.icon;
@@ -154,7 +147,7 @@ export const DockButton = ({
           {SHORTCUT_BY_ID[item.id] && (
             <div className="flex items-center gap-1">
               <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
-                {typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0 ? "⌘" : "⌃"}
+                {isMacPlatform() ? "\u2318" : "\u2303"}
               </kbd>
               <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
                 {SHORTCUT_BY_ID[item.id]}
@@ -165,4 +158,4 @@ export const DockButton = ({
       </Tooltip>
     </TooltipProvider>
   );
-};
+}

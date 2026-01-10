@@ -3,14 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X, Keyboard } from "lucide-react";
 import { Button } from "@repo/ui/components/ui/button";
 import { DOCK_SHORTCUTS } from "../../hooks/use-dock-shortcuts";
+import { getModifierKey } from "../../utils/common.utils";
 
-export function ShortcutsModal() {
+export function ShortcutsModal(): React.ReactElement | null {
   const [isOpen, setIsOpen] = useState(false);
-
-  const isMac =
-    typeof navigator !== "undefined" &&
-    navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-  const modKey = isMac ? "⌘" : "Ctrl";
+  const modKey = getModifierKey();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

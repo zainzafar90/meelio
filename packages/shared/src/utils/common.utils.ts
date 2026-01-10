@@ -90,3 +90,20 @@ export const generateUUID = () => {
     return v.toString(16);
   });
 };
+
+/**
+ * Check if the current platform is macOS
+ * @returns {boolean} True if running on macOS
+ */
+export function isMacPlatform(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return navigator.platform.toUpperCase().includes("MAC");
+}
+
+/**
+ * Get the modifier key symbol for the current platform
+ * @returns {string} The modifier key symbol (Command for Mac, Ctrl for others)
+ */
+export function getModifierKey(): string {
+  return isMacPlatform() ? "\u2318" : "Ctrl";
+}

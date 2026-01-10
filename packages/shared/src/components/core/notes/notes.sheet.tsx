@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@repo/ui/components/ui/popover";
+import { getModifierKey } from "../../../utils/common.utils";
 
 export function NotesSheet() {
   const { isNotesVisible, setNotesVisible } = useDockStore(
@@ -233,8 +234,7 @@ export function NotesSheet() {
     setShowEditor(false);
   };
 
-  const isMac = typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-  const modKey = isMac ? "⌘" : "Ctrl";
+  const modKey = getModifierKey();
 
   const Kbd = ({ children }: { children: React.ReactNode }) => (
     <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-medium text-zinc-400 bg-zinc-800 border border-zinc-700 rounded shadow-sm">

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { cn } from "@repo/ui/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useDockStore } from "../../../../stores/dock.store";
@@ -10,8 +9,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@repo/ui/components/ui/tooltip";
+import { isMacPlatform } from "../../../../utils/common.utils";
 
-export const CalendarDock = () => {
+export function CalendarDock(): React.ReactElement {
   const { t } = useTranslation();
   const [date, setDate] = useState(new Date());
   const { toggleCalendar } = useDockStore(
@@ -25,14 +25,9 @@ export const CalendarDock = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const month = t(
-    `common.calendarData.months.short.${date
-      .toLocaleString("default", { month: "short" })
-      .toLowerCase()}`
-  );
+  const monthKey = date.toLocaleString("default", { month: "short" }).toLowerCase();
+  const month = t(`common.calendarData.months.short.${monthKey}`);
   const day = date.getDate();
-
-  const isMac = typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -61,7 +56,7 @@ export const CalendarDock = () => {
           <span className="text-sm">{t("common.calendar", { defaultValue: "Calendar" })}</span>
           <div className="flex items-center gap-1">
             <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
-              {isMac ? "⌘" : "⌃"}
+              {isMacPlatform() ? "\u2318" : "\u2303"}
             </kbd>
             <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
               0
@@ -71,4 +66,4 @@ export const CalendarDock = () => {
       </Tooltip>
     </TooltipProvider>
   );
-};
+}
