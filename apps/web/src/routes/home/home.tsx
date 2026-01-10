@@ -20,7 +20,7 @@ import { Quote } from "@repo/shared";
 import { SoundscapesSheet } from "@repo/shared";
 import { TaskListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
-import { NotesSheet } from "@repo/shared";
+import { NotesSheet, ShortcutsModal } from "@repo/shared";
 import { AuthContainer } from "@repo/shared";
 import { PageSkeleton } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
@@ -99,6 +99,7 @@ const Content = () => {
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />
+      <ShortcutsModal />
     </main>
   );
 };

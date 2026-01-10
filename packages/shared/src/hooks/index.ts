@@ -8,3 +8,4 @@ export * from "./use-timer";
 export * from "./use-document-title";
 export * from "./use-wallpaper-search";
 export * from "./use-debounced-value";
+export * from "./use-dock-shortcuts";

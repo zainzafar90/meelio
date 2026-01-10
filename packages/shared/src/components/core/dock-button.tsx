@@ -23,6 +23,18 @@ const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
   home: "ring-blue-400/70",
 };
 
+const SHORTCUT_BY_ID: Record<string, string> = {
+  timer: "1",
+  breathepod: "2",
+  soundscapes: "3",
+  tasks: "4",
+  notes: "5",
+  "site-blocker": "6",
+  "tab-stash": "7",
+  bookmarks: "8",
+  background: "9",
+};
+
 export interface DockItem {
   id: string;
   name: string;
@@ -136,8 +148,18 @@ export const DockButton = ({
             )}
           </button>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>{item.name}</p>
+        <TooltipContent className="flex items-center gap-3 py-1.5 px-2.5">
+          <span className="text-sm">{item.name}</span>
+          {SHORTCUT_BY_ID[item.id] && (
+            <div className="flex items-center gap-1">
+              <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
+                {typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0 ? "⌘" : "⌃"}
+              </kbd>
+              <kbd className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-mono font-medium text-zinc-300 bg-zinc-700/80 border border-zinc-600 rounded shadow-sm">
+                {SHORTCUT_BY_ID[item.id]}
+              </kbd>
+            </div>
+          )}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

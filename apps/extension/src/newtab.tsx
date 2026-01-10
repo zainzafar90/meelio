@@ -26,6 +26,7 @@ import {
   NotesSheet,
   SimpleTimer,
   SearchPopover,
+  ShortcutsModal,
  } from "@repo/shared";
 import { useAppStore } from "@repo/shared";
 
@@ -82,6 +83,7 @@ const Content = () => {
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />
+      <ShortcutsModal />
     </main>
   );
 };

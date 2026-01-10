@@ -10,6 +10,7 @@ import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useShallow } from "zustand/shallow";
+import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
 import { SettingsDock } from "./components/settings.dock";
 import { ClockDock } from "./components/clock.dock";
@@ -51,6 +52,8 @@ const BASE_STATIC_DOCK_ITEMS: {
 ];
 
 export const Dock = () => {
+  useDockShortcuts();
+
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
   const [dropdownItems, setDropdownItems] = useState<DockItem[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
