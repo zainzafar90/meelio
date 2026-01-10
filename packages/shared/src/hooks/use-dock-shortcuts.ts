@@ -7,6 +7,13 @@ export function useDockShortcuts() {
       const isMod = e.metaKey || e.ctrlKey;
       if (!isMod) return;
 
+      const activeElement = document.activeElement;
+      const isInInput = activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement?.getAttribute("contenteditable") === "true";
+
+      if (isInInput) return;
+
       const store = useDockStore.getState();
 
       switch (e.key) {
@@ -46,6 +53,10 @@ export function useDockShortcuts() {
           e.preventDefault();
           store.toggleBackgrounds();
           break;
+        case "0":
+          e.preventDefault();
+          store.toggleCalendar();
+          break;
       }
     };
 
@@ -64,4 +75,5 @@ export const DOCK_SHORTCUTS = [
   { key: "7", label: "Tab Stash" },
   { key: "8", label: "Bookmarks" },
   { key: "9", label: "Backgrounds" },
+  { key: "0", label: "Calendar" },
 ] as const;

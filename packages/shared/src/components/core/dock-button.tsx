@@ -33,6 +33,7 @@ const SHORTCUT_BY_ID: Record<string, string> = {
   "tab-stash": "7",
   bookmarks: "8",
   background: "9",
+  calendar: "0",
 };
 
 export interface DockItem {

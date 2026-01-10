@@ -25,7 +25,7 @@ import {
   isAllDayEvent,
   isEventToday,
 } from "../../../utils/calendar-date.utils";
-import { Copy, Bell, Share, ChevronDown, Calendar, RefreshCw } from "lucide-react";
+import { Copy, Bell, Share, ChevronDown, Calendar, RefreshCw, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 export const CalendarSheet = () => {
@@ -266,14 +266,52 @@ export const CalendarSheet = () => {
             />
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-              <Calendar className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">
-                {t("calendar.sheet.connectDescription", {
-                  defaultValue: "Enter your calendar's ICS URL to view events. You can find this in your calendar settings (Google Calendar: Settings → Integrate calendar → Secret address in iCal format)."
-                })}
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col items-center text-center py-4">
+              <div className="size-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-3">
+                <Calendar className="h-6 w-6 text-white" />
               </div>
+              <h3 className="text-base font-semibold text-foreground mb-1">
+                {t("calendar.sheet.connectTitle", { defaultValue: "Connect Your Calendar" })}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("calendar.sheet.connectSubtitle", { defaultValue: "View your events right from your new tab" })}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                {t("calendar.sheet.howToConnect", { defaultValue: "How to get your ICS URL" })}
+              </p>
+              <div className="space-y-2">
+                <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">1</span>
+                  <p className="text-sm text-muted-foreground">
+                    {t("calendar.sheet.step1", { defaultValue: "Open Google Calendar settings" })}
+                  </p>
+                </div>
+                <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">2</span>
+                  <p className="text-sm text-muted-foreground">
+                    {t("calendar.sheet.step2", { defaultValue: "Select your calendar → Integrate calendar" })}
+                  </p>
+                </div>
+                <div className="flex gap-3 p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <span className="flex-shrink-0 size-5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold flex items-center justify-center">3</span>
+                  <p className="text-sm text-muted-foreground">
+                    {t("calendar.sheet.step3", { defaultValue: "Copy \"Secret address in iCal format\"" })}
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://calendar.google.com/calendar/r/settings"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-400 transition-colors"
+              >
+                <ExternalLink className="size-3" />
+                {t("calendar.sheet.openSettings", { defaultValue: "Open Google Calendar Settings" })}
+              </a>
             </div>
 
             <div className="flex flex-col gap-2">
