@@ -8,7 +8,6 @@ import {
   AppProvider,
   Background,
   BackgroundSelectorSheet,
-  BookmarksDynamicIsland,
   BookmarksSheet,
   BreathePod,
   CalendarDynamicIsland,
@@ -29,6 +28,7 @@ import {
   useBookmarksStore,
   useDockStore,
 } from "@repo/shared";
+import { BookmarksDynamicIsland } from "@repo/shared/src/components/core/bookmarks/bookmarks-dynamic-island";
 
 import "./style.css";
 

@@ -6,8 +6,6 @@ import { useShallow } from "zustand/shallow";
 
 import { cn } from "../../../lib/utils";
 import { useBookmarksStore } from "../../../stores/bookmarks.store";
-import { useCalendarStore } from "../../../stores/calendar.store";
-import { useDockStore } from "../../../stores/dock.store";
 import type { BookmarkNode } from "../../../types/bookmarks.types";
 import { getFaviconUrl } from "../site-blocker/utils/domain.utils";
 
@@ -101,21 +99,7 @@ export function BookmarksDynamicIsland(): JSX.Element | null {
     }))
   );
 
-  const { icsUrl } = useCalendarStore(
-    useShallow((state) => ({
-      icsUrl: state.icsUrl,
-    }))
-  );
-
-  const { dockIconsVisible } = useDockStore(
-    useShallow((state) => ({
-      dockIconsVisible: state.dockIconsVisible,
-    }))
-  );
-
   const showBar = displayMode === 'bar' || displayMode === 'both';
-  const calendarEnabled = dockIconsVisible.calendar ?? true;
-  const hasCalendar = icsUrl && calendarEnabled;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<HTMLDivElement>(null);
@@ -175,10 +159,7 @@ export function BookmarksDynamicIsland(): JSX.Element | null {
 
   return (
     <div
-      className={cn(
-        "fixed left-0 right-0 z-40",
-        hasCalendar ? "top-8" : "top-0"
-      )}
+      className="fixed left-0 right-0 z-40 top-0"
     >
       <div
         ref={containerRef}
