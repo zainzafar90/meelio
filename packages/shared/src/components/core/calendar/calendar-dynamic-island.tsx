@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
+import { useBookmarksStore } from "../../../stores/bookmarks.store";
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
 import { getCalendarColor } from "../../../utils/calendar-colors";
@@ -12,6 +13,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "../../../lib/utils";
 import type { CalendarEvent } from "../../../types/calendar.types";
+
+const IS_EXTENSION = typeof chrome !== "undefined" && !!chrome.storage;
 
 export const CalendarDynamicIsland = () => {
   const { getMinutesUntilNextEvent, nextEvent, icsUrl, events } =
@@ -31,7 +34,22 @@ export const CalendarDynamicIsland = () => {
     }))
   );
 
+  const { hasPermissions, displayMode, bookmarks } = useBookmarksStore(
+    useShallow((state) => ({
+      hasPermissions: state.hasPermissions,
+      displayMode: state.displayMode,
+      bookmarks: state.bookmarks,
+    }))
+  );
+
   const calendarEnabled = dockIconsVisible.calendar ?? true;
+
+  const showBookmarksBar = IS_EXTENSION && hasPermissions && (displayMode === 'bar' || displayMode === 'both');
+  const bookmarksBar = bookmarks.find(
+    (node) => node.title === "Bookmarks Bar" || node.title === "Bookmarks bar"
+  );
+  const hasBookmarksContent = bookmarksBar?.children && bookmarksBar.children.length > 0;
+  const hasBookmarksBarVisible = showBookmarksBar && hasBookmarksContent;
 
   const [minutesLeft, setMinutesLeft] = useState<number | null>(null);
   const [displayEvent, setDisplayEvent] = useState<CalendarEvent | null>(null);
@@ -114,7 +132,10 @@ export const CalendarDynamicIsland = () => {
 
     return (
       <div
-        className="fixed top-0 inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90"
+        className={cn(
+          "fixed inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90",
+          hasBookmarksBarVisible ? "top-8" : "top-0"
+        )}
         title="No upcoming events"
         onClick={handleClick}
       >
@@ -154,7 +175,10 @@ export const CalendarDynamicIsland = () => {
 
   return (
     <div
-      className="fixed top-0 inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90"
+      className={cn(
+        "fixed inset-x-0 flex items-center w-full max-w-48 mx-auto px-3 bg-black/75 backdrop-blur-sm rounded-2xl text-white text-sm font-medium -translate-y-1/2 pt-4 pb-1 transition-all cursor-pointer hover:bg-black/90",
+        hasBookmarksBarVisible ? "top-8" : "top-0"
+      )}
       title={tooltipText}
       onClick={handleClick}
     >

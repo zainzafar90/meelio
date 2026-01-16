@@ -344,7 +344,8 @@
       "dock": "اللوحة",
       "feedback": "الملاحظات",
       "timer": "المؤقت",
-      "data": "البيانات"
+      "data": "البيانات",
+      "bookmarks": "الإشارات المرجعية"
     },
     "general": {
       "title": "عام",
@@ -437,7 +438,7 @@
       "name": {
         "label": "الاسم",
         "description": "الرجاء إدخال اسمك",
-        "placeholder": "Zain Zafar"
+        "placeholder": "أدخل اسمك هنا"
       }
     },
     "feedback": {

@@ -344,7 +344,8 @@
       "dock": "工具栏",
       "feedback": "反馈",
       "timer": "计时器",
-      "data": "数据"
+      "data": "数据",
+      "bookmarks": "书签"
     },
     "general": {
       "title": "通用",
@@ -437,7 +438,7 @@
       "name": {
         "label": "姓名",
         "description": "请输入您的姓名",
-        "placeholder": "Zain Zafar"
+        "placeholder": "请输入您的名字"
       }
     },
     "feedback": {

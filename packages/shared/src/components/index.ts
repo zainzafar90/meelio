@@ -90,7 +90,7 @@ export * from "./core/site-blocker/site-blocker.sheet";
 export * from "./core/tab-stash/tab-stash.sheet";
 
 // Bookmarks
-export * from "./core/bookmarks/bookmarks.sheet";
+export * from "./core/bookmarks";
 
 // Calendar
 export * from "./core/calendar";

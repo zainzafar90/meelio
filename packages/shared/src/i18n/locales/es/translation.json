@@ -344,7 +344,8 @@
       "dock": "Panel",
       "feedback": "Comentarios",
       "timer": "Temporizador",
-      "data": "Datos"
+      "data": "Datos",
+      "bookmarks": "Marcadores"
     },
     "general": {
       "title": "General",
@@ -437,7 +438,7 @@
       "name": {
         "label": "Nombre",
         "description": "Por favor ingresa tu nombre",
-        "placeholder": "Zain Zafar"
+        "placeholder": "Ingresa tu nombre aquí"
       }
     },
     "feedback": {

@@ -9,14 +9,14 @@ import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useBookmarksStore } from "../../../stores/bookmarks.store";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
 import { SettingsDock } from "./components/settings.dock";
 import { ClockDock } from "./components/clock.dock";
 import { CalendarDock } from "./components/calendar.dock";
-import { DockButton } from "../dock-button";
-import { DockItem } from "../dock-button";
+import { DockButton, DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
@@ -51,7 +51,17 @@ const BASE_STATIC_DOCK_ITEMS: {
   },
 ];
 
-export const Dock = () => {
+type VisibilityState = Record<string, boolean>;
+
+function getVisibleItemCount(width: number, itemsLength: number): number {
+  if (width >= 1280) return Math.min(itemsLength, 14);
+  if (width >= 1024) return 10;
+  if (width >= 768) return 8;
+  if (width >= 640) return 4;
+  return 1;
+}
+
+export function Dock(): JSX.Element {
   useDockShortcuts();
 
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
@@ -59,28 +69,8 @@ export const Dock = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const {
-    isTimerVisible,
-    isBreathingVisible,
-    isSoundscapesVisible,
-    isTasksVisible,
-    isSiteBlockerVisible,
-    isBackgroundsVisible,
-    isTabStashVisible,
-    currentOnboardingStep,
-    toggleTimer,
-    toggleSoundscapes,
-    toggleBreathing,
-    toggleTasks,
-    toggleNotes,
-    toggleSiteBlocker,
-    toggleBackgrounds,
-    toggleTabStash,
-    toggleBookmarks,
-    resetDock,
-    dockIconsVisible,
-    isBookmarksVisible,
-  } = useDockStore(
+
+  const dockState = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       isBreathingVisible: state.isBreathingVisible,
@@ -89,7 +79,7 @@ export const Dock = () => {
       isSiteBlockerVisible: state.isSiteBlockerVisible,
       isBackgroundsVisible: state.isBackgroundsVisible,
       isTabStashVisible: state.isTabStashVisible,
-      isCalendarVisible: state.isCalendarVisible,
+      isBookmarksVisible: state.isBookmarksVisible,
       currentOnboardingStep: state.currentOnboardingStep,
       resetDock: state.reset,
       toggleTimer: state.toggleTimer,
@@ -102,17 +92,49 @@ export const Dock = () => {
       toggleTabStash: state.toggleTabStash,
       toggleBookmarks: state.toggleBookmarks,
       dockIconsVisible: state.dockIconsVisible,
-      isBookmarksVisible: state.isBookmarksVisible,
     }))
   );
 
+  const {
+    isTimerVisible,
+    isBreathingVisible,
+    isSoundscapesVisible,
+    isTasksVisible,
+    isSiteBlockerVisible,
+    isBackgroundsVisible,
+    isTabStashVisible,
+    isBookmarksVisible,
+    currentOnboardingStep,
+    resetDock,
+    toggleTimer,
+    toggleSoundscapes,
+    toggleBreathing,
+    toggleTasks,
+    toggleNotes,
+    toggleSiteBlocker,
+    toggleBackgrounds,
+    toggleTabStash,
+    toggleBookmarks,
+    dockIconsVisible,
+  } = dockState;
+
+  const visibilityMap: VisibilityState = {
+    timer: isTimerVisible,
+    soundscapes: isSoundscapesVisible,
+    breathepod: isBreathingVisible,
+    tasks: isTasksVisible,
+    "site-blocker": isSiteBlockerVisible,
+    background: isBackgroundsVisible,
+    "tab-stash": isTabStashVisible,
+    bookmarks: isBookmarksVisible,
+  };
+
   const { t } = useTranslation();
   const user = useAuthStore(useShallow((state) => state.user));
+  const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
+  const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
 
-  const staticItems = useMemo(
-    () => BASE_STATIC_DOCK_ITEMS,
-    []
-  );
+  const staticItems = BASE_STATIC_DOCK_ITEMS;
 
   const items = useMemo(() => {
     const allItems = [
@@ -124,7 +146,7 @@ export const Dock = () => {
       { id: "notes", name: t("common.notes", { defaultValue: "Notes" }), icon: Icons.note, activeIcon: Icons.noteActive, onClick: toggleNotes, visibilityKey: "notes" as const },
       { id: "site-blocker", name: t("common.site-blocker"), icon: Icons.siteBlocker, activeIcon: Icons.siteBlockerActive, onClick: toggleSiteBlocker, visibilityKey: "siteBlocker" as const },
       { id: "tab-stash", name: t("common.tab-stash"), icon: Icons.tabStash, activeIcon: Icons.tabStashActive, onClick: toggleTabStash, visibilityKey: "tabStash" as const },
-      { id: "bookmarks", name: t("common.bookmarks", { defaultValue: "Bookmarks" }), icon: Icons.bookmark, activeIcon: Icons.bookmarkActive, onClick: toggleBookmarks, visibilityKey: "bookmarks" as const },
+      ...(showBookmarksInDock ? [{ id: "bookmarks", name: t("common.bookmarks", { defaultValue: "Bookmarks" }), icon: Icons.bookmark, activeIcon: Icons.bookmarkActive, onClick: toggleBookmarks, visibilityKey: "bookmarks" as const }] : []),
       { id: "background", name: t("common.background"), icon: Icons.background, activeIcon: Icons.background, onClick: toggleBackgrounds, visibilityKey: "backgrounds" as const },
     ];
 
@@ -144,23 +166,16 @@ export const Dock = () => {
     toggleBackgrounds,
     toggleBookmarks,
     dockIconsVisible,
+    showBookmarksInDock,
   ]);
 
-  const getVisibleItemCount = (width: number) => {
-    if (width >= 1280) return Math.min(items.length, 14);
-    if (width >= 1024) return 10;
-    if (width >= 768) return 8;
-    if (width >= 640) return 4;
-    return 1;
-  };
-
   useEffect(() => {
-    const handleResize = () => {
+    function handleResize(): void {
       if (!dockRef.current) return;
-      const visibleCount = getVisibleItemCount(window.innerWidth);
+      const visibleCount = getVisibleItemCount(window.innerWidth, items.length);
       setVisibleItems(items.slice(0, visibleCount));
       setDropdownItems(items.slice(visibleCount));
-    };
+    }
 
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -206,22 +221,26 @@ export const Dock = () => {
 
             <div className="flex items-center gap-2 border-l border-white/10 pl-3">
               {staticItems.map((item) => {
-                if (item.id === "clock" && !dockIconsVisible.clock) {
-                  return null;
-                }
-                if (item.id === "calendar" && !(dockIconsVisible.calendar ?? true)) {
-                  return null;
-                }
+                const isVisible =
+                  item.id === "clock"
+                    ? dockIconsVisible.clock
+                    : item.id === "calendar"
+                      ? dockIconsVisible.calendar ?? true
+                      : true;
+
+                if (!isVisible) return null;
+
+                const isOnboardingHighlight =
+                  currentOnboardingStep >= 0 &&
+                  ONBOARDING_STEPS[currentOnboardingStep].position === 9 &&
+                  item.id === "settings";
 
                 return (
                   <div
                     key={item.id}
                     className={cn(
                       "relative",
-                      currentOnboardingStep >= 0 &&
-                        ONBOARDING_STEPS[currentOnboardingStep].position ===
-                          9 &&
-                        item.id === "settings" &&
+                      isOnboardingHighlight &&
                         "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                     )}
                   >
@@ -256,19 +275,8 @@ export const Dock = () => {
             className="absolute bottom-full right-0 z-50 mb-2 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-900/90 py-1.5 backdrop-blur-lg"
           >
             {dropdownItems.map((item) => {
-              const isActive =
-                (item.id === "timer" && isTimerVisible) ||
-                (item.id === "soundscapes" && isSoundscapesVisible) ||
-                (item.id === "breathepod" && isBreathingVisible) ||
-                (item.id === "tasks" && isTasksVisible) ||
-                (item.id === "site-blocker" && isSiteBlockerVisible) ||
-                (item.id === "background" && isBackgroundsVisible) ||
-                (item.id === "tab-stash" && isTabStashVisible) ||
-                (item.id === "bookmarks" && isBookmarksVisible);
-
-              const IconComponent = (
-                isActive ? item.activeIcon : item.icon
-              ) as DockIconComponent;
+              const isActive = visibilityMap[item.id] ?? false;
+              const IconComponent = (isActive ? item.activeIcon : item.icon) as DockIconComponent;
 
               if (item.id === "settings") {
                 return (

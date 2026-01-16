@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthState>()(
         if (oldUser) {
           state.user = {
             id: oldUser.id,
-            name: oldUser.name || "User",
+            name: oldUser.name || "",
             avatarUrl: oldUser.image || oldUser.avatarUrl,
             createdAt: typeof oldUser.createdAt === 'string'
               ? new Date(oldUser.createdAt).getTime()

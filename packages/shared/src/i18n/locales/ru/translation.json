@@ -344,7 +344,8 @@
       "dock": "Панель",
       "feedback": "Обратная связь",
       "timer": "Таймер",
-      "data": "Данные"
+      "data": "Данные",
+      "bookmarks": "Закладки"
     },
     "general": {
       "title": "Общие",
@@ -437,7 +438,7 @@
       "name": {
         "label": "Имя",
         "description": "Пожалуйста, введите ваше имя",
-        "placeholder": "Zain Zafar"
+        "placeholder": "Введите ваше имя"
       }
     },
     "feedback": {

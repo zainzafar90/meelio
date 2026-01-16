@@ -344,7 +344,8 @@
       "dock": "ドック",
       "feedback": "フィードバック",
       "timer": "タイマー",
-      "data": "データ"
+      "data": "データ",
+      "bookmarks": "ブックマーク"
     },
     "general": {
       "title": "一般",
@@ -437,7 +438,7 @@
       "name": {
         "label": "名前",
         "description": "お名前を入力してください",
-        "placeholder": "Zain Zafar"
+        "placeholder": "名前を入力してください"
       }
     },
     "feedback": {

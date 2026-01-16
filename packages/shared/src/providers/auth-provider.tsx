@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (mounted && !authStore.user) {
       authStore.authenticate({
         id: generateUUID(),
-        name: "User",
+        name: "",
         createdAt: Date.now(),
       });
     }

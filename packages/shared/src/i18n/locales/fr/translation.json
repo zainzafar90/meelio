@@ -344,7 +344,8 @@
       "dock": "Dock",
       "feedback": "Commentaires",
       "timer": "Minuteur",
-      "data": "Données"
+      "data": "Données",
+      "bookmarks": "Favoris"
     },
     "general": {
       "title": "Général",
@@ -437,7 +438,7 @@
       "name": {
         "label": "Nom",
         "description": "Veuillez entrer votre nom",
-        "placeholder": "Zain Zafar"
+        "placeholder": "Entrez votre nom ici"
       }
     },
     "feedback": {
