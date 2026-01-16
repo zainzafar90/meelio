@@ -438,7 +438,7 @@
       "name": {
         "label": "الاسم",
         "description": "الرجاء إدخال اسمك",
-        "placeholder": "Zain Zafar"
+        "placeholder": "أدخل اسمك هنا"
       }
     },
     "feedback": {

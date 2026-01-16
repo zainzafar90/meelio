@@ -441,7 +441,7 @@
       "name": {
         "label": "Name",
         "description": "Please enter your name",
-        "placeholder": "Zain Zafar"
+        "placeholder": "Enter your name here"
       }
     },
     "feedback": {

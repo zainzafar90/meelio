@@ -438,7 +438,7 @@
       "name": {
         "label": "姓名",
         "description": "请输入您的姓名",
-        "placeholder": "Zain Zafar"
+        "placeholder": "请输入您的名字"
       }
     },
     "feedback": {
