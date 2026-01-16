@@ -32,7 +32,7 @@ import { BookmarksDynamicIsland } from "@repo/shared/src/components/core/bookmar
 
 import "./style.css";
 
-function Home(): JSX.Element {
+const Home = () => {
   const { checkPermissions, initializeStore } = useBookmarksStore(
     useShallow((state) => ({
       checkPermissions: state.checkPermissions,
@@ -62,7 +62,7 @@ function Home(): JSX.Element {
   );
 }
 
-function Content(): JSX.Element {
+const Content = () => {
   const { t } = useTranslation();
   const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(
     useShallow((state) => ({
@@ -100,7 +100,7 @@ const fadeSlideAnimation = {
   exit: { opacity: 0, y: -20 },
 };
 
-function GreetingsContent(): JSX.Element {
+const GreetingsContent = () => {
   const isTimerVisible = useDockStore(useShallow((state) => state.isTimerVisible));
 
   return (
@@ -126,7 +126,7 @@ function GreetingsContent(): JSX.Element {
   );
 }
 
-function TopBar(): JSX.Element {
+const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
@@ -136,7 +136,7 @@ function TopBar(): JSX.Element {
   );
 }
 
-function BottomBar(): JSX.Element {
+const BottomBar = () => {
   const { t } = useTranslation();
   return (
     <footer
@@ -148,8 +148,8 @@ function BottomBar(): JSX.Element {
   );
 }
 
-export function NewTab(): JSX.Element {
-  useAppStore.getState().setPlatform("extension");
+export const NewTab = () => {
+ useAppStore.getState().setPlatform("extension");
 
   return (
     <AppProvider>
