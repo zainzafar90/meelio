@@ -344,7 +344,8 @@
       "dock": "Panel",
       "feedback": "Comentarios",
       "timer": "Temporizador",
-      "data": "Datos"
+      "data": "Datos",
+      "bookmarks": "Marcadores"
     },
     "general": {
       "title": "General",

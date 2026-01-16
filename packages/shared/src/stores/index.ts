@@ -1,5 +1,6 @@
 export * from "./auth.store";
 export * from "./background.store";
+export * from "./bookmarks.store";
 export * from "./dock.store";
 export * from "./greetings.store";
 export * from "./quotes.store";

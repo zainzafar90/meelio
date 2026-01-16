@@ -9,7 +9,8 @@ export type SettingsTab =
   | "language"
   | "dock"
   | "timer"
-  | "data";
+  | "data"
+  | "bookmarks";
 
 interface SettingsState {
   isOpen: boolean;

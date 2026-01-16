@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
 
@@ -8,6 +8,7 @@ import {
   Clock,
   TabStashSheet,
   BookmarksSheet,
+  BookmarksDynamicIsland,
   CalendarSheet,
   CalendarDynamicIsland,
   useDockStore,
@@ -25,12 +26,30 @@ import {
   SimpleTimer,
   SearchPopover,
   ShortcutsModal,
+  useBookmarksStore,
  } from "@repo/shared";
 import { useAppStore } from "@repo/shared";
 
 import "./style.css";
 
 const Home = () => {
+  const { checkPermissions, initializeStore } = useBookmarksStore(
+    useShallow((state) => ({
+      checkPermissions: state.checkPermissions,
+      initializeStore: state.initializeStore,
+    }))
+  );
+
+  useEffect(() => {
+    const initializeBookmarks = async () => {
+      const hasPerms = await checkPermissions();
+      if (hasPerms) {
+        await initializeStore();
+      }
+    };
+    initializeBookmarks();
+  }, [checkPermissions, initializeStore]);
+
   return (
     <>
       <Background />
@@ -114,6 +133,7 @@ const TopBar = () => {
   return (
     <div className="relative flex justify-center pt-0">
       <CalendarDynamicIsland />
+      <BookmarksDynamicIsland />
       <SearchPopover />
     </div>
   );

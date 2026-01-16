@@ -344,7 +344,8 @@
       "dock": "Dock",
       "feedback": "Feedback",
       "timer": "Timer",
-      "data": "Daten"
+      "data": "Daten",
+      "bookmarks": "Lesezeichen"
     },
     "general": {
       "title": "Allgemein",

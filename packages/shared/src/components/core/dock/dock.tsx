@@ -9,6 +9,7 @@ import { Icons } from "../../../components/icons/icons";
 import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useBookmarksStore } from "../../../stores/bookmarks.store";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
@@ -108,6 +109,8 @@ export const Dock = () => {
 
   const { t } = useTranslation();
   const user = useAuthStore(useShallow((state) => state.user));
+  const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
+  const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
 
   const staticItems = useMemo(
     () => BASE_STATIC_DOCK_ITEMS,
@@ -124,7 +127,7 @@ export const Dock = () => {
       { id: "notes", name: t("common.notes", { defaultValue: "Notes" }), icon: Icons.note, activeIcon: Icons.noteActive, onClick: toggleNotes, visibilityKey: "notes" as const },
       { id: "site-blocker", name: t("common.site-blocker"), icon: Icons.siteBlocker, activeIcon: Icons.siteBlockerActive, onClick: toggleSiteBlocker, visibilityKey: "siteBlocker" as const },
       { id: "tab-stash", name: t("common.tab-stash"), icon: Icons.tabStash, activeIcon: Icons.tabStashActive, onClick: toggleTabStash, visibilityKey: "tabStash" as const },
-      { id: "bookmarks", name: t("common.bookmarks", { defaultValue: "Bookmarks" }), icon: Icons.bookmark, activeIcon: Icons.bookmarkActive, onClick: toggleBookmarks, visibilityKey: "bookmarks" as const },
+      ...(showBookmarksInDock ? [{ id: "bookmarks", name: t("common.bookmarks", { defaultValue: "Bookmarks" }), icon: Icons.bookmark, activeIcon: Icons.bookmarkActive, onClick: toggleBookmarks, visibilityKey: "bookmarks" as const }] : []),
       { id: "background", name: t("common.background"), icon: Icons.background, activeIcon: Icons.background, onClick: toggleBackgrounds, visibilityKey: "backgrounds" as const },
     ];
 
@@ -144,6 +147,7 @@ export const Dock = () => {
     toggleBackgrounds,
     toggleBookmarks,
     dockIconsVisible,
+    showBookmarksInDock,
   ]);
 
   const getVisibleItemCount = (width: number) => {

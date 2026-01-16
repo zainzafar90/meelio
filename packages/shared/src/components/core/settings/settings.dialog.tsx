@@ -23,6 +23,7 @@ import {
   Languages,
   Anchor,
   HardDrive,
+  Bookmark,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -33,6 +34,7 @@ import { GeneralSettings } from "./tabs/general-settings";
 import { LanguageSettings } from "./tabs/language-settings";
 import { DockSettings } from "./tabs/dock-settings";
 import { DataSettings } from "./tabs/data-settings";
+import { BookmarksSettings } from "./tabs/bookmarks-settings";
 import { Icons } from "../../../components/icons";
 import { cn } from "../../../lib";
 import { SettingsTab, useSettingsStore } from "../../../stores/settings.store";
@@ -50,6 +52,7 @@ const SETTINGS_NAV: SettingsNavItem[] = [
   { id: "appearance", name: "appearance", icon: Paintbrush },
   { id: "language", name: "language", icon: Languages },
   { id: "dock", name: "dock", icon: Anchor },
+  { id: "bookmarks", name: "bookmarks", icon: Bookmark },
   { id: "data", name: "data", icon: HardDrive },
 ];
 
@@ -76,6 +79,8 @@ export function SettingsDialog() {
         return <DockSettings />;
       case "account":
         return <AccountSettings />;
+      case "bookmarks":
+        return <BookmarksSettings />;
       case "data":
         return <DataSettings onClose={closeSettings} />;
       default:

@@ -6,6 +6,8 @@ import { useAuthStore } from "./auth.store";
 import type { BookmarkNode, BookmarkLink, BookmarkFolder } from "../types/bookmarks.types";
 import { generateUUID } from "../utils/common.utils";
 
+export type BookmarksDisplayMode = 'hidden' | 'bar' | 'sheet' | 'both';
+
 interface BookmarksState {
     bookmarks: BookmarkNode[];
     folders: BookmarkFolder[];
@@ -14,7 +16,9 @@ interface BookmarksState {
     isLoading: boolean;
     error: string | null;
     lastSyncAt: number | null;
+    displayMode: BookmarksDisplayMode;
 
+    setDisplayMode: (mode: BookmarksDisplayMode) => void;
     initializeStore: () => Promise<void>;
     loadFromLocal: () => Promise<void>;
     syncFromChrome: () => Promise<void>;
@@ -249,6 +253,11 @@ export const useBookmarksStore = create<BookmarksState>()(
                 isLoading: false,
                 error: null,
                 lastSyncAt: null,
+                displayMode: 'bar' as BookmarksDisplayMode,
+
+                setDisplayMode: (mode: BookmarksDisplayMode) => {
+                    set({ displayMode: mode });
+                },
 
                 initializeStore: async () => {
                     const userId = useAuthStore.getState().user?.id;
@@ -554,6 +563,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 partialize: (s) => ({
                     hasPermissions: s.hasPermissions,
                     lastSyncAt: s.lastSyncAt,
+                    displayMode: s.displayMode,
                 }),
                 onRehydrateStorage: () => (state) => {
                     if (state && state.hasPermissions) {
