@@ -36,10 +36,15 @@ interface BookmarksState {
     deleteFolder: (id: string) => Promise<void>;
 }
 
-const CHROME_BOOKMARKS_ROOT = "0";
 const CACHE_DURATION = 60 * 60 * 1000;
 
-const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
+function isExtensionEnvironment(): boolean {
+    return typeof chrome !== "undefined" && !!chrome.storage;
+}
+
+function hasBookmarksApi(): boolean {
+    return isExtensionEnvironment() && !!chrome.bookmarks;
+}
 
 const mapChromeBookmark = (node: chrome.bookmarks.BookmarkTreeNode): BookmarkNode => ({
     id: node.id,
@@ -269,8 +274,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                     try {
                         set({ isLoading: true, error: null });
 
-                        const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                        if (!inExtension) {
+                        if (!isExtensionEnvironment()) {
                             set({ hasPermissions: false, isLoading: false });
                             return;
                         }
@@ -278,14 +282,14 @@ export const useBookmarksStore = create<BookmarksState>()(
                         const hasPerms = await get().checkPermissions();
                         await get().loadFromLocal();
 
-                        if (hasPerms && shouldRefresh(get().lastSyncAt)) {
-                            await get().syncFromChrome();
-                        } else if (hasPerms && get().links.length === 0) {
+                        const needsSync = hasPerms && (shouldRefresh(get().lastSyncAt) || get().links.length === 0);
+                        if (needsSync) {
                             await get().syncFromChrome();
                         }
-                    } catch (error: any) {
+                    } catch (error: unknown) {
+                        const message = error instanceof Error ? error.message : "Failed to initialize store";
                         console.error("Failed to initialize bookmarks store:", error);
-                        set({ error: error?.message || "Failed to initialize store" });
+                        set({ error: message });
                     } finally {
                         set({ isLoading: false });
                         initializationState.setIsInitializing(false);
@@ -307,8 +311,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 syncFromChrome: async () => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) {
+                    if (!hasBookmarksApi()) {
                         set({ hasPermissions: false });
                         return;
                     }
@@ -337,13 +340,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 checkPermissions: async () => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension) {
-                        set({ hasPermissions: false });
-                        return false;
-                    }
-
-                    if (!chrome.bookmarks) {
+                    if (!isExtensionEnvironment() || !chrome.bookmarks) {
                         set({ hasPermissions: false });
                         return false;
                     }
@@ -360,49 +357,39 @@ export const useBookmarksStore = create<BookmarksState>()(
                             }
                         }
 
-                        const hasBookmarksApi = typeof chrome.bookmarks !== "undefined";
-                        if (hasBookmarksApi) {
-                            try {
-                                await chrome.bookmarks.getTree();
-                                set({ hasPermissions: true });
-                                return true;
-                            } catch {
-                                set({ hasPermissions: false });
-                                return false;
-                            }
-                        }
-
-                        set({ hasPermissions: false });
-                        return false;
-                    } catch (error) {
-                        console.error("Error checking permissions:", error);
+                        // Fallback: try to access bookmarks API directly
+                        await chrome.bookmarks.getTree();
+                        set({ hasPermissions: true });
+                        return true;
+                    } catch {
                         set({ hasPermissions: false });
                         return false;
                     }
                 },
 
                 requestPermissions: async () => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-
-                    if (!inExtension || !chrome) {
+                    if (!isExtensionEnvironment()) {
                         set({ hasPermissions: false });
                         return false;
                     }
 
-                    if (!chrome.permissions) {
-                        if (chrome.bookmarks) {
-                            try {
-                                await chrome.bookmarks.getTree();
-                                set({ hasPermissions: true });
-                                await get().syncFromChrome();
-                                return true;
-                            } catch {
-                                set({ hasPermissions: false });
-                                return false;
-                            }
+                    // Helper to attempt direct API access as fallback
+                    const tryDirectAccess = async (): Promise<boolean> => {
+                        if (!chrome.bookmarks) return false;
+                        try {
+                            await chrome.bookmarks.getTree();
+                            set({ hasPermissions: true });
+                            await get().syncFromChrome();
+                            return true;
+                        } catch {
+                            return false;
                         }
-                        set({ hasPermissions: false });
-                        return false;
+                    };
+
+                    if (!chrome.permissions) {
+                        const success = await tryDirectAccess();
+                        if (!success) set({ hasPermissions: false });
+                        return success;
                     }
 
                     try {
@@ -419,19 +406,9 @@ export const useBookmarksStore = create<BookmarksState>()(
                     } catch (error) {
                         console.error("Failed to request bookmarks permission:", error);
 
-                        if (chrome.bookmarks) {
-                            try {
-                                await chrome.bookmarks.getTree();
-                                set({ hasPermissions: true });
-                                await get().syncFromChrome();
-                                return true;
-                            } catch {
-                                // Fallback also failed
-                            }
-                        }
-
-                        set({ hasPermissions: false });
-                        return false;
+                        const success = await tryDirectAccess();
+                        if (!success) set({ hasPermissions: false });
+                        return success;
                     }
                 },
 
@@ -445,8 +422,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 addBookmark: async (bookmark) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
                         await chrome.bookmarks.create({
@@ -454,7 +430,6 @@ export const useBookmarksStore = create<BookmarksState>()(
                             url: bookmark.url,
                             parentId: bookmark.parentId,
                         });
-
                         await get().syncFromChrome();
                     } catch (error) {
                         console.error("Failed to add bookmark:", error);
@@ -463,16 +438,14 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 updateBookmark: async (id, updates) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
-                        const changes: any = {};
+                        const changes: chrome.bookmarks.BookmarkChangesArg = {};
                         if (updates.title !== undefined) changes.title = updates.title;
                         if (updates.url !== undefined) changes.url = updates.url;
 
                         await chrome.bookmarks.update(id, changes);
-
                         await get().syncFromChrome();
                     } catch (error) {
                         console.error("Failed to update bookmark:", error);
@@ -481,8 +454,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 deleteBookmark: async (id) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
                         await chrome.bookmarks.remove(id);
@@ -494,15 +466,13 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 addFolder: async (folder) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
                         await chrome.bookmarks.create({
                             title: folder.title,
                             parentId: folder.parentId,
                         });
-
                         await get().syncFromChrome();
                     } catch (error) {
                         console.error("Failed to add folder:", error);
@@ -511,15 +481,13 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 updateFolder: async (id, updates) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
-                        const changes: any = {};
+                        const changes: chrome.bookmarks.BookmarkChangesArg = {};
                         if (updates.title !== undefined) changes.title = updates.title;
 
                         await chrome.bookmarks.update(id, changes);
-
                         await get().syncFromChrome();
                     } catch (error) {
                         console.error("Failed to update folder:", error);
@@ -528,8 +496,7 @@ export const useBookmarksStore = create<BookmarksState>()(
                 },
 
                 deleteFolder: async (id) => {
-                    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-                    if (!inExtension || !chrome.bookmarks) return;
+                    if (!hasBookmarksApi()) return;
 
                     try {
                         await chrome.bookmarks.removeTree(id);
@@ -575,38 +542,21 @@ export const useBookmarksStore = create<BookmarksState>()(
     )
 );
 
-const checkAndSetupListeners = () => {
-    const inExtension = typeof chrome !== "undefined" && !!chrome.storage;
-    if (inExtension && chrome.bookmarks) {
-        chrome.bookmarks.onCreated.addListener(() => {
-            const store = useBookmarksStore.getState();
-            if (store.hasPermissions) {
-                store.syncFromChrome();
-            }
-        });
+function setupBookmarkListeners(): void {
+    if (!hasBookmarksApi()) return;
 
-        chrome.bookmarks.onChanged.addListener(() => {
-            const store = useBookmarksStore.getState();
-            if (store.hasPermissions) {
-                store.syncFromChrome();
-            }
-        });
+    const syncIfAuthorized = (): void => {
+        const store = useBookmarksStore.getState();
+        if (store.hasPermissions) {
+            store.syncFromChrome();
+        }
+    };
 
-        chrome.bookmarks.onRemoved.addListener(() => {
-            const store = useBookmarksStore.getState();
-            if (store.hasPermissions) {
-                store.syncFromChrome();
-            }
-        });
+    chrome.bookmarks.onCreated.addListener(syncIfAuthorized);
+    chrome.bookmarks.onChanged.addListener(syncIfAuthorized);
+    chrome.bookmarks.onRemoved.addListener(syncIfAuthorized);
+    chrome.bookmarks.onMoved.addListener(syncIfAuthorized);
+}
 
-        chrome.bookmarks.onMoved.addListener(() => {
-            const store = useBookmarksStore.getState();
-            if (store.hasPermissions) {
-                store.syncFromChrome();
-            }
-        });
-    }
-};
-
-checkAndSetupListeners();
+setupBookmarkListeners();
 

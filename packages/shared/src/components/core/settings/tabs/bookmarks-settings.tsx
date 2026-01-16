@@ -1,13 +1,65 @@
-import { Switch } from "@repo/ui/components/ui/switch";
-import { Button } from "@repo/ui/components/ui/button";
-import { useBookmarksStore } from "../../../../stores/bookmarks.store";
-import { useShallow } from "zustand/shallow";
 import { RefreshCw } from "lucide-react";
+import { useShallow } from "zustand/shallow";
+
+import { Button } from "@repo/ui/components/ui/button";
+import { Switch } from "@repo/ui/components/ui/switch";
 import { cn } from "@repo/ui/lib/utils";
 
-const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
+import type { BookmarksDisplayMode } from "../../../../stores/bookmarks.store";
+import { useBookmarksStore } from "../../../../stores/bookmarks.store";
 
-export const BookmarksSettings = () => {
+const IS_EXTENSION = typeof chrome !== "undefined" && !!chrome.storage;
+
+interface SettingsRowProps {
+  title: string;
+  description: string;
+  checked: boolean;
+  disabled: boolean;
+  onToggle: (enabled: boolean) => void;
+}
+
+function SettingsRow({
+  title,
+  description,
+  checked,
+  disabled,
+  onToggle,
+}: SettingsRowProps): JSX.Element {
+  return (
+    <div
+      className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
+      onClick={() => onToggle(!checked)}
+    >
+      <div className="space-y-1">
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
+      <Switch
+        size="sm"
+        checked={checked}
+        onCheckedChange={onToggle}
+        disabled={disabled}
+      />
+    </div>
+  );
+}
+
+function formatLastSync(timestamp: number | null): string {
+  if (!timestamp) return "Never";
+  return new Date(timestamp).toLocaleString();
+}
+
+function computeDisplayMode(
+  showBar: boolean,
+  showSheet: boolean
+): BookmarksDisplayMode {
+  if (showBar && showSheet) return "both";
+  if (showBar) return "bar";
+  if (showSheet) return "sheet";
+  return "hidden";
+}
+
+export function BookmarksSettings(): JSX.Element {
   const {
     hasPermissions,
     displayMode,
@@ -30,32 +82,18 @@ export const BookmarksSettings = () => {
     }))
   );
 
-  const showBar = displayMode === 'bar' || displayMode === 'both';
-  const showSheet = displayMode === 'sheet' || displayMode === 'both';
+  const showBar = displayMode === "bar" || displayMode === "both";
+  const showSheet = displayMode === "sheet" || displayMode === "both";
 
   const handleBarToggle = (enabled: boolean) => {
-    if (enabled) {
-      setDisplayMode(showSheet ? 'both' : 'bar');
-    } else {
-      setDisplayMode(showSheet ? 'sheet' : 'hidden');
-    }
+    setDisplayMode(computeDisplayMode(enabled, showSheet));
   };
 
   const handleSheetToggle = (enabled: boolean) => {
-    if (enabled) {
-      setDisplayMode(showBar ? 'both' : 'sheet');
-    } else {
-      setDisplayMode(showBar ? 'bar' : 'hidden');
-    }
+    setDisplayMode(computeDisplayMode(showBar, enabled));
   };
 
-  const formatLastSync = (timestamp: number | null) => {
-    if (!timestamp) return "Never";
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
-
-  if (!isExtension) {
+  if (!IS_EXTENSION) {
     return (
       <div className="space-y-6">
         <p className="text-sm text-muted-foreground">
@@ -65,17 +103,16 @@ export const BookmarksSettings = () => {
     );
   }
 
+  const permissionDescription = hasPermissions
+    ? `${links.length} bookmarks synced`
+    : "Grant permission to access your browser bookmarks";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between rounded-lg border p-4 transition-colors">
         <div className="space-y-1">
           <p className="text-sm font-medium">Bookmarks Permission</p>
-          <p className="text-sm text-muted-foreground">
-            {hasPermissions
-              ? `${links.length} bookmarks synced`
-              : "Grant permission to access your browser bookmarks"
-            }
-          </p>
+          <p className="text-sm text-muted-foreground">{permissionDescription}</p>
         </div>
         {hasPermissions ? (
           <Button
@@ -99,41 +136,21 @@ export const BookmarksSettings = () => {
         )}
       </div>
 
-      <div
-        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
-        onClick={() => handleBarToggle(!showBar)}
-      >
-        <div className="space-y-1">
-          <p className="text-sm font-medium">Bookmarks Bar</p>
-          <p className="text-sm text-muted-foreground">
-            Show bookmarks in a bar at the top of the page
-          </p>
-        </div>
-        <Switch
-          size="sm"
-          checked={showBar}
-          onCheckedChange={handleBarToggle}
-          disabled={!hasPermissions}
-        />
-      </div>
+      <SettingsRow
+        title="Bookmarks Bar"
+        description="Show bookmarks in a bar at the top of the page"
+        checked={showBar}
+        disabled={!hasPermissions}
+        onToggle={handleBarToggle}
+      />
 
-      <div
-        className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50 cursor-pointer"
-        onClick={() => handleSheetToggle(!showSheet)}
-      >
-        <div className="space-y-1">
-          <p className="text-sm font-medium">Bookmarks in Dock</p>
-          <p className="text-sm text-muted-foreground">
-            Show bookmarks icon in dock to open side panel
-          </p>
-        </div>
-        <Switch
-          size="sm"
-          checked={showSheet}
-          onCheckedChange={handleSheetToggle}
-          disabled={!hasPermissions}
-        />
-      </div>
+      <SettingsRow
+        title="Bookmarks in Dock"
+        description="Show bookmarks icon in dock to open side panel"
+        checked={showSheet}
+        disabled={!hasPermissions}
+        onToggle={handleSheetToggle}
+      />
 
       {hasPermissions && lastSyncAt && (
         <p className="text-xs text-muted-foreground">
@@ -142,4 +159,4 @@ export const BookmarksSettings = () => {
       )}
     </div>
   );
-};
+}

@@ -1,17 +1,98 @@
-import { useShallow } from "zustand/shallow";
-import { useBookmarksStore } from "../../../stores/bookmarks.store";
-import { useDockStore } from "../../../stores/dock.store";
-import { useCalendarStore } from "../../../stores/calendar.store";
-import { getFaviconUrl } from "../site-blocker/utils/domain.utils";
-import { Bookmark, Folder, ChevronRight, ChevronDown, MoreHorizontal } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import type { BookmarkNode } from "../../../types/bookmarks.types";
+
+import { Bookmark, ChevronDown, ChevronRight, Folder } from "lucide-react";
+import { useShallow } from "zustand/shallow";
+
 import { cn } from "../../../lib/utils";
+import { useBookmarksStore } from "../../../stores/bookmarks.store";
+import { useCalendarStore } from "../../../stores/calendar.store";
+import { useDockStore } from "../../../stores/dock.store";
+import type { BookmarkNode } from "../../../types/bookmarks.types";
+import { getFaviconUrl } from "../site-blocker/utils/domain.utils";
 
-const isExtension = typeof chrome !== "undefined" && !!chrome.storage;
+const IS_EXTENSION = typeof chrome !== "undefined" && !!chrome.storage;
 
-export const BookmarksDynamicIsland = () => {
+interface DropdownPosition {
+  top: number;
+  left: number;
+}
+
+const DROPDOWN_SCROLL_STYLE: React.CSSProperties = {
+  scrollbarWidth: "none",
+  msOverflowStyle: "none",
+};
+
+const DROPDOWN_WIDTH = 288;
+const DROPDOWN_HEIGHT = 320;
+const DROPDOWN_PADDING = 8;
+
+function useDropdownClickOutside(
+  isOpen: boolean,
+  buttonRef: React.RefObject<HTMLElement | null>,
+  setIsOpen: (open: boolean) => void,
+  isSubmenu = false
+): void {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleClickOutside(e: MouseEvent): void {
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-bookmark-dropdown]")) return;
+      if (isSubmenu && target.closest("[data-bookmark-folder]")) return;
+      if (buttonRef.current && !buttonRef.current.contains(target)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, buttonRef, setIsOpen, isSubmenu]);
+}
+
+interface DropdownContainerProps {
+  items: BookmarkNode[];
+  onClose: () => void;
+  position: DropdownPosition;
+  zIndex?: number;
+  depth?: number;
+}
+
+function DropdownContainer({
+  items,
+  onClose,
+  position,
+  zIndex = 9999,
+  depth = 1,
+}: DropdownContainerProps): JSX.Element {
+  const showScrollHint = items.length > 8;
+
+  return createPortal(
+    <div
+      data-bookmark-dropdown
+      data-depth={depth}
+      className="fixed w-72 bg-zinc-900/95 backdrop-blur-md rounded-lg border border-white/10 shadow-2xl"
+      style={{ top: position.top, left: position.left, zIndex }}
+    >
+      <div
+        className="max-h-80 overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden"
+        style={DROPDOWN_SCROLL_STYLE}
+      >
+        {items.map((item) => (
+          <DropdownItem key={item.id} node={item} onClose={onClose} depth={depth} />
+        ))}
+      </div>
+      {showScrollHint && (
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-zinc-900 to-transparent pointer-events-none rounded-b-lg flex items-end justify-center pb-1">
+          <ChevronDown className="h-3 w-3 text-white/50" />
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+}
+
+export function BookmarksDynamicIsland(): JSX.Element | null {
   const { bookmarks, hasPermissions, displayMode } = useBookmarksStore(
     useShallow((state) => ({
       bookmarks: state.bookmarks,
@@ -79,7 +160,7 @@ export const BookmarksDynamicIsland = () => {
     updateVisibleCount();
   }, [bookmarksBarItems.length, updateVisibleCount]);
 
-  if (!isExtension || !showBar || !hasPermissions) {
+  if (!IS_EXTENSION || !showBar || !hasPermissions) {
     return null;
   }
 
@@ -172,60 +253,48 @@ const BookmarkLink = ({ node, inDropdown = false, onClose }: { node: BookmarkNod
   );
 };
 
-interface DropdownPosition {
-  top: number;
-  left: number;
-}
-
-const dropdownScrollStyle: React.CSSProperties = {
-  scrollbarWidth: 'none',
-  msOverflowStyle: 'none',
-};
-
-const FolderDropdown = ({
-  node,
-  isSubmenu = false,
-  onClose,
-  depth = 0,
-}: {
+interface FolderDropdownProps {
   node: BookmarkNode;
   isSubmenu?: boolean;
   onClose?: () => void;
   depth?: number;
-}) => {
+}
+
+function FolderDropdown({
+  node,
+  isSubmenu = false,
+  onClose,
+  depth = 0,
+}: FolderDropdownProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const updatePosition = useCallback(() => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const dropdownWidth = 288;
-    const dropdownHeight = 320;
-    const padding = 8;
 
     if (isSubmenu) {
       const rightSpace = window.innerWidth - rect.right;
       const leftSpace = rect.left;
 
       let left: number;
-      if (rightSpace >= dropdownWidth + padding) {
+      if (rightSpace >= DROPDOWN_WIDTH + DROPDOWN_PADDING) {
         left = rect.right + 2;
-      } else if (leftSpace >= dropdownWidth + padding) {
-        left = rect.left - dropdownWidth - 2;
+      } else if (leftSpace >= DROPDOWN_WIDTH + DROPDOWN_PADDING) {
+        left = rect.left - DROPDOWN_WIDTH - 2;
       } else {
-        left = Math.max(padding, window.innerWidth - dropdownWidth - padding);
+        left = Math.max(DROPDOWN_PADDING, window.innerWidth - DROPDOWN_WIDTH - DROPDOWN_PADDING);
       }
 
       setDropdownPosition({
-        top: Math.max(padding, Math.min(rect.top, window.innerHeight - dropdownHeight - padding)),
+        top: Math.max(DROPDOWN_PADDING, Math.min(rect.top, window.innerHeight - DROPDOWN_HEIGHT - DROPDOWN_PADDING)),
         left,
       });
     } else {
       setDropdownPosition({
         top: rect.bottom + 2,
-        left: Math.max(padding, Math.min(rect.left, window.innerWidth - dropdownWidth - padding)),
+        left: Math.max(DROPDOWN_PADDING, Math.min(rect.left, window.innerWidth - DROPDOWN_WIDTH - DROPDOWN_PADDING)),
       });
     }
   }, [isSubmenu]);
@@ -244,55 +313,19 @@ const FolderDropdown = ({
     onClose?.();
   }, [onClose]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-bookmark-dropdown]")) {
-        return;
-      }
-      if (isSubmenu && target.closest("[data-bookmark-folder]")) {
-        return;
-      }
-      if (buttonRef.current && !buttonRef.current.contains(target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, isSubmenu]);
+  useDropdownClickOutside(isOpen, buttonRef, setIsOpen, isSubmenu);
 
   const hasChildren = node.children && node.children.length > 0;
-
   const zIndex = 9999 + depth * 10;
 
-  const childCount = node.children?.length || 0;
-
-  const dropdown = isOpen && hasChildren && dropdownPosition && createPortal(
-    <div
-      data-bookmark-dropdown
-      data-depth={depth}
-      className="fixed w-72 bg-zinc-900/95 backdrop-blur-md rounded-lg border border-white/10 shadow-2xl"
-      style={{ top: dropdownPosition.top, left: dropdownPosition.left, zIndex }}
-    >
-      <div
-        ref={dropdownRef}
-        className="max-h-80 overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden"
-        style={dropdownScrollStyle}
-      >
-        {node.children?.map((child) => (
-          <DropdownItem key={child.id} node={child} onClose={handleClose} depth={depth + 1} />
-        ))}
-      </div>
-      {childCount > 8 && (
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-zinc-900 to-transparent pointer-events-none rounded-b-lg flex items-end justify-center pb-1">
-          <ChevronDown className="h-3 w-3 text-white/50" />
-        </div>
-      )}
-    </div>,
-    document.body
+  const dropdown = isOpen && hasChildren && dropdownPosition && (
+    <DropdownContainer
+      items={node.children || []}
+      onClose={handleClose}
+      position={dropdownPosition}
+      zIndex={zIndex}
+      depth={depth + 1}
+    />
   );
 
   return (
@@ -337,19 +370,17 @@ const DropdownItem = ({ node, onClose, depth = 1 }: { node: BookmarkNode; onClos
   return <BookmarkLink node={node} inDropdown onClose={onClose} />;
 };
 
-const OverflowDropdown = ({ items }: { items: BookmarkNode[] }) => {
+function OverflowDropdown({ items }: { items: BookmarkNode[] }): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const updatePosition = useCallback(() => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const dropdownWidth = 288;
     setDropdownPosition({
       top: rect.bottom + 2,
-      left: Math.max(8, Math.min(rect.left, window.innerWidth - dropdownWidth - 8)),
+      left: Math.max(DROPDOWN_PADDING, Math.min(rect.left, window.innerWidth - DROPDOWN_WIDTH - DROPDOWN_PADDING)),
     });
   }, []);
 
@@ -365,45 +396,10 @@ const OverflowDropdown = ({ items }: { items: BookmarkNode[] }) => {
     setIsOpen(false);
   }, []);
 
-  useEffect(() => {
-    if (!isOpen) return;
+  useDropdownClickOutside(isOpen, buttonRef, setIsOpen);
 
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-bookmark-dropdown]")) {
-        return;
-      }
-      if (buttonRef.current && !buttonRef.current.contains(target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
-
-  const dropdown = isOpen && dropdownPosition && createPortal(
-    <div
-      data-bookmark-dropdown
-      className="fixed z-[9999] w-72 bg-zinc-900/95 backdrop-blur-md rounded-lg border border-white/10 shadow-2xl"
-      style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
-    >
-      <div
-        ref={dropdownRef}
-        className="max-h-80 overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden"
-        style={dropdownScrollStyle}
-      >
-        {items.map((item) => (
-          <DropdownItem key={item.id} node={item} onClose={handleClose} />
-        ))}
-      </div>
-      {items.length > 8 && (
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-zinc-900 to-transparent pointer-events-none rounded-b-lg flex items-end justify-center pb-1">
-          <ChevronDown className="h-3 w-3 text-white/50" />
-        </div>
-      )}
-    </div>,
-    document.body
+  const dropdown = isOpen && dropdownPosition && (
+    <DropdownContainer items={items} onClose={handleClose} position={dropdownPosition} />
   );
 
   return (
@@ -424,19 +420,17 @@ const OverflowDropdown = ({ items }: { items: BookmarkNode[] }) => {
   );
 };
 
-const OtherBookmarksDropdown = ({ folders }: { folders: BookmarkNode[] }) => {
+function OtherBookmarksDropdown({ folders }: { folders: BookmarkNode[] }): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const updatePosition = useCallback(() => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const dropdownWidth = 288;
     setDropdownPosition({
       top: rect.bottom + 2,
-      left: Math.max(8, Math.min(rect.right - dropdownWidth, window.innerWidth - dropdownWidth - 8)),
+      left: Math.max(DROPDOWN_PADDING, Math.min(rect.right - DROPDOWN_WIDTH, window.innerWidth - DROPDOWN_WIDTH - DROPDOWN_PADDING)),
     });
   }, []);
 
@@ -452,47 +446,12 @@ const OtherBookmarksDropdown = ({ folders }: { folders: BookmarkNode[] }) => {
     setIsOpen(false);
   }, []);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-bookmark-dropdown]")) {
-        return;
-      }
-      if (buttonRef.current && !buttonRef.current.contains(target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  useDropdownClickOutside(isOpen, buttonRef, setIsOpen);
 
   const allItems = folders.flatMap((f) => f.children || []);
 
-  const dropdown = isOpen && dropdownPosition && createPortal(
-    <div
-      data-bookmark-dropdown
-      className="fixed z-[9999] w-72 bg-zinc-900/95 backdrop-blur-md rounded-lg border border-white/10 shadow-2xl"
-      style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
-    >
-      <div
-        ref={dropdownRef}
-        className="max-h-80 overflow-y-auto py-1 [&::-webkit-scrollbar]:hidden"
-        style={dropdownScrollStyle}
-      >
-        {allItems.map((item) => (
-          <DropdownItem key={item.id} node={item} onClose={handleClose} />
-        ))}
-      </div>
-      {allItems.length > 8 && (
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-zinc-900 to-transparent pointer-events-none rounded-b-lg flex items-end justify-center pb-1">
-          <ChevronDown className="h-3 w-3 text-white/50" />
-        </div>
-      )}
-    </div>,
-    document.body
+  const dropdown = isOpen && dropdownPosition && (
+    <DropdownContainer items={allItems} onClose={handleClose} position={dropdownPosition} />
   );
 
   return (
@@ -512,4 +471,4 @@ const OtherBookmarksDropdown = ({ folders }: { folders: BookmarkNode[] }) => {
       {dropdown}
     </div>
   );
-};
+}
