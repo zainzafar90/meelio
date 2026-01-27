@@ -1,7 +1,8 @@
 {
-	"name": "worker-name",
-    "compatibility_date": "2026-01-27",
-    "assets": {
-      "directory": "./apps/web/dist"
-    }
+  "name": "meelio-app",
+  "compatibility_date": "2026-01-27",
+  "routes": [{ "pattern": "app.meelio.io", "custom_domain": true }],
+  "assets": {
+    "directory": "./apps/web/dist"
   }
+}
