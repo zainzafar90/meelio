@@ -11,6 +11,7 @@
     "clean": "git clean -xdf .turbo node_modules"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.15",
     "postcss": "^8.4.29",
     "postcss-load-config": "^6.0.1",
