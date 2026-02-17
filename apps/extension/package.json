@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "private": true,
   "displayName": "Meelio",
   "description": "Focus, calm & productivity with every new tab",
@@ -24,6 +24,8 @@
     "package:opera": "plasmo package --target=opera-mv3",
     "package:safari": "plasmo package --target=safari-mv3",
     "lint": "eslint . --ext .ts,.tsx",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf .plasmo"
   },
   "dependencies": {
@@ -88,7 +90,8 @@
     "prettier-plugin-tailwindcss": "^0.5.14",
     "standard-version": "^9.5.0",
     "tailwindcss": "^3.3.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^0.34.6"
   },
   "manifest": {
     "action": {
