@@ -1,18 +1,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { useAuthStore } from "./auth.store";
 import { pomodoroSounds } from "../data";
 import {
   TimerStage,
   TimerState,
   TimerDeps,
   TimerSettings,
+  TimerRuntimeAdapter,
 } from "../types/timer.types";
 import {
   addSimpleTimerFocusTime,
   addSimpleTimerBreakTime,
 } from "../lib/db/pomodoro.dexie";
-import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
 import { timerEvents } from "../utils/timer-events";
 import { soundSyncService } from "../services/sound-sync.service";
 
@@ -68,12 +67,11 @@ function initState(): Omit<
   };
 }
 
-export const createTimerStore = (platform: TimerPlatform) => {
+export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
   const deps: TimerDeps = {
     now: () => Date.now(),
     pushUsage: async () => Promise.resolve(),
     pushSettings: async (_: TimerSettings) => Promise.resolve(),
-    postMessage: (msg) => platform.sendMessage(msg),
   };
 
   return create<TimerState>()(
@@ -96,7 +94,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
               ? "Great work! Time for a break."
               : "Ready to focus again?";
 
-          platform.showNotification(title, body);
+          runtime.showNotification(title, body);
         };
 
         const start = () => {
@@ -105,7 +103,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           const state = get();
           const duration = state.prevRemaining ?? state.durations[state.stage];
           const end = deps.now() + duration * 1000;
-          deps.postMessage?.({ type: "START", duration });
+          runtime.sendMessage({ type: "START", duration });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
 
           timerEvents.emit({
@@ -126,7 +124,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
             end !== null
               ? Math.max(0, Math.ceil((end - deps.now()) / 1000))
               : null;
-          deps.postMessage?.({ type: "PAUSE" });
+          runtime.sendMessage({ type: "PAUSE" });
           set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
 
           timerEvents.emit({
@@ -142,7 +140,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
         const reset = () => {
           const state = get();
           const duration = state.durations[TimerStage.Focus];
-          deps.postMessage?.({ type: "RESET" });
+          runtime.sendMessage({ type: "RESET" });
           set({
             stage: TimerStage.Focus,
             isRunning: false,
@@ -163,7 +161,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
 
         const skipToStage = (stage: TimerStage) => {
           const duration = get().durations[stage];
-          deps.postMessage?.({ type: "SKIP_TO_NEXT_STAGE" });
+          runtime.sendMessage({ type: "SKIP_TO_NEXT_STAGE" });
           set({
             stage,
             isRunning: false,
@@ -195,7 +193,7 @@ export const createTimerStore = (platform: TimerPlatform) => {
           const state = get();
           const stageKey = state.stage === TimerStage.Focus ? 'focus' : 'break';
           if (state.isRunning && d[stageKey] !== undefined) {
-            deps.postMessage?.({
+            runtime.sendMessage({
               type: "UPDATE_DURATION",
               duration: d[stageKey]!,
             });
@@ -293,9 +291,9 @@ export const createTimerStore = (platform: TimerPlatform) => {
           const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
           if (left <= 0) {
             set({ isRunning: false, endTimestamp: null });
-            deps.postMessage?.({ type: "RESET" });
+            runtime.sendMessage({ type: "RESET" });
           } else {
-            deps.postMessage?.({ type: "START", duration: left });
+            runtime.sendMessage({ type: "START", duration: left });
             set({ prevRemaining: left });
           }
         };
@@ -395,48 +393,4 @@ export const createTimerStore = (platform: TimerPlatform) => {
       }
     )
   );
-};
-
-const createStoreRegistry = () => {
-  const registry = {
-    extensionStore: null as ReturnType<typeof createTimerStore> | null,
-    webStore: null as ReturnType<typeof createTimerStore> | null,
-  };
-
-  return {
-    getExtensionStore: () => registry.extensionStore,
-    setExtensionStore: (store: ReturnType<typeof createTimerStore>) => {
-      registry.extensionStore = store;
-    },
-    getWebStore: () => registry.webStore,
-    setWebStore: (store: ReturnType<typeof createTimerStore>) => {
-      registry.webStore = store;
-    },
-  };
-};
-
-const storeRegistry = createStoreRegistry();
-
-export const useTimerStore = () => {
-  const platform = getTimerPlatform();
-
-  const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
-
-  if (isExtension) {
-    const extensionStore = storeRegistry.getExtensionStore();
-    if (!extensionStore) {
-      const newStore = createTimerStore(platform);
-      storeRegistry.setExtensionStore(newStore);
-      return newStore;
-    }
-    return extensionStore;
-  } else {
-    const webStore = storeRegistry.getWebStore();
-    if (!webStore) {
-      const newStore = createTimerStore(platform);
-      storeRegistry.setWebStore(newStore);
-      return newStore;
-    }
-    return webStore;
-  }
 };

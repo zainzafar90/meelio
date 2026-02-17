@@ -66,6 +66,12 @@ export type TimerEvent =
   | PausedMessage
   | ResetCompleteMessage;
 
+export interface TimerRuntimeAdapter {
+  sendMessage(message: TimerMessage): void;
+  subscribe(callback: (message: TimerEvent) => void): () => void;
+  showNotification(title: string, message: string): void;
+}
+
 export interface TimerDeps {
   now: () => number;
   pushUsage: (seconds: number) => Promise<void>;

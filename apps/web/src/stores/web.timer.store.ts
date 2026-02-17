@@ -1,7 +1,12 @@
-import { createTimerStore, TimerMessage, TimerEvent } from "@repo/shared";
+import {
+  createTimerStore,
+  type TimerMessage,
+  type TimerEvent,
+  type TimerRuntimeAdapter,
+} from "@repo/shared";
 import TimerWorker from "../workers/timer-worker?worker";
 
-class WebTimerPlatform {
+class WebTimerRuntime implements TimerRuntimeAdapter {
   private worker: Worker | null = null;
   private listeners: Set<(message: TimerEvent) => void> = new Set();
 
@@ -21,25 +26,24 @@ class WebTimerPlatform {
       type: message.type,
       payload: {
         duration: message.duration,
-        ...message
-      }
+        ...message,
+      },
     };
     this.worker?.postMessage(workerMessage);
   }
 
-  onMessage(callback: (message: TimerEvent) => void): () => void {
+  subscribe(callback: (message: TimerEvent) => void): () => void {
     this.listeners.add(callback);
     return () => this.listeners.delete(callback);
   }
 
   showNotification(title: string, message: string): void {
-    if ('Notification' in window && Notification.permission === 'granted') {
+    if ("Notification" in window && Notification.permission === "granted") {
       new Notification(title, { body: message });
     }
   }
 }
 
-const webPlatform = new WebTimerPlatform();
-export const useWebTimerStore = createTimerStore(webPlatform);
-
-export const webTimerPlatform = webPlatform;
+export const webTimerRuntime = new WebTimerRuntime();
+export const useWebTimerStore = createTimerStore(webTimerRuntime);
+export const webTimerStore = useWebTimerStore;

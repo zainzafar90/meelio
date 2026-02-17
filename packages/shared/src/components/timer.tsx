@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
-import { useTimerStore } from "../stores/timer.store";
+import { createTimerStore } from "../stores/timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
   TimerEvent,
   TimerDurations,
+  TimerRuntimeAdapter,
 } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
@@ -20,6 +21,7 @@ const useRestoreTimer = (restore: () => void) => {
 };
 
 const useBackgroundMessages = (
+  runtime: TimerRuntimeAdapter,
   stage: TimerStage,
   durations: TimerDurations,
   updateRemaining: (n: number) => void,
@@ -28,11 +30,7 @@ const useBackgroundMessages = (
   autoStartBreaks: boolean
 ) => {
   useEffect(() => {
-    if (typeof chrome === 'undefined' || !chrome.runtime) {
-      return;
-    }
-
-    const handler = (msg: TimerEvent) => {
+    const unsubscribe = runtime.subscribe((msg: TimerEvent) => {
       switch (msg.type) {
         case "TICK":
           updateRemaining(msg.remaining);
@@ -48,13 +46,10 @@ const useBackgroundMessages = (
           updateRemaining(durations[stage]);
           break;
       }
-    };
+    });
 
-    chrome.runtime.onMessage.addListener(handler);
-    return () => {
-      chrome.runtime.onMessage.removeListener(handler);
-    };
-  }, [stage, durations, updateRemaining, completeStage, start, autoStartBreaks]);
+    return unsubscribe;
+  }, [runtime, stage, durations, updateRemaining, completeStage, start, autoStartBreaks]);
 };
 
 interface TimerViewProps {
@@ -193,8 +188,12 @@ const TimerView = ({
   );
 };
 
-const useTimerState = () => {
-  const timerStore = useTimerStore();
+type TimerStoreHook = ReturnType<typeof createTimerStore>;
+
+const useTimerState = (
+  timerStore: TimerStoreHook,
+  runtime: TimerRuntimeAdapter
+) => {
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
@@ -235,6 +234,7 @@ const useTimerState = () => {
   useRestoreTimer(store.restore);
   useDocumentTitle({ remaining, stage: store.stage, running: store.isRunning });
   useBackgroundMessages(
+    runtime,
     store.stage,
     store.durations,
     store.updateRemaining,
@@ -286,7 +286,12 @@ const useTimerState = () => {
   };
 };
 
-export const Timer = () => {
+interface TimerProps {
+  timerStore: TimerStoreHook;
+  runtime: TimerRuntimeAdapter;
+}
+
+export const Timer = ({ timerStore, runtime }: TimerProps) => {
   const {
     store,
     remaining,
@@ -297,7 +302,7 @@ export const Timer = () => {
     sounds,
     soundscapes,
     autoStartBreaks,
-  } = useTimerState();
+  } = useTimerState(timerStore, runtime);
 
   return (
     <>

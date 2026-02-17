@@ -71,9 +71,6 @@ export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./timer";
 export * from "./timer-settings.dialog";
 
-// Main timer component - now points to unified implementation
-export { Timer as SimpleTimer } from "./timer";
-
 // Tasks
 export * from "./core/task-list/components/create-list";
 export * from "./core/task-list/components/create-task";

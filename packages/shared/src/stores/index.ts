@@ -13,4 +13,4 @@ export * from "./settings.store";
 export * from "./soundscapes.store";
 export * from "./task.store";
 
-export { createTimerStore, useTimerStore } from "./timer.store";
+export { createTimerStore } from "./timer.store";
