@@ -76,7 +76,6 @@ export interface TimerDeps {
   now: () => number;
   pushUsage: (seconds: number) => Promise<void>;
   pushSettings: (settings: TimerSettings) => Promise<void>;
-  postMessage?: (msg: TimerMessage) => void;
 }
 
 export interface TimerState {

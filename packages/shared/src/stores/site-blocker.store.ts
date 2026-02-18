@@ -1,11 +1,18 @@
 import { create } from "zustand";
-import { subscribeWithSelector, persist, createJSONStorage } from "zustand/middleware";
+import {
+  subscribeWithSelector,
+  persist,
+  createJSONStorage,
+  type StateStorage,
+} from "zustand/middleware";
+
 import { db } from "../lib/db/meelio.dexie";
 import type { SiteBlocker } from "../lib/db/models.dexie";
-import { useAuthStore } from "./auth.store";
 import { generateUUID } from "../utils/common.utils";
+import { normalizeSiteHost } from "../utils/site-blocker.utils";
+import { useAuthStore } from "./auth.store";
 
-interface SiteBlockerState {
+export interface SiteBlockerState {
   sites: SiteBlocker[];
   isLoading: boolean;
   error: string | null;
@@ -20,308 +27,295 @@ interface SiteBlockerState {
   bulkRemoveSites: (urls: string[]) => Promise<void>;
 }
 
-let isInitializing = false;
-
-function normalizeUrl(url: string): string {
-  try {
-    const normalized = new URL(url.includes("://") ? url : `https://${url}`);
-    return normalized.hostname.replace(/^www\./, "");
-  } catch {
-    const match = url.match(/([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-    return match ? match[1].replace(/^www\./, "") : url;
-  }
+export interface SiteBlockerGateway {
+  getCurrentUserId(): string | undefined;
+  getSitesByUser(userId: string): Promise<SiteBlocker[]>;
+  addSite(site: SiteBlocker): Promise<void>;
+  updateSite(id: string, updates: Partial<SiteBlocker>): Promise<void>;
+  generateId(): string;
+  getStorage(): StateStorage;
 }
 
-export const useSiteBlockerStore = create<SiteBlockerState>()(
-  subscribeWithSelector(
-    persist(
-      (set, get) => ({
-        sites: [],
-        isLoading: false,
-        error: null,
+const localStorageAdapter: StateStorage = {
+  getItem: (name) => localStorage.getItem(name),
+  setItem: (name, value) => localStorage.setItem(name, value),
+  removeItem: (name) => localStorage.removeItem(name),
+};
 
-        initializeStore: async () => {
-          const userId = useAuthStore.getState().user?.id;
+export const createDefaultSiteBlockerGateway = (): SiteBlockerGateway => ({
+  getCurrentUserId: () => useAuthStore.getState().user?.id,
+  getSitesByUser: (userId) =>
+    db.siteBlocker.where("userId").equals(userId).toArray(),
+  addSite: async (site) => {
+    await db.siteBlocker.add(site);
+  },
+  updateSite: async (id, updates) => {
+    await db.siteBlocker.update(id, updates);
+  },
+  generateId: () => generateUUID(),
+  getStorage: () => localStorageAdapter,
+});
 
-          if (!userId) return;
+export const createSiteBlockerStore = (gateway: SiteBlockerGateway) => {
+  let isInitializing = false;
+  return create<SiteBlockerState>()(
+    subscribeWithSelector(
+      persist(
+        (set, get) => ({
+          sites: [],
+          isLoading: false,
+          error: null,
 
-          if (isInitializing) {
-            return;
-          }
-
-          isInitializing = true;
-
-          try {
-            set({ isLoading: true, error: null });
-            await get().loadFromLocal();
-          } catch (error: any) {
-            console.error("Failed to initialize site blocker store:", error);
-            set({ error: error?.message || "Failed to initialize store" });
-          } finally {
-            set({ isLoading: false });
-            isInitializing = false;
-          }
-        },
-
-        loadFromLocal: async () => {
-          const userId = useAuthStore.getState().user?.id;
-
-          if (!userId) return;
-
-          const localSiteBlockers = await db.siteBlocker
-            .where("userId")
-            .equals(userId)
-            .toArray();
-
-          const currentState = get();
-          if (currentState.sites.length > 0 && localSiteBlockers.length === 0) {
-            console.log("Migrating site blockers from Chrome storage to IndexedDB");
-            for (const site of currentState.sites) {
-              try {
-                const siteWithUser = { ...site, userId };
-                await db.siteBlocker.add(siteWithUser);
-              } catch (err) {
-                console.warn("Failed to migrate site:", site.url, err);
-              }
-            }
-            const migratedSites = await db.siteBlocker
-              .where("userId")
-              .equals(userId)
-              .toArray();
-            set({
-              sites: migratedSites.filter(s => !s.deletedAt),
-            });
-          } else {
-            set({
-              sites: localSiteBlockers.filter(s => !s.deletedAt),
-            });
-          }
-        },
-
-        addSite: async (url, category) => {
-          const MAX_SITE_BLOCKERS = 500;
-          const normalizedUrl = normalizeUrl(url);
-
-          const existing = get().sites.find(s => s.url === normalizedUrl);
-          if (existing && existing.isBlocked) {
-            return existing;
-          }
-
-          if (get().sites.filter(s => s.isBlocked).length >= MAX_SITE_BLOCKERS) {
-            return undefined;
-          }
-
-          const userId = useAuthStore.getState().user?.id;
-          if (!userId) return;
-
-          const now = Date.now();
-          const id = generateUUID();
-
-          const siteBlocker: SiteBlocker = {
-            id,
-            userId,
-            url: normalizedUrl,
-            category: category || undefined,
-            isBlocked: true,
-            createdAt: now,
-            updatedAt: now,
-            deletedAt: null,
-          };
-
-          try {
-            if (existing) {
-              await db.siteBlocker.update(existing.id, {
-                isBlocked: true,
-                updatedAt: now,
-                deletedAt: null,
-              });
-
-              set(s => ({
-                sites: s.sites.map(site =>
-                  site.id === existing.id
-                    ? { ...site, isBlocked: true, updatedAt: now, deletedAt: null }
-                    : site
-                ),
-              }));
-
-              return { ...existing, isBlocked: true, updatedAt: now };
+          initializeStore: async () => {
+            const userId = gateway.getCurrentUserId();
+            if (!userId || isInitializing) {
+              return;
             }
 
-            await db.siteBlocker.add(siteBlocker);
-            set(s => ({ sites: [...s.sites, siteBlocker] }));
+            isInitializing = true;
+            try {
+              set({ isLoading: true, error: null });
+              await get().loadFromLocal();
+            } catch (error: any) {
+              console.error("Failed to initialize site blocker store:", error);
+              set({ error: error?.message || "Failed to initialize store" });
+            } finally {
+              set({ isLoading: false });
+              isInitializing = false;
+            }
+          },
 
-            return siteBlocker;
-          } catch (error) {
-            set({
-              error: error instanceof Error ? error.message : "Failed to add site",
-            });
-            return undefined;
-          }
-        },
+          loadFromLocal: async () => {
+            const userId = gateway.getCurrentUserId();
+            if (!userId) return;
 
-        toggleSite: async (url) => {
-          const normalizedUrl = normalizeUrl(url);
-          const site = get().sites.find(s => s.url === normalizedUrl);
+            const localSiteBlockers = await gateway.getSitesByUser(userId);
+            const currentState = get();
 
-          if (!site) {
-            await get().addSite(url);
-            return;
-          }
-
-          const updatedData = { isBlocked: !site.isBlocked, updatedAt: Date.now() };
-
-          try {
-            await db.siteBlocker.update(site.id, updatedData);
-
-            set(state => ({
-              sites: state.sites.map(s =>
-                s.id === site.id ? { ...s, ...updatedData } : s
-              ),
-            }));
-          } catch (error) {
-            set({
-              error: error instanceof Error ? error.message : "Failed to toggle site",
-            });
-          }
-        },
-
-        removeSite: async (url) => {
-          const normalizedUrl = normalizeUrl(url);
-          const site = get().sites.find(s => s.url === normalizedUrl && s.isBlocked);
-          if (!site) return;
-
-          try {
-            const deletedAt = Date.now();
-            await db.siteBlocker.update(site.id, { deletedAt, updatedAt: deletedAt });
-            set(s => ({ sites: s.sites.filter(sb => sb.id !== site.id) }));
-          } catch (error) {
-            set({
-              error: error instanceof Error ? error.message : "Failed to remove site",
-            });
-          }
-        },
-
-        bulkAddSites: async (urls, category) => {
-          const userId = useAuthStore.getState().user?.id;
-          if (!userId) return;
-
-          const normalizedUrls = urls.map(normalizeUrl);
-          const currentSites = get().sites;
-          const now = Date.now();
-
-          const toUpdate: SiteBlocker[] = [];
-          const toCreate: SiteBlocker[] = [];
-
-          for (const url of normalizedUrls) {
-            const existing = currentSites.find(s => s.url === url);
-            if (existing) {
-              if (!existing.isBlocked) {
-                toUpdate.push({ ...existing, isBlocked: true, updatedAt: now });
+            if (currentState.sites.length > 0 && localSiteBlockers.length === 0) {
+              for (const site of currentState.sites) {
+                try {
+                  await gateway.addSite({ ...site, userId });
+                } catch (error) {
+                  console.warn("Failed to migrate site blocker:", site.url, error);
+                }
               }
-            } else {
-              toCreate.push({
-                id: generateUUID(),
+              const migratedSites = await gateway.getSitesByUser(userId);
+              set({ sites: migratedSites.filter((site) => !site.deletedAt) });
+              return;
+            }
+
+            set({ sites: localSiteBlockers.filter((site) => !site.deletedAt) });
+          },
+
+          addSite: async (url, category) => {
+            const MAX_SITE_BLOCKERS = 500;
+            const normalizedUrl = normalizeSiteHost(url);
+            const now = Date.now();
+
+            const existing = get().sites.find((site) => site.url === normalizedUrl);
+            if (existing && existing.isBlocked) {
+              return existing;
+            }
+
+            if (get().sites.filter((site) => site.isBlocked).length >= MAX_SITE_BLOCKERS) {
+              return undefined;
+            }
+
+            const userId = gateway.getCurrentUserId();
+            if (!userId) return;
+
+            try {
+              if (existing) {
+                await gateway.updateSite(existing.id, {
+                  isBlocked: true,
+                  updatedAt: now,
+                  deletedAt: null,
+                });
+
+                set((state) => ({
+                  sites: state.sites.map((site) =>
+                    site.id === existing.id
+                      ? { ...site, isBlocked: true, updatedAt: now, deletedAt: null }
+                      : site
+                  ),
+                }));
+
+                return { ...existing, isBlocked: true, updatedAt: now, deletedAt: null };
+              }
+
+              const siteBlocker: SiteBlocker = {
+                id: gateway.generateId(),
                 userId,
-                url,
+                url: normalizedUrl,
                 category: category || undefined,
                 isBlocked: true,
                 createdAt: now,
                 updatedAt: now,
                 deletedAt: null,
+              };
+
+              await gateway.addSite(siteBlocker);
+              set((state) => ({ sites: [...state.sites, siteBlocker] }));
+              return siteBlocker;
+            } catch (error) {
+              set({
+                error: error instanceof Error ? error.message : "Failed to add site",
+              });
+              return undefined;
+            }
+          },
+
+          toggleSite: async (url) => {
+            const normalizedUrl = normalizeSiteHost(url);
+            const site = get().sites.find((entry) => entry.url === normalizedUrl);
+
+            if (!site) {
+              await get().addSite(url);
+              return;
+            }
+
+            const updates = { isBlocked: !site.isBlocked, updatedAt: Date.now() };
+            try {
+              await gateway.updateSite(site.id, updates);
+              set((state) => ({
+                sites: state.sites.map((entry) =>
+                  entry.id === site.id ? { ...entry, ...updates } : entry
+                ),
+              }));
+            } catch (error) {
+              set({
+                error: error instanceof Error ? error.message : "Failed to toggle site",
               });
             }
-          }
+          },
 
-          if (toUpdate.length === 0 && toCreate.length === 0) return;
+          removeSite: async (url) => {
+            const normalizedUrl = normalizeSiteHost(url);
+            const site = get().sites.find(
+              (entry) => entry.url === normalizedUrl && entry.isBlocked
+            );
+            if (!site) return;
 
-          try {
-            for (const site of toUpdate) {
-              await db.siteBlocker.update(site.id, {
-                isBlocked: true,
-                updatedAt: now,
-                deletedAt: null,
+            try {
+              const deletedAt = Date.now();
+              await gateway.updateSite(site.id, { deletedAt, updatedAt: deletedAt });
+              set((state) => ({
+                sites: state.sites.filter((entry) => entry.id !== site.id),
+              }));
+            } catch (error) {
+              set({
+                error: error instanceof Error ? error.message : "Failed to remove site",
               });
             }
-
-            for (const site of toCreate) {
-              await db.siteBlocker.add(site);
-            }
-
-            set(state => ({
-              sites: [
-                ...state.sites.map(s => {
-                  const updated = toUpdate.find(u => u.id === s.id);
-                  return updated || s;
-                }),
-                ...toCreate,
-              ],
-            }));
-          } catch (error) {
-            set({
-              error: error instanceof Error ? error.message : "Failed to bulk add sites",
-            });
-          }
-        },
-
-        bulkRemoveSites: async (urls) => {
-          const normalizedUrls = urls.map(normalizeUrl);
-          const toRemove = get().sites.filter(s => normalizedUrls.includes(s.url) && s.isBlocked);
-
-          if (toRemove.length === 0) return;
-
-          try {
-            const deletedAt = Date.now();
-
-            for (const site of toRemove) {
-              await db.siteBlocker.update(site.id, { deletedAt, updatedAt: deletedAt });
-            }
-
-            set(state => ({
-              sites: state.sites.filter(s => !toRemove.some(r => r.id === s.id)),
-            }));
-          } catch (error) {
-            set({
-              error: error instanceof Error ? error.message : "Failed to bulk remove sites",
-            });
-          }
-        },
-      }),
-      {
-        name: "meelio:local:site-blocker",
-        storage: createJSONStorage(() => ({
-          getItem: async (name) => {
-            const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
-            if (anyGlobal?.chrome?.storage?.local) {
-              const result = await anyGlobal.chrome.storage.local.get(name);
-              return result[name];
-            }
-            return localStorage.getItem(name);
           },
-          setItem: async (name, value) => {
-            const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
-            if (anyGlobal?.chrome?.storage?.local) {
-              await anyGlobal.chrome.storage.local.set({ [name]: value });
-            } else {
-              localStorage.setItem(name, value);
+
+          bulkAddSites: async (urls, category) => {
+            const userId = gateway.getCurrentUserId();
+            if (!userId) return;
+
+            const normalizedUrls = urls.map(normalizeSiteHost);
+            const currentSites = get().sites;
+            const now = Date.now();
+
+            const toUpdate: SiteBlocker[] = [];
+            const toCreate: SiteBlocker[] = [];
+
+            for (const url of normalizedUrls) {
+              const existing = currentSites.find((site) => site.url === url);
+              if (existing) {
+                if (!existing.isBlocked) {
+                  toUpdate.push({ ...existing, isBlocked: true, updatedAt: now, deletedAt: null });
+                }
+              } else {
+                toCreate.push({
+                  id: gateway.generateId(),
+                  userId,
+                  url,
+                  category: category || undefined,
+                  isBlocked: true,
+                  createdAt: now,
+                  updatedAt: now,
+                  deletedAt: null,
+                });
+              }
             }
-          },
-          removeItem: async (name) => {
-            const anyGlobal: any = typeof window !== "undefined" ? (window as any) : {};
-            if (anyGlobal?.chrome?.storage?.local) {
-              await anyGlobal.chrome.storage.local.remove(name);
-            } else {
-              localStorage.removeItem(name);
+
+            if (toUpdate.length === 0 && toCreate.length === 0) return;
+
+            try {
+              for (const site of toUpdate) {
+                await gateway.updateSite(site.id, {
+                  isBlocked: true,
+                  updatedAt: now,
+                  deletedAt: null,
+                });
+              }
+
+              for (const site of toCreate) {
+                await gateway.addSite(site);
+              }
+
+              set((state) => ({
+                sites: [
+                  ...state.sites.map((site) => {
+                    const updated = toUpdate.find((entry) => entry.id === site.id);
+                    return updated || site;
+                  }),
+                  ...toCreate,
+                ],
+              }));
+            } catch (error) {
+              set({
+                error:
+                  error instanceof Error ? error.message : "Failed to bulk add sites",
+              });
             }
           },
-        })),
-        version: 2,
-        partialize: (state) => ({
-          sites: state.sites,
+
+          bulkRemoveSites: async (urls) => {
+            const normalizedUrls = urls.map(normalizeSiteHost);
+            const toRemove = get().sites.filter(
+              (site) => normalizedUrls.includes(site.url) && site.isBlocked
+            );
+
+            if (toRemove.length === 0) return;
+
+            try {
+              const deletedAt = Date.now();
+              for (const site of toRemove) {
+                await gateway.updateSite(site.id, { deletedAt, updatedAt: deletedAt });
+              }
+
+              set((state) => ({
+                sites: state.sites.filter(
+                  (site) => !toRemove.some((removed) => removed.id === site.id)
+                ),
+              }));
+            } catch (error) {
+              set({
+                error:
+                  error instanceof Error ? error.message : "Failed to bulk remove sites",
+              });
+            }
+          },
         }),
-        onRehydrateStorage: () => (state) => {
-          state?.initializeStore?.();
-        },
-      }
+        {
+          name: "meelio:local:site-blocker",
+          storage: createJSONStorage(() => gateway.getStorage()),
+          version: 2,
+          partialize: (state) => ({
+            sites: state.sites,
+          }),
+          onRehydrateStorage: () => (state) => {
+            state?.initializeStore?.();
+          },
+        }
+      )
     )
-  )
+  );
+};
+
+export const useSiteBlockerStore = createSiteBlockerStore(
+  createDefaultSiteBlockerGateway()
 );

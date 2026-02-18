@@ -64,7 +64,6 @@ export * from "./core/soundscapes/components/sound-player/controls/sound-control
 export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
-export * from "./core/timer/components/timer-stats";
 export * from "./core/timer/components/timer-next-task";
 export * from "./core/timer/dialog/timer-reset.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";

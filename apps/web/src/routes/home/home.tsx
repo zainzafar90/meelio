@@ -20,8 +20,8 @@ import { TaskListSheet } from "@repo/shared";
 import { Dock } from "@repo/shared";
 import { NotesSheet, ShortcutsModal } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
+import { WebSiteBlockerSheet } from "@/components/web.site-blocker.sheet";
 import { WebTimer } from "@/components/web.timer";
-import { SiteBlockerSheet } from "@repo/shared";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
@@ -59,7 +59,7 @@ const Content = () => {
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
-      <SiteBlockerSheet />
+      <WebSiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />

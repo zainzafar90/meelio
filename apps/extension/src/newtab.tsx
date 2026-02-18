@@ -8,6 +8,7 @@ import {
   AppProvider,
   Background,
   BackgroundSelectorSheet,
+  BookmarksDynamicIsland,
   BookmarksSheet,
   BreathePod,
   CalendarDynamicIsland,
@@ -19,7 +20,6 @@ import {
   Quote,
   SearchPopover,
   ShortcutsModal,
-  SiteBlockerSheet,
   SoundscapesSheet,
   TabStashSheet,
   TaskListSheet,
@@ -27,7 +27,7 @@ import {
   useBookmarksStore,
   useDockStore,
 } from "@repo/shared";
-import { BookmarksDynamicIsland } from "@repo/shared/src/components/core/bookmarks/bookmarks-dynamic-island";
+import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
 
 import "./style.css";
@@ -85,7 +85,7 @@ const Content = () => {
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
-      <SiteBlockerSheet />
+      <ExtensionSiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />

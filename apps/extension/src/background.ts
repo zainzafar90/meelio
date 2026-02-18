@@ -1,4 +1,4 @@
-import { TimerMessage } from '@repo/shared'
+import type { TimerMessage } from "@repo/shared";
 
 let interval: NodeJS.Timeout | null = null
 let endTime = 0

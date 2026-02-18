@@ -4,6 +4,7 @@ import cssText from "data-text:./features/content/blocker.module.css";
 
 import { Storage } from "@plasmohq/storage";
 import { useStorage } from "@plasmohq/storage/hook";
+import { doesSiteHostMatch } from "@repo/shared";
 
 import { Blocker } from "./features/content/blocker";
 import { getCustomBlockerMessage } from "./utils/blocker.utils";
@@ -20,22 +21,6 @@ interface SiteBlockState {
 }
 
 type SiteBlockMap = Record<string, SiteBlockState>;
-
-function normalizeUrl(url: string): string {
-  try {
-    const normalized = new URL(url.includes("://") ? url : `https://${url}`);
-    return normalized.hostname.replace(/^www\./, "");
-  } catch {
-    const match = url.match(/([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-    return match ? match[1].replace(/^www\./, "") : url;
-  }
-}
-
-function doesHostMatch(host: string, site: string): boolean {
-  const normalizedHost = normalizeUrl(host);
-  const normalizedSite = normalizeUrl(site);
-  return normalizedHost === normalizedSite || normalizedHost.endsWith(`.${normalizedSite}`);
-}
 
 export const config: PlasmoCSConfig = {
   run_at: "document_start",
@@ -54,7 +39,7 @@ const getCurrentSite = () => {
 const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
   const host = getCurrentSite();
   return Object.values(sites).find(
-    (site) => site.isBlocked && doesHostMatch(host, site.url)
+    (site) => site.isBlocked && doesSiteHostMatch(host, site.url)
   );
 };
 

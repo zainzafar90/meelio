@@ -1,9 +1,9 @@
-import { createTimerStore } from "@repo/shared/src/stores/timer.store";
+import { createTimerStore } from "@repo/shared";
 import type {
   TimerRuntimeAdapter,
   TimerMessage,
   TimerEvent,
-} from "@repo/shared/src/types/timer.types";
+} from "@repo/shared";
 
 class ExtensionTimerRuntime implements TimerRuntimeAdapter {
   sendMessage(message: TimerMessage): void {
@@ -17,8 +17,15 @@ class ExtensionTimerRuntime implements TimerRuntimeAdapter {
       return () => {};
     }
 
+    const KNOWN_EVENTS: Set<TimerEvent["type"]> = new Set([
+      "TICK",
+      "STAGE_COMPLETE",
+      "PAUSED",
+      "RESET_COMPLETE",
+    ]);
+
     const listener = (message: TimerEvent) => {
-      if (message?.type) {
+      if (KNOWN_EVENTS.has(message?.type)) {
         callback(message);
       }
     };
@@ -42,5 +49,4 @@ class ExtensionTimerRuntime implements TimerRuntimeAdapter {
 }
 
 export const extensionTimerRuntime = new ExtensionTimerRuntime();
-export const useExtensionTimerStore = createTimerStore(extensionTimerRuntime);
-export const extensionTimerStore = useExtensionTimerStore;
+export const extensionTimerStore = createTimerStore(extensionTimerRuntime);

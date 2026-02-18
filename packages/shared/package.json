@@ -53,7 +53,7 @@
     "zustand": "^5"
   },
   "exports": {
-    ".": "./src/index.tsx",
+    ".": "./src/index.ts",
     "./api/*": "./src/api/**/*.ts",
     "./components/*": "./src/components/**/*.{tsx,ts}",
     "./context/*": "./src/context/**/*.{ts,tsx}",

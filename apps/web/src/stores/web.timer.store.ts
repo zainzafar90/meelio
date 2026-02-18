@@ -22,14 +22,15 @@ class WebTimerRuntime implements TimerRuntimeAdapter {
   }
 
   sendMessage(message: TimerMessage): void {
-    const workerMessage = {
-      type: message.type,
-      payload: {
-        duration: message.duration,
-        ...message,
-      },
-    };
-    this.worker?.postMessage(workerMessage);
+    if (message.type === "START" || message.type === "UPDATE_DURATION") {
+      this.worker?.postMessage({
+        type: message.type,
+        payload: { duration: message.duration },
+      });
+      return;
+    }
+
+    this.worker?.postMessage({ type: message.type });
   }
 
   subscribe(callback: (message: TimerEvent) => void): () => void {
@@ -45,5 +46,4 @@ class WebTimerRuntime implements TimerRuntimeAdapter {
 }
 
 export const webTimerRuntime = new WebTimerRuntime();
-export const useWebTimerStore = createTimerStore(webTimerRuntime);
-export const webTimerStore = useWebTimerStore;
+export const webTimerStore = createTimerStore(webTimerRuntime);
