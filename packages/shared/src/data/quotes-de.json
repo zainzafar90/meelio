@@ -1,0 +1,1832 @@
+[
+  {
+    "id": 0,
+    "quote": "Sei du selbst die Veränderung, die du dir wünschst für diese Welt.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 1,
+    "quote": "Der Weg, um anzufangen, ist, aufzuhören zu reden und anzufangen zu handeln.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 2,
+    "quote": "Erfolg ist nicht endgültig, Misserfolg ist nicht fatal: Es ist der Mut weiterzumachen, der zählt.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 3,
+    "quote": "Innovation unterscheidet zwischen einem Anführer und einem Mitläufer.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 4,
+    "quote": "Eine Reise von tausend Meilen beginnt mit einem einzigen Schritt.",
+    "author": "Laozi"
+  },
+  {
+    "id": 5,
+    "quote": "Ich habe nicht versagt. Ich habe nur 10.000 Wege gefunden, die nicht funktionieren.",
+    "author": "Thomas Edison"
+  },
+  {
+    "id": 6,
+    "quote": "In der Mitte der Schwierigkeit liegt die Möglichkeit.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 7,
+    "quote": "Der beste Zeitpunkt, einen Baum zu pflanzen, war vor 20 Jahren. Der zweitbeste Zeitpunkt ist jetzt.",
+    "author": "Chinesisches Sprichwort"
+  },
+  {
+    "id": 8,
+    "quote": "Glaube daran, dass du es kannst, und du bist auf halbem Weg.",
+    "author": "Theodore Roosevelt"
+  },
+  {
+    "id": 9,
+    "quote": "Es spielt keine Rolle, wie langsam du gehst, solange du nicht aufhörst.",
+    "author": "Konfuzius"
+  },
+  {
+    "id": 10,
+    "quote": "Alles, was du dir je gewünscht hast, liegt auf der anderen Seite der Angst.",
+    "author": "George Addair"
+  },
+  {
+    "id": 11,
+    "quote": "Das Leben besteht zu 10% aus dem, was uns passiert, und zu 90% aus dem, wie wir darauf reagieren.",
+    "author": "Charles R. Swindoll"
+  },
+  {
+    "id": 12,
+    "quote": "Die einzige unmögliche Reise ist die, die man nie beginnt.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 13,
+    "quote": "In diesem Leben können wir keine großen Dinge tun. Wir können nur kleine Dinge mit großer Liebe tun.",
+    "author": "Mutter Teresa"
+  },
+  {
+    "id": 14,
+    "quote": "Was wir denken, das werden wir.",
+    "author": "Buddha"
+  },
+  {
+    "id": 15,
+    "quote": "Die Zukunft gehört denen, die an die Schönheit ihrer Träume glauben.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 16,
+    "quote": "In unseren dunkelsten Momenten müssen wir uns konzentrieren, um das Licht zu sehen.",
+    "author": "Aristoteles"
+  },
+  {
+    "id": 17,
+    "quote": "Schau nicht auf die Uhr; tu das, was sie tut. Mach weiter.",
+    "author": "Sam Levenson"
+  },
+  {
+    "id": 18,
+    "quote": "In einem Jahr von jetzt an wirst du dir wünschen, du hättest heute angefangen.",
+    "author": "Karen Lamb"
+  },
+  {
+    "id": 19,
+    "quote": "Das Geheimnis des Vorankommens ist der Anfang.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 20,
+    "quote": "Gut getan ist besser als gut gesagt.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 21,
+    "quote": "Du verpasst 100% der Schüsse, die du nicht nimmst.",
+    "author": "Wayne Gretzky"
+  },
+  {
+    "id": 22,
+    "quote": "Ob du glaubst, du kannst es, oder ob du glaubst, du kannst es nicht – du hast Recht.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 23,
+    "quote": "Ich allein kann die Welt nicht verändern, aber ich kann einen Stein über das Wasser werfen, um viele Wellen zu erzeugen.",
+    "author": "Mutter Teresa"
+  },
+  {
+    "id": 24,
+    "quote": "Nichts ist unmöglich, das Wort selbst sagt: 'Ich bin möglich!'",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 25,
+    "quote": "Das Leben ist das, was passiert, wenn du damit beschäftigt bist, andere Pläne zu machen.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 26,
+    "quote": "Der einzige Weg, großartige Arbeit zu leisten, ist, das zu lieben, was du tust.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 27,
+    "quote": "Wenn du dich selbst emporheben willst, hebe jemand anderen empor.",
+    "author": "Booker T. Washington"
+  },
+  {
+    "id": 28,
+    "quote": "Ich habe gelernt, dass Menschen vergessen werden, was du gesagt hast, Menschen werden vergessen, was du getan hast, aber Menschen werden niemals vergessen, wie du sie fühlen ließest.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 29,
+    "quote": "Ob du glaubst, du kannst es, oder ob du glaubst, du kannst es nicht – du hast Recht.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 30,
+    "quote": "Perfektion ist nicht erreichbar, aber wenn wir Perfektion anstreben, können wir Exzellenz erreichen.",
+    "author": "Vince Lombardi"
+  },
+  {
+    "id": 31,
+    "quote": "Das Leben besteht zu 10% aus dem, was uns passiert, und zu 90% aus dem, wie wir darauf reagieren.",
+    "author": "Charles R. Swindoll"
+  },
+  {
+    "id": 32,
+    "quote": "Wenn du auf das schaust, was du im Leben hast, wirst du immer mehr haben. Wenn du auf das schaust, was du nicht hast, wirst du nie genug haben.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 33,
+    "quote": "Denke daran, dass das Nicht-Bekommen von dem, was man will, manchmal ein wunderbarer Glücksfall ist.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 34,
+    "quote": "Du kannst Kreativität nicht aufbrauchen. Je mehr du sie einsetzt, desto mehr hast du.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 35,
+    "quote": "Träume groß und wage zu scheitern.",
+    "author": "Norman Vaughan"
+  },
+  {
+    "id": 36,
+    "quote": "Unser Leben beginnt an dem Tag zu enden, an dem wir über wichtige Dinge schweigen.",
+    "author": "Martin Luther King Jr."
+  },
+  {
+    "id": 37,
+    "quote": "Tu, was du kannst, wo du bist, mit dem, was du hast.",
+    "author": "Theodore Roosevelt"
+  },
+  {
+    "id": 38,
+    "quote": "Wenn du immer das tust, was du immer getan hast, wirst du immer das bekommen, was du immer bekommen hast.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 39,
+    "quote": "Träumen ist schließlich eine Form der Planung.",
+    "author": "Gloria Steinem"
+  },
+  {
+    "id": 40,
+    "quote": "Es ist dein Platz in der Welt; es ist dein Leben. Geh und mach alles damit, und mach es zum Leben, das du leben willst.",
+    "author": "Mae Jemison"
+  },
+  {
+    "id": 41,
+    "quote": "Du magst enttäuscht sein, wenn du scheitert, aber du bist verloren, wenn du es nicht versuchst.",
+    "author": "Beverly Sills"
+  },
+  {
+    "id": 42,
+    "quote": "Denke daran: Niemand kann dich ohne deine Zustimmung minderwertig fühlen lassen.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 43,
+    "quote": "Das Leben ist das, was wir daraus machen, immer war es so, immer wird es so sein.",
+    "author": "Grandma Moses"
+  },
+  {
+    "id": 44,
+    "quote": "Die Frage ist nicht, wer mich lassen wird; es ist, wer mich aufhalten wird.",
+    "author": "Ayn Rand"
+  },
+  {
+    "id": 45,
+    "quote": "Wenn alles gegen dich zu laufen scheint, denke daran, dass das Flugzeug gegen den Wind startet, nicht mit ihm.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 46,
+    "quote": "Es zählen nicht die Jahre in deinem Leben. Es zählt das Leben in deinen Jahren.",
+    "author": "Abraham Lincoln"
+  },
+  {
+    "id": 47,
+    "quote": "Verändere deine Gedanken und du veränderst deine Welt.",
+    "author": "Norman Vincent Peale"
+  },
+  {
+    "id": 48,
+    "quote": "Schreibe entweder etwas Lesenswertes oder tue etwas Beschreibenswertes.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 49,
+    "quote": "Nichts ist unmöglich, das Wort selbst sagt: 'Ich bin möglich!'",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 50,
+    "quote": "Der einzige Weg, großartige Arbeit zu leisten, ist, das zu lieben, was du tust.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 51,
+    "quote": "Wenn du es träumen kannst, kannst du es erreichen.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 52,
+    "quote": "Was du heute tust, kann all deine Morgen verbessern.",
+    "author": "Ralph Marston"
+  },
+  {
+    "id": 53,
+    "quote": "Sei freundlich, wann immer es möglich ist. Es ist immer möglich.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 54,
+    "quote": "Das Leben besteht zu 10% aus dem, was uns passiert, und zu 90% aus dem, wie wir darauf reagieren.",
+    "author": "Dennis P. Kimbro"
+  },
+  {
+    "id": 55,
+    "quote": "Selbst wenn du auf dem richtigen Weg bist, wirst du überfahren, wenn du einfach dort sitzt.",
+    "author": "Will Rogers"
+  },
+  {
+    "id": 56,
+    "quote": "Glück ist eine Dividende des Schweißes. Je mehr du schwitzt, desto mehr Glück hast du.",
+    "author": "Ray Kroc"
+  },
+  {
+    "id": 57,
+    "quote": "Mut ist die erste aller menschlichen Eigenschaften, weil er alle anderen garantiert.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 58,
+    "quote": "Das Wichtige in dieser Welt ist nicht so sehr, wo man steht, sondern in welche Richtung man sich bewegt.",
+    "author": "Oliver Wendell Holmes"
+  },
+  {
+    "id": 59,
+    "quote": "Obwohl niemand zurückgehen und einen ganz neuen Anfang machen kann, kann jeder von jetzt an beginnen und ein ganz neues Ende schaffen.",
+    "author": "Carl Bard"
+  },
+  {
+    "id": 60,
+    "quote": "Sprich weniger als du weißt; habe mehr als du zeigst.",
+    "author": "William Shakespeare"
+  },
+  {
+    "id": 61,
+    "quote": "Bildung kostet Geld. Aber Unwissenheit auch.",
+    "author": "Sir Claus Moser"
+  },
+  {
+    "id": 62,
+    "quote": "Lass nicht zu, dass das, was du nicht kannst, das stört, was du kannst.",
+    "author": "John Wooden"
+  },
+  {
+    "id": 63,
+    "quote": "Mach dir keine Sorgen um Misserfolge, sorge dich um die Chancen, die du verpasst, wenn du es gar nicht erst versuchst.",
+    "author": "Jack Canfield"
+  },
+  {
+    "id": 64,
+    "quote": "Lebe jeden Tag, als hätte dein Leben gerade erst begonnen.",
+    "author": "Johann Wolfgang von Goethe"
+  },
+  {
+    "id": 65,
+    "quote": "Der Wille zu gewinnen, der Wunsch zu siegen, der Drang, dein volles Potenzial auszuschöpfen – das sind die Schlüssel, die die Tür zur persönlichen Exzellenz öffnen.",
+    "author": "Konfuzius"
+  },
+  {
+    "id": 66,
+    "quote": "Setze dir hohe Ziele und hör nicht auf, bis du sie erreicht hast.",
+    "author": "Bo Jackson"
+  },
+  {
+    "id": 67,
+    "quote": "Die Welt ist voller magischer Dinge, die geduldig darauf warten, dass unsere Sinne schärfer werden.",
+    "author": "Bertrand Russell"
+  },
+  {
+    "id": 68,
+    "quote": "Lass uns unsere Zukunft jetzt gestalten und unsere Träume zur Realität von morgen machen.",
+    "author": "Malala Yousafzai"
+  },
+  {
+    "id": 69,
+    "quote": "Alles, was du brauchst, ist der Plan, die Straßenkarte und den Mut, auf dein Ziel zuzugehen.",
+    "author": "Earl Nightingale"
+  },
+  {
+    "id": 70,
+    "quote": "Der Schein eines warmen Gedankens ist mir mehr wert als Geld.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 71,
+    "quote": "Die Kraft der Vorstellungskraft macht uns unendlich.",
+    "author": "John Muir"
+  },
+  {
+    "id": 72,
+    "quote": "Versuche, ein Regenbogen in jemandes Wolke zu sein.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 73,
+    "quote": "Ich wohne in der Möglichkeit.",
+    "author": "Emily Dickinson"
+  },
+  {
+    "id": 74,
+    "quote": "Auf sanfte Weise kannst du die Welt erschüttern.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 75,
+    "quote": "Folge deiner Leidenschaft und das Universum wird Türen öffnen, wo es nur Wände gab.",
+    "author": "Joseph Campbell"
+  },
+  {
+    "id": 76,
+    "quote": "Jeder Tag bringt seine eigenen Gaben.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 77,
+    "quote": "Kreativität ist Intelligenz, die Spaß hat.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 78,
+    "quote": "Menschen, die verrückt genug sind zu glauben, sie könnten die Welt verändern, sind die, die es tun.",
+    "author": "Rob Siltanen"
+  },
+  {
+    "id": 79,
+    "quote": "Es ist immer das Einfache, das das Wunderbare hervorbringt.",
+    "author": "Amelia Barr"
+  },
+  {
+    "id": 80,
+    "quote": "Unser größter Ruhm liegt nicht darin, nie zu fallen, sondern jedes Mal wieder aufzustehen.",
+    "author": "Konfuzius"
+  },
+  {
+    "id": 81,
+    "quote": "Schwierigkeiten bereiten gewöhnliche Menschen oft auf ein außergewöhnliches Schicksal vor.",
+    "author": "C.S. Lewis"
+  },
+  {
+    "id": 82,
+    "quote": "Glaube an dich selbst. Du bist mutiger als du denkst, talentierter als du weißt und zu mehr fähig als du dir vorstellst.",
+    "author": "Roy T. Bennett"
+  },
+  {
+    "id": 83,
+    "quote": "Ich habe gelernt, dass Mut nicht die Abwesenheit von Angst ist, sondern der Triumph über sie. Der tapfere Mann ist nicht derjenige, der keine Angst empfindet, sondern derjenige, der diese Angst besiegt.",
+    "author": "Nelson Mandela"
+  },
+  {
+    "id": 84,
+    "quote": "Es gibt nur eines, das einen Traum unmöglich zu verwirklichen macht: die Angst vor dem Scheitern.",
+    "author": "Paulo Coelho"
+  },
+  {
+    "id": 85,
+    "quote": "Es geht nicht darum, ob du zu Boden geschlagen wirst. Es geht darum, ob du wieder aufstehst.",
+    "author": "Vince Lombardi"
+  },
+  {
+    "id": 86,
+    "quote": "Dein wahrer Erfolg im Leben beginnt erst, wenn du dich verpflichtest, in dem, was du tust, exzellent zu sein.",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 87,
+    "quote": "Wenn du glaubst, es wird funktionieren, siehst du Chancen. Wenn du glaubst, es wird nicht funktionieren, siehst du Hindernisse.",
+    "author": "Wayne Dyer"
+  },
+  {
+    "id": 88,
+    "quote": "Alle unsere Träume können wahr werden, wenn wir den Mut haben, sie zu verfolgen.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 89,
+    "quote": "Erfolg ist, von Misserfolg zu Misserfolg zu gehen, ohne den Enthusiasmus zu verlieren.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 90,
+    "quote": "Gerade als die Raupe dachte, die Welt würde enden, verwandelte er sich in einen Schmetterling.",
+    "author": "Sprichwort"
+  },
+  {
+    "id": 91,
+    "quote": "Hab keine Angst, das Gute aufzugeben, um das Großartige zu erreichen.",
+    "author": "John D. Rockefeller"
+  },
+  {
+    "id": 92,
+    "quote": "Erhebe nicht deine Stimme, verbessere dein Argument.",
+    "author": "Anonym"
+  },
+  {
+    "id": 93,
+    "quote": "Was uns als bittere Prüfungen erscheint, sind oft Segnungen im Verborgenen.",
+    "author": "Oscar Wilde"
+  },
+  {
+    "id": 94,
+    "quote": "Tu jeden Tag eine Sache, die dir Angst macht.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 95,
+    "quote": "Das Leben geht nicht darum, sich selbst zu finden. Es geht darum, sich selbst zu erschaffen.",
+    "author": "Lolly Daskal"
+  },
+  {
+    "id": 96,
+    "quote": "Was hinter uns liegt und was vor uns liegt, sind Kleinigkeiten verglichen mit dem, was in uns liegt.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 97,
+    "quote": "Es ist nie zu spät, zu werden, was man hätte sein können.",
+    "author": "George Eliot"
+  },
+  {
+    "id": 98,
+    "quote": "In drei Worten kann ich alles zusammenfassen, was ich über das Leben gelernt habe: Es geht weiter.",
+    "author": "Robert Frost"
+  },
+  {
+    "id": 99,
+    "quote": "Wir sind immer noch Herren unseres Schicksals. Wir sind immer noch Kapitäne unserer Seelen.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 100,
+    "quote": "Der beste Ausweg führt immer hindurch.",
+    "author": "Robert Frost"
+  },
+  {
+    "id": 101,
+    "quote": "Hoffnung ist wie die Sonne, die, wenn wir auf sie zugehen, den Schatten unserer Last hinter uns wirft.",
+    "author": "Samuel Smiles"
+  },
+  {
+    "id": 102,
+    "quote": "Das Glück begünstigt die Mutigen.",
+    "author": "Publius Terentius"
+  },
+  {
+    "id": 103,
+    "quote": "Schreibe entweder etwas Lesenswertes oder tue etwas Beschreibenswertes.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 104,
+    "quote": "Wenn der Wind nicht dient, greife zum Ruder.",
+    "author": "Lateinisches Sprichwort"
+  },
+  {
+    "id": 105,
+    "quote": "Auf dem extra Weg gibt es keine Staus.",
+    "author": "Roger Staubach"
+  },
+  {
+    "id": 106,
+    "quote": "Zu viele von uns leben nicht ihre Träume, weil sie ihre Ängste leben.",
+    "author": "Les Brown"
+  },
+  {
+    "id": 107,
+    "quote": "Herausforderungen sind das, was das Leben interessant macht, und sie zu überwinden ist das, was das Leben bedeutungsvoll macht.",
+    "author": "Joshua J. Marine"
+  },
+  {
+    "id": 108,
+    "quote": "Ich bin beeindruckt von der Dringlichkeit des Handelns. Wissen genügt nicht; wir müssen anwenden. Bereit sein genügt nicht; wir müssen tun.",
+    "author": "Leonardo da Vinci"
+  },
+  {
+    "id": 109,
+    "quote": "Fang dort an, wo du bist. Benutze, was du hast. Tu, was du kannst.",
+    "author": "Arthur Ashe"
+  },
+  {
+    "id": 110,
+    "quote": "Glück ist nichts Fertiges. Es kommt aus deinen eigenen Handlungen.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 111,
+    "quote": "Wenn dir ein Platz in einer Rakete angeboten wird, frag nicht, welcher Sitz! Steig einfach ein.",
+    "author": "Sheryl Sandberg"
+  },
+  {
+    "id": 112,
+    "quote": "Wir sind das, was wir wiederholt tun. Exzellenz ist daher keine Handlung, sondern eine Gewohnheit.",
+    "author": "Aristoteles"
+  },
+  {
+    "id": 113,
+    "quote": "Gehe kalkulierte Risiken ein. Das ist etwas ganz anderes als Leichtsinn.",
+    "author": "George S. Patton"
+  },
+  {
+    "id": 114,
+    "quote": "Wenn alles gegen dich zu laufen scheint, denke daran, dass das Flugzeug gegen den Wind startet, nicht mit ihm.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 115,
+    "quote": "Übernimm die Verantwortung für dein Leben. Wisse, dass du es bist, der dich dorthin bringt, wo du hinwillst, niemand anderes.",
+    "author": "Les Brown"
+  },
+  {
+    "id": 116,
+    "quote": "Warte nicht, bis das Eisen heiß ist; mach es heiß durch Schlagen.",
+    "author": "William B. Sprague"
+  },
+  {
+    "id": 117,
+    "quote": "Bitte und es wird dir gegeben; suche und du wirst finden; klopfe an und die Tür wird dir geöffnet.",
+    "author": "Jesus"
+  },
+  {
+    "id": 118,
+    "quote": "Die Leute sagen oft, Motivation hält nicht an. Nun, Baden auch nicht, und deshalb empfehlen wir es täglich.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 119,
+    "quote": "Ich kann, also bin ich.",
+    "author": "Simone Weil"
+  },
+  {
+    "id": 120,
+    "quote": "Ich habe festgestellt, dass Glück ziemlich vorhersehbar ist. Wenn du mehr Glück willst, geh mehr Risiken ein. Sei aktiver. Zeig dich öfter.",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 121,
+    "quote": "Du musst den Widerstand der Menschen gegen dich überwinden, während du nach hohen Zielen greifst.",
+    "author": "George S. Patton"
+  },
+  {
+    "id": 122,
+    "quote": "Um sich selbst zu kennen, muss man sich selbst behaupten.",
+    "author": "Albert Camus"
+  },
+  {
+    "id": 123,
+    "quote": "Der erste Schritt zum Erfolg wird getan, wenn du dich weigerst, ein Gefangener der Umgebung zu sein, in der du dich zunächst befindest.",
+    "author": "Mark Caine"
+  },
+  {
+    "id": 124,
+    "quote": "Der effektivste Weg, etwas zu tun, ist, es zu tun.",
+    "author": "Amelia Earhart"
+  },
+  {
+    "id": 125,
+    "quote": "Beginne jetzt das zu sein, was du später sein wirst.",
+    "author": "William James"
+  },
+  {
+    "id": 126,
+    "quote": "Spring, und das Netz wird erscheinen.",
+    "author": "John Burroughs"
+  },
+  {
+    "id": 127,
+    "quote": "Tu deine Arbeit von ganzem Herzen und du wirst Erfolg haben – es gibt so wenig Konkurrenz.",
+    "author": "Elbert Hubbard"
+  },
+  {
+    "id": 128,
+    "quote": "Ein Ziel ist ein Traum mit einer Frist.",
+    "author": "Napoleon Hill"
+  },
+  {
+    "id": 129,
+    "quote": "Dinge geschehen nicht einfach. Dinge werden zum Geschehen gebracht.",
+    "author": "John F. Kennedy"
+  },
+  {
+    "id": 130,
+    "quote": "Qualität ist keine Handlung, sie ist eine Gewohnheit.",
+    "author": "Aristoteles"
+  },
+  {
+    "id": 131,
+    "quote": "Wer nicht vorbereitet ist, bereitet sich auf das Scheitern vor.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 132,
+    "quote": "Entweder führst du den Tag, oder der Tag führt dich.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 133,
+    "quote": "Wenn du einmal Hoffnung wählst, ist alles möglich.",
+    "author": "Christopher Reeve"
+  },
+  {
+    "id": 134,
+    "quote": "Versuche nicht, ein Mensch des Erfolges zu werden, sondern eher ein Mensch der Werte.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 135,
+    "quote": "Jemand sitzt heute im Schatten, weil jemand vor langer Zeit einen Baum gepflanzt hat.",
+    "author": "Warren Buffett"
+  },
+  {
+    "id": 136,
+    "quote": "Weine nicht, weil es vorbei ist, lächle, weil es geschah.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 137,
+    "quote": "Das Leben ist kurz und es ist dazu da, gelebt zu werden.",
+    "author": "Kate Winslet"
+  },
+  {
+    "id": 138,
+    "quote": "Du kannst die Punkte nicht vorausschauend verbinden; du kannst sie nur rückblickend verbinden... Dieser Ansatz hat mich nie im Stich gelassen und hat in meinem Leben den entscheidenden Unterschied gemacht.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 139,
+    "quote": "Alles, was du dir vorstellen kannst, ist real.",
+    "author": "Pablo Picasso"
+  },
+  {
+    "id": 140,
+    "quote": "Erfolgreiche Menschen tun das, was erfolglose Menschen nicht bereit sind zu tun. Wünsch dir nicht, es wäre einfacher; wünsch dir, du wärst besser.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 141,
+    "quote": "Wandel wird nicht kommen, wenn wir auf eine andere Person oder eine andere Zeit warten. Wir sind diejenigen, auf die wir gewartet haben. Wir sind der Wandel, den wir suchen.",
+    "author": "Barack Obama"
+  },
+  {
+    "id": 142,
+    "quote": "Wenn du liebst, was du tust, und bereit bist, das Nötige zu tun, liegt es in deiner Reichweite.",
+    "author": "Steve Wozniak"
+  },
+  {
+    "id": 143,
+    "quote": "Der erfolgreiche Krieger ist der durchschnittliche Mensch, mit laserartiger Konzentration.",
+    "author": "Bruce Lee"
+  },
+  {
+    "id": 144,
+    "quote": "Mitten in Bewegung und Chaos, bewahre die Stille in dir.",
+    "author": "Deepak Chopra"
+  },
+  {
+    "id": 145,
+    "quote": "Erfolg besteht nicht darin, nie Fehler zu machen, sondern darin, denselben Fehler kein zweites Mal zu machen.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 146,
+    "quote": "Wenn wir in das nächste Jahrhundert vorausblicken, werden diejenigen die Führenden sein, die andere befähigen.",
+    "author": "Bill Gates"
+  },
+  {
+    "id": 147,
+    "quote": "Der einzige Ort, an dem Erfolg vor Arbeit kommt, ist im Wörterbuch.",
+    "author": "Vidal Sassoon"
+  },
+  {
+    "id": 148,
+    "quote": "Erfolg ist, sich selbst zu mögen, das zu mögen, was man tut, und zu mögen, wie man es tut.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 149,
+    "quote": "Die Funktion von Führung ist es, mehr Führungspersönlichkeiten zu produzieren, nicht mehr Gefolgsleute.",
+    "author": "Ralph Nader"
+  },
+  {
+    "id": 150,
+    "quote": "Wann immer du dich auf der Seite der Mehrheit befindest, ist es Zeit, innezuhalten und nachzudenken.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 151,
+    "quote": "Lass nicht zu, dass die Angst vor dem Verlieren größer ist als die Aufregung über den Sieg.",
+    "author": "Robert Kiyosaki"
+  },
+  {
+    "id": 152,
+    "quote": "Motivation bringt dich in Gang. Gewohnheit hält dich am Laufen.",
+    "author": "Jim Ryun"
+  },
+  {
+    "id": 153,
+    "quote": "Menschen haben selten Erfolg, wenn sie keinen Spaß an dem haben, was sie tun.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 154,
+    "quote": "Kleine Geister werden durch Unglück gezähmt und unterworfen; aber große Geister erheben sich darüber.",
+    "author": "Washington Irving"
+  },
+  {
+    "id": 155,
+    "quote": "Erfolg wird am häufigsten von denen erreicht, die nicht wissen, dass Scheitern unvermeidlich ist.",
+    "author": "Coco Chanel"
+  },
+  {
+    "id": 156,
+    "quote": "Lerne aus dem Gestern, lebe für das Heute, hoffe auf das Morgen. Das Wichtige ist, nicht aufzuhören zu fragen.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 157,
+    "quote": "Du lebst nur einmal, aber wenn du es richtig machst, reicht einmal.",
+    "author": "Mae West"
+  },
+  {
+    "id": 158,
+    "quote": "Gelegenheiten entstehen nicht einfach. Du erschaffst sie.",
+    "author": "Chris Grosser"
+  },
+  {
+    "id": 159,
+    "quote": "So wie ich es sehe: Wenn du den Regenbogen willst, musst du den Regen in Kauf nehmen.",
+    "author": "Dolly Parton"
+  },
+  {
+    "id": 160,
+    "quote": "Je länger ich lebe, desto schöner wird das Leben.",
+    "author": "Frank Lloyd Wright"
+  },
+  {
+    "id": 161,
+    "quote": "Erfolg ist die Summe kleiner Anstrengungen, die Tag für Tag wiederholt werden.",
+    "author": "Robert Collier"
+  },
+  {
+    "id": 162,
+    "quote": "Ein Traum wird nicht durch Magie Wirklichkeit; er braucht Schweiß, Entschlossenheit und harte Arbeit.",
+    "author": "Colin Powell"
+  },
+  {
+    "id": 163,
+    "quote": "In zwanzig Jahren wirst du mehr über die Dinge enttäuscht sein, die du nicht getan hast, als über die, die du getan hast. Also wirf die Leinen los. Segel fort vom sicheren Hafen... Erkunde. Träume. Entdecke.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 164,
+    "quote": "Deine Arbeit wird einen großen Teil deines Lebens ausfüllen, und der einzige Weg, wirklich zufrieden zu sein, ist, das zu tun, von dem du glaubst, dass es großartige Arbeit ist.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 165,
+    "quote": "Verschiebe nur auf morgen, was du bereit bist, sterbend unvollendet zu lassen.",
+    "author": "Pablo Picasso"
+  },
+  {
+    "id": 166,
+    "quote": "Wir werden das, woran wir die meiste Zeit denken, und das ist das merkwürdigste Geheimnis.",
+    "author": "Earl Nightingale"
+  },
+  {
+    "id": 167,
+    "quote": "Das größte Risiko ist es, kein Risiko einzugehen... In einer Welt, die sich sehr schnell verändert, ist die einzige Strategie, die garantiert scheitert, keine Risiken einzugehen.",
+    "author": "Mark Zuckerberg"
+  },
+  {
+    "id": 168,
+    "quote": "Mach dir keine Sorgen wegen des Scheiterns; du musst nur einmal recht haben.",
+    "author": "Drew Houston"
+  },
+  {
+    "id": 169,
+    "quote": "Nichts Großes wurde je ohne Begeisterung erreicht.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 170,
+    "quote": "Halte dein Gesicht der Sonne zugewandt, dann kannst du den Schatten nicht sehen.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 171,
+    "quote": "Je mehr du dein Leben lobst und feierst, desto mehr gibt es im Leben zu feiern.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 172,
+    "quote": "Aller Fortschritt findet außerhalb der Komfortzone statt.",
+    "author": "Michael John Bobak"
+  },
+  {
+    "id": 173,
+    "quote": "Deine Zeit ist begrenzt, also verschwende sie nicht damit, das Leben eines anderen zu leben.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 174,
+    "quote": "Ziele zu setzen ist der erste Schritt, das Unsichtbare in das Sichtbare zu verwandeln.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 175,
+    "quote": "Das Schwierigste ist die Entscheidung zu handeln, der Rest ist bloße Beharrlichkeit.",
+    "author": "Amelia Earhart"
+  },
+  {
+    "id": 176,
+    "quote": "Mut ist Anmut unter Druck.",
+    "author": "Ernest Hemingway"
+  },
+  {
+    "id": 177,
+    "quote": "Wenn du nicht bereit bist, das Übliche zu riskieren, musst du dich mit dem Gewöhnlichen abfinden.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 178,
+    "quote": "Nicht die Stärksten der Spezies überleben, auch nicht die Intelligentesten, sondern die am anpassungsfähigsten an Veränderungen.",
+    "author": "Charles Darwin"
+  },
+  {
+    "id": 179,
+    "quote": "Die besten und schönsten Dinge der Welt können weder gesehen noch berührt werden – sie müssen mit dem Herzen gefühlt werden.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 180,
+    "quote": "Große Geister diskutieren Ideen; durchschnittliche Geister diskutieren Ereignisse; kleine Geister diskutieren Menschen.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 181,
+    "quote": "Die beste Rache ist massiver Erfolg.",
+    "author": "Frank Sinatra"
+  },
+  {
+    "id": 182,
+    "quote": "Ein erfolgreicher Mann ist derjenige, der ein festes Fundament aus den Steinen legen kann, die andere nach ihm geworfen haben.",
+    "author": "David Brinkley"
+  },
+  {
+    "id": 183,
+    "quote": "Mögest du jeden Tag deines Lebens leben.",
+    "author": "Jonathan Swift"
+  },
+  {
+    "id": 184,
+    "quote": "Der Unterschied zwischen Gewinnen und Verlieren ist meistens das Nicht-Aufgeben.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 185,
+    "quote": "Lebe, als würdest du morgen sterben. Lerne, als würdest du ewig leben.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 186,
+    "quote": "Wenn du aufhörst zu träumen, hörst du auf zu leben.",
+    "author": "Malcolm Forbes"
+  },
+  {
+    "id": 187,
+    "quote": "Niemand kann dich ohne deine Zustimmung minderwertig fühlen lassen.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 188,
+    "quote": "Misserfolg ist ein weiterer Trittstein zur Größe.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 189,
+    "quote": "Entwickle Erfolg aus Misserfolgen. Entmutigung und Misserfolg sind zwei der sichersten Trittsteine zum Erfolg.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 190,
+    "quote": "Wenn du nicht deinen eigenen Lebensplan entwirfst, besteht die Chance, dass du in den Plan von jemand anderem fällst. Und weißt du, was die für dich geplant haben? Nicht viel.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 191,
+    "quote": "Es gibt keinen Zufall, kein Schicksal, kein Los, das den festen Entschluss einer entschlossenen Seele hindern oder kontrollieren kann.",
+    "author": "Ella Wheeler Wilcox"
+  },
+  {
+    "id": 192,
+    "quote": "Du musst Großes von dir selbst erwarten, bevor du es tun kannst.",
+    "author": "Michael Jordan"
+  },
+  {
+    "id": 193,
+    "quote": "Sei unglücklich. Oder motiviere dich. Was auch immer getan werden muss, es liegt immer in deiner Wahl.",
+    "author": "Wayne Dyer"
+  },
+  {
+    "id": 194,
+    "quote": "Du musst jeden Morgen mit Entschlossenheit aufstehen, wenn du mit Befriedigung schlafen gehen willst.",
+    "author": "George Lorimer"
+  },
+  {
+    "id": 195,
+    "quote": "Echte Schwierigkeiten können überwunden werden; nur die eingebildeten sind unüberwindlich.",
+    "author": "Theodore N. Vail"
+  },
+  {
+    "id": 196,
+    "quote": "Misserfolg ist das Gewürz, das dem Erfolg seinen Geschmack gibt.",
+    "author": "Truman Capote"
+  },
+  {
+    "id": 197,
+    "quote": "Es ist besser, in der Originalität zu scheitern als im Nachahmen zu gelingen.",
+    "author": "Herman Melville"
+  },
+  {
+    "id": 198,
+    "quote": "Das Glück steht auf der Seite derer, die wagen.",
+    "author": "Vergil"
+  },
+  {
+    "id": 199,
+    "quote": "Du musst vielleicht eine Schlacht mehr als einmal kämpfen, um sie zu gewinnen.",
+    "author": "Margaret Thatcher"
+  },
+  {
+    "id": 200,
+    "quote": "Nichts hält ewig. Nicht einmal deine Probleme.",
+    "author": "Arnold H. Glasgow"
+  },
+  {
+    "id": 201,
+    "quote": "Es gibt nur zwei Arten, sein Leben zu leben. Eine ist so, als wäre nichts ein Wunder. Die andere ist so, als wäre alles ein Wunder.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 202,
+    "quote": "Um Großes zu vollbringen, müssen wir nicht nur handeln, sondern auch träumen, nicht nur planen, sondern auch glauben.",
+    "author": "Anatole France"
+  },
+  {
+    "id": 203,
+    "quote": "Du misst die Größe einer Leistung an den Hindernissen, die du überwinden musstest, um deine Ziele zu erreichen.",
+    "author": "Booker T. Washington"
+  },
+  {
+    "id": 204,
+    "quote": "Das Wichtigste in der Welt wurde von Menschen vollbracht, die weitergemacht haben, als es scheinbar keine Hoffnung mehr gab.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 205,
+    "quote": "Ein Leben, das mit Fehlern verbracht wird, ist nicht nur ehrenwerter, sondern nützlicher als ein Leben, das damit verbracht wird, nichts zu tun.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 206,
+    "quote": "Mach das Beste aus dir selbst, denn das ist alles, was von dir übrig ist.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 207,
+    "quote": "Das Leben besteht zu 10% aus dem, was mir passiert, und zu 90% aus dem, wie ich darauf reagiere.",
+    "author": "John Maxwell"
+  },
+  {
+    "id": 208,
+    "quote": "Beschließe, nie untätig zu sein. Niemand wird Anlass haben, über Zeitmangel zu klagen, der nie welche verliert. Es ist erstaunlich, wie viel getan werden kann, wenn wir immer aktiv sind.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 209,
+    "quote": "Ein Zimmer ohne Bücher ist wie ein Körper ohne Seele.",
+    "author": "Marcus Tullius Cicero"
+  },
+  {
+    "id": 210,
+    "quote": "Geh nicht hinter mir; ich führe vielleicht nicht. Geh nicht vor mir; ich folge vielleicht nicht. Geh einfach neben mir und sei mein Freund.",
+    "author": "Albert Camus"
+  },
+  {
+    "id": 211,
+    "quote": "Glück ist ein Schmetterling, der, wenn man ihn verfolgt, immer außer Reichweite ist, der aber, wenn man still sitzt, auf einen herabflattern kann.",
+    "author": "Nathaniel Hawthorne"
+  },
+  {
+    "id": 212,
+    "quote": "Manchmal kannst du dich selbst nicht klar sehen, bis du dich durch die Augen anderer siehst.",
+    "author": "Ellen DeGeneres"
+  },
+  {
+    "id": 213,
+    "quote": "Das ganze Geheimnis eines erfolgreichen Lebens besteht darin, herauszufinden, was sein Schicksal ist, und es dann zu tun.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 214,
+    "quote": "Wenn du durch die Hölle gehst, geh weiter.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 215,
+    "quote": "Um unersetzlich zu sein, muss man immer anders sein.",
+    "author": "Coco Chanel"
+  },
+  {
+    "id": 216,
+    "quote": "Wenn du es nicht einfach erklären kannst, verstehst du es nicht gut genug.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 217,
+    "quote": "Ich glaube, jeder Mensch hat eine begrenzte Anzahl von Herzschlägen. Ich beabsichtige nicht, einen davon zu verschwenden.",
+    "author": "Neil Armstrong"
+  },
+  {
+    "id": 218,
+    "quote": "Die zwei wichtigsten Tage in deinem Leben sind der Tag, an dem du geboren wirst, und der Tag, an dem du herausfindest, warum.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 219,
+    "quote": "Im Laufe des Älterwerdens wirst du entdecken, dass du zwei Hände hast: eine zum Helfen für dich selbst, die andere zum Helfen für andere.",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 220,
+    "quote": "Wenn du Exzellenz erreichen willst, kannst du das heute schaffen. Ab dieser Sekunde: Hör auf, weniger als exzellente Arbeit zu leisten.",
+    "author": "Thomas J. Watson"
+  },
+  {
+    "id": 221,
+    "quote": "Wenn deine Handlungen andere inspirieren, mehr zu träumen, mehr zu lernen, mehr zu tun und mehr zu werden, bist du eine Führungspersönlichkeit.",
+    "author": "John Quincy Adams"
+  },
+  {
+    "id": 222,
+    "quote": "Ich finde, je härter ich arbeite, desto mehr Glück scheine ich zu haben.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 223,
+    "quote": "Es erfordert oft mehr Mut, das Richtige zu wagen zu tun, als Angst zu haben, das Falsche zu tun.",
+    "author": "Abraham Lincoln"
+  },
+  {
+    "id": 224,
+    "quote": "Begrenze dich nicht. Viele Menschen beschränken sich auf das, was sie zu können glauben. Du kannst so weit gehen, wie dein Geist es dir erlaubt. Was du glaubst, denke daran, kannst du erreichen.",
+    "author": "Mary Kay Ash"
+  },
+  {
+    "id": 225,
+    "quote": "Sei, wer du bist, und sag, was du fühlst, weil diejenigen, denen es wichtig ist, es nicht stört, und diejenigen, denen es stört, es nicht wichtig ist.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 226,
+    "quote": "Halte deine Augen auf die Sterne und deine Füße auf dem Boden.",
+    "author": "Theodore Roosevelt"
+  },
+  {
+    "id": 227,
+    "quote": "Die einzige Person, mit der du versuchen solltest, besser zu sein, ist die Person, die du gestern warst.",
+    "author": "Anonym"
+  },
+  {
+    "id": 228,
+    "quote": "Lass dich nie zum Schweigen einschüchtern. Lass nie zu, dass du zum Opfer gemacht wirst. Akzeptiere niemandes Definition deines Lebens; definiere dich selbst.",
+    "author": "Harvey Fierstein"
+  },
+  {
+    "id": 229,
+    "quote": "Das Leben ist zu geheimnisvoll, um es zu ernst zu nehmen.",
+    "author": "Mary Engelbreit"
+  },
+  {
+    "id": 230,
+    "quote": "Der weiseste Geist hat noch etwas zu lernen.",
+    "author": "George Santayana"
+  },
+  {
+    "id": 231,
+    "quote": "Es geht nicht darum, wie hart du zuschlagen kannst; es geht darum, wie hart du getroffen werden kannst und trotzdem weitergehst.",
+    "author": "Rocky Balboa"
+  },
+  {
+    "id": 232,
+    "quote": "Wenn du schnell gehen willst, geh alleine. Wenn du weit gehen willst, geh gemeinsam.",
+    "author": "Afrikanisches Sprichwort"
+  },
+  {
+    "id": 233,
+    "quote": "Pflege deinen Garten und schmücke deine eigene Seele, anstatt darauf zu warten, dass jemand dir Blumen bringt.",
+    "author": "José Luis Borges"
+  },
+  {
+    "id": 234,
+    "quote": "Gehe nicht dorthin, wo der Weg führt, sondern dorthin, wo kein Weg ist, und hinterlasse eine Spur.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 235,
+    "quote": "Intelligenz ohne Ehrgeiz ist ein Vogel ohne Flügel.",
+    "author": "Salvador Dalí"
+  },
+  {
+    "id": 236,
+    "quote": "Der Schlüssel ist, nur mit Menschen zusammen zu sein, die dich aufbauen, deren Anwesenheit dein Bestes hervorruft.",
+    "author": "Epiktet"
+  },
+  {
+    "id": 237,
+    "quote": "Wir können vielen Niederlagen begegnen, aber wir dürfen nicht besiegt werden.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 238,
+    "quote": "Probleme sind keine Stoppschilder, sie sind Richtlinien.",
+    "author": "Robert H. Schuller"
+  },
+  {
+    "id": 239,
+    "quote": "Ein kreativer Mensch wird durch den Wunsch zu erreichen motiviert, nicht durch den Wunsch, andere zu schlagen.",
+    "author": "Ayn Rand"
+  },
+  {
+    "id": 240,
+    "quote": "Was du durch das Erreichen deiner Ziele bekommst, ist nicht so wichtig wie das, was du durch das Erreichen deiner Ziele wirst.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 241,
+    "quote": "Ein Jemand war einmal ein Niemand, der es wollte und tat.",
+    "author": "John Burroughs"
+  },
+  {
+    "id": 242,
+    "quote": "Wenn du wirklich etwas willst, warte nicht darauf – bring dir bei, ungeduldig zu sein.",
+    "author": "Gurbaksh Chahal"
+  },
+  {
+    "id": 243,
+    "quote": "Nimm eine Idee auf. Mach diese eine Idee zu deinem Leben – denke daran, träume davon, lebe für diese Idee. Lass Gehirn, Muskeln, Nerven, jeden Teil deines Körpers von dieser Idee erfüllt sein und lass jede andere Idee einfach in Ruhe. Das ist der Weg zum Erfolg.",
+    "author": "Swami Vivekananda"
+  },
+  {
+    "id": 244,
+    "quote": "Um erfolgreich zu sein, musst du alle Herausforderungen annehmen, die auf dich zukommen. Du kannst nicht nur die akzeptieren, die dir gefallen.",
+    "author": "Mike Gafka"
+  },
+  {
+    "id": 245,
+    "quote": "Wo Hoffnung wächst, blühen Wunder.",
+    "author": "Elna Rae"
+  },
+  {
+    "id": 246,
+    "quote": "Geh Risiken ein, mach Fehler. So wächst du. Schmerz nährt deinen Mut. Du musst scheitern, um zu üben, mutig zu sein.",
+    "author": "Mary Tyler Moore"
+  },
+  {
+    "id": 247,
+    "quote": "Stark zu sein bedeutet, sich darüber zu freuen, wer man ist, einschließlich der Unvollkommenheiten.",
+    "author": "Margaret Woodhouse"
+  },
+  {
+    "id": 248,
+    "quote": "Wenn du nicht nach dem strebst, was du willst, wirst du es nie haben. Wenn du nicht fragst, ist die Antwort immer Nein. Wenn du keinen Schritt nach vorne machst, bist du immer am gleichen Ort.",
+    "author": "Nora Roberts"
+  },
+  {
+    "id": 249,
+    "quote": "Hoffnung verlässt dich nie, du verlässt sie.",
+    "author": "George Weinberg"
+  },
+  {
+    "id": 250,
+    "quote": "Nichts Glänzendes wurde je von denen erreicht, die nicht glaubten, dass etwas in ihnen den Umständen überlegen war.",
+    "author": "Bruce Barton"
+  },
+  {
+    "id": 251,
+    "quote": "Ich hörte auf, Angst zu haben, als mein erstes Unternehmen scheiterte und der Himmel nicht einstürzte.",
+    "author": "Allen H. Neuharth"
+  },
+  {
+    "id": 252,
+    "quote": "Aerodynamisch sollte die Hummel nicht fliegen können, aber die Hummel weiß das nicht und fliegt trotzdem.",
+    "author": "Mary Kay Ash"
+  },
+  {
+    "id": 253,
+    "quote": "Für mich geht es im Geschäftsleben nicht darum, Anzüge zu tragen oder Aktionäre zu befriedigen. Es geht darum, dir selbst und deinen Ideen treu zu sein und sich auf das Wesentliche zu konzentrieren.",
+    "author": "Richard Branson"
+  },
+  {
+    "id": 254,
+    "quote": "Wenn du nicht hartnäckig bist, gibst du Experimente zu früh auf. Und wenn du nicht flexibel bist, schlägst du deinen Kopf gegen die Wand und siehst keine andere Lösung für ein Problem, das du zu lösen versuchst.",
+    "author": "Jeff Bezos"
+  },
+  {
+    "id": 255,
+    "quote": "Du kannst nicht jeden zufriedenstellen, und du kannst nicht bewirken, dass dich alle mögen.",
+    "author": "Katie Couric"
+  },
+  {
+    "id": 256,
+    "quote": "Du kannst nur erfolgreich sein, wenn du erfolgreich sein willst; du kannst nur scheitern, wenn dir Scheitern nichts ausmacht.",
+    "author": "Philippos"
+  },
+  {
+    "id": 257,
+    "quote": "Ich finde, wenn man ein echtes Interesse am Leben und ein neugieriges Leben hat, ist Schlaf nicht das Wichtigste.",
+    "author": "Martha Stewart"
+  },
+  {
+    "id": 258,
+    "quote": "Wissen bedeutet, sich bewusst zu sein, was man tun kann. Weisheit bedeutet, zu wissen, wann man es nicht tun sollte.",
+    "author": "Anonym"
+  },
+  {
+    "id": 259,
+    "quote": "Du kannst alles tun, aber nicht alles auf einmal.",
+    "author": "Anonym"
+  },
+  {
+    "id": 260,
+    "quote": "Es gibt zwei Arten von Menschen, die dir sagen werden, dass du in dieser Welt keinen Unterschied machen kannst: diejenigen, die Angst haben, es zu versuchen, und diejenigen, die Angst haben, dass du Erfolg haben wirst.",
+    "author": "Ray Goforth"
+  },
+  {
+    "id": 261,
+    "quote": "Ein Mann, der vor seiner Angst flieht, findet vielleicht, dass er nur eine Abkürzung genommen hat, um ihr zu begegnen.",
+    "author": "Sador"
+  },
+  {
+    "id": 262,
+    "quote": "Es gibt keine Art und Weise, wie die Dinge sein sollten. Es gibt nur das, was passiert, und das, was wir tun.",
+    "author": "Terry Pratchett"
+  },
+  {
+    "id": 263,
+    "quote": "Ich bin selbstsüchtig, ungeduldig und ein wenig unsicher. Ich mache Fehler, ich bin außer Kontrolle und manchmal schwer zu handhaben. Aber wenn du mich in meinen schlechtesten Momenten nicht handhaben kannst, verdienst du mich in meinen besten Momenten sicher nicht.",
+    "author": "Marilyn Monroe"
+  },
+  {
+    "id": 264,
+    "quote": "Du weißt, dass du verliebt bist, wenn du nicht einschlafen kannst, weil die Wirklichkeit endlich besser ist als deine Träume.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 265,
+    "quote": "Es hat mich lange gebraucht, mich nicht mehr durch die Augen anderer zu beurteilen.",
+    "author": "Sally Field"
+  },
+  {
+    "id": 266,
+    "quote": "Auszeichnungen korrodieren, Freunde sammeln keinen Staub.",
+    "author": "Jesse Owens"
+  },
+  {
+    "id": 267,
+    "quote": "Ich möchte nicht ans Ende meines Lebens kommen und feststellen, dass ich nur die Länge davon gelebt habe. Ich möchte auch die Breite davon gelebt haben.",
+    "author": "Diane Ackerman"
+  },
+  {
+    "id": 268,
+    "quote": "Identität ist ein Gefängnis, aus dem man nie entkommen kann, aber der Weg, die Vergangenheit zu erlösen, besteht nicht darin, vor ihr wegzulaufen, sondern sie zu verstehen und als Fundament für das Wachstum zu nutzen.",
+    "author": "Jay-Z"
+  },
+  {
+    "id": 269,
+    "quote": "Wenn ich wage, mächtig zu sein – meine Stärke in den Dienst meiner Vision zu stellen – dann wird es immer weniger wichtig, ob ich Angst habe.",
+    "author": "Audre Lorde"
+  },
+  {
+    "id": 270,
+    "quote": "Wenn du eine dauerhafte Veränderung herbeiführen willst, höre auf, dich auf die Größe deiner Probleme zu konzentrieren, und beginne, dich auf deine eigene Größe zu konzentrieren!",
+    "author": "T. Harv Eker"
+  },
+  {
+    "id": 271,
+    "quote": "Der Hauptgrund, warum Menschen im Leben scheitern, ist, dass sie auf ihre Freunde, Familie und Nachbarn hören.",
+    "author": "Napoleon Hill"
+  },
+  {
+    "id": 272,
+    "quote": "Unsere größte Angst sollte nicht das Scheitern sein, sondern das Gelingen bei Dingen, die im Leben eigentlich keine Rolle spielen.",
+    "author": "Francis Chan"
+  },
+  {
+    "id": 273,
+    "quote": "In meiner Erfahrung gibt es nur eine Motivation, und das ist das Verlangen. Keine Vernunft oder kein Prinzip enthält sie oder steht gegen sie.",
+    "author": "Jane Smiley"
+  },
+  {
+    "id": 274,
+    "quote": "Erfolg ist... seinen Lebenszweck zu kennen, um sein maximales Potenzial zu wachsen und Samen zu säen, die anderen nutzen.",
+    "author": "John C. Maxwell"
+  },
+  {
+    "id": 275,
+    "quote": "Es geht nicht um die Größe des Hundes im Kampf, sondern um die Größe des Kampfes im Hund.",
+    "author": "Archie Griffin"
+  },
+  {
+    "id": 276,
+    "quote": "Niederlage ist nicht bitter, solange man sie nicht schluckt.",
+    "author": "Joe Clark"
+  },
+  {
+    "id": 277,
+    "quote": "Ein Hindernis ist oft ein Trittstein.",
+    "author": "Prescott"
+  },
+  {
+    "id": 278,
+    "quote": "Ein Bleistift und ein Traum können dich überall hinbringen.",
+    "author": "Joyce Meyer"
+  },
+  {
+    "id": 279,
+    "quote": "Stell dir vor, dein Leben ist in jeder Hinsicht perfekt; wie würde es aussehen?",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 280,
+    "quote": "Begeisterung ist die Energie und Kraft, die buchstäblich den Schwung der menschlichen Seele und des menschlichen Geistes aufbaut.",
+    "author": "Bryant McGill"
+  },
+  {
+    "id": 281,
+    "quote": "Manchmal kann zu viel Denken deinen Schwung zerstören.",
+    "author": "Tom Watson"
+  },
+  {
+    "id": 282,
+    "quote": "Arbeit bewahrt uns vor drei Übeln: Langeweile, Laster und Not.",
+    "author": "Voltaire"
+  },
+  {
+    "id": 283,
+    "quote": "Starke Leben werden von dynamischen Zwecken motiviert.",
+    "author": "Kenneth Hildebrand"
+  },
+  {
+    "id": 284,
+    "quote": "Du kannst ein Feld nicht pflügen, indem du es im Geiste umdrehst.",
+    "author": "Anonym"
+  },
+  {
+    "id": 285,
+    "quote": "Die Welt ist weit, und ich werde mein Leben nicht in Reibung verschwenden, wenn es in Schwung umgewandelt werden könnte.",
+    "author": "Frances E. Willard"
+  },
+  {
+    "id": 286,
+    "quote": "Glaube mit deinem ganzen Herzen daran, dass du das tun wirst, wozu du gemacht wurdest.",
+    "author": "Orison Swett Marden"
+  },
+  {
+    "id": 287,
+    "quote": "Wenn du den Mut hast, weiter Fehler zu machen, springen deine Weisheit und Intelligenz mit enormem Schwung vorwärts.",
+    "author": "Holly Near"
+  },
+  {
+    "id": 288,
+    "quote": "Das Geheimnis des Vorankommens ist der Anfang. Das Geheimnis des Anfangs ist, deine komplexen überwältigenden Probleme in kleine handhabbare Aufgaben aufzuteilen und mit der ersten anzufangen.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 289,
+    "quote": "Arbeite immer hart. Intensität klärt. Sie schafft nicht nur Schwung, sondern auch den Druck, den du brauchst, um entweder Reibung oder Erfüllung zu spüren.",
+    "author": "Marcus Buckingham"
+  },
+  {
+    "id": 290,
+    "quote": "In jeder schwierigen Situation liegt ein potenzieller Wert. Glaube das, dann beginne, danach zu suchen.",
+    "author": "Norman Vincent Peale"
+  },
+  {
+    "id": 291,
+    "quote": "Wenn du den Regenbogen willst, musst du den Regen in Kauf nehmen.",
+    "author": "Dolly Parton"
+  },
+  {
+    "id": 292,
+    "quote": "Wenn du immer das tust, was dich interessiert, ist zumindest eine Person zufrieden.",
+    "author": "Katharine Hepburn"
+  },
+  {
+    "id": 293,
+    "quote": "Ich vermeide es, vorwärts oder rückwärts zu schauen, und versuche, aufwärts zu schauen.",
+    "author": "Charlotte Brontë"
+  },
+  {
+    "id": 294,
+    "quote": "Eine der größten Krankheiten ist es, für niemanden jemand zu sein.",
+    "author": "Mutter Teresa"
+  },
+  {
+    "id": 295,
+    "quote": "Es gibt keinen einfachen Weg zur Freiheit nirgendwo, und viele von uns werden immer wieder durch das Tal des Todesschattens gehen müssen, bevor wir den Gipfel unserer Wünsche erreichen.",
+    "author": "Nelson Mandela"
+  },
+  {
+    "id": 296,
+    "quote": "Selten habe ich eine Situation gesehen, in der weniger als der andere eine gute Strategie ist.",
+    "author": "Jimmy Spithill"
+  },
+  {
+    "id": 297,
+    "quote": "Mach weiter, und die Chancen stehen gut, dass du auf etwas stolpern wirst, vielleicht wenn du es am wenigsten erwartest.",
+    "author": "Charles F. Kettering"
+  },
+  {
+    "id": 298,
+    "quote": "Ein echter Unternehmer ist jemand, der kein Sicherheitsnetz unter sich hat.",
+    "author": "Henry Kravis"
+  },
+  {
+    "id": 299,
+    "quote": "Deine geistige und körperliche Gesundheit kommt an erster Stelle. Alles andere ist zweitrangig.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 300,
+    "quote": "Weniger ist fast immer mehr. Einfachheit ist fast immer die Antwort.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 301,
+    "quote": "Du musst Glück haben, um erfolgreich zu sein, aber Glück kann konstruiert werden.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 302,
+    "quote": "Alles beginnt und endet im Geist. Die wichtigste Fähigkeit ist die Art und Weise, wie du denkst.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 303,
+    "quote": "Menschen sind manchmal schwierig. Aber wenn du freundlich bist, holst du das Beste aus selbst den Schlimmsten heraus.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 304,
+    "quote": "Perfektion existiert nur im Geist. Sie ist nicht real. Stelle dir vor, erschaffe, verbessere.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 305,
+    "quote": "Die Welt braucht keinen weiteren Lärm. Beschwere dich nicht. Gib ein Beispiel.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 306,
+    "quote": "Kampf ist ein Teil des Lebens. Gut kämpfen zu lernen ist an sich eine Belohnung.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 307,
+    "quote": "Deine Aufmerksamkeit ist das wichtigste Gut, das du hast. Setze sie bewusst ein.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 308,
+    "quote": "Das Ziel eines idealen Partners ist nicht, dich zu vervollständigen. Es ist, dich zu ergänzen.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 309,
+    "quote": "Wen du in dein Leben lässt, ist eine entscheidende Entscheidung. Überlasse es nicht dem Zufall.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 310,
+    "quote": "Der Sinn des Lebens besteht nicht darin, zu tun oder zu vollbringen. Es geht nur darum, zu erleben.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 311,
+    "quote": "Alles ist ungefähr. Strebe nicht danach, recht zu haben. Strebe danach, weniger falsch zu liegen.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 312,
+    "quote": "Es ist besser, keine Meinung zu haben, als blind der Meinung von jemand anderem zu folgen.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 313,
+    "quote": "Damit die Welt dich niedermachen kann, muss sie erst deine Erlaubnis haben.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 314,
+    "quote": "Je mehr Dinge dir wichtig sind, desto weniger bedeutsam wird das Kümmern.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 315,
+    "quote": "Sei freundlich zu dir selbst angesichts von Misserfolgen. Sie definieren dich wirklich nicht.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 316,
+    "quote": "Sei nicht zu stolz auf deine Leistungen. Sie gehören nicht alle dir.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 317,
+    "quote": "Das Leben ist kurz, und es liegt an dir, es süß zu machen.",
+    "author": "Sarah Louise Delany"
+  },
+  {
+    "id": 318,
+    "quote": "Es stimmt, dass manche Menschen mehr angeborenes Talent haben. Aber Talent allein reicht nicht.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 319,
+    "quote": "Es gibt keine Gerechtigkeit, und daran zu grübeln erzeugt Verzweiflung.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 320,
+    "quote": "Wenn du Größe erreichen willst, hör auf, um Erlaubnis zu bitten.",
+    "author": "Anonym"
+  },
+  {
+    "id": 321,
+    "quote": "Die Dinge laufen am besten für diejenigen, die das Beste aus dem machen, wie die Dinge laufen.",
+    "author": "John Wooden"
+  },
+  {
+    "id": 322,
+    "quote": "Um ein kreatives Leben zu leben, müssen wir unsere Angst verlieren, falsch zu liegen.",
+    "author": "Anonym"
+  },
+  {
+    "id": 323,
+    "quote": "Wenn du nicht bereit bist, das Übliche zu riskieren, musst du dich mit dem Gewöhnlichen abfinden.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 324,
+    "quote": "Vertraue, weil du bereit bist, das Risiko zu akzeptieren, nicht weil es sicher oder gewiss ist.",
+    "author": "Anonym"
+  },
+  {
+    "id": 325,
+    "quote": "Gute Dinge kommen zu Menschen, die warten, aber bessere Dinge kommen zu denen, die hinausgehen und sie sich holen.",
+    "author": "Anonym"
+  },
+  {
+    "id": 326,
+    "quote": "Wenn du immer das tust, was du immer getan hast, wirst du immer das bekommen, was du immer bekommen hast.",
+    "author": "Anonym"
+  },
+  {
+    "id": 327,
+    "quote": "Erfolgreiche Unternehmer sind Geber und keine Nehmer von positiver Energie.",
+    "author": "Anonym"
+  },
+  {
+    "id": 328,
+    "quote": "Wenn du eine erfolgreiche Person siehst, siehst du nur den öffentlichen Ruhm, niemals die privaten Opfer, um ihn zu erreichen.",
+    "author": "Vaibhav Shah"
+  },
+  {
+    "id": 329,
+    "quote": "Die Distanz zwischen Wahnsinn und Genie wird nur durch Erfolg gemessen.",
+    "author": "Bruce Feirstein"
+  },
+  {
+    "id": 330,
+    "quote": "Was ist der Sinn des Lebens, wenn man nicht wenigstens versucht, etwas Bemerkenswertes zu tun?",
+    "author": "Anonym"
+  },
+  {
+    "id": 331,
+    "quote": "Das Leben geht nicht darum, sich selbst zu finden. Das Leben geht darum, sich selbst zu erschaffen.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 332,
+    "quote": "Nicht die Stärksten der Spezies überleben, auch nicht die Intelligentesten, sondern die am anpassungsfähigsten an Veränderungen.",
+    "author": "Charles Darwin"
+  },
+  {
+    "id": 333,
+    "quote": "Die besten und schönsten Dinge der Welt können weder gesehen noch berührt werden – sie müssen mit dem Herzen gefühlt werden.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 334,
+    "quote": "Große Geister diskutieren Ideen; durchschnittliche Geister diskutieren Ereignisse; kleine Geister diskutieren Menschen.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 335,
+    "quote": "Ein erfolgreicher Mann ist derjenige, der ein festes Fundament aus den Steinen legen kann, die andere nach ihm geworfen haben.",
+    "author": "David Brinkley"
+  },
+  {
+    "id": 336,
+    "quote": "Niemand kann dich ohne deine Zustimmung minderwertig fühlen lassen.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 337,
+    "quote": "Misserfolg ist ein weiterer Trittstein zur Größe.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 338,
+    "quote": "Der einzige Weg, das Unmögliche zu erreichen, ist zu glauben, dass es möglich ist.",
+    "author": "Charles Kingsleigh"
+  },
+  {
+    "id": 339,
+    "quote": "Es gibt keinen Ersatz für harte Arbeit.",
+    "author": "Thomas Edison"
+  },
+  {
+    "id": 340,
+    "quote": "Der beste Weg, die Zukunft vorherzusagen, ist, sie zu erschaffen.",
+    "author": "Peter Drucker"
+  },
+  {
+    "id": 341,
+    "quote": "Du bist nie zu alt, um ein neues Ziel zu setzen oder einen neuen Traum zu träumen.",
+    "author": "C.S. Lewis"
+  },
+  {
+    "id": 342,
+    "quote": "Die einzige Grenze für unsere Verwirklichung von morgen werden unsere Zweifel von heute sein.",
+    "author": "Franklin D. Roosevelt"
+  },
+  {
+    "id": 343,
+    "quote": "Erfolg kommt in der Regel zu denen, die zu beschäftigt sind, ihn zu suchen.",
+    "author": "Henry David Thoreau"
+  },
+  {
+    "id": 344,
+    "quote": "Lass dich nicht von den Ängsten in deinem Kopf herumschubsen. Lass dich von den Träumen in deinem Herzen führen.",
+    "author": "Roy T. Bennett"
+  },
+  {
+    "id": 345,
+    "quote": "Das Leben geht nicht darum, zu bekommen und zu haben, sondern darum, zu geben und zu sein.",
+    "author": "Kevin Kruse"
+  },
+  {
+    "id": 346,
+    "quote": "Strebe nicht danach, erfolgreich zu sein, sondern danach, von Wert zu sein.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 347,
+    "quote": "Ich bin kein Produkt meiner Umstände. Ich bin ein Produkt meiner Entscheidungen.",
+    "author": "Stephen Covey"
+  },
+  {
+    "id": 348,
+    "quote": "Die häufigste Art, wie Menschen ihre Macht aufgeben, ist zu glauben, sie hätten keine.",
+    "author": "Alice Walker"
+  },
+  {
+    "id": 349,
+    "quote": "Der Geist ist alles. Was du denkst, das wirst du.",
+    "author": "Buddha"
+  },
+  {
+    "id": 350,
+    "quote": "Deine Einschränkung – sie steckt nur in deiner Vorstellungskraft.",
+    "author": "Anonym"
+  },
+  {
+    "id": 351,
+    "quote": "Fordere dich selbst heraus, denn niemand sonst wird es für dich tun.",
+    "author": "Anonym"
+  },
+  {
+    "id": 352,
+    "quote": "Großartige Dinge entstehen nie in der Komfortzone.",
+    "author": "Anonym"
+  },
+  {
+    "id": 353,
+    "quote": "Träume es. Wünsche es. Tu es.",
+    "author": "Anonym"
+  },
+  {
+    "id": 354,
+    "quote": "Erfolg findet dich nicht einfach. Du musst hinausgehen und ihn holen.",
+    "author": "Anonym"
+  },
+  {
+    "id": 355,
+    "quote": "Je härter du für etwas arbeitest, desto besser wirst du dich fühlen, wenn du es erreichst.",
+    "author": "Anonym"
+  },
+  {
+    "id": 356,
+    "quote": "Träume größer. Tu Größeres.",
+    "author": "Anonym"
+  },
+  {
+    "id": 357,
+    "quote": "Hör nicht auf, wenn du müde bist. Hör auf, wenn du fertig bist.",
+    "author": "Anonym"
+  },
+  {
+    "id": 358,
+    "quote": "Wache mit Entschlossenheit auf. Gehe mit Befriedigung zu Bett.",
+    "author": "Anonym"
+  },
+  {
+    "id": 359,
+    "quote": "Tu heute etwas, wofür dein zukünftiges Ich dir danken wird.",
+    "author": "Anonym"
+  },
+  {
+    "id": 360,
+    "quote": "Kleine Dinge machen große Tage.",
+    "author": "Anonym"
+  },
+  {
+    "id": 361,
+    "quote": "Es wird schwer sein, aber schwer bedeutet nicht unmöglich.",
+    "author": "Anonym"
+  },
+  {
+    "id": 362,
+    "quote": "Warte nicht auf Gelegenheiten. Erschaffe sie.",
+    "author": "Anonym"
+  },
+  {
+    "id": 363,
+    "quote": "Manchmal werden wir nicht geprüft, um unsere Schwächen zu zeigen, sondern um unsere Stärken zu entdecken.",
+    "author": "Anonym"
+  },
+  {
+    "id": 364,
+    "quote": "Der Schlüssel zum Erfolg ist, sich auf Ziele zu konzentrieren, nicht auf Hindernisse.",
+    "author": "Anonym"
+  },
+  {
+    "id": 365,
+    "quote": "Träume es. Glaube es. Baue es.",
+    "author": "Anonym"
+  }
+]

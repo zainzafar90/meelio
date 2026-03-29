@@ -1,0 +1,1832 @@
+[
+  {
+    "id": 0,
+    "quote": "Seja a mudança que você deseja ver no mundo.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 1,
+    "quote": "A maneira de começar é parar de falar e começar a fazer.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 2,
+    "quote": "O sucesso não é definitivo, o fracasso não é fatal: o que conta é a coragem de continuar.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 3,
+    "quote": "A inovação distingue um líder de um seguidor.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 4,
+    "quote": "Uma jornada de mil milhas começa com um único passo.",
+    "author": "Lao Tzu"
+  },
+  {
+    "id": 5,
+    "quote": "Não falhei. Apenas encontrei 10.000 maneiras que não funcionam.",
+    "author": "Thomas Edison"
+  },
+  {
+    "id": 6,
+    "quote": "No meio da dificuldade encontra-se a oportunidade.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 7,
+    "quote": "O melhor momento para plantar uma árvore foi há 20 anos. O segundo melhor momento é agora.",
+    "author": "Chinese Proverb"
+  },
+  {
+    "id": 8,
+    "quote": "Acredite que você pode e você já está na metade do caminho.",
+    "author": "Theodore Roosevelt"
+  },
+  {
+    "id": 9,
+    "quote": "Não importa o quão devagar você vá, desde que não pare.",
+    "author": "Confucius"
+  },
+  {
+    "id": 10,
+    "quote": "Tudo o que você sempre quis está do outro lado do medo.",
+    "author": "George Addair"
+  },
+  {
+    "id": 11,
+    "quote": "A vida é 10% o que acontece com você e 90% como você reage a isso.",
+    "author": "Charles R. Swindoll"
+  },
+  {
+    "id": 12,
+    "quote": "A única jornada impossível é aquela que você nunca começa.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 13,
+    "quote": "Nesta vida não podemos fazer grandes coisas. Podemos apenas fazer pequenas coisas com grande amor.",
+    "author": "Mother Teresa"
+  },
+  {
+    "id": 14,
+    "quote": "O que pensamos, nos tornamos.",
+    "author": "Buddha"
+  },
+  {
+    "id": 15,
+    "quote": "O futuro pertence àqueles que acreditam na beleza de seus sonhos.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 16,
+    "quote": "É durante nossos momentos mais sombrios que devemos concentrar para enxergar a luz.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 17,
+    "quote": "Não fique olhando o relógio; faça o que ele faz. Continue em frente.",
+    "author": "Sam Levenson"
+  },
+  {
+    "id": 18,
+    "quote": "Daqui a um ano você pode desejar ter começado hoje.",
+    "author": "Karen Lamb"
+  },
+  {
+    "id": 19,
+    "quote": "O segredo para avançar é começar.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 20,
+    "quote": "Bem feito é melhor do que bem dito.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 21,
+    "quote": "Você perde 100% dos arremessos que não tenta.",
+    "author": "Wayne Gretzky"
+  },
+  {
+    "id": 22,
+    "quote": "Se você pensa que pode ou pensa que não pode, você está certo.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 23,
+    "quote": "Sozinho não posso mudar o mundo, mas posso lançar uma pedra nas águas para criar muitas ondas.",
+    "author": "Mother Teresa"
+  },
+  {
+    "id": 24,
+    "quote": "Nada é impossível, a própria palavra diz 'Eu sou possível'!",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 25,
+    "quote": "A vida é o que acontece quando você está ocupado fazendo outros planos.",
+    "author": "John Lennon"
+  },
+  {
+    "id": 26,
+    "quote": "A única maneira de fazer um ótimo trabalho é amar o que você faz.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 27,
+    "quote": "Se você quer se elevar, eleve alguém.",
+    "author": "Booker T. Washington"
+  },
+  {
+    "id": 28,
+    "quote": "Aprendi que as pessoas vão esquecer o que você disse, vão esquecer o que você fez, mas nunca vão esquecer como você as fez sentir.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 29,
+    "quote": "Se você pensa que pode ou pensa que não pode, você está certo.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 30,
+    "quote": "A perfeição não é atingível, mas se perseguirmos a perfeição podemos alcançar a excelência.",
+    "author": "Vince Lombardi"
+  },
+  {
+    "id": 31,
+    "quote": "A vida é 10% o que acontece com você e 90% como você reage a isso.",
+    "author": "Charles R. Swindoll"
+  },
+  {
+    "id": 32,
+    "quote": "Se você olhar para o que tem na vida, sempre terá mais. Se olhar para o que não tem, nunca terá o suficiente.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 33,
+    "quote": "Lembre-se de que não conseguir o que quer às vezes é um golpe de sorte maravilhoso.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 34,
+    "quote": "Você não pode esgotar a criatividade. Quanto mais você usa, mais você tem.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 35,
+    "quote": "Sonhe grande e ouse fracassar.",
+    "author": "Norman Vaughan"
+  },
+  {
+    "id": 36,
+    "quote": "Nossas vidas começam a acabar no dia em que ficamos em silêncio sobre as coisas que importam.",
+    "author": "Martin Luther King Jr."
+  },
+  {
+    "id": 37,
+    "quote": "Faça o que puder, onde estiver, com o que tiver.",
+    "author": "Teddy Roosevelt"
+  },
+  {
+    "id": 38,
+    "quote": "Se você fizer o que sempre fez, obterá o que sempre obteve.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 39,
+    "quote": "Sonhar, afinal, é uma forma de planejar.",
+    "author": "Gloria Steinem"
+  },
+  {
+    "id": 40,
+    "quote": "É o seu lugar no mundo; é a sua vida. Vá em frente e faça tudo o que puder com ela, e torne-a a vida que você quer viver.",
+    "author": "Mae Jemison"
+  },
+  {
+    "id": 41,
+    "quote": "Você pode se decepcionar se fracassar, mas estará condenado se não tentar.",
+    "author": "Beverly Sills"
+  },
+  {
+    "id": 42,
+    "quote": "Lembre-se de que ninguém pode fazer você se sentir inferior sem o seu consentimento.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 43,
+    "quote": "A vida é o que fazemos dela, sempre foi, sempre será.",
+    "author": "Grandma Moses"
+  },
+  {
+    "id": 44,
+    "quote": "A questão não é quem vai me deixar; é quem vai me impedir.",
+    "author": "Ayn Rand"
+  },
+  {
+    "id": 45,
+    "quote": "Quando tudo parece ir contra você, lembre-se de que o avião decola contra o vento, não a favor dele.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 46,
+    "quote": "Não são os anos em sua vida que contam. É a vida nos seus anos.",
+    "author": "Abraham Lincoln"
+  },
+  {
+    "id": 47,
+    "quote": "Mude seus pensamentos e você muda o seu mundo.",
+    "author": "Norman Vincent Peale"
+  },
+  {
+    "id": 48,
+    "quote": "Ou escreva algo digno de ser lido ou faça algo digno de ser escrito.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 49,
+    "quote": "Nada é impossível, a própria palavra diz 'Eu sou possível!'",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 50,
+    "quote": "A única maneira de fazer um ótimo trabalho é amar o que você faz.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 51,
+    "quote": "Se você pode sonhar, pode conquistar.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 52,
+    "quote": "O que você faz hoje pode melhorar todos os seus amanhãs.",
+    "author": "Ralph Marston"
+  },
+  {
+    "id": 53,
+    "quote": "Seja gentil sempre que possível. Sempre é possível.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 54,
+    "quote": "A vida é 10% o que nos acontece e 90% como reagimos a isso.",
+    "author": "Dennis P. Kimbro"
+  },
+  {
+    "id": 55,
+    "quote": "Mesmo se estiver no caminho certo, será atropelado se ficar parado.",
+    "author": "Will Rogers"
+  },
+  {
+    "id": 56,
+    "quote": "A sorte é um dividendo do suor. Quanto mais você sua, mais sortudo fica.",
+    "author": "Ray Kroc"
+  },
+  {
+    "id": 57,
+    "quote": "A coragem é a primeira das qualidades humanas porque é a qualidade que garante todas as outras.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 58,
+    "quote": "O que mais importa neste mundo não é tanto onde você está, mas em que direção está se movendo.",
+    "author": "Oliver Wendell Holmes"
+  },
+  {
+    "id": 59,
+    "quote": "Embora ninguém possa voltar e fazer um novo começo, qualquer um pode começar agora e fazer um novo final.",
+    "author": "Carl Bard"
+  },
+  {
+    "id": 60,
+    "quote": "Fale menos do que sabe; tenha mais do que mostra.",
+    "author": "William Shakespeare"
+  },
+  {
+    "id": 61,
+    "quote": "A educação custa dinheiro. Mas também custa a ignorância.",
+    "author": "Sir Claus Moser"
+  },
+  {
+    "id": 62,
+    "quote": "Não deixe o que você não pode fazer interferir no que você pode fazer.",
+    "author": "John Wooden"
+  },
+  {
+    "id": 63,
+    "quote": "Não se preocupe com fracassos, preocupe-se com as chances que você perde quando nem tenta.",
+    "author": "Jack Canfield"
+  },
+  {
+    "id": 64,
+    "quote": "Viva cada dia como se sua vida tivesse acabado de começar.",
+    "author": "Johann Wolfgang Von Goethe"
+  },
+  {
+    "id": 65,
+    "quote": "A vontade de vencer, o desejo de ter sucesso, o impulso de alcançar seu pleno potencial — estas são as chaves que vão abrir a porta para a excelência pessoal.",
+    "author": "Confucius"
+  },
+  {
+    "id": 66,
+    "quote": "Estabeleça seus objetivos alto e não pare até chegar lá.",
+    "author": "Bo Jackson"
+  },
+  {
+    "id": 67,
+    "quote": "O mundo está cheio de coisas mágicas esperando pacientemente que nossos sentidos fiquem mais aguçados.",
+    "author": "Bertrand Russell"
+  },
+  {
+    "id": 68,
+    "quote": "Vamos construir nosso futuro agora e tornar nossos sonhos a realidade de amanhã.",
+    "author": "Malala Yousafzai"
+  },
+  {
+    "id": 69,
+    "quote": "Tudo que você precisa é do plano, do mapa do caminho e da coragem de seguir em direção ao seu destino.",
+    "author": "Earl Nightingale"
+  },
+  {
+    "id": 70,
+    "quote": "O brilho de um pensamento caloroso vale para mim mais do que dinheiro.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 71,
+    "quote": "O poder da imaginação nos torna infinitos.",
+    "author": "John Muir"
+  },
+  {
+    "id": 72,
+    "quote": "Tente ser um arco-íris na nuvem de alguém.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 73,
+    "quote": "Habito na possibilidade.",
+    "author": "Emily Dickinson"
+  },
+  {
+    "id": 74,
+    "quote": "De maneira gentil, você pode sacudir o mundo.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 75,
+    "quote": "Siga sua felicidade e o universo abrirá portas onde só havia paredes.",
+    "author": "Joseph Campbell"
+  },
+  {
+    "id": 76,
+    "quote": "Cada dia traz seus próprios presentes.",
+    "author": "Marcus Aurelius"
+  },
+  {
+    "id": 77,
+    "quote": "A criatividade é a inteligência se divertindo.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 78,
+    "quote": "As pessoas loucas o suficiente para pensar que podem mudar o mundo são as que o fazem.",
+    "author": "Rob Siltanen"
+  },
+  {
+    "id": 79,
+    "quote": "É sempre o simples que produz o maravilhoso.",
+    "author": "Amelia Barr"
+  },
+  {
+    "id": 80,
+    "quote": "Nossa maior glória não está em nunca cair, mas em nos levantar cada vez que caímos.",
+    "author": "Confucius"
+  },
+  {
+    "id": 81,
+    "quote": "As dificuldades frequentemente preparam pessoas comuns para um destino extraordinário.",
+    "author": "C.S. Lewis"
+  },
+  {
+    "id": 82,
+    "quote": "Acredite em você mesmo. Você é mais corajoso do que pensa, mais talentoso do que sabe e capaz de mais do que imagina.",
+    "author": "Roy T. Bennett"
+  },
+  {
+    "id": 83,
+    "quote": "Aprendi que a coragem não é a ausência do medo, mas o triunfo sobre ele. O homem corajoso não é aquele que não sente medo, mas aquele que conquista esse medo.",
+    "author": "Nelson Mandela"
+  },
+  {
+    "id": 84,
+    "quote": "Há apenas uma coisa que torna um sonho impossível de alcançar: o medo do fracasso.",
+    "author": "Paulo Coelho"
+  },
+  {
+    "id": 85,
+    "quote": "Não importa se você cai. O que importa é se você se levanta.",
+    "author": "Vince Lombardi"
+  },
+  {
+    "id": 86,
+    "quote": "Seu verdadeiro sucesso na vida começa apenas quando você se compromete a ser excelente no que faz.",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 87,
+    "quote": "Se você acreditar que vai dar certo, verá oportunidades. Se acreditar que não vai, verá obstáculos.",
+    "author": "Wayne Dyer"
+  },
+  {
+    "id": 88,
+    "quote": "Todos os nossos sonhos podem se tornar realidade se tivermos a coragem de persegui-los.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 89,
+    "quote": "O sucesso é caminhar de fracasso em fracasso sem perder o entusiasmo.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 90,
+    "quote": "Bem quando a lagarta pensou que o mundo estava acabando, ela se transformou em borboleta.",
+    "author": "Proverb"
+  },
+  {
+    "id": 91,
+    "quote": "Não tenha medo de abrir mão do bom para ir atrás do ótimo.",
+    "author": "John D. Rockefeller"
+  },
+  {
+    "id": 92,
+    "quote": "Não levante a voz, melhore o argumento.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 93,
+    "quote": "O que nos parece como amargas provações são muitas vezes bênçãos disfarçadas.",
+    "author": "Oscar Wilde"
+  },
+  {
+    "id": 94,
+    "quote": "Faça uma coisa por dia que te assuste.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 95,
+    "quote": "A vida não é sobre se encontrar. A vida é sobre se criar.",
+    "author": "Lolly Daskal"
+  },
+  {
+    "id": 96,
+    "quote": "O que está atrás de nós e o que está diante de nós são questões pequenas comparadas ao que está dentro de nós.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 97,
+    "quote": "Nunca é tarde demais para se tornar o que você poderia ter sido.",
+    "author": "George Eliot"
+  },
+  {
+    "id": 98,
+    "quote": "Em três palavras posso resumir tudo que aprendi sobre a vida: ela continua.",
+    "author": "Robert Frost"
+  },
+  {
+    "id": 99,
+    "quote": "Ainda somos senhores do nosso destino. Ainda somos capitães de nossas almas.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 100,
+    "quote": "A melhor saída é sempre através.",
+    "author": "Robert Frost"
+  },
+  {
+    "id": 101,
+    "quote": "A esperança é como o sol, que, à medida que caminhamos em direção a ele, projeta a sombra do nosso fardo atrás de nós.",
+    "author": "Samuel Smiles"
+  },
+  {
+    "id": 102,
+    "quote": "A sorte favorece os corajosos.",
+    "author": "Publius Terence"
+  },
+  {
+    "id": 103,
+    "quote": "Ou escreva algo digno de ser lido ou faça algo digno de ser escrito.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 104,
+    "quote": "Se o vento não servir, use os remos.",
+    "author": "Latin Proverb"
+  },
+  {
+    "id": 105,
+    "quote": "Não há engarrafamento na milha extra.",
+    "author": "Roger Staubach"
+  },
+  {
+    "id": 106,
+    "quote": "Muitos de nós não estamos vivendo nossos sonhos porque estamos vivendo nossos medos.",
+    "author": "Les Brown"
+  },
+  {
+    "id": 107,
+    "quote": "Os desafios são o que torna a vida interessante e superá-los é o que torna a vida significativa.",
+    "author": "Joshua J. Marine"
+  },
+  {
+    "id": 108,
+    "quote": "Fui impressionado pela urgência de agir. Saber não é suficiente; devemos aplicar. Estar disposto não é suficiente; devemos fazer.",
+    "author": "Leonardo da Vinci"
+  },
+  {
+    "id": 109,
+    "quote": "Comece onde você está. Use o que tem. Faça o que pode.",
+    "author": "Arthur Ashe"
+  },
+  {
+    "id": 110,
+    "quote": "A felicidade não é algo pronto. Vem das suas próprias ações.",
+    "author": "Dalai Lama"
+  },
+  {
+    "id": 111,
+    "quote": "Se lhe oferecerem um assento em um foguete, não pergunte qual assento! Apenas entre.",
+    "author": "Sheryl Sandberg"
+  },
+  {
+    "id": 112,
+    "quote": "Somos o que repetidamente fazemos. A excelência, portanto, não é um ato, mas um hábito.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 113,
+    "quote": "Tome riscos calculados. Isso é bem diferente de ser imprudente.",
+    "author": "George S. Patton"
+  },
+  {
+    "id": 114,
+    "quote": "Quando tudo parece ir contra você, lembre-se de que o avião decola contra o vento, não a favor dele.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 115,
+    "quote": "Aceite a responsabilidade pela sua vida. Saiba que é você quem vai levá-la onde quer que vá, ninguém mais.",
+    "author": "Les Brown"
+  },
+  {
+    "id": 116,
+    "quote": "Não espere o ferro estar quente para bater; esquente-o batendo.",
+    "author": "William B. Sprague"
+  },
+  {
+    "id": 117,
+    "quote": "Pedi e será dado a você; busque e você encontrará; bata e a porta será aberta para você.",
+    "author": "Jesus"
+  },
+  {
+    "id": 118,
+    "quote": "As pessoas costumam dizer que a motivação não dura. Bem, o banho também não, e é por isso que o recomendamos diariamente.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 119,
+    "quote": "Posso, portanto sou.",
+    "author": "Simone Weil"
+  },
+  {
+    "id": 120,
+    "quote": "Descobri que a sorte é bastante previsível. Se você quer mais sorte, tome mais chances. Seja mais ativo. Apareça com mais frequência.",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 121,
+    "quote": "Você precisa superar a pressão das pessoas contra você enquanto busca objetivos elevados.",
+    "author": "George S. Patton"
+  },
+  {
+    "id": 122,
+    "quote": "Para se conhecer, é preciso se afirmar.",
+    "author": "Albert Camus"
+  },
+  {
+    "id": 123,
+    "quote": "O primeiro passo em direção ao sucesso é dado quando você se recusa a ser cativo do ambiente em que se encontrou pela primeira vez.",
+    "author": "Mark Caine"
+  },
+  {
+    "id": 124,
+    "quote": "A maneira mais eficaz de fazer isso é fazer.",
+    "author": "Amelia Earhart"
+  },
+  {
+    "id": 125,
+    "quote": "Comece a ser agora o que você será depois.",
+    "author": "William James"
+  },
+  {
+    "id": 126,
+    "quote": "Dê o salto, e a rede aparecerá.",
+    "author": "John Burroughs"
+  },
+  {
+    "id": 127,
+    "quote": "Faça seu trabalho de todo o coração e você terá sucesso — há tão pouca concorrência.",
+    "author": "Elbert Hubbard"
+  },
+  {
+    "id": 128,
+    "quote": "Um objetivo é um sonho com prazo.",
+    "author": "Napoleon Hill"
+  },
+  {
+    "id": 129,
+    "quote": "As coisas não acontecem. As coisas são feitas para acontecer.",
+    "author": "John F. Kennedy"
+  },
+  {
+    "id": 130,
+    "quote": "Qualidade não é um ato, é um hábito.",
+    "author": "Aristotle"
+  },
+  {
+    "id": 131,
+    "quote": "Ao deixar de se preparar, você está se preparando para fracassar.",
+    "author": "Benjamin Franklin"
+  },
+  {
+    "id": 132,
+    "quote": "Ou você comanda o dia ou o dia comanda você.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 133,
+    "quote": "Uma vez que você escolhe a esperança, tudo é possível.",
+    "author": "Christopher Reeve"
+  },
+  {
+    "id": 134,
+    "quote": "Tente não se tornar uma pessoa de sucesso, mas sim uma pessoa de valor.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 135,
+    "quote": "Alguém está sentado na sombra hoje porque alguém plantou uma árvore há muito tempo.",
+    "author": "Warren Buffett"
+  },
+  {
+    "id": 136,
+    "quote": "Não chore porque acabou, sorria porque aconteceu.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 137,
+    "quote": "A vida é curta, e ela está aqui para ser vivida.",
+    "author": "Kate Winslet"
+  },
+  {
+    "id": 138,
+    "quote": "Você não pode conectar os pontos olhando para frente; você só pode conectá-los olhando para trás... Essa abordagem nunca me decepcionou, e fez toda a diferença na minha vida.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 139,
+    "quote": "Tudo que você pode imaginar é real.",
+    "author": "Pablo Picasso"
+  },
+  {
+    "id": 140,
+    "quote": "Pessoas bem-sucedidas fazem o que pessoas malsucedidas não estão dispostas a fazer. Não deseje que fosse mais fácil; deseje ser melhor.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 141,
+    "quote": "A mudança não virá se esperarmos por outra pessoa ou outro momento. Nós somos aqueles que estávamos esperando. Nós somos a mudança que buscamos.",
+    "author": "Barack Obama"
+  },
+  {
+    "id": 142,
+    "quote": "Se você ama o que faz e está disposto a fazer o que é preciso, está ao seu alcance.",
+    "author": "Steve Wozniak"
+  },
+  {
+    "id": 143,
+    "quote": "O guerreiro bem-sucedido é o homem comum, com foco semelhante ao de um laser.",
+    "author": "Bruce Lee"
+  },
+  {
+    "id": 144,
+    "quote": "Em meio ao movimento e ao caos, mantenha a quietude dentro de você.",
+    "author": "Deepak Chopra"
+  },
+  {
+    "id": 145,
+    "quote": "O sucesso não consiste em nunca errar, mas em nunca cometer o mesmo erro pela segunda vez.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 146,
+    "quote": "Ao olharmos para o próximo século, os líderes serão aqueles que capacitam os outros.",
+    "author": "Bill Gates"
+  },
+  {
+    "id": 147,
+    "quote": "O único lugar onde o sucesso vem antes do trabalho é no dicionário.",
+    "author": "Vidal Sassoon"
+  },
+  {
+    "id": 148,
+    "quote": "O sucesso é gostar de si mesmo, gostar do que faz e gostar de como o faz.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 149,
+    "quote": "A função da liderança é produzir mais líderes, não mais seguidores.",
+    "author": "Ralph Nader"
+  },
+  {
+    "id": 150,
+    "quote": "Sempre que você se encontrar do lado da maioria, é hora de parar e refletir.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 151,
+    "quote": "Não deixe o medo de perder ser maior do que a empolgação de vencer.",
+    "author": "Robert Kiyosaki"
+  },
+  {
+    "id": 152,
+    "quote": "A motivação é o que te faz começar. O hábito é o que te mantém.",
+    "author": "Jim Ryun"
+  },
+  {
+    "id": 153,
+    "quote": "Raramente as pessoas têm sucesso a não ser que se divirtam com o que estão fazendo.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 154,
+    "quote": "Mentes pequenas são dominadas e subjugadas pelo infortúnio; mas grandes mentes se elevam acima dele.",
+    "author": "Washington Irving"
+  },
+  {
+    "id": 155,
+    "quote": "O sucesso é mais frequentemente alcançado por aqueles que não sabem que o fracasso é inevitável.",
+    "author": "Coco Chanel"
+  },
+  {
+    "id": 156,
+    "quote": "Aprenda com o ontem, viva o hoje, espere pelo amanhã. O importante é não parar de questionar.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 157,
+    "quote": "Você só vive uma vez, mas se fizer certo, uma vez é suficiente.",
+    "author": "Mae West"
+  },
+  {
+    "id": 158,
+    "quote": "Oportunidades não acontecem. Você as cria.",
+    "author": "Chris Grosser"
+  },
+  {
+    "id": 159,
+    "quote": "Do jeito que eu vejo, se você quer o arco-íris, tem que aguentar a chuva.",
+    "author": "Dolly Parton"
+  },
+  {
+    "id": 160,
+    "quote": "Quanto mais eu vivo, mais bela a vida se torna.",
+    "author": "Frank Lloyd Wright"
+  },
+  {
+    "id": 161,
+    "quote": "O sucesso é a soma de pequenos esforços, repetidos dia após dia.",
+    "author": "Robert Collier"
+  },
+  {
+    "id": 162,
+    "quote": "Um sonho não se torna realidade por magia; exige suor, determinação e trabalho duro.",
+    "author": "Colin Powell"
+  },
+  {
+    "id": 163,
+    "quote": "Daqui a vinte anos você estará mais arrependido pelas coisas que não fez do que pelas que fez. Então solte as amarras. Navegue para longe do porto seguro... Explore. Sonhe. Descubra.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 164,
+    "quote": "Seu trabalho vai preencher grande parte da sua vida, e a única maneira de se sentir verdadeiramente satisfeito é fazer o que você acredita ser um ótimo trabalho.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 165,
+    "quote": "Só adie para amanhã o que você está disposto a morrer sem ter feito.",
+    "author": "Pablo Picasso"
+  },
+  {
+    "id": 166,
+    "quote": "Nos tornamos o que pensamos na maior parte do tempo, e esse é o segredo mais estranho.",
+    "author": "Earl Nightingale"
+  },
+  {
+    "id": 167,
+    "quote": "O maior risco é não correr nenhum risco... Em um mundo que muda muito rapidamente, a única estratégia garantida de fracassar é não correr riscos.",
+    "author": "Mark Zuckerberg"
+  },
+  {
+    "id": 168,
+    "quote": "Não se preocupe com fracassos; você só precisa acertar uma vez.",
+    "author": "Drew Houston"
+  },
+  {
+    "id": 169,
+    "quote": "Nada grandioso jamais foi alcançado sem entusiasmo.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 170,
+    "quote": "Mantenha seu rosto voltado para o sol e você nunca verá a sombra.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 171,
+    "quote": "Quanto mais você elogia e celebra sua vida, mais há para celebrar.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 172,
+    "quote": "Todo progresso acontece fora da zona de conforto.",
+    "author": "Michael John Bobak"
+  },
+  {
+    "id": 173,
+    "quote": "Seu tempo é limitado, então não o desperdice vivendo a vida de outra pessoa.",
+    "author": "Steve Jobs"
+  },
+  {
+    "id": 174,
+    "quote": "Estabelecer metas é o primeiro passo para transformar o invisível em visível.",
+    "author": "Tony Robbins"
+  },
+  {
+    "id": 175,
+    "quote": "A coisa mais difícil é a decisão de agir; o resto é apenas tenacidade.",
+    "author": "Amelia Earhart"
+  },
+  {
+    "id": 176,
+    "quote": "Coragem é elegância sob pressão.",
+    "author": "Ernest Hemingway"
+  },
+  {
+    "id": 177,
+    "quote": "Se você não está disposto a arriscar o comum, terá que se contentar com o ordinário.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 178,
+    "quote": "Não é o mais forte da espécie que sobrevive, nem o mais inteligente, mas o mais responsivo à mudança.",
+    "author": "Charles Darwin"
+  },
+  {
+    "id": 179,
+    "quote": "As coisas melhores e mais belas do mundo não podem ser vistas ou tocadas — devem ser sentidas com o coração.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 180,
+    "quote": "Grandes mentes discutem ideias; mentes medianas discutem eventos; mentes pequenas discutem pessoas.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 181,
+    "quote": "A melhor vingança é o sucesso estrondoso.",
+    "author": "Frank Sinatra"
+  },
+  {
+    "id": 182,
+    "quote": "Um homem de sucesso é aquele que pode lançar um alicerce firme com os tijolos que os outros atiraram nele.",
+    "author": "David Brinkley"
+  },
+  {
+    "id": 183,
+    "quote": "Que você viva todos os dias de sua vida.",
+    "author": "Jonathan Swift"
+  },
+  {
+    "id": 184,
+    "quote": "A diferença entre ganhar e perder é, na maioria das vezes, não desistir.",
+    "author": "Walt Disney"
+  },
+  {
+    "id": 185,
+    "quote": "Viva como se fosse morrer amanhã. Aprenda como se fosse viver para sempre.",
+    "author": "Mahatma Gandhi"
+  },
+  {
+    "id": 186,
+    "quote": "Quando você para de sonhar, você para de viver.",
+    "author": "Malcolm Forbes"
+  },
+  {
+    "id": 187,
+    "quote": "Ninguém pode fazer você se sentir inferior sem o seu consentimento.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 188,
+    "quote": "O fracasso é mais um degrau para a grandeza.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 189,
+    "quote": "Desenvolva o sucesso a partir dos fracassos. O desânimo e o fracasso são dois dos degraus mais seguros para o sucesso.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 190,
+    "quote": "Se você não projetar seu próprio plano de vida, as chances são de que você cairá no plano de outra pessoa. E adivinhe o que ela planejou para você? Muito pouco.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 191,
+    "quote": "Não há acaso, nem destino, nem sorte que possa dificultar ou controlar a firme determinação de uma alma decidida.",
+    "author": "Ella Wheeler Wilcox"
+  },
+  {
+    "id": 192,
+    "quote": "Você deve esperar grandes coisas de si mesmo antes de poder realizá-las.",
+    "author": "Michael Jordan"
+  },
+  {
+    "id": 193,
+    "quote": "Seja miserável. Ou se motive. O que tiver de ser feito, sempre é sua escolha.",
+    "author": "Wayne Dyer"
+  },
+  {
+    "id": 194,
+    "quote": "Você precisa acordar toda manhã com determinação se quiser ir dormir com satisfação.",
+    "author": "George Lorimer"
+  },
+  {
+    "id": 195,
+    "quote": "Dificuldades reais podem ser superadas; são apenas as imaginárias que são invencíveis.",
+    "author": "Theodore N. Vail"
+  },
+  {
+    "id": 196,
+    "quote": "O fracasso é o tempero que dá sabor ao sucesso.",
+    "author": "Truman Capote"
+  },
+  {
+    "id": 197,
+    "quote": "É melhor fracassar na originalidade do que ter sucesso na imitação.",
+    "author": "Herman Melville"
+  },
+  {
+    "id": 198,
+    "quote": "A fortuna favorece os ousados.",
+    "author": "Virgil"
+  },
+  {
+    "id": 199,
+    "quote": "Você pode ter que lutar uma batalha mais de uma vez para vencê-la.",
+    "author": "Margaret Thatcher"
+  },
+  {
+    "id": 200,
+    "quote": "Nada dura para sempre. Nem mesmo seus problemas.",
+    "author": "Arnold H. Glasgow"
+  },
+  {
+    "id": 201,
+    "quote": "Há apenas duas maneiras de viver sua vida. Uma é como se nada fosse um milagre. A outra é como se tudo fosse um milagre.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 202,
+    "quote": "Para realizar grandes coisas, não devemos apenas agir, mas também sonhar; não apenas planejar, mas também acreditar.",
+    "author": "Anatole France"
+  },
+  {
+    "id": 203,
+    "quote": "Você mede o tamanho de uma conquista pelos obstáculos que teve de superar para alcançar seus objetivos.",
+    "author": "Booker T. Washington"
+  },
+  {
+    "id": 204,
+    "quote": "A maioria das coisas importantes do mundo foi realizada por pessoas que continuaram tentando quando não parecia haver esperança alguma.",
+    "author": "Dale Carnegie"
+  },
+  {
+    "id": 205,
+    "quote": "Uma vida gasta cometendo erros não é apenas mais honrosa, mas mais útil do que uma vida gasta sem fazer nada.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 206,
+    "quote": "Aproveite ao máximo de si mesmo, pois é tudo que existe em você.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 207,
+    "quote": "A vida é 10% o que me acontece e 90% como reajo a isso.",
+    "author": "John Maxwell"
+  },
+  {
+    "id": 208,
+    "quote": "Determine-se a nunca ficar ocioso. Ninguém terá ocasião de reclamar por falta de tempo quem nunca perde nenhum. É admirável o quanto pode ser feito se estivermos sempre ocupados.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 209,
+    "quote": "Um quarto sem livros é como um corpo sem alma.",
+    "author": "Marcus Tullius Cicero"
+  },
+  {
+    "id": 210,
+    "quote": "Não caminhe atrás de mim; posso não liderar. Não caminhe à minha frente; posso não seguir. Apenas caminhe ao meu lado e seja meu amigo.",
+    "author": "Albert Camus"
+  },
+  {
+    "id": 211,
+    "quote": "A felicidade é uma borboleta que, quando perseguida, está sempre além do seu alcance, mas que, se você se sentar quietamente, pode pousar sobre você.",
+    "author": "Nathaniel Hawthorne"
+  },
+  {
+    "id": 212,
+    "quote": "Às vezes você não consegue se enxergar claramente até se ver pelos olhos dos outros.",
+    "author": "Ellen DeGeneres"
+  },
+  {
+    "id": 213,
+    "quote": "O segredo de uma vida bem-sucedida é descobrir qual é o destino de cada um e depois fazê-lo.",
+    "author": "Henry Ford"
+  },
+  {
+    "id": 214,
+    "quote": "Se você está passando pelo inferno, continue andando.",
+    "author": "Winston Churchill"
+  },
+  {
+    "id": 215,
+    "quote": "Para ser insubstituível é preciso ser sempre diferente.",
+    "author": "Coco Chanel"
+  },
+  {
+    "id": 216,
+    "quote": "Se você não consegue explicar de forma simples, é porque não entende bem o suficiente.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 217,
+    "quote": "Acredito que cada ser humano tem um número finito de batidas do coração. Não pretendo desperdiçar nenhuma delas.",
+    "author": "Neil Armstrong"
+  },
+  {
+    "id": 218,
+    "quote": "Os dois dias mais importantes da sua vida são o dia em que você nasce e o dia em que descobre o porquê.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 219,
+    "quote": "Ao envelhecer, você descobrirá que tem duas mãos: uma para ajudar a si mesmo e a outra para ajudar os outros.",
+    "author": "Audrey Hepburn"
+  },
+  {
+    "id": 220,
+    "quote": "Se você quer alcançar a excelência, pode chegar lá hoje. A partir deste segundo, pare de fazer trabalho abaixo da excelência.",
+    "author": "Thomas J. Watson"
+  },
+  {
+    "id": 221,
+    "quote": "Se suas ações inspiram outros a sonhar mais, aprender mais, fazer mais e se tornarem mais, você é um líder.",
+    "author": "John Quincy Adams"
+  },
+  {
+    "id": 222,
+    "quote": "Percebo que quanto mais trabalho, mais sorte pareço ter.",
+    "author": "Thomas Jefferson"
+  },
+  {
+    "id": 223,
+    "quote": "Muitas vezes é preciso mais coragem para ousar fazer o que é certo do que temer fazer o errado.",
+    "author": "Abraham Lincoln"
+  },
+  {
+    "id": 224,
+    "quote": "Não se limite. Muitas pessoas se limitam ao que acham que podem fazer. Você pode ir tão longe quanto sua mente permitir. O que você acredita, lembre-se, você pode alcançar.",
+    "author": "Mary Kay Ash"
+  },
+  {
+    "id": 225,
+    "quote": "Seja quem você é e diga o que sente, porque quem não gosta não importa e quem importa não vai se importar.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 226,
+    "quote": "Mantenha os olhos nas estrelas e os pés no chão.",
+    "author": "Theodore Roosevelt"
+  },
+  {
+    "id": 227,
+    "quote": "A única pessoa com quem você deve tentar ser melhor é a pessoa que você era ontem.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 228,
+    "quote": "Nunca se deixe intimidar ao silêncio. Nunca se permita ser vítima. Não aceite a definição de vida de ninguém; defina-se.",
+    "author": "Harvey Fierstein"
+  },
+  {
+    "id": 229,
+    "quote": "A vida é misteriosa demais para ser levada muito a sério.",
+    "author": "Mary Engelbreit"
+  },
+  {
+    "id": 230,
+    "quote": "A mente mais sábia ainda tem algo a aprender.",
+    "author": "George Santayana"
+  },
+  {
+    "id": 231,
+    "quote": "Não é sobre o quão forte você pode bater; é sobre o quão forte você consegue ser atingido e continuar avançando.",
+    "author": "Rocky Balboa"
+  },
+  {
+    "id": 232,
+    "quote": "Se você quer ir rápido, vá sozinho. Se você quer ir longe, vá junto.",
+    "author": "African proverb"
+  },
+  {
+    "id": 233,
+    "quote": "Plante seu jardim e decore sua própria alma, em vez de esperar que alguém lhe traga flores.",
+    "author": "Jose Luis Borges"
+  },
+  {
+    "id": 234,
+    "quote": "Não vá onde o caminho pode levar, vá em vez disso onde não há caminho e deixe uma trilha.",
+    "author": "Ralph Waldo Emerson"
+  },
+  {
+    "id": 235,
+    "quote": "Inteligência sem ambição é como um pássaro sem asas.",
+    "author": "Salvador Dali"
+  },
+  {
+    "id": 236,
+    "quote": "O segredo é andar apenas com pessoas que elevam você, cuja presença desperta o seu melhor.",
+    "author": "Epictetus"
+  },
+  {
+    "id": 237,
+    "quote": "Podemos encontrar muitas derrotas, mas não devemos nos deixar derrotar.",
+    "author": "Maya Angelou"
+  },
+  {
+    "id": 238,
+    "quote": "Problemas não são sinais de pare, são orientações.",
+    "author": "Robert H. Schuller"
+  },
+  {
+    "id": 239,
+    "quote": "Um homem criativo é motivado pelo desejo de conquistar, não pelo desejo de superar os outros.",
+    "author": "Ayn Rand"
+  },
+  {
+    "id": 240,
+    "quote": "O que você conquista ao alcançar seus objetivos não é tão importante quanto o que você se torna ao alcançá-los.",
+    "author": "Zig Ziglar"
+  },
+  {
+    "id": 241,
+    "quote": "Um alguém foi uma vez um ninguém que quis e fez.",
+    "author": "John Burroughs"
+  },
+  {
+    "id": 242,
+    "quote": "Se você genuinamente quer algo, não espere — ensine-se a ser impaciente.",
+    "author": "Gurbaksh Chahal"
+  },
+  {
+    "id": 243,
+    "quote": "Pegue uma ideia. Torne essa ideia sua vida — pense nela, sonhe com ela, viva nessa ideia. Deixe o cérebro, os músculos, os nervos, cada parte do seu corpo estar cheio dessa ideia, e simplesmente deixe todas as outras ideias de lado. É assim que se chega ao sucesso.",
+    "author": "Swami Vivekananda"
+  },
+  {
+    "id": 244,
+    "quote": "Para ter sucesso, você deve aceitar todos os desafios que aparecem no seu caminho. Não pode apenas aceitar aqueles que você gosta.",
+    "author": "Mike Gafka"
+  },
+  {
+    "id": 245,
+    "quote": "Onde a esperança floresce, milagres florescem.",
+    "author": "Elna Rae"
+  },
+  {
+    "id": 246,
+    "quote": "Corra riscos, cometa erros. É assim que você cresce. A dor nutre sua coragem. Você tem que fracassar para praticar ser corajoso.",
+    "author": "Mary Tyler Moore"
+  },
+  {
+    "id": 247,
+    "quote": "Ser forte significa regozijar-se em quem você é, com todas as imperfeições.",
+    "author": "Margaret Woodhouse"
+  },
+  {
+    "id": 248,
+    "quote": "Se você não correr atrás do que quer, nunca vai ter. Se não perguntar, a resposta é sempre não. Se não der um passo à frente, estará sempre no mesmo lugar.",
+    "author": "Nora Roberts"
+  },
+  {
+    "id": 249,
+    "quote": "A esperança nunca te abandona, você é quem a abandona.",
+    "author": "George Weinberg"
+  },
+  {
+    "id": 250,
+    "quote": "Nada esplêndido jamais foi conquistado exceto por aqueles que ousaram acreditar que havia algo dentro deles superior às circunstâncias.",
+    "author": "Bruce Barton"
+  },
+  {
+    "id": 251,
+    "quote": "Parei de ter medo quando minha primeira aventura fracassou e o céu não caiu.",
+    "author": "Allen H. Neuharth"
+  },
+  {
+    "id": 252,
+    "quote": "Aerodinamicamente, o mamangaba não deveria conseguir voar, mas o mamangaba não sabe disso e vai voando assim mesmo.",
+    "author": "Mary Kay Ash"
+  },
+  {
+    "id": 253,
+    "quote": "Para mim, os negócios não são sobre usar ternos ou agradar acionistas. É sobre ser fiel a si mesmo, às suas ideias e focar no essencial.",
+    "author": "Richard Branson"
+  },
+  {
+    "id": 254,
+    "quote": "Se você não for teimoso, vai desistir dos experimentos cedo demais. E se não for flexível, vai bater a cabeça na parede e não enxergará uma solução diferente para o problema que tenta resolver.",
+    "author": "Jeff Bezos"
+  },
+  {
+    "id": 255,
+    "quote": "Você não pode agradar a todos, e não pode fazer todo mundo gostar de você.",
+    "author": "Katie Couric"
+  },
+  {
+    "id": 256,
+    "quote": "Você só terá sucesso se desejar ter sucesso; só fracassará se não se importar com o fracasso.",
+    "author": "Philippos"
+  },
+  {
+    "id": 257,
+    "quote": "Percebi que, quando você tem um interesse real pela vida e uma vida curiosa, o sono não é a coisa mais importante.",
+    "author": "Martha Stewart"
+  },
+  {
+    "id": 258,
+    "quote": "Conhecimento é saber o que você pode fazer. Sabedoria é saber quando não fazer.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 259,
+    "quote": "Você pode fazer qualquer coisa, mas não tudo.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 260,
+    "quote": "Existem dois tipos de pessoas que vão te dizer que você não pode fazer diferença neste mundo: aqueles com medo de tentar e aqueles com medo que você vá conseguir.",
+    "author": "Ray Goforth"
+  },
+  {
+    "id": 261,
+    "quote": "Um homem que foge do seu medo pode descobrir que apenas tomou um atalho para encontrá-lo.",
+    "author": "Sador"
+  },
+  {
+    "id": 262,
+    "quote": "Não há uma maneira certa como as coisas deveriam ser. Há apenas o que acontece e o que fazemos.",
+    "author": "Terry Pratchett"
+  },
+  {
+    "id": 263,
+    "quote": "Sou egoísta, impaciente e um pouco insegura. Cometo erros, sou fora de controle e às vezes difícil de lidar. Mas se você não consegue me aguentar no meu pior, então certamente não merece o meu melhor.",
+    "author": "Marilyn Monroe"
+  },
+  {
+    "id": 264,
+    "quote": "Você sabe que está apaixonado quando não consegue dormir porque a realidade é finalmente melhor do que seus sonhos.",
+    "author": "Dr. Seuss"
+  },
+  {
+    "id": 265,
+    "quote": "Demorei muito para não me julgar pelos olhos de outra pessoa.",
+    "author": "Sally Field"
+  },
+  {
+    "id": 266,
+    "quote": "Os prêmios enferrujam, os amigos não juntam poeira.",
+    "author": "Jesse Owens"
+  },
+  {
+    "id": 267,
+    "quote": "Não quero chegar ao fim da minha vida e descobrir que apenas vivi o comprimento dela. Quero ter vivido também a largura dela.",
+    "author": "Diane Ackerman"
+  },
+  {
+    "id": 268,
+    "quote": "Identidade é uma prisão da qual você nunca pode escapar, mas a maneira de redimir seu passado não é fugir dele, mas tentar entendê-lo e usá-lo como base para crescer.",
+    "author": "Jay-Z"
+  },
+  {
+    "id": 269,
+    "quote": "Quando ouso ser poderosa — usar minha força a serviço da minha visão, então se torna cada vez menos importante se estou com medo ou não.",
+    "author": "Audre Lorde"
+  },
+  {
+    "id": 270,
+    "quote": "Se você quer fazer uma mudança permanente, pare de se concentrar no tamanho dos seus problemas e comece a se concentrar no tamanho de você!",
+    "author": "T. Harv Eker"
+  },
+  {
+    "id": 271,
+    "quote": "O motivo número um pelo qual as pessoas fracassam na vida é porque ouvem seus amigos, familiares e vizinhos.",
+    "author": "Napoleon Hill"
+  },
+  {
+    "id": 272,
+    "quote": "Nosso maior medo não deveria ser o fracasso, mas o sucesso em coisas na vida que realmente não importam.",
+    "author": "Francis Chan"
+  },
+  {
+    "id": 273,
+    "quote": "Na minha experiência, há apenas uma motivação, e é o desejo. Nenhuma razão ou princípio o contém ou se opõe a ele.",
+    "author": "Jane Smiley"
+  },
+  {
+    "id": 274,
+    "quote": "Sucesso é... conhecer seu propósito na vida, crescer para alcançar seu máximo potencial e semear sementes que beneficiam os outros.",
+    "author": "John C. Maxwell"
+  },
+  {
+    "id": 275,
+    "quote": "Não é o tamanho do cão na briga, mas o tamanho da briga no cão.",
+    "author": "Archie Griffen"
+  },
+  {
+    "id": 276,
+    "quote": "A derrota não é amarga a menos que você a engula.",
+    "author": "Joe Clark"
+  },
+  {
+    "id": 277,
+    "quote": "Um obstáculo é muitas vezes um degrau.",
+    "author": "Prescott"
+  },
+  {
+    "id": 278,
+    "quote": "Um lápis número 2 e um sonho podem te levar a qualquer lugar.",
+    "author": "Joyce Meyer"
+  },
+  {
+    "id": 279,
+    "quote": "Imagine que sua vida é perfeita em todos os aspectos; como seria?",
+    "author": "Brian Tracy"
+  },
+  {
+    "id": 280,
+    "quote": "O entusiasmo é a energia e a força que constroem o momentum literal da alma e da mente humana.",
+    "author": "Bryant McGill"
+  },
+  {
+    "id": 281,
+    "quote": "Às vezes pensar demais pode destruir o seu momentum.",
+    "author": "Tom Watson"
+  },
+  {
+    "id": 282,
+    "quote": "O trabalho nos poupa de três males: o tédio, o vício e a necessidade.",
+    "author": "Voltaire"
+  },
+  {
+    "id": 283,
+    "quote": "Vidas fortes são motivadas por propósitos dinâmicos.",
+    "author": "Kenneth Hildebrand"
+  },
+  {
+    "id": 284,
+    "quote": "Você não pode arar um campo apenas pensando nele.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 285,
+    "quote": "O mundo é vasto e não vou desperdiçar minha vida em atrito quando ele poderia ser transformado em momentum.",
+    "author": "Frances E. Willard"
+  },
+  {
+    "id": 286,
+    "quote": "Acredite de todo o coração que você fará o para o qual foi feito.",
+    "author": "Orison Swett Marden"
+  },
+  {
+    "id": 287,
+    "quote": "Se você tem coragem para continuar cometendo erros, sua sabedoria e inteligência avançam com grande momentum.",
+    "author": "Holly Near"
+  },
+  {
+    "id": 288,
+    "quote": "O segredo para avançar é começar. O segredo para começar é dividir seus problemas complexos e avassaladores em pequenas tarefas gerenciáveis e começar pela primeira.",
+    "author": "Mark Twain"
+  },
+  {
+    "id": 289,
+    "quote": "Sempre trabalhe duro. A intensidade clarifica. Ela cria não apenas momentum, mas também a pressão necessária para sentir atrito ou realização.",
+    "author": "Marcus Buckingham"
+  },
+  {
+    "id": 290,
+    "quote": "Em cada situação difícil há um valor potencial. Acredite nisso, então comece a procurá-lo.",
+    "author": "Norman Vincent Peale"
+  },
+  {
+    "id": 291,
+    "quote": "Se você quer o arco-íris, tem que aguentar a chuva.",
+    "author": "Dolly Parton"
+  },
+  {
+    "id": 292,
+    "quote": "Se você sempre fizer o que te interessa, pelo menos uma pessoa ficará satisfeita.",
+    "author": "Katharine Hepburn"
+  },
+  {
+    "id": 293,
+    "quote": "Evito olhar para frente ou para trás, e tento continuar olhando para cima.",
+    "author": "Charlotte Bronte"
+  },
+  {
+    "id": 294,
+    "quote": "Uma das maiores doenças é ser ninguém para ninguém.",
+    "author": "Mother Teresa"
+  },
+  {
+    "id": 295,
+    "quote": "Não há caminho fácil para a liberdade em lugar algum, e muitos de nós terão que passar pelo vale da sombra da morte repetidamente antes de alcançarmos o topo dos nossos desejos.",
+    "author": "Nelson Mandela"
+  },
+  {
+    "id": 296,
+    "quote": "Raramente vi uma situação em que fazer menos do que o outro seja uma boa estratégia.",
+    "author": "Jimmy Spithill"
+  },
+  {
+    "id": 297,
+    "quote": "Continue avançando, e as chances são de que você tropeçará em algo, talvez quando menos esperar.",
+    "author": "Charles F. Kettering"
+  },
+  {
+    "id": 298,
+    "quote": "Um verdadeiro empreendedor é alguém que não tem rede de segurança abaixo dele.",
+    "author": "Henry Kravis"
+  },
+  {
+    "id": 299,
+    "quote": "Sua saúde mental e física vêm em primeiro lugar. Todo o resto é secundário.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 300,
+    "quote": "Menos é quase sempre mais. A simplicidade é quase sempre a resposta.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 301,
+    "quote": "Você precisa ter sorte para ter sucesso, mas a sorte pode ser construída.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 302,
+    "quote": "Tudo começa e termina na mente. A habilidade mais crucial é como você pensa.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 303,
+    "quote": "As pessoas são difíceis. Mas se você for gentil, obterá o melhor até dos piores.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 304,
+    "quote": "A perfeição existe apenas na mente. Não é real. Imagine, crie, melhore.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 305,
+    "quote": "O mundo não precisa de mais barulho. Não reclame. Dê o exemplo.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 306,
+    "quote": "A luta é parte da vida. Aprender a lutar bem já é uma recompensa em si.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 307,
+    "quote": "Sua atenção é o ativo mais importante que você tem. Use-a deliberadamente.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 308,
+    "quote": "O objetivo de um parceiro ideal não é completar você. É potencializá-lo.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 309,
+    "quote": "Quem você deixa entrar na sua vida é uma decisão vital. Não deixe ao acaso.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 310,
+    "quote": "O propósito da vida não é fazer ou realizar. É simplesmente experimentar.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 311,
+    "quote": "Tudo é aproximado. Não tente estar certo. Tente estar menos errado.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 312,
+    "quote": "É melhor não ter opinião do que seguir cegamente a de outra pessoa.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 313,
+    "quote": "Para o mundo te derrubar, ele primeiro precisa que você lhe dê permissão.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 314,
+    "quote": "Quanto mais coisas você se importa, menos significativo se torna o ato de se importar.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 315,
+    "quote": "Seja gentil consigo mesmo diante dos fracassos. Eles realmente não te definem.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 316,
+    "quote": "Não se orgulhe demais de suas conquistas. Elas não são todas suas.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 317,
+    "quote": "A vida é curta, e cabe a você torná-la doce.",
+    "author": "Sarah Louise Delany"
+  },
+  {
+    "id": 318,
+    "quote": "É verdade que algumas pessoas têm mais talento nato. Mas talento não basta.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 319,
+    "quote": "Não existe algo como justiça, e ficar ruminando sobre isso gera desespero.",
+    "author": "Zat Rana"
+  },
+  {
+    "id": 320,
+    "quote": "Se você quer alcançar a grandeza, pare de pedir permissão.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 321,
+    "quote": "As coisas funcionam melhor para aqueles que tiram o melhor de como as coisas funcionam.",
+    "author": "John Wooden"
+  },
+  {
+    "id": 322,
+    "quote": "Para viver uma vida criativa, devemos perder o medo de errar.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 323,
+    "quote": "Se você não está disposto a arriscar o comum, terá que se contentar com o ordinário.",
+    "author": "Jim Rohn"
+  },
+  {
+    "id": 324,
+    "quote": "Confie porque você está disposto a aceitar o risco, não porque é seguro ou certo.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 325,
+    "quote": "Coisas boas vêm para quem espera, mas coisas melhores vêm para quem vai lá buscar.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 326,
+    "quote": "Se você fizer o que sempre fez, obterá o que sempre obteve.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 327,
+    "quote": "Empreendedores de sucesso são doadores e não receptores de energia positiva.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 328,
+    "quote": "Quando você vê uma pessoa bem-sucedida, só vê as glórias públicas, nunca os sacrifícios privados para chegar lá.",
+    "author": "Vaibhav Shah"
+  },
+  {
+    "id": 329,
+    "quote": "A distância entre a loucura e o gênio é medida apenas pelo sucesso.",
+    "author": "Bruce Feirstein"
+  },
+  {
+    "id": 330,
+    "quote": "Qual é o ponto de estar vivo se você pelo menos não tenta fazer algo extraordinário.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 331,
+    "quote": "A vida não é sobre se encontrar. A vida é sobre se criar.",
+    "author": "George Bernard Shaw"
+  },
+  {
+    "id": 332,
+    "quote": "Não é o mais forte da espécie que sobrevive, nem o mais inteligente, mas o mais responsivo à mudança.",
+    "author": "Charles Darwin"
+  },
+  {
+    "id": 333,
+    "quote": "As coisas melhores e mais belas do mundo não podem ser vistas ou tocadas — devem ser sentidas com o coração.",
+    "author": "Helen Keller"
+  },
+  {
+    "id": 334,
+    "quote": "Grandes mentes discutem ideias; mentes medianas discutem eventos; mentes pequenas discutem pessoas.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 335,
+    "quote": "Um homem de sucesso é aquele que pode lançar um alicerce firme com os tijolos que os outros atiraram nele.",
+    "author": "David Brinkley"
+  },
+  {
+    "id": 336,
+    "quote": "Ninguém pode fazer você se sentir inferior sem o seu consentimento.",
+    "author": "Eleanor Roosevelt"
+  },
+  {
+    "id": 337,
+    "quote": "O fracasso é mais um degrau para a grandeza.",
+    "author": "Oprah Winfrey"
+  },
+  {
+    "id": 338,
+    "quote": "A única maneira de alcançar o impossível é acreditar que é possível.",
+    "author": "Charles Kingsleigh"
+  },
+  {
+    "id": 339,
+    "quote": "Não há substituto para o trabalho duro.",
+    "author": "Thomas Edison"
+  },
+  {
+    "id": 340,
+    "quote": "A melhor maneira de prever o futuro é criá-lo.",
+    "author": "Peter Drucker"
+  },
+  {
+    "id": 341,
+    "quote": "Você nunca é velho demais para estabelecer outro objetivo ou sonhar um novo sonho.",
+    "author": "C.S. Lewis"
+  },
+  {
+    "id": 342,
+    "quote": "O único limite para a realização do amanhã serão nossas dúvidas de hoje.",
+    "author": "Franklin D. Roosevelt"
+  },
+  {
+    "id": 343,
+    "quote": "O sucesso geralmente vem para aqueles que estão ocupados demais para estar à sua procura.",
+    "author": "Henry David Thoreau"
+  },
+  {
+    "id": 344,
+    "quote": "Não se deixe dominar pelos medos da sua mente. Deixe-se guiar pelos sonhos do seu coração.",
+    "author": "Roy T. Bennett"
+  },
+  {
+    "id": 345,
+    "quote": "A vida não é sobre obter e ter, é sobre dar e ser.",
+    "author": "Kevin Kruse"
+  },
+  {
+    "id": 346,
+    "quote": "Esforce-se não para ser um sucesso, mas para ser de valor.",
+    "author": "Albert Einstein"
+  },
+  {
+    "id": 347,
+    "quote": "Não sou um produto das minhas circunstâncias. Sou um produto das minhas decisões.",
+    "author": "Stephen Covey"
+  },
+  {
+    "id": 348,
+    "quote": "A maneira mais comum como as pessoas abrem mão do seu poder é pensando que não têm nenhum.",
+    "author": "Alice Walker"
+  },
+  {
+    "id": 349,
+    "quote": "A mente é tudo. O que você pensa, você se torna.",
+    "author": "Buddha"
+  },
+  {
+    "id": 350,
+    "quote": "Sua limitação — é apenas a sua imaginação.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 351,
+    "quote": "Empurre-se, porque ninguém mais vai fazer isso por você.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 352,
+    "quote": "Grandes coisas nunca vêm de zonas de conforto.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 353,
+    "quote": "Sonhe. Deseje. Realize.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 354,
+    "quote": "O sucesso não vem te procurar. Você tem que ir buscá-lo.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 355,
+    "quote": "Quanto mais duro você trabalha por algo, maior será a sensação quando você o conquistar.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 356,
+    "quote": "Sonhe maior. Faça maior.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 357,
+    "quote": "Não pare quando estiver cansado. Pare quando tiver terminado.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 358,
+    "quote": "Acorde com determinação. Vá dormir com satisfação.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 359,
+    "quote": "Faça algo hoje pelo qual o seu eu futuro vai te agradecer.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 360,
+    "quote": "Pequenas coisas fazem grandes dias.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 361,
+    "quote": "Vai ser difícil, mas difícil não significa impossível.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 362,
+    "quote": "Não espere pela oportunidade. Crie-a.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 363,
+    "quote": "Às vezes somos testados não para mostrar nossas fraquezas, mas para descobrir nossas forças.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 364,
+    "quote": "A chave para o sucesso é focar nos objetivos, não nos obstáculos.",
+    "author": "Anonymous"
+  },
+  {
+    "id": 365,
+    "quote": "Sonhe. Acredite. Construa.",
+    "author": "Anonymous"
+  }
+]

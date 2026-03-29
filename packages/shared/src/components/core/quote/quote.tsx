@@ -14,14 +14,14 @@ export const Quote = () => {
       updateQuote: state.updateQuote,
     }))
   );
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
-    updateQuote();
+    updateQuote(i18n.language);
 
     const quoteInterval = setInterval(
       () => {
-        updateQuote();
+        updateQuote(i18n.language);
       },
       24 * 60 * 60 * 1000
     ); // Every 24 hours
@@ -29,7 +29,7 @@ export const Quote = () => {
     return () => {
       clearInterval(quoteInterval);
     };
-  }, []);
+  }, [i18n.language]);
 
   return (
     <AnimatePresence mode="wait">

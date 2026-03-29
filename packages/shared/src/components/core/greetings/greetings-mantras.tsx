@@ -15,7 +15,7 @@ import { ShadowOverlay } from "../backgrounds/components/shadow-overlay";
 
 export const Greeting = () => {
   const user = useAuthStore(useShallow((state) => state.user));
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { mantraRotationCount, mantraRotationEnabled } = useAppStore(
     useShallow((state) => ({
       mantraRotationCount: state.mantraRotationCount,
@@ -43,8 +43,8 @@ export const Greeting = () => {
 
   useEffect(() => {
     updateGreeting(new Date(), t);
-    updateMantra();
-  }, [t]);
+    updateMantra(i18n.language);
+  }, [t, i18n.language]);
 
   useInterval(
     () => {
@@ -55,7 +55,7 @@ export const Greeting = () => {
 
   useInterval(
     () => {
-      updateMantra();
+      updateMantra(i18n.language);
     },
     24 * 60 * 60 * 1000
   );
@@ -66,7 +66,7 @@ export const Greeting = () => {
 
   const handleClick = () => {
     updateGreeting(new Date(), t);
-    updateMantra();
+    updateMantra(i18n.language);
     setIsMantraVisible(!isMantraVisible);
   };
 
