@@ -1,10 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Popup from "../../src/popup";
+import NewTab from "../../newtab";
 
 const root = document.getElementById("root")!;
 createRoot(root).render(
   <React.StrictMode>
-    <Popup />
+    <NewTab />
   </React.StrictMode>
 );

@@ -1,5 +1,11 @@
 import { defineBackground } from "wxt/utils/define-background";
-import type { TimerMessage } from "@repo/shared";
+
+type TimerMessage =
+  | { type: "START"; duration: number }
+  | { type: "PAUSE" }
+  | { type: "RESET" }
+  | { type: "UPDATE_DURATION"; duration: number }
+  | { type: "SKIP_TO_NEXT_STAGE" };
 
 export default defineBackground(() => {
   let interval: ReturnType<typeof setInterval> | null = null;

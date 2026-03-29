@@ -1,6 +1,8 @@
 import { defineConfig } from "wxt";
 
 export default defineConfig({
+  manifestVersion: 3,
+  srcDir: "src",
   manifest: {
     name: "Meelio",
     description: "Focus, calm & productivity with every new tab",

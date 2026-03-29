@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { createShadowRootUi } from "wxt/utils/content-script-ui/shadow-root";
-import { doesSiteHostMatch } from "@repo/shared";
-import { useChromeStorageLocal } from "../src/hooks/use-chrome-storage-local";
-import { Blocker } from "../src/features/content/blocker";
-import { getCustomBlockerMessage } from "../src/utils/blocker.utils";
-import { pauseAllVideos, startAutoPause } from "../src/utils/media.utils";
+import { doesSiteHostMatch } from "@/utils/site-blocker.utils";
+import { useChromeStorageLocal } from "../hooks/use-chrome-storage-local";
+import { Blocker } from "../features/content/blocker";
+import { getCustomBlockerMessage } from "../utils/blocker.utils";
+import { pauseAllVideos, startAutoPause } from "../utils/media.utils";
 
 interface SiteBlockState {
   id: string;
