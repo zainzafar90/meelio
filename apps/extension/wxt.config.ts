@@ -6,7 +6,7 @@ export default defineConfig({
   manifest: {
     name: "Meelio",
     description: "Focus, calm & productivity with every new tab",
-    version: "0.8.3",
+    version: "0.9.0",
     permissions: ["storage", "notifications"],
     optional_permissions: ["tabs", "tabGroups", "bookmarks"],
     host_permissions: ["https://*.meelio.io/*"],
