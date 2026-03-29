@@ -6,32 +6,23 @@
   "description": "Focus, calm & productivity with every new tab",
   "author": "zainzafar90@gmail.com",
   "scripts": {
-    "dev": "rm -rf .plasmo && rm -rf build && plasmo dev",
-    "build": "plasmo build",
-    "build:all": "npm run build:firefox && npm run build:edge && npm run build:chrome && npm run build:opera && npm run build:safari",
-    "build:edge": "plasmo build --target=edge-mv3",
-    "build:brave": "plasmo build --target=brave-mv3",
-    "build:chrome": "plasmo build --target=chrome-mv3",
-    "build:firefox": "plasmo build --target=firefox-mv3",
-    "build:opera": "plasmo build --target=opera-mv3",
-    "build:safari": "plasmo build --target=safari-mv3",
-    "package": "plasmo package",
-    "package:all": "npm run package:firefox && npm run package:edge && npm run package:chrome && npm run package:opera && npm run package:safari",
-    "package:firefox": "plasmo package --target=firefox-mv3",
-    "package:edge": "plasmo package --target=edge-mv3",
-    "package:brave": "plasmo package --target=brave-mv3",
-    "package:chrome": "plasmo package --target=chrome-mv3",
-    "package:opera": "plasmo package --target=opera-mv3",
-    "package:safari": "plasmo package --target=safari-mv3",
+    "dev": "wxt -b chrome",
+    "build": "wxt build -b chrome",
+    "build:chrome": "wxt build -b chrome",
+    "build:firefox": "wxt build -b firefox",
+    "build:edge": "wxt build -b edge",
+    "build:safari": "wxt build -b safari",
+    "package": "wxt zip -b chrome",
+    "package:chrome": "wxt zip -b chrome",
+    "package:firefox": "wxt zip -b firefox",
     "lint": "eslint . --ext .ts,.tsx",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf .plasmo"
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .output && rm -rf .wxt"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
-    "@plasmohq/storage": "^1.13.0",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tailwindcss/typography": "^0.5.9",
@@ -48,7 +39,6 @@
     "i18next-browser-languagedetector": "^7.2.0",
     "lucide-react": "^0.454.0",
     "next-themes": "^0.3.0",
-    "plasmo": "0.90.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.47.0",
@@ -63,6 +53,7 @@
     "tailwindcss-animate": "^1.0.7",
     "use-sync-external-store": "^1.5.0",
     "usehooks-ts": "^2.9.1",
+    "wxt": "^0.20.6",
     "zod": "^3.22.4",
     "zustand": "^5"
   },
@@ -92,42 +83,5 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.3.3",
     "vitest": "^0.34.6"
-  },
-  "manifest": {
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "web_accessible_resources": [
-      {
-        "resources": [
-          "public/**/*.svg",
-          "public/**/*.png",
-          "public/**/*.jpg",
-          "public/**/*.webp",
-          "public/**/*.avif",
-          "public/**/*.mp4",
-          "public/**/*.mp3",
-          "public/**/*.json"
-        ],
-        "matches": [
-          "https://www.plasmo.com/*"
-        ]
-      }
-    ],
-    "host_permissions": [
-      "https://*.meelio.io/*"
-    ],
-    "optional_host_permissions": [
-      "https://*/*"
-    ],
-    "permissions": [
-      "storage",
-      "notifications"
-    ],
-    "optional_permissions": [
-      "tabs",
-      "tabGroups",
-      "bookmarks"
-    ]
   }
 }

@@ -1,25 +1,26 @@
 {
-  "extends": [
-    "plasmo/templates/tsconfig.base",
-    "@repo/typescript-config/base.json"
-  ],
+  "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "verbatimModuleSyntax": false,
+    "types": ["chrome"],
     "paths": {
       "@/*": ["./src/*"]
     },
     "baseUrl": "."
   },
   "include": [
-    ".plasmo/index.d.ts",
-    "./**/*.ts",
-    "./**/*.tsx",
+    "entrypoints",
+    "src",
+    "wxt.config.ts",
     "tailwind.config.ts",
     "postcss.config.js",
     "prettier.config.mjs"
   ],
-  "exclude": ["node_modules", "build", "dist", ".plasmo"]
+  "exclude": ["node_modules", ".output", ".wxt"]
 }
