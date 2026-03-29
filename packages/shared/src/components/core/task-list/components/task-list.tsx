@@ -2,6 +2,7 @@ import { Badge } from "@repo/ui/components/ui/badge";
 import { useTranslation } from "react-i18next";
 import { useTaskStore } from "../../../../stores/task.store";
 import { useShallow } from "zustand/shallow";
+import { useState, useRef, useEffect } from "react";
 
 import { Task } from "../../../../lib/db/models.dexie";
 import { cn } from "../../../../lib";
@@ -50,25 +51,56 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
-  const { toggleTask, deleteTask, togglePinTask } = useTaskStore(
+  const { toggleTask, deleteTask, togglePinTask, editTask } = useTaskStore(
     useShallow((state) => ({
       toggleTask: state.toggleTask,
       deleteTask: state.deleteTask,
       togglePinTask: state.togglePinTask,
+      editTask: state.editTask,
     }))
   );
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(task.title);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
+
+  const startEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditValue(task.title);
+    setIsEditing(true);
+  };
+
+  const commitEdit = () => {
+    if (editValue.trim() && editValue.trim() !== task.title) {
+      editTask(task.id, editValue);
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") commitEdit();
+    if (e.key === "Escape") setIsEditing(false);
+  };
 
   return (
     <div
       key={task.id}
-      onClick={() => toggleTask(task.id)}
+      onClick={() => !isEditing && toggleTask(task.id)}
       className="group flex cursor-pointer items-center gap-3 rounded-lg border bg-card p-3 hover:bg-muted/50"
     >
       <button
         className={cn(
-          "flex h-4 w-4 items-center justify-center rounded-full border-2 border-foreground/50 transition-colors",
+          "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-foreground/50 transition-colors",
           task.completed ? "border-transparent bg-accent" : ""
         )}
+        onClick={(e) => { e.stopPropagation(); toggleTask(task.id); }}
       >
         {task.completed ? (
           <Icons.check className="h-3 w-3 text-accent-foreground" />
@@ -77,8 +109,19 @@ const TaskItem = ({ task }: { task: Task }) => {
         )}
       </button>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full bg-transparent text-sm outline-none"
+          />
+        ) : (
           <span
+            onDoubleClick={startEdit}
             className={cn(
               "text-sm transition-all duration-200",
               task.completed && "text-muted-foreground line-through"
@@ -86,10 +129,10 @@ const TaskItem = ({ task }: { task: Task }) => {
           >
             {task.title}
           </span>
-        </div>
+        )}
       </div>
       <div className="ml-auto flex items-center gap-2">
-       {task.dueDate && (
+        {task.dueDate && (
           <Badge className="uppercase" variant="secondary">
             {new Date(task.dueDate).toLocaleDateString()}
           </Badge>
@@ -108,7 +151,6 @@ const TaskItem = ({ task }: { task: Task }) => {
             )}
           />
         </button>
-       
         <button
           className="invisible text-muted-foreground group-hover:visible"
           onClick={(e) => {

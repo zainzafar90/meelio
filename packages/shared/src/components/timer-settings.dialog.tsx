@@ -39,12 +39,14 @@ export interface TimerSettingsDialogProps {
   breakMin: number;
   notifications: boolean;
   sounds: boolean;
+  soundId?: string;
   soundscapes?: boolean;
   autoStartBreaks?: boolean;
   onSave: (values: {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
+    soundId?: string;
     soundscapes?: boolean;
     autoStartBreaks?: boolean;
   }) => void;
@@ -57,6 +59,7 @@ export function TimerSettingsDialog({
   breakMin,
   notifications,
   sounds,
+  soundId = "timeout-1-back-chime",
   soundscapes = true,
   autoStartBreaks = true,
   onSave,
@@ -99,6 +102,7 @@ export function TimerSettingsDialog({
         },
         notifications,
         sounds,
+        soundId,
         soundscapes,
         autoStartBreaks,
       });
@@ -120,6 +124,7 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications: !notifications,
       sounds,
+      soundId,
       soundscapes,
       autoStartBreaks,
     });
@@ -130,6 +135,18 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications,
       sounds: !sounds,
+      soundId,
+      soundscapes,
+      autoStartBreaks,
+    });
+  };
+
+  const handleSoundChange = (newSoundId: string) => {
+    onSave({
+      durations: { focusMin, breakMin },
+      notifications,
+      sounds,
+      soundId: newSoundId,
       soundscapes,
       autoStartBreaks,
     });
@@ -140,6 +157,7 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications,
       sounds,
+      soundId,
       soundscapes: !soundscapes,
       autoStartBreaks,
     });
@@ -150,6 +168,7 @@ export function TimerSettingsDialog({
       durations: { focusMin, breakMin },
       notifications,
       sounds,
+      soundId,
       soundscapes,
       autoStartBreaks: !autoStartBreaks,
     });
@@ -320,8 +339,8 @@ export function TimerSettingsDialog({
                 </div>
                 <div className="flex items-center gap-2">
                   <Select
-                    value="timeout-1-back-chime"
-                    onValueChange={() => {}}
+                    value={soundId}
+                    onValueChange={handleSoundChange}
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Select a sound" />
@@ -338,7 +357,7 @@ export function TimerSettingsDialog({
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => playPreviewSound("timeout-1-back-chime")}
+                    onClick={() => playPreviewSound(soundId)}
                     title="Preview sound"
                   >
                     <Volume2 className="h-4 w-4" />

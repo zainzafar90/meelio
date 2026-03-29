@@ -212,6 +212,7 @@ const useTimerState = (
       toggleSounds: state.toggleSounds,
       toggleSoundscapes: state.toggleSoundscapes,
       toggleAutoStartBreaks: state.toggleAutoStartBreaks,
+      setSoundId: state.setSoundId,
       updateRemaining: state.updateRemaining,
       restore: state.restore,
       completeStage: state.completeStage,
@@ -251,6 +252,7 @@ const useTimerState = (
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
+    soundId?: string;
     soundscapes?: boolean;
     autoStartBreaks?: boolean;
   }) => {
@@ -264,6 +266,9 @@ const useTimerState = (
     }
     if (settings.sounds !== store.settings.sounds) {
       store.toggleSounds();
+    }
+    if (settings.soundId !== undefined && settings.soundId !== store.settings.soundId) {
+      store.setSoundId?.(settings.soundId);
     }
     if (typeof settings.soundscapes === 'boolean' && settings.soundscapes !== store.settings.soundscapes) {
       store.toggleSoundscapes?.();
@@ -281,6 +286,7 @@ const useTimerState = (
     settingsModal,
     notifications: store.settings.notifications,
     sounds: store.settings.sounds,
+    soundId: store.settings.soundId ?? "timeout-1-back-chime",
     soundscapes: store.settings.soundscapes ?? true,
     autoStartBreaks: store.settings.autoStartBreaks ?? true,
   };
@@ -300,6 +306,7 @@ export const Timer = ({ timerStore, runtime }: TimerProps) => {
     settingsModal,
     notifications,
     sounds,
+    soundId,
     soundscapes,
     autoStartBreaks,
   } = useTimerState(timerStore, runtime);
@@ -331,6 +338,7 @@ export const Timer = ({ timerStore, runtime }: TimerProps) => {
         breakMin={store.durations[TimerStage.Break] / 60}
         notifications={notifications}
         sounds={sounds}
+        soundId={soundId}
         soundscapes={soundscapes}
         autoStartBreaks={autoStartBreaks}
         onSave={handleSettingsChange}

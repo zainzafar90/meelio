@@ -60,7 +60,7 @@ function initState(): Omit<
     isRunning: false,
     endTimestamp: null,
     durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: true, sounds: true, soundscapes: true, autoStartBreaks: true },
+    settings: { notifications: true, sounds: true, soundId: "timeout-1-back-chime", soundscapes: true, autoStartBreaks: true },
     stats: { focusSec: 0, breakSec: 0 },
     unsyncedFocusSec: 0,
     prevRemaining: null,
@@ -313,7 +313,7 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
             });
           }
 
-          playCompletionSound(state.settings.sounds).catch(console.error);
+          playCompletionSound(state.settings.sounds, state.settings.soundId).catch(console.error);
           showCompletionNotification(
             finishedStage,
             state.settings.notifications
@@ -363,6 +363,9 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
           toggleAutoStartBreaks,
           toggleSoundscapes: () => set((s) => ({
             settings: { ...s.settings, soundscapes: !s.settings.soundscapes }
+          })),
+          setSoundId: (id: string) => set((s) => ({
+            settings: { ...s.settings, soundId: id }
           })),
           updateRemaining,
           restore,
