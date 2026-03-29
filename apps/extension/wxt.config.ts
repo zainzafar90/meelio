@@ -1,6 +1,17 @@
 import { defineConfig } from "wxt";
 
 export default defineConfig({
+  vite: () => ({
+    build: {
+      chunkSizeWarningLimit: 3000,
+      rollupOptions: {
+        onwarn(warning, warn) {
+          if (warning.code === "MODULE_LEVEL_DIRECTIVE") return;
+          warn(warning);
+        },
+      },
+    },
+  }),
   manifestVersion: 3,
   srcDir: "src",
   manifest: {
