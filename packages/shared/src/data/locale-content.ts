@@ -1,51 +1,52 @@
 import quotesEn from "./quotes.json";
+import quotesDe from "./quotes-de.json";
+import quotesEs from "./quotes-es.json";
+import quotesFr from "./quotes-fr.json";
+import quotesPt from "./quotes-pt.json";
+import quotesRu from "./quotes-ru.json";
+import quotesJa from "./quotes-ja.json";
+import quotesZh from "./quotes-zh.json";
+import quotesAr from "./quotes-ar.json";
+
 import mantrasEn from "./mantras.json";
+import mantrasDe from "./mantras-de.json";
+import mantrasEs from "./mantras-es.json";
+import mantrasFr from "./mantras-fr.json";
+import mantrasPt from "./mantras-pt.json";
+import mantrasRu from "./mantras-ru.json";
+import mantrasJa from "./mantras-ja.json";
+import mantrasZh from "./mantras-zh.json";
+import mantrasAr from "./mantras-ar.json";
 
 type Quote = { id: number; quote: string; author: string };
 type Mantra = { id: number; text: string };
 
-export async function loadLocaleQuotes(lang: string): Promise<Quote[]> {
-  switch (lang) {
-    case "de":
-      return (await import("./quotes-de.json")).default as Quote[];
-    case "es":
-      return (await import("./quotes-es.json")).default as Quote[];
-    case "fr":
-      return (await import("./quotes-fr.json")).default as Quote[];
-    case "pt":
-      return (await import("./quotes-pt.json")).default as Quote[];
-    case "ru":
-      return (await import("./quotes-ru.json")).default as Quote[];
-    case "ja":
-      return (await import("./quotes-ja.json")).default as Quote[];
-    case "zh":
-      return (await import("./quotes-zh.json")).default as Quote[];
-    case "ar":
-      return (await import("./quotes-ar.json")).default as Quote[];
-    default:
-      return quotesEn as Quote[];
-  }
+const quotesByLang: Record<string, Quote[]> = {
+  de: quotesDe as Quote[],
+  es: quotesEs as Quote[],
+  fr: quotesFr as Quote[],
+  pt: quotesPt as Quote[],
+  ru: quotesRu as Quote[],
+  ja: quotesJa as Quote[],
+  zh: quotesZh as Quote[],
+  ar: quotesAr as Quote[],
+};
+
+const mantrasByLang: Record<string, Mantra[]> = {
+  de: mantrasDe as Mantra[],
+  es: mantrasEs as Mantra[],
+  fr: mantrasFr as Mantra[],
+  pt: mantrasPt as Mantra[],
+  ru: mantrasRu as Mantra[],
+  ja: mantrasJa as Mantra[],
+  zh: mantrasZh as Mantra[],
+  ar: mantrasAr as Mantra[],
+};
+
+export function getLocaleQuotes(lang: string): Quote[] {
+  return quotesByLang[lang] ?? (quotesEn as Quote[]);
 }
 
-export async function loadLocaleMantras(lang: string): Promise<Mantra[]> {
-  switch (lang) {
-    case "de":
-      return (await import("./mantras-de.json")).default as Mantra[];
-    case "es":
-      return (await import("./mantras-es.json")).default as Mantra[];
-    case "fr":
-      return (await import("./mantras-fr.json")).default as Mantra[];
-    case "pt":
-      return (await import("./mantras-pt.json")).default as Mantra[];
-    case "ru":
-      return (await import("./mantras-ru.json")).default as Mantra[];
-    case "ja":
-      return (await import("./mantras-ja.json")).default as Mantra[];
-    case "zh":
-      return (await import("./mantras-zh.json")).default as Mantra[];
-    case "ar":
-      return (await import("./mantras-ar.json")).default as Mantra[];
-    default:
-      return mantrasEn as Mantra[];
-  }
+export function getLocaleMantras(lang: string): Mantra[] {
+  return mantrasByLang[lang] ?? (mantrasEn as Mantra[]);
 }
