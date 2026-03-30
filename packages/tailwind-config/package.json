@@ -6,7 +6,7 @@
   "license": "MIT",
   "files": [
     "index.ts",
-    "postcss.config.js"
+    "postcss.config.cjs"
   ],
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules"
