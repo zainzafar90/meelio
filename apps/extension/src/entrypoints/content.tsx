@@ -113,11 +113,23 @@ const BlockerOverlay = () => {
   );
 };
 
+const isCurrentSiteBlocked = async (): Promise<boolean> => {
+  const result = await chrome.storage.local.get("meelio:local:site-blocker");
+  const raw = result["meelio:local:site-blocker"];
+  if (!raw) return false;
+  const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+  const sites = parsed?.state?.sites ?? {};
+  return Boolean(getMatchingSite(sites));
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
 export default defineContentScript({
   matches: ["<all_urls>"],
   runAt: "document_start",
   cssInjectionMode: "ui",
   async main(ctx) {
+    if (!(await isCurrentSiteBlocked())) return;
+
     const ui = await createShadowRootUi(ctx, {
       name: "meelio-site-blocker",
       position: "modal",
