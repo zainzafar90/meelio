@@ -53,6 +53,11 @@ jobs:
         id: chrome
         uses: browser-actions/setup-chrome@v1
 
+      - name: Verify Chrome install
+        run: |
+          echo "Chrome path: ${{ steps.chrome.outputs.chrome-path }}"
+          "${{ steps.chrome.outputs.chrome-path }}" --version
+
       - name: Run shared timer-core boundary tests
         run: pnpm --filter @repo/shared test -- --run
 
@@ -66,4 +71,5 @@ jobs:
         env:
           MEELIO_BLOCK_TEST_DOMAIN: zainzafar.net
           MEELIO_BROWSER_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          MEELIO_BROWSER_STARTUP_TIMEOUT_MS: 45000
         run: xvfb-run -a pnpm validate:extension

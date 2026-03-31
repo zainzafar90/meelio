@@ -14,6 +14,11 @@ const extensionOutputDir = path.join(
 );
 const blockerPattern = process.env.MEELIO_BLOCK_TEST_DOMAIN || "zainzafar.net";
 const blockedPageSuffix = "/blocked.html";
+const isCi = process.env.CI === "true";
+const browserStartupTimeoutMs = Number(
+  process.env.MEELIO_BROWSER_STARTUP_TIMEOUT_MS ||
+    (isCi ? 45000 : 15000)
+);
 
 const browserCandidates = [
   process.env.MEELIO_BROWSER_PATH,
@@ -200,12 +205,43 @@ class CdpClient {
   }
 }
 
-async function waitForDebugger(port) {
+function formatBrowserDiagnostics(browserState) {
+  const diagnostics = [];
+
+  if (browserState.exitCode !== null) {
+    diagnostics.push(`Browser exited with code ${browserState.exitCode}.`);
+  }
+
+  if (browserState.signal !== null) {
+    diagnostics.push(`Browser exited with signal ${browserState.signal}.`);
+  }
+
+  const stderr = browserState.stderr.trim();
+  if (stderr) {
+    diagnostics.push(`Browser stderr:\n${stderr}`);
+  }
+
+  const stdout = browserState.stdout.trim();
+  if (stdout) {
+    diagnostics.push(`Browser stdout:\n${stdout}`);
+  }
+
+  return diagnostics.length > 0 ? diagnostics.join("\n\n") : null;
+}
+
+async function waitForDebugger(port, browserState) {
   return waitFor(
     "Chrome DevTools endpoint",
     () => fetchJson(`http://127.0.0.1:${port}/json/version`),
-    (value) => Boolean(value?.webSocketDebuggerUrl),
-    15000
+    (value) => {
+      if (browserState.exitCode !== null || browserState.signal !== null) {
+        const diagnostics = formatBrowserDiagnostics(browserState);
+        throw new Error(diagnostics ?? "Browser exited before DevTools became ready.");
+      }
+
+      return Boolean(value?.webSocketDebuggerUrl);
+    },
+    browserStartupTimeoutMs
   );
 }
 
@@ -480,23 +516,57 @@ async function main() {
 
   logStep(`Using blocked-domain smoke target: ${blockerPattern}`);
   logStep(`Launching browser on port ${port}`);
+  const browserState = {
+    exitCode: null,
+    signal: null,
+    stderr: "",
+    stdout: "",
+  };
+  const browserFlags = [
+    `--user-data-dir=${profileDir}`,
+    `--disable-extensions-except=${extensionOutputDir}`,
+    `--load-extension=${extensionOutputDir}`,
+    `--remote-debugging-port=${port}`,
+    "--remote-debugging-address=127.0.0.1",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--new-window",
+    "about:blank",
+  ];
+
+  if (process.platform === "linux") {
+    browserFlags.push("--no-sandbox", "--disable-setuid-sandbox");
+  }
+
+  if (isCi) {
+    browserFlags.push(
+      "--disable-dev-shm-usage",
+      "--disable-background-networking",
+      "--enable-logging=stderr"
+    );
+  }
+
   const browserProcess = spawn(
     browserBinary,
-    [
-      `--user-data-dir=${profileDir}`,
-      `--disable-extensions-except=${extensionOutputDir}`,
-      `--load-extension=${extensionOutputDir}`,
-      `--remote-debugging-port=${port}`,
-      "--no-first-run",
-      "--no-default-browser-check",
-      "--new-window",
-      "about:blank",
-    ],
+    browserFlags,
     {
       cwd: repoRoot,
-      stdio: "ignore",
+      stdio: ["ignore", "pipe", "pipe"],
     }
   );
+
+  browserProcess.stdout?.setEncoding("utf8");
+  browserProcess.stderr?.setEncoding("utf8");
+  browserProcess.stdout?.on("data", (chunk) => {
+    browserState.stdout = `${browserState.stdout}${chunk}`.slice(-8000);
+  });
+  browserProcess.stderr?.on("data", (chunk) => {
+    browserState.stderr = `${browserState.stderr}${chunk}`.slice(-16000);
+  });
+  browserProcess.on("exit", (code, signal) => {
+    browserState.exitCode = code;
+    browserState.signal = signal;
+  });
 
   let cleanedUp = false;
 
@@ -554,7 +624,7 @@ async function main() {
     void cleanup().finally(() => process.exit(143));
   });
 
-  const version = await waitForDebugger(port);
+  const version = await waitForDebugger(port, browserState);
   const browserClient = new CdpClient(version.webSocketDebuggerUrl);
   await browserClient.connect();
   await browserClient.send("Target.setDiscoverTargets", { discover: true });
