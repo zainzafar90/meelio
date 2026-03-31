@@ -105,6 +105,36 @@ function patchManifestForValidation(extensionDir) {
   return manifestPath;
 }
 
+async function removeDirBestEffort(directory) {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      rmSync(directory, {
+        force: true,
+        recursive: true,
+        maxRetries: 10,
+        retryDelay: 100,
+      });
+      return;
+    } catch (error) {
+      const code = error?.code;
+      if (
+        code !== "ENOTEMPTY" &&
+        code !== "EBUSY" &&
+        code !== "EPERM" &&
+        code !== "EMFILE"
+      ) {
+        throw error;
+      }
+
+      await sleep(250 * (attempt + 1));
+    }
+  }
+
+  process.stderr.write(
+    `[validate:extension] Warning: unable to fully remove temporary directory ${directory}\n`
+  );
+}
+
 async function getAvailablePort() {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
@@ -617,19 +647,9 @@ async function main() {
 
   let cleanedUp = false;
 
-  const removeProfileDir = () => {
-    rmSync(profileDir, {
-      force: true,
-      recursive: true,
-      maxRetries: 10,
-      retryDelay: 100,
-    });
-    rmSync(validationExtensionDir, {
-      force: true,
-      recursive: true,
-      maxRetries: 10,
-      retryDelay: 100,
-    });
+  const removeTempDirs = async () => {
+    await removeDirBestEffort(profileDir);
+    await removeDirBestEffort(validationExtensionDir);
   };
 
   const waitForBrowserExit = async (timeoutMs) => {
@@ -660,12 +680,28 @@ async function main() {
       await waitForBrowserExit(1000);
     }
 
-    removeProfileDir();
+    await removeTempDirs();
   };
 
   process.on("exit", () => {
     try {
-      removeProfileDir();
+      rmSync(profileDir, {
+        force: true,
+        recursive: true,
+        maxRetries: 2,
+        retryDelay: 50,
+      });
+    } catch {
+      // Best-effort exit cleanup only.
+    }
+
+    try {
+      rmSync(validationExtensionDir, {
+        force: true,
+        recursive: true,
+        maxRetries: 2,
+        retryDelay: 50,
+      });
     } catch {
       // Best-effort exit cleanup only.
     }
