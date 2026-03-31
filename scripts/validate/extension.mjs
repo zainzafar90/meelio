@@ -1,5 +1,12 @@
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
@@ -19,6 +26,9 @@ const browserStartupTimeoutMs = Number(
   process.env.MEELIO_BROWSER_STARTUP_TIMEOUT_MS ||
     (isCi ? 45000 : 15000)
 );
+const pregrantBlockerAccess =
+  process.env.MEELIO_PREGRANT_BLOCKER_ACCESS === "true" ||
+  (isCi && process.env.MEELIO_PREGRANT_BLOCKER_ACCESS !== "false");
 
 const browserCandidates = [
   process.env.MEELIO_BROWSER_PATH,
@@ -73,25 +83,53 @@ function findBrowserBinary() {
   return binary;
 }
 
-async function getAvailablePort(start = 9226) {
-  const tryPort = (port) =>
-    new Promise((resolve, reject) => {
-      const server = net.createServer();
-      server.once("error", reject);
-      server.listen(port, "127.0.0.1", () => {
-        server.close(() => resolve(port));
-      });
-    });
+function createValidationExtensionDir(sourceDir) {
+  const validationDir = mkdtempSync(path.join(os.tmpdir(), "meelio-extension-"));
+  cpSync(sourceDir, validationDir, { recursive: true });
+  return validationDir;
+}
 
-  for (let port = start; port < start + 25; port += 1) {
-    try {
-      return await tryPort(port);
-    } catch {
-      // Try the next port.
-    }
+function patchManifestForValidation(extensionDir) {
+  const manifestPath = path.join(extensionDir, "manifest.json");
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  const requiredOrigins = ["http://*/*", "https://*/*"];
+  const hostPermissions = new Set(manifest.host_permissions ?? []);
+
+  for (const origin of requiredOrigins) {
+    hostPermissions.add(origin);
   }
 
-  throw new Error("Unable to reserve a remote debugging port for the browser.");
+  manifest.host_permissions = [...hostPermissions];
+
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+  return manifestPath;
+}
+
+async function getAvailablePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      if (!address || typeof address === "string") {
+        server.close(() => {
+          reject(new Error("Unable to reserve a remote debugging port for the browser."));
+        });
+        return;
+      }
+
+      const { port } = address;
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve(port);
+      });
+    });
+  });
 }
 
 async function fetchJson(url) {
@@ -470,6 +508,10 @@ async function hasAllSitesPermission(pageClient) {
 }
 
 async function requestAllSitesPermission(pageClient) {
+  if (await hasAllSitesPermission(pageClient)) {
+    return true;
+  }
+
   await clickButtonByText(pageClient, "Request access");
   await sleep(1200);
 
@@ -513,6 +555,11 @@ async function main() {
   const browserBinary = findBrowserBinary();
   const port = await getAvailablePort();
   const profileDir = mkdtempSync(path.join(os.tmpdir(), "meelio-validate-"));
+  const validationExtensionDir = createValidationExtensionDir(extensionOutputDir);
+
+  if (pregrantBlockerAccess) {
+    patchManifestForValidation(validationExtensionDir);
+  }
 
   logStep(`Using blocked-domain smoke target: ${blockerPattern}`);
   logStep(`Launching browser on port ${port}`);
@@ -524,8 +571,8 @@ async function main() {
   };
   const browserFlags = [
     `--user-data-dir=${profileDir}`,
-    `--disable-extensions-except=${extensionOutputDir}`,
-    `--load-extension=${extensionOutputDir}`,
+    `--disable-extensions-except=${validationExtensionDir}`,
+    `--load-extension=${validationExtensionDir}`,
     `--remote-debugging-port=${port}`,
     "--remote-debugging-address=127.0.0.1",
     "--no-first-run",
@@ -572,6 +619,12 @@ async function main() {
 
   const removeProfileDir = () => {
     rmSync(profileDir, {
+      force: true,
+      recursive: true,
+      maxRetries: 10,
+      retryDelay: 100,
+    });
+    rmSync(validationExtensionDir, {
       force: true,
       recursive: true,
       maxRetries: 10,
@@ -698,7 +751,11 @@ async function main() {
   await waitForBodyText(newtabClient, "Site blocker");
   await waitForBodyTextGone(newtabClient, "Syncing blocker state...");
 
-  logStep("Requesting all-sites access");
+  logStep(
+    pregrantBlockerAccess
+      ? "Checking pregranted all-sites access"
+      : "Requesting all-sites access"
+  );
   const permissionGranted = await requestAllSitesPermission(newtabClient);
   assert(permissionGranted, "Expected all-sites permission request to succeed.");
   await waitFor(
