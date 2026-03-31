@@ -1,4 +1,9 @@
 import { sendExtensionCommand } from "../../features/site-blocker/services/blocker-runtime";
+import {
+  ensureI18nReady,
+  getI18nLocale,
+  translate,
+} from "@repo/shared/i18n";
 
 const root = document.getElementById("app");
 if (!root) {
@@ -332,9 +337,6 @@ if (!document.getElementById(styleTagId)) {
   document.head.append(styleTag);
 }
 
-const params = new URLSearchParams(window.location.search);
-const pattern = params.get("pattern")?.trim().toLowerCase() ?? "this site";
-
 const setCurrentLocation = (url: string) => {
   window.location.assign(url);
 };
@@ -373,142 +375,191 @@ const createBadge = (label: string, value: string) => {
   badge.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
   return badge;
 };
+const renderBlockedPage = async () => {
+  await ensureI18nReady();
 
-const shell = document.createElement("article");
-shell.className = "blocked-shell";
+  const locale = getI18nLocale();
+  document.documentElement.lang = locale;
 
-const header = document.createElement("header");
-header.className = "blocked-header";
+  const params = new URLSearchParams(window.location.search);
+  const genericPattern = translate(
+    "site-blocker.blockedPage.genericPattern"
+  );
+  const pattern =
+    params.get("pattern")?.trim().toLowerCase() ?? genericPattern;
 
-const eyebrow = document.createElement("div");
-eyebrow.className = "blocked-eyebrow";
-eyebrow.textContent = "Extension tools";
+  const shell = document.createElement("article");
+  shell.className = "blocked-shell";
 
-const title = document.createElement("h1");
-title.className = "blocked-title";
-title.textContent = "This site is blocked";
+  const header = document.createElement("header");
+  header.className = "blocked-header";
 
-const description = document.createElement("p");
-description.className = "blocked-description";
-description.textContent =
-  pattern === "this site"
-    ? "Meelio interrupted this destination because it matches one of your active blocker rules."
-    : `${pattern} is currently blocked because it matches one of your active Meelio focus rules.`;
+  const eyebrow = document.createElement("div");
+  eyebrow.className = "blocked-eyebrow";
+  eyebrow.textContent = translate("site-blocker.blockedPage.eyebrow");
 
-const badges = document.createElement("div");
-badges.className = "blocked-badges";
-const ruleBadge = createBadge(
-  "Rule",
-  pattern === "this site" ? "Blocked site" : pattern
-);
-ruleBadge.dataset.tone = "rule";
-const modeBadge = createBadge("Mode", "Strict blocker");
-modeBadge.dataset.tone = "mode";
-badges.append(ruleBadge, modeBadge);
+  const title = document.createElement("h1");
+  title.className = "blocked-title";
+  title.textContent = translate("site-blocker.blockedPage.title");
 
-header.append(eyebrow, title, description, badges);
+  const description = document.createElement("p");
+  description.className = "blocked-description";
+  description.textContent =
+    pattern === genericPattern
+      ? translate("site-blocker.blockedPage.genericDescription")
+      : translate("site-blocker.blockedPage.patternDescription", {
+          pattern,
+        });
 
-const bypassSection = document.createElement("section");
-bypassSection.className = "blocked-section blocked-section--tinted";
+  const badges = document.createElement("div");
+  badges.className = "blocked-badges";
+  const ruleBadge = createBadge(
+    translate("site-blocker.blockedPage.ruleLabel"),
+    pattern === genericPattern
+      ? translate("site-blocker.blockedPage.genericRuleValue")
+      : pattern
+  );
+  ruleBadge.dataset.tone = "rule";
+  const modeBadge = createBadge(
+    translate("site-blocker.blockedPage.modeLabel"),
+    translate("site-blocker.blockedPage.modeValue")
+  );
+  modeBadge.dataset.tone = "mode";
+  badges.append(ruleBadge, modeBadge);
 
-const bypassTitle = document.createElement("h2");
-bypassTitle.className = "blocked-section-title";
-bypassTitle.textContent = "Temporary bypass";
+  header.append(eyebrow, title, description, badges);
 
-const bypassCopy = document.createElement("p");
-bypassCopy.className = "blocked-section-copy";
-bypassCopy.textContent =
-  "Bypasses stay local and expire automatically, so you can unblock the site without disabling the rule entirely.";
+  const bypassSection = document.createElement("section");
+  bypassSection.className = "blocked-section blocked-section--tinted";
 
-const bypassActions = document.createElement("div");
-bypassActions.className = "blocked-actions";
+  const bypassTitle = document.createElement("h2");
+  bypassTitle.className = "blocked-section-title";
+  bypassTitle.textContent = translate("site-blocker.blockedPage.bypassTitle");
 
-const navigationSection = document.createElement("section");
-navigationSection.className = "blocked-section";
+  const bypassCopy = document.createElement("p");
+  bypassCopy.className = "blocked-section-copy";
+  bypassCopy.textContent = translate("site-blocker.blockedPage.bypassDescription");
 
-const navigationTitle = document.createElement("h2");
-navigationTitle.className = "blocked-section-title";
-navigationTitle.textContent = "Navigation";
+  const bypassActions = document.createElement("div");
+  bypassActions.className = "blocked-actions";
 
-const navigationCopy = document.createElement("p");
-navigationCopy.className = "blocked-section-copy";
-navigationCopy.textContent =
-  "Go back, open Meelio settings, or continue after starting a timed bypass.";
+  const navigationSection = document.createElement("section");
+  navigationSection.className = "blocked-section";
 
-const navigationActions = document.createElement("div");
-navigationActions.className = "blocked-actions";
+  const navigationTitle = document.createElement("h2");
+  navigationTitle.className = "blocked-section-title";
+  navigationTitle.textContent = translate(
+    "site-blocker.blockedPage.navigationTitle"
+  );
 
-const footer = document.createElement("footer");
-footer.className = "blocked-footer";
+  const navigationCopy = document.createElement("p");
+  navigationCopy.className = "blocked-section-copy";
+  navigationCopy.textContent = translate(
+    "site-blocker.blockedPage.navigationDescription"
+  );
 
-const footerNote = document.createElement("p");
-footerNote.className = "blocked-footer-note";
-footerNote.textContent =
-  "Use a timed bypass if you need to continue intentionally, or return to Meelio to change the rule.";
+  const navigationActions = document.createElement("div");
+  navigationActions.className = "blocked-actions";
 
-const status = document.createElement("p");
-status.className = "blocked-status";
+  const footer = document.createElement("footer");
+  footer.className = "blocked-footer";
 
-const continueButton = createButton("Continue to exact URL", "primary", () => {});
-continueButton.style.display = "none";
+  const footerNote = document.createElement("p");
+  footerNote.className = "blocked-footer-note";
+  footerNote.textContent = translate("site-blocker.blockedPage.footerNote");
 
-const setStatus = (message: string, tone: "success" | "warning") => {
-  status.textContent = message;
-  status.dataset.tone = tone;
-  status.style.display = "block";
-};
+  const status = document.createElement("p");
+  status.className = "blocked-status";
 
-const startBypass = async (durationMinutes: number) => {
-  try {
-    const result = await sendExtensionCommand({
-      type: "blocker/start-bypass",
-      payload: {
-        pattern,
-        durationMinutes,
-      },
-    });
+  const continueButton = createButton(
+    translate("site-blocker.blockedPage.continue"),
+    "primary",
+    () => {}
+  );
+  continueButton.style.display = "none";
 
-    setStatus(`Bypass enabled for ${durationMinutes} minutes.`, "success");
+  const setStatus = (message: string, tone: "success" | "warning") => {
+    status.textContent = message;
+    status.dataset.tone = tone;
+    status.style.display = "block";
+  };
 
-    if (result.continueUrl) {
-      continueButton.style.display = "inline-flex";
-      continueButton.onclick = () => setCurrentLocation(result.continueUrl!);
+  const startBypass = async (durationMinutes: number) => {
+    try {
+      const result = await sendExtensionCommand({
+        type: "blocker/start-bypass",
+        payload: {
+          pattern,
+          durationMinutes,
+        },
+      });
+
+      setStatus(
+        translate("site-blocker.blockedPage.bypassEnabled", {
+          minutes: durationMinutes,
+        }),
+        "success"
+      );
+
+      if (result.continueUrl) {
+        continueButton.style.display = "inline-flex";
+        continueButton.onclick = () => setCurrentLocation(result.continueUrl!);
+      }
+    } catch {
+      setStatus(translate("site-blocker.blockedPage.bypassFailed"), "warning");
     }
-  } catch {
-    setStatus(
-      "Unable to start the bypass right now. Open Meelio settings and try again.",
-      "warning"
-    );
-  }
+  };
+
+  bypassActions.append(
+    createButton(
+      translate("site-blocker.blockedPage.bypass15"),
+      "primary",
+      () => {
+        void startBypass(15);
+      }
+    ),
+    createButton(
+      translate("site-blocker.blockedPage.bypass60"),
+      "secondary",
+      () => {
+        void startBypass(60);
+      }
+    )
+  );
+
+  navigationActions.append(
+    createButton(
+      translate("site-blocker.blockedPage.back"),
+      "secondary",
+      goBack
+    ),
+    createButton(
+      translate("site-blocker.blockedPage.openSettings"),
+      "secondary",
+      openSettings
+    ),
+    continueButton
+  );
+
+  bypassSection.append(bypassTitle, bypassCopy, bypassActions);
+  navigationSection.append(
+    navigationTitle,
+    navigationCopy,
+    navigationActions
+  );
+  footer.append(footerNote, status);
+
+  void sendExtensionCommand({
+    type: "blocker/record-blocked",
+    payload: {
+      pattern,
+    },
+  }).catch(() => {
+    // Best-effort audit logging only.
+  });
+
+  shell.append(header, bypassSection, navigationSection, footer);
+  root.replaceChildren(shell);
 };
 
-bypassActions.append(
-  createButton("Bypass 15 min", "primary", () => {
-    void startBypass(15);
-  }),
-  createButton("Bypass 60 min", "secondary", () => {
-    void startBypass(60);
-  })
-);
-
-navigationActions.append(
-  createButton("Back", "secondary", goBack),
-  createButton("Open Meelio settings", "secondary", openSettings),
-  continueButton
-);
-
-bypassSection.append(bypassTitle, bypassCopy, bypassActions);
-navigationSection.append(navigationTitle, navigationCopy, navigationActions);
-footer.append(footerNote, status);
-
-void sendExtensionCommand({
-  type: "blocker/record-blocked",
-  payload: {
-    pattern,
-  },
-}).catch(() => {
-  // Best-effort audit logging only.
-});
-
-shell.append(header, bypassSection, navigationSection, footer);
-root.replaceChildren(shell);
+void renderBlockedPage();

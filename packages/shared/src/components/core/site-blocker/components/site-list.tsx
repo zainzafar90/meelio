@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight, Ban, Plus } from "lucide-react";
 import { SiteItem } from "./site-item";
-import { SITE_LIST, SITE_CATEGORIES } from "../data/site-list";
+import {
+  SITE_CATEGORY_LABEL_KEYS,
+  SITE_LIST,
+  SITE_CATEGORIES,
+} from "../data/site-list";
 import { cn } from "@repo/ui/lib/utils";
+import { useTranslation } from "../../../../i18n";
 
 export interface Site {
   id: string;
@@ -34,6 +39,7 @@ export function SiteList({
   onUnblockSites,
   showHeading = true,
 }: SiteListProps) {
+  const { t } = useTranslation();
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryKey: string) => {
@@ -60,10 +66,11 @@ export function SiteList({
     <div className="space-y-3">
       {showHeading ? (
         <div className="space-y-1">
-          <h2 className="text-base font-semibold text-white">Curated sites</h2>
+          <h2 className="text-base font-semibold text-white">
+            {t("site-blocker.drawer.presets.heading")}
+          </h2>
           <p className="text-sm text-white/50">
-            Start with Meelio&apos;s preset categories and expand only what you
-            need.
+            {t("site-blocker.drawer.presets.copy")}
           </p>
         </div>
       ) : null}
@@ -82,16 +89,18 @@ export function SiteList({
                 <span className="text-lg">{category.icon}</span>
                 <div className="min-w-0">
                   <h3 className="truncate text-sm font-medium text-white/90">
-                    {category.name}
+                    {t(
+                      SITE_CATEGORY_LABEL_KEYS[category.key] ??
+                        "site-blocker.title"
+                    )}
                   </h3>
                   <p className="text-xs text-white/45">
-                    {
-                      SITE_LIST[category.key]?.filter((site) =>
+                    {t("site-blocker.drawer.presets.groupBlocked", {
+                      blocked: SITE_LIST[category.key]?.filter((site) =>
                         blockedSites.includes(site.url)
-                      ).length
-                    }
-                    {" / "}
-                    {SITE_LIST[category.key]?.length ?? 0} blocked
+                      ).length,
+                      total: SITE_LIST[category.key]?.length ?? 0,
+                    })}
                   </p>
                 </div>
                 {expandedCategories.includes(category.key) ? (
@@ -116,12 +125,12 @@ export function SiteList({
                 {isGroupBlocked(category.key, blockedSites) ? (
                   <>
                     <Ban className="h-3.5 w-3.5" />
-                    <span>Unblock all</span>
+                    <span>{t("site-blocker.drawer.presets.unblockAll")}</span>
                   </>
                 ) : (
                   <>
                     <Plus className="h-3.5 w-3.5" />
-                    <span>Block all</span>
+                    <span>{t("site-blocker.drawer.presets.blockAll")}</span>
                   </>
                 )}
               </button>

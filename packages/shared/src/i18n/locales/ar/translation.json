@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "تم حفظ الإعدادات",
-        "description": "تم حفظ إعداداتك."
+        "description": "تم حفظ إعداداتك.",
+        "error": "تعذر حفظ الإعدادات",
+        "errorDescription": "حاول مرة أخرى بعد قليل."
+      },
+      "notifications": {
+        "label": "إشعارات المؤقت",
+        "description": "اعرض إشعارًا عند انتهاء جلسة التركيز أو الاستراحة.",
+        "denied": "لم يتم منح إذن الإشعارات."
+      },
+      "notificationSound": {
+        "label": "صوت الإشعار",
+        "description": "شغّل صوتًا قصيرًا مع إشعارات المؤقت."
+      },
+      "soundscapes": {
+        "label": "المشاهد الصوتية المحيطة",
+        "description": "أبقِ المشاهد الصوتية المحيطة متاحة أثناء التركيز."
+      },
+      "soundPicker": {
+        "label": "صوت الإشعار",
+        "description": "اختر الصوت الذي يتم تشغيله عند انتقال المؤقت بين المراحل.",
+        "placeholder": "اختر صوتًا",
+        "preview": "معاينة الصوت"
+      },
+      "actions": {
+        "saving": "جارٍ الحفظ..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "وضع الاستراحة",
       "reset": "إعادة تعيين المؤقت",
       "startStop": "بدء/إيقاف المؤقت",
-      "skipStage": "تخطي إلى المرحلة التالية"
+      "skipStage": "تخطي إلى المرحلة التالية",
+      "focusLabel": "تركيز",
+      "breakLabel": "استراحة",
+      "resetLabel": "إعادة تعيين",
+      "viewStats": "عرض الإحصاءات",
+      "statsLabel": "إحصاءات",
+      "skipToNextStage": "الانتقال إلى المرحلة التالية",
+      "settings": "الإعدادات"
+    },
+    "validation": {
+      "invalidNumber": "أدخل رقمًا صالحًا",
+      "min": "يجب ألا يقل عن {{count}}",
+      "max": "يجب ألا يزيد عن {{count}}"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "احصل على الإضافة",
     "upgrade": "الترقية إلى النسخة الاحترافية",
     "premium-feature-title": "حاجب المواقع الاحترافي",
-    "premium-feature": "قم بالترقية إلى النسخة الاحترافية لحجب عدد غير محدود من المواقع المشتتة والبقاء مركزاً."
+    "premium-feature": "قم بالترقية إلى النسخة الاحترافية لحجب عدد غير محدود من المواقع المشتتة والبقاء مركزاً.",
+    "invalid-url": "تنسيق URL غير صالح",
+    "already-blocked": "هذا الموقع محظور بالفعل",
+    "site-added": "تم حظر الموقع بنجاح",
+    "already-exists": "الموقع موجود بالفعل",
+    "add-failed": "تعذر إضافة الموقع",
+    "input-placeholder": "أدخل رابط موقع مخصص (مثل example.com)",
+    "add-button": "إضافة",
+    "drawer": {
+      "description": "حظر صارم مع مراجعة خفيفة للنشاط داخل درج علامة التبويب الجديدة.",
+      "eyebrow": "أدوات الإضافة",
+      "subtitle": "حظر صارم مع مراجعة خفيفة للنشاط داخل درج علامة التبويب الجديدة.",
+      "tabs": {
+        "sites": "المواقع",
+        "activity": "النشاط"
+      },
+      "summary": {
+        "activeRules": "{{count}} قاعدة نشطة",
+        "accessReady": "وصول جميع المواقع جاهز",
+        "needsAccess": "يلزم وصول جميع المواقع"
+      },
+      "sections": {
+        "protection": "الحماية",
+        "rules": "القواعد",
+        "presets": "الإعدادات المسبقة",
+        "backup": "النسخ الاحتياطي",
+        "activity": "النشاط",
+        "events": "الأحداث",
+        "sessions": "الجلسات"
+      },
+      "errors": {
+        "updateFailed": "تعذر تحديث إعدادات الحاجب."
+      },
+      "blocking": {
+        "title": "سلوك الحظر",
+        "description": "اجمع بين الحظر وعناصر التحكم الزمنية حتى يبدو الحاجب جزءًا من تدفق التركيز.",
+        "strictTitle": "حاجب صارم",
+        "strictDescription": "يعيد توجيه المواقع المطابقة إلى صفحة الحظر قبل عرضها.",
+        "activationTitle": "وضع التفعيل",
+        "activationDescription": "أبقِ المواقع محظورة دائمًا أو فقط أثناء جلسات التركيز.",
+        "activationAlways": "دائمًا",
+        "activationFocusOnly": "أثناء جلسات التركيز فقط"
+      },
+      "access": {
+        "title": "وصول المواقع",
+        "granted": "تم منح وصول جميع المواقع. الحظر ونشاط التصفح متاحان على الصفحات المدعومة.",
+        "missing": "امنح وصول جميع المواقع لتفعيل الحظر الصارم ونشاط التصفح.",
+        "request": "طلب الوصول",
+        "denied": "لم يتم منح وصول جميع المواقع."
+      },
+      "custom": {
+        "title": "نطاقات مخصصة",
+        "description": "أضف نطاقاتك الخاصة عندما تكون المجموعات المسبقة واسعة جدًا أو لا تشمل ما يشتتك.",
+        "placeholder": "أضف نطاقًا مخصصًا",
+        "add": "إضافة",
+        "empty": "لا توجد نطاقات مخصصة بعد.",
+        "blockedNow": "محظور الآن",
+        "savedInactive": "محفوظ لكنه غير نشط",
+        "disable": "تعطيل",
+        "enable": "تفعيل",
+        "remove": "إزالة",
+        "invalid": "أدخل نطاقًا صالحًا مثل example.com",
+        "added": "تم حظر {{pattern}} الآن."
+      },
+      "presets": {
+        "title": "مواقع منسقة",
+        "description": "مجموعات مسبقة من كتالوج Meelio الحالي.",
+        "heading": "مواقع شائعة",
+        "copy": "إعدادات منسقة من كتالوج Meelio الحالي.",
+        "groupBlocked": "{{blocked}} / {{total}} محظور",
+        "blockAll": "حظر الكل",
+        "unblockAll": "إلغاء حظر الكل",
+        "blocked": "محظور",
+        "block": "حظر",
+        "categories": {
+          "entertainment": "ترفيه",
+          "social": "اجتماعي",
+          "games": "ألعاب",
+          "creativity": "إبداع",
+          "education": "تعليم",
+          "healthFitness": "صحة ولياقة",
+          "information": "معلومات",
+          "productivityFinance": "إنتاجية ومال",
+          "shoppingFood": "تسوق وطعام",
+          "travel": "سفر"
+        }
+      },
+      "backup": {
+        "title": "نسخة احتياطية محلية",
+        "description": "قم بتصدير أو استيراد قواعد الحظر وبيانات النشاط على هذا الجهاز.",
+        "export": "تصدير البيانات",
+        "import": "استيراد البيانات",
+        "importSuccess": "تم استيراد بيانات الحظر.",
+        "importFailed": "تعذر استيراد بيانات الحظر."
+      },
+      "activity": {
+        "topSitesTitle": "أهم المواقع",
+        "topSitesDescription": "آخر 7 أيام من وقت التصفح والزيارات ومحاولات الحظر.",
+        "topSitesSummary": "{{visits}} زيارة · {{blocked}} محظور",
+        "topSitesEmpty": "لا يوجد نشاط تصفح بعد.",
+        "eventsTitle": "الأحداث الأخيرة",
+        "eventsDescription": "محاولات الحظر والتجاوزات وتغييرات الأذونات.",
+        "eventsEmpty": "لا توجد أحداث حظر بعد.",
+        "sessionsTitle": "الجلسات الأخيرة",
+        "sessionsDescription": "أحدث جلسات التصفح التي التقطها المتتبع.",
+        "sessionsEmpty": "لا توجد جلسات مسجلة بعد.",
+        "events": {
+          "blocked": "تم حظر {{pattern}}",
+          "bypassStarted": "بدأ تجاوز {{pattern}}",
+          "bypassEnded": "انتهى تجاوز {{pattern}}",
+          "permissionDenied": "تم رفض وصول جميع المواقع"
+        }
+      },
+      "bootstrap": "جارٍ مزامنة حالة الحاجب..."
+    },
+    "blockedPage": {
+      "genericPattern": "هذا الموقع",
+      "eyebrow": "أدوات الإضافة",
+      "title": "هذا الموقع محظور",
+      "genericDescription": "هذه الصفحة محظورة حاليًا لأنها تطابق إحدى قواعد التركيز النشطة في Meelio.",
+      "patternDescription": "{{pattern}} محظور حاليًا لأنه يطابق إحدى قواعد التركيز النشطة في Meelio.",
+      "ruleLabel": "القاعدة",
+      "genericRuleValue": "قاعدة نشطة",
+      "modeLabel": "الوضع",
+      "modeValue": "حاجب صارم",
+      "bypassTitle": "تجاوز مؤقت",
+      "bypassDescription": "تبقى التجاوزات محلية وتنتهي تلقائيًا، حتى تتمكن من المتابعة من دون تعطيل القاعدة بالكامل.",
+      "navigationTitle": "التنقل",
+      "navigationDescription": "عد للخلف، أو افتح إعدادات Meelio، أو تابع بعد بدء تجاوز مؤقت.",
+      "footerNote": "استخدم تجاوزًا مؤقتًا إذا كنت بحاجة للمتابعة عن قصد، أو عد إلى Meelio لتغيير القاعدة.",
+      "continue": "تابع إلى الموقع",
+      "bypassEnabled": "تم تفعيل التجاوز لمدة {{minutes}} دقيقة.",
+      "bypassFailed": "تعذر بدء التجاوز. حاول مرة أخرى.",
+      "bypass15": "تجاوز 15 دقيقة",
+      "bypass60": "تجاوز 60 دقيقة",
+      "back": "رجوع",
+      "openSettings": "فتح إعدادات Meelio"
+    }
   },
   "tab-stash": {
     "title": "حفظ الألسنة",

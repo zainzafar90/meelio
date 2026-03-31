@@ -22,5 +22,9 @@
     "postcss.config.js",
     "prettier.config.mjs"
   ],
-  "exclude": ["node_modules", ".output", ".wxt"]
+  "exclude": [
+    "node_modules",
+    "output",
+    ".wxt"
+  ]
 }

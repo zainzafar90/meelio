@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "设置已保存",
-        "description": "您的设置已保存。"
+        "description": "您的设置已保存。",
+        "error": "无法保存设置",
+        "errorDescription": "请稍后再试。"
+      },
+      "notifications": {
+        "label": "计时器通知",
+        "description": "当专注或休息时段结束时显示通知。",
+        "denied": "未授予通知权限。"
+      },
+      "notificationSound": {
+        "label": "通知声音",
+        "description": "在计时器通知出现时播放一个简短声音。"
+      },
+      "soundscapes": {
+        "label": "环境音景",
+        "description": "在专注时保持环境音景可用。"
+      },
+      "soundPicker": {
+        "label": "通知声音",
+        "description": "选择计时器切换阶段时播放的声音。",
+        "placeholder": "选择声音",
+        "preview": "试听声音"
+      },
+      "actions": {
+        "saving": "正在保存..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "休息模式",
       "reset": "重置计时器",
       "startStop": "开始/停止计时器",
-      "skipStage": "跳到下一阶段"
+      "skipStage": "跳到下一阶段",
+      "focusLabel": "专注",
+      "breakLabel": "休息",
+      "resetLabel": "重置",
+      "viewStats": "查看统计",
+      "statsLabel": "统计",
+      "skipToNextStage": "跳到下一阶段",
+      "settings": "设置"
+    },
+    "validation": {
+      "invalidNumber": "请输入有效数字",
+      "min": "必须至少为 {{count}}",
+      "max": "必须至多为 {{count}}"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "获取扩展",
     "upgrade": "升级到专业版",
     "premium-feature-title": "专业版网站拦截",
-    "premium-feature": "升级到专业版以拦截无限的干扰性网站并保持专注。"
+    "premium-feature": "升级到专业版以拦截无限的干扰性网站并保持专注。",
+    "invalid-url": "URL 格式无效",
+    "already-blocked": "该网站已被阻止",
+    "site-added": "网站已成功阻止",
+    "already-exists": "该网站已存在",
+    "add-failed": "无法添加该网站",
+    "input-placeholder": "输入自定义网站 URL（例如 example.com）",
+    "add-button": "添加",
+    "drawer": {
+      "description": "在新标签抽屉中进行严格拦截并提供轻量活动查看。",
+      "eyebrow": "扩展工具",
+      "subtitle": "在新标签抽屉中进行严格拦截并提供轻量活动查看。",
+      "tabs": {
+        "sites": "网站",
+        "activity": "活动"
+      },
+      "summary": {
+        "activeRules": "{{count}} 条生效规则",
+        "accessReady": "全站访问已就绪",
+        "needsAccess": "需要全站访问"
+      },
+      "sections": {
+        "protection": "保护",
+        "rules": "规则",
+        "presets": "预设",
+        "backup": "备份",
+        "activity": "活动",
+        "events": "事件",
+        "sessions": "会话"
+      },
+      "errors": {
+        "updateFailed": "无法更新拦截器设置。"
+      },
+      "blocking": {
+        "title": "阻止行为",
+        "description": "将拦截和计时控制放在一起，让拦截器成为专注流程的一部分。",
+        "strictTitle": "严格拦截",
+        "strictDescription": "在匹配网站渲染前将其重定向到阻止页面。",
+        "activationTitle": "启用模式",
+        "activationDescription": "始终阻止网站，或仅在专注时段阻止。",
+        "activationAlways": "始终开启",
+        "activationFocusOnly": "仅在专注时段"
+      },
+      "access": {
+        "title": "站点访问",
+        "granted": "已授予全站访问权限。阻止和浏览活动可在受支持的页面上使用。",
+        "missing": "请授予全站访问权限，以启用严格阻止和浏览活动。",
+        "request": "请求访问",
+        "denied": "未授予全站访问权限。"
+      },
+      "custom": {
+        "title": "自定义域名",
+        "description": "当预设组过于宽泛或没有包含让你分心的网站时，添加你自己的域名。",
+        "placeholder": "添加自定义域名",
+        "add": "添加",
+        "empty": "还没有自定义域名。",
+        "blockedNow": "当前已阻止",
+        "savedInactive": "已保存但未启用",
+        "disable": "停用",
+        "enable": "启用",
+        "remove": "移除",
+        "invalid": "请输入 example.com 这样的有效域名",
+        "added": "{{pattern}} 已被阻止。"
+      },
+      "presets": {
+        "title": "精选网站",
+        "description": "来自现有 Meelio 目录的预设分组。",
+        "heading": "热门网站",
+        "copy": "来自现有 Meelio 目录的精选预设。",
+        "groupBlocked": "{{blocked}} / {{total}} 已阻止",
+        "blockAll": "全部阻止",
+        "unblockAll": "全部解除",
+        "blocked": "已阻止",
+        "block": "阻止",
+        "categories": {
+          "entertainment": "娱乐",
+          "social": "社交",
+          "games": "游戏",
+          "creativity": "创作",
+          "education": "教育",
+          "healthFitness": "健康与健身",
+          "information": "资讯",
+          "productivityFinance": "效率与财务",
+          "shoppingFood": "购物与美食",
+          "travel": "旅行"
+        }
+      },
+      "backup": {
+        "title": "本地备份",
+        "description": "在此设备上导出或导入阻止规则和活动数据。",
+        "export": "导出数据",
+        "import": "导入数据",
+        "importSuccess": "已导入拦截数据。",
+        "importFailed": "无法导入拦截数据。"
+      },
+      "activity": {
+        "topSitesTitle": "热门网站",
+        "topSitesDescription": "最近 7 天的浏览时长、访问次数和阻止次数。",
+        "topSitesSummary": "{{visits}} 次访问 · {{blocked}} 次阻止",
+        "topSitesEmpty": "还没有浏览活动。",
+        "eventsTitle": "最近事件",
+        "eventsDescription": "阻止尝试、绕过和权限变化。",
+        "eventsEmpty": "还没有阻止事件。",
+        "sessionsTitle": "最近会话",
+        "sessionsDescription": "跟踪器记录的最新浏览会话。",
+        "sessionsEmpty": "还没有记录任何会话。",
+        "events": {
+          "blocked": "{{pattern}} 已被阻止",
+          "bypassStarted": "{{pattern}} 已开始绕过",
+          "bypassEnded": "{{pattern}} 的绕过已结束",
+          "permissionDenied": "全站访问被拒绝"
+        }
+      },
+      "bootstrap": "正在同步拦截器状态..."
+    },
+    "blockedPage": {
+      "genericPattern": "该网站",
+      "eyebrow": "扩展工具",
+      "title": "此网站已被阻止",
+      "genericDescription": "当前页面已被阻止，因为它匹配了你的一条 Meelio 专注规则。",
+      "patternDescription": "{{pattern}} 当前已被阻止，因为它匹配了你的一条 Meelio 专注规则。",
+      "ruleLabel": "规则",
+      "genericRuleValue": "生效规则",
+      "modeLabel": "模式",
+      "modeValue": "严格拦截",
+      "bypassTitle": "临时绕过",
+      "bypassDescription": "绕过仅在本地生效并会自动过期，因此你无需完全禁用规则也能继续访问。",
+      "navigationTitle": "导航",
+      "navigationDescription": "返回、打开 Meelio 设置，或先开启限时绕过后继续。",
+      "footerNote": "如果你确实需要继续，请使用限时绕过，或返回 Meelio 修改规则。",
+      "continue": "继续访问网站",
+      "bypassEnabled": "已启用 {{minutes}} 分钟绕过。",
+      "bypassFailed": "无法启动绕过，请重试。",
+      "bypass15": "绕过 15 分钟",
+      "bypass60": "绕过 60 分钟",
+      "back": "返回",
+      "openSettings": "打开 Meelio 设置"
+    }
   },
   "tab-stash": {
     "title": "标签收纳",

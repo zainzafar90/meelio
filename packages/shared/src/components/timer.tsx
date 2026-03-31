@@ -3,6 +3,7 @@ import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { toast } from "sonner";
 import { useDocumentTitle, useDisclosure } from "../hooks";
+import { useTranslation } from "../i18n";
 import {
   TimerStage,
   TimerEvent,
@@ -79,6 +80,8 @@ const TimerView = ({
   onStatsClick,
   onSettingsClick,
 }: TimerViewProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="relative">
       <div className="max-w-full w-88 sm:w-[440px] lg:w-[540px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
@@ -90,9 +93,9 @@ const TimerView = ({
                 className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                   stage === TimerStage.Focus ? "bg-white/50" : ""
                 }`}
-                title="Focus mode"
+                title={t("timer.controls.focusMode")}
               >
-                <span>Focus</span>
+                <span>{t("timer.controls.focusLabel")}</span>
               </button>
               <button
                 onClick={() => skip(TimerStage.Break)}
@@ -100,9 +103,9 @@ const TimerView = ({
                 className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                   stage === TimerStage.Break ? "bg-white/50" : ""
                 } ${stage === TimerStage.Break ? "opacity-50 cursor-not-allowed" : ""}`}
-                title="Break mode"
+                title={t("timer.controls.breakMode")}
               >
-                <span>Break</span>
+                <span>{t("timer.controls.breakLabel")}</span>
               </button>
             </div>
           </div>
@@ -119,27 +122,27 @@ const TimerView = ({
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={reset}
-                title="Reset"
+                title={t("timer.controls.reset")}
                 role="button"
               >
                 <Icons.resetTimer className="size-4 text-white/90" />
-                <span className="sr-only">Reset</span>
+                <span className="sr-only">{t("timer.controls.resetLabel")}</span>
               </button>
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={onStatsClick}
-                title="View stats"
+                title={t("timer.controls.viewStats")}
                 role="button"
               >
                 <Icons.graph className="size-4 text-white/90" />
-                <span className="sr-only">Stats</span>
+                <span className="sr-only">{t("timer.controls.statsLabel")}</span>
               </button>
 
               <button
                 className="cursor-pointer relative flex h-10 min-w-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
                 onClick={() => running ? pause() : start()}
-                title={running ? "Pause" : "Start"}
+                title={running ? t("common.actions.pause") : t("common.actions.start")}
                 role="button"
               >
                 {running ? (
@@ -148,28 +151,28 @@ const TimerView = ({
                   <Icons.play className="size-4" />
                 )}
                 <span className="ml-2 uppercase text-xs sm:text-sm md:text-base hidden sm:block">
-                  {running ? "Pause" : "Start"}
+                  {running ? t("common.actions.pause") : t("common.actions.start")}
                 </span>
               </button>
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={() => skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}
-                title="Skip to next stage"
+                title={t("timer.controls.skipToNextStage")}
                 role="button"
               >
                 <Icons.forward className="size-4 text-white/90" />
-                <span className="sr-only">Skip stage</span>
+                <span className="sr-only">{t("timer.controls.skipStage")}</span>
               </button>
 
               <button
                 className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
                 onClick={onSettingsClick}
-                title="Settings"
+                title={t("timer.controls.settings")}
                 role="button"
               >
                 <Icons.settings className="size-4 text-white/90" />
-                <span className="sr-only">Settings</span>
+                <span className="sr-only">{t("timer.controls.settings")}</span>
               </button>
             </div>
 
@@ -196,6 +199,7 @@ const useTimerState = (
   timerStore: TimerStoreHook,
   runtime: TimerRuntimeAdapter
 ) => {
+  const { t } = useTranslation();
   const statsModal = useDisclosure();
   const settingsModal = useDisclosure();
 
@@ -269,7 +273,7 @@ const useTimerState = (
           (await runtime.requestNotificationPermission?.()) ?? true;
 
         if (!granted) {
-          toast.error("Notifications permission was denied");
+          toast.error(t("timer.settings.notifications.denied"));
         } else {
           store.toggleNotifications();
         }

@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "Einstellungen gespeichert",
-        "description": "Deine Einstellungen wurden gespeichert."
+        "description": "Deine Einstellungen wurden gespeichert.",
+        "error": "Einstellungen konnten nicht gespeichert werden",
+        "errorDescription": "Versuche es in einem Moment erneut."
+      },
+      "notifications": {
+        "label": "Timer-Benachrichtigungen",
+        "description": "Zeige eine Benachrichtigung, wenn eine Fokus- oder Pausensitzung endet.",
+        "denied": "Die Benachrichtigungsberechtigung wurde nicht erteilt."
+      },
+      "notificationSound": {
+        "label": "Benachrichtigungston",
+        "description": "Spiele zusammen mit Timer-Benachrichtigungen einen kurzen Ton ab."
+      },
+      "soundscapes": {
+        "label": "Ambient-Klangwelten",
+        "description": "Halte Ambient-Klangwelten während deiner Fokuszeit verfügbar."
+      },
+      "soundPicker": {
+        "label": "Benachrichtigungston",
+        "description": "Wähle aus, welcher Ton beim Phasenwechsel abgespielt wird.",
+        "placeholder": "Ton auswählen",
+        "preview": "Ton anhören"
+      },
+      "actions": {
+        "saving": "Wird gespeichert..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "Pausenmodus",
       "reset": "Timer zurücksetzen",
       "startStop": "Timer starten/stoppen",
-      "skipStage": "Zum nächsten Abschnitt springen"
+      "skipStage": "Zum nächsten Abschnitt springen",
+      "focusLabel": "Fokus",
+      "breakLabel": "Pause",
+      "resetLabel": "Zurücksetzen",
+      "viewStats": "Statistiken ansehen",
+      "statsLabel": "Statistiken",
+      "skipToNextStage": "Zur nächsten Phase springen",
+      "settings": "Einstellungen"
+    },
+    "validation": {
+      "invalidNumber": "Gib eine gültige Zahl ein",
+      "min": "Muss mindestens {{count}} sein",
+      "max": "Darf höchstens {{count}} sein"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "Erweiterung herunterladen",
     "upgrade": "Auf Pro upgraden",
     "premium-feature-title": "Premium Seitenblocker",
-    "premium-feature": "Upgrade auf Pro, um unbegrenzt ablenkende Websites zu blockieren und fokussiert zu bleiben."
+    "premium-feature": "Upgrade auf Pro, um unbegrenzt ablenkende Websites zu blockieren und fokussiert zu bleiben.",
+    "invalid-url": "Ungültiges URL-Format",
+    "already-blocked": "Diese Website ist bereits blockiert",
+    "site-added": "Website erfolgreich blockiert",
+    "already-exists": "Website existiert bereits",
+    "add-failed": "Website konnte nicht hinzugefügt werden",
+    "input-placeholder": "Benutzerdefinierte Website-URL eingeben (z. B. example.com)",
+    "add-button": "Hinzufügen",
+    "drawer": {
+      "description": "Strenges Blockieren mit leichter Aktivitätsübersicht im New-Tab-Drawer.",
+      "eyebrow": "Erweiterungstools",
+      "subtitle": "Strenges Blockieren mit leichter Aktivitätsübersicht im New-Tab-Drawer.",
+      "tabs": {
+        "sites": "Websites",
+        "activity": "Aktivität"
+      },
+      "summary": {
+        "activeRules": "{{count}} aktive Regeln",
+        "accessReady": "Zugriff auf alle Websites aktiv",
+        "needsAccess": "Zugriff auf alle Websites erforderlich"
+      },
+      "sections": {
+        "protection": "Schutz",
+        "rules": "Regeln",
+        "presets": "Voreinstellungen",
+        "backup": "Sicherung",
+        "activity": "Aktivität",
+        "events": "Ereignisse",
+        "sessions": "Sitzungen"
+      },
+      "errors": {
+        "updateFailed": "Blocker-Einstellungen konnten nicht aktualisiert werden."
+      },
+      "blocking": {
+        "title": "Blockierverhalten",
+        "description": "Halte Durchsetzung und Zeitsteuerung zusammen, damit sich der Blocker wie Teil des Fokusflusses anfühlt.",
+        "strictTitle": "Strenger Blocker",
+        "strictDescription": "Leitet passende Websites zur Blockierungsseite um, bevor sie gerendert werden.",
+        "activationTitle": "Aktivierungsmodus",
+        "activationDescription": "Blockiere Websites immer oder nur während Fokus-Sitzungen.",
+        "activationAlways": "Immer aktiv",
+        "activationFocusOnly": "Nur Fokus-Sitzungen"
+      },
+      "access": {
+        "title": "Website-Zugriff",
+        "granted": "Der Zugriff auf alle Websites wurde erteilt. Blockierung und Surfaktivität sind auf unterstützten Seiten verfügbar.",
+        "missing": "Gewähre Zugriff auf alle Websites, um harte Blockierung und Surfaktivität zu aktivieren.",
+        "request": "Zugriff anfordern",
+        "denied": "Der Zugriff auf alle Websites wurde nicht erteilt."
+      },
+      "custom": {
+        "title": "Benutzerdefinierte Domains",
+        "description": "Füge eigene Domains hinzu, wenn Voreinstellungsgruppen zu breit sind oder deine Ablenkungen nicht enthalten.",
+        "placeholder": "Benutzerdefinierte Domain hinzufügen",
+        "add": "Hinzufügen",
+        "empty": "Noch keine benutzerdefinierten Domains hinzugefügt.",
+        "blockedNow": "Jetzt blockiert",
+        "savedInactive": "Gespeichert, aber inaktiv",
+        "disable": "Deaktivieren",
+        "enable": "Aktivieren",
+        "remove": "Entfernen",
+        "invalid": "Gib eine gültige Domain wie example.com ein",
+        "added": "{{pattern}} wird jetzt blockiert."
+      },
+      "presets": {
+        "title": "Kuratierte Websites",
+        "description": "Voreinstellungsgruppen aus dem bestehenden Meelio-Katalog.",
+        "heading": "Beliebte Websites",
+        "copy": "Kuratierte Voreinstellungen aus dem bestehenden Meelio-Katalog.",
+        "groupBlocked": "{{blocked}} / {{total}} blockiert",
+        "blockAll": "Alle blockieren",
+        "unblockAll": "Alle freigeben",
+        "blocked": "Blockiert",
+        "block": "Blockieren",
+        "categories": {
+          "entertainment": "Unterhaltung",
+          "social": "Soziale Netzwerke",
+          "games": "Spiele",
+          "creativity": "Kreativität",
+          "education": "Bildung",
+          "healthFitness": "Gesundheit & Fitness",
+          "information": "Informationen",
+          "productivityFinance": "Produktivität & Finanzen",
+          "shoppingFood": "Einkaufen & Essen",
+          "travel": "Reisen"
+        }
+      },
+      "backup": {
+        "title": "Lokale Sicherung",
+        "description": "Exportiere oder importiere Blocker-Regeln und Aktivitätsdaten auf diesem Gerät.",
+        "export": "Daten exportieren",
+        "import": "Daten importieren",
+        "importSuccess": "Blocker-Daten importiert.",
+        "importFailed": "Blocker-Daten konnten nicht importiert werden."
+      },
+      "activity": {
+        "topSitesTitle": "Top-Websites",
+        "topSitesDescription": "Die letzten 7 Tage Surfzeit, Besuche und Blockierungsversuche.",
+        "topSitesSummary": "{{visits}} Besuche · {{blocked}} blockiert",
+        "topSitesEmpty": "Noch keine Surfaktivität.",
+        "eventsTitle": "Kürzliche Ereignisse",
+        "eventsDescription": "Blockierungsversuche, Umgehungen und Berechtigungsänderungen.",
+        "eventsEmpty": "Noch keine Blocker-Ereignisse.",
+        "sessionsTitle": "Kürzliche Sitzungen",
+        "sessionsDescription": "Die neuesten vom Tracker erfassten Surf-Sitzungen.",
+        "sessionsEmpty": "Noch keine Sitzungen erfasst.",
+        "events": {
+          "blocked": "{{pattern}} wurde blockiert",
+          "bypassStarted": "Umgehung für {{pattern}} gestartet",
+          "bypassEnded": "Umgehung für {{pattern}} beendet",
+          "permissionDenied": "Zugriff auf alle Websites wurde verweigert"
+        }
+      },
+      "bootstrap": "Blocker-Status wird synchronisiert..."
+    },
+    "blockedPage": {
+      "genericPattern": "diese Website",
+      "eyebrow": "Erweiterungstools",
+      "title": "Diese Website ist blockiert",
+      "genericDescription": "Diese Seite ist derzeit blockiert, weil sie einer deiner aktiven Meelio-Fokusregeln entspricht.",
+      "patternDescription": "{{pattern}} ist derzeit blockiert, weil es einer deiner aktiven Meelio-Fokusregeln entspricht.",
+      "ruleLabel": "Regel",
+      "genericRuleValue": "Aktive Regel",
+      "modeLabel": "Modus",
+      "modeValue": "Strenger Blocker",
+      "bypassTitle": "Temporäre Umgehung",
+      "bypassDescription": "Umgehungen bleiben lokal und laufen automatisch ab, damit du fortfahren kannst, ohne die Regel vollständig zu deaktivieren.",
+      "navigationTitle": "Navigation",
+      "navigationDescription": "Gehe zurück, öffne die Meelio-Einstellungen oder fahre nach dem Start einer zeitlich begrenzten Umgehung fort.",
+      "footerNote": "Nutze eine zeitlich begrenzte Umgehung, wenn du bewusst fortfahren musst, oder kehre zu Meelio zurück, um die Regel zu ändern.",
+      "continue": "Weiter zur Website",
+      "bypassEnabled": "Umgehung für {{minutes}} Minuten aktiviert.",
+      "bypassFailed": "Die Umgehung konnte nicht gestartet werden. Versuche es erneut.",
+      "bypass15": "15 Min. umgehen",
+      "bypass60": "60 Min. umgehen",
+      "back": "Zurück",
+      "openSettings": "Meelio-Einstellungen öffnen"
+    }
   },
   "tab-stash": {
     "title": "Tab-Stash",

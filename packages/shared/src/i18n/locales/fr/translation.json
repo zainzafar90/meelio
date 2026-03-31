@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "Paramètres enregistrés",
-        "description": "Vos paramètres ont été enregistrés."
+        "description": "Vos paramètres ont été enregistrés.",
+        "error": "Impossible d’enregistrer les paramètres",
+        "errorDescription": "Réessayez dans un instant."
+      },
+      "notifications": {
+        "label": "Notifications du minuteur",
+        "description": "Afficher une notification quand une session de focus ou de pause se termine.",
+        "denied": "L’autorisation de notification n’a pas été accordée."
+      },
+      "notificationSound": {
+        "label": "Son de notification",
+        "description": "Jouer un court son avec les notifications du minuteur."
+      },
+      "soundscapes": {
+        "label": "Paysages sonores ambiants",
+        "description": "Garder les paysages sonores ambiants disponibles pendant votre focus."
+      },
+      "soundPicker": {
+        "label": "Son de notification",
+        "description": "Choisissez le son joué quand le minuteur change d’étape.",
+        "placeholder": "Sélectionner un son",
+        "preview": "Écouter le son"
+      },
+      "actions": {
+        "saving": "Enregistrement..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "Mode pause",
       "reset": "Réinitialiser le minuteur",
       "startStop": "Démarrer/Arrêter le minuteur",
-      "skipStage": "Passer à l'étape suivante"
+      "skipStage": "Passer à l'étape suivante",
+      "focusLabel": "Focus",
+      "breakLabel": "Pause",
+      "resetLabel": "Réinitialiser",
+      "viewStats": "Voir les stats",
+      "statsLabel": "Stats",
+      "skipToNextStage": "Passer à l’étape suivante",
+      "settings": "Paramètres"
+    },
+    "validation": {
+      "invalidNumber": "Entrez un nombre valide",
+      "min": "Doit être au moins de {{count}}",
+      "max": "Doit être au maximum de {{count}}"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "Obtenir l'extension",
     "upgrade": "Passer à Pro",
     "premium-feature-title": "Bloqueur de sites Premium",
-    "premium-feature": "Passez à Pro pour bloquer un nombre illimité de sites web distrayants et rester concentré."
+    "premium-feature": "Passez à Pro pour bloquer un nombre illimité de sites web distrayants et rester concentré.",
+    "invalid-url": "Format d’URL invalide",
+    "already-blocked": "Ce site est déjà bloqué",
+    "site-added": "Site bloqué avec succès",
+    "already-exists": "Le site existe déjà",
+    "add-failed": "Impossible d’ajouter le site",
+    "input-placeholder": "Saisissez une URL personnalisée (ex. example.com)",
+    "add-button": "Ajouter",
+    "drawer": {
+      "description": "Blocage strict avec un aperçu léger de l’activité dans le panneau du nouvel onglet.",
+      "eyebrow": "Outils de l’extension",
+      "subtitle": "Blocage strict avec un aperçu léger de l’activité dans le panneau du nouvel onglet.",
+      "tabs": {
+        "sites": "Sites",
+        "activity": "Activité"
+      },
+      "summary": {
+        "activeRules": "{{count}} règles actives",
+        "accessReady": "Accès à tous les sites prêt",
+        "needsAccess": "Accès à tous les sites requis"
+      },
+      "sections": {
+        "protection": "Protection",
+        "rules": "Règles",
+        "presets": "Préréglages",
+        "backup": "Sauvegarde",
+        "activity": "Activité",
+        "events": "Événements",
+        "sessions": "Sessions"
+      },
+      "errors": {
+        "updateFailed": "Impossible de mettre à jour les paramètres du bloqueur."
+      },
+      "blocking": {
+        "title": "Comportement de blocage",
+        "description": "Gardez l’application et les contrôles temporels ensemble pour que le bloqueur fasse partie du flux de concentration.",
+        "strictTitle": "Bloqueur strict",
+        "strictDescription": "Redirige les sites correspondants vers la page bloquée avant leur rendu.",
+        "activationTitle": "Mode d’activation",
+        "activationDescription": "Gardez les sites bloqués en permanence, ou seulement pendant les sessions de concentration.",
+        "activationAlways": "Toujours actif",
+        "activationFocusOnly": "Sessions de concentration uniquement"
+      },
+      "access": {
+        "title": "Accès aux sites",
+        "granted": "L’accès à tous les sites est accordé. Le blocage et l’activité de navigation sont disponibles sur les pages prises en charge.",
+        "missing": "Accordez l’accès à tous les sites pour appliquer le blocage strict et l’activité de navigation.",
+        "request": "Demander l’accès",
+        "denied": "L’accès à tous les sites n’a pas été accordé."
+      },
+      "custom": {
+        "title": "Domaines personnalisés",
+        "description": "Ajoutez vos propres domaines lorsque les groupes prédéfinis sont trop larges ou n’incluent pas ce qui vous distrait.",
+        "placeholder": "Ajouter un domaine personnalisé",
+        "add": "Ajouter",
+        "empty": "Aucun domaine personnalisé pour le moment.",
+        "blockedNow": "Bloqué maintenant",
+        "savedInactive": "Enregistré mais inactif",
+        "disable": "Désactiver",
+        "enable": "Activer",
+        "remove": "Supprimer",
+        "invalid": "Saisissez un domaine valide comme example.com",
+        "added": "{{pattern}} est maintenant bloqué."
+      },
+      "presets": {
+        "title": "Sites sélectionnés",
+        "description": "Groupes prédéfinis du catalogue Meelio existant.",
+        "heading": "Sites populaires",
+        "copy": "Préréglages issus du catalogue Meelio existant.",
+        "groupBlocked": "{{blocked}} / {{total}} bloqués",
+        "blockAll": "Tout bloquer",
+        "unblockAll": "Tout débloquer",
+        "blocked": "Bloqué",
+        "block": "Bloquer",
+        "categories": {
+          "entertainment": "Divertissement",
+          "social": "Social",
+          "games": "Jeux",
+          "creativity": "Créativité",
+          "education": "Éducation",
+          "healthFitness": "Santé et fitness",
+          "information": "Informations",
+          "productivityFinance": "Productivité et finance",
+          "shoppingFood": "Achats et nourriture",
+          "travel": "Voyage"
+        }
+      },
+      "backup": {
+        "title": "Sauvegarde locale",
+        "description": "Exportez ou importez les règles du bloqueur et les données d’activité sur cet appareil.",
+        "export": "Exporter les données",
+        "import": "Importer les données",
+        "importSuccess": "Données du bloqueur importées.",
+        "importFailed": "Impossible d’importer les données du bloqueur."
+      },
+      "activity": {
+        "topSitesTitle": "Principaux sites",
+        "topSitesDescription": "Les 7 derniers jours de temps de navigation, de visites et de tentatives bloquées.",
+        "topSitesSummary": "{{visits}} visites · {{blocked}} bloqués",
+        "topSitesEmpty": "Aucune activité de navigation pour le moment.",
+        "eventsTitle": "Événements récents",
+        "eventsDescription": "Tentatives bloquées, contournements et changements d’autorisation.",
+        "eventsEmpty": "Aucun événement du bloqueur pour le moment.",
+        "sessionsTitle": "Sessions récentes",
+        "sessionsDescription": "Les dernières sessions de navigation capturées par le suivi.",
+        "sessionsEmpty": "Aucune session suivie pour le moment.",
+        "events": {
+          "blocked": "{{pattern}} a été bloqué",
+          "bypassStarted": "Contournement lancé pour {{pattern}}",
+          "bypassEnded": "Contournement terminé pour {{pattern}}",
+          "permissionDenied": "L’accès à tous les sites a été refusé"
+        }
+      },
+      "bootstrap": "Synchronisation de l’état du bloqueur..."
+    },
+    "blockedPage": {
+      "genericPattern": "ce site",
+      "eyebrow": "Outils de l’extension",
+      "title": "Ce site est bloqué",
+      "genericDescription": "Cette page est actuellement bloquée car elle correspond à l’une de vos règles de concentration actives dans Meelio.",
+      "patternDescription": "{{pattern}} est actuellement bloqué car il correspond à l’une de vos règles de concentration actives dans Meelio.",
+      "ruleLabel": "Règle",
+      "genericRuleValue": "Règle active",
+      "modeLabel": "Mode",
+      "modeValue": "Bloqueur strict",
+      "bypassTitle": "Contournement temporaire",
+      "bypassDescription": "Les contournements restent locaux et expirent automatiquement, afin que vous puissiez continuer sans désactiver entièrement la règle.",
+      "navigationTitle": "Navigation",
+      "navigationDescription": "Revenez en arrière, ouvrez les paramètres de Meelio ou continuez après avoir lancé un contournement limité dans le temps.",
+      "footerNote": "Utilisez un contournement limité dans le temps si vous devez continuer volontairement, ou revenez à Meelio pour modifier la règle.",
+      "continue": "Continuer vers le site",
+      "bypassEnabled": "Contournement activé pour {{minutes}} minutes.",
+      "bypassFailed": "Impossible de lancer le contournement. Réessayez.",
+      "bypass15": "Contourner 15 min",
+      "bypass60": "Contourner 60 min",
+      "back": "Retour",
+      "openSettings": "Ouvrir les paramètres Meelio"
+    }
   },
   "tab-stash": {
     "title": "Rangement d'onglets",

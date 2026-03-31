@@ -3,6 +3,7 @@ import { Ban, Plus } from "lucide-react";
 import type { Site } from "../data/site-list";
 import { FallbackSiteIcon } from "./fallback-site-icon";
 import { cn } from "@repo/ui/lib/utils";
+import { useTranslation } from "../../../../i18n";
 
 interface SiteItemProps {
   site: Site;
@@ -17,6 +18,7 @@ export function SiteItem({
   onToggle,
   disabled = false,
 }: SiteItemProps) {
+  const { t } = useTranslation();
   const iconAccent = site.icon ? `#${site.icon.hex}` : "#71717a";
 
   return (
@@ -85,12 +87,12 @@ export function SiteItem({
           {isBlocked ? (
             <>
               <Ban className="h-3.5 w-3.5" />
-              Blocked
+              {t("site-blocker.drawer.presets.blocked")}
             </>
           ) : (
             <>
               <Plus className="h-3.5 w-3.5" />
-              Block
+              {t("site-blocker.drawer.presets.block")}
             </>
           )}
         </span>

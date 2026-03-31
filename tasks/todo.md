@@ -238,6 +238,30 @@
 ## Lint Scan Review
 
 - Root command run: `pnpm lint` from the workspace root (`turbo run lint`)
+
+# Localization Audit And Fix
+
+- [x] Audit blocker drawer, blocked page, shared preset UI, and timer surfaces for English-only copy
+- [x] Add missing blocker and timer translation keys across all supported locales
+- [x] Add locale-aware formatting and plain-DOM i18n helpers for `blocked.html`
+- [x] Add locale completeness and hardcoded-copy boundary tests
+- [x] Verify shared, web, and extension builds/tests after the localization pass
+
+## Localization Review
+
+- Branch-introduced localization debt is concentrated in the extension blocker drawer, `blocked.html`, and the shared site preset UI.
+- Surfaced inherited localization debt includes timer controls, timer settings copy, and timer validation messages.
+- This pass keeps the narrow `@repo/shared/i18n` boundary, adds non-React helpers for DOM-only entrypoints, and localizes blocker/timer user-facing copy across all supported locales.
+- Added full blocker/timer locale coverage for `en`, `de`, `es`, `fr`, `pt`, `ru`, `ja`, `zh`, and `ar`, including the extension drawer, blocked page, preset labels, timer controls, timer settings, and validation messages.
+- Added locale guardrails:
+  - `packages/shared/src/i18n/localization-completeness.test.ts`
+  - `packages/shared/src/i18n/localization-boundary.test.ts`
+  - `apps/extension/src/tests/localization-boundary.test.ts`
+- Verification completed:
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
 - Result: failed
 - Hard failure:
   - `@repo/timer-core#lint` exited with ESLint error: `No files matching the pattern "." were found.`

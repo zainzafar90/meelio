@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SiteList, useDockStore } from "@repo/shared";
+import {
+  formatLocalizedDateTime,
+  formatLocalizedDuration,
+  useTranslation,
+} from "@repo/shared/i18n";
 import { cn } from "@repo/ui/lib/utils";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
@@ -50,39 +55,29 @@ const EMPTY_BLOCKER_STATE = createEmptyBlockerState();
 
 type DrawerTab = "sites" | "activity";
 
-const formatDuration = (durationMs: number) => {
-  const totalMinutes = Math.round(durationMs / 60_000);
-  if (totalMinutes < 60) {
-    return `${totalMinutes}m`;
-  }
-
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
-};
-
-const formatTimestamp = (value: string) =>
-  new Date(value).toLocaleString([], {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-const describeEvent = (event: {
+const describeEvent = (
+  t: ReturnType<typeof useTranslation>["t"],
+  event: {
   type: string;
   pattern: string;
   originalUrl?: string;
-}) => {
+}
+) => {
   switch (event.type) {
     case "blocked":
-      return `Blocked ${event.pattern}`;
+      return t("site-blocker.drawer.activity.events.blocked", {
+        pattern: event.pattern,
+      });
     case "bypass_started":
-      return `Started bypass for ${event.pattern}`;
+      return t("site-blocker.drawer.activity.events.bypassStarted", {
+        pattern: event.pattern,
+      });
     case "bypass_ended":
-      return `Bypass expired for ${event.pattern}`;
+      return t("site-blocker.drawer.activity.events.bypassEnded", {
+        pattern: event.pattern,
+      });
     case "permission_denied":
-      return "All-sites permission denied";
+      return t("site-blocker.drawer.activity.events.permissionDenied");
     default:
       return event.pattern;
   }
@@ -127,6 +122,7 @@ const EmptyState = ({ children }: { children: React.ReactNode }) => (
 );
 
 export const ExtensionSiteBlockerSheet = () => {
+  const { t } = useTranslation();
   const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore(
     useShallow((state) => ({
       isSiteBlockerVisible: state.isSiteBlockerVisible,
@@ -169,7 +165,7 @@ export const ExtensionSiteBlockerSheet = () => {
       await task();
     } catch (error) {
       console.error("[meelio] blocker mutation failed", error);
-      toast.error("Unable to update site blocker");
+      toast.error(t("site-blocker.drawer.errors.updateFailed"));
     }
   };
 
@@ -241,13 +237,17 @@ export const ExtensionSiteBlockerSheet = () => {
     runMutation(async () => {
       const normalizedPattern = normalizeSiteHost(siteInput);
       if (!normalizedPattern || !normalizedPattern.includes(".")) {
-        toast.error("Enter a valid domain");
+        toast.error(t("site-blocker.drawer.custom.invalid"));
         return;
       }
 
       await enableRule(normalizedPattern, "custom");
       setSiteInput("");
-      toast.success(`${normalizedPattern} added to your block list`);
+      toast.success(
+        t("site-blocker.drawer.custom.added", {
+          pattern: normalizedPattern,
+        })
+      );
     });
 
   const handleRemoveCustomSite = (ruleId: string) =>
@@ -295,10 +295,10 @@ export const ExtensionSiteBlockerSheet = () => {
           snapshot,
         },
       });
-      toast.success("Imported blocker data");
+      toast.success(t("site-blocker.drawer.backup.importSuccess"));
     } catch (error) {
       console.error("[meelio] failed to import blocker data", error);
-      toast.error("Import failed");
+      toast.error(t("site-blocker.drawer.backup.importFailed"));
     } finally {
       event.target.value = "";
     }
@@ -312,10 +312,8 @@ export const ExtensionSiteBlockerSheet = () => {
       >
         <VisuallyHidden>
           <SheetHeader>
-            <SheetTitle>Site blocker</SheetTitle>
-            <SheetDescription>
-              Manage strict blocking and browsing activity.
-            </SheetDescription>
+            <SheetTitle>{t("site-blocker.title")}</SheetTitle>
+            <SheetDescription>{t("site-blocker.drawer.description")}</SheetDescription>
           </SheetHeader>
         </VisuallyHidden>
 
@@ -323,14 +321,13 @@ export const ExtensionSiteBlockerSheet = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] uppercase tracking-[0.22em] text-white/35">
-                Extension tools
+                {t("site-blocker.drawer.eyebrow")}
               </p>
               <h2 className="mt-1 text-lg font-semibold text-white">
-                Site blocker
+                {t("site-blocker.title")}
               </h2>
               <p className="mt-1 text-sm text-white/50">
-                Strict blocking with lightweight activity review inside the
-                new-tab drawer.
+                {t("site-blocker.drawer.subtitle")}
               </p>
             </div>
             <div className="inline-flex rounded-full border border-white/10 bg-black/20 p-1">
@@ -343,7 +340,7 @@ export const ExtensionSiteBlockerSheet = () => {
                     : "text-white/50 hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
-                Sites
+                {t("site-blocker.drawer.tabs.sites")}
               </button>
               <button
                 type="button"
@@ -354,19 +351,21 @@ export const ExtensionSiteBlockerSheet = () => {
                     : "text-white/50 hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
-                Activity
+                {t("site-blocker.drawer.tabs.activity")}
               </button>
             </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
-              {activeRuleCount} active rule{activeRuleCount === 1 ? "" : "s"}
+              {t("site-blocker.drawer.summary.activeRules", {
+                count: activeRuleCount,
+              })}
             </span>
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
               {state.settings.activationMode === "always"
-                ? "Always on"
-                : "Focus sessions only"}
+                ? t("site-blocker.drawer.blocking.activationAlways")
+                : t("site-blocker.drawer.blocking.activationFocusOnly")}
             </span>
             <span
               className={cn(
@@ -377,8 +376,8 @@ export const ExtensionSiteBlockerSheet = () => {
               )}
             >
               {state.settings.permissionGranted
-                ? "All-sites access ready"
-                : "Needs site access"}
+                ? t("site-blocker.drawer.summary.accessReady")
+                : t("site-blocker.drawer.summary.needsAccess")}
             </span>
           </div>
         </div>
@@ -387,19 +386,18 @@ export const ExtensionSiteBlockerSheet = () => {
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="space-y-5">
               <Section
-                eyebrow="Protection"
-                title="Blocking behavior"
-                description="Keep enforcement and timing controls together so the blocker feels like part of the focus flow, not a separate settings page."
+                eyebrow={t("site-blocker.drawer.sections.protection")}
+                title={t("site-blocker.drawer.blocking.title")}
+                description={t("site-blocker.drawer.blocking.description")}
               >
                 <div className="-m-4 divide-y divide-white/10">
                   <div className="flex items-start justify-between gap-4 px-4 py-4">
                     <div className="pr-2">
                       <p className="text-sm font-medium text-white">
-                        Strict blocker
+                        {t("site-blocker.drawer.blocking.strictTitle")}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-white/50">
-                        Redirect matching sites to the blocked page before they
-                        render.
+                        {t("site-blocker.drawer.blocking.strictDescription")}
                       </p>
                     </div>
                     <Switch
@@ -420,11 +418,10 @@ export const ExtensionSiteBlockerSheet = () => {
                       <Clock3 className="mt-0.5 size-4 text-white/45" />
                       <div className="w-full">
                         <p className="text-sm font-medium text-white">
-                          Activation mode
+                          {t("site-blocker.drawer.blocking.activationTitle")}
                         </p>
                         <p className="mt-1 text-sm leading-6 text-white/50">
-                          Keep sites blocked all the time, or only during focus
-                          sessions.
+                          {t("site-blocker.drawer.blocking.activationDescription")}
                         </p>
                         <Select
                           value={state.settings.activationMode}
@@ -445,9 +442,11 @@ export const ExtensionSiteBlockerSheet = () => {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="always">Always on</SelectItem>
+                            <SelectItem value="always">
+                              {t("site-blocker.drawer.blocking.activationAlways")}
+                            </SelectItem>
                             <SelectItem value="focus-only">
-                              Focus sessions only
+                              {t("site-blocker.drawer.blocking.activationFocusOnly")}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -483,12 +482,12 @@ export const ExtensionSiteBlockerSheet = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-white">
-                        Site access
+                        {t("site-blocker.drawer.access.title")}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-white/70">
                         {state.settings.permissionGranted
-                          ? "All-sites access is granted. Blocking and browsing activity are available on supported pages."
-                          : "Grant all-sites access so Meelio can enforce strict blocking and capture browsing activity."}
+                          ? t("site-blocker.drawer.access.granted")
+                          : t("site-blocker.drawer.access.missing")}
                       </p>
                     </div>
                   </div>
@@ -503,21 +502,21 @@ export const ExtensionSiteBlockerSheet = () => {
                             type: "blocker/request-host-access",
                           });
                           if (!granted || !result.granted) {
-                            toast.error("Permission request was denied");
+                            toast.error(t("site-blocker.drawer.access.denied"));
                           }
                         });
                       }}
                     >
-                      Request access
+                      {t("site-blocker.drawer.access.request")}
                     </Button>
                   ) : null}
                 </div>
               </section>
 
               <Section
-                eyebrow="Rules"
-                title="Custom domains"
-                description="Add your own domains when the preset groups are too broad or don’t include what distracts you."
+                eyebrow={t("site-blocker.drawer.sections.rules")}
+                title={t("site-blocker.drawer.custom.title")}
+                description={t("site-blocker.drawer.custom.description")}
               >
                 <div className="flex items-center gap-2">
                   <Input
@@ -529,7 +528,7 @@ export const ExtensionSiteBlockerSheet = () => {
                         void handleAddCustomSite();
                       }
                     }}
-                    placeholder="Add a custom domain"
+                    placeholder={t("site-blocker.drawer.custom.placeholder")}
                     className="border-white/10 bg-black/20 text-white placeholder:text-white/35"
                   />
                   <Button
@@ -539,7 +538,7 @@ export const ExtensionSiteBlockerSheet = () => {
                       void handleAddCustomSite();
                     }}
                   >
-                    Add
+                    {t("site-blocker.drawer.custom.add")}
                   </Button>
                 </div>
 
@@ -559,7 +558,9 @@ export const ExtensionSiteBlockerSheet = () => {
                               {rule.pattern}
                             </p>
                             <p className="mt-1 text-xs text-white/45">
-                              {rule.enabled ? "Blocked now" : "Saved but inactive"}
+                              {rule.enabled
+                                ? t("site-blocker.drawer.custom.blockedNow")
+                                : t("site-blocker.drawer.custom.savedInactive")}
                             </p>
                           </div>
                           <div className="flex shrink-0 items-center gap-2">
@@ -574,30 +575,32 @@ export const ExtensionSiteBlockerSheet = () => {
                                   });
                                 });
                               }}
-                            >
-                              {rule.enabled ? "Disable" : "Enable"}
+                              >
+                              {rule.enabled
+                                ? t("site-blocker.drawer.custom.disable")
+                                : t("site-blocker.drawer.custom.enable")}
                             </Button>
                             <Button
                               variant="outline"
                               className="border-white/10 bg-transparent text-white/60 hover:bg-white/[0.04] hover:text-white"
                               onClick={() => handleRemoveCustomSite(rule.id)}
                             >
-                              Remove
+                              {t("site-blocker.drawer.custom.remove")}
                             </Button>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <EmptyState>No custom domains added yet.</EmptyState>
+                    <EmptyState>{t("site-blocker.drawer.custom.empty")}</EmptyState>
                   )}
                 </div>
               </Section>
 
               <Section
-                eyebrow="Presets"
-                title="Popular site groups"
-                description="Use Meelio’s curated categories when you want a broader blocklist without managing every domain individually."
+                eyebrow={t("site-blocker.drawer.sections.presets")}
+                title={t("site-blocker.drawer.presets.title")}
+                description={t("site-blocker.drawer.presets.description")}
               >
                 <SiteList
                   showHeading={false}
@@ -621,9 +624,9 @@ export const ExtensionSiteBlockerSheet = () => {
               </Section>
 
               <Section
-                eyebrow="Backup"
-                title="Import or export"
-                description="Keep a local copy of your blocker state, events, and activity when you want to move devices or checkpoint your setup."
+                eyebrow={t("site-blocker.drawer.sections.backup")}
+                title={t("site-blocker.drawer.backup.title")}
+                description={t("site-blocker.drawer.backup.description")}
               >
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
@@ -634,7 +637,7 @@ export const ExtensionSiteBlockerSheet = () => {
                     }}
                   >
                     <Download className="mr-2 size-4" />
-                    Export data
+                    {t("site-blocker.drawer.backup.export")}
                   </Button>
                   <Button
                     variant="outline"
@@ -642,7 +645,7 @@ export const ExtensionSiteBlockerSheet = () => {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="mr-2 size-4" />
-                    Import data
+                    {t("site-blocker.drawer.backup.import")}
                   </Button>
                   <input
                     ref={fileInputRef}
@@ -661,9 +664,9 @@ export const ExtensionSiteBlockerSheet = () => {
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="space-y-5">
               <Section
-                eyebrow="Activity"
-                title="Top sites in the last 7 days"
-                description="A lightweight summary of where time is going, without charts or habit framing."
+                eyebrow={t("site-blocker.drawer.sections.activity")}
+                title={t("site-blocker.drawer.activity.topSitesTitle")}
+                description={t("site-blocker.drawer.activity.topSitesDescription")}
               >
                 {activity.topSites.length > 0 ? (
                   <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
@@ -683,24 +686,27 @@ export const ExtensionSiteBlockerSheet = () => {
                             </p>
                           </div>
                           <p className="mt-1 text-xs text-white/45">
-                            {site.visits} visits, {site.blockedAttempts} blocked
+                            {t("site-blocker.drawer.activity.topSitesSummary", {
+                              visits: site.visits,
+                              blocked: site.blockedAttempts,
+                            })}
                           </p>
                         </div>
                         <span className="shrink-0 text-sm text-white/65">
-                          {formatDuration(site.totalDurationMs)}
+                          {formatLocalizedDuration(site.totalDurationMs)}
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <EmptyState>No activity recorded yet.</EmptyState>
+                  <EmptyState>{t("site-blocker.drawer.activity.topSitesEmpty")}</EmptyState>
                 )}
               </Section>
 
               <Section
-                eyebrow="Events"
-                title="Recent blocker events"
-                description="A simple timeline of what the blocker changed, denied, or bypassed."
+                eyebrow={t("site-blocker.drawer.sections.events")}
+                title={t("site-blocker.drawer.activity.eventsTitle")}
+                description={t("site-blocker.drawer.activity.eventsDescription")}
               >
                 {activity.recentEvents.length > 0 ? (
                   <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
@@ -711,25 +717,25 @@ export const ExtensionSiteBlockerSheet = () => {
                           "px-3 py-3",
                           index > 0 && "border-t border-white/10"
                         )}
-                      >
-                        <p className="text-sm font-medium text-white/90">
-                          {describeEvent(event)}
-                        </p>
-                        <p className="mt-1 text-xs text-white/45">
-                          {formatTimestamp(event.occurredAt)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                        >
+                          <p className="text-sm font-medium text-white/90">
+                            {describeEvent(t, event)}
+                          </p>
+                          <p className="mt-1 text-xs text-white/45">
+                            {formatLocalizedDateTime(event.occurredAt)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                 ) : (
-                  <EmptyState>No blocker events yet.</EmptyState>
+                  <EmptyState>{t("site-blocker.drawer.activity.eventsEmpty")}</EmptyState>
                 )}
               </Section>
 
               <Section
-                eyebrow="Sessions"
-                title="Recent tracked sessions"
-                description="Recent browsing sessions captured by the extension while the blocker is active."
+                eyebrow={t("site-blocker.drawer.sections.sessions")}
+                title={t("site-blocker.drawer.activity.sessionsTitle")}
+                description={t("site-blocker.drawer.activity.sessionsDescription")}
               >
                 {activity.recentSessions.length > 0 ? (
                   <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
@@ -746,17 +752,17 @@ export const ExtensionSiteBlockerSheet = () => {
                             {session.host}
                           </p>
                           <span className="shrink-0 text-xs text-white/45">
-                            {formatDuration(session.durationMs)}
+                            {formatLocalizedDuration(session.durationMs)}
                           </span>
                         </div>
                         <p className="mt-1 text-xs text-white/45">
-                          {formatTimestamp(session.endedAt)}
+                          {formatLocalizedDateTime(session.endedAt)}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <EmptyState>No tracked sessions yet.</EmptyState>
+                  <EmptyState>{t("site-blocker.drawer.activity.sessionsEmpty")}</EmptyState>
                 )}
               </Section>
             </div>
@@ -765,7 +771,7 @@ export const ExtensionSiteBlockerSheet = () => {
 
         {isBootstrapping ? (
           <div className="border-t border-white/10 px-6 py-3 text-sm text-white/40">
-            Syncing blocker state...
+            {t("site-blocker.drawer.bootstrap")}
           </div>
         ) : null}
       </SheetContent>

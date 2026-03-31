@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "Configurações salvas",
-        "description": "Suas configurações foram salvas."
+        "description": "Suas configurações foram salvas.",
+        "error": "Não foi possível salvar as configurações",
+        "errorDescription": "Tente novamente em instantes."
+      },
+      "notifications": {
+        "label": "Notificações do timer",
+        "description": "Mostre uma notificação quando uma sessão de foco ou pausa terminar.",
+        "denied": "A permissão de notificações não foi concedida."
+      },
+      "notificationSound": {
+        "label": "Som de notificação",
+        "description": "Reproduza um som curto junto com as notificações do timer."
+      },
+      "soundscapes": {
+        "label": "Paisagens sonoras ambiente",
+        "description": "Mantenha paisagens sonoras ambiente disponíveis enquanto você se concentra."
+      },
+      "soundPicker": {
+        "label": "Som de notificação",
+        "description": "Escolha qual som toca quando o timer muda de etapa.",
+        "placeholder": "Selecione um som",
+        "preview": "Ouvir som"
+      },
+      "actions": {
+        "saving": "Salvando..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "Modo pausa",
       "reset": "Redefinir timer",
       "startStop": "Iniciar/Parar timer",
-      "skipStage": "Pular para próxima etapa"
+      "skipStage": "Pular para próxima etapa",
+      "focusLabel": "Foco",
+      "breakLabel": "Pausa",
+      "resetLabel": "Redefinir",
+      "viewStats": "Ver estatísticas",
+      "statsLabel": "Estatísticas",
+      "skipToNextStage": "Pular para a próxima etapa",
+      "settings": "Configurações"
+    },
+    "validation": {
+      "invalidNumber": "Digite um número válido",
+      "min": "Deve ser pelo menos {{count}}",
+      "max": "Deve ser no máximo {{count}}"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "Obter a Extensão",
     "upgrade": "Atualizar para Pro",
     "premium-feature-title": "Bloqueador de Sites Premium",
-    "premium-feature": "Atualize para Pro para bloquear sites que distraem ilimitadamente e manter o foco."
+    "premium-feature": "Atualize para Pro para bloquear sites que distraem ilimitadamente e manter o foco.",
+    "invalid-url": "Formato de URL inválido",
+    "already-blocked": "Este site já está bloqueado",
+    "site-added": "Site bloqueado com sucesso",
+    "already-exists": "O site já existe",
+    "add-failed": "Não foi possível adicionar o site",
+    "input-placeholder": "Digite a URL de um site personalizado (ex.: example.com)",
+    "add-button": "Adicionar",
+    "drawer": {
+      "description": "Bloqueio rígido com revisão leve de atividade dentro da gaveta da nova guia.",
+      "eyebrow": "Ferramentas da extensão",
+      "subtitle": "Bloqueio rígido com revisão leve de atividade dentro da gaveta da nova guia.",
+      "tabs": {
+        "sites": "Sites",
+        "activity": "Atividade"
+      },
+      "summary": {
+        "activeRules": "{{count}} regras ativas",
+        "accessReady": "Acesso a todos os sites pronto",
+        "needsAccess": "Acesso a todos os sites necessário"
+      },
+      "sections": {
+        "protection": "Proteção",
+        "rules": "Regras",
+        "presets": "Predefinições",
+        "backup": "Backup",
+        "activity": "Atividade",
+        "events": "Eventos",
+        "sessions": "Sessões"
+      },
+      "errors": {
+        "updateFailed": "Não foi possível atualizar as configurações do bloqueador."
+      },
+      "blocking": {
+        "title": "Comportamento de bloqueio",
+        "description": "Mantenha a aplicação e os controles de tempo juntos para que o bloqueador pareça parte do fluxo de foco.",
+        "strictTitle": "Bloqueador rígido",
+        "strictDescription": "Redireciona sites correspondentes para a página bloqueada antes de serem renderizados.",
+        "activationTitle": "Modo de ativação",
+        "activationDescription": "Mantenha os sites bloqueados o tempo todo ou apenas durante sessões de foco.",
+        "activationAlways": "Sempre ativo",
+        "activationFocusOnly": "Apenas sessões de foco"
+      },
+      "access": {
+        "title": "Acesso ao site",
+        "granted": "O acesso a todos os sites foi concedido. O bloqueio e a atividade de navegação estão disponíveis nas páginas compatíveis.",
+        "missing": "Conceda acesso a todos os sites para aplicar bloqueio rígido e atividade de navegação.",
+        "request": "Solicitar acesso",
+        "denied": "O acesso a todos os sites não foi concedido."
+      },
+      "custom": {
+        "title": "Domínios personalizados",
+        "description": "Adicione seus próprios domínios quando os grupos predefinidos forem amplos demais ou não incluírem o que distrai você.",
+        "placeholder": "Adicionar um domínio personalizado",
+        "add": "Adicionar",
+        "empty": "Nenhum domínio personalizado adicionado ainda.",
+        "blockedNow": "Bloqueado agora",
+        "savedInactive": "Salvo, mas inativo",
+        "disable": "Desativar",
+        "enable": "Ativar",
+        "remove": "Remover",
+        "invalid": "Digite um domínio válido como example.com",
+        "added": "{{pattern}} está bloqueado agora."
+      },
+      "presets": {
+        "title": "Sites selecionados",
+        "description": "Grupos predefinidos do catálogo existente do Meelio.",
+        "heading": "Sites populares",
+        "copy": "Predefinições selecionadas do catálogo existente do Meelio.",
+        "groupBlocked": "{{blocked}} / {{total}} bloqueados",
+        "blockAll": "Bloquear tudo",
+        "unblockAll": "Desbloquear tudo",
+        "blocked": "Bloqueado",
+        "block": "Bloquear",
+        "categories": {
+          "entertainment": "Entretenimento",
+          "social": "Social",
+          "games": "Jogos",
+          "creativity": "Criatividade",
+          "education": "Educação",
+          "healthFitness": "Saúde e fitness",
+          "information": "Informação",
+          "productivityFinance": "Produtividade e finanças",
+          "shoppingFood": "Compras e comida",
+          "travel": "Viagem"
+        }
+      },
+      "backup": {
+        "title": "Backup local",
+        "description": "Exporte ou importe regras do bloqueador e dados de atividade neste dispositivo.",
+        "export": "Exportar dados",
+        "import": "Importar dados",
+        "importSuccess": "Dados do bloqueador importados.",
+        "importFailed": "Não foi possível importar os dados do bloqueador."
+      },
+      "activity": {
+        "topSitesTitle": "Principais sites",
+        "topSitesDescription": "Os últimos 7 dias de tempo de navegação, visitas e tentativas bloqueadas.",
+        "topSitesSummary": "{{visits}} visitas · {{blocked}} bloqueados",
+        "topSitesEmpty": "Ainda não há atividade de navegação.",
+        "eventsTitle": "Eventos recentes",
+        "eventsDescription": "Tentativas bloqueadas, desvios e mudanças de permissão.",
+        "eventsEmpty": "Ainda não há eventos do bloqueador.",
+        "sessionsTitle": "Sessões recentes",
+        "sessionsDescription": "As últimas sessões de navegação capturadas pelo rastreador.",
+        "sessionsEmpty": "Ainda não há sessões registradas.",
+        "events": {
+          "blocked": "{{pattern}} foi bloqueado",
+          "bypassStarted": "Desvio iniciado para {{pattern}}",
+          "bypassEnded": "Desvio encerrado para {{pattern}}",
+          "permissionDenied": "O acesso a todos os sites foi negado"
+        }
+      },
+      "bootstrap": "Sincronizando o estado do bloqueador..."
+    },
+    "blockedPage": {
+      "genericPattern": "este site",
+      "eyebrow": "Ferramentas da extensão",
+      "title": "Este site está bloqueado",
+      "genericDescription": "Esta página está bloqueada no momento porque corresponde a uma das suas regras de foco ativas do Meelio.",
+      "patternDescription": "{{pattern}} está bloqueado no momento porque corresponde a uma das suas regras de foco ativas do Meelio.",
+      "ruleLabel": "Regra",
+      "genericRuleValue": "Regra ativa",
+      "modeLabel": "Modo",
+      "modeValue": "Bloqueador rígido",
+      "bypassTitle": "Desvio temporário",
+      "bypassDescription": "Os desvios permanecem locais e expiram automaticamente, para que você possa continuar sem desativar totalmente a regra.",
+      "navigationTitle": "Navegação",
+      "navigationDescription": "Volte, abra as configurações do Meelio ou continue após iniciar um desvio temporário.",
+      "footerNote": "Use um desvio temporário se precisar continuar intencionalmente, ou volte ao Meelio para mudar a regra.",
+      "continue": "Continuar para o site",
+      "bypassEnabled": "Desvio ativado por {{minutes}} minutos.",
+      "bypassFailed": "Não foi possível iniciar o desvio. Tente novamente.",
+      "bypass15": "Desviar 15 min",
+      "bypass60": "Desviar 60 min",
+      "back": "Voltar",
+      "openSettings": "Abrir configurações do Meelio"
+    }
   },
   "tab-stash": {
     "title": "Guardar Abas",

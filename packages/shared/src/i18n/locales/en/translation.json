@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "Settings saved",
-        "description": "Your settings have been saved."
+        "description": "Your settings have been saved.",
+        "error": "Could not save settings",
+        "errorDescription": "Try again in a moment."
+      },
+      "notifications": {
+        "label": "Timer notifications",
+        "description": "Show a notification when a focus or break session ends.",
+        "denied": "Notification permission was not granted."
+      },
+      "notificationSound": {
+        "label": "Notification sound",
+        "description": "Play a short sound together with timer notifications."
+      },
+      "soundscapes": {
+        "label": "Ambient soundscapes",
+        "description": "Keep ambient soundscapes available while you focus."
+      },
+      "soundPicker": {
+        "label": "Notification sound",
+        "description": "Choose which sound plays when the timer changes stages.",
+        "placeholder": "Select a sound",
+        "preview": "Preview sound"
+      },
+      "actions": {
+        "saving": "Saving..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "Break mode",
       "reset": "Reset timer",
       "startStop": "Start/Stop timer",
-      "skipStage": "Skip to next stage"
+      "skipStage": "Skip to next stage",
+      "focusLabel": "Focus",
+      "breakLabel": "Break",
+      "resetLabel": "Reset",
+      "viewStats": "View stats",
+      "statsLabel": "Stats",
+      "skipToNextStage": "Skip to next stage",
+      "settings": "Settings"
+    },
+    "validation": {
+      "invalidNumber": "Enter a valid number",
+      "min": "Must be at least {{count}}",
+      "max": "Must be at most {{count}}"
     }
   },
   "settings": {
@@ -486,7 +522,144 @@
     "get-extension": "Get the Extension",
     "upgrade": "Upgrade to Pro",
     "premium-feature-title": "Premium Site Blocker",
-    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused."
+    "premium-feature": "Upgrade to Pro to block unlimited distracting websites and stay focused.",
+    "invalid-url": "Invalid URL format",
+    "already-blocked": "Site is already blocked",
+    "site-added": "Site blocked successfully",
+    "already-exists": "Site already exists",
+    "add-failed": "Failed to add site",
+    "input-placeholder": "Enter custom site URL (e.g., example.com)",
+    "add-button": "Add",
+    "drawer": {
+      "description": "Strict blocking with lightweight activity review inside the new-tab drawer.",
+      "eyebrow": "Extension tools",
+      "subtitle": "Strict blocking with lightweight activity review inside the new-tab drawer.",
+      "tabs": {
+        "sites": "Sites",
+        "activity": "Activity"
+      },
+      "summary": {
+        "activeRules": "{{count}} active rules",
+        "accessReady": "All-sites access ready",
+        "needsAccess": "All-sites access needed"
+      },
+      "sections": {
+        "protection": "Protection",
+        "rules": "Rules",
+        "presets": "Presets",
+        "backup": "Backup",
+        "activity": "Activity",
+        "events": "Events",
+        "sessions": "Sessions"
+      },
+      "errors": {
+        "updateFailed": "Could not update blocker settings."
+      },
+      "blocking": {
+        "title": "Blocking behavior",
+        "description": "Keep enforcement and timing controls together so the blocker feels like part of the focus flow.",
+        "strictTitle": "Strict blocker",
+        "strictDescription": "Redirect matching sites to the blocked page before they render.",
+        "activationTitle": "Activation mode",
+        "activationDescription": "Keep sites blocked all the time, or only during focus sessions.",
+        "activationAlways": "Always on",
+        "activationFocusOnly": "Focus sessions only"
+      },
+      "access": {
+        "title": "Site access",
+        "granted": "All-sites access is granted. Blocking and browsing activity are available on supported pages.",
+        "missing": "Grant all-sites access to enforce hard blocking and browsing activity.",
+        "request": "Request access",
+        "denied": "All-sites access was not granted."
+      },
+      "custom": {
+        "title": "Custom domains",
+        "description": "Add your own domains when preset groups are too broad or do not include what distracts you.",
+        "placeholder": "Add a custom domain",
+        "add": "Add",
+        "empty": "No custom domains added yet.",
+        "blockedNow": "Blocked now",
+        "savedInactive": "Saved but inactive",
+        "disable": "Disable",
+        "enable": "Enable",
+        "remove": "Remove",
+        "invalid": "Enter a valid domain like example.com",
+        "added": "{{pattern}} is now blocked."
+      },
+      "presets": {
+        "title": "Curated sites",
+        "description": "Preset groups from the existing Meelio catalog.",
+        "heading": "Popular sites",
+        "copy": "Curated presets from the existing Meelio catalog.",
+        "groupBlocked": "{{blocked}} / {{total}} blocked",
+        "blockAll": "Block all",
+        "unblockAll": "Unblock all",
+        "blocked": "Blocked",
+        "block": "Block",
+        "categories": {
+          "entertainment": "Entertainment",
+          "social": "Social",
+          "games": "Games",
+          "creativity": "Creativity",
+          "education": "Education",
+          "healthFitness": "Health & Fitness",
+          "information": "Information",
+          "productivityFinance": "Productivity & Finance",
+          "shoppingFood": "Shopping & Food",
+          "travel": "Travel"
+        }
+      },
+      "backup": {
+        "title": "Local backup",
+        "description": "Export or import blocker rules and activity data on this device.",
+        "export": "Export data",
+        "import": "Import data",
+        "importSuccess": "Blocker data imported.",
+        "importFailed": "Could not import blocker data."
+      },
+      "activity": {
+        "topSitesTitle": "Top sites",
+        "topSitesDescription": "The last 7 days of browsing time, visits, and blocked attempts.",
+        "topSitesSummary": "{{visits}} visits · {{blocked}} blocked",
+        "topSitesEmpty": "No browsing activity yet.",
+        "eventsTitle": "Recent events",
+        "eventsDescription": "Blocked attempts, bypasses, and permission changes.",
+        "eventsEmpty": "No blocker events yet.",
+        "sessionsTitle": "Recent sessions",
+        "sessionsDescription": "The latest browsing sessions captured by the tracker.",
+        "sessionsEmpty": "No sessions tracked yet.",
+        "events": {
+          "blocked": "{{pattern}} was blocked",
+          "bypassStarted": "Bypass started for {{pattern}}",
+          "bypassEnded": "Bypass ended for {{pattern}}",
+          "permissionDenied": "All-sites access was denied"
+        }
+      },
+      "bootstrap": "Syncing blocker state..."
+    },
+    "blockedPage": {
+      "genericPattern": "this site",
+      "eyebrow": "Extension tools",
+      "title": "This site is blocked",
+      "genericDescription": "This page is currently blocked because it matches one of your active Meelio focus rules.",
+      "patternDescription": "{{pattern}} is currently blocked because it matches one of your active Meelio focus rules.",
+      "ruleLabel": "Rule",
+      "genericRuleValue": "Active rule",
+      "modeLabel": "Mode",
+      "modeValue": "Strict blocker",
+      "bypassTitle": "Temporary bypass",
+      "bypassDescription": "Bypasses stay local and expire automatically, so you can continue without disabling the rule entirely.",
+      "navigationTitle": "Navigation",
+      "navigationDescription": "Go back, open Meelio settings, or continue after starting a timed bypass.",
+      "footerNote": "Use a timed bypass if you need to continue intentionally, or return to Meelio to change the rule.",
+      "continue": "Continue to site",
+      "bypassEnabled": "Bypass enabled for {{minutes}} minutes.",
+      "bypassFailed": "Could not start the bypass. Try again.",
+      "bypass15": "Bypass 15 min",
+      "bypass60": "Bypass 60 min",
+      "back": "Back",
+      "openSettings": "Open Meelio settings"
+    }
   },
   "tab-stash": {
     "title": "Tab Stash",

@@ -4,7 +4,6 @@ import { Volume2 } from "lucide-react";
 import { Input } from "@repo/ui/components/ui/input";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { Controller, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 import {
@@ -21,16 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui/components/ui/select";
+import { useTranslation } from "../i18n";
 
 import { pomodoroSounds } from "../data/sounds-data";
 import { soundSyncService } from "../services/sound-sync.service";
 
-const timerSettingsSchema = z.object({
-  focusTime: z.number().min(1).max(1440),
-  breakTime: z.number().min(1).max(1440),
-});
-
-type TimerSettingsValues = z.infer<typeof timerSettingsSchema>;
+type TimerSettingsValues = {
+  focusTime: number;
+  breakTime: number;
+};
 
 export interface TimerSettingsDialogProps {
   isOpen: boolean;
@@ -65,6 +63,20 @@ export function TimerSettingsDialog({
   onSave,
 }: TimerSettingsDialogProps) {
   const { t } = useTranslation();
+  const timerSettingsSchema = z.object({
+    focusTime: z
+      .number({
+        invalid_type_error: t("timer.validation.invalidNumber"),
+      })
+      .min(1, t("timer.validation.min", { count: 1 }))
+      .max(1440, t("timer.validation.max", { count: 1440 })),
+    breakTime: z
+      .number({
+        invalid_type_error: t("timer.validation.invalidNumber"),
+      })
+      .min(1, t("timer.validation.min", { count: 1 }))
+      .max(1440, t("timer.validation.max", { count: 1440 })),
+  });
 
   const form = useForm<TimerSettingsValues>({
     resolver: zodResolver(timerSettingsSchema),
@@ -76,8 +88,8 @@ export function TimerSettingsDialog({
 
   const playPreviewSound = async (soundId: string) => {
     try {
-      const sound = pomodoroSounds.find((s) => s.id === soundId);
-      if (!sound) {
+        const sound = pomodoroSounds.find((s) => s.id === soundId);
+        if (!sound) {
         console.error("Sound not found:", soundId);
         return;
       }
@@ -178,9 +190,9 @@ export function TimerSettingsDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Timer Settings</DialogTitle>
+          <DialogTitle>{t("timer.settings.title")}</DialogTitle>
           <DialogDescription>
-            Configure your timer duration, notifications, and sounds.
+            {t("timer.settings.description")}
           </DialogDescription>
         </DialogHeader>
         
@@ -272,8 +284,12 @@ export function TimerSettingsDialog({
               className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
             >
               <div className="space-y-1">
-                <p className="text-sm font-medium">Timer notification</p>
-                <p className="text-sm text-muted-foreground">Show a notification when the timer completes</p>
+                <p className="text-sm font-medium">
+                  {t("timer.settings.notifications.label")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {t("timer.settings.notifications.description")}
+                </p>
               </div>
               <Switch
                 size="sm"
@@ -287,9 +303,11 @@ export function TimerSettingsDialog({
               onClick={handleSoundsToggle}
             >
               <div className="space-y-1">
-                <p className="text-sm font-medium">Timer notification sound</p>
+                <p className="text-sm font-medium">
+                  {t("timer.settings.notificationSound.label")}
+                </p>
                 <p className="text-sm text-muted-foreground">
-                  Play a sound when the timer completes
+                  {t("timer.settings.notificationSound.description")}
                 </p>
               </div>
               <Switch
@@ -305,8 +323,12 @@ export function TimerSettingsDialog({
               className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
             >
               <div className="space-y-1">
-                <p className="text-sm font-medium">Ambient soundscapes</p>
-                <p className="text-sm text-muted-foreground">Automatically play ambient sounds during focus sessions</p>
+                <p className="text-sm font-medium">
+                  {t("timer.settings.soundscapes.label")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {t("timer.settings.soundscapes.description")}
+                </p>
               </div>
               <Switch
                 size="sm"
@@ -319,8 +341,12 @@ export function TimerSettingsDialog({
               className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-muted/50"
             >
               <div className="space-y-1">
-                <p className="text-sm font-medium">Auto Start Breaks</p>
-                <p className="text-sm text-muted-foreground">Automatically start the next stage when one completes</p>
+                <p className="text-sm font-medium">
+                  {t("timer.settings.autoStart.label")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {t("timer.settings.autoStart.description")}
+                </p>
               </div>
               <Switch
                 size="sm"
@@ -332,9 +358,11 @@ export function TimerSettingsDialog({
             {notifications && (
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Timer Sound</p>
+                  <p className="text-sm font-medium">
+                    {t("timer.settings.soundPicker.label")}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Choose the sound to play when timer completes
+                    {t("timer.settings.soundPicker.description")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -343,7 +371,9 @@ export function TimerSettingsDialog({
                     onValueChange={handleSoundChange}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select a sound" />
+                      <SelectValue
+                        placeholder={t("timer.settings.soundPicker.placeholder")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {pomodoroSounds.map((sound) => (
@@ -358,7 +388,7 @@ export function TimerSettingsDialog({
                     variant="outline"
                     size="icon"
                     onClick={() => playPreviewSound(soundId)}
-                    title="Preview sound"
+                    title={t("timer.settings.soundPicker.preview")}
                   >
                     <Volume2 className="h-4 w-4" />
                   </Button>
@@ -372,11 +402,11 @@ export function TimerSettingsDialog({
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t("common.actions.cancel")}
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting
-                  ? "Saving..."
+                  ? t("timer.settings.actions.saving")
                   : t("common.actions.save")}
               </Button>
             </div>
