@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight, Ban, Plus } from "lucide-react";
 import { SiteItem } from "./site-item";
 import { SITE_LIST, SITE_CATEGORIES } from "../data/site-list";
+import { cn } from "@repo/ui/lib/utils";
 
 export interface Site {
   id: string;
@@ -18,6 +19,7 @@ interface SiteListProps {
   onToggleSite: (site: string) => void;
   onBlockSites: (sites: string[]) => void;
   onUnblockSites: (sites: string[]) => void;
+  showHeading?: boolean;
 }
 
 const isGroupBlocked = (categoryKey: string, blockedSites: string[]) => {
@@ -30,6 +32,7 @@ export function SiteList({
   onToggleSite,
   onBlockSites,
   onUnblockSites,
+  showHeading = true,
 }: SiteListProps) {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
@@ -54,28 +57,47 @@ export function SiteList({
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white">Popular Sites</h2>
+    <div className="space-y-3">
+      {showHeading ? (
+        <div className="space-y-1">
+          <h2 className="text-base font-semibold text-white">Curated sites</h2>
+          <p className="text-sm text-white/50">
+            Start with Meelio&apos;s preset categories and expand only what you
+            need.
+          </p>
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         {SITE_CATEGORIES.filter((cat) => cat.isBlocked).map((category) => (
           <div
             key={category.key}
-            className="rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/[0.075]"
+            className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]"
           >
-            <div className="flex w-full items-center justify-between">
+            <div className="flex w-full items-center justify-between px-4 py-3">
               <button
                 onClick={() => toggleCategory(category.key)}
-                className="flex items-center gap-2"
+                className="flex min-w-0 items-center gap-3 text-left"
               >
-                <span className="text-xl">{category.icon}</span>
-                <h3 className="text-sm font-medium text-white/90">
-                  {category.name}
-                </h3>
+                <span className="text-lg">{category.icon}</span>
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-medium text-white/90">
+                    {category.name}
+                  </h3>
+                  <p className="text-xs text-white/45">
+                    {
+                      SITE_LIST[category.key]?.filter((site) =>
+                        blockedSites.includes(site.url)
+                      ).length
+                    }
+                    {" / "}
+                    {SITE_LIST[category.key]?.length ?? 0} blocked
+                  </p>
+                </div>
                 {expandedCategories.includes(category.key) ? (
-                  <ChevronDown className="h-4 w-4 text-white/60" />
+                  <ChevronDown className="h-4 w-4 text-white/45" />
                 ) : (
-                  <ChevronRight className="h-4 w-4 text-white/60" />
+                  <ChevronRight className="h-4 w-4 text-white/45" />
                 )}
               </button>
 
@@ -84,24 +106,29 @@ export function SiteList({
                   e.stopPropagation();
                   toggleGroupBlock(category.key);
                 }}
-                className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60 hover:bg-white/[0.075]"
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  isGroupBlocked(category.key, blockedSites)
+                    ? "border-rose-400/20 bg-rose-400/10 text-rose-100"
+                    : "border-white/10 bg-white/[0.04] text-white/65 hover:text-white"
+                )}
               >
                 {isGroupBlocked(category.key, blockedSites) ? (
                   <>
-                    <Ban className="h-4 w-4 text-red-500" />
-                    <span>Unblock All</span>
+                    <Ban className="h-3.5 w-3.5" />
+                    <span>Unblock all</span>
                   </>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4" />
-                    <span>Block All</span>
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Block all</span>
                   </>
                 )}
               </button>
             </div>
 
             {expandedCategories.includes(category.key) && (
-              <div className="mt-4 space-y-2">
+              <div className="border-t border-white/10 px-2 py-2">
                 {SITE_LIST[category.key]?.map((site) => (
                   <SiteItem
                     key={site.id}

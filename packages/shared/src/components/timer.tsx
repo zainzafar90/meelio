@@ -1,12 +1,13 @@
 import { useEffect } from "react";
+import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { createTimerStore } from "../stores/timer.store";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
   TimerEvent,
   TimerDurations,
   TimerRuntimeAdapter,
+  TimerState,
 } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
@@ -188,7 +189,7 @@ const TimerView = ({
   );
 };
 
-type TimerStoreHook = ReturnType<typeof createTimerStore>;
+type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
 const useTimerState = (
   timerStore: TimerStoreHook,

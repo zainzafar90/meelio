@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { SiteList, useDockStore } from "@repo/shared";
+import { cn } from "@repo/ui/lib/utils";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import {
@@ -18,7 +19,14 @@ import {
 } from "@repo/ui/components/ui/sheet";
 import { Switch } from "@repo/ui/components/ui/switch";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
-import { Download, ShieldAlert, Upload } from "lucide-react";
+import {
+  Clock3,
+  Download,
+  Globe2,
+  ShieldAlert,
+  ShieldCheck,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/shallow";
 
@@ -79,6 +87,44 @@ const describeEvent = (event: {
   }
 };
 
+const sectionShell =
+  "rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_1px_0_rgba(255,255,255,0.03)_inset]";
+
+const Section = ({
+  eyebrow,
+  title,
+  description,
+  children,
+  className,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <section className={cn(sectionShell, className)}>
+    <div className="border-b border-white/10 px-4 py-3">
+      {eyebrow ? (
+        <p className="text-[11px] uppercase tracking-[0.18em] text-white/35">
+          {eyebrow}
+        </p>
+      ) : null}
+      <h3 className="mt-1 text-sm font-semibold text-white">{title}</h3>
+      {description ? (
+        <p className="mt-1 text-sm leading-6 text-white/50">{description}</p>
+      ) : null}
+    </div>
+    <div className="p-4">{children}</div>
+  </section>
+);
+
+const EmptyState = ({ children }: { children: React.ReactNode }) => (
+  <p className="rounded-xl border border-dashed border-white/10 bg-black/20 px-3 py-4 text-sm text-white/45">
+    {children}
+  </p>
+);
+
 export const ExtensionSiteBlockerSheet = () => {
   const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore(
     useShallow((state) => ({
@@ -106,6 +152,10 @@ export const ExtensionSiteBlockerSheet = () => {
   );
   const customRules = useMemo(
     () => state.rules.filter((rule) => rule.source === "custom"),
+    [state.rules]
+  );
+  const activeRuleCount = useMemo(
+    () => state.rules.filter((rule) => rule.enabled).length,
     [state.rules]
   );
   const activity = useMemo(
@@ -269,21 +319,27 @@ export const ExtensionSiteBlockerSheet = () => {
         </VisuallyHidden>
 
         <div className="border-b border-white/10 px-6 py-5">
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-white/40">
-                Meelio
+              <p className="text-[11px] uppercase tracking-[0.22em] text-white/35">
+                Extension tools
               </p>
-              <h2 className="mt-2 text-lg font-semibold">Site blocker</h2>
+              <h2 className="mt-1 text-lg font-semibold text-white">
+                Site blocker
+              </h2>
+              <p className="mt-1 text-sm text-white/50">
+                Strict blocking with lightweight activity review inside the
+                new-tab drawer.
+              </p>
             </div>
-            <div className="inline-flex rounded-full border border-white/10 bg-white/5 p-1">
+            <div className="inline-flex rounded-full border border-white/10 bg-black/20 p-1">
               <button
                 type="button"
                 onClick={() => setActiveTab("sites")}
                 className={`rounded-full px-3 py-1.5 text-sm transition ${
                   activeTab === "sites"
-                    ? "bg-white text-black"
-                    : "text-white/60 hover:text-white"
+                    ? "bg-white/12 text-white"
+                    : "text-white/50 hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
                 Sites
@@ -293,94 +349,152 @@ export const ExtensionSiteBlockerSheet = () => {
                 onClick={() => setActiveTab("activity")}
                 className={`rounded-full px-3 py-1.5 text-sm transition ${
                   activeTab === "activity"
-                    ? "bg-white text-black"
-                    : "text-white/60 hover:text-white"
+                    ? "bg-white/12 text-white"
+                    : "text-white/50 hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
                 Activity
               </button>
             </div>
           </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
+              {activeRuleCount} active rule{activeRuleCount === 1 ? "" : "s"}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
+              {state.settings.activationMode === "always"
+                ? "Always on"
+                : "Focus sessions only"}
+            </span>
+            <span
+              className={cn(
+                "rounded-full border px-2.5 py-1 text-xs",
+                state.settings.permissionGranted
+                  ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
+                  : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+              )}
+            >
+              {state.settings.permissionGranted
+                ? "All-sites access ready"
+                : "Needs site access"}
+            </span>
+          </div>
         </div>
 
         {activeTab === "sites" ? (
           <div className="flex-1 overflow-y-auto px-4 py-5">
-            <div className="space-y-6">
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h3 className="font-medium">Strict blocker</h3>
-                    <p className="text-sm text-white/60">
-                      Redirect matching sites to the blocked page before they
-                      render.
-                    </p>
+            <div className="space-y-5">
+              <Section
+                eyebrow="Protection"
+                title="Blocking behavior"
+                description="Keep enforcement and timing controls together so the blocker feels like part of the focus flow, not a separate settings page."
+              >
+                <div className="-m-4 divide-y divide-white/10">
+                  <div className="flex items-start justify-between gap-4 px-4 py-4">
+                    <div className="pr-2">
+                      <p className="text-sm font-medium text-white">
+                        Strict blocker
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-white/50">
+                        Redirect matching sites to the blocked page before they
+                        render.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={state.settings.enabled}
+                      onCheckedChange={(enabled) => {
+                        void runMutation(async () => {
+                          await sendExtensionCommand({
+                            type: "blocker/set-enabled",
+                            payload: { enabled },
+                          });
+                        });
+                      }}
+                    />
                   </div>
-                  <Switch
-                    checked={state.settings.enabled}
-                    onCheckedChange={(enabled) => {
-                      void runMutation(async () => {
-                        await sendExtensionCommand({
-                          type: "blocker/set-enabled",
-                          payload: { enabled },
-                        });
-                      });
-                    }}
-                  />
-                </div>
 
-                <div className="mt-4">
-                  <p className="mb-2 text-xs uppercase tracking-[0.16em] text-white/40">
-                    Activation mode
-                  </p>
-                  <Select
-                    value={state.settings.activationMode}
-                    onValueChange={(value) => {
-                      void runMutation(async () => {
-                        await sendExtensionCommand({
-                          type: "blocker/set-activation-mode",
-                          payload: {
-                            activationMode: value as "always" | "focus-only",
-                          },
-                        });
-                      });
-                    }}
-                  >
-                    <SelectTrigger className="border-white/10 bg-white/5 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="always">Always on</SelectItem>
-                      <SelectItem value="focus-only">
-                        Focus sessions only
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="px-4 py-4">
+                    <div className="flex items-start gap-3">
+                      <Clock3 className="mt-0.5 size-4 text-white/45" />
+                      <div className="w-full">
+                        <p className="text-sm font-medium text-white">
+                          Activation mode
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">
+                          Keep sites blocked all the time, or only during focus
+                          sessions.
+                        </p>
+                        <Select
+                          value={state.settings.activationMode}
+                          onValueChange={(value) => {
+                            void runMutation(async () => {
+                              await sendExtensionCommand({
+                                type: "blocker/set-activation-mode",
+                                payload: {
+                                  activationMode: value as
+                                    | "always"
+                                    | "focus-only",
+                                },
+                              });
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="mt-3 border-white/10 bg-black/20 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="always">Always on</SelectItem>
+                            <SelectItem value="focus-only">
+                              Focus sessions only
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </section>
+              </Section>
 
               <section
-                className={`rounded-2xl border p-4 ${
+                className={cn(
+                  "rounded-2xl border px-4 py-4",
                   state.settings.permissionGranted
-                    ? "border-emerald-500/20 bg-emerald-500/10"
-                    : "border-amber-500/20 bg-amber-500/10"
-                }`}
+                    ? "border-emerald-400/15 bg-emerald-400/[0.08]"
+                    : "border-amber-400/15 bg-amber-400/[0.08]"
+                )}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <ShieldAlert className="size-4" />
-                      <h3 className="font-medium">Site access</h3>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={cn(
+                        "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border",
+                        state.settings.permissionGranted
+                          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
+                          : "border-amber-400/20 bg-amber-400/10 text-amber-100"
+                      )}
+                    >
+                      {state.settings.permissionGranted ? (
+                        <ShieldCheck className="size-4" />
+                      ) : (
+                        <ShieldAlert className="size-4" />
+                      )}
                     </div>
-                    <p className="mt-2 text-sm text-white/70">
-                      {state.settings.permissionGranted
-                        ? "All-sites access is granted. Blocking and tracking are active on supported pages."
-                        : "Grant all-sites access to enforce hard blocking and browsing tracking."}
-                    </p>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        Site access
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-white/70">
+                        {state.settings.permissionGranted
+                          ? "All-sites access is granted. Blocking and browsing activity are available on supported pages."
+                          : "Grant all-sites access so Meelio can enforce strict blocking and capture browsing activity."}
+                      </p>
+                    </div>
                   </div>
                   {!state.settings.permissionGranted ? (
                     <Button
                       variant="outline"
-                      className="border-white/20 bg-white/5 text-white"
+                      className="border-white/15 bg-black/20 text-white hover:bg-white/[0.04]"
                       onClick={() => {
                         void runMutation(async () => {
                           const result = await sendExtensionCommand({
@@ -398,7 +512,11 @@ export const ExtensionSiteBlockerSheet = () => {
                 </div>
               </section>
 
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <Section
+                eyebrow="Rules"
+                title="Custom domains"
+                description="Add your own domains when the preset groups are too broad or don’t include what distracts you."
+              >
                 <div className="flex items-center gap-2">
                   <Input
                     value={siteInput}
@@ -414,7 +532,7 @@ export const ExtensionSiteBlockerSheet = () => {
                   />
                   <Button
                     variant="outline"
-                    className="border-white/10 bg-white/5 text-white"
+                    className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
                     onClick={() => {
                       void handleAddCustomSite();
                     }}
@@ -423,62 +541,64 @@ export const ExtensionSiteBlockerSheet = () => {
                   </Button>
                 </div>
 
-                {customRules.length > 0 ? (
-                  <div className="mt-4 space-y-2">
-                    {customRules.map((rule) => (
-                      <div
-                        key={rule.id}
-                        className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3 py-2"
-                      >
-                        <div>
-                          <p className="text-sm font-medium">{rule.pattern}</p>
-                          <p className="text-xs text-white/45">
-                            {rule.enabled ? "Blocked" : "Saved but disabled"}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            className="border-white/10 bg-white/5 text-white"
-                            onClick={() => {
-                              void runMutation(async () => {
-                                await sendExtensionCommand({
-                                  type: "blocker/toggle-rule",
-                                  payload: { id: rule.id },
+                <div className="mt-4">
+                  {customRules.length > 0 ? (
+                    <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                      {customRules.map((rule, index) => (
+                        <div
+                          key={rule.id}
+                          className={cn(
+                            "flex items-center justify-between gap-3 px-3 py-3",
+                            index > 0 && "border-t border-white/10"
+                          )}
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-white/90">
+                              {rule.pattern}
+                            </p>
+                            <p className="mt-1 text-xs text-white/45">
+                              {rule.enabled ? "Blocked now" : "Saved but inactive"}
+                            </p>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-2">
+                            <Button
+                              variant="outline"
+                              className="border-white/10 bg-white/[0.04] text-white/75 hover:bg-white/[0.07] hover:text-white"
+                              onClick={() => {
+                                void runMutation(async () => {
+                                  await sendExtensionCommand({
+                                    type: "blocker/toggle-rule",
+                                    payload: { id: rule.id },
+                                  });
                                 });
-                              });
-                            }}
-                          >
-                            {rule.enabled ? "Disable" : "Enable"}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="border-white/10 bg-white/5 text-white"
-                            onClick={() => handleRemoveCustomSite(rule.id)}
-                          >
-                            Remove
-                          </Button>
+                              }}
+                            >
+                              {rule.enabled ? "Disable" : "Enable"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              className="border-white/10 bg-transparent text-white/60 hover:bg-white/[0.04] hover:text-white"
+                              onClick={() => handleRemoveCustomSite(rule.id)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="mt-4 text-sm text-white/50">
-                    No custom domains added yet.
-                  </p>
-                )}
-              </section>
-
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">Popular sites</h3>
-                    <p className="text-sm text-white/60">
-                      Curated presets from the existing Meelio catalog.
-                    </p>
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState>No custom domains added yet.</EmptyState>
+                  )}
                 </div>
+              </Section>
+
+              <Section
+                eyebrow="Presets"
+                title="Popular site groups"
+                description="Use Meelio’s curated categories when you want a broader blocklist without managing every domain individually."
+              >
                 <SiteList
+                  showHeading={false}
                   blockedSites={blockedSites}
                   onToggleSite={handlePresetToggle}
                   onBlockSites={(sites) => {
@@ -496,13 +616,17 @@ export const ExtensionSiteBlockerSheet = () => {
                     });
                   }}
                 />
-              </section>
+              </Section>
 
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <Section
+                eyebrow="Backup"
+                title="Import or export"
+                description="Keep a local copy of your blocker state, events, and activity when you want to move devices or checkpoint your setup."
+              >
                 <div className="flex flex-wrap items-center gap-3">
                   <Button
                     variant="outline"
-                    className="border-white/10 bg-white/5 text-white"
+                    className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
                     onClick={() => {
                       void handleExport();
                     }}
@@ -512,7 +636,7 @@ export const ExtensionSiteBlockerSheet = () => {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-white/10 bg-white/5 text-white"
+                    className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="mr-2 size-4" />
@@ -528,75 +652,98 @@ export const ExtensionSiteBlockerSheet = () => {
                     }}
                   />
                 </div>
-              </section>
+              </Section>
             </div>
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-4 py-5">
-            <div className="space-y-6">
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <h3 className="font-medium">Top sites in the last 7 days</h3>
-                <div className="mt-4 space-y-2">
-                  {activity.topSites.length > 0 ? (
-                    activity.topSites.slice(0, 8).map((site) => (
+            <div className="space-y-5">
+              <Section
+                eyebrow="Activity"
+                title="Top sites in the last 7 days"
+                description="A lightweight summary of where time is going, without charts or habit framing."
+              >
+                {activity.topSites.length > 0 ? (
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                    {activity.topSites.slice(0, 8).map((site, index) => (
                       <div
                         key={site.host}
-                        className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-3 py-2"
+                        className={cn(
+                          "flex items-center justify-between gap-3 px-3 py-3",
+                          index > 0 && "border-t border-white/10"
+                        )}
                       >
-                        <div>
-                          <p className="text-sm font-medium">{site.host}</p>
-                          <p className="text-xs text-white/45">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <Globe2 className="size-4 text-white/35" />
+                            <p className="truncate text-sm font-medium text-white/90">
+                              {site.host}
+                            </p>
+                          </div>
+                          <p className="mt-1 text-xs text-white/45">
                             {site.visits} visits, {site.blockedAttempts} blocked
                           </p>
                         </div>
-                        <span className="text-sm text-white/70">
+                        <span className="shrink-0 text-sm text-white/65">
                           {formatDuration(site.totalDurationMs)}
                         </span>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-white/50">
-                      No activity recorded yet.
-                    </p>
-                  )}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState>No activity recorded yet.</EmptyState>
+                )}
+              </Section>
 
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <h3 className="font-medium">Recent blocker events</h3>
-                <div className="mt-4 space-y-2">
-                  {activity.recentEvents.length > 0 ? (
-                    activity.recentEvents.slice(0, 10).map((event) => (
+              <Section
+                eyebrow="Events"
+                title="Recent blocker events"
+                description="A simple timeline of what the blocker changed, denied, or bypassed."
+              >
+                {activity.recentEvents.length > 0 ? (
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                    {activity.recentEvents.slice(0, 10).map((event, index) => (
                       <div
                         key={event.id}
-                        className="rounded-xl border border-white/10 bg-black/20 px-3 py-2"
+                        className={cn(
+                          "px-3 py-3",
+                          index > 0 && "border-t border-white/10"
+                        )}
                       >
-                        <p className="text-sm font-medium">{describeEvent(event)}</p>
+                        <p className="text-sm font-medium text-white/90">
+                          {describeEvent(event)}
+                        </p>
                         <p className="mt-1 text-xs text-white/45">
                           {formatTimestamp(event.occurredAt)}
                         </p>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-white/50">
-                      No blocker events yet.
-                    </p>
-                  )}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState>No blocker events yet.</EmptyState>
+                )}
+              </Section>
 
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <h3 className="font-medium">Recent tracked sessions</h3>
-                <div className="mt-4 space-y-2">
-                  {activity.recentSessions.length > 0 ? (
-                    activity.recentSessions.slice(0, 10).map((session) => (
+              <Section
+                eyebrow="Sessions"
+                title="Recent tracked sessions"
+                description="Recent browsing sessions captured by the extension while the blocker is active."
+              >
+                {activity.recentSessions.length > 0 ? (
+                  <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
+                    {activity.recentSessions.slice(0, 10).map((session, index) => (
                       <div
                         key={session.id}
-                        className="rounded-xl border border-white/10 bg-black/20 px-3 py-2"
+                        className={cn(
+                          "px-3 py-3",
+                          index > 0 && "border-t border-white/10"
+                        )}
                       >
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-medium">{session.host}</p>
-                          <span className="text-xs text-white/45">
+                          <p className="truncate text-sm font-medium text-white/90">
+                            {session.host}
+                          </p>
+                          <span className="shrink-0 text-xs text-white/45">
                             {formatDuration(session.durationMs)}
                           </span>
                         </div>
@@ -604,20 +751,18 @@ export const ExtensionSiteBlockerSheet = () => {
                           {formatTimestamp(session.endedAt)}
                         </p>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-white/50">
-                      No tracked sessions yet.
-                    </p>
-                  )}
-                </div>
-              </section>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState>No tracked sessions yet.</EmptyState>
+                )}
+              </Section>
             </div>
           </div>
         )}
 
         {isBootstrapping ? (
-          <div className="border-t border-white/10 px-6 py-3 text-sm text-white/45">
+          <div className="border-t border-white/10 px-6 py-3 text-sm text-white/40">
             Syncing blocker state...
           </div>
         ) : null}

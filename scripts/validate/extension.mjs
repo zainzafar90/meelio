@@ -677,6 +677,108 @@ async function main() {
     "unblocked-domain navigation"
   );
 
+  logStep("Re-adding the custom rule for focus-only validation");
+  await setInputByPlaceholder(newtabClient, "Add a custom domain", blockerPattern);
+  await clickButtonByText(newtabClient, "Add");
+  await waitForBodyText(newtabClient, blockerPattern);
+
+  logStep("Switching to focus-only mode and verifying break stage stays unblocked");
+  const focusOnlyState = await sendRuntimeMessage(newtabClient, {
+    type: "blocker/set-activation-mode",
+    payload: { activationMode: "focus-only" },
+  });
+  assert(
+    focusOnlyState?.state?.settings?.activationMode === "focus-only",
+    "Expected blocker activation mode to switch to focus-only."
+  );
+
+  const breakStageResult = await sendRuntimeMessage(newtabClient, {
+    type: "blocker/set-timer-state",
+    payload: {
+      stage: "break",
+      isRunning: true,
+    },
+  });
+  assert(
+    breakStageResult?.ok === true,
+    "Expected break-stage timer override to succeed."
+  );
+
+  const breakModeTab = await openTabFromWorker(
+    workerClient,
+    `https://${blockerPattern}`
+  );
+  await waitForTabUrl(
+    workerClient,
+    breakModeTab.id,
+    (url) => typeof url === "string" && !url.startsWith(blockedPrefix),
+    "focus-only break-stage navigation"
+  );
+
+  logStep("Switching timer to focus stage and verifying blocking resumes");
+  const focusStageResult = await sendRuntimeMessage(newtabClient, {
+    type: "blocker/set-timer-state",
+    payload: {
+      stage: "focus",
+      isRunning: true,
+    },
+  });
+  assert(
+    focusStageResult?.ok === true,
+    "Expected focus-stage timer override to succeed."
+  );
+
+  const focusBlockedTab = await openTabFromWorker(
+    workerClient,
+    `https://${blockerPattern}`
+  );
+  await waitForTabUrl(
+    workerClient,
+    focusBlockedTab.id,
+    (url) => typeof url === "string" && url.startsWith(blockedPrefix),
+    "focus-only focus-stage navigation"
+  );
+  const focusBlockedTarget = await waitForTarget(
+    port,
+    (target) =>
+      target.type === "page" &&
+      typeof target.url === "string" &&
+      target.url.startsWith(blockedPrefix),
+    "focus-only blocked page target",
+    15000
+  );
+  const focusBlockedClient = await connectToTarget(focusBlockedTarget);
+  await waitForBodyText(focusBlockedClient, "This site is blocked");
+  await focusBlockedClient.close();
+
+  logStep("Resetting blocker state after focus-only validation");
+  const breakIdleResult = await sendRuntimeMessage(newtabClient, {
+    type: "blocker/set-timer-state",
+    payload: {
+      stage: "break",
+      isRunning: false,
+    },
+  });
+  assert(
+    breakIdleResult?.ok === true,
+    "Expected timer override reset to succeed."
+  );
+  const alwaysOnState = await sendRuntimeMessage(newtabClient, {
+    type: "blocker/set-activation-mode",
+    payload: { activationMode: "always" },
+  });
+  assert(
+    alwaysOnState?.state?.settings?.activationMode === "always",
+    "Expected blocker activation mode to return to always."
+  );
+  await clickButtonByText(newtabClient, "Remove");
+  await waitFor(
+    "focus-only cleanup rule removal",
+    () => getBodyText(newtabClient),
+    (value) => typeof value === "string" && !value.includes(blockerPattern),
+    10000
+  );
+
   await blockedPageClient.close();
   await newtabClient.close();
   await workerClient.close();
