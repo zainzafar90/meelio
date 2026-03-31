@@ -103,7 +103,7 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
           const state = get();
           const duration = state.prevRemaining ?? state.durations[state.stage];
           const end = deps.now() + duration * 1000;
-          runtime.sendMessage({ type: "START", duration });
+          runtime.sendMessage({ type: "START", duration, stage: state.stage });
           set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
 
           timerEvents.emit({
@@ -140,7 +140,7 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
         const reset = () => {
           const state = get();
           const duration = state.durations[TimerStage.Focus];
-          runtime.sendMessage({ type: "RESET" });
+          runtime.sendMessage({ type: "RESET", stage: TimerStage.Focus });
           set({
             stage: TimerStage.Focus,
             isRunning: false,
@@ -161,7 +161,7 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
 
         const skipToStage = (stage: TimerStage) => {
           const duration = get().durations[stage];
-          runtime.sendMessage({ type: "SKIP_TO_NEXT_STAGE" });
+          runtime.sendMessage({ type: "SKIP_TO_NEXT_STAGE", nextStage: stage });
           set({
             stage,
             isRunning: false,
@@ -291,9 +291,9 @@ export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
           const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
           if (left <= 0) {
             set({ isRunning: false, endTimestamp: null });
-            runtime.sendMessage({ type: "RESET" });
+            runtime.sendMessage({ type: "RESET", stage: TimerStage.Focus });
           } else {
-            runtime.sendMessage({ type: "START", duration: left });
+            runtime.sendMessage({ type: "START", duration: left, stage: s.stage });
             set({ prevRemaining: left });
           }
         };

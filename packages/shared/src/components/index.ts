@@ -81,6 +81,8 @@ export * from "./core/notes/notes.sheet";
 
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";
+export * from "./core/site-blocker/components/site-list";
+export * from "./core/site-blocker/data/site-list";
 
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";

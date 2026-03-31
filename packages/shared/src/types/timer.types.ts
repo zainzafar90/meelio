@@ -26,12 +26,14 @@ export interface TimerStats {
 export interface StartMessage {
   type: "START";
   duration: number;
+  stage: TimerStage;
 }
 export interface PauseMessage {
   type: "PAUSE";
 }
 export interface ResetMessage {
   type: "RESET";
+  stage: TimerStage;
 }
 export interface UpdateDurationMessage {
   type: "UPDATE_DURATION";
@@ -39,6 +41,7 @@ export interface UpdateDurationMessage {
 }
 export interface SkipStageMessage {
   type: "SKIP_TO_NEXT_STAGE";
+  nextStage: TimerStage;
 }
 export type TimerMessage =
   | StartMessage
@@ -53,6 +56,7 @@ export interface TickMessage {
 }
 export interface StageCompleteMessage {
   type: "STAGE_COMPLETE";
+  finishedStage: TimerStage;
 }
 export interface PausedMessage {
   type: "PAUSED";

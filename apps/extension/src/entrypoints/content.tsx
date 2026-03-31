@@ -1,148 +1,122 @@
-import React, { useEffect } from "react";
-import { createRoot } from "react-dom/client";
 import { defineContentScript } from "wxt/utils/define-content-script";
-import { createShadowRootUi } from "wxt/utils/content-script-ui/shadow-root";
-import { doesSiteHostMatch } from "@/utils/site-blocker.utils";
-import { useChromeStorageLocal } from "../hooks/use-chrome-storage-local";
-import { Blocker } from "../features/content/blocker";
-import { getCustomBlockerMessage } from "../utils/blocker.utils";
-import { pauseAllVideos, startAutoPause } from "../utils/media.utils";
 
-interface SiteBlockState {
-  id: string;
-  url: string;
-  isBlocked: boolean;
-  streak: number;
-  createdAt: number;
-  updatedAt: number;
-  deletedAt?: number | null;
-}
+import { sendExtensionCommand } from "../features/site-blocker/services/blocker-runtime";
+import { normalizeSiteHost } from "../utils/site-blocker.utils";
 
-type SiteBlockMap = Record<string, SiteBlockState>;
+const TRACKING_FLUSH_INTERVAL_MS = 15_000;
 
-const getCurrentSite = () => window.location.hostname;
-
-const getMatchingSite = (sites: SiteBlockMap): SiteBlockState | undefined => {
-  const host = getCurrentSite();
-  return Object.values(sites).find(
-    (site) => site.isBlocked && doesSiteHostMatch(host, site.url)
-  );
-};
-
-const BlockerOverlay = () => {
-  const currentSite = getCurrentSite();
-  const [storageData, setStorageData] = useChromeStorageLocal<{
-    state: { sites: SiteBlockMap };
-  }>("meelio:local:site-blocker", { state: { sites: {} } });
-
-  const sites = storageData?.state?.sites ?? {};
-  const message = getCustomBlockerMessage();
-  const matchingSite = getMatchingSite(sites);
-  const isBlocked = Boolean(matchingSite);
-
-  useEffect(() => {
-    if (!isBlocked) return;
-
-    pauseAllVideos();
-    startAutoPause();
-    window.addEventListener("yt-navigate-finish", pauseAllVideos);
-
-    document.addEventListener(
-      "play",
-      (e) => {
-        (e.target as HTMLVideoElement | HTMLAudioElement).pause();
-      },
-      true
-    );
-
-    if (matchingSite) {
-      void setStorageData({
-        state: {
-          sites: {
-            ...sites,
-            [matchingSite.id]: {
-              ...matchingSite,
-              streak: (matchingSite.streak ?? 0) + 1,
-            },
-          },
-        },
-      });
-    }
-  }, [isBlocked]);
-
-  const openAnyway = async () => {
-    if (!matchingSite) return;
-    await setStorageData({
-      state: {
-        sites: {
-          ...sites,
-          [matchingSite.id]: {
-            ...matchingSite,
-            isBlocked: false,
-            streak: 0,
-            updatedAt: Date.now(),
-          },
-        },
-      },
-    });
-  };
-
-  if (!isBlocked) return null;
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0, 0, 0, 1)",
-        backdropFilter: "blur(10px)",
-        zIndex: 2147483647,
-        display: "flex",
-        height: "100vh",
-        width: "100vw",
-        flex: 1,
-      }}
-    >
-      <Blocker
-        message={message}
-        siteName={currentSite}
-        streak={matchingSite?.streak ?? 0}
-        onOpenAnyway={openAnyway}
-      />
-    </div>
-  );
-};
-
-const isCurrentSiteBlocked = async (): Promise<boolean> => {
-  const result = await chrome.storage.local.get("meelio:local:site-blocker");
-  const raw = result["meelio:local:site-blocker"];
-  if (!raw) return false;
-  const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-  const sites = parsed?.state?.sites ?? {};
-  return Boolean(getMatchingSite(sites));
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
 export default defineContentScript({
-  matches: ["<all_urls>"],
+  matches: ["http://*/*", "https://*/*"],
   runAt: "document_start",
-  cssInjectionMode: "ui",
-  async main(ctx) {
-    if (!(await isCurrentSiteBlocked())) return;
+  main() {
+    if (window.top !== window.self) {
+      return;
+    }
 
-    const ui = await createShadowRootUi(ctx, {
-      name: "meelio-site-blocker",
-      position: "modal",
-      zIndex: 2147483646,
-      onMount: (uiContainer) => {
-        const root = createRoot(uiContainer);
-        root.render(<BlockerOverlay />);
-        return root;
-      },
-      onRemove: (root) => {
-        root?.unmount();
-      },
+    const sessionId = crypto.randomUUID();
+    const startedAt = new Date().toISOString();
+    const host = normalizeSiteHost(window.location.hostname);
+
+    let activeStartedAt = 0;
+    let accumulatedDurationMs = 0;
+    let closed = false;
+
+    const isActive = () =>
+      document.visibilityState === "visible" && document.hasFocus();
+
+    const startActiveWindow = () => {
+      if (!isActive() || activeStartedAt !== 0) {
+        return;
+      }
+
+      activeStartedAt = Date.now();
+    };
+
+    const stopActiveWindow = () => {
+      if (activeStartedAt === 0) {
+        return;
+      }
+
+      accumulatedDurationMs += Date.now() - activeStartedAt;
+      activeStartedAt = 0;
+    };
+
+    const currentDurationMs = () =>
+      accumulatedDurationMs +
+      (activeStartedAt === 0 ? 0 : Date.now() - activeStartedAt);
+
+    const createPayload = () => ({
+      sessionId,
+      url: window.location.href,
+      host,
+      startedAt,
+      observedAt: new Date().toISOString(),
+      durationMs: currentDurationMs(),
     });
-    ui.mount();
+
+    const flushUpdate = () => {
+      void sendExtensionCommand({
+        type: "tracking/session-update",
+        payload: createPayload(),
+      }).catch(() => {
+        // Best-effort tracking only.
+      });
+    };
+
+    const finishSession = () => {
+      if (closed) {
+        return;
+      }
+
+      closed = true;
+      stopActiveWindow();
+      window.clearInterval(intervalId);
+      detachListeners();
+
+      void sendExtensionCommand({
+        type: "tracking/session-end",
+        payload: {
+          ...createPayload(),
+          endedAt: new Date().toISOString(),
+        },
+      }).catch(() => {
+        // Best-effort tracking only.
+      });
+    };
+
+    const handleActivityChange = () => {
+      if (isActive()) {
+        startActiveWindow();
+        return;
+      }
+
+      stopActiveWindow();
+      flushUpdate();
+    };
+
+    const detachListeners = () => {
+      document.removeEventListener("visibilitychange", handleActivityChange);
+      window.removeEventListener("focus", handleActivityChange, true);
+      window.removeEventListener("blur", handleActivityChange, true);
+      window.removeEventListener("pagehide", finishSession, true);
+      window.removeEventListener("beforeunload", finishSession, true);
+    };
+
+    startActiveWindow();
+    flushUpdate();
+
+    const intervalId = window.setInterval(() => {
+      if (closed) {
+        return;
+      }
+
+      flushUpdate();
+    }, TRACKING_FLUSH_INTERVAL_MS);
+
+    document.addEventListener("visibilitychange", handleActivityChange);
+    window.addEventListener("focus", handleActivityChange, true);
+    window.addEventListener("blur", handleActivityChange, true);
+    window.addEventListener("pagehide", finishSession, true);
+    window.addEventListener("beforeunload", finishSession, true);
   },
 });

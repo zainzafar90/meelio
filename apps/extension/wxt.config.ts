@@ -18,10 +18,18 @@ export default defineConfig({
     name: "Meelio",
     description: "Focus, calm & productivity with every new tab",
     version: "0.9.1",
-    permissions: ["storage", "notifications"],
-    optional_permissions: ["tabs", "tabGroups", "bookmarks"],
+    permissions: [
+      "storage",
+      "notifications",
+      "alarms",
+      "tabs",
+      "webNavigation",
+      "declarativeNetRequest",
+      "declarativeNetRequestWithHostAccess",
+    ],
+    optional_permissions: ["tabGroups", "bookmarks"],
     host_permissions: ["https://*.meelio.io/*"],
-    optional_host_permissions: ["https://*/*"],
+    optional_host_permissions: ["http://*/*", "https://*/*"],
     icons: {
       "16": "/icon-16.png",
       "32": "/icon-32.png",
@@ -31,6 +39,7 @@ export default defineConfig({
     web_accessible_resources: [
       {
         resources: [
+          "blocked.html",
           "**/*.svg",
           "**/*.png",
           "**/*.jpg",
