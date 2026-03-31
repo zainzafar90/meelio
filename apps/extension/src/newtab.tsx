@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
+import { useTranslation } from "@repo/shared/i18n";
 
 import {
   AppLayout,

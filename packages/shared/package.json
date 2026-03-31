@@ -60,6 +60,7 @@
     "./context/*": "./src/context/**/*.{ts,tsx}",
     "./data/*": "./src/data/**/*.{ts,json}",
     "./hooks/*": "./src/hooks/**/*.{ts,tsx}",
+    "./i18n": "./src/i18n/index.ts",
     "./i18n/*": "./src/i18n/**/*.{ts,tsx}",
     "./lib/*": "./src/lib/**/*.ts",
     "./providers/*": "./src/providers/**/*.{ts,tsx}",

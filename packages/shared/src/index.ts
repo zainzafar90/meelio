@@ -3,7 +3,6 @@ export * from "./components";
 export * from "./context";
 export * from "./data";
 export * from "./hooks";
-export * from "./i18n";
 export * from "./lib";
 export * from "./providers";
 export * from "./stores";
