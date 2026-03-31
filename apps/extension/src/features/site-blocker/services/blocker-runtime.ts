@@ -6,11 +6,14 @@ import type {
   TimerStage,
 } from "./blocker-core";
 import type { ActivitySnapshot } from "./blocker-state";
+export {
+  BLOCKER_REQUIRED_ORIGINS,
+  requestBlockerAccessPermission,
+} from "../../../utils/extension-permissions";
 
 export const BLOCKER_STORAGE_KEY = "meelio:extension:blocker-state.v1";
 export const BLOCKER_BYPASS_ALARM_NAME =
   "meelio:extension:blocker-bypass-expiry.v1";
-export const BLOCKER_REQUIRED_ORIGINS = ["http://*/*", "https://*/*"] as const;
 
 export interface TrackingSessionPayload {
   sessionId: string;

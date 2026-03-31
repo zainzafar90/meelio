@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
+import { toast } from "sonner";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import {
   TimerStage,
@@ -249,7 +250,7 @@ const useTimerState = (
     store.checkDailyReset?.();
   }, []);
 
-  const handleSettingsChange = (settings: {
+  const handleSettingsChange = async (settings: {
     durations: { focusMin: number; breakMin: number };
     notifications: boolean;
     sounds: boolean;
@@ -263,7 +264,18 @@ const useTimerState = (
     });
 
     if (settings.notifications !== store.settings.notifications) {
-      store.toggleNotifications();
+      if (settings.notifications) {
+        const granted =
+          (await runtime.requestNotificationPermission?.()) ?? true;
+
+        if (!granted) {
+          toast.error("Notifications permission was denied");
+        } else {
+          store.toggleNotifications();
+        }
+      } else {
+        store.toggleNotifications();
+      }
     }
     if (settings.sounds !== store.settings.sounds) {
       store.toggleSounds();

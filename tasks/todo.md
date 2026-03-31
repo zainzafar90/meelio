@@ -166,3 +166,110 @@
 
 - Root cause: `packages/timer-core/tsconfig.json` extended `@repo/typescript-config/base.json`, which resolves under the workspace toolchain but can fail in editor/static resolution paths that do not follow workspace package lookup the same way.
 - Fix applied: `packages/timer-core/tsconfig.json` now extends `../typescript-config/base.json` directly, which keeps the package self-contained inside the monorepo and avoids package-resolution ambiguity for the config file itself.
+
+# Blocker Permission Flow Review
+
+- [x] Inspect extension manifest/WXT permission declarations for blocker enforcement
+- [x] Trace runtime permission request and state sync behavior in the blocker UI/background
+- [x] Summarize whether blocker permissions are optional, when they are requested, and whether anything should change
+
+## Permission Flow Review
+
+- Current manifest shape:
+  - core extension permissions are declared in `apps/extension/wxt.config.ts`
+  - all-sites access for blocker enforcement/tracking is declared as `optional_host_permissions`, not a startup host permission
+  - the blocker also uses `declarativeNetRequestWithHostAccess`, so host access still depends on the optional all-sites grant
+- Fix applied:
+  - the actual `chrome.permissions.request` call now happens in the blocker drawer click handler
+  - the background `blocker/request-host-access` command now only reconciles and persists permission state instead of trying to trigger the prompt itself
+- Verification completed:
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter extension build`
+  - `pnpm validate:extension`
+
+# Permission Minimization
+
+- [x] Audit every required extension permission against actual runtime usage
+- [x] Add failing coverage for the new optional-permission behavior where practical
+- [x] Move safe permissions behind explicit user intent without breaking blocker/timer flows
+- [x] Re-run extension tests, build, and live validator after the manifest/runtime changes
+
+## Permission Minimization Review
+
+- Final permission split:
+  - required: `storage`, `alarms`, `tabs`, `webNavigation`, `declarativeNetRequest`, `declarativeNetRequestWithHostAccess`
+  - optional: `notifications`, `tabGroups`, `bookmarks`
+  - runtime user-intent grant: `optional_host_permissions` for `http://*/*` and `https://*/*`
+- Runtime behavior changes:
+  - the blocker request button now asks for all-sites host access from the page click path and then syncs state in the background
+  - timer notifications now request permission only when the user enables notifications
+- Validation evidence:
+  - removing `tabs` broke URL visibility needed by the live blocker flow
+  - removing `webNavigation` broke the exact-URL continue path on `blocked.html`
+  - keeping `tabs` + `webNavigation` required while moving `notifications` optional preserved all blocker/timer flows
+- Verification completed:
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter web test -- --run`
+  - `pnpm --filter extension build`
+  - `pnpm validate:extension`
+
+# Background Error Investigation
+
+- [x] Reproduce the reported `background.ts` error with a targeted diagnostic
+- [x] Inspect the failing `background.ts` lines and surrounding permission/runtime code
+- [x] Explain the root cause and apply a fix if the error is real
+
+## Background Error Review
+
+- Root cause: `apps/extension/src/entrypoints/background.ts` still referenced `hasAllSitesPermission()` in the `blocker/import` branch after the permission refactor renamed the shared permission check to `hasBlockerAccessPermission()`.
+- Fix applied: the stale call in `background.ts` now uses `hasBlockerAccessPermission()`.
+- Verification completed:
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter extension build`
+  - `pnpm --filter extension exec tsc --noEmit 2>&1 | rg 'background.ts'`
+- Note: a full `tsc --noEmit` for the extension still reports unrelated existing repo issues outside `background.ts`; the reported `background.ts` error itself is resolved.
+
+# Project-wide Lint Scan
+
+- [x] Run the root workspace lint command
+- [x] Capture any failing packages/files
+- [x] Summarize the project-wide lint state
+
+## Lint Scan Review
+
+- Root command run: `pnpm lint` from the workspace root (`turbo run lint`)
+- Result: failed
+- Hard failure:
+  - `@repo/timer-core#lint` exited with ESLint error: `No files matching the pattern "." were found.`
+- Warnings surfaced before Turbo stopped:
+  - `packages/ui/src/components/ui/badge.tsx:36` `react-refresh/only-export-components`
+  - `packages/ui/src/components/ui/button.tsx:62` `react-refresh/only-export-components`
+  - `packages/ui/src/components/ui/form.tsx:169` `react-refresh/only-export-components`
+  - `packages/ui/src/components/ui/sidebar.tsx:117` `react-hooks/exhaustive-deps`
+  - `packages/ui/src/components/ui/sidebar.tsx:764` `react-refresh/only-export-components`
+- Because Turbo aborted on `@repo/timer-core`, this run should be treated as an incomplete workspace lint pass until the timer-core lint script/pattern is fixed and the scan is rerun.
+
+# Lint Fix
+
+- [x] Fix the `@repo/timer-core` lint script so root lint can traverse the workspace
+- [x] Fix the `apps/extension` typed-lint config so `vitest.config.ts` is covered cleanly
+- [x] Re-run `pnpm lint`
+- [x] Summarize remaining warnings or failures after the root blockers are removed
+
+## Extension Lint Boundary Review
+
+- Root cause: `apps/extension/.eslintrc.js` used typed linting (`parserOptions.project`) against `apps/extension/tsconfig.json`, but `vitest.config.ts` was linted by the package script without being included in that TSConfig.
+- Secondary config issues: the extension ESLint config did not load TypeScript recommended rules, and it did not declare the browser extension environment (`chrome`, `window`, `document`), which produced a large amount of misleading lint noise.
+- Fix applied: added `apps/extension/tsconfig.eslint.json` for typed lint coverage of config files, switched the extension ESLint config to a browser/React-internal base with TypeScript and React Hooks rules, and declared the `chrome` global explicitly.
+- Verification completed:
+  - `pnpm --filter extension lint`
+  - `pnpm lint`
+- Current status:
+  - `apps/extension` lint now exits successfully with warnings only.
+  - Workspace lint now exits successfully.
+  - Remaining warning-only frontier is mostly pre-existing lint noise in `packages/shared`, plus a smaller set in `apps/extension` (`react-refresh`, `react-hooks/exhaustive-deps`, `turbo/no-undeclared-env-vars`, and `media.utils.ts` cleanup).
+
+# Timer Core Lint Cleanup
+
+- [x] Replace the explicit timer-core lint file globs with a cleaner package-wide ESLint command
+- [x] Re-run targeted timer-core lint to confirm the cleaner script works

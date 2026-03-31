@@ -203,6 +203,22 @@ class WebTimerRuntime implements TimerRuntimeAdapter {
       new Notification(title, { body: message });
     }
   }
+
+  async requestNotificationPermission(): Promise<boolean> {
+    if (!("Notification" in window)) {
+      return false;
+    }
+
+    if (Notification.permission === "granted") {
+      return true;
+    }
+
+    if (Notification.permission === "denied") {
+      return false;
+    }
+
+    return (await Notification.requestPermission()) === "granted";
+  }
 }
 
 export const webTimerRuntime = new WebTimerRuntime();

@@ -423,6 +423,41 @@ async function sendRuntimeMessage(pageClient, payload) {
   `);
 }
 
+async function hasAllSitesPermission(pageClient) {
+  return pageClient.evaluate(`
+    (async () => {
+      return chrome.permissions.contains({
+        origins: ["http://*/*", "https://*/*"],
+      });
+    })()
+  `);
+}
+
+async function requestAllSitesPermission(pageClient) {
+  await clickButtonByText(pageClient, "Request access");
+  await sleep(1200);
+
+  if (await hasAllSitesPermission(pageClient)) {
+    return true;
+  }
+
+  const granted = await pageClient.evaluate(`
+    (async () => {
+      return chrome.permissions.request({
+        origins: ["http://*/*", "https://*/*"],
+      });
+    })()
+  `);
+
+  if (granted) {
+    await sendRuntimeMessage(pageClient, {
+      type: "blocker/request-host-access",
+    });
+  }
+
+  return granted;
+}
+
 async function main() {
   assert(
     existsSync(extensionOutputDir) || existsSync(path.join(repoRoot, "apps/extension")),
@@ -594,17 +629,11 @@ async function main() {
   await waitForBodyTextGone(newtabClient, "Syncing blocker state...");
 
   logStep("Requesting all-sites access");
-  await clickButtonByText(newtabClient, "Request access");
+  const permissionGranted = await requestAllSitesPermission(newtabClient);
+  assert(permissionGranted, "Expected all-sites permission request to succeed.");
   await waitFor(
     "all-sites permission",
-    () =>
-      newtabClient.evaluate(`
-        (async () => {
-          return chrome.permissions.contains({
-            origins: ["http://*/*", "https://*/*"],
-          });
-        })()
-      `),
+    () => hasAllSitesPermission(newtabClient),
     Boolean,
     15000
   );

@@ -49,7 +49,7 @@ export interface TimerSettingsDialogProps {
     soundId?: string;
     soundscapes?: boolean;
     autoStartBreaks?: boolean;
-  }) => void;
+  }) => void | Promise<void>;
 }
 
 export function TimerSettingsDialog({
@@ -95,7 +95,7 @@ export function TimerSettingsDialog({
 
   const handleSave = async (data: TimerSettingsValues) => {
     try {
-      onSave({
+      await onSave({
         durations: {
           focusMin: data.focusTime,
           breakMin: data.breakTime,
@@ -120,7 +120,7 @@ export function TimerSettingsDialog({
   };
 
   const handleNotificationsToggle = () => {
-    onSave({
+    void onSave({
       durations: { focusMin, breakMin },
       notifications: !notifications,
       sounds,
@@ -131,7 +131,7 @@ export function TimerSettingsDialog({
   };
 
   const handleSoundsToggle = () => {
-    onSave({
+    void onSave({
       durations: { focusMin, breakMin },
       notifications,
       sounds: !sounds,
@@ -142,7 +142,7 @@ export function TimerSettingsDialog({
   };
 
   const handleSoundChange = (newSoundId: string) => {
-    onSave({
+    void onSave({
       durations: { focusMin, breakMin },
       notifications,
       sounds,
@@ -153,7 +153,7 @@ export function TimerSettingsDialog({
   };
 
   const handleSoundscapesToggle = () => {
-    onSave({
+    void onSave({
       durations: { focusMin, breakMin },
       notifications,
       sounds,
@@ -164,7 +164,7 @@ export function TimerSettingsDialog({
   };
 
   const handleAutoStartBreaksToggle = () => {
-    onSave({
+    void onSave({
       durations: { focusMin, breakMin },
       notifications,
       sounds,

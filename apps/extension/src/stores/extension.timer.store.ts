@@ -25,6 +25,10 @@ import {
 } from "../../../../packages/shared/src/lib/db/pomodoro.dexie";
 import { soundSyncService } from "../../../../packages/shared/src/services/sound-sync.service";
 import { timerEvents } from "../../../../packages/shared/src/utils/timer-events";
+import {
+  hasNotificationPermission,
+  requestNotificationPermission as requestExtensionNotificationPermission,
+} from "../utils/extension-permissions";
 
 interface ExtensionTimerStoreState extends TimerSnapshot {
   start: () => void;
@@ -204,6 +208,18 @@ class ExtensionTimerRuntime implements TimerRuntimeAdapter {
       title,
       message,
     });
+  }
+
+  async requestNotificationPermission(): Promise<boolean> {
+    if (!chrome?.permissions?.request) {
+      return false;
+    }
+
+    if (await hasNotificationPermission()) {
+      return true;
+    }
+
+    return requestExtensionNotificationPermission();
   }
 }
 

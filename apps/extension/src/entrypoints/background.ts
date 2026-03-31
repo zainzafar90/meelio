@@ -7,7 +7,6 @@ import { defineBackground } from "wxt/utils/define-background";
 
 import {
   BLOCKER_BYPASS_ALARM_NAME,
-  BLOCKER_REQUIRED_ORIGINS,
   BLOCKER_STORAGE_KEY,
   isExtensionCommand,
   type BlockerRecordBlockedCommand,
@@ -41,6 +40,7 @@ import {
   toggleRule,
 } from "../features/site-blocker/services/blocker-state";
 import { normalizeSiteHost } from "../utils/site-blocker.utils";
+import { hasBlockerAccessPermission } from "../utils/extension-permissions";
 
 interface TimerControllerState {
   stage: TimerStage;
@@ -61,7 +61,6 @@ interface LiveSessionDraft {
 
 const newtabUrl = chrome.runtime.getURL("newtab.html");
 const blockedPageUrl = chrome.runtime.getURL("blocked.html");
-const extensionOrigin = chrome.runtime.getURL("");
 
 const timerState: TimerControllerState = {
   stage: TimerStage.Focus,
@@ -90,11 +89,6 @@ const toStoredState = async (): Promise<BlockerState> => {
     state: rawState as BlockerState,
   });
 };
-
-const hasAllSitesPermission = async (): Promise<boolean> =>
-  chrome.permissions.contains({
-    origins: [...BLOCKER_REQUIRED_ORIGINS] as unknown as string[],
-  });
 
 const getEffectiveTimerStage = (): "focus" | "break" =>
   timerState.isRunning && timerState.stage === TimerStage.Focus
@@ -143,7 +137,7 @@ const reconcileAndPersistState = async (
   state: BlockerState
 ): Promise<BlockerState> => {
   const now = Date.now();
-  const permissionGranted = await hasAllSitesPermission();
+  const permissionGranted = await hasBlockerAccessPermission();
   const cleanedState = cleanupBlockerData(state, now);
   const reconciledState =
     cleanedState.settings.permissionGranted === permissionGranted
@@ -512,9 +506,7 @@ const handleExtensionCommand = async (
         ),
       };
     case "blocker/request-host-access": {
-      const granted = await chrome.permissions.request({
-        origins: [...BLOCKER_REQUIRED_ORIGINS] as unknown as string[],
-      });
+      const granted = await hasBlockerAccessPermission();
       const state = await runBlockerMutation((currentState) => {
         let nextState = setPermissionGranted(currentState, granted, Date.now());
         if (!granted) {
@@ -548,7 +540,7 @@ const handleExtensionCommand = async (
       return {
         state: await runBlockerMutation(async () => {
           const imported = importBlockerSnapshot(command.payload.snapshot);
-          const permissionGranted = await hasAllSitesPermission();
+          const permissionGranted = await hasBlockerAccessPermission();
           return setPermissionGranted(imported, permissionGranted, Date.now());
         }),
       };

@@ -82,4 +82,5 @@ export interface TimerRuntimeAdapter {
   sendMessage(message: TimerMessage): void;
   subscribe(callback: (message: TimerEvent) => void): () => void;
   showNotification(title: string, message: string): void;
+  requestNotificationPermission?: () => Promise<boolean>;
 }

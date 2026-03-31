@@ -33,6 +33,7 @@ import { useShallow } from "zustand/shallow";
 import { useChromeStorageLocal } from "../hooks/use-chrome-storage-local";
 import {
   BLOCKER_STORAGE_KEY,
+  requestBlockerAccessPermission,
   sendExtensionCommand,
   type BlockerExportCommand,
 } from "../features/site-blocker/services/blocker-runtime";
@@ -497,10 +498,11 @@ export const ExtensionSiteBlockerSheet = () => {
                       className="border-white/15 bg-black/20 text-white hover:bg-white/[0.04]"
                       onClick={() => {
                         void runMutation(async () => {
+                          const granted = await requestBlockerAccessPermission();
                           const result = await sendExtensionCommand({
                             type: "blocker/request-host-access",
                           });
-                          if (!result.granted) {
+                          if (!granted || !result.granted) {
                             toast.error("Permission request was denied");
                           }
                         });

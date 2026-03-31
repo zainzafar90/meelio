@@ -17,17 +17,20 @@ export default defineConfig({
   manifest: {
     name: "Meelio",
     description: "Focus, calm & productivity with every new tab",
-    version: "0.9.1",
+    version: "0.9.2",
     permissions: [
       "storage",
-      "notifications",
       "alarms",
       "tabs",
       "webNavigation",
       "declarativeNetRequest",
       "declarativeNetRequestWithHostAccess",
     ],
-    optional_permissions: ["tabGroups", "bookmarks"],
+    optional_permissions: [
+      "tabGroups",
+      "bookmarks",
+      "notifications",
+    ],
     host_permissions: ["https://*.meelio.io/*"],
     optional_host_permissions: ["http://*/*", "https://*/*"],
     icons: {
