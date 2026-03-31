@@ -21,6 +21,7 @@ A productivity and focus application built as a Turborepo monorepo. Fully offlin
 ## Packages
 
 - **@repo/shared** - Core business logic, stores, hooks, components
+- **@repo/timer-core** - Pure timer contracts and state machine helpers
 - **@repo/ui** - React component library (shadcn/ui based)
 - **@repo/logger** - Logging utility
 - **@repo/eslint-config** - ESLint configuration
@@ -55,6 +56,28 @@ pnpm clean            # Clean build artifacts
 pnpm test             # Run tests
 ```
 
+## Testing
+
+```bash
+# Pure timer-core unit tests
+pnpm --filter @repo/timer-core test -- --run
+
+# Shared package tests
+pnpm --filter @repo/shared test -- --run
+
+# Extension unit/regression tests
+pnpm --filter extension test -- --run
+
+# Extension production build
+pnpm --filter extension build
+
+# Full extension smoke validator (builds, launches browser, verifies timer + blocker flows)
+pnpm validate:extension
+
+# Override the blocked-domain smoke target used by the validator
+MEELIO_BLOCK_TEST_DOMAIN=zainzafar.net pnpm validate:extension
+```
+
 ## Loading the Extension Locally
 
 1. Build the extension:
@@ -66,7 +89,7 @@ pnpm test             # Run tests
 
 3. Enable **Developer mode** (toggle in the top right)
 
-4. Click **Load unpacked** and select the `apps/extension/build/chrome-mv3-prod` directory
+4. Click **Load unpacked** and select the `apps/extension/.output/chrome-mv3` directory
 
 ## Features
 

@@ -9,3 +9,6 @@
 - If an extension UI is stuck in bootstrapping state, trace the full runtime message path before changing surface components. A hanging or broken background `get-state` handler can make every control look dead even when the DOM is fine.
 - Never import the extension background worker from the `@repo/shared` root barrel. For MV3 worker code, import the exact shared file you need, or the worker bundle can pull in client-only stores/components and fail before `chrome.runtime.onMessage` is registered.
 - When the user asks to see the complexity or shape of a long-term design, do not answer with only a clarifying question. First provide the concrete architecture, migration scope, and tradeoffs, then ask at most one narrowing question if still needed.
+- Extension browser validators need to neutralize first-run onboarding state before interacting with dock- or sheet-driven UI; otherwise the overlay can make a valid flow look broken.
+- When driving controlled React inputs from a browser validator, use the native input value setter plus a bubbling `InputEvent` instead of assigning `input.value` directly.
+- Do not hardcode the blocker smoke-test domain inside the validator. Keep it configurable via an env var so user or environment-specific targets like `zainzafar.net` can be swapped without editing code.

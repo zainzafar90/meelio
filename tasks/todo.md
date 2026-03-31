@@ -71,3 +71,38 @@
 - Existing repo state: `apps/web` already has Playwright-based E2E, but `apps/extension` does not have an extension-aware browser validation runner.
 - Current architectural risk: the extension background is protected from the shared root barrel now, but timer messaging and timer store logic are still partially coupled to shared code.
 - Desired outcome: a long-term design that makes timer behavior portable and a validation harness that can prove app behavior without manual browser poking.
+
+# Timer Core Extraction And Extension Validation
+
+- [x] Create a dedicated follow-up branch from blocker checkpoint `03826245`
+- [x] Add failing unit tests for a pure `packages/timer-core` state machine and contracts
+- [x] Extract timer contracts, defaults, and transition logic into `packages/timer-core`
+- [x] Migrate extension background timer messaging to `@repo/timer-core`
+- [x] Rebuild `apps/extension/src/stores/extension.timer.store.ts` on top of `@repo/timer-core` and an extension-local runtime adapter
+- [x] Add a repo-level `validate:extension` command for extension boot, timer, and blocker smoke flows
+- [x] Verify unit tests, extension tests, extension build, and extension validator
+
+## Extraction Review
+
+- Follow-up branch: `feat/timer-core-validation`
+- Goal: remove extension timer/runtime dependence on shared UI-owned timer contracts without changing blocker behavior.
+- Constraint: keep `packages/timer-core` pure and environment-agnostic so it can be reused by extension and web adapters.
+- Validation goal: prove the extension boots, timer actions respond, blocker drawer loads, blocked redirects fire, and bypass returns to the original URL.
+- Implemented `packages/timer-core` with pure timer contracts, defaults, snapshots, and transition helpers plus dedicated Vitest coverage.
+- Replaced the extension’s `createTimerStore` dependency with a local Zustand store that uses `@repo/timer-core` for timer transitions while keeping extension runtime messaging local.
+- Added a regression test preventing the MV3 background and extension timer store from drifting back to the shared root barrel.
+- Added `pnpm validate:extension`, which now:
+  - runs extension tests
+  - builds the unpacked MV3 bundle
+  - launches a fresh browser profile
+  - validates timer start/pause/reset
+  - validates blocker drawer bootstrap and permission request
+  - adds and removes a custom blocked domain through the live UI
+  - verifies blocked-page bypass leaves `blocked.html` and that the site no longer redirects after rule removal
+  - accepts `MEELIO_BLOCK_TEST_DOMAIN` so the blocked-domain smoke target can be changed without editing the script
+- Verification completed:
+  - `pnpm --filter @repo/timer-core test -- --run`
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter extension build`
+  - `pnpm validate:extension`

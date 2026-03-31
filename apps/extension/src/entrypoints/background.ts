@@ -1,7 +1,8 @@
 import {
   TimerStage,
+  getNextTimerStage,
   type TimerMessage,
-} from "../../../../packages/shared/src/types/timer.types";
+} from "@repo/timer-core";
 import { defineBackground } from "wxt/utils/define-background";
 
 import {
@@ -369,10 +370,7 @@ const handleTimerMessage = (message: TimerMessage): void => {
         const left = remaining();
         if (left <= 0) {
           const finishedStage = timerState.stage;
-          timerState.stage =
-            timerState.stage === TimerStage.Focus
-              ? TimerStage.Break
-              : TimerStage.Focus;
+          timerState.stage = getNextTimerStage(timerState.stage);
           timerState.isRunning = false;
           chrome.runtime.sendMessage({
             type: "TICK",

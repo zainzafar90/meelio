@@ -37,6 +37,9 @@ importers:
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@repo/timer-core':
+        specifier: workspace:*
+        version: link:../../packages/timer-core
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -480,6 +483,9 @@ importers:
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
+      '@repo/timer-core':
+        specifier: workspace:*
+        version: link:../timer-core
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -601,6 +607,24 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.19(yaml@2.8.2))
+
+  packages/timer-core:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.1
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/typescript-config: {}
 

@@ -1,81 +1,8 @@
-export enum TimerStage {
-  Focus = "focus",
-  Break = "break",
-}
+export * from "@repo/timer-core";
 
-export interface TimerDurations {
-  [TimerStage.Focus]: number;
-  [TimerStage.Break]: number;
-}
-
-export interface TimerSettings {
-  notifications: boolean;
-  sounds: boolean;
-  soundId: string;
-  // Controls whether ambient soundscapes auto-play during focus and are managed by the timer
-  soundscapes: boolean;
-  // When true, automatically start breaks (and next focus) after stage completion
-  autoStartBreaks: boolean;
-}
-
-export interface TimerStats {
-  focusSec: number;
-  breakSec: number;
-}
-
-export interface StartMessage {
-  type: "START";
-  duration: number;
-  stage: TimerStage;
-}
-export interface PauseMessage {
-  type: "PAUSE";
-}
-export interface ResetMessage {
-  type: "RESET";
-  stage: TimerStage;
-}
-export interface UpdateDurationMessage {
-  type: "UPDATE_DURATION";
-  duration: number;
-}
-export interface SkipStageMessage {
-  type: "SKIP_TO_NEXT_STAGE";
-  nextStage: TimerStage;
-}
-export type TimerMessage =
-  | StartMessage
-  | PauseMessage
-  | ResetMessage
-  | UpdateDurationMessage
-  | SkipStageMessage;
-
-export interface TickMessage {
-  type: "TICK";
-  remaining: number;
-}
-export interface StageCompleteMessage {
-  type: "STAGE_COMPLETE";
-  finishedStage: TimerStage;
-}
-export interface PausedMessage {
-  type: "PAUSED";
-  remaining: number;
-}
-export interface ResetCompleteMessage {
-  type: "RESET_COMPLETE";
-}
-export type TimerEvent =
-  | TickMessage
-  | StageCompleteMessage
-  | PausedMessage
-  | ResetCompleteMessage;
-
-export interface TimerRuntimeAdapter {
-  sendMessage(message: TimerMessage): void;
-  subscribe(callback: (message: TimerEvent) => void): () => void;
-  showNotification(title: string, message: string): void;
-}
+import type { TimerSnapshot } from "@repo/timer-core";
+import type { TimerStage } from "@repo/timer-core";
+import type { TimerSettings } from "@repo/timer-core";
 
 export interface TimerDeps {
   now: () => number;
@@ -83,15 +10,7 @@ export interface TimerDeps {
   pushSettings: (settings: TimerSettings) => Promise<void>;
 }
 
-export interface TimerState {
-  stage: TimerStage;
-  isRunning: boolean;
-  endTimestamp: number | null;
-  durations: TimerDurations;
-  settings: TimerSettings;
-  stats: TimerStats;
-  unsyncedFocusSec: number;
-  prevRemaining: number | null;
+export interface TimerState extends TimerSnapshot {
   start: () => void;
   pause: () => void;
   reset: () => void;
