@@ -12,3 +12,10 @@
 - Extension browser validators need to neutralize first-run onboarding state before interacting with dock- or sheet-driven UI; otherwise the overlay can make a valid flow look broken.
 - When driving controlled React inputs from a browser validator, use the native input value setter plus a bubbling `InputEvent` instead of assigning `input.value` directly.
 - Do not hardcode the blocker smoke-test domain inside the validator. Keep it configurable via an env var so user or environment-specific targets like `zainzafar.net` can be swapped without editing code.
+- When closing a task, distinguish clearly between "done for the agreed scope" and "possible future follow-ups" so completion status does not sound self-contradictory.
+- When migrating an app to a new workspace package, update the consuming app's `package.json` and lockfile in the same change. Tests can still pass while the real production build fails on unresolved workspace imports.
+- When refining a multi-surface feature like the site blocker, do not stop at the drawer if the blocked page is part of the same user journey. Audit both the control surface and the interruption surface before calling the design pass complete.
+- Do not interrupt an in-progress UX pass with another approval gate when the user has already clearly extended the same request to the next surface. Capture the lesson once if needed, then continue the implementation.
+- Do not claim a visual alignment fix on a DOM-built page until the rendered page is visually checked. Inline `style` attributes cannot contain stylesheet rules like `:root {}` or `* {}`; use a real `<style>` tag or explicit element styles for page-wide theming.
+- When the user gives concrete visual feedback like “too bold” or “too bland,” respond by tuning the actual typography/color system, not by defending the previous direction. Screenshot feedback is design evidence.
+- For monorepo-local `tsconfig` inheritance, prefer direct relative `extends` paths when editor/static tooling reports file-not-found issues on workspace package aliases. Build-time package resolution and editor-time config resolution do not always behave the same.

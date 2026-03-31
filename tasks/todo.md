@@ -106,3 +106,63 @@
   - `pnpm --filter extension test -- --run`
   - `pnpm --filter extension build`
   - `pnpm validate:extension`
+
+# Remaining Branch Blockers
+
+- [x] Migrate the web/shared timer runtime fully onto `@repo/timer-core`
+- [x] Extend `validate:extension` to prove `focus-only` blocking behavior
+- [x] Wire the validator into CI
+- [x] Re-run verification after the blocker-scope changes
+
+## Blocker Review
+
+- User clarified that web/shared timer migration, `focus-only` validation, and CI wiring are blockers for branch completion, not optional follow-ups.
+- Resolved gaps:
+  - `apps/web/src/stores/web.timer.store.ts` now owns a local web timer store built directly on `@repo/timer-core`
+  - `packages/shared/src/stores/timer.store.ts` now delegates timer transitions to `@repo/timer-core`
+  - `packages/shared/src/components/timer.tsx` now types the timer store against Zustand state instead of `ReturnType<typeof createTimerStore>`, so web and extension stores can diverge cleanly
+  - `scripts/validate/extension.mjs` now proves `focus-only` gating by asserting the same blocked domain stays unblocked during a running break and redirects again during a running focus session
+  - `.github/workflows/extension-validator.yml` now runs shared/web timer boundary checks, the web production build, and `pnpm validate:extension` in CI
+- Verification completed after the blocker-scope changes:
+  - `pnpm --filter @repo/timer-core test -- --run`
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter web test -- --run`
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `MEELIO_BLOCK_TEST_DOMAIN=zainzafar.net pnpm validate:extension`
+
+# Site Blocker UI Alignment
+
+- [x] Audit the current extension blocker sheet against existing Meelio sheet patterns
+- [x] Align the blocker drawer structure, spacing, controls, and surfaces with Meelio design language
+- [x] Verify the updated drawer with targeted extension checks
+
+## UI Alignment Notes
+
+- Current mismatch: the blocker sheet uses more standalone card treatments and a more “settings console” feel than the calmer, flatter Meelio sheets used by bookmarks, tab stash, and the legacy blocker surface.
+- The redesign should preserve the current functionality while bringing the visual hierarchy, spacing rhythm, and control treatments back toward the existing Meelio drawer language.
+- Implemented changes:
+  - simplified the header language and brought the tabs into the same quieter drawer treatment used elsewhere in Meelio
+  - replaced the heavier nested cards with flatter bordered sections and row-based controls
+  - restyled the shared blocker preset rows so the category list and site items feel like Meelio content, not a separate tool embedded inside the sheet
+  - removed the duplicate “Popular Sites” heading in the extension flow and made the curated list read as part of the same surface
+  - redesigned `blocked.html` so the interruption page now reads like an expanded Meelio blocker surface instead of a separate glassy landing page
+  - tuned `blocked.html` typography down from the overly heavy first pass and added restrained emerald/sky badge accents so the page feels lighter without drifting away from the Meelio palette
+- Verification completed:
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter extension test -- --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `MEELIO_BLOCK_TEST_DOMAIN=zainzafar.net pnpm validate:extension`
+
+# Timer Core Tsconfig Fix
+
+- [x] Reproduce the `packages/timer-core/tsconfig.json` resolution issue
+- [x] Replace the brittle workspace-package `extends` path with a direct monorepo-relative config path
+- [x] Re-run targeted timer-core TypeScript verification
+
+## Tsconfig Fix Review
+
+- Root cause: `packages/timer-core/tsconfig.json` extended `@repo/typescript-config/base.json`, which resolves under the workspace toolchain but can fail in editor/static resolution paths that do not follow workspace package lookup the same way.
+- Fix applied: `packages/timer-core/tsconfig.json` now extends `../typescript-config/base.json` directly, which keeps the package self-contained inside the monorepo and avoids package-resolution ambiguity for the config file itself.
