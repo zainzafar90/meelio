@@ -4,7 +4,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(process.cwd(), "../..");
-const validatorPath = path.join(repoRoot, "scripts/validate/extension.mjs");
+const validatorScenarioPath = path.join(
+  repoRoot,
+  "scripts/validate/scenarios/extension-flow.mjs"
+);
 const workflowPath = path.join(
   repoRoot,
   ".github/workflows/extension-validator.yml"
@@ -12,7 +15,7 @@ const workflowPath = path.join(
 
 describe("extension validator coverage", () => {
   it("covers focus-only blocker mode explicitly", () => {
-    const source = readFileSync(validatorPath, "utf8");
+    const source = readFileSync(validatorScenarioPath, "utf8");
 
     expect(source).toContain("focus-only");
     expect(source).toContain("blocker/set-timer-state");
