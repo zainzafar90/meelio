@@ -58,16 +58,6 @@ pnpm test             # Run tests
 
 ## Testing
 
-```bash
-# Pure timer-core unit tests
-pnpm --filter @repo/timer-core test -- --run
-
-# Shared package tests
-pnpm --filter @repo/shared test -- --run
-
-# Extension unit/regression tests
-pnpm --filter extension test -- --run
-
 # Extension production build
 pnpm --filter extension build
 
