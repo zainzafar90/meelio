@@ -1,4 +1,5 @@
 import { waitFor, assert, sleep } from "./utils.mjs";
+import { getValidationCopy } from "./validation-copy.mjs";
 
 export async function openTabFromWorker(workerClient, url) {
   return workerClient.evaluate(`
@@ -53,6 +54,51 @@ export async function waitForUrl(pageClient, predicate, description, timeoutMs =
     description,
     () => pageClient.evaluate("(() => location.href)()"),
     predicate,
+    timeoutMs
+  );
+}
+
+export async function clickButtonByLabel(pageClient, label) {
+  const result = await pageClient.evaluate(`
+    (() => {
+      const button = Array.from(document.querySelectorAll("button")).find(
+        (candidate) =>
+          candidate instanceof HTMLButtonElement &&
+          (
+            candidate.getAttribute("title") === ${JSON.stringify(label)} ||
+            candidate.getAttribute("aria-label") === ${JSON.stringify(label)} ||
+            candidate.textContent?.trim() === ${JSON.stringify(label)}
+          )
+      );
+      if (!button) {
+        return false;
+      }
+      button.click();
+      return true;
+    })()
+  `);
+
+  assert(result, `Unable to find button with label "${label}".`);
+}
+
+export async function waitForButtonByLabel(pageClient, label, timeoutMs = 15000) {
+  return waitFor(
+    `button with label "${label}"`,
+    () =>
+      pageClient.evaluate(`
+        (() => Boolean(
+          Array.from(document.querySelectorAll("button")).find(
+            (candidate) =>
+              candidate instanceof HTMLButtonElement &&
+              (
+                candidate.getAttribute("title") === ${JSON.stringify(label)} ||
+                candidate.getAttribute("aria-label") === ${JSON.stringify(label)} ||
+                candidate.textContent?.trim() === ${JSON.stringify(label)}
+              )
+          )
+        ))()
+      `),
+    Boolean,
     timeoutMs
   );
 }
@@ -202,7 +248,10 @@ export async function requestAllSitesPermission(pageClient) {
     return true;
   }
 
-  await clickButtonByText(pageClient, "Request access");
+  await clickButtonByText(
+    pageClient,
+    getValidationCopy("site-blocker.drawer.access.request")
+  );
   await sleep(1200);
 
   if (await hasAllSitesPermission(pageClient)) {

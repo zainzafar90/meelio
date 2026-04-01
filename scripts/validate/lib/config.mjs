@@ -12,6 +12,8 @@ export const extensionOutputDir = path.join(
 export const blockerPattern =
   process.env.MEELIO_BLOCK_TEST_DOMAIN || "zainzafar.net";
 export const blockedPageSuffix = "/blocked.html";
+export const validationLocale =
+  process.env.MEELIO_VALIDATION_LOCALE || "en-US";
 export const isCi = process.env.CI === "true";
 export const browserStartupTimeoutMs = Number(
   process.env.MEELIO_BROWSER_STARTUP_TIMEOUT_MS ||

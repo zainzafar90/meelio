@@ -10,6 +10,7 @@ import {
   isCi,
   pregrantBlockerAccess,
   repoRoot,
+  validationLocale,
 } from "./config.mjs";
 import { connectToTarget, CdpClient, waitForDebugger, waitForTarget } from "./cdp.mjs";
 import {
@@ -105,6 +106,7 @@ export async function launchBrowserSession() {
     `--load-extension=${validationExtensionDir}`,
     `--remote-debugging-port=${port}`,
     "--remote-debugging-address=127.0.0.1",
+    `--lang=${validationLocale}`,
     "--no-first-run",
     "--no-default-browser-check",
     "--new-window",
