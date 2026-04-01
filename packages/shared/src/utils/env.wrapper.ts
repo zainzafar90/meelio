@@ -31,8 +31,10 @@ export class EnvWrapper {
 
   private getExtensionEnv(): Environment {
     return {
-      cdnUrl: process.env.PLASMO_PUBLIC_CDN_URL || "",
-      dev: process.env.PLASMO_PUBLIC_DEV || false,
+      // @ts-ignore - Vite specific
+      cdnUrl: import.meta.env.VITE_CDN_URL || "",
+      // @ts-ignore - Vite specific
+      dev: import.meta.env.DEV || false,
     };
   }
 

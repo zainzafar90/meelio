@@ -1,13 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/shallow";
+import { useTranslation } from "@repo/shared/i18n";
 
 import {
   AppLayout,
   AppProvider,
   Background,
   BackgroundSelectorSheet,
+  BookmarksDynamicIsland,
   BookmarksSheet,
   BreathePod,
   CalendarDynamicIsland,
@@ -19,8 +20,6 @@ import {
   Quote,
   SearchPopover,
   ShortcutsModal,
-  SimpleTimer,
-  SiteBlockerSheet,
   SoundscapesSheet,
   TabStashSheet,
   TaskListSheet,
@@ -28,7 +27,8 @@ import {
   useBookmarksStore,
   useDockStore,
 } from "@repo/shared";
-import { BookmarksDynamicIsland } from "@repo/shared/src/components/core/bookmarks/bookmarks-dynamic-island";
+import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
+import { ExtensionTimer } from "./components/extension.timer";
 
 import "./style.css";
 
@@ -85,7 +85,7 @@ const Content = () => {
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
-      <SiteBlockerSheet />
+      <ExtensionSiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />
@@ -108,7 +108,7 @@ const GreetingsContent = () => {
       <AnimatePresence mode="wait">
         {isTimerVisible ? (
           <motion.div key="timer" {...fadeSlideAnimation}>
-            <SimpleTimer />
+            <ExtensionTimer />
           </motion.div>
         ) : (
           <motion.div

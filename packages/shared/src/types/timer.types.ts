@@ -1,87 +1,16 @@
-export enum TimerStage {
-  Focus = "focus",
-  Break = "break",
-}
+export * from "@repo/timer-core";
 
-export interface TimerDurations {
-  [TimerStage.Focus]: number;
-  [TimerStage.Break]: number;
-}
-
-export interface TimerSettings {
-  notifications: boolean;
-  sounds: boolean;
-  // Controls whether ambient soundscapes auto-play during focus and are managed by the timer
-  soundscapes: boolean;
-  // When true, automatically start breaks (and next focus) after stage completion
-  autoStartBreaks: boolean;
-}
-
-export interface TimerStats {
-  focusSec: number;
-  breakSec: number;
-}
-
-export interface StartMessage {
-  type: "START";
-  duration: number;
-}
-export interface PauseMessage {
-  type: "PAUSE";
-}
-export interface ResetMessage {
-  type: "RESET";
-}
-export interface UpdateDurationMessage {
-  type: "UPDATE_DURATION";
-  duration: number;
-}
-export interface SkipStageMessage {
-  type: "SKIP_TO_NEXT_STAGE";
-}
-export type TimerMessage =
-  | StartMessage
-  | PauseMessage
-  | ResetMessage
-  | UpdateDurationMessage
-  | SkipStageMessage;
-
-export interface TickMessage {
-  type: "TICK";
-  remaining: number;
-}
-export interface StageCompleteMessage {
-  type: "STAGE_COMPLETE";
-}
-export interface PausedMessage {
-  type: "PAUSED";
-  remaining: number;
-}
-export interface ResetCompleteMessage {
-  type: "RESET_COMPLETE";
-}
-export type TimerEvent =
-  | TickMessage
-  | StageCompleteMessage
-  | PausedMessage
-  | ResetCompleteMessage;
+import type { TimerSnapshot } from "@repo/timer-core";
+import type { TimerStage } from "@repo/timer-core";
+import type { TimerSettings } from "@repo/timer-core";
 
 export interface TimerDeps {
   now: () => number;
   pushUsage: (seconds: number) => Promise<void>;
   pushSettings: (settings: TimerSettings) => Promise<void>;
-  postMessage?: (msg: TimerMessage) => void;
 }
 
-export interface TimerState {
-  stage: TimerStage;
-  isRunning: boolean;
-  endTimestamp: number | null;
-  durations: TimerDurations;
-  settings: TimerSettings;
-  stats: TimerStats;
-  unsyncedFocusSec: number;
-  prevRemaining: number | null;
+export interface TimerState extends TimerSnapshot {
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -93,6 +22,7 @@ export interface TimerState {
   toggleSounds: () => void;
   toggleSoundscapes: () => void;
   toggleAutoStartBreaks: () => void;
+  setSoundId: (id: string) => void;
   updateRemaining: (remaining: number) => void;
   restore: () => void;
   completeStage: () => void;

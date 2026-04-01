@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 import { Bookmark, ChevronDown, ChevronRight, Folder } from "lucide-react";
 import { useShallow } from "zustand/shallow";
@@ -65,7 +64,7 @@ function DropdownContainer({
 }: DropdownContainerProps): JSX.Element {
   const showScrollHint = items.length > 8;
 
-  return createPortal(
+  return (
     <div
       data-bookmark-dropdown
       data-depth={depth}
@@ -85,8 +84,7 @@ function DropdownContainer({
           <ChevronDown className="h-3 w-3 text-white/50" />
         </div>
       )}
-    </div>,
-    document.body
+    </div>
   );
 }
 

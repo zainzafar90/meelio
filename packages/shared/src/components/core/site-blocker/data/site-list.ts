@@ -87,6 +87,20 @@ export interface Site {
   defaultDeleted?: boolean;
 }
 
+export const SITE_CATEGORY_LABEL_KEYS: Record<string, string> = {
+  "entertainment-group": "site-blocker.drawer.presets.categories.entertainment",
+  "social-group": "site-blocker.drawer.presets.categories.social",
+  "games-group": "site-blocker.drawer.presets.categories.games",
+  "creativity-group": "site-blocker.drawer.presets.categories.creativity",
+  "education-group": "site-blocker.drawer.presets.categories.education",
+  "health-fitness-group": "site-blocker.drawer.presets.categories.healthFitness",
+  "information-group": "site-blocker.drawer.presets.categories.information",
+  "productivity-finance-group":
+    "site-blocker.drawer.presets.categories.productivityFinance",
+  "shopping-food-group": "site-blocker.drawer.presets.categories.shoppingFood",
+  "travel-group": "site-blocker.drawer.presets.categories.travel",
+};
+
 export const SITE_CATEGORIES: SiteCategory[] = [
   {
     name: "Entertainment",

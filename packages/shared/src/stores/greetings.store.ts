@@ -1,24 +1,24 @@
 import { create } from "zustand";
 
-import mantras from "../data/mantras.json";
+import mantrasEn from "../data/mantras.json";
+import { getLocaleMantras } from "../data/locale-content";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { getSeedIndexByDate } from "../utils/common.utils";
 
 interface MantraStore {
   isMantraVisible: boolean;
   currentMantra: string;
-  mantras: string[];
-  updateMantra: () => void;
+  updateMantra: (lang?: string) => void;
   setIsMantraVisible: (isVisible: boolean) => void;
 }
 
 export const useMantraStore = create<MantraStore>()(
   persist(
     (set) => ({
-      currentMantra: mantras[0].text,
-      mantras: mantras.map((mantra) => mantra.text),
+      currentMantra: mantrasEn[0].text,
       isMantraVisible: false,
-      updateMantra: () => {
+      updateMantra: (lang = "en") => {
+        const mantras = getLocaleMantras(lang);
         const index = getSeedIndexByDate(mantras.length);
         set({ currentMantra: mantras[index].text });
       },
@@ -31,7 +31,6 @@ export const useMantraStore = create<MantraStore>()(
       version: 3,
       onRehydrateStorage: () => (state) => {
         if (state) {
-          const index = getSeedIndexByDate(mantras.length);
           state.updateMantra();
         }
       },

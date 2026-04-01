@@ -5,19 +5,24 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "peerDependencies": {
     "react": "^18.3.1"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.0"
+    "@types/chrome": "0.0.258",
+    "@types/uuid": "^9.0.0",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
     "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
+    "@repo/timer-core": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.67.3",
@@ -49,12 +54,13 @@
     "zustand": "^5"
   },
   "exports": {
-    ".": "./src/index.tsx",
+    ".": "./src/index.ts",
     "./api/*": "./src/api/**/*.ts",
     "./components/*": "./src/components/**/*.{tsx,ts}",
     "./context/*": "./src/context/**/*.{ts,tsx}",
     "./data/*": "./src/data/**/*.{ts,json}",
     "./hooks/*": "./src/hooks/**/*.{ts,tsx}",
+    "./i18n": "./src/i18n/index.ts",
     "./i18n/*": "./src/i18n/**/*.{ts,tsx}",
     "./lib/*": "./src/lib/**/*.ts",
     "./providers/*": "./src/providers/**/*.{ts,tsx}",

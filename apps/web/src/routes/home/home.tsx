@@ -1,27 +1,27 @@
-import { useTranslation } from "react-i18next";
-
+import { useTranslation } from "@repo/shared/i18n";
 import {
-  Clock,
-  TabStashSheet,
+  AppLayout,
+  Background,
+  BackgroundSelectorSheet,
   BookmarksSheet,
-  CalendarSheet,
+  BreathePod,
   CalendarDynamicIsland,
+  CalendarSheet,
+  Clock,
+  Dock,
+  Greeting,
+  NotesSheet,
+  Quote,
   SearchPopover,
+  ShortcutsModal,
+  SoundscapesSheet,
+  TabStashSheet,
+  TaskListSheet,
   useDockStore,
 } from "@repo/shared";
-import { Background } from "@repo/shared";
-import { BackgroundSelectorSheet } from "@repo/shared";
-import { BreathePod } from "@repo/shared";
-import { Greeting } from "@repo/shared";
-import { AppLayout } from "@repo/shared";
-import { Quote } from "@repo/shared";
-import { SoundscapesSheet } from "@repo/shared";
-import { TaskListSheet } from "@repo/shared";
-import { Dock } from "@repo/shared";
-import { NotesSheet, ShortcutsModal } from "@repo/shared";
 import { AnimatePresence, motion } from "framer-motion";
+import { WebSiteBlockerSheet } from "@/components/web.site-blocker.sheet";
 import { WebTimer } from "@/components/web.timer";
-import { SiteBlockerSheet } from "@repo/shared";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
@@ -59,7 +59,7 @@ const Content = () => {
       <TaskListSheet />
       <NotesSheet />
       <BackgroundSelectorSheet />
-      <SiteBlockerSheet />
+      <WebSiteBlockerSheet />
       <TabStashSheet />
       <BookmarksSheet />
       <CalendarSheet />

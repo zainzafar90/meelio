@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src", "vitest.config.ts", "wxt.config.ts", "tailwind.config.ts"],
+  "exclude": ["node_modules", ".output", ".wxt"]
+}

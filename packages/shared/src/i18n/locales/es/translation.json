@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "Configuración guardada",
-        "description": "Tu configuración ha sido guardada."
+        "description": "Tu configuración ha sido guardada.",
+        "error": "No se pudieron guardar los ajustes",
+        "errorDescription": "Vuelve a intentarlo en un momento."
+      },
+      "notifications": {
+        "label": "Notificaciones del temporizador",
+        "description": "Muestra una notificación cuando termina una sesión de enfoque o descanso.",
+        "denied": "No se concedió el permiso de notificaciones."
+      },
+      "notificationSound": {
+        "label": "Sonido de notificación",
+        "description": "Reproduce un sonido breve junto con las notificaciones del temporizador."
+      },
+      "soundscapes": {
+        "label": "Paisajes sonoros ambientales",
+        "description": "Mantén disponibles los paisajes sonoros ambientales mientras te concentras."
+      },
+      "soundPicker": {
+        "label": "Sonido de notificación",
+        "description": "Elige qué sonido se reproduce cuando el temporizador cambia de etapa.",
+        "placeholder": "Selecciona un sonido",
+        "preview": "Vista previa del sonido"
+      },
+      "actions": {
+        "saving": "Guardando..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "Modo de descanso",
       "reset": "Restablecer temporizador",
       "startStop": "Iniciar/Detener temporizador",
-      "skipStage": "Saltar a la siguiente etapa"
+      "skipStage": "Saltar a la siguiente etapa",
+      "focusLabel": "Enfoque",
+      "breakLabel": "Descanso",
+      "resetLabel": "Restablecer",
+      "viewStats": "Ver estadísticas",
+      "statsLabel": "Estadísticas",
+      "skipToNextStage": "Saltar a la siguiente etapa",
+      "settings": "Configuración"
+    },
+    "validation": {
+      "invalidNumber": "Introduce un número válido",
+      "min": "Debe ser al menos {{count}}",
+      "max": "Debe ser como máximo {{count}}"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "Obtener la Extensión",
     "upgrade": "Actualizar a Pro",
     "premium-feature-title": "Bloqueador de Sitios Premium",
-    "premium-feature": "Actualiza a Pro para bloquear sitios web ilimitados que te distraen y mantener el enfoque."
+    "premium-feature": "Actualiza a Pro para bloquear sitios web ilimitados que te distraen y mantener el enfoque.",
+    "invalid-url": "Formato de URL no válido",
+    "already-blocked": "Este sitio ya está bloqueado",
+    "site-added": "Sitio bloqueado correctamente",
+    "already-exists": "El sitio ya existe",
+    "add-failed": "No se pudo añadir el sitio",
+    "input-placeholder": "Introduce la URL de un sitio personalizado (p. ej., example.com)",
+    "add-button": "Añadir",
+    "drawer": {
+      "description": "Bloqueo estricto con revisión ligera de actividad dentro del panel de nueva pestaña.",
+      "eyebrow": "Herramientas de la extensión",
+      "subtitle": "Bloqueo estricto con revisión ligera de actividad dentro del panel de nueva pestaña.",
+      "tabs": {
+        "sites": "Sitios",
+        "activity": "Actividad"
+      },
+      "summary": {
+        "activeRules": "{{count}} reglas activas",
+        "accessReady": "Acceso a todos los sitios listo",
+        "needsAccess": "Se necesita acceso a todos los sitios"
+      },
+      "sections": {
+        "protection": "Protección",
+        "rules": "Reglas",
+        "presets": "Preajustes",
+        "backup": "Respaldo",
+        "activity": "Actividad",
+        "events": "Eventos",
+        "sessions": "Sesiones"
+      },
+      "errors": {
+        "updateFailed": "No se pudieron actualizar los ajustes del bloqueador."
+      },
+      "blocking": {
+        "title": "Comportamiento de bloqueo",
+        "description": "Mantén la aplicación y los controles de tiempo juntos para que el bloqueador se sienta parte del flujo de enfoque.",
+        "strictTitle": "Bloqueador estricto",
+        "strictDescription": "Redirige los sitios coincidentes a la página bloqueada antes de que se rendericen.",
+        "activationTitle": "Modo de activación",
+        "activationDescription": "Mantén los sitios bloqueados todo el tiempo o solo durante las sesiones de enfoque.",
+        "activationAlways": "Siempre activo",
+        "activationFocusOnly": "Solo sesiones de enfoque"
+      },
+      "access": {
+        "title": "Acceso a sitios",
+        "granted": "Se concedió acceso a todos los sitios. El bloqueo y la actividad de navegación están disponibles en las páginas compatibles.",
+        "missing": "Concede acceso a todos los sitios para aplicar bloqueo estricto y actividad de navegación.",
+        "request": "Solicitar acceso",
+        "denied": "No se concedió acceso a todos los sitios."
+      },
+      "custom": {
+        "title": "Dominios personalizados",
+        "description": "Añade tus propios dominios cuando los grupos predefinidos sean demasiado amplios o no incluyan lo que te distrae.",
+        "placeholder": "Añadir un dominio personalizado",
+        "add": "Añadir",
+        "empty": "Aún no se añadieron dominios personalizados.",
+        "blockedNow": "Bloqueado ahora",
+        "savedInactive": "Guardado pero inactivo",
+        "disable": "Desactivar",
+        "enable": "Activar",
+        "remove": "Eliminar",
+        "invalid": "Introduce un dominio válido como example.com",
+        "added": "Ahora {{pattern}} está bloqueado."
+      },
+      "presets": {
+        "title": "Sitios seleccionados",
+        "description": "Grupos predefinidos del catálogo existente de Meelio.",
+        "heading": "Sitios populares",
+        "copy": "Preajustes seleccionados del catálogo existente de Meelio.",
+        "groupBlocked": "{{blocked}} / {{total}} bloqueados",
+        "blockAll": "Bloquear todo",
+        "unblockAll": "Desbloquear todo",
+        "blocked": "Bloqueado",
+        "block": "Bloquear",
+        "categories": {
+          "entertainment": "Entretenimiento",
+          "social": "Social",
+          "games": "Juegos",
+          "creativity": "Creatividad",
+          "education": "Educación",
+          "healthFitness": "Salud y ejercicio",
+          "information": "Información",
+          "productivityFinance": "Productividad y finanzas",
+          "shoppingFood": "Compras y comida",
+          "travel": "Viajes"
+        }
+      },
+      "backup": {
+        "title": "Copia local",
+        "description": "Exporta o importa reglas del bloqueador y datos de actividad en este dispositivo.",
+        "export": "Exportar datos",
+        "import": "Importar datos",
+        "importSuccess": "Datos del bloqueador importados.",
+        "importFailed": "No se pudieron importar los datos del bloqueador."
+      },
+      "activity": {
+        "topSitesTitle": "Sitios principales",
+        "topSitesDescription": "Los últimos 7 días de tiempo de navegación, visitas e intentos bloqueados.",
+        "topSitesSummary": "{{visits}} visitas · {{blocked}} bloqueados",
+        "topSitesEmpty": "Aún no hay actividad de navegación.",
+        "eventsTitle": "Eventos recientes",
+        "eventsDescription": "Intentos bloqueados, omisiones y cambios de permisos.",
+        "eventsEmpty": "Aún no hay eventos del bloqueador.",
+        "sessionsTitle": "Sesiones recientes",
+        "sessionsDescription": "Las últimas sesiones capturadas por el rastreador.",
+        "sessionsEmpty": "Aún no hay sesiones registradas.",
+        "events": {
+          "blocked": "{{pattern}} fue bloqueado",
+          "bypassStarted": "Se inició una omisión para {{pattern}}",
+          "bypassEnded": "La omisión de {{pattern}} terminó",
+          "permissionDenied": "Se denegó el acceso a todos los sitios"
+        }
+      },
+      "bootstrap": "Sincronizando el estado del bloqueador..."
+    },
+    "blockedPage": {
+      "genericPattern": "este sitio",
+      "eyebrow": "Herramientas de la extensión",
+      "title": "Este sitio está bloqueado",
+      "genericDescription": "Esta página está bloqueada actualmente porque coincide con una de tus reglas activas de enfoque de Meelio.",
+      "patternDescription": "{{pattern}} está bloqueado actualmente porque coincide con una de tus reglas activas de enfoque de Meelio.",
+      "ruleLabel": "Regla",
+      "genericRuleValue": "Regla activa",
+      "modeLabel": "Modo",
+      "modeValue": "Bloqueador estricto",
+      "bypassTitle": "Omisión temporal",
+      "bypassDescription": "Las omisiones se mantienen locales y caducan automáticamente, para que puedas continuar sin desactivar por completo la regla.",
+      "navigationTitle": "Navegación",
+      "navigationDescription": "Vuelve atrás, abre la configuración de Meelio o continúa después de iniciar una omisión temporal.",
+      "footerNote": "Usa una omisión temporal si necesitas continuar de forma intencional, o vuelve a Meelio para cambiar la regla.",
+      "continue": "Continuar al sitio",
+      "bypassEnabled": "Omisión habilitada durante {{minutes}} minutos.",
+      "bypassFailed": "No se pudo iniciar la omisión. Inténtalo de nuevo.",
+      "bypass15": "Omitir 15 min",
+      "bypass60": "Omitir 60 min",
+      "back": "Volver",
+      "openSettings": "Abrir ajustes de Meelio"
+    }
   },
   "tab-stash": {
     "title": "Guardar Pestañas",

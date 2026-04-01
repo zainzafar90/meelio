@@ -4,7 +4,6 @@ export * from "./use-mobile";
 export * from "./use-mounted";
 export * from "./use-oscillation";
 export * from "./use-previous";
-export * from "./use-timer";
 export * from "./use-document-title";
 export * from "./use-wallpaper-search";
 export * from "./use-debounced-value";

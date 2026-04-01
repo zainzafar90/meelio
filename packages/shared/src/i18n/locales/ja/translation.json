@@ -302,7 +302,31 @@
       },
       "toast": {
         "success": "設定を保存しました",
-        "description": "設定が保存されました。"
+        "description": "設定が保存されました。",
+        "error": "設定を保存できませんでした",
+        "errorDescription": "少ししてからもう一度お試しください。"
+      },
+      "notifications": {
+        "label": "タイマー通知",
+        "description": "集中または休憩セッションが終わると通知を表示します。",
+        "denied": "通知の許可が付与されませんでした。"
+      },
+      "notificationSound": {
+        "label": "通知音",
+        "description": "タイマー通知と一緒に短い音を再生します。"
+      },
+      "soundscapes": {
+        "label": "環境サウンドスケープ",
+        "description": "集中中も環境サウンドスケープを利用できるようにします。"
+      },
+      "soundPicker": {
+        "label": "通知音",
+        "description": "タイマーがステージを切り替えるときに鳴る音を選びます。",
+        "placeholder": "音を選択",
+        "preview": "音を試聴"
+      },
+      "actions": {
+        "saving": "保存中..."
       }
     },
     "reset": {
@@ -319,7 +343,19 @@
       "breakMode": "休憩モード",
       "reset": "タイマーをリセット",
       "startStop": "タイマーを開始/停止",
-      "skipStage": "次のステージにスキップ"
+      "skipStage": "次のステージにスキップ",
+      "focusLabel": "集中",
+      "breakLabel": "休憩",
+      "resetLabel": "リセット",
+      "viewStats": "統計を見る",
+      "statsLabel": "統計",
+      "skipToNextStage": "次のステージへ進む",
+      "settings": "設定"
+    },
+    "validation": {
+      "invalidNumber": "有効な数値を入力してください",
+      "min": "{{count}} 以上である必要があります",
+      "max": "{{count}} 以下である必要があります"
     }
   },
   "settings": {
@@ -483,7 +519,144 @@
     "get-extension": "拡張機能を取得",
     "upgrade": "Proにアップグレード",
     "premium-feature-title": "プレミアムサイトブロッカー",
-    "premium-feature": "Proにアップグレードして、無制限に気を散らすウェブサイトをブロックし、集中力を維持しましょう。"
+    "premium-feature": "Proにアップグレードして、無制限に気を散らすウェブサイトをブロックし、集中力を維持しましょう。",
+    "invalid-url": "無効な URL 形式です",
+    "already-blocked": "このサイトはすでにブロックされています",
+    "site-added": "サイトをブロックしました",
+    "already-exists": "サイトはすでに存在します",
+    "add-failed": "サイトを追加できませんでした",
+    "input-placeholder": "カスタムサイト URL を入力してください（例: example.com）",
+    "add-button": "追加",
+    "drawer": {
+      "description": "新しいタブのドロワー内で、軽いアクティビティ確認と一緒に厳格なブロックを行います。",
+      "eyebrow": "拡張機能ツール",
+      "subtitle": "新しいタブのドロワー内で、軽いアクティビティ確認と一緒に厳格なブロックを行います。",
+      "tabs": {
+        "sites": "サイト",
+        "activity": "アクティビティ"
+      },
+      "summary": {
+        "activeRules": "{{count}} 件の有効なルール",
+        "accessReady": "全サイトアクセスの準備完了",
+        "needsAccess": "全サイトアクセスが必要"
+      },
+      "sections": {
+        "protection": "保護",
+        "rules": "ルール",
+        "presets": "プリセット",
+        "backup": "バックアップ",
+        "activity": "アクティビティ",
+        "events": "イベント",
+        "sessions": "セッション"
+      },
+      "errors": {
+        "updateFailed": "ブロッカー設定を更新できませんでした。"
+      },
+      "blocking": {
+        "title": "ブロック動作",
+        "description": "ブロックと時間管理をまとめて、ブロッカーが集中フローの一部として感じられるようにします。",
+        "strictTitle": "厳格なブロッカー",
+        "strictDescription": "一致するサイトを、表示前にブロックページへリダイレクトします。",
+        "activationTitle": "有効化モード",
+        "activationDescription": "サイトを常にブロックするか、集中セッション中だけブロックします。",
+        "activationAlways": "常にオン",
+        "activationFocusOnly": "集中セッション中のみ"
+      },
+      "access": {
+        "title": "サイトアクセス",
+        "granted": "全サイトへのアクセスが許可されています。ブロックと閲覧アクティビティは対応ページで利用できます。",
+        "missing": "厳格なブロックと閲覧アクティビティのために、全サイトへのアクセスを許可してください。",
+        "request": "アクセスをリクエスト",
+        "denied": "全サイトへのアクセスは許可されませんでした。"
+      },
+      "custom": {
+        "title": "カスタムドメイン",
+        "description": "プリセットグループが広すぎる場合、または気を散らすサイトが含まれていない場合に独自のドメインを追加します。",
+        "placeholder": "カスタムドメインを追加",
+        "add": "追加",
+        "empty": "まだカスタムドメインはありません。",
+        "blockedNow": "現在ブロック中",
+        "savedInactive": "保存済みですが無効です",
+        "disable": "無効にする",
+        "enable": "有効にする",
+        "remove": "削除",
+        "invalid": "example.com のような有効なドメインを入力してください",
+        "added": "{{pattern}} がブロックされました。"
+      },
+      "presets": {
+        "title": "キュレーションされたサイト",
+        "description": "既存の Meelio カタログからのプリセットグループです。",
+        "heading": "人気のサイト",
+        "copy": "既存の Meelio カタログからのキュレーション済みプリセットです。",
+        "groupBlocked": "{{blocked}} / {{total}} 件をブロック",
+        "blockAll": "すべてブロック",
+        "unblockAll": "すべて解除",
+        "blocked": "ブロック済み",
+        "block": "ブロック",
+        "categories": {
+          "entertainment": "エンターテインメント",
+          "social": "ソーシャル",
+          "games": "ゲーム",
+          "creativity": "クリエイティブ",
+          "education": "学習",
+          "healthFitness": "健康・フィットネス",
+          "information": "情報",
+          "productivityFinance": "生産性・金融",
+          "shoppingFood": "買い物・食事",
+          "travel": "旅行"
+        }
+      },
+      "backup": {
+        "title": "ローカルバックアップ",
+        "description": "このデバイスでブロッカールールとアクティビティデータをエクスポートまたはインポートします。",
+        "export": "データをエクスポート",
+        "import": "データをインポート",
+        "importSuccess": "ブロッカーデータをインポートしました。",
+        "importFailed": "ブロッカーデータをインポートできませんでした。"
+      },
+      "activity": {
+        "topSitesTitle": "主要サイト",
+        "topSitesDescription": "過去 7 日間の閲覧時間、訪問数、ブロック試行です。",
+        "topSitesSummary": "{{visits}} 回の訪問・{{blocked}} 回ブロック",
+        "topSitesEmpty": "まだ閲覧アクティビティはありません。",
+        "eventsTitle": "最近のイベント",
+        "eventsDescription": "ブロック試行、バイパス、権限変更です。",
+        "eventsEmpty": "まだブロッカーイベントはありません。",
+        "sessionsTitle": "最近のセッション",
+        "sessionsDescription": "トラッカーが記録した最新の閲覧セッションです。",
+        "sessionsEmpty": "まだ記録されたセッションはありません。",
+        "events": {
+          "blocked": "{{pattern}} がブロックされました",
+          "bypassStarted": "{{pattern}} のバイパスを開始しました",
+          "bypassEnded": "{{pattern}} のバイパスが終了しました",
+          "permissionDenied": "全サイトアクセスが拒否されました"
+        }
+      },
+      "bootstrap": "ブロッカー状態を同期しています..."
+    },
+    "blockedPage": {
+      "genericPattern": "このサイト",
+      "eyebrow": "拡張機能ツール",
+      "title": "このサイトはブロックされています",
+      "genericDescription": "このページは、現在有効な Meelio の集中ルールのいずれかに一致するためブロックされています。",
+      "patternDescription": "{{pattern}} は、現在有効な Meelio の集中ルールのいずれかに一致するためブロックされています。",
+      "ruleLabel": "ルール",
+      "genericRuleValue": "有効なルール",
+      "modeLabel": "モード",
+      "modeValue": "厳格なブロッカー",
+      "bypassTitle": "一時バイパス",
+      "bypassDescription": "バイパスはローカルのまま自動で期限切れになるため、ルール全体を無効にせずに続行できます。",
+      "navigationTitle": "ナビゲーション",
+      "navigationDescription": "戻る、Meelio 設定を開く、または時間制限付きバイパスを開始して続行できます。",
+      "footerNote": "続行が必要な場合は時間制限付きバイパスを使うか、Meelio に戻ってルールを変更してください。",
+      "continue": "サイトへ進む",
+      "bypassEnabled": "{{minutes}} 分のバイパスを有効にしました。",
+      "bypassFailed": "バイパスを開始できませんでした。もう一度お試しください。",
+      "bypass15": "15分バイパス",
+      "bypass60": "60分バイパス",
+      "back": "戻る",
+      "openSettings": "Meelio 設定を開く"
+    }
   },
   "tab-stash": {
     "title": "タブ保管",

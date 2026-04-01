@@ -13,13 +13,25 @@ import { SiteList } from "./components/site-list";
 import { CustomBlockedSites } from "./components/custom-sites";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import { useShallow } from "zustand/shallow";
-import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
+import {
+  createSiteBlockerStore,
+  useSiteBlockerStore,
+} from "../../../stores/site-blocker.store";
 import { toast } from "sonner";
 
-const isExtension =
-  typeof chrome !== "undefined" && chrome.storage !== undefined;
+type SiteBlockerStoreHook = ReturnType<typeof createSiteBlockerStore>;
 
-export function SiteBlockerSheet() {
+interface SiteBlockerSheetProps {
+  siteBlockerStore?: SiteBlockerStoreHook;
+  isSupported?: boolean;
+  onOpenExtensionClick?: () => void;
+}
+
+export function SiteBlockerSheet({
+  siteBlockerStore = useSiteBlockerStore,
+  isSupported = true,
+  onOpenExtensionClick,
+}: SiteBlockerSheetProps) {
   const { t } = useTranslation();
   const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore(
     useShallow((state) => ({
@@ -51,25 +63,28 @@ export function SiteBlockerSheet() {
           </h2>
         </div>
 
-        {isExtension ? (
-          <ExtensionSiteBlockerContent />
+        {isSupported ? (
+          <SiteBlockerContent siteBlockerStore={siteBlockerStore} />
         ) : (
-          <BrowserSiteBlockerContent />
+          <BrowserSiteBlockerContent onOpenExtensionClick={onOpenExtensionClick} />
         )}
       </SheetContent>
     </Sheet>
   );
 }
 
-const ExtensionSiteBlockerContent = () => {
+const SiteBlockerContent = ({
+  siteBlockerStore,
+}: {
+  siteBlockerStore: SiteBlockerStoreHook;
+}) => {
   const { t } = useTranslation();
   const [siteInput, setSiteInput] = useState("");
-  const { sites, addSite, toggleSite, removeSite, bulkAddSites, bulkRemoveSites, initializeStore } = useSiteBlockerStore(
+  const { sites, addSite, toggleSite, bulkAddSites, bulkRemoveSites, initializeStore } = siteBlockerStore(
     useShallow((state) => ({
       sites: state.sites,
       addSite: state.addSite,
       toggleSite: state.toggleSite,
-      removeSite: state.removeSite,
       bulkAddSites: state.bulkAddSites,
       bulkRemoveSites: state.bulkRemoveSites,
       initializeStore: state.initializeStore,
@@ -190,7 +205,11 @@ const ExtensionSiteBlockerContent = () => {
   );
 };
 
-const BrowserSiteBlockerContent = () => {
+const BrowserSiteBlockerContent = ({
+  onOpenExtensionClick,
+}: {
+  onOpenExtensionClick?: () => void;
+}) => {
   const { t } = useTranslation();
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
@@ -203,11 +222,13 @@ const BrowserSiteBlockerContent = () => {
       <Button
         variant="outline"
         className="mt-4"
-        onClick={() =>
-          window.open(
-            "https://chromewebstore.google.com/detail/meelio/cjcgnlglboofgepielbmjcepcdohipaj",
-            "_blank"
-          )
+        onClick={
+          onOpenExtensionClick ??
+          (() =>
+            window.open(
+              "https://chromewebstore.google.com/detail/meelio/cjcgnlglboofgepielbmjcepcdohipaj",
+              "_blank"
+            ))
         }
       >
         {t("site-blocker.get-extension")}

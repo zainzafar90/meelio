@@ -1,6 +1,6 @@
 {
   "name": "meelio",
-  "version": "0.8.2",
+  "version": "0.9.2",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -14,7 +14,11 @@
     "dev": "turbo run dev",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "validate:extension": "node scripts/validate/extension.mjs",
+    "validate:app": "pnpm validate:extension",
+    "qa:baseline": "pnpm --filter @repo/logger test && pnpm --filter @repo/shared test -- --run && pnpm --filter extension test -- --run",
+    "qa:phase": "pnpm qa:baseline && pnpm --filter @repo/shared lint && pnpm --filter extension lint && pnpm --filter web lint"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.1",

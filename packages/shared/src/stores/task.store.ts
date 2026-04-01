@@ -38,6 +38,7 @@ interface TaskState {
   }) => Promise<void>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
+  editTask: (taskId: string, title: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
 
   addList: (list: Omit<TaskListMeta, "id"> & { id?: string }) => Promise<void>;
@@ -165,6 +166,22 @@ export const useTaskStore = create<TaskState>()(
           error:
             error instanceof Error ? error.message : "Failed to toggle task",
         });
+      }
+    },
+
+    editTask: async (taskId, title) => {
+      const trimmed = title.trim();
+      if (!trimmed) return;
+      try {
+        const updatedAt = Date.now();
+        await db.tasks.update(taskId, { title: trimmed, updatedAt });
+        set((state) => ({
+          tasks: state.tasks.map((t) =>
+            t.id === taskId ? { ...t, title: trimmed, updatedAt } : t
+          ),
+        }));
+      } catch (error) {
+        set({ error: error instanceof Error ? error.message : "Failed to edit task" });
       }
     },
 

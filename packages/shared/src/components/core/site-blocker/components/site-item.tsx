@@ -3,6 +3,7 @@ import { Ban, Plus } from "lucide-react";
 import type { Site } from "../data/site-list";
 import { FallbackSiteIcon } from "./fallback-site-icon";
 import { cn } from "@repo/ui/lib/utils";
+import { useTranslation } from "../../../../i18n";
 
 interface SiteItemProps {
   site: Site;
@@ -17,66 +18,85 @@ export function SiteItem({
   onToggle,
   disabled = false,
 }: SiteItemProps) {
-  const getBackgroundColor = (hex: string) => {
-    if (isBlocked) return "#ff000010";
-    if (disabled) return "#00000020";
-    return `#${hex}AA`;
-  };
+  const { t } = useTranslation();
+  const iconAccent = site.icon ? `#${site.icon.hex}` : "#71717a";
 
-  const getTextColor = () => {
-    if (disabled && !isBlocked) return "#ffffff40";
-    return isBlocked ? "#ffffff66" : "#ffffff";
-  };
-
-  const getIconColor = () => {
-    if (disabled && !isBlocked) return "#ffffff40";
-    return isBlocked ? "#ffffff66" : "#fff";
-  };
-
-  const buttonContent = (
+  return (
     <button
       onClick={() => !disabled && onToggle(site.url)}
       className={cn(
-        "group flex w-full items-center justify-between rounded-md border border-white/10 bg-white/5 px-3 py-2 transition-colors",
+        "group flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors",
         {
-          "hover:bg-white/[0.075]": !disabled || isBlocked,
-          "cursor-not-allowed opacity-60": disabled && !isBlocked,
+          "hover:bg-white/[0.045]": !disabled || isBlocked,
+          "cursor-not-allowed opacity-55": disabled && !isBlocked,
         }
       )}
-      style={{
-        backgroundColor: getBackgroundColor(site.icon?.hex || "#000"),
-      }}
       disabled={disabled && !isBlocked}
     >
-      <div className="flex items-center gap-2">
-        <div className="flex scale-75 transform items-center justify-center rounded">
+      <div className="flex min-w-0 items-center gap-3">
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]",
+            isBlocked && "border-rose-400/20 bg-rose-400/10"
+          )}
+          style={{
+            boxShadow: isBlocked
+              ? "none"
+              : `inset 0 0 0 1px color-mix(in srgb, ${iconAccent} 20%, transparent)`,
+          }}
+        >
           {site.icon ? (
-            <svg className="size-6">
-              <path d={site.icon.path} fill={getIconColor()} />
+            <svg className="size-5">
+              <path
+                d={site.icon.path}
+                fill={isBlocked ? "#ffe4e6" : iconAccent}
+              />
             </svg>
           ) : (
             <FallbackSiteIcon url={site.url} />
           )}
         </div>
-        <span
-          className={`text-sm font-medium`}
-          style={{ color: getTextColor() }}
-        >
-          {site.name}
-        </span>
+
+        <div className="min-w-0">
+          <p
+            className={cn("truncate text-sm font-medium", {
+              "text-white/90": !isBlocked && !disabled,
+              "text-rose-50": isBlocked,
+              "text-white/45": disabled && !isBlocked,
+            })}
+          >
+            {site.name}
+          </p>
+          <p className="truncate text-xs text-white/45">{site.url}</p>
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-white/60">{site.url}</span>
-        {isBlocked ? (
-          <Ban className="h-4 w-4 text-red-500" />
-        ) : (
-          <Plus
-            className={`h-4 w-4 ${disabled ? "text-white/30" : "text-white/60"}`}
-          />
-        )}
+
+      <div className="ml-3 flex shrink-0 items-center gap-2">
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium tracking-[0.01em]",
+            {
+              "border-rose-400/20 bg-rose-400/10 text-rose-100": isBlocked,
+              "border-white/10 bg-white/[0.04] text-white/60 group-hover:text-white/80":
+                !isBlocked && !disabled,
+              "border-white/10 bg-white/[0.02] text-white/35":
+                disabled && !isBlocked,
+            }
+          )}
+        >
+          {isBlocked ? (
+            <>
+              <Ban className="h-3.5 w-3.5" />
+              {t("site-blocker.drawer.presets.blocked")}
+            </>
+          ) : (
+            <>
+              <Plus className="h-3.5 w-3.5" />
+              {t("site-blocker.drawer.presets.block")}
+            </>
+          )}
+        </span>
       </div>
     </button>
   );
-
-  return buttonContent;
 }

@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 
 export interface LucideProps extends Partial<SVGProps<SVGSVGElement>> {
+  className?: string;
   size?: string | number;
   absoluteStrokeWidth?: boolean;
 }

@@ -64,15 +64,11 @@ export * from "./core/soundscapes/components/sound-player/controls/sound-control
 export * from "./core/timer/components/timer-donut-graph";
 export * from "./core/timer/components/timer-expanded-content";
 export * from "./core/timer/components/timer-session-indicators";
-export * from "./core/timer/components/timer-stats";
 export * from "./core/timer/components/timer-next-task";
 export * from "./core/timer/dialog/timer-reset.dialog";
 export * from "./core/timer/dialog/timer-stats.dialog";
 export * from "./timer";
 export * from "./timer-settings.dialog";
-
-// Main timer component - now points to unified implementation
-export { Timer as SimpleTimer } from "./timer";
 
 // Tasks
 export * from "./core/task-list/components/create-list";
@@ -85,6 +81,8 @@ export * from "./core/notes/notes.sheet";
 
 // Site Blocker
 export * from "./core/site-blocker/site-blocker.sheet";
+export * from "./core/site-blocker/components/site-list";
+export * from "./core/site-blocker/data/site-list";
 
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";

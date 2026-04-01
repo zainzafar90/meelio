@@ -5,6 +5,7 @@
   },
   "include": [
     "src",
+    "vitest.config.ts",
     "prettier.config.mjs",
     "tailwind.config.ts",
     "./.eslintrc.js"

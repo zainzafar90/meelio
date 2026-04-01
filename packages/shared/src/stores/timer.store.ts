@@ -1,79 +1,154 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { useAuthStore } from "./auth.store";
-import { pomodoroSounds } from "../data";
 import {
   TimerStage,
-  TimerState,
-  TimerDeps,
-  TimerSettings,
-} from "../types/timer.types";
+  completeTimerStage,
+  createInitialTimerSnapshot,
+  pauseTimer,
+  resetTimer,
+  restoreTimer,
+  skipToTimerStage,
+  startTimer,
+  updateTimerDurations,
+  updateTimerRemaining,
+  type TimerRuntimeAdapter,
+  type TimerSettings,
+  type TimerSnapshot,
+} from "@repo/timer-core";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+import { pomodoroSounds } from "../data";
 import {
-  addSimpleTimerFocusTime,
   addSimpleTimerBreakTime,
+  addSimpleTimerFocusTime,
 } from "../lib/db/pomodoro.dexie";
-import { getTimerPlatform, TimerPlatform } from "../lib/timer.platform";
-import { timerEvents } from "../utils/timer-events";
 import { soundSyncService } from "../services/sound-sync.service";
+import type { TimerState } from "../types/timer.types";
+import { timerEvents } from "../utils/timer-events";
+
+interface TimerStoreDeps {
+  now: () => number;
+  pushUsage: (seconds: number) => Promise<void>;
+}
+
+const TIMER_STORAGE_KEY = "meelio:simple-timer";
+const TIMER_LAST_RESET_KEY = "meelio:simple-timer:lastReset";
 
 const playCompletionSound = async (
   soundEnabled: boolean,
-  soundId: string = "timeout-1-back-chime"
+  soundId = "timeout-1-back-chime"
 ) => {
-  if (!soundEnabled) return;
+  if (!soundEnabled) {
+    return;
+  }
 
   try {
-    const sound = pomodoroSounds.find((s) => s.id === soundId);
-    if (!sound) return;
+    const sound = pomodoroSounds.find((entry) => entry.id === soundId);
+    if (!sound) {
+      return;
+    }
 
     const url = await soundSyncService.getSoundUrl(sound.url);
     const audio = new Audio(url);
     audio.volume = 0.5;
-    audio.play().catch((error) => {
-      console.error("Failed to play timer sound:", error);
-    });
+    await audio.play();
   } catch (error) {
-    console.error("Error playing completion sound:", error);
+    console.error("Failed to play timer sound:", error);
   }
 };
 
-function initState(): Omit<
-  TimerState,
-  | keyof TimerDeps
-  | "start"
-  | "pause"
-  | "reset"
-  | "skipToStage"
-  | "updateDurations"
-  | "toggleNotifications"
-  | "toggleSounds"
-  | "toggleSoundscapes"
-  | "toggleAutoStartBreaks"
-  | "updateRemaining"
-  | "restore"
-  | "completeStage"
-  | "checkDailyReset"
-  | "playCompletionSound"
-  | "showCompletionNotification"
-> {
-  return {
-    stage: TimerStage.Focus,
-    isRunning: false,
-    endTimestamp: null,
-    durations: { [TimerStage.Focus]: 25 * 60, [TimerStage.Break]: 5 * 60 },
-    settings: { notifications: true, sounds: true, soundscapes: true, autoStartBreaks: true },
-    stats: { focusSec: 0, breakSec: 0 },
-    unsyncedFocusSec: 0,
-    prevRemaining: null,
-  };
-}
+const pickTimerSnapshot = (state: TimerState): TimerSnapshot => ({
+  stage: state.stage,
+  isRunning: state.isRunning,
+  endTimestamp: state.endTimestamp,
+  durations: state.durations,
+  settings: state.settings,
+  stats: state.stats,
+  unsyncedFocusSec: state.unsyncedFocusSec,
+  prevRemaining: state.prevRemaining,
+});
 
-export const createTimerStore = (platform: TimerPlatform) => {
-  const deps: TimerDeps = {
+const emitTimerStart = (state: TimerSnapshot, duration: number) => {
+  timerEvents.emit({
+    type: "timer:start",
+    stage: state.stage === TimerStage.Focus ? "focus" : "break",
+    duration,
+    remaining: duration,
+    data: {
+      soundscapesEnabled: state.settings.soundscapes ?? true,
+    },
+  });
+};
+
+const emitTimerPause = (state: TimerSnapshot, remaining: number | null) => {
+  timerEvents.emit({
+    type: "timer:pause",
+    stage: state.stage === TimerStage.Focus ? "focus" : "break",
+    remaining: remaining ?? undefined,
+    data: {
+      soundscapesEnabled: state.settings.soundscapes ?? true,
+    },
+  });
+};
+
+const emitTimerReset = (state: TimerSnapshot) => {
+  timerEvents.emit({
+    type: "timer:reset",
+    stage: "focus",
+    data: {
+      soundscapesEnabled: state.settings.soundscapes ?? true,
+    },
+  });
+};
+
+const emitDurationUpdate = (
+  state: TimerSnapshot,
+  durations: Partial<{ focus: number; break: number }>
+) => {
+  timerEvents.emit({
+    type: "timer:duration-update",
+    stage: state.stage === TimerStage.Focus ? "focus" : "break",
+    duration:
+      durations.focus ?? durations.break ?? state.durations[state.stage],
+    data: {
+      focus: durations.focus ?? state.durations[TimerStage.Focus],
+      break: durations.break ?? state.durations[TimerStage.Break],
+    },
+  });
+};
+
+const emitTimerComplete = (
+  finishedStage: TimerStage,
+  completedDuration: number,
+  settings: TimerSettings
+) => {
+  const nextStage =
+    finishedStage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus;
+
+  timerEvents.emit({
+    type: "timer:complete",
+    stage: finishedStage === TimerStage.Focus ? "focus" : "break",
+    duration: completedDuration,
+    data: {
+      nextStage: nextStage === TimerStage.Focus ? "focus" : "break",
+      soundscapesEnabled: settings.soundscapes ?? true,
+    },
+  });
+
+  timerEvents.emit({
+    type: "timer:stage-change",
+    stage: nextStage === TimerStage.Focus ? "focus" : "break",
+    data: {
+      soundscapesEnabled: settings.soundscapes ?? true,
+    },
+  });
+};
+
+const getTodayKey = (): string => new Date().toISOString().split("T")[0]!;
+
+export const createTimerStore = (runtime: TimerRuntimeAdapter) => {
+  const deps: TimerStoreDeps = {
     now: () => Date.now(),
     pushUsage: async () => Promise.resolve(),
-    pushSettings: async (_: TimerSettings) => Promise.resolve(),
-    postMessage: (msg) => platform.sendMessage(msg),
   };
 
   return create<TimerState>()(
@@ -96,347 +171,247 @@ export const createTimerStore = (platform: TimerPlatform) => {
               ? "Great work! Time for a break."
               : "Ready to focus again?";
 
-          platform.showNotification(title, body);
+          runtime.showNotification(title, body);
+        };
+
+        const checkDailyReset = () => {
+          const todayKey = getTodayKey();
+          const lastResetDate = localStorage.getItem(TIMER_LAST_RESET_KEY);
+
+          if (lastResetDate === todayKey) {
+            return;
+          }
+
+          set((state) => ({
+            stats: {
+              ...state.stats,
+              focusSec: 0,
+              breakSec: 0,
+            },
+          }));
+
+          localStorage.setItem(TIMER_LAST_RESET_KEY, todayKey);
         };
 
         const start = () => {
           checkDailyReset();
 
-          const state = get();
-          const duration = state.prevRemaining ?? state.durations[state.stage];
-          const end = deps.now() + duration * 1000;
-          deps.postMessage?.({ type: "START", duration });
-          set({ isRunning: true, endTimestamp: end, prevRemaining: duration });
+          const current = pickTimerSnapshot(get());
+          const next = startTimer(current, deps.now());
+          const duration = next.prevRemaining ?? next.durations[next.stage];
 
-          timerEvents.emit({
-            type: 'timer:start',
-            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
+          runtime.sendMessage({
+            type: "START",
             duration,
-            remaining: duration,
-            data: {
-              soundscapesEnabled: state.settings.soundscapes ?? true,
-            },
+            stage: next.stage,
           });
+          set(next);
+          emitTimerStart(next, duration);
         };
 
         const pause = () => {
-          const state = get();
-          const end = state.endTimestamp;
-          const remain =
-            end !== null
-              ? Math.max(0, Math.ceil((end - deps.now()) / 1000))
-              : null;
-          deps.postMessage?.({ type: "PAUSE" });
-          set({ isRunning: false, endTimestamp: null, prevRemaining: remain });
+          const current = pickTimerSnapshot(get());
+          const next = pauseTimer(current, deps.now());
 
-          timerEvents.emit({
-            type: 'timer:pause',
-            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
-            remaining: remain ?? undefined,
-            data: {
-              soundscapesEnabled: state.settings.soundscapes ?? true,
-            },
-          });
+          runtime.sendMessage({ type: "PAUSE" });
+          set(next);
+          emitTimerPause(current, next.prevRemaining);
         };
 
         const reset = () => {
-          const state = get();
-          const duration = state.durations[TimerStage.Focus];
-          deps.postMessage?.({ type: "RESET" });
-          set({
-            stage: TimerStage.Focus,
-            isRunning: false,
-            endTimestamp: null,
-            stats: { focusSec: 0, breakSec: 0 },
-            unsyncedFocusSec: 0,
-            prevRemaining: duration,
-          });
+          const current = pickTimerSnapshot(get());
+          const next = resetTimer(current);
 
-          timerEvents.emit({
-            type: 'timer:reset',
-            stage: 'focus',
-            data: {
-              soundscapesEnabled: state.settings.soundscapes ?? true,
-            },
+          runtime.sendMessage({
+            type: "RESET",
+            stage: TimerStage.Focus,
           });
+          set(next);
+          emitTimerReset(current);
         };
 
         const skipToStage = (stage: TimerStage) => {
-          const duration = get().durations[stage];
-          deps.postMessage?.({ type: "SKIP_TO_NEXT_STAGE" });
-          set({
-            stage,
-            isRunning: false,
-            endTimestamp: null,
-            prevRemaining: duration,
+          const next = skipToTimerStage(pickTimerSnapshot(get()), stage);
+
+          runtime.sendMessage({
+            type: "SKIP_TO_NEXT_STAGE",
+            nextStage: stage,
           });
+          set(next);
         };
 
-        const updateDurations = (
-          d: Partial<{ focus: number; break: number }>
+        const updateDurationsAction = (
+          durations: Partial<{ focus: number; break: number }>
         ) => {
-          set((s) => {
-            const newDurations = {
-              [TimerStage.Focus]: d.focus ?? s.durations[TimerStage.Focus],
-              [TimerStage.Break]: d.break ?? s.durations[TimerStage.Break],
-            };
+          const current = pickTimerSnapshot(get());
+          const next = updateTimerDurations(current, durations);
+          const activeStageKey =
+            current.stage === TimerStage.Focus ? "focus" : "break";
 
-            const stageKey = s.stage === TimerStage.Focus ? 'focus' : 'break';
-            const shouldUpdatePrevRemaining = !s.isRunning && d[stageKey] !== undefined;
-
-            return {
-              durations: newDurations,
-              prevRemaining: shouldUpdatePrevRemaining
-                ? newDurations[s.stage]
-                : s.prevRemaining,
-            };
-          });
-
-          const state = get();
-          const stageKey = state.stage === TimerStage.Focus ? 'focus' : 'break';
-          if (state.isRunning && d[stageKey] !== undefined) {
-            deps.postMessage?.({
+          set(next);
+          if (current.isRunning && durations[activeStageKey] !== undefined) {
+            runtime.sendMessage({
               type: "UPDATE_DURATION",
-              duration: d[stageKey]!,
+              duration: durations[activeStageKey]!,
             });
           }
 
-          timerEvents.emit({
-            type: 'timer:duration-update',
-            stage: state.stage === TimerStage.Focus ? 'focus' : 'break',
-            duration: d.focus ?? d.break ?? state.durations[state.stage],
-            data: {
-              focus: d.focus ?? state.durations[TimerStage.Focus],
-              break: d.break ?? state.durations[TimerStage.Break],
-            },
-          });
+          emitDurationUpdate(next, durations);
         };
 
-        const toggleNotifications = () => {
-          set((s) => ({
-            settings: {
-              ...s.settings,
-              notifications: !s.settings.notifications,
-            },
-          }));
-        };
+        const updateRemainingAction = (remaining: number) => {
+          const current = pickTimerSnapshot(get());
+          const next = updateTimerRemaining(current, remaining);
 
-        const toggleSounds = () => {
-          set((s) => ({
-            settings: { ...s.settings, sounds: !s.settings.sounds },
-          }));
-        };
-
-        const toggleAutoStartBreaks = () => {
-          set((s) => ({
-            settings: { ...s.settings, autoStartBreaks: !s.settings.autoStartBreaks },
-          }));
-        };
-
-        const updateRemaining = (remaining: number) => {
-          const s = get();
-          if (s.prevRemaining !== null && s.isRunning) {
-            const diff = s.prevRemaining - remaining;
-            if (s.stage === TimerStage.Focus) {
-              const focus = s.stats.focusSec + diff;
-              const unsynced = s.unsyncedFocusSec + diff;
-
-              set({
-                stats: { ...s.stats, focusSec: focus },
-                unsyncedFocusSec: unsynced,
-                prevRemaining: remaining,
+          set(next);
+          if (next.stage === TimerStage.Focus && next.unsyncedFocusSec >= 300) {
+            void deps
+              .pushUsage(next.unsyncedFocusSec)
+              .then(() => set({ unsyncedFocusSec: 0 }))
+              .catch((error: Error) => {
+                console.error("sync usage failed", error);
               });
-              if (unsynced >= 300) {
-                deps
-                  .pushUsage(unsynced)
-                  .then(() => set({ unsyncedFocusSec: 0 }))
-                  .catch((error: Error) => {
-                    console.error("sync usage failed", error);
-                  });
-              }
-            } else {
-              set({
-                stats: { ...s.stats, breakSec: s.stats.breakSec + diff },
-                prevRemaining: remaining,
-              });
-            }
-          } else {
-            set({ prevRemaining: remaining });
-          }
-        };
-
-        const checkDailyReset = () => {
-          const now = new Date();
-          const todayStr = now.toISOString().split("T")[0];
-          const lastResetDate = localStorage.getItem(
-            "meelio:simple-timer:lastReset"
-          );
-
-          if (lastResetDate !== todayStr) {
-            set((state) => ({
-              stats: {
-                ...state.stats,
-                focusSec: 0,
-                breakSec: 0,
-              },
-            }));
-
-            localStorage.setItem("meelio:simple-timer:lastReset", todayStr);
           }
         };
 
         const restore = () => {
           checkDailyReset();
 
-          const s = get();
-          if (!s.isRunning || !s.endTimestamp) return;
-          const left = Math.ceil((s.endTimestamp - deps.now()) / 1000);
+          const current = pickTimerSnapshot(get());
+          if (!current.isRunning || current.endTimestamp === null) {
+            return;
+          }
+
+          const left = Math.max(
+            0,
+            Math.ceil((current.endTimestamp - deps.now()) / 1000)
+          );
+
           if (left <= 0) {
             set({ isRunning: false, endTimestamp: null });
-            deps.postMessage?.({ type: "RESET" });
-          } else {
-            deps.postMessage?.({ type: "START", duration: left });
-            set({ prevRemaining: left });
+            runtime.sendMessage({
+              type: "RESET",
+              stage: TimerStage.Focus,
+            });
+            return;
           }
+
+          runtime.sendMessage({
+            type: "START",
+            duration: left,
+            stage: current.stage,
+          });
+          set(restoreTimer(current, deps.now()));
         };
 
         const completeStage = () => {
-          const state = get();
-          const finishedStage = state.stage;
-          const completedDuration = state.durations[finishedStage];
+          const current = pickTimerSnapshot(get());
+          const finishedStage = current.stage;
+          const completedDuration = current.durations[finishedStage];
+          const next = completeTimerStage(current, finishedStage);
+
+          if (next === current) {
+            return;
+          }
 
           if (finishedStage === TimerStage.Focus) {
             addSimpleTimerFocusTime(completedDuration).catch((error) => {
               console.error("Failed to save focus time to database:", error);
             });
-          } else if (finishedStage === TimerStage.Break) {
+          } else {
             addSimpleTimerBreakTime(completedDuration).catch((error) => {
               console.error("Failed to save break time to database:", error);
             });
           }
 
-          playCompletionSound(state.settings.sounds).catch(console.error);
+          void playCompletionSound(
+            current.settings.sounds,
+            current.settings.soundId
+          ).catch(console.error);
           showCompletionNotification(
             finishedStage,
-            state.settings.notifications
+            current.settings.notifications
           );
 
-          const nextStage =
-            finishedStage === TimerStage.Focus
-              ? TimerStage.Break
-              : TimerStage.Focus;
-          const duration = state.durations[nextStage];
-
-          timerEvents.emit({
-            type: 'timer:complete',
-            stage: finishedStage === TimerStage.Focus ? 'focus' : 'break',
-            duration: completedDuration,
-            data: {
-              nextStage: nextStage === TimerStage.Focus ? 'focus' : 'break',
-              soundscapesEnabled: state.settings.soundscapes ?? true,
-            },
-          });
-
           set({
-            stage: nextStage,
+            stage: next.stage,
             isRunning: false,
             endTimestamp: null,
-            prevRemaining: duration,
+            prevRemaining: next.prevRemaining,
           });
-
-          timerEvents.emit({
-            type: 'timer:stage-change',
-            stage: nextStage === TimerStage.Focus ? 'focus' : 'break',
-            data: {
-              soundscapesEnabled: get().settings.soundscapes ?? true,
-            },
-          });
+          emitTimerComplete(
+            finishedStage,
+            completedDuration,
+            current.settings
+          );
         };
 
         return {
-          ...initState(),
+          ...createInitialTimerSnapshot(),
           start,
           pause,
           reset,
           skipToStage,
-          updateDurations,
-          toggleNotifications,
-          toggleSounds,
-          toggleAutoStartBreaks,
-          toggleSoundscapes: () => set((s) => ({
-            settings: { ...s.settings, soundscapes: !s.settings.soundscapes }
-          })),
-          updateRemaining,
+          updateDurations: updateDurationsAction,
+          toggleNotifications: () =>
+            set((state) => ({
+              settings: {
+                ...state.settings,
+                notifications: !state.settings.notifications,
+              },
+            })),
+          toggleSounds: () =>
+            set((state) => ({
+              settings: {
+                ...state.settings,
+                sounds: !state.settings.sounds,
+              },
+            })),
+          toggleSoundscapes: () =>
+            set((state) => ({
+              settings: {
+                ...state.settings,
+                soundscapes: !state.settings.soundscapes,
+              },
+            })),
+          toggleAutoStartBreaks: () =>
+            set((state) => ({
+              settings: {
+                ...state.settings,
+                autoStartBreaks: !state.settings.autoStartBreaks,
+              },
+            })),
+          setSoundId: (id: string) =>
+            set((state) => ({
+              settings: {
+                ...state.settings,
+                soundId: id,
+              },
+            })),
+          updateRemaining: updateRemainingAction,
           restore,
           completeStage,
           checkDailyReset,
-          playCompletionSound: () => playCompletionSound(get().settings.sounds).catch(console.error),
+          playCompletionSound: () =>
+            playCompletionSound(get().settings.sounds, get().settings.soundId)
+              .catch(console.error),
           showCompletionNotification: (stage: TimerStage) =>
             showCompletionNotification(stage, get().settings.notifications),
-        } as TimerState & {
-          completeStage: () => void;
-          checkDailyReset: () => void;
-          playCompletionSound: () => void;
-          showCompletionNotification: (stage: TimerStage) => void;
         };
       },
       {
-        name: "meelio:simple-timer",
+        name: TIMER_STORAGE_KEY,
         storage: createJSONStorage(() => localStorage),
-        partialize: (s) => ({
-          stage: s.stage,
-          durations: s.durations,
-          settings: s.settings,
-          stats: s.stats,
-          isRunning: s.isRunning,
-          endTimestamp: s.endTimestamp,
-          prevRemaining: s.prevRemaining,
+        partialize: (state) => ({
+          stage: state.stage,
+          durations: state.durations,
+          settings: state.settings,
+          stats: state.stats,
+          isRunning: state.isRunning,
+          endTimestamp: state.endTimestamp,
+          prevRemaining: state.prevRemaining,
         }),
       }
     )
   );
-};
-
-const createStoreRegistry = () => {
-  const registry = {
-    extensionStore: null as ReturnType<typeof createTimerStore> | null,
-    webStore: null as ReturnType<typeof createTimerStore> | null,
-  };
-
-  return {
-    getExtensionStore: () => registry.extensionStore,
-    setExtensionStore: (store: ReturnType<typeof createTimerStore>) => {
-      registry.extensionStore = store;
-    },
-    getWebStore: () => registry.webStore,
-    setWebStore: (store: ReturnType<typeof createTimerStore>) => {
-      registry.webStore = store;
-    },
-  };
-};
-
-const storeRegistry = createStoreRegistry();
-
-export const useTimerStore = () => {
-  const platform = getTimerPlatform();
-
-  const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
-
-  if (isExtension) {
-    const extensionStore = storeRegistry.getExtensionStore();
-    if (!extensionStore) {
-      const newStore = createTimerStore(platform);
-      storeRegistry.setExtensionStore(newStore);
-      return newStore;
-    }
-    return extensionStore;
-  } else {
-    const webStore = storeRegistry.getWebStore();
-    if (!webStore) {
-      const newStore = createTimerStore(platform);
-      storeRegistry.setWebStore(newStore);
-      return newStore;
-    }
-    return webStore;
-  }
 };

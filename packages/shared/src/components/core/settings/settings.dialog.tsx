@@ -7,6 +7,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -126,6 +127,15 @@ export function SettingsDialog() {
                 </SidebarGroupContent>
               </SidebarGroup>
             </SidebarContent>
+
+            <SidebarFooter className="p-3">
+              <a
+                href="mailto:support@meelio.io"
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors truncate"
+              >
+                support@meelio.io
+              </a>
+            </SidebarFooter>
           </Sidebar>
           <main className="flex h-full w-full flex-col">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b">

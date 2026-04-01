@@ -54,10 +54,8 @@ export function Blocker({ siteName, message, streak, onOpenAnyway }: BlockerProp
               </button>
 
             <button onClick={onOpenAnyway} className={style.openAnywayButton}>
-              <span className={style.openAnywayText}>
-                <span className={style.openAnywayIcon}>🔒</span>{" "}
-                Open "{siteName}" anyway
-              </span>
+              <span className={style.openAnywayIcon}>🔒</span>{" "}
+              Open "{siteName}" anyway
             </button>
           </div>
         </div>

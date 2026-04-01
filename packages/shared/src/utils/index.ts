@@ -3,5 +3,6 @@ export * from "./common.utils";
 export * from "./env.utils";
 export * from "./favicon.utils";
 export * from "./router.utils";
+export * from "./site-blocker.utils";
 export * from "./sound.utils";
 export * from "./timer.utils";
