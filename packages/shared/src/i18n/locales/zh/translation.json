@@ -615,6 +615,12 @@
         "importFailed": "无法导入拦截数据。"
       },
       "activity": {
+        "title": "Usage history",
+        "privacy": "Stored only on this device and never shared with anyone.",
+        "clear": "Clear history",
+        "clearConfirmTitle": "Clear usage history?",
+        "clearConfirmDescription": "This permanently removes tracked visits, sessions, and blocker events from this device. Your rules and blocker settings stay unchanged.",
+        "clearSuccess": "Usage history cleared.",
         "topSitesTitle": "热门网站",
         "topSitesDescription": "最近 7 天的浏览时长、访问次数和阻止次数。",
         "topSitesSummary": "{{visits}} 次访问 · {{blocked}} 次阻止",

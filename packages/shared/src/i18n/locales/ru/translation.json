@@ -615,6 +615,12 @@
         "importFailed": "Не удалось импортировать данные блокировщика."
       },
       "activity": {
+        "title": "Usage history",
+        "privacy": "Stored only on this device and never shared with anyone.",
+        "clear": "Clear history",
+        "clearConfirmTitle": "Clear usage history?",
+        "clearConfirmDescription": "This permanently removes tracked visits, sessions, and blocker events from this device. Your rules and blocker settings stay unchanged.",
+        "clearSuccess": "Usage history cleared.",
         "topSitesTitle": "Лучшие сайты",
         "topSitesDescription": "Последние 7 дней времени в браузере, посещений и заблокированных попыток.",
         "topSitesSummary": "{{visits}} посещений · {{blocked}} заблокировано",

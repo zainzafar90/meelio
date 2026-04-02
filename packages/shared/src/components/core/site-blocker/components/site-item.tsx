@@ -46,7 +46,12 @@ export function SiteItem({
           }}
         >
           {site.icon ? (
-            <svg className="size-5">
+            <svg
+              className="size-5"
+              viewBox="-2 -2 28 28"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+            >
               <path
                 d={site.icon.path}
                 fill={isBlocked ? "#ffe4e6" : iconAccent}

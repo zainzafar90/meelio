@@ -15,12 +15,17 @@ describe("extension localization boundaries", () => {
     expect(drawerSource).toContain('t("site-blocker.drawer.tabs.sites")');
     expect(drawerSource).toContain('t("site-blocker.drawer.custom.title")');
     expect(drawerSource).toContain('t("site-blocker.drawer.backup.importFailed")');
+    expect(drawerSource).toContain('t("site-blocker.drawer.activity.title")');
+    expect(drawerSource).toContain('t("site-blocker.drawer.activity.privacy")');
+    expect(drawerSource).toContain('t("site-blocker.drawer.activity.clear")');
+    expect(drawerSource).toContain('t("site-blocker.drawer.activity.clearConfirmTitle")');
     expect(drawerSource).toContain("formatLocalizedDuration");
     expect(drawerSource).toContain("formatLocalizedDateTime");
     expect(drawerSource).not.toContain(
       '"Strict blocking with lightweight activity review inside the new-tab drawer."'
     );
     expect(drawerSource).not.toContain('"Site access"');
+    expect(drawerSource).not.toContain('"Stored only on this device"');
     expect(drawerSource).not.toContain('"Syncing blocker state..."');
   });
 

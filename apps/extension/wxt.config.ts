@@ -17,7 +17,7 @@ export default defineConfig({
   manifest: {
     name: "Meelio",
     description: "Focus, calm & productivity with every new tab",
-    version: "0.9.2",
+    version: "0.9.3",
     permissions: [
       "storage",
       "alarms",

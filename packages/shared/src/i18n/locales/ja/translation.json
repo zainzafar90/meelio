@@ -615,6 +615,12 @@
         "importFailed": "ブロッカーデータをインポートできませんでした。"
       },
       "activity": {
+        "title": "Usage history",
+        "privacy": "Stored only on this device and never shared with anyone.",
+        "clear": "Clear history",
+        "clearConfirmTitle": "Clear usage history?",
+        "clearConfirmDescription": "This permanently removes tracked visits, sessions, and blocker events from this device. Your rules and blocker settings stay unchanged.",
+        "clearSuccess": "Usage history cleared.",
         "topSitesTitle": "主要サイト",
         "topSitesDescription": "過去 7 日間の閲覧時間、訪問数、ブロック試行です。",
         "topSitesSummary": "{{visits}} 回の訪問・{{blocked}} 回ブロック",

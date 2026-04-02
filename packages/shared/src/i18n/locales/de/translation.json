@@ -615,6 +615,12 @@
         "importFailed": "Blocker-Daten konnten nicht importiert werden."
       },
       "activity": {
+        "title": "Usage history",
+        "privacy": "Stored only on this device and never shared with anyone.",
+        "clear": "Clear history",
+        "clearConfirmTitle": "Clear usage history?",
+        "clearConfirmDescription": "This permanently removes tracked visits, sessions, and blocker events from this device. Your rules and blocker settings stay unchanged.",
+        "clearSuccess": "Usage history cleared.",
         "topSitesTitle": "Top-Websites",
         "topSitesDescription": "Die letzten 7 Tage Surfzeit, Besuche und Blockierungsversuche.",
         "topSitesSummary": "{{visits}} Besuche · {{blocked}} blockiert",

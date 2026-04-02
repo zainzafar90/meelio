@@ -178,6 +178,13 @@ export const appendBlockerEvent = (
   events: [...state.events, event],
 });
 
+export const clearActivityHistory = (state: BlockerState): BlockerState => ({
+  ...state,
+  events: [],
+  sessions: [],
+  dailyAggregates: [],
+});
+
 const withinLastSevenDays = (date: string, now: number): boolean => {
   const timestamp = Date.parse(`${date}T23:59:59.999Z`);
   if (Number.isNaN(timestamp)) {

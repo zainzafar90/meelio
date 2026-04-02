@@ -615,6 +615,12 @@
         "importFailed": "تعذر استيراد بيانات الحظر."
       },
       "activity": {
+        "title": "Usage history",
+        "privacy": "Stored only on this device and never shared with anyone.",
+        "clear": "Clear history",
+        "clearConfirmTitle": "Clear usage history?",
+        "clearConfirmDescription": "This permanently removes tracked visits, sessions, and blocker events from this device. Your rules and blocker settings stay unchanged.",
+        "clearSuccess": "Usage history cleared.",
         "topSitesTitle": "أهم المواقع",
         "topSitesDescription": "آخر 7 أيام من وقت التصفح والزيارات ومحاولات الحظر.",
         "topSitesSummary": "{{visits}} زيارة · {{blocked}} محظور",

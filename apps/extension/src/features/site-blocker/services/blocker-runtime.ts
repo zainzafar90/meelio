@@ -103,6 +103,10 @@ export interface BlockerRecordBlockedCommand {
   };
 }
 
+export interface BlockerClearActivityCommand {
+  type: "blocker/clear-activity";
+}
+
 export interface BlockerSetTimerStateCommand {
   type: "blocker/set-timer-state";
   payload: {
@@ -138,6 +142,7 @@ export type ExtensionCommand =
   | BlockerExportCommand
   | BlockerImportCommand
   | BlockerRecordBlockedCommand
+  | BlockerClearActivityCommand
   | BlockerSetTimerStateCommand
   | TrackingSessionUpdateCommand
   | TrackingSessionEndCommand
@@ -178,6 +183,7 @@ export interface ExtensionCommandResponseMap {
   "blocker/export": BlockerExport;
   "blocker/import": MutationStateResponse;
   "blocker/record-blocked": MutationStateResponse;
+  "blocker/clear-activity": MutationStateResponse;
   "blocker/set-timer-state": TrackingMutationResponse;
   "tracking/session-update": TrackingMutationResponse;
   "tracking/session-end": TrackingMutationResponse;
@@ -200,6 +206,7 @@ const extensionCommandTypes = new Set<ExtensionCommandType>([
   "blocker/export",
   "blocker/import",
   "blocker/record-blocked",
+  "blocker/clear-activity",
   "blocker/set-timer-state",
   "tracking/session-update",
   "tracking/session-end",

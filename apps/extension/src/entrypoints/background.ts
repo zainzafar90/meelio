@@ -31,6 +31,7 @@ import {
   addOrEnableRule,
   appendBlockerEvent,
   buildActivitySnapshot,
+  clearActivityHistory,
   clearBypassForPattern,
   removeRule,
   setActivationMode,
@@ -547,6 +548,10 @@ const handleExtensionCommand = async (
     case "blocker/record-blocked":
       return {
         state: await recordBlockedAttempt(sender, command),
+      };
+    case "blocker/clear-activity":
+      return {
+        state: await runBlockerMutation((state) => clearActivityHistory(state)),
       };
     case "blocker/set-timer-state":
       timerState.stage =

@@ -6,6 +6,17 @@ import {
   useTranslation,
 } from "@repo/shared/i18n";
 import { cn } from "@repo/ui/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@repo/ui/components/ui/alert-dialog";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import {
@@ -30,6 +41,7 @@ import {
   Globe2,
   ShieldAlert,
   ShieldCheck,
+  Trash2,
   Upload,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -121,6 +133,51 @@ const EmptyState = ({ children }: { children: React.ReactNode }) => (
   </p>
 );
 
+const ClearActivityHistoryDialog = ({
+  disabled,
+  onConfirm,
+  t,
+}: {
+  disabled: boolean;
+  onConfirm: () => void;
+  t: ReturnType<typeof useTranslation>["t"];
+}) => (
+  <AlertDialog>
+    <AlertDialogTrigger asChild>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={disabled}
+        className="border-white/10 bg-white/[0.04] text-white/75 hover:bg-white/[0.08] hover:text-white disabled:border-white/10 disabled:bg-transparent disabled:text-white/30"
+      >
+        <Trash2 className="size-4" />
+        {t("site-blocker.drawer.activity.clear")}
+      </Button>
+    </AlertDialogTrigger>
+    <AlertDialogContent className="border-white/10 bg-zinc-950 text-white">
+      <AlertDialogHeader>
+        <AlertDialogTitle className="text-white">
+          {t("site-blocker.drawer.activity.clearConfirmTitle")}
+        </AlertDialogTitle>
+        <AlertDialogDescription className="text-white/60">
+          {t("site-blocker.drawer.activity.clearConfirmDescription")}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08] hover:text-white">
+          {t("common.actions.cancel")}
+        </AlertDialogCancel>
+        <AlertDialogAction
+          className="bg-red-500 text-white hover:bg-red-500/90"
+          onClick={onConfirm}
+        >
+          {t("site-blocker.drawer.activity.clear")}
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+);
+
 export const ExtensionSiteBlockerSheet = () => {
   const { t } = useTranslation();
   const { isSiteBlockerVisible, toggleSiteBlocker } = useDockStore(
@@ -159,6 +216,10 @@ export const ExtensionSiteBlockerSheet = () => {
     () => buildActivitySnapshot(state, Date.now()),
     [state]
   );
+  const hasActivityHistory =
+    activity.topSites.length > 0 ||
+    activity.recentEvents.length > 0 ||
+    activity.recentSessions.length > 0;
 
   const runMutation = async <T extends Promise<unknown>>(task: () => T) => {
     try {
@@ -304,6 +365,14 @@ export const ExtensionSiteBlockerSheet = () => {
     }
   };
 
+  const handleClearActivityHistory = () =>
+    runMutation(async () => {
+      await sendExtensionCommand({
+        type: "blocker/clear-activity",
+      });
+      toast.success(t("site-blocker.drawer.activity.clearSuccess"));
+    });
+
   return (
     <Sheet open={isSiteBlockerVisible} onOpenChange={toggleSiteBlocker}>
       <SheetContent
@@ -318,42 +387,16 @@ export const ExtensionSiteBlockerSheet = () => {
         </VisuallyHidden>
 
         <div className="border-b border-white/10 px-6 py-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-white/35">
-                {t("site-blocker.drawer.eyebrow")}
-              </p>
-              <h2 className="mt-1 text-lg font-semibold text-white">
-                {t("site-blocker.title")}
-              </h2>
-              <p className="mt-1 text-sm text-white/50">
-                {t("site-blocker.drawer.subtitle")}
-              </p>
-            </div>
-            <div className="inline-flex rounded-full border border-white/10 bg-black/20 p-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab("sites")}
-                className={`rounded-full px-3 py-1.5 text-sm transition ${
-                  activeTab === "sites"
-                    ? "bg-white/12 text-white"
-                    : "text-white/50 hover:bg-white/[0.04] hover:text-white"
-                }`}
-              >
-                {t("site-blocker.drawer.tabs.sites")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("activity")}
-                className={`rounded-full px-3 py-1.5 text-sm transition ${
-                  activeTab === "activity"
-                    ? "bg-white/12 text-white"
-                    : "text-white/50 hover:bg-white/[0.04] hover:text-white"
-                }`}
-              >
-                {t("site-blocker.drawer.tabs.activity")}
-              </button>
-            </div>
+          <div className="pr-12">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-white/35">
+              {t("site-blocker.drawer.eyebrow")}
+            </p>
+            <h2 className="mt-1 text-lg font-semibold text-white">
+              {t("site-blocker.title")}
+            </h2>
+            <p className="mt-1 text-sm text-white/50">
+              {t("site-blocker.drawer.subtitle")}
+            </p>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -379,6 +422,37 @@ export const ExtensionSiteBlockerSheet = () => {
                 ? t("site-blocker.drawer.summary.accessReady")
                 : t("site-blocker.drawer.summary.needsAccess")}
             </span>
+          </div>
+
+          <div className="mt-4">
+            <div className="grid grid-cols-2 rounded-full border border-white/10 bg-black/20 p-1">
+              <button
+                type="button"
+                aria-pressed={activeTab === "sites"}
+                onClick={() => setActiveTab("sites")}
+                className={cn(
+                  "rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200",
+                  activeTab === "sites"
+                    ? "border border-white/15 bg-zinc-100 text-zinc-950 shadow-[0_8px_24px_rgba(255,255,255,0.18)]"
+                    : "border border-transparent text-white/45 hover:bg-white/[0.04] hover:text-white/80"
+                )}
+              >
+                {t("site-blocker.drawer.tabs.sites")}
+              </button>
+              <button
+                type="button"
+                aria-pressed={activeTab === "activity"}
+                onClick={() => setActiveTab("activity")}
+                className={cn(
+                  "rounded-full border px-3 py-2 text-sm font-semibold transition-all duration-200",
+                  activeTab === "activity"
+                    ? "border border-white/15 bg-zinc-100 text-zinc-950 shadow-[0_8px_24px_rgba(255,255,255,0.18)]"
+                    : "border border-transparent text-white/45 hover:bg-white/[0.04] hover:text-white/80"
+                )}
+              >
+                {t("site-blocker.drawer.tabs.activity")}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -663,6 +737,32 @@ export const ExtensionSiteBlockerSheet = () => {
         ) : (
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="space-y-5">
+              <section className={sectionShell}>
+                <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0 pr-2">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-white/35">
+                      {t("site-blocker.drawer.sections.activity")}
+                    </p>
+                    <h3 className="mt-1 text-sm font-semibold text-white">
+                      {t("site-blocker.drawer.activity.title")}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-white/50">
+                      {t("site-blocker.drawer.activity.privacy")}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0">
+                    <ClearActivityHistoryDialog
+                      disabled={!hasActivityHistory}
+                      onConfirm={() => {
+                        void handleClearActivityHistory();
+                      }}
+                      t={t}
+                    />
+                  </div>
+                </div>
+              </section>
+
               <Section
                 eyebrow={t("site-blocker.drawer.sections.activity")}
                 title={t("site-blocker.drawer.activity.topSitesTitle")}

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   addOrEnableRule,
   buildActivitySnapshot,
+  clearActivityHistory,
   clearBypassForPattern,
   removeRule,
   setActivationMode,
@@ -201,6 +202,71 @@ describe("blocker-state", () => {
           bypassSessions: 0,
         },
       ],
+    });
+  });
+
+  it("clears usage history without removing blocker configuration", () => {
+    const state: BlockerState = {
+      ...createEmptyBlockerState(),
+      settings: {
+        enabled: true,
+        activationMode: "always",
+        permissionGranted: true,
+        updatedAt: 123,
+      },
+      rules: [
+        createBlockRule({
+          id: "youtube",
+          pattern: "youtube.com",
+          source: "preset",
+        }),
+      ],
+      bypassGrants: [
+        {
+          pattern: "youtube.com",
+          originalUrl: "https://youtube.com/watch?v=1",
+          createdAt: 50,
+          expiresAt: 500,
+        },
+      ],
+      events: [
+        {
+          id: "event-1",
+          type: "blocked",
+          pattern: "youtube.com",
+          occurredAt: "2026-03-31T09:00:00.000Z",
+        },
+      ],
+      sessions: [
+        {
+          id: "session-1",
+          host: "youtube.com",
+          url: "https://youtube.com/watch?v=123",
+          startedAt: "2026-03-31T08:00:00.000Z",
+          endedAt: "2026-03-31T08:20:00.000Z",
+          durationMs: 1_200_000,
+          tabId: 3,
+          wasBlockedRuleMatch: true,
+          occurredDuringBypass: false,
+        },
+      ],
+      dailyAggregates: [
+        {
+          date: "2026-03-31",
+          host: "youtube.com",
+          totalDurationMs: 1_200_000,
+          visits: 2,
+          blockedAttempts: 1,
+          bypassSessions: 0,
+        },
+      ],
+    };
+
+    expect(clearActivityHistory(state)).toEqual({
+      ...state,
+      events: [],
+      sessions: [],
+      dailyAggregates: [],
     });
   });
 });
