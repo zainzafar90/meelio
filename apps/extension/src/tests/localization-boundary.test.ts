@@ -15,6 +15,7 @@ describe("extension localization boundaries", () => {
     expect(drawerSource).toContain('t("site-blocker.drawer.tabs.sites")');
     expect(drawerSource).toContain('t("site-blocker.drawer.custom.title")');
     expect(drawerSource).toContain('t("site-blocker.drawer.backup.importFailed")');
+    expect(drawerSource).toContain('t("site-blocker.drawer.sections.controls")');
     expect(drawerSource).toContain('t("site-blocker.drawer.activity.title")');
     expect(drawerSource).toContain('t("site-blocker.drawer.activity.privacy")');
     expect(drawerSource).toContain('t("site-blocker.drawer.activity.clear")');

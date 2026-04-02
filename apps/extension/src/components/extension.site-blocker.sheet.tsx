@@ -18,6 +18,11 @@ import {
   AlertDialogTrigger,
 } from "@repo/ui/components/ui/alert-dialog";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@repo/ui/components/ui/collapsible";
 import { Input } from "@repo/ui/components/ui/input";
 import {
   Select,
@@ -36,11 +41,11 @@ import {
 import { Switch } from "@repo/ui/components/ui/switch";
 import { VisuallyHidden } from "@repo/ui/components/ui/visually-hidden";
 import {
+  ChevronDown,
   Clock3,
   Download,
   Globe2,
   ShieldAlert,
-  ShieldCheck,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -187,6 +192,7 @@ export const ExtensionSiteBlockerSheet = () => {
     }))
   );
   const [activeTab, setActiveTab] = useState<DrawerTab>("sites");
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [siteInput, setSiteInput] = useState("");
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const [state] = useChromeStorageLocal(BLOCKER_STORAGE_KEY, EMPTY_BLOCKER_STATE);
@@ -206,10 +212,6 @@ export const ExtensionSiteBlockerSheet = () => {
   );
   const customRules = useMemo(
     () => state.rules.filter((rule) => rule.source === "custom"),
-    [state.rules]
-  );
-  const activeRuleCount = useMemo(
-    () => state.rules.filter((rule) => rule.enabled).length,
     [state.rules]
   );
   const activity = useMemo(
@@ -394,34 +396,6 @@ export const ExtensionSiteBlockerSheet = () => {
             <h2 className="mt-1 text-lg font-semibold text-white">
               {t("site-blocker.title")}
             </h2>
-            <p className="mt-1 text-sm text-white/50">
-              {t("site-blocker.drawer.subtitle")}
-            </p>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
-              {t("site-blocker.drawer.summary.activeRules", {
-                count: activeRuleCount,
-              })}
-            </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-white/65">
-              {state.settings.activationMode === "always"
-                ? t("site-blocker.drawer.blocking.activationAlways")
-                : t("site-blocker.drawer.blocking.activationFocusOnly")}
-            </span>
-            <span
-              className={cn(
-                "rounded-full border px-2.5 py-1 text-xs",
-                state.settings.permissionGranted
-                  ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                  : "border-amber-400/20 bg-amber-400/10 text-amber-100"
-              )}
-            >
-              {state.settings.permissionGranted
-                ? t("site-blocker.drawer.summary.accessReady")
-                : t("site-blocker.drawer.summary.needsAccess")}
-            </span>
           </div>
 
           <div className="mt-4">
@@ -459,113 +433,22 @@ export const ExtensionSiteBlockerSheet = () => {
         {activeTab === "sites" ? (
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="space-y-5">
-              <Section
-                eyebrow={t("site-blocker.drawer.sections.protection")}
-                title={t("site-blocker.drawer.blocking.title")}
-                description={t("site-blocker.drawer.blocking.description")}
-              >
-                <div className="-m-4 divide-y divide-white/10">
-                  <div className="flex items-start justify-between gap-4 px-4 py-4">
-                    <div className="pr-2">
-                      <p className="text-sm font-medium text-white">
-                        {t("site-blocker.drawer.blocking.strictTitle")}
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-white/50">
-                        {t("site-blocker.drawer.blocking.strictDescription")}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={state.settings.enabled}
-                      onCheckedChange={(enabled) => {
-                        void runMutation(async () => {
-                          await sendExtensionCommand({
-                            type: "blocker/set-enabled",
-                            payload: { enabled },
-                          });
-                        });
-                      }}
-                    />
-                  </div>
-
-                  <div className="px-4 py-4">
+              {!state.settings.permissionGranted ? (
+                <section className="rounded-2xl border border-amber-400/15 bg-amber-400/[0.08] px-4 py-4">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <Clock3 className="mt-0.5 size-4 text-white/45" />
-                      <div className="w-full">
+                      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-100">
+                        <ShieldAlert className="size-4" />
+                      </div>
+                      <div>
                         <p className="text-sm font-medium text-white">
-                          {t("site-blocker.drawer.blocking.activationTitle")}
+                          {t("site-blocker.drawer.access.title")}
                         </p>
-                        <p className="mt-1 text-sm leading-6 text-white/50">
-                          {t("site-blocker.drawer.blocking.activationDescription")}
+                        <p className="mt-1 text-sm leading-6 text-white/70">
+                          {t("site-blocker.drawer.access.missing")}
                         </p>
-                        <Select
-                          value={state.settings.activationMode}
-                          onValueChange={(value) => {
-                            void runMutation(async () => {
-                              await sendExtensionCommand({
-                                type: "blocker/set-activation-mode",
-                                payload: {
-                                  activationMode: value as
-                                    | "always"
-                                    | "focus-only",
-                                },
-                              });
-                            });
-                          }}
-                        >
-                          <SelectTrigger className="mt-3 border-white/10 bg-black/20 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="always">
-                              {t("site-blocker.drawer.blocking.activationAlways")}
-                            </SelectItem>
-                            <SelectItem value="focus-only">
-                              {t("site-blocker.drawer.blocking.activationFocusOnly")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </Section>
-
-              <section
-                className={cn(
-                  "rounded-2xl border px-4 py-4",
-                  state.settings.permissionGranted
-                    ? "border-emerald-400/15 bg-emerald-400/[0.08]"
-                    : "border-amber-400/15 bg-amber-400/[0.08]"
-                )}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={cn(
-                        "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border",
-                        state.settings.permissionGranted
-                          ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
-                          : "border-amber-400/20 bg-amber-400/10 text-amber-100"
-                      )}
-                    >
-                      {state.settings.permissionGranted ? (
-                        <ShieldCheck className="size-4" />
-                      ) : (
-                        <ShieldAlert className="size-4" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">
-                        {t("site-blocker.drawer.access.title")}
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-white/70">
-                        {state.settings.permissionGranted
-                          ? t("site-blocker.drawer.access.granted")
-                          : t("site-blocker.drawer.access.missing")}
-                      </p>
-                    </div>
-                  </div>
-                  {!state.settings.permissionGranted ? (
                     <Button
                       variant="outline"
                       className="border-white/15 bg-black/20 text-white hover:bg-white/[0.04]"
@@ -583,9 +466,9 @@ export const ExtensionSiteBlockerSheet = () => {
                     >
                       {t("site-blocker.drawer.access.request")}
                     </Button>
-                  ) : null}
-                </div>
-              </section>
+                  </div>
+                </section>
+              ) : null}
 
               <Section
                 eyebrow={t("site-blocker.drawer.sections.rules")}
@@ -649,7 +532,7 @@ export const ExtensionSiteBlockerSheet = () => {
                                   });
                                 });
                               }}
-                              >
+                            >
                               {rule.enabled
                                 ? t("site-blocker.drawer.custom.disable")
                                 : t("site-blocker.drawer.custom.enable")}
@@ -697,41 +580,136 @@ export const ExtensionSiteBlockerSheet = () => {
                 />
               </Section>
 
-              <Section
-                eyebrow={t("site-blocker.drawer.sections.backup")}
-                title={t("site-blocker.drawer.backup.title")}
-                description={t("site-blocker.drawer.backup.description")}
+              <Collapsible
+                open={controlsOpen}
+                onOpenChange={setControlsOpen}
+                className={sectionShell}
               >
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    variant="outline"
-                    className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
-                    onClick={() => {
-                      void handleExport();
-                    }}
-                  >
-                    <Download className="mr-2 size-4" />
-                    {t("site-blocker.drawer.backup.export")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="mr-2 size-4" />
-                    {t("site-blocker.drawer.backup.import")}
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/json"
-                    className="hidden"
-                    onChange={(event) => {
-                      void handleImportFile(event);
-                    }}
+                <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left transition-colors hover:bg-white/[0.03]">
+                  <div className="pr-2">
+                    <p className="text-[11px] uppercase tracking-[0.18em] text-white/35">
+                      {t("site-blocker.drawer.sections.controls")}
+                    </p>
+                    <h3 className="mt-1 text-sm font-semibold text-white">
+                      {t("site-blocker.drawer.blocking.title")}
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-white/50">
+                      {t("site-blocker.drawer.blocking.description")}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      "size-4 shrink-0 text-white/45 transition-transform duration-200",
+                      controlsOpen && "rotate-180"
+                    )}
                   />
-                </div>
-              </Section>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className="border-t border-white/10">
+                  <div className="divide-y divide-white/10">
+                    <div className="flex items-start justify-between gap-4 px-4 py-4">
+                      <div className="pr-2">
+                        <p className="text-sm font-medium text-white">
+                          {t("site-blocker.drawer.blocking.strictTitle")}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-white/50">
+                          {t("site-blocker.drawer.blocking.strictDescription")}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={state.settings.enabled}
+                        onCheckedChange={(enabled) => {
+                          void runMutation(async () => {
+                            await sendExtensionCommand({
+                              type: "blocker/set-enabled",
+                              payload: { enabled },
+                            });
+                          });
+                        }}
+                      />
+                    </div>
+
+                    <div className="px-4 py-4">
+                      <div className="flex items-start gap-3">
+                        <Clock3 className="mt-0.5 size-4 text-white/45" />
+                        <div className="w-full">
+                          <p className="text-sm font-medium text-white">
+                            {t("site-blocker.drawer.blocking.activationTitle")}
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-white/50">
+                            {t("site-blocker.drawer.blocking.activationDescription")}
+                          </p>
+                          <Select
+                            value={state.settings.activationMode}
+                            onValueChange={(value) => {
+                              void runMutation(async () => {
+                                await sendExtensionCommand({
+                                  type: "blocker/set-activation-mode",
+                                  payload: {
+                                    activationMode: value as
+                                      | "always"
+                                      | "focus-only",
+                                  },
+                                });
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="mt-3 border-white/10 bg-black/20 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="always">
+                                {t("site-blocker.drawer.blocking.activationAlways")}
+                              </SelectItem>
+                              <SelectItem value="focus-only">
+                                {t("site-blocker.drawer.blocking.activationFocusOnly")}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-4">
+                      <p className="text-sm font-medium text-white">
+                        {t("site-blocker.drawer.backup.title")}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-white/50">
+                        {t("site-blocker.drawer.backup.description")}
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-3">
+                        <Button
+                          variant="outline"
+                          className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
+                          onClick={() => {
+                            void handleExport();
+                          }}
+                        >
+                          <Download className="mr-2 size-4" />
+                          {t("site-blocker.drawer.backup.export")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.07]"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="mr-2 size-4" />
+                          {t("site-blocker.drawer.backup.import")}
+                        </Button>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="application/json"
+                          className="hidden"
+                          onChange={(event) => {
+                            void handleImportFile(event);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </div>
         ) : (

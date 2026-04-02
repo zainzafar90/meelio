@@ -17,4 +17,17 @@ describe("site blocker segmented control", () => {
     );
     expect(drawerSource).not.toContain('? "bg-white/12 text-white"');
   });
+
+  it("puts blocker inputs ahead of controls and removes header summary clutter", () => {
+    const drawerSource = readSource(
+      "src/components/extension.site-blocker.sheet.tsx"
+    );
+
+    expect(drawerSource.indexOf('t("site-blocker.drawer.custom.title")')).toBeLessThan(
+      drawerSource.indexOf('t("site-blocker.drawer.blocking.title")')
+    );
+    expect(drawerSource).toContain("Collapsible");
+    expect(drawerSource).not.toContain('t("site-blocker.drawer.summary.activeRules")');
+    expect(drawerSource).not.toContain('t("site-blocker.drawer.summary.accessReady")');
+  });
 });
