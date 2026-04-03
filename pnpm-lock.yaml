@@ -34,6 +34,18 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../../packages/application
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -406,6 +418,65 @@ importers:
         specifier: ^0.34.1
         version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
+  packages/application:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
+  packages/contracts:
+    dependencies:
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
+  packages/core:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/chrome':
+        specifier: 0.0.258
+        version: 0.0.258
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
   packages/eslint-config:
     devDependencies:
       '@typescript-eslint/eslint-plugin':
@@ -429,6 +500,21 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
+
+  packages/infrastructure:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/jest-presets:
     dependencies:
@@ -462,6 +548,28 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
+
+  packages/platform:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/chrome':
+        specifier: 0.0.258
+        version: 0.0.258
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/prettier-config:
     devDependencies:

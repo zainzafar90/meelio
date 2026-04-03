@@ -2,7 +2,6 @@
   "extends": "../typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "lib": ["ES2015", "DOM"]
   },
   "include": ["src", "vitest.config.ts"],

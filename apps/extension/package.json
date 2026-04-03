@@ -23,6 +23,10 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
+    "@repo/application": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
+    "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/timer-core": "workspace:*",
     "@repo/ui": "workspace:*",
