@@ -10,7 +10,6 @@ export const AppLayout = (props: { children: React.ReactNode }) => {
         "transition-opacity duration-300 ease-out"
       )}
     >
-    
       {props.children}
     </div>
   );
