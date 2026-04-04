@@ -242,6 +242,30 @@
 - `pnpm validate:extension`
 - `pnpm validate:extension:blocker`
 
+## Home Surface Validation
+
+### Plan
+- [completed] Audit the remaining new-tab flows that were not covered by timer/blocker validation.
+- [completed] Add a focused home validator for greeting/mantra, quote, wallpaper, and breathing flows.
+- [completed] Fold the new home validator into the umbrella extension validation and verify the full sequence.
+
+### Success Criteria
+- The extension validation suite includes a focused home/new-tab scenario alongside the timer and blocker scenarios.
+- The home validator covers greeting/mantra behavior, quote visibility, wallpaper actions, and breathing interactions.
+- `pnpm validate:extension`, `pnpm validate:extension:home`, `pnpm validate:extension:timer`, and `pnpm validate:extension:blocker` all pass.
+
+### Review
+- Added [scripts/validate/scenarios/extension-home-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-home-flow.mjs) for the new-tab home surface.
+- Added [scripts/validate/extension-home.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-home.mjs) and [package.json](/Users/zainzafar/projects/meelio/meelio/package.json) script wiring for `validate:extension:home`.
+- Updated [scripts/validate/extension.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension.mjs) so the umbrella validator now runs home, timer, and blocker sequentially.
+- Added structural coverage in [apps/extension/src/tests/validator-home-coverage.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-home-coverage.test.ts).
+- Extended [apps/extension/src/tests/validator-localization.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-localization.test.ts) so the home scenario is locked to translation-driven labels.
+- Added reusable validator helpers to [scripts/validate/lib/page-actions.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/lib/page-actions.mjs) for persisted-store reads/writes and text-containing element clicks.
+- Verification:
+- `pnpm --filter extension test -- src/tests/validator-home-coverage.test.ts src/tests/validator-localization.test.ts`
+- `pnpm validate:extension:home`
+- `pnpm validate:extension`
+
 ## Shared Timer Cleanup
 
 ### Plan

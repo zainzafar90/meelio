@@ -17,6 +17,10 @@ const timerScenarioPath = path.join(
   repoRoot,
   "scripts/validate/scenarios/extension-timer-flow.mjs"
 );
+const homeScenarioPath = path.join(
+  repoRoot,
+  "scripts/validate/scenarios/extension-home-flow.mjs"
+);
 const pageActionsPath = path.join(repoRoot, "scripts/validate/lib/page-actions.mjs");
 
 describe("extension validator localization stability", () => {
@@ -54,5 +58,17 @@ describe("extension validator localization stability", () => {
     );
     expect(scenarioSource).not.toContain('"Site blocker"');
     expect(scenarioSource).not.toContain('"Continue to exact URL"');
+  });
+
+  it("reads home-surface labels from translation keys instead of hardcoded UI copy", () => {
+    const scenarioSource = readFileSync(homeScenarioPath, "utf8");
+
+    expect(scenarioSource).toContain('getValidationLabel("backgrounds.title")');
+    expect(scenarioSource).toContain('getValidationLabel("backgrounds.randomBackground")');
+    expect(scenarioSource).toContain('getValidationLabel("backgrounds.resetToDefault")');
+    expect(scenarioSource).toContain('getValidationLabel("breathing.method.change")');
+    expect(scenarioSource).toContain('getValidationLabel("breathing.method.title")');
+    expect(scenarioSource).toContain('getValidationLabel("home.quote.aria.quote")');
+    expect(scenarioSource).toContain('getValidationLabel("home.quote.aria.author")');
   });
 });
