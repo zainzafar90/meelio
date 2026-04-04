@@ -153,6 +153,29 @@ export async function clickButtonByText(pageClient, label) {
   assert(result, `Unable to find button with label "${label}".`);
 }
 
+export async function clickElementContainingText(pageClient, selector, text) {
+  const result = await pageClient.evaluate(`
+    (() => {
+      const normalizedText = ${JSON.stringify(text)}.toLowerCase();
+      const element = Array.from(document.querySelectorAll(${JSON.stringify(
+        selector
+      )})).find((candidate) =>
+        candidate.textContent?.toLowerCase().includes(normalizedText)
+      );
+      if (!(element instanceof HTMLElement)) {
+        return false;
+      }
+      element.click();
+      return true;
+    })()
+  `);
+
+  assert(
+    result,
+    `Unable to find element matching "${selector}" containing text "${text}".`
+  );
+}
+
 export async function setInputByPlaceholder(pageClient, placeholder, value) {
   const result = await pageClient.evaluate(`
     (() => {
@@ -310,6 +333,44 @@ export async function clearTimerPersistedState(pageClient) {
       localStorage.removeItem("meelio:simple-timer:lastReset");
       return true;
     })()
+  `);
+}
+
+export async function readPersistedStoreState(pageClient, key) {
+  return pageClient.evaluate(`
+    ((key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      return parsed.state ?? null;
+    })(${JSON.stringify(key)})
+  `);
+}
+
+export async function writePersistedStoreState(
+  pageClient,
+  key,
+  nextState,
+  version = 0
+) {
+  return pageClient.evaluate(`
+    ((key, nextState, version) => {
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? JSON.parse(raw) : { state: {}, version };
+      parsed.state = {
+        ...(parsed.state ?? {}),
+        ...nextState,
+      };
+      if (parsed.version === undefined) {
+        parsed.version = version;
+      }
+      localStorage.setItem(key, JSON.stringify(parsed));
+      return parsed.state;
+    })(${JSON.stringify(key)}, ${JSON.stringify(nextState)}, ${JSON.stringify(
+    version
+  )})
   `);
 }
 

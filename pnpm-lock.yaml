@@ -518,6 +518,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
+      dexie:
+        specifier: ^3.2.4
+        version: 3.2.7
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -604,6 +607,9 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../application
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -613,6 +619,9 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../infrastructure
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
