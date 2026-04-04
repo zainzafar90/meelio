@@ -55,7 +55,7 @@ const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
-        <div className="flex shrink-0 justify-center pb-5">
+        <div className="hidden shrink-0 justify-center pb-5 [@media(min-height:640px)]:flex">
           <Quote />
         </div>
         <BottomBar />

@@ -208,7 +208,7 @@ const HomeModeShell = ({
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="grid h-full w-full max-w-[1600px] grid-rows-[auto_1fr] gap-4">
-      <div className="flex items-start justify-between gap-6 px-2 py-2">
+      <div className="hidden items-start justify-between gap-6 px-2 py-2 [@media(min-height:580px)]:flex">
         <div className="hidden flex-wrap gap-2 md:flex">
           <InfoBadge label="Focus" value={currentTimerLabel} />
           <InfoBadge label="Blocker" value={blockerMode} />
@@ -243,7 +243,7 @@ const FocusModeShell = ({
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="flex h-full w-full max-w-[1600px] flex-col">
-      <div className="flex items-center justify-between px-2 py-2">
+      <div className="hidden items-center justify-between px-2 py-2 [@media(min-height:580px)]:flex">
         <div className="flex items-center gap-3">
           <InfoBadge label="Focus" value={currentTimerLabel} />
         </div>
