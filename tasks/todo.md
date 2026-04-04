@@ -265,3 +265,23 @@
 - `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
 - `pnpm --filter extension test -- src/tests/timer-boundary.test.ts`
 - `pnpm validate:extension:timer`
+
+## Shared Blocker Core Utility Cleanup
+
+### Plan
+- [completed] Add a boundary test proving the shared site blocker store consumes the core blocker helpers instead of a duplicate shared implementation.
+- [completed] Point the shared site blocker store and compatibility utility shim at `@repo/core/site-blocker`.
+- [completed] Re-run shared package tests and a web build after the cleanup.
+
+### Success Criteria
+- `packages/shared/src/stores/site-blocker.store.ts` imports `normalizeSiteHost` from `@repo/core/site-blocker`.
+- `packages/shared/src/utils/site-blocker.utils.ts` is only a compatibility re-export.
+- Shared blocker-related tests and the web build pass after the cleanup.
+
+### Review
+- Added a structural test that locks the shared site blocker store to the core blocker utility layer.
+- Removed the duplicate shared host-normalization implementation and re-exported the canonical helper from `@repo/core/site-blocker`.
+- Verification:
+- `pnpm --filter @repo/shared test -- src/stores/site-blocker-core-integration.test.ts`
+- `pnpm --filter @repo/shared test -- --run`
+- `pnpm --filter web build`
