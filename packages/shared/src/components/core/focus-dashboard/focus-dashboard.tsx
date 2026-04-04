@@ -11,7 +11,15 @@ import { Progress } from "@repo/ui/components/ui/progress";
 import { Textarea } from "@repo/ui/components/ui/textarea";
 
 import type { TimerState } from "../../../types/timer.types";
+import { Category } from "../../../types/category";
+import type { CalendarEvent } from "../../../types/calendar.types";
 import { formatTime } from "../../../utils/timer.utils";
+import {
+  getEventStartDate,
+  getMinutesUntilEvent,
+  isAllDayEvent,
+  isEventHappening,
+} from "../../../utils/calendar-date.utils";
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
 import {
@@ -64,7 +72,15 @@ export const FocusDashboard = ({
   timerStore,
   timerPanel,
 }: FocusDashboardProps) => {
-  const { stage, isRunning, prevRemaining, endTimestamp, durations, start } =
+  const {
+    stage,
+    isRunning,
+    prevRemaining,
+    endTimestamp,
+    durations,
+    start,
+    settings,
+  } =
     timerStore(
       useShallow((state) => ({
         stage: state.stage,
@@ -73,6 +89,7 @@ export const FocusDashboard = ({
         endTimestamp: state.endTimestamp,
         durations: state.durations,
         start: state.start,
+        settings: state.settings,
       }))
     );
   const tasks = useTaskStore(useShallow((state) => state.tasks));
@@ -138,10 +155,23 @@ export const FocusDashboard = ({
     snapshot.topTasksTotal === 0
       ? 0
       : (snapshot.topTasksCompleted / snapshot.topTasksTotal) * 100;
+  const agendaSummary = useMemo(
+    () => getAgendaSummary(nextEvent),
+    [nextEvent]
+  );
+  const isFocusReady = dailyPlan.topTasks.length > 0 || dailyPlan.headline.trim().length > 0;
 
   const handlePrimaryAction = () => {
     setTimerVisible(true);
     setGreetingsVisible(false);
+
+    if (settings.soundscapes) {
+      const soundState = useSoundscapesStore.getState();
+      const hasPlayingSounds = soundState.sounds.some((sound) => sound.playing);
+      if (!hasPlayingSounds) {
+        soundState.playCategory(Category.Productivity);
+      }
+    }
 
     if (!isRunning) {
       start();
@@ -170,7 +200,7 @@ export const FocusDashboard = ({
                   {snapshot.headline}
                 </h2>
                 <p className="text-sm text-white/70 sm:text-base">
-                  {snapshot.currentTimerLabel}. {snapshot.nextEventLabel}
+                  {snapshot.currentTimerLabel}. {agendaSummary.summary}
                 </p>
               </div>
             </div>
@@ -191,6 +221,11 @@ export const FocusDashboard = ({
               <p className="text-sm text-white/60">
                 {snapshot.primaryAction.description}
               </p>
+              {!isFocusReady && (
+                <p className="text-sm text-amber-200/80">
+                  Add a headline or pin a task to make this session more intentional.
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -237,6 +272,28 @@ export const FocusDashboard = ({
                 </Badge>
               </div>
               <Progress value={completionPercentage} className="bg-white/10" />
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
+            <CardHeader className="space-y-2">
+              <CardTitle className="text-xl">Agenda</CardTitle>
+              <p className="text-sm text-white/60">
+                Keep the next calendar commitment visible while you focus.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+                <p className="text-xs uppercase tracking-[0.24em] text-white/45">
+                  {agendaSummary.label}
+                </p>
+                <p className="mt-2 text-base font-medium text-white">
+                  {agendaSummary.summary}
+                </p>
+                <p className="mt-2 text-sm text-white/60">
+                  {agendaSummary.detail}
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -316,3 +373,44 @@ const StatusCard = ({
     <p className="mt-2 text-sm font-medium capitalize text-white">{value}</p>
   </div>
 );
+
+const getAgendaSummary = (event: CalendarEvent | null) => {
+  if (!event) {
+    return {
+      label: "No upcoming event",
+      summary: "Your calendar is clear.",
+      detail: "This looks like a good window for deep work.",
+    };
+  }
+
+  const now = new Date();
+  if (isEventHappening(event, now)) {
+    return {
+      label: "Happening now",
+      summary: event.summary ?? "Current event",
+      detail: isAllDayEvent(event)
+        ? "This is an all-day event."
+        : `Ends later today.`,
+    };
+  }
+
+  const minutesUntil = getMinutesUntilEvent(event);
+  const startDate = getEventStartDate(event);
+  const formattedTime = isAllDayEvent(event)
+    ? "All day"
+    : startDate.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+  return {
+    label: minutesUntil !== null && minutesUntil < 60 ? "Coming up soon" : "Next on your calendar",
+    summary: event.summary ?? "Upcoming event",
+    detail:
+      minutesUntil === null
+        ? formattedTime
+        : minutesUntil < 60
+          ? `Starts in ${minutesUntil} min at ${formattedTime}.`
+          : `Starts ${formattedTime}.`,
+  };
+};
