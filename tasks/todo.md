@@ -241,3 +241,27 @@
 - `pnpm validate:extension:timer`
 - `pnpm validate:extension`
 - `pnpm validate:extension:blocker`
+
+## Shared Timer Cleanup
+
+### Plan
+- [completed] Replace the legacy shared timer store implementation with a thin compatibility wrapper over `@repo/application/timer`.
+- [completed] Collapse shared timer state types onto the application/contracts/core timer types instead of redefining timer behavior in `@repo/shared`.
+- [completed] Run focused shared/app/extension verification after the cleanup.
+
+### Success Criteria
+- `packages/shared/src/stores/timer.store.ts` no longer duplicates timer orchestration logic.
+- `packages/shared/src/types/timer.types.ts` does not redefine the timer state shape already owned by `@repo/application/timer`.
+- Shared timer integration tests and extension/web timer boundary checks still pass.
+
+### Review
+- Replaced the legacy timer store in `@repo/shared` with a compatibility wrapper over `@repo/application/timer` plus `@repo/infrastructure/timer`.
+- Removed the shared-only timer state/type duplication and re-exported the canonical timer state from `@repo/application/timer`.
+- Added `@repo/application` and `@repo/infrastructure` as explicit dependencies of `@repo/shared` so the wrapper resolves cleanly.
+- Verification:
+- `pnpm --filter @repo/shared test -- src/stores/timer-core-integration.test.ts`
+- `pnpm install`
+- `pnpm --filter @repo/shared test -- --run`
+- `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
+- `pnpm --filter extension test -- src/tests/timer-boundary.test.ts`
+- `pnpm validate:extension:timer`
