@@ -2,8 +2,7 @@ import { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { motion } from "framer-motion";
-import { CalendarDays, ListChecks, Music2, ShieldCheck, Timer, CheckSquare2 } from "lucide-react";
+import { CalendarDays, CheckSquare2, Timer } from "lucide-react";
 
 import type { TimerState } from "../../../types/timer.types";
 import type { CalendarEvent } from "../../../types/calendar.types";
@@ -71,6 +70,8 @@ export const FocusDashboard = ({
     prevRemaining,
     endTimestamp,
     durations,
+    settings,
+    start,
   } = timerStore(
     useShallow((state) => ({
       stage: state.stage,
@@ -78,6 +79,8 @@ export const FocusDashboard = ({
       prevRemaining: state.prevRemaining,
       endTimestamp: state.endTimestamp,
       durations: state.durations,
+      settings: state.settings,
+      start: state.start,
     }))
   );
   const tasks = useTaskStore(useShallow((state) => state.tasks));
@@ -86,9 +89,19 @@ export const FocusDashboard = ({
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible } = useDockStore(
+  const {
+    isTimerVisible,
+    setTimerVisible,
+    setGreetingsVisible,
+    setTasksVisible,
+    setSoundscapesVisible,
+  } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
+      setTimerVisible: state.setTimerVisible,
+      setGreetingsVisible: state.setGreetingsVisible,
+      setTasksVisible: state.setTasksVisible,
+      setSoundscapesVisible: state.setSoundscapesVisible,
     }))
   );
   const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
@@ -137,21 +150,52 @@ export const FocusDashboard = ({
   const agendaSummary = useMemo(() => getAgendaSummary(nextEvent), [nextEvent]);
   const showTimerPanel = isTimerVisible || isRunning;
 
+  const handlePrimaryAction = () => {
+    if (snapshot.primaryAction.kind === "review-plan") {
+      setTasksVisible(true);
+      setTimerVisible(false);
+      return;
+    }
+
+    setTasksVisible(false);
+    setGreetingsVisible(false);
+    setTimerVisible(true);
+
+    if (settings.soundscapes) {
+      setSoundscapesVisible(true);
+    }
+
+    if (!isRunning) {
+      start();
+    }
+  };
+
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
       {showTimerPanel ? (
         <FocusModeShell
           timerPanel={timerPanel}
           currentTimerLabel={snapshot.currentTimerLabel}
+          activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
           topTasksCompleted={snapshot.topTasksCompleted}
           agendaLabel={agendaSummary.label}
         />
       ) : (
         <HomeModeShell
+          headline={snapshot.headline}
+          primaryActionLabel={
+            snapshot.primaryAction.kind === "review-plan"
+              ? "Open Tasks"
+              : "Start Focusing"
+          }
+          primaryActionDescription={
+            snapshot.primaryAction.kind === "review-plan"
+              ? "Pick or pin a task to anchor the next focus block."
+              : snapshot.agendaWindowLabel
+          }
+          onPrimaryAction={handlePrimaryAction}
           currentTimerLabel={snapshot.currentTimerLabel}
           agendaSummary={agendaSummary}
-          blockerMode={snapshot.blockerMode}
-          soundtrackMode={snapshot.soundtrackMode}
           topTasksTotal={snapshot.topTasksTotal}
         />
       )}
@@ -160,45 +204,58 @@ export const FocusDashboard = ({
 };
 
 const HomeModeShell = ({
+  headline,
+  primaryActionLabel,
+  primaryActionDescription,
+  onPrimaryAction,
   currentTimerLabel,
   agendaSummary,
-  blockerMode,
-  soundtrackMode,
   topTasksTotal,
 }: {
+  headline: string;
+  primaryActionLabel: string;
+  primaryActionDescription: string;
+  onPrimaryAction: () => void;
   currentTimerLabel: string;
   agendaSummary: ReturnType<typeof getAgendaSummary>;
-  blockerMode: string;
-  soundtrackMode: string;
   topTasksTotal: number;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
-    <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-6 px-4 py-2 [@media(min-height:580px)]:flex">
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="hidden flex-wrap gap-2 md:flex"
-      >
-        <InfoBadge label="Focus" value={currentTimerLabel} icon={<Timer className="size-3" />} />
-        <InfoBadge label="Blocker" value={blockerMode} icon={<ShieldCheck className="size-3" />} />
-        <InfoBadge label="Sound" value={soundtrackMode} icon={<Music2 className="size-3" />} />
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut", delay: 0.08 }}
-        className="ml-auto flex flex-wrap justify-end gap-2"
-      >
-        <InfoBadge label="Calendar" value={agendaSummary.label} icon={<CalendarDays className="size-3" />} />
-        <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} icon={<ListChecks className="size-3" />} />
-      </motion.div>
+    <div className="absolute inset-x-0 top-0 z-10 hidden items-center justify-end gap-5 px-4 py-3 [@media(min-height:580px)]:flex">
+      <AmbientMeta
+        icon={<CalendarDays className="size-3.5" />}
+        value={agendaSummary.label}
+      />
+      <AmbientMeta
+        icon={<CheckSquare2 className="size-3.5" />}
+        value={`${topTasksTotal} queued`}
+      />
     </div>
 
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-      <Clock />
-      <div className="mt-1">
-        <Greeting />
+      <div className="max-w-4xl space-y-5">
+        <Clock />
+        <div className="space-y-3">
+          <Greeting />
+          <p className="mx-auto max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            {headline}
+          </p>
+          <p className="text-base font-medium text-white/78 sm:text-lg">
+            {currentTimerLabel}
+          </p>
+        </div>
+        <div className="space-y-3 pt-2">
+          <button
+            type="button"
+            onClick={onPrimaryAction}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-white/10 bg-black/55 px-8 text-base font-medium text-white shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors hover:bg-black/68"
+          >
+            {primaryActionLabel}
+          </button>
+          <p className="mx-auto max-w-xl text-sm leading-6 text-white/68">
+            {primaryActionDescription}
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -207,58 +264,60 @@ const HomeModeShell = ({
 const FocusModeShell = ({
   timerPanel,
   currentTimerLabel,
+  activeFocusTaskLabel,
   topTasksCompleted,
   agendaLabel,
 }: {
   timerPanel: ReactNode;
   currentTimerLabel: string;
+  activeFocusTaskLabel: string;
   topTasksCompleted: number;
   agendaLabel: string;
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="flex h-full w-full max-w-[1600px] flex-col">
       <div className="hidden items-center justify-between px-2 py-2 [@media(min-height:580px)]:flex">
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="flex items-center gap-3"
-        >
-          <InfoBadge label="Focus" value={currentTimerLabel} icon={<Timer className="size-3" />} />
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut", delay: 0.08 }}
-          className="hidden items-center gap-3 sm:flex"
-        >
-          <InfoBadge label="Today" value={`${topTasksCompleted} done`} icon={<CheckSquare2 className="size-3" />} />
-          <InfoBadge label="Calendar" value={agendaLabel} icon={<CalendarDays className="size-3" />} />
-        </motion.div>
+        <AmbientMeta
+          icon={<Timer className="size-3.5" />}
+          value={currentTimerLabel}
+        />
+        <div className="hidden items-center gap-5 sm:flex">
+          <AmbientMeta
+            icon={<CheckSquare2 className="size-3.5" />}
+            value={`${topTasksCompleted} done`}
+          />
+          <AmbientMeta
+            icon={<CalendarDays className="size-3.5" />}
+            value={agendaLabel}
+          />
+        </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-4">
+        <div className="space-y-2 text-center">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-white/50">
+            Active Focus Task
+          </p>
+          <h2 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            {activeFocusTaskLabel}
+          </h2>
+        </div>
         {timerPanel}
       </div>
     </div>
   </div>
 );
 
-const InfoBadge = ({
-  label,
-  value,
+const AmbientMeta = ({
   icon,
+  value,
 }: {
-  label: string;
-  value: string;
   icon?: ReactNode;
+  value: string;
 }) => (
-  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 shadow-lg backdrop-blur-lg">
-    {icon && <span className="text-white/60">{icon}</span>}
-    <span className="text-[10px] uppercase tracking-[0.3em] font-medium text-white">
-      {label}
-    </span>
-    <span className="text-xs font-medium text-white">{value}</span>
+  <div className="inline-flex items-center gap-2 text-sm font-medium text-white/78">
+    {icon && <span className="text-white/46">{icon}</span>}
+    <span>{value}</span>
   </div>
 );
 

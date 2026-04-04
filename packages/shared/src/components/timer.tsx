@@ -84,15 +84,15 @@ const TimerView = ({
 
   return (
     <div className="relative">
-      <div className="max-w-full w-88 rounded-[32px] border border-white/[0.06] bg-black/48 text-white shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:w-[440px] lg:w-[540px]">
-        <div className="space-y-4 p-4 [@media(min-height:580px)]:space-y-10 sm:p-8">
+      <div className="w-[22rem] max-w-full rounded-[30px] border border-white/10 bg-black/38 text-white shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:w-[440px] lg:w-[520px]">
+        <div className="space-y-5 p-4 [@media(min-height:580px)]:space-y-8 sm:p-7">
           <div className="w-full">
-            <div className="flex h-12 w-full rounded-full bg-black/5 p-1 text-white">
+            <div className="flex h-12 w-full rounded-full bg-white/8 p-1 text-white">
               <button
                 onClick={() => skip(TimerStage.Focus)}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
                   stage === TimerStage.Focus
-                    ? "bg-white/88 bg-white/10 shadow-lg"
+                    ? "bg-white text-zinc-950 shadow-lg"
                     : "text-white/78 hover:bg-white/10"
                 }`}
                 title={t("timer.controls.focusMode")}
@@ -102,9 +102,9 @@ const TimerView = ({
               <button
                 onClick={() => skip(TimerStage.Break)}
                 disabled={stage === TimerStage.Break}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
+                className={`flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
                   stage === TimerStage.Break
-                      ? "bg-white/88 bg-white/10 shadow-lg"
+                    ? "bg-white text-zinc-950 shadow-lg"
                     : "text-white/78 hover:bg-white/10"
                 } ${stage === TimerStage.Break ? "cursor-not-allowed" : ""}`}
                 title={t("timer.controls.breakMode")}
@@ -114,7 +114,7 @@ const TimerView = ({
             </div>
           </div>
 
-          <div className="text-center space-y-4">
+          <div className="space-y-4 text-center">
             <div className="text-5xl font-bold tracking-normal sm:text-7xl md:text-9xl">
               {formatTime(remaining)}
             </div>
@@ -124,7 +124,7 @@ const TimerView = ({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <button
-                className="cursor-pointer relative flex size-10 shrink-0 items-center justify-center rounded-full bg-black/45 text-white"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/8 bg-white/10 text-white transition-colors hover:bg-white/16"
                 onClick={reset}
                 title={t("timer.controls.reset")}
                 role="button"
@@ -134,7 +134,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex size-10 shrink-0 items-center justify-center rounded-full bg-black/45 text-white"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/8 bg-white/10 text-white transition-colors hover:bg-white/16"
                 onClick={onStatsClick}
                 title={t("timer.controls.viewStats")}
                 role="button"
@@ -144,7 +144,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex h-10 min-w-10 w-full items-center justify-center rounded-full bg-white/75 text-black shadow-xl"
+                className="relative flex h-10 min-w-10 w-full cursor-pointer items-center justify-center rounded-full bg-white text-zinc-950 shadow-xl transition-colors hover:bg-white/92"
                 onClick={() => running ? pause() : start()}
                 title={running ? t("common.actions.pause") : t("common.actions.start")}
                 role="button"
@@ -160,7 +160,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex size-10 shrink-0 items-center justify-center rounded-full bg-black/45 text-white"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/8 bg-white/10 text-white transition-colors hover:bg-white/16"
                 onClick={() => skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}
                 title={t("timer.controls.skipToNextStage")}
                 role="button"
@@ -170,7 +170,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex size-10 shrink-0 items-center justify-center rounded-full bg-black/45 text-white"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/8 bg-white/10 text-white transition-colors hover:bg-white/16"
                 onClick={onSettingsClick}
                 title={t("timer.controls.settings")}
                 role="button"
@@ -180,7 +180,7 @@ const TimerView = ({
               </button>
             </div>
 
-            <div className="h-1.5 rounded-full bg-white/18">
+            <div className="h-1.5 rounded-full bg-white/12">
               <div
                 className="h-full rounded-full bg-white transition-all"
                 style={{ width: `${(remaining / durations[stage]) * 100}%` }}
