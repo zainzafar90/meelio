@@ -2,6 +2,8 @@ import { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
+import { motion } from "framer-motion";
+import { CalendarDays, ListChecks, Music2, ShieldCheck, Timer, CheckSquare2 } from "lucide-react";
 
 import type { TimerState } from "../../../types/timer.types";
 import type { CalendarEvent } from "../../../types/calendar.types";
@@ -172,15 +174,25 @@ const HomeModeShell = ({
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-6 px-4 py-2 [@media(min-height:580px)]:flex">
-      <div className="hidden flex-wrap gap-2 md:flex">
-        <InfoBadge label="Focus" value={currentTimerLabel} />
-        <InfoBadge label="Blocker" value={blockerMode} />
-        <InfoBadge label="Sound" value={soundtrackMode} />
-      </div>
-      <div className="ml-auto flex flex-wrap justify-end gap-2">
-        <InfoBadge label="Calendar" value={agendaSummary.label} />
-        <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className="hidden flex-wrap gap-2 md:flex"
+      >
+        <InfoBadge label="Focus" value={currentTimerLabel} icon={<Timer className="size-3" />} />
+        <InfoBadge label="Blocker" value={blockerMode} icon={<ShieldCheck className="size-3" />} />
+        <InfoBadge label="Sound" value={soundtrackMode} icon={<Music2 className="size-3" />} />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut", delay: 0.08 }}
+        className="ml-auto flex flex-wrap justify-end gap-2"
+      >
+        <InfoBadge label="Calendar" value={agendaSummary.label} icon={<CalendarDays className="size-3" />} />
+        <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} icon={<ListChecks className="size-3" />} />
+      </motion.div>
     </div>
 
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
@@ -206,13 +218,23 @@ const FocusModeShell = ({
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="flex h-full w-full max-w-[1600px] flex-col">
       <div className="hidden items-center justify-between px-2 py-2 [@media(min-height:580px)]:flex">
-        <div className="flex items-center gap-3">
-          <InfoBadge label="Focus" value={currentTimerLabel} />
-        </div>
-        <div className="hidden items-center gap-3 sm:flex">
-          <InfoBadge label="Today" value={`${topTasksCompleted} done`} />
-          <InfoBadge label="Calendar" value={agendaLabel} />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="flex items-center gap-3"
+        >
+          <InfoBadge label="Focus" value={currentTimerLabel} icon={<Timer className="size-3" />} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut", delay: 0.08 }}
+          className="hidden items-center gap-3 sm:flex"
+        >
+          <InfoBadge label="Today" value={`${topTasksCompleted} done`} icon={<CheckSquare2 className="size-3" />} />
+          <InfoBadge label="Calendar" value={agendaLabel} icon={<CalendarDays className="size-3" />} />
+        </motion.div>
       </div>
 
       <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
@@ -225,11 +247,14 @@ const FocusModeShell = ({
 const InfoBadge = ({
   label,
   value,
+  icon,
 }: {
   label: string;
   value: string;
+  icon?: ReactNode;
 }) => (
-  <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/12 px-4 py-2 shadow-lg backdrop-blur-lg">
+  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 px-4 py-2 shadow-lg backdrop-blur-lg">
+    {icon && <span className="text-white/60">{icon}</span>}
     <span className="text-[10px] uppercase tracking-[0.3em] font-medium text-white">
       {label}
     </span>
