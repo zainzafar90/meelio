@@ -182,7 +182,6 @@ export const FocusDashboard = ({
         />
       ) : (
         <HomeModeShell
-          headline={snapshot.headline}
           primaryActionLabel={
             snapshot.primaryAction.kind === "review-plan"
               ? "Open Tasks"
@@ -194,7 +193,6 @@ export const FocusDashboard = ({
               : snapshot.agendaWindowLabel
           }
           onPrimaryAction={handlePrimaryAction}
-          currentTimerLabel={snapshot.currentTimerLabel}
           agendaSummary={agendaSummary}
           topTasksTotal={snapshot.topTasksTotal}
         />
@@ -204,47 +202,46 @@ export const FocusDashboard = ({
 };
 
 const HomeModeShell = ({
-  headline,
   primaryActionLabel,
   primaryActionDescription,
   onPrimaryAction,
-  currentTimerLabel,
   agendaSummary,
   topTasksTotal,
 }: {
-  headline: string;
   primaryActionLabel: string;
   primaryActionDescription: string;
   onPrimaryAction: () => void;
-  currentTimerLabel: string;
   agendaSummary: ReturnType<typeof getAgendaSummary>;
   topTasksTotal: number;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
-    <div className="absolute inset-x-0 top-0 z-10 hidden items-center justify-end gap-5 px-4 py-3 [@media(min-height:580px)]:flex">
-      <AmbientMeta
-        icon={<CalendarDays className="size-3.5" />}
-        value={agendaSummary.label}
-      />
-      <AmbientMeta
-        icon={<CheckSquare2 className="size-3.5" />}
-        value={`${topTasksTotal} queued`}
-      />
+    <div className="absolute inset-x-0 top-0 z-10 hidden [@media(min-height:580px)]:block">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-3 px-4 py-3">
+        <AmbientPill
+          icon={<CalendarDays className="size-3.5" />}
+          label="Calendar"
+          value={agendaSummary.label}
+        />
+        <AmbientPill
+          icon={<CheckSquare2 className="size-3.5" />}
+          label="Tasks"
+          value={`${topTasksTotal} queued`}
+        />
+      </div>
     </div>
 
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-      <div className="max-w-4xl space-y-5">
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-20 pt-10 text-center sm:pb-24 sm:pt-14">
+      <div className="max-w-4xl -translate-y-8 space-y-4 sm:-translate-y-10">
         <Clock />
         <div className="space-y-3">
-          <Greeting />
-          <p className="mx-auto max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            {headline}
-          </p>
-          <p className="text-base font-medium text-white/78 sm:text-lg">
-            {currentTimerLabel}
+          <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
+            <Greeting />
+          </div>
+          <p className="mx-auto max-w-lg text-sm leading-6 text-white/70 sm:text-base">
+            {primaryActionDescription}
           </p>
         </div>
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3 pt-1">
           <button
             type="button"
             onClick={onPrimaryAction}
@@ -252,9 +249,6 @@ const HomeModeShell = ({
           >
             {primaryActionLabel}
           </button>
-          <p className="mx-auto max-w-xl text-sm leading-6 text-white/68">
-            {primaryActionDescription}
-          </p>
         </div>
       </div>
     </div>
@@ -318,6 +312,24 @@ const AmbientMeta = ({
   <div className="inline-flex items-center gap-2 text-sm font-medium text-white/78">
     {icon && <span className="text-white/46">{icon}</span>}
     <span>{value}</span>
+  </div>
+);
+
+const AmbientPill = ({
+  icon,
+  label,
+  value,
+}: {
+  icon?: ReactNode;
+  label: string;
+  value: string;
+}) => (
+  <div className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 text-sm text-white/88 backdrop-blur-md">
+    {icon && <span className="text-white/58">{icon}</span>}
+    <span className="text-[11px] uppercase tracking-[0.22em] text-white/55">
+      {label}
+    </span>
+    <span className="font-medium text-white/92">{value}</span>
   </div>
 );
 
