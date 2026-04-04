@@ -3,8 +3,6 @@ import type { ReactNode } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
-import { Button } from "@repo/ui/components/ui/button";
-
 import type { TimerState } from "../../../types/timer.types";
 import { Category } from "../../../types/category";
 import type { CalendarEvent } from "../../../types/calendar.types";
@@ -185,16 +183,10 @@ export const FocusDashboard = ({
       ) : (
         <HomeModeShell
           currentTimerLabel={snapshot.currentTimerLabel}
-          primaryActionLabel={
-            snapshot.primaryAction.kind === "review-plan"
-              ? "Open Tasks"
-              : snapshot.primaryAction.label
-          }
           agendaSummary={agendaSummary}
           blockerMode={snapshot.blockerMode}
           soundtrackMode={snapshot.soundtrackMode}
           topTasksTotal={snapshot.topTasksTotal}
-          onPrimaryAction={handlePrimaryAction}
         />
       )}
     </div>
@@ -203,20 +195,16 @@ export const FocusDashboard = ({
 
 const HomeModeShell = ({
   currentTimerLabel,
-  primaryActionLabel,
   agendaSummary,
   blockerMode,
   soundtrackMode,
   topTasksTotal,
-  onPrimaryAction,
 }: {
   currentTimerLabel: string;
-  primaryActionLabel: string;
   agendaSummary: ReturnType<typeof getAgendaSummary>;
   blockerMode: string;
   soundtrackMode: string;
   topTasksTotal: number;
-  onPrimaryAction: () => void;
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="grid h-full w-full max-w-[1600px] grid-rows-[auto_1fr] gap-4">
@@ -236,19 +224,6 @@ const HomeModeShell = ({
         <Clock />
         <div className="mt-3">
           <Greeting />
-        </div>
-        <div className="mt-8 flex flex-col items-center gap-3">
-          <Button
-            onClick={onPrimaryAction}
-            className="h-10 rounded-full border border-white/20 bg-black/40 px-6 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/50"
-          >
-            {primaryActionLabel}
-          </Button>
-          <p className="text-sm text-white/80 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
-            {agendaSummary.label === "No upcoming event"
-              ? "No events"
-              : agendaSummary.summary}
-          </p>
         </div>
       </div>
     </div>
