@@ -33,6 +33,7 @@ import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
+import { QuickCaptureBar } from "../quick-capture/quick-capture-bar";
 import { Quote } from "../quote/quote";
 
 type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
@@ -92,7 +93,13 @@ export const FocusDashboard = ({
         settings: state.settings,
       }))
     );
-  const tasks = useTaskStore(useShallow((state) => state.tasks));
+  const { tasks, toggleTask, togglePinTask } = useTaskStore(
+    useShallow((state) => ({
+      tasks: state.tasks,
+      toggleTask: state.toggleTask,
+      togglePinTask: state.togglePinTask,
+    }))
+  );
   const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
   const playingSounds = useSoundscapesStore(
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
@@ -155,6 +162,10 @@ export const FocusDashboard = ({
     snapshot.topTasksTotal === 0
       ? 0
       : (snapshot.topTasksCompleted / snapshot.topTasksTotal) * 100;
+  const taskDetails = useMemo(
+    () => new Map(tasks.map((task) => [task.id, task])),
+    [tasks]
+  );
   const agendaSummary = useMemo(
     () => getAgendaSummary(nextEvent),
     [nextEvent]
@@ -227,6 +238,8 @@ export const FocusDashboard = ({
                 </p>
               )}
             </div>
+
+            <QuickCaptureBar />
           </CardContent>
         </Card>
 
@@ -309,15 +322,38 @@ export const FocusDashboard = ({
                 dailyPlan.topTasks.map((task, index) => (
                   <div
                     key={task.id}
-                    className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs text-white/70">
-                      {index + 1}
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs text-white/70">
+                        {index + 1}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-white">
+                          {task.title}
+                        </p>
+                        <p className="mt-1 text-xs text-white/45">
+                          {taskDetails.get(task.id)?.pinned
+                            ? "Pinned for the current focus window."
+                            : "Available to promote into focus."}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
-                        {task.title}
-                      </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        onClick={() => void toggleTask(task.id)}
+                        className="h-8 rounded-xl border border-white/10 bg-transparent px-3 text-white hover:bg-white/10"
+                      >
+                        Complete
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => void togglePinTask(task.id)}
+                        className="h-8 rounded-xl border border-white/10 bg-transparent px-3 text-white hover:bg-white/10"
+                      >
+                        {taskDetails.get(task.id)?.pinned ? "Unpin" : "Pin"}
+                      </Button>
                     </div>
                   </div>
                 ))

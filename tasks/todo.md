@@ -9,6 +9,11 @@
 - [x] Implement chunk 1 foundation in `contracts`, `core`, `application`, and `infrastructure`
 - [x] Compose the first focus dashboard shell in web and extension
 - [x] Verify behavior and architecture boundaries
+- [x] Create Phase 2 branch for quick capture work
+- [x] Define Phase 2 scope: quick capture + dashboard task actions
+- [x] Write Phase 2 spec and implementation plan
+- [x] Implement Phase 2 quick capture foundation
+- [x] Verify Phase 2 behavior and boundaries
 
 ## Review
 
@@ -16,6 +21,9 @@
 - The gap is not raw feature count; the gap is product composition and daily workflow cohesion.
 - First chunk should establish a canonical daily dashboard experience rather than adding more isolated utilities.
 - The initial build target is: Today Dashboard + Daily Focus Plan + Unified Focus Session entrypoint.
+- Phase 2 target is: Quick Capture + dashboard task actions + stronger actionability from the focus dashboard.
+- Phase 2 foundation now adds a layered quick-capture slice, a shared quick-capture store, a dashboard capture bar, and inline dashboard task actions.
+- Quick-captured tasks are intentionally pinned so the dashboard loop stays action-first and new work lands in focus immediately.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

@@ -35,7 +35,7 @@ interface TaskState {
     pinned?: boolean;
     categoryId?: string;
     providerId?: string;
-  }) => Promise<void>;
+  }) => Promise<Task | undefined>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
   editTask: (taskId: string, title: string) => Promise<void>;
@@ -86,7 +86,7 @@ export const useTaskStore = create<TaskState>()(
         const userId = getAuthUserId();
         if (!userId) {
           set({ error: "No user session found" });
-          return;
+          return undefined;
         }
 
         const activeListId = get().activeListId;
@@ -128,10 +128,14 @@ export const useTaskStore = create<TaskState>()(
             tasks: [...state.tasks, newTask],
             error: null,
           }));
+
+          return newTask;
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : "Failed to add task",
           });
+
+          return undefined;
         }
       },
 

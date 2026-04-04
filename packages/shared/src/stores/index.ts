@@ -8,6 +8,7 @@ export * from "./dock.store";
 export * from "./greetings.store";
 export * from "./focus-dashboard.store";
 export * from "./note.store";
+export * from "./quick-capture.store";
 export * from "./quotes.store";
 export * from "./search.store";
 export * from "./settings.store";

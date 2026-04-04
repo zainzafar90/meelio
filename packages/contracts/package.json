@@ -18,6 +18,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./focus-dashboard": "./src/focus-dashboard/index.ts",
+    "./quick-capture": "./src/quick-capture/index.ts",
     "./site-blocker": "./src/site-blocker/index.ts",
     "./timer": "./src/timer/index.ts"
   }
