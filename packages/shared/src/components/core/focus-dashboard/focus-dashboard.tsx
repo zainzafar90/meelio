@@ -206,25 +206,23 @@ const HomeModeShell = ({
   soundtrackMode: string;
   topTasksTotal: number;
 }) => (
-  <div className="flex min-h-0 flex-1 items-center justify-center">
-    <div className="grid h-full w-full max-w-[1600px] grid-rows-[auto_1fr] gap-4">
-      <div className="hidden items-start justify-between gap-6 px-2 py-2 [@media(min-height:580px)]:flex">
-        <div className="hidden flex-wrap gap-2 md:flex">
-          <InfoBadge label="Focus" value={currentTimerLabel} />
-          <InfoBadge label="Blocker" value={blockerMode} />
-          <InfoBadge label="Sound" value={soundtrackMode} />
-        </div>
-        <div className="ml-auto flex flex-wrap justify-end gap-2">
-          <InfoBadge label="Calendar" value={agendaSummary.label} />
-          <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} />
-        </div>
+  <div className="relative flex min-h-0 flex-1 flex-col">
+    <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-6 px-4 py-2 [@media(min-height:580px)]:flex">
+      <div className="hidden flex-wrap gap-2 md:flex">
+        <InfoBadge label="Focus" value={currentTimerLabel} />
+        <InfoBadge label="Blocker" value={blockerMode} />
+        <InfoBadge label="Sound" value={soundtrackMode} />
       </div>
+      <div className="ml-auto flex flex-wrap justify-end gap-2">
+        <InfoBadge label="Calendar" value={agendaSummary.label} />
+        <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} />
+      </div>
+    </div>
 
-      <div className="flex min-h-0 flex-col items-center justify-center px-4 text-center">
-        <Clock />
-        <div className="mt-3">
-          <Greeting />
-        </div>
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
+      <Clock />
+      <div className="mt-1">
+        <Greeting />
       </div>
     </div>
   </div>
