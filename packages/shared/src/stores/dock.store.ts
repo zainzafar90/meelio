@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface DockIconsVisibility {
+export interface DockIconsVisibility {
   timer: boolean;
   breathing: boolean;
   soundscapes: boolean;

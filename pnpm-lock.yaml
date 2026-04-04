@@ -518,6 +518,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
+      dexie:
+        specifier: ^3.2.4
+        version: 3.2.7
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

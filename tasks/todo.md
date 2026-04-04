@@ -258,6 +258,32 @@
 - Replaced the legacy timer store in `@repo/shared` with a compatibility wrapper over `@repo/application/timer` plus `@repo/infrastructure/timer`.
 - Removed the shared-only timer state/type duplication and re-exported the canonical timer state from `@repo/application/timer`.
 - Added `@repo/application` and `@repo/infrastructure` as explicit dependencies of `@repo/shared` so the wrapper resolves cleanly.
+
+## Timer Stage Storage Unification
+
+### Plan
+- [completed] Add failing storage-layer tests that define the desired `TimerStage`-only persistence contract and legacy numeric-stage normalization behavior.
+- [completed] Replace `PersistedPomodoroStage` with `TimerStage` in the DB schema and add a Dexie upgrade path for legacy numeric session rows.
+- [completed] Normalize imported/exported focus sessions through the same `TimerStage` contract and remove the persisted-stage compatibility exports.
+- [completed] Re-run targeted infrastructure/shared verification plus the focused timer validator after the migration.
+
+### Success Criteria
+- `PomodoroSession.stage` is `TimerStage` everywhere the active codebase touches it.
+- Existing numeric focus-session rows and imported backups are normalized to `TimerStage` strings instead of breaking on read/import.
+- No active code exports or references `PersistedPomodoroStage`.
+
+### Review
+- Replaced the persisted numeric stage enum in [packages/infrastructure/src/db/models.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/models.dexie.ts) so `PomodoroSession.stage` now uses `TimerStage`.
+- Simplified [packages/infrastructure/src/db/pomodoro.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/pomodoro.dexie.ts) so writes and backfills use `TimerStage` directly instead of a second persisted-stage type.
+- Simplified [packages/infrastructure/src/db/meelio.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/meelio.dexie.ts) to keep the v14 schema version without a numeric-stage migration path, because backward compatibility for old stage values is not required.
+- Updated [packages/shared/src/utils/export-import.utils.ts](/Users/zainzafar/projects/meelio/meelio/packages/shared/src/utils/export-import.utils.ts) so imported focus sessions use `addPomodoroSession(...)` and stay on the single `TimerStage` storage contract.
+- Removed the temporary legacy compatibility layer and deleted the old persisted-stage helper/test files.
+- Removed active `PersistedPomodoroStage` exports from the shared/infrastructure DB facades so `TimerStage` is the only active pomodoro stage type.
+- Verification:
+- `pnpm --filter @repo/infrastructure test -- src/db/pomodoro.dexie.test.ts`
+- `pnpm --filter @repo/infrastructure test -- src/infrastructure-boundary.test.ts`
+- `pnpm --filter @repo/shared test -- --run`
+- `pnpm validate:extension:timer`
 - Verification:
 - `pnpm --filter @repo/shared test -- src/stores/timer-core-integration.test.ts`
 - `pnpm install`
@@ -285,3 +311,27 @@
 - `pnpm --filter @repo/shared test -- src/stores/site-blocker-core-integration.test.ts`
 - `pnpm --filter @repo/shared test -- --run`
 - `pnpm --filter web build`
+
+## Infrastructure Timer Boundary Cleanup
+
+### Plan
+- [completed] Audit infrastructure timer dependencies on shared private files and record the cleanup scope in `tasks/todo.md`.
+- [completed] Add a failing structural test that forbids filesystem-path imports from `packages/shared` inside infrastructure timer code.
+- [completed] Move the timer DB/event implementations and timer sound configuration into `@repo/infrastructure` and update shared wrappers.
+- [completed] Run focused infrastructure/shared/web/extension verification and document results.
+
+### Success Criteria
+- `packages/infrastructure/src/timer/index.ts` no longer imports from `packages/shared/src/...` by filesystem path.
+- Timer DB helpers and timer event bus live in `@repo/infrastructure`, with shared wrappers preserving compatibility.
+- Infrastructure/shared tests, web build, and the timer extension validator all pass after the refactor.
+
+### Review
+- Moved Dexie DB models, DB setup, and pomodoro summary helpers into `@repo/infrastructure/db`.
+- Moved the timer event bus into `@repo/infrastructure/timer` and turned shared timer event/db files into compatibility re-exports.
+- Replaced the timer completion sound dependency on the shared sound-sync service with an infrastructure-local pomodoro sound catalog.
+- Verification:
+- `pnpm --filter @repo/infrastructure test -- src/infrastructure-boundary.test.ts`
+- `pnpm --filter @repo/shared test -- --run`
+- `pnpm install`
+- `pnpm --filter web build`
+- `pnpm validate:extension:timer`

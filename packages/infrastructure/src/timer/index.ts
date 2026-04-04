@@ -1,13 +1,12 @@
 import { TimerStage } from "@repo/contracts/timer";
+import type { TimerAppEvent } from "@repo/application/timer";
 
-import { pomodoroSounds } from "../../../../packages/shared/src/data/sounds-data";
 import {
   addSimpleTimerBreakTime,
   addSimpleTimerFocusTime,
-} from "../../../../packages/shared/src/lib/db/pomodoro.dexie";
-import { soundSyncService } from "../../../../packages/shared/src/services/sound-sync.service";
-import { timerEvents } from "../../../../packages/shared/src/utils/timer-events";
-import type { TimerAppEvent } from "@repo/application/timer";
+} from "../db/pomodoro.dexie";
+import { pomodoroSounds } from "./pomodoro-sounds";
+import { timerEvents } from "./timer-events";
 
 export const playTimerCompletionSound = async (
   soundEnabled: boolean,
@@ -22,8 +21,7 @@ export const playTimerCompletionSound = async (
     return;
   }
 
-  const url = await soundSyncService.getSoundUrl(sound.url);
-  const audio = new Audio(url);
+  const audio = new Audio(sound.url);
   audio.volume = 0.5;
   await audio.play();
 };
@@ -43,3 +41,5 @@ export const recordCompletedTimerStage = async (
 export const emitTimerAppEvent = (event: TimerAppEvent): void => {
   timerEvents.emit(event);
 };
+
+export { timerEvents } from "./timer-events";
