@@ -196,11 +196,26 @@
 ## Timer Core Package Removal
 
 ### Plan
-- [in_progress] Find all remaining references to `@repo/timer-core` and replace them with direct `contracts` or `core` imports.
-- [pending] Delete `packages/timer-core` now that it is only a shim.
-- [pending] Re-run focused verification after the package removal.
+- [completed] Find all remaining references to `@repo/timer-core` and replace them with direct `contracts` or `core` imports.
+- [completed] Delete `packages/timer-core` now that it is only a shim.
+- [completed] Re-run focused verification after the package removal.
 
 ### Success Criteria
 - No code, tests, or workspace package manifests depend on `@repo/timer-core`.
 - `packages/timer-core` no longer exists in the workspace.
 - The timer-focused validation and relevant builds/tests still pass after removal.
+
+### Review
+- Removed the `packages/timer-core` compatibility package after migrating active timer consumers to `@repo/contracts/timer` and `@repo/core/timer`.
+- Cleared the old workspace dependency from `apps/web`, `apps/extension`, and `packages/shared`.
+- Remaining `timer-core` mentions are historical notes in planning documents, not live code or package manifests.
+- Verification:
+- `pnpm --filter @repo/contracts test`
+- `pnpm --filter @repo/core test`
+- `pnpm --filter @repo/application test`
+- `pnpm --filter @repo/shared test -- src/stores/timer-core-integration.test.ts`
+- `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
+- `pnpm --filter extension test -- src/tests/timer-boundary.test.ts`
+- `pnpm --filter web build`
+- `pnpm validate:extension:timer`
+- `pnpm validate:extension`
