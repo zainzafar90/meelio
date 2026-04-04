@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
+import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 
 import type { TimerState } from "../../../types/timer.types";
@@ -174,17 +175,26 @@ export const FocusDashboard = ({
   };
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
       {showTimerPanel ? (
-        <FocusModeShell timerPanel={timerPanel} />
+        <FocusModeShell
+          timerPanel={timerPanel}
+          currentTimerLabel={snapshot.currentTimerLabel}
+          topTasksCompleted={snapshot.topTasksCompleted}
+          agendaLabel={agendaSummary.label}
+        />
       ) : (
         <HomeModeShell
+          currentTimerLabel={snapshot.currentTimerLabel}
           primaryActionLabel={
             snapshot.primaryAction.kind === "review-plan"
               ? "Open Tasks"
               : snapshot.primaryAction.label
           }
           agendaSummary={agendaSummary}
+          blockerMode={snapshot.blockerMode}
+          soundtrackMode={snapshot.soundtrackMode}
+          topTasksTotal={snapshot.topTasksTotal}
           onPrimaryAction={handlePrimaryAction}
         />
       )}
@@ -193,32 +203,54 @@ export const FocusDashboard = ({
 };
 
 const HomeModeShell = ({
+  currentTimerLabel,
   primaryActionLabel,
   agendaSummary,
+  blockerMode,
+  soundtrackMode,
+  topTasksTotal,
   onPrimaryAction,
 }: {
+  currentTimerLabel: string;
   primaryActionLabel: string;
   agendaSummary: ReturnType<typeof getAgendaSummary>;
+  blockerMode: string;
+  soundtrackMode: string;
+  topTasksTotal: number;
   onPrimaryAction: () => void;
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
-    <div className="flex flex-col items-center px-4 text-center">
-      <Clock />
-      <div className="mt-3">
-        <Greeting />
+    <div className="grid h-full w-full max-w-[1600px] grid-rows-[auto_1fr] gap-4">
+      <div className="flex items-start justify-between gap-6 px-2 py-2">
+        <div className="hidden flex-wrap gap-2 md:flex">
+          <InfoBadge label="Focus" value={currentTimerLabel} />
+          <InfoBadge label="Blocker" value={blockerMode} />
+          <InfoBadge label="Sound" value={soundtrackMode} />
+        </div>
+        <div className="ml-auto flex flex-wrap justify-end gap-2">
+          <InfoBadge label="Calendar" value={agendaSummary.label} />
+          <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} />
+        </div>
       </div>
-      <div className="mt-8 flex flex-col items-center gap-3">
-        <Button
-          onClick={onPrimaryAction}
-          className="h-10 rounded-full border border-white/20 bg-white/10 px-6 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-        >
-          {primaryActionLabel}
-        </Button>
-        <p className="text-sm text-white/60 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
-          {agendaSummary.label === "No upcoming event"
-            ? "No events"
-            : agendaSummary.summary}
-        </p>
+
+      <div className="flex min-h-0 flex-col items-center justify-center px-4 text-center">
+        <Clock />
+        <div className="mt-3">
+          <Greeting />
+        </div>
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <Button
+            onClick={onPrimaryAction}
+            className="h-10 rounded-full border border-white/20 bg-white/10 px-6 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+          >
+            {primaryActionLabel}
+          </Button>
+          <p className="text-sm text-white/60 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
+            {agendaSummary.label === "No upcoming event"
+              ? "No events"
+              : agendaSummary.summary}
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -226,11 +258,49 @@ const HomeModeShell = ({
 
 const FocusModeShell = ({
   timerPanel,
+  currentTimerLabel,
+  topTasksCompleted,
+  agendaLabel,
 }: {
   timerPanel: ReactNode;
+  currentTimerLabel: string;
+  topTasksCompleted: number;
+  agendaLabel: string;
 }) => (
-  <div className="flex min-h-0 flex-1 items-center justify-center px-4">
-    {timerPanel}
+  <div className="flex min-h-0 flex-1 items-center justify-center">
+    <div className="flex h-full w-full max-w-[1600px] flex-col">
+      <div className="flex items-center justify-between px-2 py-2">
+        <div className="flex items-center gap-3 text-white">
+          <Badge variant="secondary" className="border-white/20 bg-black/35 text-white shadow-lg backdrop-blur-md">
+            Focusing
+          </Badge>
+          <span className="text-sm text-white/82">{currentTimerLabel}</span>
+        </div>
+        <div className="hidden items-center gap-3 sm:flex">
+          <InfoBadge label="Today" value={`${topTasksCompleted} done`} />
+          <InfoBadge label="Calendar" value={agendaLabel} />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
+        {timerPanel}
+      </div>
+    </div>
+  </div>
+);
+
+const InfoBadge = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/32 px-3 py-1.5 shadow-lg backdrop-blur-lg">
+    <span className="text-[10px] uppercase tracking-[0.2em] text-white/68">
+      {label}
+    </span>
+    <span className="text-xs font-medium capitalize text-white/96">{value}</span>
   </div>
 );
 
