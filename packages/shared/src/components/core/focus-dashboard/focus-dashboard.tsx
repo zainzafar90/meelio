@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
-import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 
 import type { TimerState } from "../../../types/timer.types";
@@ -270,11 +269,8 @@ const FocusModeShell = ({
   <div className="flex min-h-0 flex-1 items-center justify-center">
     <div className="flex h-full w-full max-w-[1600px] flex-col">
       <div className="flex items-center justify-between px-2 py-2">
-        <div className="flex items-center gap-3 text-white">
-          <Badge variant="secondary" className="border-white/20 bg-black/35 text-white shadow-lg backdrop-blur-md">
-            Focusing
-          </Badge>
-          <span className="text-sm text-white/82">{currentTimerLabel}</span>
+        <div className="flex items-center gap-3">
+          <InfoBadge label="Focus" value={currentTimerLabel} />
         </div>
         <div className="hidden items-center gap-3 sm:flex">
           <InfoBadge label="Today" value={`${topTasksCompleted} done`} />
