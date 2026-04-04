@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { TimerStage, type TimerEvent, type TimerMessage } from "@repo/timer-core";
+import { TimerStage } from "@repo/contracts/timer";
+import type { TimerEvent, TimerMessage } from "@repo/contracts/timer";
 
 import { createTimerStore, type TimerAppEvent } from "./create-timer-store";
 

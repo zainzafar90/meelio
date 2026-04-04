@@ -10,8 +10,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@repo/contracts": "workspace:*",
-    "@repo/timer-core": "workspace:*"
+    "@repo/contracts": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

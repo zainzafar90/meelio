@@ -7,6 +7,10 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "dependencies": {
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*"
+  },
   "scripts": {
     "lint": "eslint --ext .ts . --max-warnings 0",
     "test": "vitest run"

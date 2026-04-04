@@ -6,9 +6,6 @@
     "lib": [
       "ES2015",
       "DOM"
-    ],
-    "types": [
-      "chrome"
     ]
   },
   "include": ["src", "vitest.config.ts"],

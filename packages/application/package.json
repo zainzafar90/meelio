@@ -12,7 +12,6 @@
   "dependencies": {
     "@repo/contracts": "workspace:*",
     "@repo/core": "workspace:*",
-    "@repo/timer-core": "workspace:*",
     "zustand": "^5"
   },
   "devDependencies": {

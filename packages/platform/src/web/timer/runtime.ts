@@ -2,7 +2,7 @@ import type {
   TimerEvent,
   TimerMessage,
   TimerRuntimeAdapter,
-} from "@repo/timer-core";
+} from "@repo/contracts/timer";
 
 export interface WorkerTimerFactory {
   new (): Worker;

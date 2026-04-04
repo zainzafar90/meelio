@@ -134,3 +134,33 @@
 - Verification:
 - `pnpm --filter extension test -- src/tests/validator-localization.test.ts src/tests/validator-focus-mode.test.ts src/tests/validator-timer-coverage.test.ts`
 - `pnpm validate:extension:timer`
+
+## Timer Layer Alignment
+
+### Plan
+- [completed] Inspect `packages/timer-core` exports and current timer imports across the repo.
+- [completed] Align timer contracts/core with the newer layered package structure while keeping compatibility for existing imports.
+- [completed] Verify the refactor with targeted tests, builds, and validator runs.
+
+### Success Criteria
+- Timer contracts and core logic are represented consistently with the newer layered packages.
+- Existing consumers do not break during the migration.
+- The focused timer validation and relevant tests still pass after the alignment.
+
+### Review
+- Added timer contracts to [packages/contracts/src/timer/contracts.ts](/Users/zainzafar/projects/meelio/meelio/packages/contracts/src/timer/contracts.ts) with a minimal guard test at [packages/contracts/src/timer/contracts.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/contracts/src/timer/contracts.test.ts).
+- Added timer core logic to [packages/core/src/timer/timer.machine.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/timer/timer.machine.ts) and [packages/core/src/timer/timer.defaults.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/timer/timer.defaults.ts), plus coverage in [packages/core/src/timer/timer.machine.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/timer/timer.machine.test.ts).
+- Turned [packages/timer-core/src/timer.contract.ts](/Users/zainzafar/projects/meelio/meelio/packages/timer-core/src/timer.contract.ts), [packages/timer-core/src/timer.defaults.ts](/Users/zainzafar/projects/meelio/meelio/packages/timer-core/src/timer.defaults.ts), and [packages/timer-core/src/timer.machine.ts](/Users/zainzafar/projects/meelio/meelio/packages/timer-core/src/timer.machine.ts) into compatibility re-exports so older consumers can keep working during migration.
+- Updated the newer layered timer code to use the new homes:
+- [packages/application/src/timer/create-timer-store.ts](/Users/zainzafar/projects/meelio/meelio/packages/application/src/timer/create-timer-store.ts)
+- [packages/platform/src/web/timer/runtime.ts](/Users/zainzafar/projects/meelio/meelio/packages/platform/src/web/timer/runtime.ts)
+- [packages/platform/src/extension/timer/runtime.ts](/Users/zainzafar/projects/meelio/meelio/packages/platform/src/extension/timer/runtime.ts)
+- [packages/infrastructure/src/timer/index.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/timer/index.ts)
+- Verification:
+- `pnpm install`
+- `pnpm --filter @repo/contracts test`
+- `pnpm --filter @repo/core test`
+- `pnpm --filter @repo/application test`
+- `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
+- `pnpm --filter web build`
+- `pnpm validate:extension:timer`

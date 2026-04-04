@@ -1,4 +1,4 @@
-import { TimerStage } from "@repo/timer-core";
+import { TimerStage } from "@repo/contracts/timer";
 
 import { pomodoroSounds } from "../../../../packages/shared/src/data/sounds-data";
 import {

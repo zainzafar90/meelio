@@ -10,7 +10,8 @@ describe("web timer boundaries", () => {
   it("keeps timer-core transitions inside the extracted application timer store", () => {
     const source = readSource("../../packages/application/src/timer/create-timer-store.ts");
 
-    expect(source).toContain('from "@repo/timer-core"');
+    expect(source).toContain('from "@repo/core/timer"');
+    expect(source).toContain('from "@repo/contracts/timer"');
     expect(source).not.toContain("type TimerRuntimeAdapter,\n} from \"@repo/shared\"");
   });
 

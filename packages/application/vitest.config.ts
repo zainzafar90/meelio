@@ -4,7 +4,11 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@repo/timer-core": path.resolve(__dirname, "../timer-core/src/index.ts"),
+      "@repo/contracts/timer": path.resolve(
+        __dirname,
+        "../contracts/src/timer/index.ts"
+      ),
+      "@repo/core/timer": path.resolve(__dirname, "../core/src/timer/index.ts"),
     },
   },
   test: {

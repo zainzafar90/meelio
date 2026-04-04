@@ -1,5 +1,4 @@
 import {
-  TimerStage,
   completeTimerStage,
   createInitialTimerSnapshot,
   pauseTimer,
@@ -9,10 +8,10 @@ import {
   startTimer,
   updateTimerDurations,
   updateTimerRemaining,
-  type TimerRuntimeAdapter,
-  type TimerSettings,
   type TimerSnapshot,
-} from "@repo/timer-core";
+} from "@repo/core/timer";
+import type { TimerRuntimeAdapter, TimerSettings } from "@repo/contracts/timer";
+import { TimerStage } from "@repo/contracts/timer";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

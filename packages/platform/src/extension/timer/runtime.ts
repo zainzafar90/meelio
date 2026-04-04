@@ -2,7 +2,7 @@ import type {
   TimerEvent,
   TimerMessage,
   TimerRuntimeAdapter,
-} from "@repo/timer-core";
+} from "@repo/contracts/timer";
 
 const KNOWN_EVENTS: Set<TimerEvent["type"]> = new Set([
   "TICK",

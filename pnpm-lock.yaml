@@ -438,9 +438,6 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../core
-      '@repo/timer-core':
-        specifier: workspace:*
-        version: link:../timer-core
       zustand:
         specifier: ^5
         version: 5.0.9(@types/react@18.3.27)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
@@ -459,10 +456,6 @@ importers:
         version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/contracts:
-    dependencies:
-      '@repo/core':
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -478,6 +471,10 @@ importers:
         version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/core:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -524,9 +521,9 @@ importers:
       '@repo/application':
         specifier: workspace:*
         version: link:../application
-      '@repo/timer-core':
+      '@repo/contracts':
         specifier: workspace:*
-        version: link:../timer-core
+        version: link:../contracts
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -579,9 +576,6 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@repo/timer-core':
-        specifier: workspace:*
-        version: link:../timer-core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -748,6 +742,13 @@ importers:
         version: 1.0.7(tailwindcss@3.4.19(yaml@2.8.2))
 
   packages/timer-core:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
