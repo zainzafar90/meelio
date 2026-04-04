@@ -70,7 +70,7 @@ const Content = () => {
 
   return (
     <main
-      className="flex flex-1 flex-col items-center justify-center"
+      className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden"
       aria-label={t("home.layout.main.aria")}
     >
       {!isBreathingVisible && (
@@ -107,7 +107,7 @@ const BottomBar = () => {
   const { t } = useTranslation();
   return (
     <footer
-      className="flex items-center justify-center pb-2"
+      className="flex shrink-0 items-center justify-center pb-2"
       aria-label={t("home.layout.footer.aria")}
     >
       <Dock />

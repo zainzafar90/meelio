@@ -5,10 +5,7 @@ import { useShallow } from "zustand/shallow";
 
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/ui/card";
-import { Input } from "@repo/ui/components/ui/input";
-import { Progress } from "@repo/ui/components/ui/progress";
-import { Textarea } from "@repo/ui/components/ui/textarea";
+import { Card, CardContent } from "@repo/ui/components/ui/card";
 
 import type { TimerState } from "../../../types/timer.types";
 import { Category } from "../../../types/category";
@@ -33,7 +30,6 @@ import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
-import { QuickCaptureBar } from "../quick-capture/quick-capture-bar";
 
 type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
@@ -80,43 +76,37 @@ export const FocusDashboard = ({
     durations,
     start,
     settings,
-  } =
-    timerStore(
-      useShallow((state) => ({
-        stage: state.stage,
-        isRunning: state.isRunning,
-        prevRemaining: state.prevRemaining,
-        endTimestamp: state.endTimestamp,
-        durations: state.durations,
-        start: state.start,
-        settings: state.settings,
-      }))
-    );
-  const { tasks, toggleTask, togglePinTask } = useTaskStore(
+  } = timerStore(
     useShallow((state) => ({
-      tasks: state.tasks,
-      toggleTask: state.toggleTask,
-      togglePinTask: state.togglePinTask,
+      stage: state.stage,
+      isRunning: state.isRunning,
+      prevRemaining: state.prevRemaining,
+      endTimestamp: state.endTimestamp,
+      durations: state.durations,
+      start: state.start,
+      settings: state.settings,
     }))
   );
+  const tasks = useTaskStore(useShallow((state) => state.tasks));
   const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
   const playingSounds = useSoundscapesStore(
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible, setTimerVisible, setGreetingsVisible } = useDockStore(
+  const {
+    isTimerVisible,
+    setTimerVisible,
+    setGreetingsVisible,
+    setTasksVisible,
+  } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       setTimerVisible: state.setTimerVisible,
       setGreetingsVisible: state.setGreetingsVisible,
+      setTasksVisible: state.setTasksVisible,
     }))
   );
-  const { dailyPlan, snapshot } = useFocusDashboardStore(
-    useShallow((state) => ({
-      dailyPlan: state.dailyPlan,
-      snapshot: state.snapshot,
-    }))
-  );
+  const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
   const timerRemaining = useMemo(() => {
@@ -159,24 +149,16 @@ export const FocusDashboard = ({
     timerRemaining,
   ]);
 
-  const completionPercentage =
-    snapshot.topTasksTotal === 0
-      ? 0
-      : (snapshot.topTasksCompleted / snapshot.topTasksTotal) * 100;
-  const taskDetails = useMemo(
-    () => new Map(tasks.map((task) => [task.id, task])),
-    [tasks]
-  );
-  const activeFocusTask = snapshot.activeFocusTaskId
-    ? taskDetails.get(snapshot.activeFocusTaskId)
-    : undefined;
-  const agendaSummary = useMemo(
-    () => getAgendaSummary(nextEvent),
-    [nextEvent]
-  );
-  const isFocusReady = dailyPlan.topTasks.length > 0 || dailyPlan.headline.trim().length > 0;
+  const agendaSummary = useMemo(() => getAgendaSummary(nextEvent), [nextEvent]);
+  const showTimerPanel = isTimerVisible || isRunning;
 
   const handlePrimaryAction = () => {
+    if (snapshot.primaryAction.kind === "review-plan") {
+      setTasksVisible(true);
+      setTimerVisible(false);
+      return;
+    }
+
     setTimerVisible(true);
     setGreetingsVisible(false);
 
@@ -193,191 +175,188 @@ export const FocusDashboard = ({
     }
   };
 
-  const showTimerPanel = isTimerVisible || isRunning;
-
   return (
-    <div className="flex w-full max-w-6xl flex-col gap-8 px-4 pb-6 pt-6 sm:px-6 lg:px-8">
-      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-        <Card className="border-white/10 bg-black/20 text-white shadow-2xl backdrop-blur-xl">
-          <CardContent className="flex flex-col gap-6 p-6 sm:p-8">
-            <div className="space-y-5 text-center lg:text-left">
-              <div className="flex flex-col items-center gap-4 lg:items-start">
-                <Clock />
-                <Greeting />
-              </div>
-              <div className="space-y-3">
-                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                  {snapshot.headline}
-                </h2>
-                <p className="text-sm text-white/70 sm:max-w-2xl sm:text-base">
-                  {snapshot.currentTimerLabel}. {snapshot.agendaWindowLabel}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                  <p className="text-xs uppercase tracking-[0.24em] text-white/45">
-                    Active Focus Task
-                  </p>
-                  <p className="mt-2 text-base font-medium text-white">
-                    {snapshot.activeFocusTaskLabel}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <InfoBadge label="Focus" value={snapshot.currentTimerLabel} />
-                    <InfoBadge label="Blocker" value={snapshot.blockerMode} />
-                    <InfoBadge label="Sound" value={snapshot.soundtrackMode} />
-                  </div>
-                </div>
-                <QuickCaptureBar />
-              </div>
-              <div className="flex flex-col gap-3 lg:w-[240px]">
-                <Button
-                  onClick={handlePrimaryAction}
-                  className="h-12 rounded-2xl bg-white text-black hover:bg-white/90"
-                >
-                  {snapshot.primaryAction.label}
-                </Button>
-                <p className="text-sm text-white/60 lg:text-right">
-                  {snapshot.primaryAction.description}
-                </p>
-                {!isFocusReady && (
-                  <p className="text-sm text-amber-200/80 lg:text-right">
-                    Add a headline or pin a task to make this session more intentional.
-                  </p>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-6">
-          <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
-            <CardHeader className="space-y-2">
-              <CardTitle className="text-xl">Daily Focus Plan</CardTitle>
-              <p className="text-sm text-white/60">
-                Set the tone, then keep one short reflection attached to the day.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                value={dailyPlan.headline}
-                onChange={(event) =>
-                  updateDailyFocusPlan({ headline: event.target.value })
-                }
-                placeholder="What matters most today?"
-                className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-              />
-              <Textarea
-                value={dailyPlan.intention}
-                onChange={(event) =>
-                  updateDailyFocusPlan({ intention: event.target.value })
-                }
-                placeholder="Define the intention for this session."
-                className="min-h-[96px] border-white/10 bg-white/5 text-white placeholder:text-white/35"
-              />
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-                <Input
-                  type="number"
-                  min={0}
-                  value={dailyPlan.sessionTarget}
-                  onChange={(event) =>
-                    updateDailyFocusPlan({
-                      sessionTarget: Number(event.target.value || 0),
-                    })
-                  }
-                  className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
-                />
-                <Badge variant="secondary" className="justify-center border-white/10 bg-white/10 text-white">
-                  {snapshot.topTasksCompleted}/{snapshot.topTasksTotal} done
-                </Badge>
-              </div>
-              <Progress value={completionPercentage} className="bg-white/10" />
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">
-                      Next on your calendar
-                    </p>
-                    <p className="mt-2 text-sm font-medium text-white">
-                      {agendaSummary.summary}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="border-white/10 bg-white/10 text-white">
-                    {agendaSummary.label}
-                  </Badge>
-                </div>
-                <p className="mt-2 text-sm text-white/55">
-                  {agendaSummary.detail}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
-            <CardHeader className="space-y-2">
-              <CardTitle className="text-xl">Top Tasks</CardTitle>
-              <p className="text-sm text-white/60">
-                Pulled from your current task state and pinned for focus.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {dailyPlan.topTasks.length > 0 ? (
-                dailyPlan.topTasks.map((task, index) => (
-                  <div
-                    key={task.id}
-                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs text-white/70">
-                        {index + 1}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-white">
-                          {task.title}
-                        </p>
-                        <p className="mt-1 text-xs text-white/45">
-                          {taskDetails.get(task.id)?.pinned
-                            ? "Pinned for the current focus window."
-                            : activeFocusTask
-                              ? "Available if you want to replace the current focus task."
-                              : "Available to promote into focus."}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        type="button"
-                        onClick={() => void toggleTask(task.id)}
-                        className="h-8 rounded-lg border border-white/10 bg-transparent px-3 text-white hover:bg-white/10"
-                      >
-                        Complete
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={() => void togglePinTask(task.id)}
-                        className="h-8 rounded-lg border border-white/10 bg-transparent px-3 text-white hover:bg-white/10"
-                      >
-                        {taskDetails.get(task.id)?.pinned ? "Remove Focus" : "Focus This"}
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-white/60">
-                  Add or pin a task to make the daily plan actionable.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {showTimerPanel && <div className="flex justify-center">{timerPanel}</div>}
+    <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
+      {showTimerPanel ? (
+        <FocusModeShell
+          timerPanel={timerPanel}
+          currentTimerLabel={snapshot.currentTimerLabel}
+          activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
+          topTasksCompleted={snapshot.topTasksCompleted}
+          agendaLabel={agendaSummary.label}
+        />
+      ) : (
+        <HomeModeShell
+          headline={snapshot.headline}
+          currentTimerLabel={snapshot.currentTimerLabel}
+          agendaWindowLabel={snapshot.agendaWindowLabel}
+          activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
+          primaryActionLabel={
+            snapshot.primaryAction.kind === "review-plan"
+              ? "Open Tasks"
+              : snapshot.primaryAction.label
+          }
+          primaryActionDescription={
+            snapshot.primaryAction.kind === "review-plan"
+              ? "Pick or pin a task before starting a focus session."
+              : snapshot.primaryAction.description
+          }
+          agendaSummary={agendaSummary}
+          blockerMode={snapshot.blockerMode}
+          soundtrackMode={snapshot.soundtrackMode}
+          topTasksTotal={snapshot.topTasksTotal}
+          onPrimaryAction={handlePrimaryAction}
+        />
+      )}
     </div>
   );
 };
+
+const HomeModeShell = ({
+  headline,
+  currentTimerLabel,
+  agendaWindowLabel,
+  activeFocusTaskLabel,
+  primaryActionLabel,
+  primaryActionDescription,
+  agendaSummary,
+  blockerMode,
+  soundtrackMode,
+  topTasksTotal,
+  onPrimaryAction,
+}: {
+  headline: string;
+  currentTimerLabel: string;
+  agendaWindowLabel: string;
+  activeFocusTaskLabel: string;
+  primaryActionLabel: string;
+  primaryActionDescription: string;
+  agendaSummary: ReturnType<typeof getAgendaSummary>;
+  blockerMode: string;
+  soundtrackMode: string;
+  topTasksTotal: number;
+  onPrimaryAction: () => void;
+}) => (
+  <div className="flex min-h-0 flex-1 items-center justify-center">
+    <div className="grid h-full w-full max-w-[1600px] grid-rows-[auto_1fr_auto] gap-4">
+      <div className="flex items-start justify-between gap-6 px-2 py-2">
+        <div className="hidden flex-wrap gap-2 md:flex">
+          <InfoBadge label="Focus" value={currentTimerLabel} />
+          <InfoBadge label="Blocker" value={blockerMode} />
+          <InfoBadge label="Sound" value={soundtrackMode} />
+        </div>
+        <div className="ml-auto flex flex-wrap justify-end gap-2">
+          <InfoBadge label="Calendar" value={agendaSummary.label} />
+          <InfoBadge label="Tasks" value={`${topTasksTotal} queued`} />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-col items-center justify-center px-4 text-center">
+        <div className="space-y-6 px-6 py-8 sm:px-10">
+          <div className="flex flex-col items-center gap-4">
+            <Clock />
+            <Greeting />
+          </div>
+          <div className="space-y-3">
+            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-7xl">
+              {headline}
+            </h1>
+            <p className="mx-auto max-w-2xl text-base text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] sm:text-lg">
+              {currentTimerLabel}. {agendaWindowLabel}
+            </p>
+          </div>
+          <div className="space-y-3">
+            <Button
+              onClick={onPrimaryAction}
+              className="h-12 rounded-full border border-white/15 bg-black/65 px-8 text-base text-white shadow-xl backdrop-blur-md hover:bg-black/75"
+            >
+              {primaryActionLabel}
+            </Button>
+            <p className="text-sm text-white/82 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+              {primaryActionDescription}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 px-2 py-2 lg:grid-cols-[minmax(0,360px)_minmax(0,420px)] lg:justify-between">
+        <div className="rounded-3xl border border-white/12 bg-black/45 p-4 text-left shadow-xl backdrop-blur-lg">
+          <p className="text-[10px] uppercase tracking-[0.24em] text-white/60">
+            Active Focus Task
+          </p>
+          <p className="mt-2 text-base font-medium text-white sm:text-lg">
+            {activeFocusTaskLabel}
+          </p>
+        </div>
+        <Card className="border-white/12 bg-black/45 text-white shadow-xl backdrop-blur-lg">
+          <CardContent className="space-y-3 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.24em] text-white/60">
+                  Next on your calendar
+                </p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  {agendaSummary.summary}
+                </p>
+              </div>
+              <Badge variant="secondary" className="border-white/10 bg-white/10 text-white">
+                {agendaSummary.label}
+              </Badge>
+            </div>
+            <p className="text-sm text-white/75">{agendaSummary.detail}</p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </div>
+);
+
+const FocusModeShell = ({
+  timerPanel,
+  currentTimerLabel,
+  activeFocusTaskLabel,
+  topTasksCompleted,
+  agendaLabel,
+}: {
+  timerPanel: ReactNode;
+  currentTimerLabel: string;
+  activeFocusTaskLabel: string;
+  topTasksCompleted: number;
+  agendaLabel: string;
+}) => (
+  <div className="flex min-h-0 flex-1 items-center justify-center">
+    <div className="flex h-full w-full max-w-[1600px] flex-col">
+      <div className="flex items-center justify-between px-2 py-2">
+        <div className="flex items-center gap-3 text-white">
+          <Badge variant="secondary" className="border-white/20 bg-black/35 text-white shadow-lg backdrop-blur-md">
+            Focusing
+          </Badge>
+          <span className="text-sm text-white/82">{currentTimerLabel}</span>
+        </div>
+        <div className="hidden items-center gap-3 sm:flex">
+          <InfoBadge label="Today" value={`${topTasksCompleted} done`} />
+          <InfoBadge label="Calendar" value={agendaLabel} />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 items-center justify-center px-4 pb-4">
+        <div className="flex w-full max-w-5xl flex-col items-center gap-6">
+          <div className="space-y-2 text-center">
+            <p className="text-sm uppercase tracking-[0.24em] text-white/70">
+              Active Focus Task
+            </p>
+            <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              {activeFocusTaskLabel}
+            </h2>
+          </div>
+          <div className="w-full max-w-3xl sm:p-2">
+            {timerPanel}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const InfoBadge = ({
   label,
@@ -386,9 +365,11 @@ const InfoBadge = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-1.5">
-    <span className="text-[10px] uppercase tracking-[0.2em] text-white/45">{label}</span>
-    <span className="text-xs font-medium capitalize text-white">{value}</span>
+  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/32 px-3 py-1.5 shadow-lg backdrop-blur-lg">
+    <span className="text-[10px] uppercase tracking-[0.2em] text-white/68">
+      {label}
+    </span>
+    <span className="text-xs font-medium capitalize text-white/96">{value}</span>
   </div>
 );
 
@@ -406,9 +387,7 @@ const getAgendaSummary = (event: CalendarEvent | null) => {
     return {
       label: "Happening now",
       summary: event.summary ?? "Current event",
-      detail: isAllDayEvent(event)
-        ? "This is an all-day event."
-        : `Ends later today.`,
+      detail: isAllDayEvent(event) ? "This is an all-day event." : "Ends later today.",
     };
   }
 
@@ -422,7 +401,10 @@ const getAgendaSummary = (event: CalendarEvent | null) => {
       });
 
   return {
-    label: minutesUntil !== null && minutesUntil < 60 ? "Coming up soon" : "Next on your calendar",
+    label:
+      minutesUntil !== null && minutesUntil < 60
+        ? "Coming up soon"
+        : "Next on your calendar",
     summary: event.summary ?? "Upcoming event",
     detail:
       minutesUntil === null

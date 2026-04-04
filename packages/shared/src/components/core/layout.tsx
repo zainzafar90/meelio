@@ -5,7 +5,7 @@ export const AppLayout = (props: { children: React.ReactNode }) => {
     <div
       className={cn(
         "text-white",
-        "relative h-screen p-home",
+        "relative h-screen overflow-hidden p-home",
         "flex min-h-screen flex-col",
         "transition-opacity duration-300 ease-out"
       )}
