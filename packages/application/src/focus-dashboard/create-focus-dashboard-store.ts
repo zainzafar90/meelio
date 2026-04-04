@@ -16,6 +16,7 @@ export interface FocusDashboardSignals {
   blockerMode: FocusBlockerMode;
   soundtrackMode: FocusSoundtrackMode;
   nextEventLabel: string;
+  minutesUntilEvent: number | null;
 }
 
 export interface CreateFocusDashboardStoreInput {
@@ -60,6 +61,7 @@ const createSignals = (
   blockerMode: signals?.blockerMode ?? "ready",
   soundtrackMode: signals?.soundtrackMode ?? "available",
   nextEventLabel: signals?.nextEventLabel ?? "",
+  minutesUntilEvent: signals?.minutesUntilEvent ?? null,
 });
 
 const buildSnapshot = (
@@ -78,6 +80,7 @@ const buildSnapshot = (
     blockerMode: signals.blockerMode,
     soundtrackMode: signals.soundtrackMode,
     nextEventLabel: signals.nextEventLabel,
+    minutesUntilEvent: signals.minutesUntilEvent,
   });
 
   return {

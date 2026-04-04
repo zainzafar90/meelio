@@ -97,6 +97,7 @@ export const syncFocusDashboardSignals = (signals: {
   blockerMode: "ready" | "active" | "bypassing";
   soundtrackMode: "available" | "playing" | "muted";
   nextEventLabel: string;
+  minutesUntilEvent: number | null;
 }) => {
   useFocusDashboardStore.getState().setSignals(signals);
 };

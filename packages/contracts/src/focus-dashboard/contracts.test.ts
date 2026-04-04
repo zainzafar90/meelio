@@ -42,6 +42,8 @@ describe("focus dashboard contracts", () => {
       greeting: "Good evening",
       headline: "Your day is ready",
       focusPlan: plan,
+      activeFocusTaskId: "task-1",
+      activeFocusTaskLabel: "Define dashboard structure",
       topTasksCompleted: 0,
       topTasksTotal: 1,
       currentTimerLabel: "Ready to focus",
@@ -49,10 +51,12 @@ describe("focus dashboard contracts", () => {
       blockerMode: "ready",
       soundtrackMode: "available",
       nextEventLabel: "No events scheduled",
+      agendaWindowLabel: "Calendar is clear for deep work.",
       primaryAction: action,
     };
 
     expect(snapshot.focusPlan.headline).toBe("Ship phase 1 dashboard");
+    expect(snapshot.activeFocusTaskLabel).toBe("Define dashboard structure");
     expect(snapshot.primaryAction.kind).toBe("start-focus-session");
   });
 });

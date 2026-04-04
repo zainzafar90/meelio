@@ -25,6 +25,7 @@ describe("createFocusDashboardStore", () => {
     expect(snapshot.focusPlan.headline).toBe("Ship dashboard shell");
     expect(snapshot.topTasksTotal).toBe(1);
     expect(snapshot.primaryAction.kind).toBe("start-focus-session");
+    expect(snapshot.activeFocusTaskLabel).toBe("Create daily plan card");
   });
 
   it("recomputes the primary action when timer signals change", () => {
@@ -49,6 +50,7 @@ describe("createFocusDashboardStore", () => {
       blockerMode: "active",
       soundtrackMode: "playing",
       nextEventLabel: "Design review at 7:00 PM",
+      minutesUntilEvent: 18,
     });
 
     const snapshot = store.getState().snapshot;
@@ -56,5 +58,6 @@ describe("createFocusDashboardStore", () => {
     expect(snapshot.primaryAction.kind).toBe("resume-focus-session");
     expect(snapshot.currentTimerLabel).toBe("12:00 remaining");
     expect(snapshot.blockerMode).toBe("active");
+    expect(snapshot.agendaWindowLabel).toContain("18 min");
   });
 });

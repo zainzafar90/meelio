@@ -23,10 +23,24 @@ describe("focus dashboard core", () => {
       timerRunning: true,
       timerStage: TimerStage.Focus,
       topTasksCount: 2,
+      activeFocusTaskLabel: "Ship dashboard shell",
     });
 
     expect(action.kind).toBe("resume-focus-session");
-    expect(action.label).toBe("Resume Focus Session");
+    expect(action.label).toBe("Resume Focus: Ship dashboard shell");
+  });
+
+  it("derives a start action that references the active focus task and time window", () => {
+    const action = deriveFocusPrimaryAction({
+      timerRunning: false,
+      topTasksCount: 2,
+      activeFocusTaskLabel: "Draft the release plan",
+      minutesUntilEvent: 24,
+    });
+
+    expect(action.kind).toBe("start-focus-session");
+    expect(action.label).toBe("Use 24 min for: Draft the release plan");
+    expect(action.description).toContain("next event");
   });
 
   it("builds a dashboard snapshot with task progress and ambient fallbacks", () => {
@@ -43,12 +57,16 @@ describe("focus dashboard core", () => {
       blockerMode: "ready",
       soundtrackMode: "available",
       nextEventLabel: "",
+      minutesUntilEvent: null,
     });
 
     expect(snapshot.topTasksCompleted).toBe(1);
     expect(snapshot.topTasksTotal).toBe(2);
     expect(snapshot.primaryAction.kind).toBe("start-focus-session");
     expect(snapshot.nextEventLabel).toBe("No events scheduled");
+    expect(snapshot.activeFocusTaskId).toBe("task-2");
+    expect(snapshot.activeFocusTaskLabel).toBe("Wire focus CTA");
+    expect(snapshot.agendaWindowLabel).toBe("Calendar is clear for deep work.");
   });
 
   it("ranks the dashboard cards based on immediate user context", () => {

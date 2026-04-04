@@ -17,6 +17,8 @@ export interface DeriveFocusPrimaryActionInput {
   timerRunning: boolean;
   timerStage?: TimerStage;
   topTasksCount: number;
+  activeFocusTaskLabel?: string;
+  minutesUntilEvent?: number | null;
 }
 
 export interface DeriveFocusDashboardSnapshotInput {
@@ -29,6 +31,7 @@ export interface DeriveFocusDashboardSnapshotInput {
   blockerMode: FocusBlockerMode;
   soundtrackMode: FocusSoundtrackMode;
   nextEventLabel?: string;
+  minutesUntilEvent?: number | null;
 }
 
 export interface RankFocusDashboardCardsInput {
@@ -42,12 +45,18 @@ export const deriveFocusPrimaryAction = ({
   timerRunning,
   timerStage,
   topTasksCount,
+  activeFocusTaskLabel,
+  minutesUntilEvent,
 }: DeriveFocusPrimaryActionInput): FocusPrimaryAction => {
+  const focusLabel = activeFocusTaskLabel?.trim();
+
   if (timerRunning && timerStage === TimerStage.Focus) {
     return {
       kind: "resume-focus-session",
-      label: "Resume Focus Session",
-      description: "Jump back into the active focus block.",
+      label: focusLabel ? `Resume Focus: ${focusLabel}` : "Resume Focus Session",
+      description: focusLabel
+        ? `Jump back into the active block for ${focusLabel}.`
+        : "Jump back into the active focus block.",
       emphasis: "primary",
     };
   }
@@ -61,10 +70,21 @@ export const deriveFocusPrimaryAction = ({
     };
   }
 
+  if (focusLabel && minutesUntilEvent !== null && minutesUntilEvent !== undefined && minutesUntilEvent > 0 && minutesUntilEvent < 30) {
+    return {
+      kind: "start-focus-session",
+      label: `Use ${minutesUntilEvent} min for: ${focusLabel}`,
+      description: "Start a shorter focus block before your next event.",
+      emphasis: "primary",
+    };
+  }
+
   return {
     kind: "start-focus-session",
-    label: "Start Focus Session",
-    description: "Launch a fresh focus block with your focus tools.",
+    label: focusLabel ? `Start Focus: ${focusLabel}` : "Start Focus Session",
+    description: focusLabel
+      ? `Launch a fresh focus block for ${focusLabel}.`
+      : "Launch a fresh focus block with your focus tools.",
     emphasis: "primary",
   };
 };
@@ -79,8 +99,18 @@ export const deriveFocusDashboardSnapshot = ({
   blockerMode,
   soundtrackMode,
   nextEventLabel,
+  minutesUntilEvent,
 }: DeriveFocusDashboardSnapshotInput): FocusDashboardSnapshot => {
   const topTasksCompleted = topTasks.filter((task) => task.completed).length;
+  const activeFocusTask = topTasks.find((task) => !task.completed) ?? null;
+  const agendaWindowLabel =
+    minutesUntilEvent === null || minutesUntilEvent === undefined
+      ? "Calendar is clear for deep work."
+      : minutesUntilEvent <= 0
+        ? "An event is happening now."
+        : minutesUntilEvent < 30
+          ? `${minutesUntilEvent} min until your next event. Keep this focus block short.`
+          : `${minutesUntilEvent} min available before your next event.`;
 
   return {
     date,
@@ -96,6 +126,9 @@ export const deriveFocusDashboardSnapshot = ({
       sessionTarget: 0,
       reflection: "",
     },
+    activeFocusTaskId: activeFocusTask?.id ?? null,
+    activeFocusTaskLabel:
+      activeFocusTask?.title ?? "Choose a task to anchor the next focus block",
     topTasksCompleted,
     topTasksTotal: topTasks.length,
     currentTimerLabel: timerLabel,
@@ -106,10 +139,13 @@ export const deriveFocusDashboardSnapshot = ({
       nextEventLabel && nextEventLabel.trim().length > 0
         ? nextEventLabel
         : "No events scheduled",
+    agendaWindowLabel,
     primaryAction: deriveFocusPrimaryAction({
       timerRunning,
       timerStage,
       topTasksCount: topTasks.length,
+      activeFocusTaskLabel: activeFocusTask?.title,
+      minutesUntilEvent,
     }),
   };
 };

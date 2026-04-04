@@ -14,6 +14,10 @@
 - [x] Write Phase 2 spec and implementation plan
 - [x] Implement Phase 2 quick capture foundation
 - [x] Verify Phase 2 behavior and boundaries
+- [x] Define Phase 3 scope: smart dashboard actions
+- [x] Write Phase 3 spec and implementation plan
+- [x] Implement Phase 3 smart dashboard actions
+- [x] Verify Phase 3 behavior and boundaries
 
 ## Review
 
@@ -24,6 +28,8 @@
 - Phase 2 target is: Quick Capture + dashboard task actions + stronger actionability from the focus dashboard.
 - Phase 2 foundation now adds a layered quick-capture slice, a shared quick-capture store, a dashboard capture bar, and inline dashboard task actions.
 - Quick-captured tasks are intentionally pinned so the dashboard loop stays action-first and new work lands in focus immediately.
+- Phase 3 target is: smarter dashboard actions driven by the pinned task and the time window before the next event.
+- Phase 3 now treats the pinned task as the active focus task, lets the CTA reference that task directly, and adds agenda-window guidance to the hero and agenda card.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

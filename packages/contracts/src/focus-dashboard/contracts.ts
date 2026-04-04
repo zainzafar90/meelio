@@ -35,6 +35,8 @@ export interface FocusDashboardSnapshot {
   greeting: string;
   headline: string;
   focusPlan: DailyFocusPlan;
+  activeFocusTaskId: string | null;
+  activeFocusTaskLabel: string;
   topTasksCompleted: number;
   topTasksTotal: number;
   currentTimerLabel: string;
@@ -42,5 +44,6 @@ export interface FocusDashboardSnapshot {
   blockerMode: FocusBlockerMode;
   soundtrackMode: FocusSoundtrackMode;
   nextEventLabel: string;
+  agendaWindowLabel: string;
   primaryAction: FocusPrimaryAction;
 }

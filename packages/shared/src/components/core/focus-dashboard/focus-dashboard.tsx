@@ -148,10 +148,12 @@ export const FocusDashboard = ({
       blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
       soundtrackMode: playingSounds > 0 ? "playing" : "available",
       nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
+      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
     });
   }, [
     blockedSites.length,
     isRunning,
+    nextEvent,
     nextEvent?.summary,
     playingSounds,
     stage,
@@ -166,6 +168,9 @@ export const FocusDashboard = ({
     () => new Map(tasks.map((task) => [task.id, task])),
     [tasks]
   );
+  const activeFocusTask = snapshot.activeFocusTaskId
+    ? taskDetails.get(snapshot.activeFocusTaskId)
+    : undefined;
   const agendaSummary = useMemo(
     () => getAgendaSummary(nextEvent),
     [nextEvent]
@@ -213,6 +218,9 @@ export const FocusDashboard = ({
                 <p className="text-sm text-white/70 sm:text-base">
                   {snapshot.currentTimerLabel}. {agendaSummary.summary}
                 </p>
+                <p className="text-sm text-white/55">
+                  {snapshot.agendaWindowLabel}
+                </p>
               </div>
             </div>
 
@@ -223,6 +231,14 @@ export const FocusDashboard = ({
             </div>
 
             <div className="flex flex-col gap-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.24em] text-white/45">
+                  Active Focus Task
+                </p>
+                <p className="mt-2 text-sm font-medium text-white">
+                  {snapshot.activeFocusTaskLabel}
+                </p>
+              </div>
               <Button
                 onClick={handlePrimaryAction}
                 className="h-12 rounded-2xl bg-white text-black hover:bg-white/90"
@@ -306,6 +322,9 @@ export const FocusDashboard = ({
                 <p className="mt-2 text-sm text-white/60">
                   {agendaSummary.detail}
                 </p>
+                <p className="mt-2 text-sm text-white/45">
+                  {snapshot.agendaWindowLabel}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -335,7 +354,9 @@ export const FocusDashboard = ({
                         <p className="mt-1 text-xs text-white/45">
                           {taskDetails.get(task.id)?.pinned
                             ? "Pinned for the current focus window."
-                            : "Available to promote into focus."}
+                            : activeFocusTask
+                              ? "Available if you want to replace the current focus task."
+                              : "Available to promote into focus."}
                         </p>
                       </div>
                     </div>
@@ -352,7 +373,7 @@ export const FocusDashboard = ({
                         onClick={() => void togglePinTask(task.id)}
                         className="h-8 rounded-xl border border-white/10 bg-transparent px-3 text-white hover:bg-white/10"
                       >
-                        {taskDetails.get(task.id)?.pinned ? "Unpin" : "Pin"}
+                        {taskDetails.get(task.id)?.pinned ? "Remove Focus" : "Focus This"}
                       </Button>
                     </div>
                   </div>

@@ -54,6 +54,7 @@ describe("focus dashboard store", () => {
       blockerMode: "active",
       soundtrackMode: "playing",
       nextEventLabel: "Next: Design review",
+      minutesUntilEvent: 18,
     });
 
     const snapshot = module.useFocusDashboardStore.getState().snapshot;
@@ -62,5 +63,6 @@ describe("focus dashboard store", () => {
     expect(snapshot.currentTimerLabel).toBe("08:00 remaining");
     expect(snapshot.blockerMode).toBe("active");
     expect(snapshot.nextEventLabel).toBe("Next: Design review");
+    expect(snapshot.agendaWindowLabel).toContain("18 min");
   });
 });
