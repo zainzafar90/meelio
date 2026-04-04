@@ -18,6 +18,10 @@
 - [x] Write Phase 3 spec and implementation plan
 - [x] Implement Phase 3 smart dashboard actions
 - [x] Verify Phase 3 behavior and boundaries
+- [x] Define Phase 4 scope: desktop home and focus shell
+- [x] Write Phase 4 spec and implementation plan
+- [ ] Implement Phase 4 desktop home and focus shell
+- [ ] Verify Phase 4 behavior and boundaries
 
 ## Review
 
@@ -30,6 +34,7 @@
 - Quick-captured tasks are intentionally pinned so the dashboard loop stays action-first and new work lands in focus immediately.
 - Phase 3 target is: smarter dashboard actions driven by the pinned task and the time window before the next event.
 - Phase 3 now treats the pinned task as the active focus task, lets the CTA reference that task directly, and adds agenda-window guidance to the hero and agenda card.
+- Phase 4 target is: replace the card-heavy home layout with a desktop-style ambient shell, a persistent dock, and a dedicated focus mode shell.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

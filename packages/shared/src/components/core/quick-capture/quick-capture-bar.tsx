@@ -56,8 +56,12 @@ export const QuickCaptureBar = () => {
       : "Use capture to add a task or note without leaving the dashboard.";
 
   return (
-    <div className="space-y-3 rounded-3xl border border-white/10 bg-white/5 p-4">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-3 rounded-2xl border border-white/10 bg-black/15 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs uppercase tracking-[0.24em] text-white/45">
+          Quick Capture
+        </p>
+        <div className="flex flex-wrap gap-2">
         {(["task", "note"] as const).map((mode) => {
           const active = draft.mode === mode;
 
@@ -68,14 +72,15 @@ export const QuickCaptureBar = () => {
               onClick={() => setMode(mode)}
               className={
                 active
-                  ? "h-9 rounded-xl bg-white text-black hover:bg-white/90"
-                  : "h-9 rounded-xl border border-white/10 bg-transparent text-white hover:bg-white/10"
+                  ? "h-8 rounded-lg bg-white text-black hover:bg-white/90"
+                  : "h-8 rounded-lg border border-white/10 bg-transparent text-white hover:bg-white/10"
               }
             >
               {mode === "task" ? "Task" : "Note"}
             </Button>
           );
         })}
+        </div>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row">
         <Input
@@ -83,18 +88,18 @@ export const QuickCaptureBar = () => {
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="h-11 border-white/10 bg-black/20 text-white placeholder:text-white/35"
+          className="h-11 border-white/10 bg-white/5 text-white placeholder:text-white/35"
         />
         <Button
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit || isSubmitting}
-          className="h-11 rounded-2xl bg-white text-black hover:bg-white/90 sm:min-w-[140px]"
+          className="h-11 rounded-xl bg-white text-black hover:bg-white/90 sm:min-w-[128px]"
         >
-          {isSubmitting ? "Saving..." : draft.mode === "task" ? "Add Task" : "Add Note"}
+          {isSubmitting ? "Saving..." : "Add"}
         </Button>
       </div>
-      <p className={`text-sm ${error ? "text-rose-200/80" : "text-white/60"}`}>
+      <p className={`text-xs ${error ? "text-rose-200/80" : "text-white/50"}`}>
         {feedback}
       </p>
     </div>
