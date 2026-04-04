@@ -240,11 +240,11 @@ const HomeModeShell = ({
         <div className="mt-8 flex flex-col items-center gap-3">
           <Button
             onClick={onPrimaryAction}
-            className="h-10 rounded-full border border-white/20 bg-white/10 px-6 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            className="h-10 rounded-full border border-white/20 bg-black/40 px-6 text-sm font-medium text-white shadow-lg backdrop-blur-md transition-colors hover:bg-black/50"
           >
             {primaryActionLabel}
           </Button>
-          <p className="text-sm text-white/60 drop-shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
+          <p className="text-sm text-white/80 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)]">
             {agendaSummary.label === "No upcoming event"
               ? "No events"
               : agendaSummary.summary}

@@ -42,13 +42,13 @@ export const Quote = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
-          className="text-xs italic leading-relaxed text-white/60 sm:text-sm"
+          className="text-xs italic leading-relaxed text-white/80 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-sm"
           key={currentQuote.quote}
         >
           {currentQuote.quote}
         </motion.p>
         <span
-          className="text-[10px] text-white/40 sm:text-xs"
+          className="text-[10px] text-white/60 drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] sm:text-xs"
           aria-label={t("home.quote.aria.author")}
         >
           — {currentQuote.author}
