@@ -7,11 +7,9 @@ import {
   BreathePod,
   CalendarDynamicIsland,
   CalendarSheet,
-  Clock,
   Dock,
-  Greeting,
+  FocusDashboard,
   NotesSheet,
-  Quote,
   SearchPopover,
   ShortcutsModal,
   SoundscapesSheet,
@@ -19,9 +17,9 @@ import {
   TaskListSheet,
   useDockStore,
 } from "@repo/shared";
-import { AnimatePresence, motion } from "framer-motion";
 import { WebSiteBlockerSheet } from "@/components/web.site-blocker.sheet";
 import { WebTimer } from "@/components/web.timer";
+import { webTimerStore } from "@/stores/web.timer.store";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
@@ -38,12 +36,10 @@ const Home = () => {
 };
 
 const Content = () => {
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } =
+  const { isBreathingVisible } =
     useDockStore(
       useShallow((state) => ({
         isBreathingVisible: state.isBreathingVisible,
-        isGreetingsVisible: state.isGreetingsVisible,
-        isTimerVisible: state.isTimerVisible,
       })),
     );
   const { t } = useTranslation();
@@ -53,7 +49,12 @@ const Content = () => {
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
-      {(isGreetingsVisible || isTimerVisible) && <GreetingsContent />}
+      {!isBreathingVisible && (
+        <FocusDashboard
+          timerStore={webTimerStore}
+          timerPanel={<WebTimer />}
+        />
+      )}
       {isBreathingVisible && <BreathingContent />}
       <SoundscapesSheet />
       <TaskListSheet />
@@ -65,41 +66,6 @@ const Content = () => {
       <CalendarSheet />
       <ShortcutsModal />
     </main>
-  );
-};
-
-const GreetingsContent = () => {
-  const isTimerVisible = useDockStore(
-    useShallow((state) => state.isTimerVisible),
-  );
-
-  return (
-    <motion.div>
-      <AnimatePresence mode="wait">
-        {isTimerVisible ? (
-          <motion.div
-            key="timer"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <WebTimer />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="clock"
-            className="flex flex-col items-center justify-center gap-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Clock />
-            <Greeting />
-            <Quote />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
   );
 };
 

@@ -1,0 +1,318 @@
+import { useEffect, useMemo } from "react";
+import type { ReactNode } from "react";
+import type { StoreApi, UseBoundStore } from "zustand";
+import { useShallow } from "zustand/shallow";
+
+import { Badge } from "@repo/ui/components/ui/badge";
+import { Button } from "@repo/ui/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/ui/card";
+import { Input } from "@repo/ui/components/ui/input";
+import { Progress } from "@repo/ui/components/ui/progress";
+import { Textarea } from "@repo/ui/components/ui/textarea";
+
+import type { TimerState } from "../../../types/timer.types";
+import { formatTime } from "../../../utils/timer.utils";
+import { useCalendarStore } from "../../../stores/calendar.store";
+import { useDockStore } from "../../../stores/dock.store";
+import {
+  initializeFocusDashboardStore,
+  syncFocusDashboardSignals,
+  updateDailyFocusPlan,
+  useFocusDashboardStore,
+} from "../../../stores/focus-dashboard.store";
+import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
+import { useSoundscapesStore } from "../../../stores/soundscapes.store";
+import { useTaskStore } from "../../../stores/task.store";
+import { Clock } from "../clock";
+import { Greeting } from "../greetings/greetings-mantras";
+import { Quote } from "../quote/quote";
+
+type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
+
+interface FocusDashboardProps {
+  timerStore: TimerStoreHook;
+  timerPanel: ReactNode;
+}
+
+const selectFocusTasks = (
+  tasks: Array<{
+    id: string;
+    title: string;
+    completed?: boolean;
+    pinned?: boolean;
+    deletedAt?: number | null;
+    updatedAt?: number;
+  }>
+) =>
+  tasks
+    .filter((task) => !task.completed && !task.deletedAt)
+    .sort((left, right) => {
+      if (Boolean(left.pinned) !== Boolean(right.pinned)) {
+        return left.pinned ? -1 : 1;
+      }
+
+      return (right.updatedAt ?? 0) - (left.updatedAt ?? 0);
+    })
+    .slice(0, 3)
+    .map((task) => ({
+      id: task.id,
+      title: task.title,
+      completed: false,
+    }));
+
+export const FocusDashboard = ({
+  timerStore,
+  timerPanel,
+}: FocusDashboardProps) => {
+  const { stage, isRunning, prevRemaining, endTimestamp, durations, start } =
+    timerStore(
+      useShallow((state) => ({
+        stage: state.stage,
+        isRunning: state.isRunning,
+        prevRemaining: state.prevRemaining,
+        endTimestamp: state.endTimestamp,
+        durations: state.durations,
+        start: state.start,
+      }))
+    );
+  const tasks = useTaskStore(useShallow((state) => state.tasks));
+  const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
+  const playingSounds = useSoundscapesStore(
+    useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
+  );
+  const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
+  const { isTimerVisible, setTimerVisible, setGreetingsVisible } = useDockStore(
+    useShallow((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      setTimerVisible: state.setTimerVisible,
+      setGreetingsVisible: state.setGreetingsVisible,
+    }))
+  );
+  const { dailyPlan, snapshot } = useFocusDashboardStore(
+    useShallow((state) => ({
+      dailyPlan: state.dailyPlan,
+      snapshot: state.snapshot,
+    }))
+  );
+
+  const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
+  const timerRemaining = useMemo(() => {
+    if (!isRunning && prevRemaining !== null) {
+      return prevRemaining;
+    }
+
+    if (isRunning && endTimestamp) {
+      return Math.max(0, Math.ceil((endTimestamp - Date.now()) / 1000));
+    }
+
+    return durations[stage];
+  }, [durations, endTimestamp, isRunning, prevRemaining, stage]);
+
+  useEffect(() => {
+    initializeFocusDashboardStore();
+  }, []);
+
+  useEffect(() => {
+    updateDailyFocusPlan({ topTasks: focusTasks });
+  }, [focusTasks]);
+
+  useEffect(() => {
+    syncFocusDashboardSignals({
+      timerRunning: isRunning,
+      timerStage: stage,
+      timerLabel: isRunning ? `${formatTime(timerRemaining)} remaining` : "Ready to focus",
+      blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
+      soundtrackMode: playingSounds > 0 ? "playing" : "available",
+      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
+    });
+  }, [
+    blockedSites.length,
+    isRunning,
+    nextEvent?.summary,
+    playingSounds,
+    stage,
+    timerRemaining,
+  ]);
+
+  const completionPercentage =
+    snapshot.topTasksTotal === 0
+      ? 0
+      : (snapshot.topTasksCompleted / snapshot.topTasksTotal) * 100;
+
+  const handlePrimaryAction = () => {
+    setTimerVisible(true);
+    setGreetingsVisible(false);
+
+    if (!isRunning) {
+      start();
+    }
+  };
+
+  const showTimerPanel = isTimerVisible || isRunning;
+
+  return (
+    <div className="flex w-full max-w-6xl flex-col gap-8 px-4 pb-6 pt-6 sm:px-6 lg:px-8">
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_0.95fr]">
+        <Card className="border-white/10 bg-black/20 text-white shadow-2xl backdrop-blur-xl">
+          <CardContent className="flex flex-col gap-8 p-6 sm:p-8">
+            <div className="space-y-6 text-center lg:text-left">
+              <div className="flex justify-center lg:justify-start">
+                <Badge variant="secondary" className="border-white/10 bg-white/10 text-white">
+                  Phase 1
+                </Badge>
+              </div>
+              <div className="flex flex-col items-center gap-4 lg:items-start">
+                <Clock />
+                <Greeting />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {snapshot.headline}
+                </h2>
+                <p className="text-sm text-white/70 sm:text-base">
+                  {snapshot.currentTimerLabel}. {snapshot.nextEventLabel}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <StatusCard label="Focus" value={snapshot.currentTimerLabel} />
+              <StatusCard label="Blocker" value={snapshot.blockerMode} />
+              <StatusCard label="Sound" value={snapshot.soundtrackMode} />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <Button
+                onClick={handlePrimaryAction}
+                className="h-12 rounded-2xl bg-white text-black hover:bg-white/90"
+              >
+                {snapshot.primaryAction.label}
+              </Button>
+              <p className="text-sm text-white/60">
+                {snapshot.primaryAction.description}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-6">
+          <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
+            <CardHeader className="space-y-2">
+              <CardTitle className="text-xl">Daily Focus Plan</CardTitle>
+              <p className="text-sm text-white/60">
+                Set the tone, then let Meelio carry the session.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Input
+                value={dailyPlan.headline}
+                onChange={(event) =>
+                  updateDailyFocusPlan({ headline: event.target.value })
+                }
+                placeholder="What matters most today?"
+                className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
+              />
+              <Textarea
+                value={dailyPlan.intention}
+                onChange={(event) =>
+                  updateDailyFocusPlan({ intention: event.target.value })
+                }
+                placeholder="Define the intention for this session."
+                className="min-h-[96px] border-white/10 bg-white/5 text-white placeholder:text-white/35"
+              />
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <Input
+                  type="number"
+                  min={0}
+                  value={dailyPlan.sessionTarget}
+                  onChange={(event) =>
+                    updateDailyFocusPlan({
+                      sessionTarget: Number(event.target.value || 0),
+                    })
+                  }
+                  className="border-white/10 bg-white/5 text-white placeholder:text-white/35"
+                />
+                <Badge variant="secondary" className="justify-center border-white/10 bg-white/10 text-white">
+                  {snapshot.topTasksCompleted}/{snapshot.topTasksTotal} done
+                </Badge>
+              </div>
+              <Progress value={completionPercentage} className="bg-white/10" />
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
+            <CardHeader className="space-y-2">
+              <CardTitle className="text-xl">Top Tasks</CardTitle>
+              <p className="text-sm text-white/60">
+                Pulled from your current task state and pinned for focus.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {dailyPlan.topTasks.length > 0 ? (
+                dailyPlan.topTasks.map((task, index) => (
+                  <div
+                    key={task.id}
+                    className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                  >
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs text-white/70">
+                      {index + 1}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-white">
+                        {task.title}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-white/60">
+                  Add or pin a task to make the daily plan actionable.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <Card className="border-white/10 bg-black/20 text-white shadow-xl backdrop-blur-xl">
+          <CardHeader className="space-y-2">
+            <CardTitle className="text-xl">Reflection</CardTitle>
+            <p className="text-sm text-white/60">
+              Keep one compact note about how you want today to feel.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={dailyPlan.reflection}
+              onChange={(event) =>
+                updateDailyFocusPlan({ reflection: event.target.value })
+              }
+              placeholder="What would make this day feel meaningful?"
+              className="min-h-[112px] border-white/10 bg-white/5 text-white placeholder:text-white/35"
+            />
+          </CardContent>
+        </Card>
+
+        <div className="flex items-stretch">
+          <Quote />
+        </div>
+      </div>
+
+      {showTimerPanel && <div className="flex justify-center">{timerPanel}</div>}
+    </div>
+  );
+};
+
+const StatusCard = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+    <p className="text-xs uppercase tracking-[0.24em] text-white/45">{label}</p>
+    <p className="mt-2 text-sm font-medium capitalize text-white">{value}</p>
+  </div>
+);

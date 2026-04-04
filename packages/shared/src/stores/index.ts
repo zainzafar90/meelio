@@ -6,6 +6,7 @@ export * from "./breathing.store";
 export * from "./calendar.store";
 export * from "./dock.store";
 export * from "./greetings.store";
+export * from "./focus-dashboard.store";
 export * from "./note.store";
 export * from "./quotes.store";
 export * from "./search.store";

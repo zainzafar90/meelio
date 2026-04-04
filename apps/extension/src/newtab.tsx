@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useTranslation } from "@repo/shared/i18n";
@@ -13,11 +12,9 @@ import {
   BreathePod,
   CalendarDynamicIsland,
   CalendarSheet,
-  Clock,
   Dock,
-  Greeting,
+  FocusDashboard,
   NotesSheet,
-  Quote,
   SearchPopover,
   ShortcutsModal,
   SoundscapesSheet,
@@ -29,6 +26,7 @@ import {
 } from "@repo/shared";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
+import { extensionTimerStore } from "./stores/extension.timer.store";
 
 import "./style.css";
 
@@ -64,22 +62,23 @@ const Home = () => {
 
 const Content = () => {
   const { t } = useTranslation();
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(
+  const { isBreathingVisible } = useDockStore(
     useShallow((state) => ({
       isBreathingVisible: state.isBreathingVisible,
-      isGreetingsVisible: state.isGreetingsVisible,
-      isTimerVisible: state.isTimerVisible,
     }))
   );
-
-  const showGreetings = isGreetingsVisible || isTimerVisible;
 
   return (
     <main
       className="flex flex-1 flex-col items-center justify-center"
       aria-label={t("home.layout.main.aria")}
     >
-      {showGreetings && <GreetingsContent />}
+      {!isBreathingVisible && (
+        <FocusDashboard
+          timerStore={extensionTimerStore}
+          timerPanel={<ExtensionTimer />}
+        />
+      )}
       {isBreathingVisible && <BreathePod />}
       <SoundscapesSheet />
       <TaskListSheet />
@@ -91,38 +90,6 @@ const Content = () => {
       <CalendarSheet />
       <ShortcutsModal />
     </main>
-  );
-}
-
-const fadeSlideAnimation = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-};
-
-const GreetingsContent = () => {
-  const isTimerVisible = useDockStore(useShallow((state) => state.isTimerVisible));
-
-  return (
-    <motion.div>
-      <AnimatePresence mode="wait">
-        {isTimerVisible ? (
-          <motion.div key="timer" {...fadeSlideAnimation}>
-            <ExtensionTimer />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="clock"
-            className="flex flex-col items-center justify-center gap-8"
-            {...fadeSlideAnimation}
-          >
-            <Clock />
-            <Greeting />
-            <Quote />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
   );
 }
 

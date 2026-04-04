@@ -31,6 +31,7 @@ export * from "./core/dock/components/settings.dock";
 
 // Greeting
 export * from "./core/greetings/greetings-mantras";
+export * from "./core/focus-dashboard/focus-dashboard";
 
 // Quote
 export * from "./core/quote/quote";
