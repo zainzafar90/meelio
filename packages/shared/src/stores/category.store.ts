@@ -12,6 +12,7 @@ type LocalCategory = {
   type: "system" | "user";
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number | null;
 };
 
 interface CategoryState {
@@ -75,6 +76,7 @@ export const useCategoryStore = create<CategoryState>()(
           type: "user",
           createdAt: Date.now(),
           updatedAt: Date.now(),
+          deletedAt: null,
         };
 
         await db.categories.add(newCat);

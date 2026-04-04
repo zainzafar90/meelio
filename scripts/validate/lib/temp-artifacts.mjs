@@ -38,6 +38,7 @@ export function patchManifestForValidation(extensionDir) {
 
 export async function removeDirBestEffort(directory) {
   const deadline = Date.now() + tempDirCleanupTimeoutMs;
+  const validationName = process.env.MEELIO_VALIDATION_NAME ?? "validate:extension";
 
   while (Date.now() < deadline) {
     try {
@@ -64,7 +65,7 @@ export async function removeDirBestEffort(directory) {
   }
 
   process.stderr.write(
-    `[validate:extension] Warning: unable to fully remove temporary directory ${directory}\n`
+    `[${validationName}] Warning: unable to fully remove temporary directory ${directory}\n`
   );
 }
 

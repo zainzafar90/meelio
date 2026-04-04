@@ -5,11 +5,11 @@ import {
   createJSONStorage,
   type StateStorage,
 } from "zustand/middleware";
+import { normalizeSiteHost } from "@repo/core/site-blocker";
 
 import { db } from "../lib/db/meelio.dexie";
 import type { SiteBlocker } from "../lib/db/models.dexie";
 import { generateUUID } from "../utils/common.utils";
-import { normalizeSiteHost } from "../utils/site-blocker.utils";
 import { useAuthStore } from "./auth.store";
 
 export interface SiteBlockerState {

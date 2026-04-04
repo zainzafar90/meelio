@@ -21,14 +21,14 @@ Each layer should only depend downward. UI must not call infrastructure or platf
 - `apps/web`: Vite React web app.
 - `apps/extension`: WXT browser extension app with background/content/newtab entrypoints.
 - `packages/ui`: design-system and primitive UI package.
-- `packages/timer-core`: cleanest existing core/domain package.
+- `packages/core`: shared domain package containing timer and blocker state logic.
 - `packages/shared`: mixed package containing UI, providers, stores, data, utils, db access, and services.
 - `packages/logger`: utility package.
 
 ### What is already working
 
 - The repo is already a pnpm/turbo monorepo, so the workspace model does not need to change.
-- `packages/timer-core` proves the team can maintain a package with domain logic outside app code.
+- The repo now has a real `packages/core` package for domain logic outside app code.
 - `apps/extension/src/features/site-blocker/services` already separates some command contracts and core state logic.
 
 ### Main architectural problems
@@ -163,7 +163,7 @@ This layer can expose interfaces like:
 
 Immediate candidates:
 
-- `packages/timer-core`
+- `packages/core/src/timer/*`
 - pure parts of `apps/extension/src/features/site-blocker/services/blocker-core.ts`
 - pure aggregation and policy logic from `blocker-state.ts`
 
@@ -220,7 +220,7 @@ Do not split everything at once. Use four phases.
 ### Phase 1: Enforce package boundaries around existing clean seams
 
 1. Create `packages/contracts`, `packages/core`, `packages/application`, `packages/infrastructure`, and `packages/platform`.
-2. Move `packages/timer-core` contents into `packages/core/timer` or keep `packages/timer-core` and declare it part of the core layer.
+2. Keep timer state machine and defaults in `packages/core/timer` and point remaining consumers there directly.
 3. Extract extension site-blocker command/response types into `packages/contracts`.
 4. Replace direct relative imports into `packages/shared/src/...` with package exports only.
 
@@ -271,9 +271,9 @@ Success criteria:
 For this codebase, the most pragmatic package split is:
 
 - Keep `packages/ui`
-- Keep `packages/timer-core` for now, but treat it as `core`
-- Add `packages/contracts`
+- Keep `packages/contracts`
 - Add `packages/application`
+- Keep `packages/core`
 - Add `packages/infrastructure`
 - Add `packages/platform`
 

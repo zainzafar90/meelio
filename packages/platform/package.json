@@ -21,6 +21,8 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./extension/site-blocker": "./src/extension/site-blocker/index.ts"
+    "./extension/site-blocker": "./src/extension/site-blocker/index.ts",
+    "./extension/timer": "./src/extension/timer/index.ts",
+    "./web/timer": "./src/web/timer/index.ts"
   }
 }

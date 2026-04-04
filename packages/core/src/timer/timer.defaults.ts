@@ -3,7 +3,7 @@ import {
   type TimerDurations,
   type TimerSettings,
   type TimerStats,
-} from "./timer.contract";
+} from "@repo/contracts/timer";
 
 export const DEFAULT_TIMER_DURATIONS: TimerDurations = {
   [TimerStage.Focus]: 25 * 60,

@@ -3,7 +3,7 @@ import {
   type TimerDurations,
   type TimerSettings,
   type TimerStats,
-} from "./timer.contract";
+} from "@repo/contracts/timer";
 import {
   DEFAULT_TIMER_DURATIONS,
   DEFAULT_TIMER_SETTINGS,

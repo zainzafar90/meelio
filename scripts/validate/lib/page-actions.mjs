@@ -1,5 +1,5 @@
 import { waitFor, assert, sleep } from "./utils.mjs";
-import { getValidationCopy } from "./validation-copy.mjs";
+import { getValidationLabel } from "./validation-labels.mjs";
 
 export async function openTabFromWorker(workerClient, url) {
   return workerClient.evaluate(`
@@ -153,6 +153,29 @@ export async function clickButtonByText(pageClient, label) {
   assert(result, `Unable to find button with label "${label}".`);
 }
 
+export async function clickElementContainingText(pageClient, selector, text) {
+  const result = await pageClient.evaluate(`
+    (() => {
+      const normalizedText = ${JSON.stringify(text)}.toLowerCase();
+      const element = Array.from(document.querySelectorAll(${JSON.stringify(
+        selector
+      )})).find((candidate) =>
+        candidate.textContent?.toLowerCase().includes(normalizedText)
+      );
+      if (!(element instanceof HTMLElement)) {
+        return false;
+      }
+      element.click();
+      return true;
+    })()
+  `);
+
+  assert(
+    result,
+    `Unable to find element matching "${selector}" containing text "${text}".`
+  );
+}
+
 export async function setInputByPlaceholder(pageClient, placeholder, value) {
   const result = await pageClient.evaluate(`
     (() => {
@@ -184,6 +207,171 @@ export async function setInputByPlaceholder(pageClient, placeholder, value) {
   `);
 
   assert(result, `Unable to find input with placeholder "${placeholder}".`);
+}
+
+export async function setInputById(pageClient, id, value) {
+  const result = await pageClient.evaluate(`
+    (() => {
+      const input = document.getElementById(${JSON.stringify(id)});
+      if (!(input instanceof HTMLInputElement)) {
+        return false;
+      }
+      const valueSetter = Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value"
+      )?.set;
+      if (!valueSetter) {
+        return false;
+      }
+      input.focus();
+      valueSetter.call(input, ${JSON.stringify(value)});
+      input.dispatchEvent(
+        new InputEvent("input", {
+          bubbles: true,
+          data: ${JSON.stringify(value)},
+          inputType: "insertText",
+        })
+      );
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+      return true;
+    })()
+  `);
+
+  assert(result, `Unable to find input with id "${id}".`);
+}
+
+export async function toggleSwitchByText(pageClient, label) {
+  const result = await pageClient.evaluate(`
+    (() => {
+      const normalizedLabel = ${JSON.stringify(label)};
+      const candidates = Array.from(document.querySelectorAll("*"));
+      const findSwitchFor = (match) => {
+        let container = match instanceof Element ? match : null;
+        while (container) {
+          const switchButton = container.querySelector('button[role="switch"]');
+          if (switchButton instanceof HTMLButtonElement) {
+            return switchButton;
+          }
+          container = container.parentElement;
+        }
+        return null;
+      };
+
+      const exactMatch = candidates.find((candidate) => {
+        const text = candidate.textContent?.trim();
+        return text === normalizedLabel;
+      });
+
+      const switchButton =
+        findSwitchFor(exactMatch) ??
+        (() => {
+          const broadMatch = candidates.find((candidate) => {
+            const text = candidate.textContent?.trim();
+            return Boolean(text) && text.includes(normalizedLabel);
+          });
+          return findSwitchFor(broadMatch);
+        })();
+
+      if (!(switchButton instanceof HTMLButtonElement)) {
+        return false;
+      }
+      switchButton.click();
+      return true;
+    })()
+  `);
+
+  assert(result, `Unable to find switch with label "${label}".`);
+}
+
+export async function readTimerPersistedState(pageClient) {
+  return pageClient.evaluate(`
+    (() => {
+      const raw = localStorage.getItem("meelio:simple-timer");
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      return parsed.state ?? null;
+    })()
+  `);
+}
+
+export async function writeTimerPersistedState(pageClient, nextState) {
+  return pageClient.evaluate(`
+    ((nextState) => {
+      const key = "meelio:simple-timer";
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? JSON.parse(raw) : { state: {}, version: 0 };
+      const currentState = parsed.state ?? {};
+      const mergedState = {
+        ...currentState,
+        ...nextState,
+        durations: {
+          ...(currentState.durations ?? {}),
+          ...(nextState.durations ?? {}),
+        },
+        settings: {
+          ...(currentState.settings ?? {}),
+          ...(nextState.settings ?? {}),
+        },
+        stats: {
+          ...(currentState.stats ?? {}),
+          ...(nextState.stats ?? {}),
+        },
+      };
+      parsed.state = mergedState;
+      localStorage.setItem(key, JSON.stringify(parsed));
+      return mergedState;
+    })(${JSON.stringify(nextState)})
+  `);
+}
+
+export async function clearTimerPersistedState(pageClient) {
+  return pageClient.evaluate(`
+    (() => {
+      localStorage.removeItem("meelio:simple-timer");
+      localStorage.removeItem("meelio:simple-timer:lastReset");
+      return true;
+    })()
+  `);
+}
+
+export async function readPersistedStoreState(pageClient, key) {
+  return pageClient.evaluate(`
+    ((key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) {
+        return null;
+      }
+      const parsed = JSON.parse(raw);
+      return parsed.state ?? null;
+    })(${JSON.stringify(key)})
+  `);
+}
+
+export async function writePersistedStoreState(
+  pageClient,
+  key,
+  nextState,
+  version = 0
+) {
+  return pageClient.evaluate(`
+    ((key, nextState, version) => {
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? JSON.parse(raw) : { state: {}, version };
+      parsed.state = {
+        ...(parsed.state ?? {}),
+        ...nextState,
+      };
+      if (parsed.version === undefined) {
+        parsed.version = version;
+      }
+      localStorage.setItem(key, JSON.stringify(parsed));
+      return parsed.state;
+    })(${JSON.stringify(key)}, ${JSON.stringify(nextState)}, ${JSON.stringify(
+    version
+  )})
+  `);
 }
 
 export async function setDockState(pageClient, nextState) {
@@ -250,7 +438,7 @@ export async function requestAllSitesPermission(pageClient) {
 
   await clickButtonByText(
     pageClient,
-    getValidationCopy("site-blocker.drawer.access.request")
+    getValidationLabel("site-blocker.drawer.access.request")
   );
   await sleep(1200);
 

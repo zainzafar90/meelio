@@ -5,6 +5,9 @@ module.exports = {
   ignorePatterns: [".eslintrc.js"],
   globals: {
     chrome: "readonly",
+    window: "readonly",
+    Notification: "readonly",
+    Worker: "readonly",
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {

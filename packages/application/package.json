@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@repo/contracts": "workspace:*",
-    "@repo/core": "workspace:*"
+    "@repo/core": "workspace:*",
+    "zustand": "^5"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -21,6 +22,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./site-blocker": "./src/site-blocker/index.ts"
+    "./site-blocker": "./src/site-blocker/index.ts",
+    "./timer": "./src/timer/index.ts"
   }
 }

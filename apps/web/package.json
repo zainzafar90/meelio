@@ -18,8 +18,10 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
+    "@repo/application": "workspace:*",
+    "@repo/infrastructure": "workspace:*",
+    "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
-    "@repo/timer-core": "workspace:*",
     "@tailwindcss/typography": "^0.5.9",
     "axios": "^1.5.0",
     "blurhash": "^2.0.5",
