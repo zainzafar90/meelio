@@ -11,3 +11,5 @@
 - When the user explicitly says backward compatibility is unnecessary, delete the compatibility layer instead of preserving dead migration code.
 - When moving DB models into infrastructure, preserve soft-delete fields like `deletedAt` if shared code already filters or hydrates those records as soft-deletable.
 - Audit export/import utilities against the current store APIs after refactors; they tend to keep stale property names long after the underlying stores change.
+- Split broad home-surface validators by feature once they start mixing unrelated behaviors; compose them back together with a `validate:extension:home` umbrella instead of keeping one oversized scenario.
+- Do not run WXT-based extension validators in parallel against the same workspace; they race on `apps/extension/.output/chrome-mv3` and fail with misleading `ENOENT` build errors.

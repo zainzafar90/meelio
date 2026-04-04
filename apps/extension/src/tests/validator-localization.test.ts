@@ -17,9 +17,17 @@ const timerScenarioPath = path.join(
   repoRoot,
   "scripts/validate/scenarios/extension-timer-flow.mjs"
 );
-const homeScenarioPath = path.join(
+const greetingScenarioPath = path.join(
   repoRoot,
-  "scripts/validate/scenarios/extension-home-flow.mjs"
+  "scripts/validate/scenarios/extension-greeting-flow.mjs"
+);
+const wallpaperScenarioPath = path.join(
+  repoRoot,
+  "scripts/validate/scenarios/extension-wallpaper-flow.mjs"
+);
+const breathingScenarioPath = path.join(
+  repoRoot,
+  "scripts/validate/scenarios/extension-breathing-flow.mjs"
 );
 const pageActionsPath = path.join(repoRoot, "scripts/validate/lib/page-actions.mjs");
 
@@ -60,15 +68,17 @@ describe("extension validator localization stability", () => {
     expect(scenarioSource).not.toContain('"Continue to exact URL"');
   });
 
-  it("reads home-surface labels from translation keys instead of hardcoded UI copy", () => {
-    const scenarioSource = readFileSync(homeScenarioPath, "utf8");
+  it("reads greeting, wallpaper, and breathing labels from translation keys instead of hardcoded UI copy", () => {
+    const greetingSource = readFileSync(greetingScenarioPath, "utf8");
+    const wallpaperSource = readFileSync(wallpaperScenarioPath, "utf8");
+    const breathingSource = readFileSync(breathingScenarioPath, "utf8");
 
-    expect(scenarioSource).toContain('getValidationLabel("backgrounds.title")');
-    expect(scenarioSource).toContain('getValidationLabel("backgrounds.randomBackground")');
-    expect(scenarioSource).toContain('getValidationLabel("backgrounds.resetToDefault")');
-    expect(scenarioSource).toContain('getValidationLabel("breathing.method.change")');
-    expect(scenarioSource).toContain('getValidationLabel("breathing.method.title")');
-    expect(scenarioSource).toContain('getValidationLabel("home.quote.aria.quote")');
-    expect(scenarioSource).toContain('getValidationLabel("home.quote.aria.author")');
+    expect(greetingSource).toContain('getValidationLabel("home.quote.aria.quote")');
+    expect(greetingSource).toContain('getValidationLabel("home.quote.aria.author")');
+    expect(wallpaperSource).toContain('getValidationLabel("backgrounds.title")');
+    expect(wallpaperSource).toContain('getValidationLabel("backgrounds.randomBackground")');
+    expect(wallpaperSource).toContain('getValidationLabel("backgrounds.resetToDefault")');
+    expect(breathingSource).toContain('getValidationLabel("breathing.method.change")');
+    expect(breathingSource).toContain('getValidationLabel("breathing.method.title")');
   });
 });

@@ -247,22 +247,28 @@
 ### Plan
 - [completed] Audit the remaining new-tab flows that were not covered by timer/blocker validation.
 - [completed] Add a focused home validator for greeting/mantra, quote, wallpaper, and breathing flows.
-- [completed] Fold the new home validator into the umbrella extension validation and verify the full sequence.
+- [completed] Split the home validator into focused greeting, wallpaper, and breathing validators.
+- [completed] Fold the new home umbrella into the umbrella extension validation and verify the full sequence.
 
 ### Success Criteria
 - The extension validation suite includes a focused home/new-tab scenario alongside the timer and blocker scenarios.
-- The home validator covers greeting/mantra behavior, quote visibility, wallpaper actions, and breathing interactions.
-- `pnpm validate:extension`, `pnpm validate:extension:home`, `pnpm validate:extension:timer`, and `pnpm validate:extension:blocker` all pass.
+- The home validation surface is split into focused greeting, wallpaper, and breathing scenarios.
+- `pnpm validate:extension`, `pnpm validate:extension:home`, `pnpm validate:extension:greeting`, `pnpm validate:extension:wallpaper`, `pnpm validate:extension:breathing`, `pnpm validate:extension:timer`, and `pnpm validate:extension:blocker` all pass.
 
 ### Review
-- Added [scripts/validate/scenarios/extension-home-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-home-flow.mjs) for the new-tab home surface.
-- Added [scripts/validate/extension-home.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-home.mjs) and [package.json](/Users/zainzafar/projects/meelio/meelio/package.json) script wiring for `validate:extension:home`.
+- Replaced the single home scenario with focused scenarios in [scripts/validate/scenarios/extension-greeting-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-greeting-flow.mjs), [scripts/validate/scenarios/extension-wallpaper-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-wallpaper-flow.mjs), and [scripts/validate/scenarios/extension-breathing-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-breathing-flow.mjs).
+- Added shared home-validator bootstrap helpers in [scripts/validate/scenarios/extension-home-common.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-home-common.mjs).
+- Added focused runner entrypoints in [scripts/validate/extension-greeting.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-greeting.mjs), [scripts/validate/extension-wallpaper.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-wallpaper.mjs), and [scripts/validate/extension-breathing.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-breathing.mjs).
+- Updated [scripts/validate/extension-home.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-home.mjs) and [package.json](/Users/zainzafar/projects/meelio/meelio/package.json) so `validate:extension:home` is now an umbrella over the three focused home validators.
 - Updated [scripts/validate/extension.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension.mjs) so the umbrella validator now runs home, timer, and blocker sequentially.
 - Added structural coverage in [apps/extension/src/tests/validator-home-coverage.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-home-coverage.test.ts).
-- Extended [apps/extension/src/tests/validator-localization.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-localization.test.ts) so the home scenario is locked to translation-driven labels.
+- Extended [apps/extension/src/tests/validator-localization.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-localization.test.ts) so greeting, wallpaper, and breathing validators are each locked to translation-driven labels.
 - Added reusable validator helpers to [scripts/validate/lib/page-actions.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/lib/page-actions.mjs) for persisted-store reads/writes and text-containing element clicks.
 - Verification:
 - `pnpm --filter extension test -- src/tests/validator-home-coverage.test.ts src/tests/validator-localization.test.ts`
+- `pnpm validate:extension:greeting`
+- `pnpm validate:extension:wallpaper`
+- `pnpm validate:extension:breathing`
 - `pnpm validate:extension:home`
 - `pnpm validate:extension`
 
