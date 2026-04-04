@@ -17,7 +17,7 @@ const interpolate = (value, variables) =>
     String(variables[key] ?? "")
   );
 
-export function getValidationCopy(key, variables = {}) {
+export function getValidationLabel(key, variables = {}) {
   const value = key
     .split(".")
     .reduce((current, segment) => current?.[segment], englishTranslation);

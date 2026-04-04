@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const repoRoot = path.resolve(process.cwd(), "../..");
 const validatorScenarioPath = path.join(
   repoRoot,
-  "scripts/validate/scenarios/extension-flow.mjs"
+  "scripts/validate/scenarios/extension-blocker-flow.mjs"
 );
 const workflowPath = path.join(
   repoRoot,

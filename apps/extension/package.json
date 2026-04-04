@@ -26,6 +26,7 @@
     "@repo/application": "workspace:*",
     "@repo/contracts": "workspace:*",
     "@repo/core": "workspace:*",
+    "@repo/infrastructure": "workspace:*",
     "@repo/platform": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/timer-core": "workspace:*",

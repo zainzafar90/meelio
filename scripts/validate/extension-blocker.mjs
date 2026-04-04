@@ -1,8 +1,8 @@
 import { runExtensionValidation } from "./scenarios/extension-blocker-flow.mjs";
 
-process.env.MEELIO_VALIDATION_NAME = "validate:extension";
+process.env.MEELIO_VALIDATION_NAME = "validate:extension:blocker";
 
 runExtensionValidation().catch((error) => {
-  console.error(`\n[validate:extension] FAILED: ${error.message}`);
+  console.error(`\n[validate:extension:blocker] FAILED: ${error.message}`);
   process.exitCode = 1;
 });

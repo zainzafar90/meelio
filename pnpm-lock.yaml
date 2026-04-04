@@ -43,6 +43,9 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
       '@repo/platform':
         specifier: workspace:*
         version: link:../../packages/platform
@@ -233,6 +236,15 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../../packages/application
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -426,6 +438,12 @@ importers:
       '@repo/core':
         specifier: workspace:*
         version: link:../core
+      '@repo/timer-core':
+        specifier: workspace:*
+        version: link:../timer-core
+      zustand:
+        specifier: ^5
+        version: 5.0.9(@types/react@18.3.27)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -502,6 +520,13 @@ importers:
         version: 5.9.3
 
   packages/infrastructure:
+    dependencies:
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../application
+      '@repo/timer-core':
+        specifier: workspace:*
+        version: link:../timer-core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -554,6 +579,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@repo/timer-core':
+        specifier: workspace:*
+        version: link:../timer-core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

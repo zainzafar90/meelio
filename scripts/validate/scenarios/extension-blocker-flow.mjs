@@ -4,7 +4,7 @@ import path from "node:path";
 import { blockerPattern, extensionOutputDir, pregrantBlockerAccess, repoRoot } from "../lib/config.mjs";
 import { connectToTarget, waitForTarget } from "../lib/cdp.mjs";
 import { launchBrowserSession } from "../lib/browser-session.mjs";
-import { getValidationCopy } from "../lib/validation-copy.mjs";
+import { getValidationLabel } from "../lib/validation-labels.mjs";
 import {
   clickButtonByLabel,
   clickButtonByText,
@@ -25,22 +25,22 @@ import {
 import { assert, logStep, runCommand, sleep, waitFor } from "../lib/utils.mjs";
 
 export async function runExtensionValidation() {
-  const startLabel = getValidationCopy("common.actions.start");
-  const pauseLabel = getValidationCopy("common.actions.pause");
-  const resetLabel = getValidationCopy("timer.controls.resetLabel");
-  const siteBlockerTitle = getValidationCopy("site-blocker.title");
-  const blockerBootstrap = getValidationCopy("site-blocker.drawer.bootstrap");
-  const blockerAccessGranted = getValidationCopy("site-blocker.drawer.access.granted");
-  const customDomainPlaceholder = getValidationCopy("site-blocker.drawer.custom.placeholder");
-  const addDomainLabel = getValidationCopy("site-blocker.drawer.custom.add");
-  const blockedPageTitle = getValidationCopy("site-blocker.blockedPage.title");
-  const bypass15Label = getValidationCopy("site-blocker.blockedPage.bypass15");
-  const bypassEnabledLabel = getValidationCopy(
+  const startLabel = getValidationLabel("common.actions.start");
+  const pauseLabel = getValidationLabel("common.actions.pause");
+  const resetLabel = getValidationLabel("timer.controls.resetLabel");
+  const siteBlockerTitle = getValidationLabel("site-blocker.title");
+  const blockerBootstrap = getValidationLabel("site-blocker.drawer.bootstrap");
+  const blockerAccessGranted = getValidationLabel("site-blocker.drawer.access.granted");
+  const customDomainPlaceholder = getValidationLabel("site-blocker.drawer.custom.placeholder");
+  const addDomainLabel = getValidationLabel("site-blocker.drawer.custom.add");
+  const blockedPageTitle = getValidationLabel("site-blocker.blockedPage.title");
+  const bypass15Label = getValidationLabel("site-blocker.blockedPage.bypass15");
+  const bypassEnabledLabel = getValidationLabel(
     "site-blocker.blockedPage.bypassEnabled",
     { minutes: 15 }
   );
-  const continueLabel = getValidationCopy("site-blocker.blockedPage.continue");
-  const removeDomainLabel = getValidationCopy("site-blocker.drawer.custom.remove");
+  const continueLabel = getValidationLabel("site-blocker.blockedPage.continue");
+  const removeDomainLabel = getValidationLabel("site-blocker.drawer.custom.remove");
 
   assert(
     existsSync(extensionOutputDir) || existsSync(path.join(repoRoot, "apps/extension")),

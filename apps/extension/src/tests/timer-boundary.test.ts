@@ -14,11 +14,13 @@ describe("extension timer boundaries", () => {
     expect(backgroundSource).not.toContain('from "@repo/shared"');
   });
 
-  it("builds the extension timer store locally instead of importing createTimerStore from shared", () => {
+  it("builds the extension timer store from layered application/platform packages", () => {
     const storeSource = readSource("src/stores/extension.timer.store.ts");
 
-    expect(storeSource).toContain("createInitialTimerSnapshot");
-    expect(storeSource).not.toContain("createTimerStore");
-    expect(storeSource).not.toContain('from "@repo/shared"');
+    expect(storeSource).toContain('from "@repo/application/timer"');
+    expect(storeSource).toContain('from "@repo/platform/extension/timer"');
+    expect(storeSource).not.toContain('from "../../../../packages/shared/src/lib/db/pomodoro.dexie"');
+    expect(storeSource).not.toContain('from "../../../../packages/shared/src/services/sound-sync.service"');
+    expect(storeSource).not.toContain('from "../../../../packages/shared/src/utils/timer-events"');
   });
 });

@@ -11,7 +11,7 @@ const browserSessionPath = path.join(
 );
 const validatorScenarioPath = path.join(
   repoRoot,
-  "scripts/validate/scenarios/extension-flow.mjs"
+  "scripts/validate/scenarios/extension-blocker-flow.mjs"
 );
 const pageActionsPath = path.join(repoRoot, "scripts/validate/lib/page-actions.mjs");
 
@@ -32,9 +32,9 @@ describe("extension validator localization stability", () => {
 
     expect(pageActionsSource).toContain("export async function clickButtonByLabel");
     expect(pageActionsSource).toContain("export async function waitForButtonByLabel");
-    expect(scenarioSource).toContain('const startLabel = getValidationCopy("common.actions.start")');
-    expect(scenarioSource).toContain('const pauseLabel = getValidationCopy("common.actions.pause")');
-    expect(scenarioSource).toContain('const resetLabel = getValidationCopy("timer.controls.resetLabel")');
+    expect(scenarioSource).toContain('const startLabel = getValidationLabel("common.actions.start")');
+    expect(scenarioSource).toContain('const pauseLabel = getValidationLabel("common.actions.pause")');
+    expect(scenarioSource).toContain('const resetLabel = getValidationLabel("timer.controls.resetLabel")');
     expect(scenarioSource).toContain("clickButtonByLabel(newtabClient, resetLabel)");
     expect(scenarioSource).toContain("waitForButtonByLabel(newtabClient, startLabel)");
     expect(scenarioSource).toContain("waitForButtonByLabel(newtabClient, pauseLabel)");
@@ -44,9 +44,9 @@ describe("extension validator localization stability", () => {
   it("reads blocker copy from the English translation source instead of hardcoded UI text", () => {
     const scenarioSource = readFileSync(validatorScenarioPath, "utf8");
 
-    expect(scenarioSource).toContain('getValidationCopy("site-blocker.title")');
+    expect(scenarioSource).toContain('getValidationLabel("site-blocker.title")');
     expect(scenarioSource).toContain(
-      'getValidationCopy("site-blocker.blockedPage.continue")'
+      'getValidationLabel("site-blocker.blockedPage.continue")'
     );
     expect(scenarioSource).not.toContain('"Site blocker"');
     expect(scenarioSource).not.toContain('"Continue to exact URL"');
