@@ -85,7 +85,7 @@ const TimerView = ({
   return (
     <div className="relative">
       <div className="max-w-full w-88 rounded-[32px] border border-white/[0.06] bg-black/48 text-white shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:w-[440px] lg:w-[540px]">
-        <div className="space-y-4 p-4 [@media(min-height:640px)]:space-y-10 sm:p-8">
+        <div className="space-y-4 p-4 [@media(min-height:580px)]:space-y-10 sm:p-8">
           <div className="w-full">
             <div className="flex h-12 w-full rounded-full bg-black/5 p-1 text-white">
               <button

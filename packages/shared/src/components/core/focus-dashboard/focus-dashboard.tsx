@@ -4,7 +4,6 @@ import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 
 import type { TimerState } from "../../../types/timer.types";
-import { Category } from "../../../types/category";
 import type { CalendarEvent } from "../../../types/calendar.types";
 import { formatTime } from "../../../utils/timer.utils";
 import {
@@ -70,8 +69,6 @@ export const FocusDashboard = ({
     prevRemaining,
     endTimestamp,
     durations,
-    start,
-    settings,
   } = timerStore(
     useShallow((state) => ({
       stage: state.stage,
@@ -79,8 +76,6 @@ export const FocusDashboard = ({
       prevRemaining: state.prevRemaining,
       endTimestamp: state.endTimestamp,
       durations: state.durations,
-      start: state.start,
-      settings: state.settings,
     }))
   );
   const tasks = useTaskStore(useShallow((state) => state.tasks));
@@ -89,17 +84,9 @@ export const FocusDashboard = ({
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const {
-    isTimerVisible,
-    setTimerVisible,
-    setGreetingsVisible,
-    setTasksVisible,
-  } = useDockStore(
+  const { isTimerVisible } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
-      setTimerVisible: state.setTimerVisible,
-      setGreetingsVisible: state.setGreetingsVisible,
-      setTasksVisible: state.setTasksVisible,
     }))
   );
   const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
@@ -147,29 +134,6 @@ export const FocusDashboard = ({
 
   const agendaSummary = useMemo(() => getAgendaSummary(nextEvent), [nextEvent]);
   const showTimerPanel = isTimerVisible || isRunning;
-
-  const handlePrimaryAction = () => {
-    if (snapshot.primaryAction.kind === "review-plan") {
-      setTasksVisible(true);
-      setTimerVisible(false);
-      return;
-    }
-
-    setTimerVisible(true);
-    setGreetingsVisible(false);
-
-    if (settings.soundscapes) {
-      const soundState = useSoundscapesStore.getState();
-      const hasPlayingSounds = soundState.sounds.some((sound) => sound.playing);
-      if (!hasPlayingSounds) {
-        soundState.playCategory(Category.Productivity);
-      }
-    }
-
-    if (!isRunning) {
-      start();
-    }
-  };
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
