@@ -192,3 +192,15 @@
 - `rg -n '@repo/timer-core' apps packages -g '*.ts' -g '*.tsx'`
 - `pnpm install`
 - `pnpm validate:extension:timer`
+
+## Timer Core Package Removal
+
+### Plan
+- [in_progress] Find all remaining references to `@repo/timer-core` and replace them with direct `contracts` or `core` imports.
+- [pending] Delete `packages/timer-core` now that it is only a shim.
+- [pending] Re-run focused verification after the package removal.
+
+### Success Criteria
+- No code, tests, or workspace package manifests depend on `@repo/timer-core`.
+- `packages/timer-core` no longer exists in the workspace.
+- The timer-focused validation and relevant builds/tests still pass after removal.

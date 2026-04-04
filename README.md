@@ -21,7 +21,8 @@ A productivity and focus application built as a Turborepo monorepo. Fully offlin
 ## Packages
 
 - **@repo/shared** - Core business logic, stores, hooks, components
-- **@repo/timer-core** - Pure timer contracts and state machine helpers
+- **@repo/contracts** - Shared contracts, DTOs, and timer/blocker message types
+- **@repo/core** - Pure domain logic including timer and blocker state machines
 - **@repo/ui** - React component library (shadcn/ui based)
 - **@repo/logger** - Logging utility
 - **@repo/eslint-config** - ESLint configuration
