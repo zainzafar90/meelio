@@ -42,7 +42,7 @@ const selectFocusTasks = (
     pinned?: boolean;
     deletedAt?: number | null;
     updatedAt?: number;
-  }>
+  }>,
 ) =>
   tasks
     .filter((task) => !task.completed && !task.deletedAt)
@@ -81,12 +81,12 @@ export const FocusDashboard = ({
       durations: state.durations,
       settings: state.settings,
       start: state.start,
-    }))
+    })),
   );
   const tasks = useTaskStore(useShallow((state) => state.tasks));
   const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
   const playingSounds = useSoundscapesStore(
-    useShallow((state) => state.sounds.filter((sound) => sound.playing).length)
+    useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
   const {
@@ -102,9 +102,11 @@ export const FocusDashboard = ({
       setGreetingsVisible: state.setGreetingsVisible,
       setTasksVisible: state.setTasksVisible,
       setSoundscapesVisible: state.setSoundscapesVisible,
-    }))
+    })),
   );
-  const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
+  const snapshot = useFocusDashboardStore(
+    useShallow((state) => state.snapshot),
+  );
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
   const timerRemaining = useMemo(() => {
@@ -131,7 +133,9 @@ export const FocusDashboard = ({
     syncFocusDashboardSignals({
       timerRunning: isRunning,
       timerStage: stage,
-      timerLabel: isRunning ? `${formatTime(timerRemaining)} remaining` : "Ready to focus",
+      timerLabel: isRunning
+        ? `${formatTime(timerRemaining)} remaining`
+        : "Ready to focus",
       blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
       soundtrackMode: playingSounds > 0 ? "playing" : "available",
       nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
@@ -216,7 +220,7 @@ const HomeModeShell = ({
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden [@media(min-height:580px)]:block">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-3 px-4 py-3">
+      <div className="mx-auto flex w-full max-w-full items-center justify-between gap-3 px-4 py-3">
         <AmbientPill
           icon={<CalendarDays className="size-3.5" />}
           label="Calendar"
@@ -269,22 +273,26 @@ const FocusModeShell = ({
   agendaLabel: string;
 }) => (
   <div className="flex min-h-0 flex-1 items-center justify-center">
-    <div className="flex h-full w-full max-w-[1600px] flex-col">
-      <div className="hidden items-center justify-between px-2 py-2 [@media(min-height:580px)]:flex">
-        <AmbientMeta
+    <div className="flex h-full w-full max-w-full flex-col">
+      <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
+        {/* <div className="hidden items-center gap-5 sm:flex"> */}
+        <AmbientPill
+          icon={<CalendarDays className="size-3.5" />}
+          label="Calendar"
+          value={agendaLabel}
+        />
+        <AmbientPill
           icon={<Timer className="size-3.5" />}
+          label="Focus"
           value={currentTimerLabel}
         />
-        <div className="hidden items-center gap-5 sm:flex">
-          <AmbientMeta
-            icon={<CheckSquare2 className="size-3.5" />}
-            value={`${topTasksCompleted} done`}
-          />
-          <AmbientMeta
-            icon={<CalendarDays className="size-3.5" />}
-            value={agendaLabel}
-          />
-        </div>
+
+        <AmbientPill
+          icon={<CheckSquare2 className="size-3.5" />}
+          label="Today"
+          value={`${topTasksCompleted} done`}
+        />
+        {/* </div> */}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-4">
@@ -302,13 +310,7 @@ const FocusModeShell = ({
   </div>
 );
 
-const AmbientMeta = ({
-  icon,
-  value,
-}: {
-  icon?: ReactNode;
-  value: string;
-}) => (
+const AmbientMeta = ({ icon, value }: { icon?: ReactNode; value: string }) => (
   <div className="inline-flex items-center gap-2 text-sm font-medium text-white/78">
     {icon && <span className="text-white/46">{icon}</span>}
     <span>{value}</span>
@@ -324,12 +326,12 @@ const AmbientPill = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex h-10 items-center gap-2 rounded-full border border-white/10 bg-black/20 px-4 text-sm text-white/88 backdrop-blur-md">
-    {icon && <span className="text-white/58">{icon}</span>}
-    <span className="text-[11px] uppercase tracking-[0.22em] text-white/55">
+  <div className="inline-flex h-9 items-center gap-3 rounded-full bg-black/14 px-5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] ring-1 ring-inset ring-white/10 backdrop-blur-xl">
+    {icon && <span className="text-white/80">{icon}</span>}
+    <span className="text-xs font-medium uppercase tracking-[0.28em] text-white/58">
       {label}
     </span>
-    <span className="font-medium text-white/92">{value}</span>
+    <span className="text-sm font-semibold text-white ">{value}</span>
   </div>
 );
 
@@ -347,7 +349,9 @@ const getAgendaSummary = (event: CalendarEvent | null) => {
     return {
       label: "Happening now",
       summary: event.summary ?? "Current event",
-      detail: isAllDayEvent(event) ? "This is an all-day event." : "Ends later today.",
+      detail: isAllDayEvent(event)
+        ? "This is an all-day event."
+        : "Ends later today.",
     };
   }
 
