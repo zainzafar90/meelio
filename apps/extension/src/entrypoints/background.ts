@@ -1,13 +1,12 @@
-import {
-  TimerStage,
-  getNextTimerStage,
-  type TimerMessage,
-} from "@repo/timer-core";
+import { TimerStage } from "@repo/contracts/timer";
+import type { TimerMessage } from "@repo/contracts/timer";
+import { getNextTimerStage as getNextTimerStageFromCore } from "@repo/core/timer";
 import { defineBackground } from "wxt/utils/define-background";
 
 import {
   BLOCKER_BYPASS_ALARM_NAME,
   BLOCKER_STORAGE_KEY,
+  buildExtensionDynamicRules,
   isExtensionCommand,
   type BlockerRecordBlockedCommand,
   type BlockerStartBypassCommand,
@@ -17,7 +16,6 @@ import {
 import {
   applyCompletedSession,
   buildBlockerExport,
-  buildDynamicRules,
   cleanupBlockerData,
   createEmptyBlockerState,
   getBlockDecision,
@@ -122,7 +120,7 @@ const syncBypassAlarm = async (state: BlockerState): Promise<void> => {
 
 const syncDynamicRules = async (state: BlockerState): Promise<void> => {
   const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
-  const nextRules = buildDynamicRules(state, {
+  const nextRules = buildExtensionDynamicRules(state, {
     blockedPageUrl,
     timerStage: getEffectiveTimerStage(),
     now: Date.now(),
@@ -365,7 +363,7 @@ const handleTimerMessage = (message: TimerMessage): void => {
         const left = remaining();
         if (left <= 0) {
           const finishedStage = timerState.stage;
-          timerState.stage = getNextTimerStage(timerState.stage);
+          timerState.stage = getNextTimerStageFromCore(timerState.stage);
           timerState.isRunning = false;
           chrome.runtime.sendMessage({
             type: "TICK",

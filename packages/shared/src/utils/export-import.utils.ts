@@ -1,9 +1,12 @@
+import { addPomodoroSession } from "../lib/db/pomodoro.dexie";
 import { db } from "../lib/db/meelio.dexie";
+import type { PomodoroSession } from "../lib/db/models.dexie";
 import { useAuthStore } from "../stores/auth.store";
 import { useAppStore } from "../stores/app.store";
+import type { Wallpaper } from "../stores/background.store";
+import type { DockIconsVisibility } from "../stores/dock.store";
 import { useDockStore } from "../stores/dock.store";
 import { useBackgroundStore } from "../stores/background.store";
-import { useGreetingStore, useMantraStore } from "../stores/greetings.store";
 
 export interface MeelioExport {
   version: string;
@@ -19,7 +22,7 @@ export interface MeelioExport {
     categories: any[];
     siteBlocker: any[];
     tabStashes: any[];
-    focusSessions: any[];
+    focusSessions: PomodoroSession[];
     bookmarks: any[];
   };
   settings: {
@@ -30,15 +33,11 @@ export interface MeelioExport {
       confettiOnComplete: boolean;
     };
     dock: {
-      dockIconsVisible: Record<string, boolean>;
+      dockIconsVisible: DockIconsVisibility;
       showIconLabels: boolean;
     };
     background: {
-      selectedBackground: any;
-    };
-    greetings: {
-      customGreeting: string | null;
-      customMantra: string | null;
+      currentWallpaper: Wallpaper | null;
     };
   };
 }
@@ -48,8 +47,6 @@ export async function exportAllData(): Promise<MeelioExport> {
   const appState = useAppStore.getState();
   const dockState = useDockStore.getState();
   const backgroundState = useBackgroundStore.getState();
-  const greetingState = useGreetingStore.getState();
-  const mantraState = useMantraStore.getState();
 
   const userId = authState.user?.id;
 
@@ -58,7 +55,7 @@ export async function exportAllData(): Promise<MeelioExport> {
   let categories: any[] = [];
   let siteBlocker: any[] = [];
   let tabStashes: any[] = [];
-  let focusSessions: any[] = [];
+  let focusSessions: PomodoroSession[] = [];
   let bookmarks: any[] = [];
 
   if (userId) {
@@ -106,11 +103,11 @@ export async function exportAllData(): Promise<MeelioExport> {
   return {
     version: "1.0.0",
     exportedAt: Date.now(),
-    user: user
+    user: authState.user
       ? {
-          id: user.id,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
+          id: authState.user.id,
+          name: authState.user.name,
+          avatarUrl: authState.user.avatarUrl,
         }
       : null,
     data: {
@@ -134,11 +131,7 @@ export async function exportAllData(): Promise<MeelioExport> {
         showIconLabels: dockState.showIconLabels,
       },
       background: {
-        selectedBackground: backgroundState.selectedBackground,
-      },
-      greetings: {
-        customGreeting: greetingState.customGreeting,
-        customMantra: mantraState.customMantra,
+        currentWallpaper: backgroundState.currentWallpaper,
       },
     },
   };
@@ -254,7 +247,7 @@ export async function importAllData(data: MeelioExport): Promise<void> {
     for (const session of data.data.focusSessions) {
       const existingSession = await db.focusSessions.get(session.id);
       if (!existingSession) {
-        await db.focusSessions.add({
+        await addPomodoroSession({
           ...session,
           userId,
         });
@@ -278,8 +271,6 @@ export async function importAllData(data: MeelioExport): Promise<void> {
     const appStore = useAppStore.getState();
     const dockStore = useDockStore.getState();
     const backgroundStore = useBackgroundStore.getState();
-    const greetingStore = useGreetingStore.getState();
-    const mantraStore = useMantraStore.getState();
 
     if (data.settings.app) {
       appStore.setMantraRotation(data.settings.app.mantraRotationEnabled);
@@ -292,28 +283,17 @@ export async function importAllData(data: MeelioExport): Promise<void> {
 
     if (data.settings.dock) {
       dockStore.setShowIconLabels(data.settings.dock.showIconLabels);
-      if (data.settings.dock.dockIconsVisible) {
-        for (const [key, value] of Object.entries(
-          data.settings.dock.dockIconsVisible
-        )) {
-          dockStore.setDockIconVisible(key as any, value);
-        }
+      for (const [key, value] of Object.entries(
+        data.settings.dock.dockIconsVisible
+      ) as [keyof DockIconsVisibility, boolean][]) {
+        dockStore.setDockIconVisible(key, value);
       }
     }
 
-    if (data.settings.background?.selectedBackground) {
-      backgroundStore.setSelectedBackground(
-        data.settings.background.selectedBackground
+    if (data.settings.background?.currentWallpaper) {
+      backgroundStore.setCurrentWallpaper(
+        data.settings.background.currentWallpaper
       );
-    }
-
-    if (data.settings.greetings) {
-      if (data.settings.greetings.customGreeting) {
-        greetingStore.setCustomGreeting(data.settings.greetings.customGreeting);
-      }
-      if (data.settings.greetings.customMantra) {
-        mantraStore.setCustomMantra(data.settings.greetings.customMantra);
-      }
     }
   }
 }

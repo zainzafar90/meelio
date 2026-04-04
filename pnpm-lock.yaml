@@ -34,12 +34,24 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../../packages/application
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@repo/timer-core':
-        specifier: workspace:*
-        version: link:../../packages/timer-core
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -221,12 +233,18 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../../packages/application
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../../packages/infrastructure
+      '@repo/platform':
+        specifier: workspace:*
+        version: link:../../packages/platform
       '@repo/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@repo/timer-core':
-        specifier: workspace:*
-        version: link:../../packages/timer-core
       '@tailwindcss/typography':
         specifier: ^0.5.9
         version: 0.5.19(tailwindcss@3.4.19(yaml@2.8.2))
@@ -406,6 +424,68 @@ importers:
         specifier: ^0.34.1
         version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
+  packages/application:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+      zustand:
+        specifier: ^5
+        version: 5.0.9(@types/react@18.3.27)(react@18.3.1)(use-sync-external-store@1.6.0(react@18.3.1))
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
+  packages/contracts:
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
+  packages/core:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/chrome':
+        specifier: 0.0.258
+        version: 0.0.258
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
   packages/eslint-config:
     devDependencies:
       '@typescript-eslint/eslint-plugin':
@@ -429,6 +509,31 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
+
+  packages/infrastructure:
+    dependencies:
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../application
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      dexie:
+        specifier: ^3.2.4
+        version: 3.2.7
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/jest-presets:
     dependencies:
@@ -463,6 +568,31 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
+  packages/platform:
+    dependencies:
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/chrome':
+        specifier: 0.0.258
+        version: 0.0.258
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
+
   packages/prettier-config:
     devDependencies:
       '@ianvs/prettier-plugin-sort-imports':
@@ -480,15 +610,24 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.0
         version: 0.3.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@repo/application':
+        specifier: workspace:*
+        version: link:../application
+      '@repo/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@repo/infrastructure':
+        specifier: workspace:*
+        version: link:../infrastructure
       '@repo/tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
-      '@repo/timer-core':
-        specifier: workspace:*
-        version: link:../timer-core
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
@@ -610,24 +749,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.19(yaml@2.8.2))
-
-  packages/timer-core:
-    devDependencies:
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      eslint:
-        specifier: ^8.57.0
-        version: 8.57.1
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
-      vitest:
-        specifier: ^0.34.6
-        version: 0.34.6(less@4.5.1)(lightningcss@1.32.0)(playwright@1.57.0)(sass@1.97.2)(terser@5.44.1)
 
   packages/typescript-config: {}
 

@@ -1,18 +1,25 @@
-export const BLOCKER_REQUIRED_ORIGINS = ["http://*/*", "https://*/*"] as const;
+import {
+  BLOCKER_REQUIRED_ORIGINS,
+  hasBlockerAccessPermission as hasPlatformBlockerAccessPermission,
+  requestBlockerAccessPermission as requestPlatformBlockerAccessPermission,
+} from "../../../../packages/platform/src/extension/site-blocker";
+
+export { BLOCKER_REQUIRED_ORIGINS };
 
 export const BLOCKER_OPTIONAL_PERMISSION_REQUEST = {
   origins: [...BLOCKER_REQUIRED_ORIGINS] as string[],
 };
 
+const NOTIFICATION_PERMISSION = "notifications";
 export const NOTIFICATION_PERMISSION_REQUEST = {
-  permissions: ["notifications"] as string[],
+  permissions: [NOTIFICATION_PERMISSION] as string[],
 };
 
 export const hasBlockerAccessPermission = async (): Promise<boolean> =>
-  chrome.permissions.contains(BLOCKER_OPTIONAL_PERMISSION_REQUEST);
+  hasPlatformBlockerAccessPermission();
 
 export const requestBlockerAccessPermission = async (): Promise<boolean> =>
-  chrome.permissions.request(BLOCKER_OPTIONAL_PERMISSION_REQUEST);
+  requestPlatformBlockerAccessPermission();
 
 export const hasNotificationPermission = async (): Promise<boolean> =>
   chrome.permissions.contains(NOTIFICATION_PERMISSION_REQUEST);

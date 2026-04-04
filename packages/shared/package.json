@@ -20,9 +20,12 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
+    "@repo/application": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/core": "workspace:*",
     "@repo/eslint-config": "workspace:*",
+    "@repo/infrastructure": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
-    "@repo/timer-core": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.67.3",

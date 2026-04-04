@@ -1,0 +1,16 @@
+{
+  "extends": "../typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
+    "lib": [
+      "ES2015",
+      "DOM"
+    ],
+    "types": [
+      "chrome"
+    ]
+  },
+  "include": ["src", "vitest.config.ts"],
+  "exclude": ["dist", "build", "node_modules"]
+}

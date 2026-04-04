@@ -1,9 +1,0 @@
-{
-  "extends": "../typescript-config/base.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "lib": ["ES2015", "DOM"]
-  },
-  "include": ["src", "vitest.config.ts"],
-  "exclude": ["dist", "build", "node_modules"]
-}

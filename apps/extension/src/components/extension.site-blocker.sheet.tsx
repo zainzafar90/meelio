@@ -433,22 +433,38 @@ export const ExtensionSiteBlockerSheet = () => {
         {activeTab === "sites" ? (
           <div className="flex-1 overflow-y-auto px-4 py-5">
             <div className="space-y-5">
-              {!state.settings.permissionGranted ? (
-                <section className="rounded-2xl border border-amber-400/15 bg-amber-400/[0.08] px-4 py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 text-amber-100">
-                        <ShieldAlert className="size-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          {t("site-blocker.drawer.access.title")}
-                        </p>
-                        <p className="mt-1 text-sm leading-6 text-white/70">
-                          {t("site-blocker.drawer.access.missing")}
-                        </p>
-                      </div>
+              <section
+                className={cn(
+                  "rounded-2xl px-4 py-4",
+                  state.settings.permissionGranted
+                    ? "border border-emerald-400/15 bg-emerald-400/[0.08]"
+                    : "border border-amber-400/15 bg-amber-400/[0.08]"
+                )}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={cn(
+                        "mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl text-white",
+                        state.settings.permissionGranted
+                          ? "border border-emerald-400/20 bg-emerald-400/10 text-emerald-100"
+                          : "border border-amber-400/20 bg-amber-400/10 text-amber-100"
+                      )}
+                    >
+                      <ShieldAlert className="size-4" />
                     </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">
+                        {t("site-blocker.drawer.access.title")}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-white/70">
+                        {state.settings.permissionGranted
+                          ? t("site-blocker.drawer.access.granted")
+                          : t("site-blocker.drawer.access.missing")}
+                      </p>
+                    </div>
+                  </div>
+                  {!state.settings.permissionGranted ? (
                     <Button
                       variant="outline"
                       className="border-white/15 bg-black/20 text-white hover:bg-white/[0.04]"
@@ -466,9 +482,9 @@ export const ExtensionSiteBlockerSheet = () => {
                     >
                       {t("site-blocker.drawer.access.request")}
                     </Button>
-                  </div>
-                </section>
-              ) : null}
+                  ) : null}
+                </div>
+              </section>
 
               <Section
                 eyebrow={t("site-blocker.drawer.sections.rules")}

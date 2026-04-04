@@ -3,7 +3,8 @@ import { spawn } from "node:child_process";
 import { repoRoot } from "./config.mjs";
 
 export function logStep(message) {
-  process.stdout.write(`\n[validate:extension] ${message}\n`);
+  const validationName = process.env.MEELIO_VALIDATION_NAME ?? "validate:extension";
+  process.stdout.write(`\n[${validationName}] ${message}\n`);
 }
 
 export function sleep(ms) {
