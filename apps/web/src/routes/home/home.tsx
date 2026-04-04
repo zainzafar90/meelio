@@ -9,6 +9,7 @@ import {
   CalendarSheet,
   Dock,
   FocusDashboard,
+  Quote,
   NotesSheet,
   SearchPopover,
   ShortcutsModal,
@@ -29,6 +30,9 @@ const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
+        <div className="flex shrink-0 justify-center pb-3">
+          <Quote />
+        </div>
         <BottomBar />
       </AppLayout>
     </>

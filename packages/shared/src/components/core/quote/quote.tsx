@@ -34,7 +34,7 @@ export const Quote = () => {
   return (
     <AnimatePresence mode="wait">
       <div
-        className="relative mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 p-3 text-center backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg"
+        className="relative mx-auto max-w-md text-center"
         aria-label={t("home.quote.aria.quote")}
       >
         <motion.p
@@ -42,13 +42,13 @@ export const Quote = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
-          className="text-shadow-lg md:text-md my-2 text-sm leading-relaxed lg:text-lg"
+          className="text-xs italic leading-relaxed text-white/60 sm:text-sm"
           key={currentQuote.quote}
         >
           {currentQuote.quote}
         </motion.p>
         <span
-          className="text-xxs text-white/50 sm:text-xs md:text-sm"
+          className="text-[10px] text-white/40 sm:text-xs"
           aria-label={t("home.quote.aria.author")}
         >
           — {currentQuote.author}
