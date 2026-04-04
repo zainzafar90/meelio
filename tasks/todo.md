@@ -164,3 +164,31 @@
 - `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
 - `pnpm --filter web build`
 - `pnpm validate:extension:timer`
+
+## Timer Core Consumer Cleanup
+
+### Plan
+- [completed] Locate the remaining `@repo/timer-core` imports and classify whether they should depend on timer contracts or timer core.
+- [completed] Update the remaining consumers to the new timer package paths.
+- [completed] Re-run targeted verification so the compatibility shim is no longer needed for active consumers.
+
+### Success Criteria
+- Active timer consumers no longer depend on `@repo/timer-core` unless intentionally left as temporary compatibility shims.
+- Shared, web, and extension timer code reference `@repo/contracts/timer` and `@repo/core/timer` directly where appropriate.
+- Focused timer validation and relevant boundary tests still pass after the cleanup.
+
+### Review
+- Updated the remaining active timer consumers to the new timer packages:
+- [packages/shared/src/types/timer.types.ts](/Users/zainzafar/projects/meelio/meelio/packages/shared/src/types/timer.types.ts)
+- [packages/shared/src/stores/timer.store.ts](/Users/zainzafar/projects/meelio/meelio/packages/shared/src/stores/timer.store.ts)
+- [apps/extension/src/entrypoints/background.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/entrypoints/background.ts)
+- Updated the tests that pinned the old shim path:
+- [packages/shared/src/stores/timer-core-integration.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/shared/src/stores/timer-core-integration.test.ts)
+- [apps/extension/src/tests/timer-boundary.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/timer-boundary.test.ts)
+- Added the missing `@repo/contracts` and `@repo/core` dependencies to [packages/shared/package.json](/Users/zainzafar/projects/meelio/meelio/packages/shared/package.json) so extension builds can resolve the new timer imports through `@repo/shared`.
+- Verification:
+- `pnpm --filter @repo/shared test -- src/stores/timer-core-integration.test.ts`
+- `pnpm --filter extension test -- src/tests/timer-boundary.test.ts`
+- `rg -n '@repo/timer-core' apps packages -g '*.ts' -g '*.tsx'`
+- `pnpm install`
+- `pnpm validate:extension:timer`

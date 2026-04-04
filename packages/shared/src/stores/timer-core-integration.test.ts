@@ -10,7 +10,8 @@ describe("shared timer store integration", () => {
   it("delegates timer transitions to timer-core helpers", () => {
     const source = readSource("src/stores/timer.store.ts");
 
-    expect(source).toContain('from "@repo/timer-core"');
+    expect(source).toContain('from "@repo/core/timer"');
+    expect(source).toContain('from "@repo/contracts/timer"');
     expect(source).toContain("createInitialTimerSnapshot");
     expect(source).toContain("startTimer");
     expect(source).toContain("pauseTimer");

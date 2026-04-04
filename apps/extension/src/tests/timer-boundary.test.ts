@@ -7,10 +7,11 @@ const readSource = (relativePath: string) =>
   readFileSync(path.resolve(process.cwd(), relativePath), "utf8");
 
 describe("extension timer boundaries", () => {
-  it("keeps the MV3 background on timer-core instead of the shared root barrel", () => {
+  it("keeps the MV3 background on timer contracts/core instead of the shared root barrel", () => {
     const backgroundSource = readSource("src/entrypoints/background.ts");
 
-    expect(backgroundSource).toContain('from "@repo/timer-core"');
+    expect(backgroundSource).toContain('from "@repo/contracts/timer"');
+    expect(backgroundSource).toContain('from "@repo/core/timer"');
     expect(backgroundSource).not.toContain('from "@repo/shared"');
   });
 

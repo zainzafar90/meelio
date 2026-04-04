@@ -1,8 +1,8 @@
-export * from "@repo/timer-core";
+export * from "@repo/contracts/timer";
+export type { TimerSnapshot } from "@repo/core/timer";
 
-import type { TimerSnapshot } from "@repo/timer-core";
-import type { TimerStage } from "@repo/timer-core";
-import type { TimerSettings } from "@repo/timer-core";
+import type { TimerSnapshot } from "@repo/core/timer";
+import type { TimerStage, TimerSettings } from "@repo/contracts/timer";
 
 export interface TimerDeps {
   now: () => number;
