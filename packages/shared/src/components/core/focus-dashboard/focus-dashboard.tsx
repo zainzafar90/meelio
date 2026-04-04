@@ -326,12 +326,12 @@ const AmbientPill = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex h-9 items-center gap-3 rounded-full bg-black/14 px-5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] ring-1 ring-inset ring-white/10 backdrop-blur-xl">
+  <div className="inline-flex h-7 sm:h-9 items-center gap-1 sm:gap-1.5 md:gap-3 rounded-full bg-black/14 px-3 sm:px-5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] ring-1 ring-inset ring-white/10 backdrop-blur-xl">
     {icon && <span className="text-white/80">{icon}</span>}
-    <span className="text-xs font-medium uppercase tracking-[0.28em] text-white/58">
+    <span className="hidden md:inline text-xs font-medium uppercase tracking-[0.28em] text-white/58">
       {label}
     </span>
-    <span className="text-sm font-semibold text-white ">{value}</span>
+    <span className="truncate max-w-[72px] sm:max-w-[120px] md:max-w-none text-xs sm:text-sm font-semibold text-white">{value}</span>
   </div>
 );
 
