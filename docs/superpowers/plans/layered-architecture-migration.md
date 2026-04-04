@@ -1,5 +1,11 @@
 # Layered Architecture Migration Plan
 
+Canonical architecture rules now live in:
+
+- [docs/architecture/layered-architecture.md](/Users/zainzafar/projects/meelio/meelio/docs/architecture/layered-architecture.md)
+
+This file should be treated as migration history and planning context. The doc above is the source of truth for current package ownership and dependency direction.
+
 ## Goal
 
 Refactor the current monorepo into a layered architecture that matches this dependency direction:
