@@ -98,4 +98,41 @@ describe("createTimerStore", () => {
       })
     );
   });
+
+  it("swallows completion sound failures for the fire-and-forget action", async () => {
+    const playCompletionSound = vi
+      .fn()
+      .mockRejectedValue(new Error("audio unavailable"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const runtime = {
+      sendMessage: vi.fn(),
+      subscribe: (_callback: (message: TimerEvent) => void) => () => {},
+      showNotification: vi.fn(),
+    };
+
+    const store = createTimerStore(runtime, {
+      now: () => 1_700_000_000_000,
+      storage: createMemoryStorage(),
+      playCompletionSound,
+      recordCompletedStage: vi.fn().mockResolvedValue(undefined),
+      emitEvent: vi.fn(),
+    });
+    const {
+      settings: { sounds, soundId },
+    } = store.getState();
+
+    expect(() => store.getState().playCompletionSound()).not.toThrow();
+
+    expect(playCompletionSound).toHaveBeenCalledWith(sounds, soundId);
+    await vi.waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to play timer sound:",
+        expect.any(Error)
+      );
+    });
+
+    consoleError.mockRestore();
+  });
 });

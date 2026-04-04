@@ -374,5 +374,77 @@ describe("blocker-core", () => {
 
       expect(importBlockerSnapshot(snapshot)).toEqual(createEmptyBlockerState());
     });
+
+    it("normalizes imported hosts and patterns from raw snapshot data", () => {
+      const snapshot: BlockerExport = {
+        version: 1,
+        exportedAt: "2026-04-01T00:00:00.000Z",
+        state: {
+          settings: {
+            enabled: true,
+            activationMode: "always",
+            permissionGranted: true,
+            updatedAt: 123,
+          },
+          rules: [
+            {
+              id: "youtube",
+              pattern: "https://WWW.YouTube.com/watch?v=123",
+              enabled: true,
+              source: "custom",
+              createdAt: 123,
+              updatedAt: 123,
+            },
+          ],
+          bypassGrants: [
+            {
+              pattern: "HTTPS://m.Reddit.com/r/typescript",
+              originalUrl: "https://www.reddit.com/r/typescript",
+              createdAt: 123,
+              expiresAt: 456,
+            },
+          ],
+          events: [
+            {
+              id: "event-1",
+              type: "blocked",
+              pattern: "https://X.com/home",
+              occurredAt: "2026-04-01T00:00:00.000Z",
+            },
+          ],
+          sessions: [
+            {
+              id: "session-1",
+              host: "HTTPS://News.YCombinator.com/item?id=1",
+              url: "https://news.ycombinator.com/item?id=1",
+              startedAt: "2026-04-01T00:00:00.000Z",
+              endedAt: "2026-04-01T00:05:00.000Z",
+              durationMs: 300_000,
+              tabId: 1,
+              wasBlockedRuleMatch: false,
+              occurredDuringBypass: false,
+            },
+          ],
+          dailyAggregates: [
+            {
+              date: "2026-04-01",
+              host: "HTTP://WWW.LinkedIn.com/feed",
+              totalDurationMs: 300_000,
+              visits: 2,
+              blockedAttempts: 1,
+              bypassSessions: 0,
+            },
+          ],
+        },
+      };
+
+      const imported = importBlockerSnapshot(snapshot);
+
+      expect(imported.rules[0]?.pattern).toBe("youtube.com");
+      expect(imported.bypassGrants[0]?.pattern).toBe("m.reddit.com");
+      expect(imported.events[0]?.pattern).toBe("x.com");
+      expect(imported.sessions[0]?.host).toBe("news.ycombinator.com");
+      expect(imported.dailyAggregates[0]?.host).toBe("linkedin.com");
+    });
   });
 });

@@ -242,126 +242,59 @@
 - `pnpm validate:extension`
 - `pnpm validate:extension:blocker`
 
-## Home Surface Validation
+## PR Review Follow-up
 
 ### Plan
-- [completed] Audit the remaining new-tab flows that were not covered by timer/blocker validation.
-- [completed] Add a focused home validator for greeting/mantra, quote, wallpaper, and breathing flows.
-- [completed] Split the home validator into focused greeting, wallpaper, and breathing validators.
-- [completed] Fold the new home umbrella into the umbrella extension validation and verify the full sequence.
+- [completed] Inspect the `TimerState.playCompletionSound` action and confirm whether it still behaves as a fire-and-forget action.
+- [completed] Restore internal rejection handling so the action matches its `() => void` contract.
+- [completed] Add a focused regression test for rejected audio playback.
 
 ### Success Criteria
-- The extension validation suite includes a focused home/new-tab scenario alongside the timer and blocker scenarios.
-- The home validation surface is split into focused greeting, wallpaper, and breathing scenarios.
-- `pnpm validate:extension`, `pnpm validate:extension:home`, `pnpm validate:extension:greeting`, `pnpm validate:extension:wallpaper`, `pnpm validate:extension:breathing`, `pnpm validate:extension:timer`, and `pnpm validate:extension:blocker` all pass.
+- `TimerState.playCompletionSound` does not leak a rejected promise to callers.
+- Audio/playback failures are logged internally instead of becoming unhandled promise rejections.
+- The timer application test suite covers the rejected-audio path.
 
 ### Review
-- Replaced the single home scenario with focused scenarios in [scripts/validate/scenarios/extension-greeting-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-greeting-flow.mjs), [scripts/validate/scenarios/extension-wallpaper-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-wallpaper-flow.mjs), and [scripts/validate/scenarios/extension-breathing-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-breathing-flow.mjs).
-- Added shared home-validator bootstrap helpers in [scripts/validate/scenarios/extension-home-common.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-home-common.mjs).
-- Added focused runner entrypoints in [scripts/validate/extension-greeting.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-greeting.mjs), [scripts/validate/extension-wallpaper.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-wallpaper.mjs), and [scripts/validate/extension-breathing.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-breathing.mjs).
-- Updated [scripts/validate/extension-home.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension-home.mjs) and [package.json](/Users/zainzafar/projects/meelio/meelio/package.json) so `validate:extension:home` is now an umbrella over the three focused home validators.
-- Updated [scripts/validate/extension.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/extension.mjs) so the umbrella validator now runs home, timer, and blocker sequentially.
-- Added structural coverage in [apps/extension/src/tests/validator-home-coverage.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-home-coverage.test.ts).
-- Extended [apps/extension/src/tests/validator-localization.test.ts](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/tests/validator-localization.test.ts) so greeting, wallpaper, and breathing validators are each locked to translation-driven labels.
-- Added reusable validator helpers to [scripts/validate/lib/page-actions.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/lib/page-actions.mjs) for persisted-store reads/writes and text-containing element clicks.
+- Updated [packages/application/src/timer/create-timer-store.ts](/Users/zainzafar/projects/meelio/meelio/packages/application/src/timer/create-timer-store.ts) so `playCompletionSound` stays fire-and-forget and logs `"Failed to play timer sound:"` on rejection.
+- Added a regression test in [packages/application/src/timer/create-timer-store.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/application/src/timer/create-timer-store.test.ts) that verifies the action swallows rejected audio playback.
+- Verification:
+- `pnpm --filter @repo/application test -- src/timer/create-timer-store.test.ts`
+
+## PR Review Follow-up 2
+
+### Plan
+- [completed] Inspect the wallpaper validator and confirm the flaky assumption around random wallpaper selection.
+- [completed] Replace the non-deterministic wallpaper-id change check with deterministic side-effect assertions.
+- [completed] Re-run focused wallpaper validation after the change.
+
+### Success Criteria
+- `validate:extension:wallpaper` does not assume one random draw must change the wallpaper id.
+- The validator still proves `Random Background` and `Reset to Default` have deterministic persisted side effects.
+- Focused wallpaper validation passes end to end after the update.
+
+### Review
+- Updated [scripts/validate/scenarios/extension-wallpaper-flow.mjs](/Users/zainzafar/projects/meelio/meelio/scripts/validate/scenarios/extension-wallpaper-flow.mjs) so it no longer waits for a different random wallpaper id.
+- The validator now proves deterministic behavior instead:
+- `Random Background` disables `wallpaperRotationEnabled` and leaves a valid `currentWallpaper`.
+- `Reset to Default` re-enables `wallpaperRotationEnabled` and leaves a valid `currentWallpaper`.
 - Verification:
 - `pnpm --filter extension test -- src/tests/validator-home-coverage.test.ts src/tests/validator-localization.test.ts`
-- `pnpm validate:extension:greeting`
 - `pnpm validate:extension:wallpaper`
-- `pnpm validate:extension:breathing`
-- `pnpm validate:extension:home`
-- `pnpm validate:extension`
 
-## Shared Timer Cleanup
+## PR Review Follow-up 3
 
 ### Plan
-- [completed] Replace the legacy shared timer store implementation with a thin compatibility wrapper over `@repo/application/timer`.
-- [completed] Collapse shared timer state types onto the application/contracts/core timer types instead of redefining timer behavior in `@repo/shared`.
-- [completed] Run focused shared/app/extension verification after the cleanup.
+- [completed] Inspect the blocker snapshot import path and confirm where normalization was lost.
+- [completed] Restore normalization for imported rules, bypasses, events, sessions, and daily aggregates.
+- [completed] Add a focused regression test for mixed-format imported blocker snapshots.
 
 ### Success Criteria
-- `packages/shared/src/stores/timer.store.ts` no longer duplicates timer orchestration logic.
-- `packages/shared/src/types/timer.types.ts` does not redefine the timer state shape already owned by `@repo/application/timer`.
-- Shared timer integration tests and extension/web timer boundary checks still pass.
+- Imported blocker snapshots canonicalize host and pattern fields the same way live blocker input does.
+- Mixed-case/protocol/path-bearing imported values no longer persist as raw strings.
+- The blocker core test suite covers the import normalization path.
 
 ### Review
-- Replaced the legacy timer store in `@repo/shared` with a compatibility wrapper over `@repo/application/timer` plus `@repo/infrastructure/timer`.
-- Removed the shared-only timer state/type duplication and re-exported the canonical timer state from `@repo/application/timer`.
-- Added `@repo/application` and `@repo/infrastructure` as explicit dependencies of `@repo/shared` so the wrapper resolves cleanly.
-
-## Timer Stage Storage Unification
-
-### Plan
-- [completed] Add failing storage-layer tests that define the desired `TimerStage`-only persistence contract and legacy numeric-stage normalization behavior.
-- [completed] Replace `PersistedPomodoroStage` with `TimerStage` in the DB schema and add a Dexie upgrade path for legacy numeric session rows.
-- [completed] Normalize imported/exported focus sessions through the same `TimerStage` contract and remove the persisted-stage compatibility exports.
-- [completed] Re-run targeted infrastructure/shared verification plus the focused timer validator after the migration.
-
-### Success Criteria
-- `PomodoroSession.stage` is `TimerStage` everywhere the active codebase touches it.
-- Existing numeric focus-session rows and imported backups are normalized to `TimerStage` strings instead of breaking on read/import.
-- No active code exports or references `PersistedPomodoroStage`.
-
-### Review
-- Replaced the persisted numeric stage enum in [packages/infrastructure/src/db/models.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/models.dexie.ts) so `PomodoroSession.stage` now uses `TimerStage`.
-- Simplified [packages/infrastructure/src/db/pomodoro.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/pomodoro.dexie.ts) so writes and backfills use `TimerStage` directly instead of a second persisted-stage type.
-- Simplified [packages/infrastructure/src/db/meelio.dexie.ts](/Users/zainzafar/projects/meelio/meelio/packages/infrastructure/src/db/meelio.dexie.ts) to keep the v14 schema version without a numeric-stage migration path, because backward compatibility for old stage values is not required.
-- Updated [packages/shared/src/utils/export-import.utils.ts](/Users/zainzafar/projects/meelio/meelio/packages/shared/src/utils/export-import.utils.ts) so imported focus sessions use `addPomodoroSession(...)` and stay on the single `TimerStage` storage contract.
-- Removed the temporary legacy compatibility layer and deleted the old persisted-stage helper/test files.
-- Removed active `PersistedPomodoroStage` exports from the shared/infrastructure DB facades so `TimerStage` is the only active pomodoro stage type.
+- Updated [packages/core/src/site-blocker/blocker-core.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/site-blocker/blocker-core.ts) so `importBlockerSnapshot` normalizes imported `rules`, `bypassGrants`, `events`, `sessions`, and `dailyAggregates`.
+- Added a regression test in [packages/core/src/site-blocker/blocker-core.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/site-blocker/blocker-core.test.ts) that imports mixed-format snapshot data and verifies canonicalized hosts/patterns.
 - Verification:
-- `pnpm --filter @repo/infrastructure test -- src/db/pomodoro.dexie.test.ts`
-- `pnpm --filter @repo/infrastructure test -- src/infrastructure-boundary.test.ts`
-- `pnpm --filter @repo/shared test -- --run`
-- `pnpm validate:extension:timer`
-- Verification:
-- `pnpm --filter @repo/shared test -- src/stores/timer-core-integration.test.ts`
-- `pnpm install`
-- `pnpm --filter @repo/shared test -- --run`
-- `pnpm --filter web test -- src/tests/timer-boundary.test.ts`
-- `pnpm --filter extension test -- src/tests/timer-boundary.test.ts`
-- `pnpm validate:extension:timer`
-
-## Shared Blocker Core Utility Cleanup
-
-### Plan
-- [completed] Add a boundary test proving the shared site blocker store consumes the core blocker helpers instead of a duplicate shared implementation.
-- [completed] Point the shared site blocker store and compatibility utility shim at `@repo/core/site-blocker`.
-- [completed] Re-run shared package tests and a web build after the cleanup.
-
-### Success Criteria
-- `packages/shared/src/stores/site-blocker.store.ts` imports `normalizeSiteHost` from `@repo/core/site-blocker`.
-- `packages/shared/src/utils/site-blocker.utils.ts` is only a compatibility re-export.
-- Shared blocker-related tests and the web build pass after the cleanup.
-
-### Review
-- Added a structural test that locks the shared site blocker store to the core blocker utility layer.
-- Removed the duplicate shared host-normalization implementation and re-exported the canonical helper from `@repo/core/site-blocker`.
-- Verification:
-- `pnpm --filter @repo/shared test -- src/stores/site-blocker-core-integration.test.ts`
-- `pnpm --filter @repo/shared test -- --run`
-- `pnpm --filter web build`
-
-## Infrastructure Timer Boundary Cleanup
-
-### Plan
-- [completed] Audit infrastructure timer dependencies on shared private files and record the cleanup scope in `tasks/todo.md`.
-- [completed] Add a failing structural test that forbids filesystem-path imports from `packages/shared` inside infrastructure timer code.
-- [completed] Move the timer DB/event implementations and timer sound configuration into `@repo/infrastructure` and update shared wrappers.
-- [completed] Run focused infrastructure/shared/web/extension verification and document results.
-
-### Success Criteria
-- `packages/infrastructure/src/timer/index.ts` no longer imports from `packages/shared/src/...` by filesystem path.
-- Timer DB helpers and timer event bus live in `@repo/infrastructure`, with shared wrappers preserving compatibility.
-- Infrastructure/shared tests, web build, and the timer extension validator all pass after the refactor.
-
-### Review
-- Moved Dexie DB models, DB setup, and pomodoro summary helpers into `@repo/infrastructure/db`.
-- Moved the timer event bus into `@repo/infrastructure/timer` and turned shared timer event/db files into compatibility re-exports.
-- Replaced the timer completion sound dependency on the shared sound-sync service with an infrastructure-local pomodoro sound catalog.
-- Verification:
-- `pnpm --filter @repo/infrastructure test -- src/infrastructure-boundary.test.ts`
-- `pnpm --filter @repo/shared test -- --run`
-- `pnpm install`
-- `pnpm --filter web build`
-- `pnpm validate:extension:timer`
+- `pnpm --filter @repo/core test -- src/site-blocker/blocker-core.test.ts`

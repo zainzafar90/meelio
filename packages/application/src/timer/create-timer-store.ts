@@ -401,8 +401,13 @@ export const createTimerStore = (
           restore,
           completeStage,
           checkDailyReset,
-          playCompletionSound: () =>
-            deps.playCompletionSound(get().settings.sounds, get().settings.soundId),
+          playCompletionSound: () => {
+            void deps
+              .playCompletionSound(get().settings.sounds, get().settings.soundId)
+              .catch((error) => {
+                console.error("Failed to play timer sound:", error);
+              });
+          },
           showCompletionNotification: (stage: TimerStage) =>
             showCompletionNotification(stage, get().settings.notifications),
         };

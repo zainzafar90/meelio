@@ -360,6 +360,35 @@ export const buildBlockerExport = (
   },
 });
 
+const normalizeImportedRule = (rule: BlockRule): BlockRule => ({
+  ...rule,
+  pattern: normalizeSiteHost(rule.pattern),
+});
+
+const normalizeImportedBypassGrant = (grant: BypassGrant): BypassGrant => ({
+  ...grant,
+  pattern: normalizeSiteHost(grant.pattern),
+});
+
+const normalizeImportedEvent = (event: BlockerEvent): BlockerEvent => ({
+  ...event,
+  pattern: normalizeSiteHost(event.pattern),
+});
+
+const normalizeImportedSession = (
+  session: BrowsingSession
+): BrowsingSession => ({
+  ...session,
+  host: normalizeSiteHost(session.host),
+});
+
+const normalizeImportedAggregate = (
+  aggregate: DailySiteAggregate
+): DailySiteAggregate => ({
+  ...aggregate,
+  host: normalizeSiteHost(aggregate.host),
+});
+
 export const importBlockerSnapshot = (
   snapshot: BlockerExport
 ): BlockerState => ({
@@ -369,9 +398,13 @@ export const importBlockerSnapshot = (
     ...createDefaultSettings(),
     ...(snapshot.state.settings ?? {}),
   },
-  rules: snapshot.state.rules ?? [],
-  bypassGrants: snapshot.state.bypassGrants ?? [],
-  events: snapshot.state.events ?? [],
-  sessions: snapshot.state.sessions ?? [],
-  dailyAggregates: snapshot.state.dailyAggregates ?? [],
+  rules: (snapshot.state.rules ?? []).map(normalizeImportedRule),
+  bypassGrants: (snapshot.state.bypassGrants ?? []).map(
+    normalizeImportedBypassGrant
+  ),
+  events: (snapshot.state.events ?? []).map(normalizeImportedEvent),
+  sessions: (snapshot.state.sessions ?? []).map(normalizeImportedSession),
+  dailyAggregates: (snapshot.state.dailyAggregates ?? []).map(
+    normalizeImportedAggregate
+  ),
 });
