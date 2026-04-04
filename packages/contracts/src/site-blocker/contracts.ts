@@ -1,21 +1,102 @@
-import type {
-  ActivationMode,
-  BlockRuleSource,
-  BlockerExport,
-  BlockerState,
-  TimerStage,
-} from "../../../core/src/site-blocker";
+export type ActivationMode = "always" | "focus-only";
+export type BlockRuleSource = "custom" | "preset";
+export type BlockerEventType =
+  | "blocked"
+  | "bypass_started"
+  | "bypass_ended"
+  | "permission_denied";
+export type TimerStage = "focus" | "break";
+
+export interface BlockRule {
+  id: string;
+  pattern: string;
+  enabled: boolean;
+  source: BlockRuleSource;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface BlockerSettings {
+  enabled: boolean;
+  activationMode: ActivationMode;
+  permissionGranted: boolean;
+  updatedAt: number;
+}
+
+export interface BypassGrant {
+  pattern: string;
+  expiresAt: number;
+  originalUrl: string;
+  createdAt: number;
+}
+
+export interface BlockerEvent {
+  id: string;
+  type: BlockerEventType;
+  pattern: string;
+  originalUrl?: string;
+  occurredAt: string;
+}
+
+export interface BrowsingSession {
+  id: string;
+  host: string;
+  url: string;
+  startedAt: string;
+  endedAt: string;
+  durationMs: number;
+  tabId: number;
+  wasBlockedRuleMatch: boolean;
+  occurredDuringBypass: boolean;
+}
+
+export interface DailySiteAggregate {
+  date: string;
+  host: string;
+  totalDurationMs: number;
+  visits: number;
+  blockedAttempts: number;
+  bypassSessions: number;
+}
+
+export interface BlockerState {
+  settings: BlockerSettings;
+  rules: BlockRule[];
+  bypassGrants: BypassGrant[];
+  events: BlockerEvent[];
+  sessions: BrowsingSession[];
+  dailyAggregates: DailySiteAggregate[];
+}
+
+export interface BlockerExport {
+  version: number;
+  exportedAt: string;
+  state: Partial<BlockerState> & Pick<BlockerState, "settings" | "rules">;
+}
+
+export interface BlockingContext {
+  timerStage: TimerStage;
+}
+
+export interface BlockDecisionContext extends BlockingContext {
+  url: string;
+  now: number;
+}
+
+export interface DynamicRulePatternContext extends BlockingContext {
+  now: number;
+}
+
+export interface BlockDecision {
+  shouldBlock: boolean;
+  matchedRule: BlockRule | null;
+  bypass: BypassGrant | null;
+}
 
 export interface ActivitySnapshot {
-  recentEvents: BlockerState["events"];
-  recentSessions: BlockerState["sessions"];
-  topSites: Array<{
-    host: string;
-    totalDurationMs: number;
-    visits: number;
-    blockedAttempts: number;
-    bypassSessions: number;
-  }>;
+  recentEvents: BlockerEvent[];
+  recentSessions: BrowsingSession[];
+  topSites: Array<Omit<DailySiteAggregate, "date">>;
 }
 
 export interface TrackingSessionPayload {

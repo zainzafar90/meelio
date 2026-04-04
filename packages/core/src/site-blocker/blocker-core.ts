@@ -1,105 +1,27 @@
+import type {
+  BlockDecision,
+  BlockDecisionContext,
+  BlockerEvent,
+  BlockerExport,
+  BlockerSettings,
+  BlockerState,
+  BlockRule,
+  BlockRuleSource,
+  BrowsingSession,
+  BypassGrant,
+  DailySiteAggregate,
+  DynamicRulePatternContext,
+  TimerStage,
+  BlockingContext,
+  BlockerEventType,
+  ActivationMode,
+} from "@repo/contracts/site-blocker";
 import { doesSiteHostMatch, normalizeSiteHost } from "./site-blocker.utils";
 
 export const RAW_SESSION_RETENTION_DAYS = 30;
 export const BLOCKER_EVENT_RETENTION_DAYS = 90;
 export const DAILY_AGGREGATE_RETENTION_DAYS = 180;
 export const BLOCKER_EXPORT_VERSION = 1;
-
-export type ActivationMode = "always" | "focus-only";
-export type BlockRuleSource = "custom" | "preset";
-export type BlockerEventType =
-  | "blocked"
-  | "bypass_started"
-  | "bypass_ended"
-  | "permission_denied";
-export type TimerStage = "focus" | "break";
-
-export interface BlockRule {
-  id: string;
-  pattern: string;
-  enabled: boolean;
-  source: BlockRuleSource;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface BlockerSettings {
-  enabled: boolean;
-  activationMode: ActivationMode;
-  permissionGranted: boolean;
-  updatedAt: number;
-}
-
-export interface BypassGrant {
-  pattern: string;
-  expiresAt: number;
-  originalUrl: string;
-  createdAt: number;
-}
-
-export interface BlockerEvent {
-  id: string;
-  type: BlockerEventType;
-  pattern: string;
-  originalUrl?: string;
-  occurredAt: string;
-}
-
-export interface BrowsingSession {
-  id: string;
-  host: string;
-  url: string;
-  startedAt: string;
-  endedAt: string;
-  durationMs: number;
-  tabId: number;
-  wasBlockedRuleMatch: boolean;
-  occurredDuringBypass: boolean;
-}
-
-export interface DailySiteAggregate {
-  date: string;
-  host: string;
-  totalDurationMs: number;
-  visits: number;
-  blockedAttempts: number;
-  bypassSessions: number;
-}
-
-export interface BlockerState {
-  settings: BlockerSettings;
-  rules: BlockRule[];
-  bypassGrants: BypassGrant[];
-  events: BlockerEvent[];
-  sessions: BrowsingSession[];
-  dailyAggregates: DailySiteAggregate[];
-}
-
-export interface BlockerExport {
-  version: number;
-  exportedAt: string;
-  state: Partial<BlockerState> & Pick<BlockerState, "settings" | "rules">;
-}
-
-export interface BlockingContext {
-  timerStage: TimerStage;
-}
-
-export interface BlockDecisionContext extends BlockingContext {
-  url: string;
-  now: number;
-}
-
-export interface DynamicRuleContext extends BlockingContext {
-  blockedPageUrl: string;
-  now: number;
-}
-
-export interface BlockDecision {
-  shouldBlock: boolean;
-  matchedRule: BlockRule | null;
-  bypass: BypassGrant | null;
-}
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -245,10 +167,10 @@ export const getBlockDecision = (
   };
 };
 
-export const buildDynamicRules = (
+export const getDynamicRulePatterns = (
   state: BlockerState,
-  context: DynamicRuleContext
-): chrome.declarativeNetRequest.Rule[] => {
+  context: DynamicRulePatternContext
+): string[] => {
   state.bypassGrants = pruneExpiredBypasses(state.bypassGrants, context.now);
 
   if (!isBlockingActive(state.settings, context)) {
@@ -261,20 +183,7 @@ export const buildDynamicRules = (
 
   return state.rules
     .filter((rule) => rule.enabled && !bypassedPatterns.has(rule.pattern))
-    .map((rule, index) => ({
-      id: index + 1,
-      priority: 1,
-      action: {
-        type: "redirect" as const,
-        redirect: {
-          url: `${context.blockedPageUrl}?pattern=${rule.pattern}`,
-        },
-      },
-      condition: {
-        requestDomains: [rule.pattern],
-        resourceTypes: ["main_frame" as chrome.declarativeNetRequest.ResourceType],
-      },
-    }));
+    .map((rule) => rule.pattern);
 };
 
 const toDayKey = (isoDate: string): string => isoDate.slice(0, 10);

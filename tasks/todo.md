@@ -298,3 +298,34 @@
 - Added a regression test in [packages/core/src/site-blocker/blocker-core.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/site-blocker/blocker-core.test.ts) that imports mixed-format snapshot data and verifies canonicalized hosts/patterns.
 - Verification:
 - `pnpm --filter @repo/core test -- src/site-blocker/blocker-core.test.ts`
+
+## Final Architecture Hardening
+
+### Plan
+- [completed] Remove the remaining cross-package `src` imports from layered packages and compatibility shims.
+- [completed] Move Chrome DNR rule shaping out of `@repo/core` so the site-blocker core stays host-agnostic.
+- [completed] Break the `contracts <-> core` package cycle by making `@repo/contracts/site-blocker` own the shared blocker types.
+- [completed] Re-run focused package tests and the blocker/full extension validators after the seam cleanup.
+
+### Success Criteria
+- Layered packages import each other through package exports, not `src` filesystem paths.
+- `@repo/core/site-blocker` contains no Chrome-specific types or DNR payload shaping.
+- `@repo/contracts` and `@repo/core` do not form a workspace dependency cycle.
+- Focused package tests plus blocker/full extension validation pass after the cleanup.
+
+### Review
+- Updated [packages/contracts/src/site-blocker/contracts.ts](/Users/zainzafar/projects/meelio/meelio/packages/contracts/src/site-blocker/contracts.ts) so the shared site-blocker types live in `@repo/contracts`.
+- Updated [packages/core/src/site-blocker/blocker-core.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/site-blocker/blocker-core.ts) to consume contract-owned types and return host-agnostic dynamic-rule patterns instead of Chrome DNR rules.
+- Updated [packages/core/src/site-blocker/index.ts](/Users/zainzafar/projects/meelio/meelio/packages/core/src/site-blocker/index.ts) to re-export the shared blocker types for compatibility.
+- Updated [packages/platform/src/extension/site-blocker/runtime.ts](/Users/zainzafar/projects/meelio/meelio/packages/platform/src/extension/site-blocker/runtime.ts) so the extension platform layer now builds Chrome DNR rules via `buildExtensionDynamicRules(...)`.
+- Updated [packages/application/src/site-blocker/blocker-state.ts](/Users/zainzafar/projects/meelio/meelio/packages/application/src/site-blocker/blocker-state.ts), [packages/contracts/src/site-blocker/contracts.ts](/Users/zainzafar/projects/meelio/meelio/packages/contracts/src/site-blocker/contracts.ts), and the extension compatibility shims under [apps/extension/src/features/site-blocker/services](/Users/zainzafar/projects/meelio/meelio/apps/extension/src/features/site-blocker/services) to use package imports instead of cross-package `src` paths.
+- Updated boundary coverage in [packages/platform/src/platform-boundary.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/platform/src/platform-boundary.test.ts) and [packages/contracts/src/site-blocker/contracts.test.ts](/Users/zainzafar/projects/meelio/meelio/packages/contracts/src/site-blocker/contracts.test.ts).
+- Verification:
+- `pnpm install`
+- `pnpm --filter @repo/contracts test -- src/site-blocker/contracts.test.ts`
+- `pnpm --filter @repo/core test -- src/site-blocker/blocker-core.test.ts`
+- `pnpm --filter @repo/application test -- src/site-blocker/blocker-state.test.ts`
+- `pnpm --filter @repo/platform test -- src/platform-boundary.test.ts`
+- `pnpm --filter extension test -- src/features/site-blocker/services/blocker-core.test.ts`
+- `pnpm validate:extension:blocker`
+- `pnpm validate:extension`

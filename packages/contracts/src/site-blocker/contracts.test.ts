@@ -17,6 +17,7 @@ describe("site-blocker contracts boundary", () => {
     expect(source).not.toContain("chrome.");
     expect(source).not.toContain("window.");
     expect(source).not.toContain("react");
+    expect(source).not.toContain("../../../core/src/");
   });
 
   it("defines the extension command and response contract types", () => {

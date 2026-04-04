@@ -13,10 +13,13 @@ describe("platform package boundaries", () => {
 
     expect(runtimeSource).toContain("chrome.runtime");
     expect(timerSource).toContain("chrome.runtime");
+    expect(runtimeSource).toContain('from "@repo/contracts/site-blocker"');
+    expect(runtimeSource).toContain('from "@repo/core/site-blocker"');
     expect(runtimeSource).not.toContain("react");
     expect(timerSource).not.toContain("react");
     expect(runtimeSource).not.toContain("@repo/shared");
     expect(timerSource).not.toContain("@repo/shared");
+    expect(runtimeSource).not.toContain("../../../../contracts/src/");
   });
 
   it("keeps web adapters focused on host runtime concerns", () => {

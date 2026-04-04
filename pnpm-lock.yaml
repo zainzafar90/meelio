@@ -573,6 +573,9 @@ importers:
       '@repo/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@repo/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

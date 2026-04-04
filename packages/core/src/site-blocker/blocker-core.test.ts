@@ -6,11 +6,11 @@ import {
   RAW_SESSION_RETENTION_DAYS,
   applyCompletedSession,
   buildBlockerExport,
-  buildDynamicRules,
   cleanupBlockerData,
   createBlockRule,
   createBypassGrant,
   createEmptyBlockerState,
+  getDynamicRulePatterns,
   getBlockDecision,
   importBlockerSnapshot,
   isBlockingActive,
@@ -136,8 +136,8 @@ describe("blocker-core", () => {
     });
   });
 
-  describe("buildDynamicRules", () => {
-    it("builds main-frame redirect rules only for currently enforced patterns", () => {
+  describe("getDynamicRulePatterns", () => {
+    it("returns only currently enforced patterns", () => {
       const state = createEmptyBlockerState();
       state.settings.permissionGranted = true;
       state.rules = [
@@ -162,38 +162,21 @@ describe("blocker-core", () => {
         }),
       ];
 
-      const rules = buildDynamicRules(state, {
-        blockedPageUrl: "chrome-extension://abc123/blocked.html",
+      const patterns = getDynamicRulePatterns(state, {
         timerStage: "focus",
         now: 5_000,
       });
 
-      expect(rules).toEqual([]);
+      expect(patterns).toEqual([]);
 
       state.bypassGrants = [];
 
       expect(
-        buildDynamicRules(state, {
-          blockedPageUrl: "chrome-extension://abc123/blocked.html",
+        getDynamicRulePatterns(state, {
           timerStage: "focus",
           now: 5_000,
         })
-      ).toEqual([
-        expect.objectContaining({
-          id: 1,
-          priority: 1,
-          action: {
-            type: "redirect",
-            redirect: {
-              url: "chrome-extension://abc123/blocked.html?pattern=youtube.com",
-            },
-          },
-          condition: expect.objectContaining({
-            requestDomains: ["youtube.com"],
-            resourceTypes: ["main_frame"],
-          }),
-        }),
-      ]);
+      ).toEqual(["youtube.com"]);
     });
   });
 

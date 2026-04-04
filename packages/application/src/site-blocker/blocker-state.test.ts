@@ -15,7 +15,7 @@ import {
   createBlockRule,
   createEmptyBlockerState,
   type BlockerState,
-} from "../../../core/src/site-blocker";
+} from "@repo/core/site-blocker";
 
 describe("blocker-state", () => {
   it("re-enables an existing matching rule instead of duplicating it", () => {

@@ -1,5 +1,5 @@
-import type { ActivitySnapshot } from "../../../contracts/src/site-blocker";
-import { normalizeSiteHost } from "../../../core/src/site-blocker";
+import type { ActivitySnapshot } from "@repo/contracts/site-blocker";
+import { normalizeSiteHost } from "@repo/core/site-blocker";
 import {
   createBlockRule,
   createBypassGrant,
@@ -8,7 +8,7 @@ import {
   type BlockRuleSource,
   type BlockerState,
   type DailySiteAggregate,
-} from "../../../core/src/site-blocker";
+} from "@repo/core/site-blocker";
 
 export const addOrEnableRule = (
   state: BlockerState,

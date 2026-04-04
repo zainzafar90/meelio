@@ -3,7 +3,9 @@ import type {
   ExtensionCommandFor,
   ExtensionCommandResponse,
   ExtensionCommandType,
-} from "../../../../contracts/src/site-blocker";
+} from "@repo/contracts/site-blocker";
+import { getDynamicRulePatterns, type BlockerState } from "@repo/core/site-blocker";
+import type { TimerStage } from "@repo/core/site-blocker";
 
 export const BLOCKER_STORAGE_KEY = "meelio:extension:blocker-state.v1";
 export const BLOCKER_BYPASS_ALARM_NAME =
@@ -49,3 +51,26 @@ export const sendExtensionCommand = async <T extends ExtensionCommandType>(
   chrome.runtime.sendMessage(
     command
   ) as Promise<ExtensionCommandResponse<T>>;
+
+export const buildExtensionDynamicRules = (
+  state: BlockerState,
+  context: {
+    blockedPageUrl: string;
+    timerStage: TimerStage;
+    now: number;
+  }
+): chrome.declarativeNetRequest.Rule[] =>
+  getDynamicRulePatterns(state, context).map((pattern, index) => ({
+    id: index + 1,
+    priority: 1,
+    action: {
+      type: "redirect",
+      redirect: {
+        url: `${context.blockedPageUrl}?pattern=${pattern}`,
+      },
+    },
+    condition: {
+      requestDomains: [pattern],
+      resourceTypes: ["main_frame"],
+    },
+  }));

@@ -7,3 +7,5 @@
 - If an action is typed as fire-and-forget (`() => void`), never return a raw promise from the implementation. Consume and log rejections inside the action so callers do not trigger unhandled promise rejections.
 - In validators, never assert that a single random UI action must produce a different value unless the product code guarantees uniqueness. Prefer deterministic side effects like setting toggles, persisted flags, or existence checks.
 - When importing persisted snapshots or raw JSON backups, re-run the same normalization/canonicalization steps used for live user input. Refactors that move import code can silently drop those ingest guarantees.
+- Keep `contracts` as the owner of cross-layer shared types and let `core` consume/re-export them. If `contracts` starts importing from `core`, you will recreate the package cycle the layered split is supposed to remove.
+- If `core` needs host-specific output, stop at host-agnostic descriptors or pattern lists and let `platform` shape the final browser/OS API payloads.

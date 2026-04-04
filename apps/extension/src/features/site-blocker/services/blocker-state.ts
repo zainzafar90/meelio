@@ -1,1 +1,1 @@
-export * from "../../../../../../packages/application/src/site-blocker";
+export * from "@repo/application/site-blocker";

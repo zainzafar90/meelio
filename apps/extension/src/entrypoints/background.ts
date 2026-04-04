@@ -6,6 +6,7 @@ import { defineBackground } from "wxt/utils/define-background";
 import {
   BLOCKER_BYPASS_ALARM_NAME,
   BLOCKER_STORAGE_KEY,
+  buildExtensionDynamicRules,
   isExtensionCommand,
   type BlockerRecordBlockedCommand,
   type BlockerStartBypassCommand,
@@ -15,7 +16,6 @@ import {
 import {
   applyCompletedSession,
   buildBlockerExport,
-  buildDynamicRules,
   cleanupBlockerData,
   createEmptyBlockerState,
   getBlockDecision,
@@ -120,7 +120,7 @@ const syncBypassAlarm = async (state: BlockerState): Promise<void> => {
 
 const syncDynamicRules = async (state: BlockerState): Promise<void> => {
   const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
-  const nextRules = buildDynamicRules(state, {
+  const nextRules = buildExtensionDynamicRules(state, {
     blockedPageUrl,
     timerStage: getEffectiveTimerStage(),
     now: Date.now(),
