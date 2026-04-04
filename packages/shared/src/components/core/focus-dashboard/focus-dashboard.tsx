@@ -296,11 +296,11 @@ const InfoBadge = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/32 px-3 py-1.5 shadow-lg backdrop-blur-lg">
-    <span className="text-[10px] uppercase tracking-[0.2em] text-white/68">
+  <div className="inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/12 px-4 py-2 shadow-lg backdrop-blur-lg">
+    <span className="text-[10px] uppercase tracking-[0.3em] font-medium text-white">
       {label}
     </span>
-    <span className="text-xs font-medium capitalize text-white/96">{value}</span>
+    <span className="text-xs font-medium text-white">{value}</span>
   </div>
 );
 

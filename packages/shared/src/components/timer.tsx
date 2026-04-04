@@ -84,15 +84,15 @@ const TimerView = ({
 
   return (
     <div className="relative">
-      <div className="max-w-full w-88 rounded-[32px] border border-white/12 bg-black/48 text-white shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:w-[440px] lg:w-[540px]">
+      <div className="max-w-full w-88 rounded-[32px] border border-white/[0.06] bg-black/48 text-white shadow-[0_24px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl sm:w-[440px] lg:w-[540px]">
         <div className="space-y-10 p-4 sm:p-8">
           <div className="w-full">
-            <div className="flex h-12 w-full rounded-full bg-black/45 p-1 text-white">
+            <div className="flex h-12 w-full rounded-full bg-black/5 p-1 text-white">
               <button
                 onClick={() => skip(TimerStage.Focus)}
                 className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                   stage === TimerStage.Focus
-                    ? "bg-white/88 text-black shadow-lg"
+                    ? "bg-white/88 bg-white/10 shadow-lg"
                     : "text-white/78 hover:bg-white/10"
                 }`}
                 title={t("timer.controls.focusMode")}
@@ -104,7 +104,7 @@ const TimerView = ({
                 disabled={stage === TimerStage.Break}
                 className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
                   stage === TimerStage.Break
-                    ? "bg-white/88 text-black shadow-lg"
+                      ? "bg-white/88 bg-white/10 shadow-lg"
                     : "text-white/78 hover:bg-white/10"
                 } ${stage === TimerStage.Break ? "cursor-not-allowed" : ""}`}
                 title={t("timer.controls.breakMode")}
@@ -144,7 +144,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex h-10 min-w-10 w-full items-center justify-center rounded-full bg-black text-white shadow-xl"
+                className="cursor-pointer relative flex h-10 min-w-10 w-full items-center justify-center rounded-full bg-white/75 text-black shadow-xl"
                 onClick={() => running ? pause() : start()}
                 title={running ? t("common.actions.pause") : t("common.actions.start")}
                 role="button"
