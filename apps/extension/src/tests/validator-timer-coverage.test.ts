@@ -9,6 +9,7 @@ const timerScenarioPath = path.join(
   "scripts/validate/scenarios/extension-timer-flow.mjs"
 );
 const packageJsonPath = path.join(repoRoot, "package.json");
+const extensionValidatorPath = path.join(repoRoot, "scripts/validate/extension.mjs");
 
 describe("timer validator coverage", () => {
   it("uses extension-scoped timer validation commands", () => {
@@ -17,6 +18,13 @@ describe("timer validator coverage", () => {
     expect(packageJson).toContain('"validate:extension:timer"');
     expect(packageJson).toContain('"validate:extension:blocker"');
     expect(packageJson).not.toContain('"validate:timer"');
+  });
+
+  it("makes the top-level extension validator an umbrella over timer and blocker", () => {
+    const source = readFileSync(extensionValidatorPath, "utf8");
+
+    expect(source).toContain('runCommand("pnpm", ["validate:extension:timer"])');
+    expect(source).toContain('runCommand("pnpm", ["validate:extension:blocker"])');
   });
 
   it("covers restore, auto-start, and settings persistence flows explicitly", () => {

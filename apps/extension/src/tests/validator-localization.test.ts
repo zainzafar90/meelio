@@ -9,9 +9,13 @@ const browserSessionPath = path.join(
   repoRoot,
   "scripts/validate/lib/browser-session.mjs"
 );
-const validatorScenarioPath = path.join(
+const blockerScenarioPath = path.join(
   repoRoot,
   "scripts/validate/scenarios/extension-blocker-flow.mjs"
+);
+const timerScenarioPath = path.join(
+  repoRoot,
+  "scripts/validate/scenarios/extension-timer-flow.mjs"
 );
 const pageActionsPath = path.join(repoRoot, "scripts/validate/lib/page-actions.mjs");
 
@@ -27,7 +31,7 @@ describe("extension validator localization stability", () => {
   });
 
   it("uses label-based timer controls instead of a brittle reset-title selector", () => {
-    const scenarioSource = readFileSync(validatorScenarioPath, "utf8");
+    const scenarioSource = readFileSync(timerScenarioPath, "utf8");
     const pageActionsSource = readFileSync(pageActionsPath, "utf8");
 
     expect(pageActionsSource).toContain("export async function clickButtonByLabel");
@@ -42,7 +46,7 @@ describe("extension validator localization stability", () => {
   });
 
   it("reads blocker copy from the English translation source instead of hardcoded UI text", () => {
-    const scenarioSource = readFileSync(validatorScenarioPath, "utf8");
+    const scenarioSource = readFileSync(blockerScenarioPath, "utf8");
 
     expect(scenarioSource).toContain('getValidationLabel("site-blocker.title")');
     expect(scenarioSource).toContain(

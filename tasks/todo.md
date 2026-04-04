@@ -219,3 +219,25 @@
 - `pnpm --filter web build`
 - `pnpm validate:extension:timer`
 - `pnpm validate:extension`
+
+## Extension Validator Cleanup
+
+### Plan
+- [completed] Split the blocker validator into a true blocker-only scenario.
+- [completed] Make `validate:extension` run the focused timer and blocker validators sequentially.
+- [completed] Re-run focused and umbrella validation after the command cleanup.
+
+### Success Criteria
+- `validate:extension:blocker` does not perform timer smoke assertions.
+- `validate:extension` is an umbrella command over the focused timer and blocker validators.
+- Timer-focused, blocker-focused, and umbrella validation all pass after the refactor.
+
+### Review
+- `scripts/validate/scenarios/extension-blocker-flow.mjs` is now blocker-only and no longer performs timer smoke assertions.
+- `scripts/validate/extension.mjs` is now an umbrella command that runs `validate:extension:timer` and `validate:extension:blocker` sequentially.
+- Updated validator structural tests so timer localization assertions target the timer scenario and blocker copy assertions target the blocker scenario.
+- Verification:
+- `pnpm --filter extension test -- src/tests/validator-localization.test.ts`
+- `pnpm validate:extension:timer`
+- `pnpm validate:extension`
+- `pnpm validate:extension:blocker`

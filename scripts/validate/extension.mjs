@@ -1,8 +1,14 @@
-import { runExtensionValidation } from "./scenarios/extension-blocker-flow.mjs";
+import { logStep, runCommand } from "./lib/utils.mjs";
 
 process.env.MEELIO_VALIDATION_NAME = "validate:extension";
 
-runExtensionValidation().catch((error) => {
+(async () => {
+  logStep("Running focused timer validator");
+  await runCommand("pnpm", ["validate:extension:timer"]);
+
+  logStep("Running focused blocker validator");
+  await runCommand("pnpm", ["validate:extension:blocker"]);
+})().catch((error) => {
   console.error(`\n[validate:extension] FAILED: ${error.message}`);
   process.exitCode = 1;
 });

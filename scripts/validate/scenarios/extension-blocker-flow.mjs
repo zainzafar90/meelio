@@ -6,10 +6,8 @@ import { connectToTarget, waitForTarget } from "../lib/cdp.mjs";
 import { launchBrowserSession } from "../lib/browser-session.mjs";
 import { getValidationLabel } from "../lib/validation-labels.mjs";
 import {
-  clickButtonByLabel,
   clickButtonByText,
   getBodyText,
-  getTimerValue,
   hasAllSitesPermission,
   openTabFromWorker,
   requestAllSitesPermission,
@@ -18,16 +16,12 @@ import {
   setInputByPlaceholder,
   waitForBodyText,
   waitForBodyTextGone,
-  waitForButtonByLabel,
   waitForTabUrl,
   waitForUrl,
 } from "../lib/page-actions.mjs";
-import { assert, logStep, runCommand, sleep, waitFor } from "../lib/utils.mjs";
+import { assert, logStep, runCommand, waitFor } from "../lib/utils.mjs";
 
-export async function runExtensionValidation() {
-  const startLabel = getValidationLabel("common.actions.start");
-  const pauseLabel = getValidationLabel("common.actions.pause");
-  const resetLabel = getValidationLabel("timer.controls.resetLabel");
+export async function runBlockerValidation() {
   const siteBlockerTitle = getValidationLabel("site-blocker.title");
   const blockerBootstrap = getValidationLabel("site-blocker.drawer.bootstrap");
   const blockerAccessGranted = getValidationLabel("site-blocker.drawer.access.granted");
@@ -82,40 +76,6 @@ export async function runExtensionValidation() {
       15000
     );
     newtabClient = await connectToTarget(newtabTarget);
-
-    logStep("Validating timer start, tick, pause, and reset");
-    await setDockState(newtabClient, {
-      isTimerVisible: true,
-      isGreetingsVisible: true,
-      isSiteBlockerVisible: false,
-    });
-    await waitForButtonByLabel(newtabClient, startLabel);
-    const initialTimer = await getTimerValue(newtabClient);
-    assert(initialTimer === "25:00", `Expected fresh timer to show 25:00, got ${initialTimer}`);
-    await clickButtonByLabel(newtabClient, startLabel);
-    await waitForButtonByLabel(newtabClient, pauseLabel);
-    await sleep(2200);
-    const runningTimer = await getTimerValue(newtabClient);
-    assert(
-      runningTimer !== initialTimer,
-      "Expected timer display to change after starting."
-    );
-    await clickButtonByLabel(newtabClient, pauseLabel);
-    await waitForButtonByLabel(newtabClient, startLabel);
-    const pausedTimer = await getTimerValue(newtabClient);
-    await sleep(1600);
-    const pausedTimerAfterWait = await getTimerValue(newtabClient);
-    assert(
-      pausedTimer === pausedTimerAfterWait,
-      "Expected paused timer display to stay stable."
-    );
-    await clickButtonByLabel(newtabClient, resetLabel);
-    await waitFor(
-      "timer reset to 25:00",
-      () => getTimerValue(newtabClient),
-      (value) => value === "25:00",
-      10000
-    );
 
     logStep("Opening site blocker drawer and validating bootstrap");
     await setDockState(newtabClient, {
@@ -320,3 +280,5 @@ export async function runExtensionValidation() {
     await cleanup();
   }
 }
+
+export const runExtensionValidation = runBlockerValidation;
