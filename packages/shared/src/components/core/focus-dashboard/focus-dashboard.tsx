@@ -59,6 +59,7 @@ const selectFocusTasks = (
       id: task.id,
       title: task.title,
       completed: false,
+      pinned: Boolean(task.pinned),
     }));
 
 export const FocusDashboard = ({
@@ -157,7 +158,10 @@ export const FocusDashboard = ({
   const showTimerPanel = isTimerVisible || isRunning;
 
   const handlePrimaryAction = () => {
-    if (snapshot.primaryAction.kind === "review-plan") {
+    if (
+      snapshot.primaryAction.kind === "review-plan" ||
+      snapshot.primaryAction.kind === "choose-focus-task"
+    ) {
       setTasksVisible(true);
       setTimerVisible(false);
       return;
@@ -239,10 +243,13 @@ export const FocusDashboard = ({
               primaryActionLabel={
                 snapshot.primaryAction.kind === "review-plan"
                   ? "Open Tasks"
+                  : snapshot.primaryAction.kind === "choose-focus-task"
+                    ? "Choose Focus Task"
                   : "Start Focusing"
               }
               primaryActionDescription={
-                snapshot.primaryAction.kind === "review-plan"
+                snapshot.primaryAction.kind === "review-plan" ||
+                  snapshot.primaryAction.kind === "choose-focus-task"
                   ? "Pick or pin a task to anchor the next focus block."
                   : snapshot.agendaWindowLabel
               }

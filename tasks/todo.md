@@ -35,6 +35,10 @@
 - [x] Implement Phase 6 shell presence and responsive calibration
 - [x] Tighten Phase 6 responsive spacing for home, focus, quote, and dock
 - [x] Verify Phase 6 behavior and boundaries
+- [x] Define Phase 7 scope: focus workflow intelligence
+- [x] Write Phase 7 spec and implementation plan
+- [ ] Implement Phase 7 focus workflow intelligence
+- [ ] Verify Phase 7 behavior and boundaries
 - [x] Verify Phase 4 behavior and boundaries
 
 ## Review
@@ -52,6 +56,7 @@
 - The latest Phase 4 pass repaired broken CTA wiring after a manual UI rewrite, simplified the ambient metadata treatment, and pushed the timer toward the same darker visual language as the shell.
 - Phase 5 target is: make home and focus feel like two states of one environment through restrained transitions instead of abrupt mode swaps.
 - Phase 6 target is: calibrate shell presence across wallpapers and screen sizes without reintroducing harsh chrome.
+- Phase 7 now explicitly distinguishes “choose focus task” from “start focus” by tying the active focus task to the pinned task instead of the first incomplete task.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

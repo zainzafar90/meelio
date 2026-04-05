@@ -2,6 +2,7 @@ export interface DailyFocusTask {
   id: string;
   title: string;
   completed: boolean;
+  pinned: boolean;
 }
 
 export interface DailyFocusPlan {
@@ -16,6 +17,7 @@ export interface DailyFocusPlan {
 export type FocusPrimaryActionKind =
   | "start-focus-session"
   | "resume-focus-session"
+  | "choose-focus-task"
   | "review-plan";
 
 export type FocusActionEmphasis = "primary" | "secondary";

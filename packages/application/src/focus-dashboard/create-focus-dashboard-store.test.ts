@@ -14,7 +14,12 @@ describe("createFocusDashboardStore", () => {
       headline: "Ship dashboard shell",
       intention: "Build the dashboard before adding more cards.",
       topTasks: [
-        { id: "task-1", title: "Create daily plan card", completed: false },
+        {
+          id: "task-1",
+          title: "Create daily plan card",
+          completed: false,
+          pinned: true,
+        },
       ],
       sessionTarget: 3,
       reflection: "",
@@ -26,6 +31,28 @@ describe("createFocusDashboardStore", () => {
     expect(snapshot.topTasksTotal).toBe(1);
     expect(snapshot.primaryAction.kind).toBe("start-focus-session");
     expect(snapshot.activeFocusTaskLabel).toBe("Create daily plan card");
+  });
+
+  it("asks the user to choose a focus task when tasks exist but none is pinned", () => {
+    const store = createFocusDashboardStore({
+      initialDate: "2026-04-04",
+      greeting: "Good evening",
+    });
+
+    store.getState().setDailyPlan({
+      headline: "Protect focus time",
+      intention: "Pick the right task before starting.",
+      topTasks: [
+        { id: "task-1", title: "Start focus mode", completed: false, pinned: false },
+      ],
+      sessionTarget: 2,
+      reflection: "",
+    });
+
+    const snapshot = store.getState().snapshot;
+
+    expect(snapshot.primaryAction.kind).toBe("choose-focus-task");
+    expect(snapshot.activeFocusTaskId).toBeNull();
   });
 
   it("recomputes the primary action when timer signals change", () => {

@@ -70,6 +70,15 @@ export const deriveFocusPrimaryAction = ({
     };
   }
 
+  if (!focusLabel) {
+    return {
+      kind: "choose-focus-task",
+      label: "Choose Focus Task",
+      description: "Pick or pin the task you want to anchor the next focus block.",
+      emphasis: "secondary",
+    };
+  }
+
   if (focusLabel && minutesUntilEvent !== null && minutesUntilEvent !== undefined && minutesUntilEvent > 0 && minutesUntilEvent < 30) {
     return {
       kind: "start-focus-session",
@@ -102,7 +111,8 @@ export const deriveFocusDashboardSnapshot = ({
   minutesUntilEvent,
 }: DeriveFocusDashboardSnapshotInput): FocusDashboardSnapshot => {
   const topTasksCompleted = topTasks.filter((task) => task.completed).length;
-  const activeFocusTask = topTasks.find((task) => !task.completed) ?? null;
+  const activeFocusTask =
+    topTasks.find((task) => !task.completed && task.pinned) ?? null;
   const agendaWindowLabel =
     minutesUntilEvent === null || minutesUntilEvent === undefined
       ? "Calendar is clear for deep work."
@@ -120,7 +130,7 @@ export const deriveFocusDashboardSnapshot = ({
     focusPlan: {
       date,
       headline:
-        topTasks[0]?.title ?? "Choose the one thing that deserves your focus",
+      activeFocusTask?.title ?? "Choose the one thing that deserves your focus",
       intention: "",
       topTasks,
       sessionTarget: 0,
