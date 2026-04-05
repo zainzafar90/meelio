@@ -17,6 +17,7 @@ export interface DailyFocusPlan {
 export type FocusPrimaryActionKind =
   | "start-focus-session"
   | "resume-focus-session"
+  | "switch-focus-task"
   | "choose-focus-task"
   | "review-plan";
 
@@ -39,6 +40,7 @@ export interface FocusDashboardSnapshot {
   focusPlan: DailyFocusPlan;
   activeFocusTaskId: string | null;
   activeFocusTaskLabel: string;
+  sessionFocusTaskId: string | null;
   topTasksCompleted: number;
   topTasksTotal: number;
   currentTimerLabel: string;

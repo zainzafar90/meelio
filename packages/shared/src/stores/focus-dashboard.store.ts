@@ -94,6 +94,7 @@ export const syncFocusDashboardSignals = (signals: {
   timerRunning: boolean;
   timerStage: TimerStage;
   timerLabel: string;
+  sessionFocusTaskId: string | null;
   blockerMode: "ready" | "active" | "bypassing";
   soundtrackMode: "available" | "playing" | "muted";
   nextEventLabel: string;

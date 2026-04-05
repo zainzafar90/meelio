@@ -139,6 +139,7 @@ export const FocusDashboard = ({
       timerLabel: isRunning
         ? `${formatTime(timerRemaining)} remaining`
         : "Ready to focus",
+      sessionFocusTaskId: isRunning ? snapshot.sessionFocusTaskId : null,
       blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
       soundtrackMode: playingSounds > 0 ? "playing" : "available",
       nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
@@ -174,6 +175,23 @@ export const FocusDashboard = ({
     if (settings.soundscapes) {
       setSoundscapesVisible(true);
     }
+
+    syncFocusDashboardSignals({
+      timerRunning: isRunning,
+      timerStage: stage,
+      timerLabel: isRunning
+        ? `${formatTime(timerRemaining)} remaining`
+        : "Ready to focus",
+      sessionFocusTaskId:
+        snapshot.primaryAction.kind === "start-focus-session" ||
+        snapshot.primaryAction.kind === "switch-focus-task"
+          ? snapshot.activeFocusTaskId
+          : snapshot.sessionFocusTaskId,
+      blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
+      soundtrackMode: playingSounds > 0 ? "playing" : "available",
+      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
+      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
+    });
 
     if (!isRunning) {
       start();
@@ -245,6 +263,8 @@ export const FocusDashboard = ({
                   ? "Open Tasks"
                   : snapshot.primaryAction.kind === "choose-focus-task"
                     ? "Choose Focus Task"
+                  : snapshot.primaryAction.kind === "switch-focus-task"
+                    ? "Switch Focus Task"
                   : "Start Focusing"
               }
               primaryActionDescription={

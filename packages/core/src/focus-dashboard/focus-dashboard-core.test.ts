@@ -41,6 +41,20 @@ describe("focus dashboard core", () => {
     expect(action.label).toBe("Resume Focus: Ship dashboard shell");
   });
 
+  it("derives a switch action when focus is running for a different task", () => {
+    const action = deriveFocusPrimaryAction({
+      timerRunning: true,
+      timerStage: TimerStage.Focus,
+      topTasksCount: 2,
+      activeFocusTaskLabel: "Prepare launch checklist",
+      activeFocusTaskId: "task-2",
+      sessionFocusTaskId: "task-1",
+    });
+
+    expect(action.kind).toBe("switch-focus-task");
+    expect(action.label).toBe("Switch Focus: Prepare launch checklist");
+  });
+
   it("derives a start action that references the active focus task and time window", () => {
     const action = deriveFocusPrimaryAction({
       timerRunning: false,
@@ -79,6 +93,7 @@ describe("focus dashboard core", () => {
       soundtrackMode: "available",
       nextEventLabel: "",
       minutesUntilEvent: null,
+      sessionFocusTaskId: "task-2",
     });
 
     expect(snapshot.topTasksCompleted).toBe(1);
@@ -87,6 +102,7 @@ describe("focus dashboard core", () => {
     expect(snapshot.nextEventLabel).toBe("No events scheduled");
     expect(snapshot.activeFocusTaskId).toBe("task-2");
     expect(snapshot.activeFocusTaskLabel).toBe("Wire focus CTA");
+    expect(snapshot.sessionFocusTaskId).toBe("task-2");
     expect(snapshot.agendaWindowLabel).toBe("Calendar is clear for deep work.");
   });
 
@@ -115,6 +131,7 @@ describe("focus dashboard core", () => {
       soundtrackMode: "available",
       nextEventLabel: "",
       minutesUntilEvent: null,
+      sessionFocusTaskId: null,
     });
 
     expect(snapshot.activeFocusTaskId).toBeNull();

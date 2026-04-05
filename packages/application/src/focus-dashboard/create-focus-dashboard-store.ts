@@ -13,6 +13,7 @@ export interface FocusDashboardSignals {
   timerRunning: boolean;
   timerStage: TimerStage;
   timerLabel: string;
+  sessionFocusTaskId: string | null;
   blockerMode: FocusBlockerMode;
   soundtrackMode: FocusSoundtrackMode;
   nextEventLabel: string;
@@ -58,6 +59,7 @@ const createSignals = (
   timerRunning: signals?.timerRunning ?? false,
   timerStage: signals?.timerStage ?? TimerStage.Focus,
   timerLabel: signals?.timerLabel ?? "Ready to focus",
+  sessionFocusTaskId: signals?.sessionFocusTaskId ?? null,
   blockerMode: signals?.blockerMode ?? "ready",
   soundtrackMode: signals?.soundtrackMode ?? "available",
   nextEventLabel: signals?.nextEventLabel ?? "",
@@ -81,6 +83,7 @@ const buildSnapshot = (
     soundtrackMode: signals.soundtrackMode,
     nextEventLabel: signals.nextEventLabel,
     minutesUntilEvent: signals.minutesUntilEvent,
+    sessionFocusTaskId: signals.sessionFocusTaskId,
   });
 
   return {

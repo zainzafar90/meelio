@@ -57,6 +57,8 @@
 - Phase 5 target is: make home and focus feel like two states of one environment through restrained transitions instead of abrupt mode swaps.
 - Phase 6 target is: calibrate shell presence across wallpapers and screen sizes without reintroducing harsh chrome.
 - Phase 7 now explicitly distinguishes “choose focus task” from “start focus” by tying the active focus task to the pinned task instead of the first incomplete task.
+- Phase 7.2 now tracks the session focus task separately from the currently pinned task, so the CTA can distinguish resume from switch.
+- Completing a pinned focus task now promotes the next most recently updated incomplete task into focus automatically.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

@@ -17,7 +17,9 @@ export interface DeriveFocusPrimaryActionInput {
   timerRunning: boolean;
   timerStage?: TimerStage;
   topTasksCount: number;
+  activeFocusTaskId?: string | null;
   activeFocusTaskLabel?: string;
+  sessionFocusTaskId?: string | null;
   minutesUntilEvent?: number | null;
 }
 
@@ -32,6 +34,7 @@ export interface DeriveFocusDashboardSnapshotInput {
   soundtrackMode: FocusSoundtrackMode;
   nextEventLabel?: string;
   minutesUntilEvent?: number | null;
+  sessionFocusTaskId?: string | null;
 }
 
 export interface RankFocusDashboardCardsInput {
@@ -45,10 +48,31 @@ export const deriveFocusPrimaryAction = ({
   timerRunning,
   timerStage,
   topTasksCount,
+  activeFocusTaskId,
   activeFocusTaskLabel,
+  sessionFocusTaskId,
   minutesUntilEvent,
 }: DeriveFocusPrimaryActionInput): FocusPrimaryAction => {
+  const activeTaskId = activeFocusTaskId?.trim();
   const focusLabel = activeFocusTaskLabel?.trim();
+  const sessionTaskId = sessionFocusTaskId?.trim();
+
+  if (
+    timerRunning &&
+    timerStage === TimerStage.Focus &&
+    activeTaskId &&
+    sessionTaskId &&
+    activeTaskId !== sessionTaskId
+  ) {
+    return {
+      kind: "switch-focus-task",
+      label: focusLabel ? `Switch Focus: ${focusLabel}` : "Switch Focus Task",
+      description: focusLabel
+        ? `Switch this running focus block to ${focusLabel}.`
+        : "Switch the running focus block to the selected task.",
+      emphasis: "primary",
+    };
+  }
 
   if (timerRunning && timerStage === TimerStage.Focus) {
     return {
@@ -109,6 +133,7 @@ export const deriveFocusDashboardSnapshot = ({
   soundtrackMode,
   nextEventLabel,
   minutesUntilEvent,
+  sessionFocusTaskId,
 }: DeriveFocusDashboardSnapshotInput): FocusDashboardSnapshot => {
   const topTasksCompleted = topTasks.filter((task) => task.completed).length;
   const activeFocusTask =
@@ -139,6 +164,7 @@ export const deriveFocusDashboardSnapshot = ({
     activeFocusTaskId: activeFocusTask?.id ?? null,
     activeFocusTaskLabel:
       activeFocusTask?.title ?? "Choose a task to anchor the next focus block",
+    sessionFocusTaskId: sessionFocusTaskId ?? activeFocusTask?.id ?? null,
     topTasksCompleted,
     topTasksTotal: topTasks.length,
     currentTimerLabel: timerLabel,
@@ -154,7 +180,9 @@ export const deriveFocusDashboardSnapshot = ({
       timerRunning,
       timerStage,
       topTasksCount: topTasks.length,
+      activeFocusTaskId: activeFocusTask?.id,
       activeFocusTaskLabel: activeFocusTask?.title,
+      sessionFocusTaskId,
       minutesUntilEvent,
     }),
   };

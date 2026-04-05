@@ -74,6 +74,7 @@ describe("createFocusDashboardStore", () => {
       timerRunning: true,
       timerStage: TimerStage.Focus,
       timerLabel: "12:00 remaining",
+      sessionFocusTaskId: "task-1",
       blockerMode: "active",
       soundtrackMode: "playing",
       nextEventLabel: "Design review at 7:00 PM",
@@ -84,7 +85,42 @@ describe("createFocusDashboardStore", () => {
 
     expect(snapshot.primaryAction.kind).toBe("resume-focus-session");
     expect(snapshot.currentTimerLabel).toBe("12:00 remaining");
+    expect(snapshot.sessionFocusTaskId).toBe("task-1");
     expect(snapshot.blockerMode).toBe("active");
     expect(snapshot.agendaWindowLabel).toContain("18 min");
+  });
+
+  it("asks to switch focus when the pinned task changes during a running session", () => {
+    const store = createFocusDashboardStore({
+      initialDate: "2026-04-04",
+      greeting: "Good evening",
+    });
+
+    store.getState().setDailyPlan({
+      headline: "Protect focus time",
+      intention: "Switch intentionally when priorities change.",
+      topTasks: [
+        { id: "task-1", title: "Current focus", completed: false, pinned: false },
+        { id: "task-2", title: "New urgent task", completed: false, pinned: true },
+      ],
+      sessionTarget: 2,
+      reflection: "",
+    });
+    store.getState().setSignals({
+      timerRunning: true,
+      timerStage: TimerStage.Focus,
+      timerLabel: "22:00 remaining",
+      blockerMode: "active",
+      soundtrackMode: "playing",
+      nextEventLabel: "",
+      minutesUntilEvent: null,
+      sessionFocusTaskId: "task-1",
+    });
+
+    const snapshot = store.getState().snapshot;
+
+    expect(snapshot.sessionFocusTaskId).toBe("task-1");
+    expect(snapshot.activeFocusTaskId).toBe("task-2");
+    expect(snapshot.primaryAction.kind).toBe("switch-focus-task");
   });
 });

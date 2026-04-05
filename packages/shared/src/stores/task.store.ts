@@ -75,6 +75,17 @@ export const useTaskStore = create<TaskState>()(
       }));
     };
 
+    const getNextPromotableTask = (excludeId: string) =>
+      get()
+        .tasks
+        .filter(
+          (task) =>
+            task.id !== excludeId &&
+            !task.completed &&
+            !task.deletedAt
+        )
+        .sort((left, right) => (right.updatedAt ?? 0) - (left.updatedAt ?? 0))[0];
+
     return {
       lists: SYSTEM_LISTS,
       tasks: [],
@@ -143,20 +154,37 @@ export const useTaskStore = create<TaskState>()(
       const task = get().tasks.find((t) => t.id === taskId);
       if (!task) return;
 
-      const authState = useAuthStore.getState();
+      const nextPinnedTask =
+        task.pinned && !task.completed ? getNextPromotableTask(taskId) : undefined;
+      const toggledAt = Date.now();
       const updatedData = {
         completed: !task.completed,
-        updatedAt: Date.now(),
+        updatedAt: toggledAt,
         ...(task.pinned && !task.completed ? { pinned: false } : {}),
       };
 
       try {
         await db.tasks.update(taskId, updatedData);
 
+        if (nextPinnedTask) {
+          await db.tasks.update(nextPinnedTask.id, {
+            pinned: true,
+            updatedAt: toggledAt,
+          });
+        }
+
         set((state) => ({
-          tasks: state.tasks.map((t) =>
-            t.id === taskId ? { ...t, ...updatedData } : t
-          ),
+          tasks: state.tasks.map((t) => {
+            if (t.id === taskId) {
+              return { ...t, ...updatedData };
+            }
+
+            if (nextPinnedTask && t.id === nextPinnedTask.id) {
+              return { ...t, pinned: true, updatedAt: toggledAt };
+            }
+
+            return t;
+          }),
         }));
 
         if (updatedData.completed) {

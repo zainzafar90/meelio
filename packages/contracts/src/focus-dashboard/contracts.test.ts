@@ -26,7 +26,12 @@ describe("focus dashboard contracts", () => {
       headline: "Ship phase 1 dashboard",
       intention: "Turn separate focus tools into one coherent ritual.",
       topTasks: [
-        { id: "task-1", title: "Define dashboard structure", completed: false },
+        {
+          id: "task-1",
+          title: "Define dashboard structure",
+          completed: false,
+          pinned: true,
+        },
       ],
       sessionTarget: 4,
       reflection: "",
@@ -44,6 +49,7 @@ describe("focus dashboard contracts", () => {
       focusPlan: plan,
       activeFocusTaskId: "task-1",
       activeFocusTaskLabel: "Define dashboard structure",
+      sessionFocusTaskId: "task-1",
       topTasksCompleted: 0,
       topTasksTotal: 1,
       currentTimerLabel: "Ready to focus",

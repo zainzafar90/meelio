@@ -51,6 +51,7 @@ describe("focus dashboard store", () => {
       timerRunning: true,
       timerStage: TimerStage.Focus,
       timerLabel: "08:00 remaining",
+      sessionFocusTaskId: "task-1",
       blockerMode: "active",
       soundtrackMode: "playing",
       nextEventLabel: "Next: Design review",
@@ -61,6 +62,7 @@ describe("focus dashboard store", () => {
 
     expect(snapshot.currentTimerRunning).toBe(true);
     expect(snapshot.currentTimerLabel).toBe("08:00 remaining");
+    expect(snapshot.sessionFocusTaskId).toBe("task-1");
     expect(snapshot.blockerMode).toBe("active");
     expect(snapshot.nextEventLabel).toBe("Next: Design review");
     expect(snapshot.agendaWindowLabel).toContain("18 min");
