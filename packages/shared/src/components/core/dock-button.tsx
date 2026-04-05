@@ -98,6 +98,7 @@ export function DockButton({ item, isDisabled, className }: DockButtonProps): Re
   const ringClassName = shouldShowActiveRing
     ? `ring-2 ${FEATURE_RING_CLASS_BY_ID[item.id] ?? "ring-white/60"}`
     : "";
+  const isFocusRitual = item.id === "timer";
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -115,14 +116,18 @@ export function DockButton({ item, isDisabled, className }: DockButtonProps): Re
             className={cn(
               "cursor-pointer",
               "relative flex size-10 items-center justify-center rounded-xl shadow-lg",
-              "bg-gradient-to-b from-zinc-800 to-zinc-900",
+              isFocusRitual
+                ? "overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),transparent_42%),linear-gradient(180deg,rgba(255,119,91,0.92),rgba(107,33,168,0.94))]"
+                : "bg-gradient-to-b from-zinc-800 to-zinc-900",
+              isFocusRitual && "before:absolute before:inset-[5px] before:rounded-[10px] before:border before:border-white/18 before:content-['']",
+              isFocusRitual && isActive && "animate-pulse",
               ringClassName,
               className
             )}
             onClick={handleClick}
             role="button"
           >
-            <IconComponent className="size-6 text-white" />
+            <IconComponent className={cn("size-6 text-white", isFocusRitual && "relative z-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.28)]")} />
             {item.requirePro && (
               <span
                 className={cn(

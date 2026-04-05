@@ -129,7 +129,7 @@ const BottomBar = () => {
       className="flex shrink-0 items-center justify-center pb-2"
       aria-label={t("home.layout.footer.aria")}
     >
-      <Dock />
+      <Dock timerStore={extensionTimerStore} />
     </footer>
   );
 }

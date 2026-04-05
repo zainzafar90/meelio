@@ -26,6 +26,7 @@ import { useAuthStore } from "../../../stores/auth.store";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
+import { cn } from "../../../lib/utils";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
 import {
@@ -78,7 +79,6 @@ export const FocusDashboard = ({
     prevRemaining,
     endTimestamp,
     durations,
-    start,
   } = timerStore(
     useShallow((state) => ({
       stage: state.stage,
@@ -86,8 +86,6 @@ export const FocusDashboard = ({
       prevRemaining: state.prevRemaining,
       endTimestamp: state.endTimestamp,
       durations: state.durations,
-      settings: state.settings,
-      start: state.start,
     })),
   );
   const { tasks, initializeTaskStore, isTaskStoreLoading, hasTaskStoreInitialized } = useTaskStore(
@@ -103,17 +101,9 @@ export const FocusDashboard = ({
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const {
-    isTimerVisible,
-    setTimerVisible,
-    setGreetingsVisible,
-    setTasksVisible,
-  } = useDockStore(
+  const { isTimerVisible } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
-      setTimerVisible: state.setTimerVisible,
-      setGreetingsVisible: state.setGreetingsVisible,
-      setTasksVisible: state.setTasksVisible,
     })),
   );
   const snapshot = useFocusDashboardStore(
@@ -180,63 +170,7 @@ export const FocusDashboard = ({
     timerRemaining,
   ]);
 
-  const agendaSummary = useMemo(() => getAgendaSummary(nextEvent), [nextEvent]);
   const showTimerPanel = isTimerVisible || isRunning;
-  const primaryActionLabel = isTaskBootstrapPending
-    ? "Loading focus..."
-    : snapshot.primaryAction.kind === "review-plan"
-      ? "Open Tasks"
-      : snapshot.primaryAction.kind === "choose-focus-task"
-        ? "Choose Focus Task"
-        : snapshot.primaryAction.kind === "switch-focus-task"
-          ? "Switch Focus Task"
-          : "Start Focusing";
-  const primaryActionDescription = isTaskBootstrapPending
-    ? "Pulling in your pinned task and today's queue."
-    : snapshot.primaryAction.kind === "review-plan" ||
-        snapshot.primaryAction.kind === "choose-focus-task"
-      ? "Pick or pin a task to anchor the next focus block."
-      : snapshot.agendaWindowLabel;
-
-  const handlePrimaryAction = () => {
-    if (isTaskBootstrapPending) {
-      return;
-    }
-
-    if (
-      snapshot.primaryAction.kind === "review-plan" ||
-      snapshot.primaryAction.kind === "choose-focus-task"
-    ) {
-      setTasksVisible(true);
-      setTimerVisible(false);
-      return;
-    }
-
-    setTasksVisible(false);
-    setGreetingsVisible(false);
-    setTimerVisible(true);
-
-    syncFocusDashboardSignals({
-      timerRunning: isRunning,
-      timerStage: stage,
-      timerLabel: isRunning
-        ? `${formatTime(timerRemaining)} remaining`
-        : "Ready to focus",
-      sessionFocusTaskId:
-        snapshot.primaryAction.kind === "start-focus-session" ||
-        snapshot.primaryAction.kind === "switch-focus-task"
-          ? snapshot.activeFocusTaskId
-          : snapshot.sessionFocusTaskId,
-      blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
-      soundtrackMode: playingSounds > 0 ? "playing" : "available",
-      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
-      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
-    });
-
-    if (!isRunning) {
-      start();
-    }
-  };
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
@@ -298,12 +232,10 @@ export const FocusDashboard = ({
             className="flex min-h-0 flex-1"
           >
             <HomeModeShell
-              primaryActionLabel={primaryActionLabel}
-              primaryActionDescription={primaryActionDescription}
-              isPrimaryActionPending={isTaskBootstrapPending}
-              onPrimaryAction={handlePrimaryAction}
               calendarPillValue={getAgendaPillValue(nextEvent)}
               queuedTaskCount={taskPillSummary.queuedCount}
+              focusTasks={focusTasks}
+              isTaskBootstrapPending={isTaskBootstrapPending}
             />
           </motion.div>
         )}
@@ -313,19 +245,15 @@ export const FocusDashboard = ({
 };
 
 const HomeModeShell = ({
-  primaryActionLabel,
-  primaryActionDescription,
-  isPrimaryActionPending,
-  onPrimaryAction,
   calendarPillValue,
   queuedTaskCount,
+  focusTasks,
+  isTaskBootstrapPending,
 }: {
-  primaryActionLabel: string;
-  primaryActionDescription: string;
-  isPrimaryActionPending: boolean;
-  onPrimaryAction: () => void;
   calendarPillValue: string;
   queuedTaskCount: number;
+  focusTasks: Array<{ id: string; title: string; pinned: boolean }>;
+  isTaskBootstrapPending: boolean;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
@@ -342,33 +270,39 @@ const HomeModeShell = ({
     </div>
 
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-      <div className="max-w-4xl space-y-4">
+      <div className="max-w-4xl space-y-6">
         <Clock />
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
             <Greeting />
           </div>
-          <p className="mx-auto max-w-lg text-sm leading-6 text-white/70 sm:text-base">
-            {primaryActionDescription}
-          </p>
         </div>
-        <div className="space-y-3 pt-1">
-          <button
-            type="button"
-            disabled={isPrimaryActionPending}
-            onClick={onPrimaryAction}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-black/55 px-8 text-base font-medium text-white shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors hover:bg-black/68 disabled:cursor-default disabled:bg-black/42 disabled:text-white/82"
-          >
-            {isPrimaryActionPending ? (
-              <motion.span
-                aria-hidden="true"
-                className="size-2 rounded-full bg-white/78"
-                animate={{ opacity: [0.35, 1, 0.35], scale: [0.9, 1.15, 0.9] }}
-                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
-              />
-            ) : null}
-            {primaryActionLabel}
-          </button>
+        <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+          {isTaskBootstrapPending ? (
+            <motion.div
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-black/28 px-4 text-sm text-white/78 backdrop-blur-md"
+              animate={{ opacity: [0.55, 1, 0.55] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <span className="size-2 rounded-full bg-white/72" />
+              Loading focus ritual
+            </motion.div>
+          ) : focusTasks.length > 0 ? (
+            focusTasks.map((task) => (
+              <div
+                key={task.id}
+                className={cn(
+                  "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm text-white/82 backdrop-blur-md",
+                  task.pinned
+                    ? "border-white/16 bg-white/14 shadow-[0_10px_30px_rgba(0,0,0,0.14)]"
+                    : "border-white/10 bg-black/24",
+                )}
+              >
+                {task.pinned ? <span className="size-2 rounded-full bg-amber-300" /> : null}
+                <span className="max-w-[180px] truncate">{task.title}</span>
+              </div>
+            ))
+          ) : null}
         </div>
       </div>
     </div>
@@ -452,47 +386,3 @@ const AmbientPill = ({
     </span>
   </div>
 );
-
-const getAgendaSummary = (event: CalendarEvent | null) => {
-  if (!event) {
-    return {
-      label: "No upcoming event",
-      summary: "Your calendar is clear.",
-      detail: "This looks like a good window for deep work.",
-    };
-  }
-
-  const now = new Date();
-  if (isEventHappening(event, now)) {
-    return {
-      label: "Happening now",
-      summary: event.summary ?? "Current event",
-      detail: isAllDayEvent(event)
-        ? "This is an all-day event."
-        : "Ends later today.",
-    };
-  }
-
-  const minutesUntil = getMinutesUntilEvent(event);
-  const startDate = getEventStartDate(event);
-  const formattedTime = isAllDayEvent(event)
-    ? "All day"
-    : startDate.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-      });
-
-  return {
-    label:
-      minutesUntil !== null && minutesUntil < 60
-        ? "Coming up soon"
-        : "Next on your calendar",
-    summary: event.summary ?? "Upcoming event",
-    detail:
-      minutesUntil === null
-        ? formattedTime
-        : minutesUntil < 60
-          ? `Starts in ${minutesUntil} min at ${formattedTime}.`
-          : `Starts ${formattedTime}.`,
-  };
-};

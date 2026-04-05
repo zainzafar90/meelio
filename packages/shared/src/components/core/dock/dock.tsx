@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { StoreApi, UseBoundStore } from "zustand";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { Brain, MoreHorizontal, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
@@ -10,6 +11,12 @@ import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useBookmarksStore } from "../../../stores/bookmarks.store";
+import { useFocusDashboardStore, syncFocusDashboardSignals } from "../../../stores/focus-dashboard.store";
+import { useTaskStore } from "../../../stores/task.store";
+import type { TimerState } from "../../../types/timer.types";
+import { formatTime } from "../../../utils/timer.utils";
+import { getMinutesUntilEvent } from "../../../utils/calendar-date.utils";
+import { useCalendarStore } from "../../../stores/calendar.store";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
@@ -20,6 +27,7 @@ import { DockButton, DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
+type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
 const BASE_STATIC_DOCK_ITEMS: {
   id: string;
@@ -61,14 +69,42 @@ function getVisibleItemCount(width: number, itemsLength: number): number {
   return 1;
 }
 
-export function Dock(): JSX.Element {
+function selectFocusCandidates(
+  tasks: Array<{
+    id: string;
+    title: string;
+    completed?: boolean;
+    pinned?: boolean;
+    deletedAt?: number | null;
+    updatedAt?: number;
+  }>,
+) {
+  return tasks
+    .filter((task) => !task.completed && !task.deletedAt)
+    .sort((left, right) => {
+      if (Boolean(left.pinned) !== Boolean(right.pinned)) {
+        return left.pinned ? -1 : 1;
+      }
+
+      return (right.updatedAt ?? 0) - (left.updatedAt ?? 0);
+    })
+    .slice(0, 3);
+}
+
+interface DockProps {
+  timerStore?: TimerStoreHook;
+}
+
+export function Dock({ timerStore }: DockProps): JSX.Element {
   useDockShortcuts();
 
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
   const [dropdownItems, setDropdownItems] = useState<DockItem[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFocusChooserOpen, setIsFocusChooserOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const focusChooserRef = useRef<HTMLDivElement>(null);
 
   const dockState = useDockStore(
     useShallow((state) => ({
@@ -82,7 +118,6 @@ export function Dock(): JSX.Element {
       isBookmarksVisible: state.isBookmarksVisible,
       currentOnboardingStep: state.currentOnboardingStep,
       resetDock: state.reset,
-      toggleTimer: state.toggleTimer,
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
@@ -91,6 +126,9 @@ export function Dock(): JSX.Element {
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
       toggleBookmarks: state.toggleBookmarks,
+      setTimerVisible: state.setTimerVisible,
+      setGreetingsVisible: state.setGreetingsVisible,
+      setTasksVisible: state.setTasksVisible,
       dockIconsVisible: state.dockIconsVisible,
     }))
   );
@@ -106,7 +144,6 @@ export function Dock(): JSX.Element {
     isBookmarksVisible,
     currentOnboardingStep,
     resetDock,
-    toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
@@ -115,6 +152,9 @@ export function Dock(): JSX.Element {
     toggleBackgrounds,
     toggleTabStash,
     toggleBookmarks,
+    setTimerVisible,
+    setGreetingsVisible,
+    setTasksVisible,
     dockIconsVisible,
   } = dockState;
 
@@ -133,13 +173,114 @@ export function Dock(): JSX.Element {
   const user = useAuthStore(useShallow((state) => state.user));
   const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
   const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
+  const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
+  const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
+  const {
+    tasks,
+    togglePinTask,
+    hasInitialized: hasTaskStoreInitialized,
+    isLoading: isTaskStoreLoading,
+  } = useTaskStore(
+    useShallow((state) => ({
+      tasks: state.tasks,
+      togglePinTask: state.togglePinTask,
+      hasInitialized: state.hasInitialized,
+      isLoading: state.isLoading,
+    })),
+  );
+  const timerSnapshot = timerStore?.(
+    useShallow((state) => ({
+      stage: state.stage,
+      isRunning: state.isRunning,
+      prevRemaining: state.prevRemaining,
+      endTimestamp: state.endTimestamp,
+      durations: state.durations,
+      start: state.start,
+    })),
+  );
+  const focusCandidates = useMemo(() => selectFocusCandidates(tasks), [tasks]);
+  const isTaskBootstrapPending =
+    Boolean(user) && (!hasTaskStoreInitialized || isTaskStoreLoading);
+
+  const launchFocusSession = (focusTaskId?: string | null) => {
+    if (!timerStore || !timerSnapshot) {
+      return;
+    }
+
+    const timerRemaining = !timerSnapshot.isRunning && timerSnapshot.prevRemaining !== null
+      ? timerSnapshot.prevRemaining
+      : timerSnapshot.isRunning && timerSnapshot.endTimestamp
+        ? Math.max(0, Math.ceil((timerSnapshot.endTimestamp - Date.now()) / 1000))
+        : timerSnapshot.durations[timerSnapshot.stage];
+
+    setTasksVisible(false);
+    setGreetingsVisible(false);
+    setTimerVisible(true);
+    setIsFocusChooserOpen(false);
+
+    syncFocusDashboardSignals({
+      timerRunning: timerSnapshot.isRunning,
+      timerStage: timerSnapshot.stage,
+      timerLabel: timerSnapshot.isRunning
+        ? `${formatTime(timerRemaining)} remaining`
+        : "Ready to focus",
+      sessionFocusTaskId: focusTaskId ??
+        (snapshot.primaryAction.kind === "start-focus-session" ||
+        snapshot.primaryAction.kind === "switch-focus-task"
+          ? snapshot.activeFocusTaskId
+          : snapshot.sessionFocusTaskId),
+      blockerMode: "ready",
+      soundtrackMode: "available",
+      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
+      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
+    });
+
+    if (!timerSnapshot.isRunning) {
+      timerSnapshot.start();
+    }
+  };
+
+  const handleFocusDockAction = async () => {
+    if (isTaskBootstrapPending || !timerStore || !timerSnapshot) {
+      return;
+    }
+
+    if (
+      snapshot.primaryAction.kind === "review-plan" ||
+      snapshot.primaryAction.kind === "choose-focus-task"
+    ) {
+      if (focusCandidates.length === 0) {
+        setTasksVisible(true);
+        setIsFocusChooserOpen(false);
+        return;
+      }
+
+      setIsFocusChooserOpen((open) => !open);
+      return;
+    }
+
+    launchFocusSession();
+  };
+
+  const handleChooseFocusTask = async (taskId: string) => {
+    await togglePinTask(taskId);
+    launchFocusSession(taskId);
+  };
 
   const staticItems = BASE_STATIC_DOCK_ITEMS;
 
   const items = useMemo(() => {
     const allItems = [
       { id: "home", name: t("common.home"), icon: Logo, activeIcon: Logo, onClick: resetDock, visibilityKey: null },
-      { id: "timer", name: t("common.pomodoro"), icon: Icons.pomodoro, activeIcon: Icons.pomodoroActive, onClick: toggleTimer, visibilityKey: "timer" as const },
+      {
+        id: "timer",
+        name: "Focus",
+        icon: Brain,
+        activeIcon: Brain,
+        onClick: handleFocusDockAction,
+        isActive: isTimerVisible || isFocusChooserOpen,
+        visibilityKey: "timer" as const,
+      },
       { id: "soundscapes", name: t("common.soundscapes"), icon: Icons.soundscapes, activeIcon: Icons.soundscapesActive, onClick: toggleSoundscapes, visibilityKey: "soundscapes" as const },
       { id: "breathepod", name: t("common.breathing"), icon: Icons.breathing, activeIcon: Icons.breathingActive, onClick: toggleBreathing, visibilityKey: "breathing" as const },
       { id: "tasks", name: t("common.tasks"), icon: Icons.taskList, activeIcon: Icons.taskListActive, onClick: toggleTasks, visibilityKey: "tasks" as const },
@@ -156,7 +297,7 @@ export function Dock(): JSX.Element {
   }, [
     t,
     resetDock,
-    toggleTimer,
+    handleFocusDockAction,
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
@@ -167,6 +308,8 @@ export function Dock(): JSX.Element {
     toggleBookmarks,
     dockIconsVisible,
     showBookmarksInDock,
+    isTimerVisible,
+    isFocusChooserOpen,
   ]);
 
   useEffect(() => {
@@ -196,10 +339,72 @@ export function Dock(): JSX.Element {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        focusChooserRef.current &&
+        !focusChooserRef.current.contains(event.target as Node)
+      ) {
+        setIsFocusChooserOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <>
       {user && <DockOnboarding />}
       <div className="relative z-50" ref={dockRef}>
+        {isFocusChooserOpen && (
+          <div
+            ref={focusChooserRef}
+            className="absolute bottom-full left-1/2 z-50 mb-4 w-[320px] -translate-x-1/2 overflow-hidden rounded-[28px] border border-white/14 bg-zinc-950/78 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.42)] backdrop-blur-2xl"
+          >
+            <div className="space-y-1 px-2 pb-3 pt-1">
+              <div className="flex items-center gap-2 text-white/92">
+                <div className="flex size-8 items-center justify-center rounded-full bg-white/10">
+                  <Sparkles className="size-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Choose your next focus</p>
+                  <p className="text-xs text-white/56">
+                    Pick one thread, then slip into focus.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {focusCandidates.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  onClick={() => void handleChooseFocusTask(task.id)}
+                  className="flex w-full items-center justify-between rounded-2xl border border-white/8 bg-white/6 px-4 py-3 text-left text-white transition-colors hover:bg-white/10"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{task.title}</p>
+                    <p className="mt-0.5 text-xs text-white/48">
+                      {task.pinned ? "Current focus task" : "Set as focus and begin"}
+                    </p>
+                  </div>
+                  <Brain className="size-4 shrink-0 text-white/70" />
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsFocusChooserOpen(false);
+                  setTasksVisible(true);
+                }}
+                className="flex w-full items-center justify-center rounded-2xl border border-white/10 bg-transparent px-4 py-3 text-sm font-medium text-white/78 transition-colors hover:bg-white/8 hover:text-white"
+              >
+                Open full task list
+              </button>
+            </div>
+          </div>
+        )}
         <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-3 pr-1">

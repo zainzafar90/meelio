@@ -127,3 +127,20 @@
 - The dashboard also avoids writing an empty daily plan back into the focus store during that pending window, which removes the visual flash instead of merely masking it.
 - Verification:
   - `pnpm --filter @repo/shared test -- --run`
+
+## Focus Entry Redesign
+
+- [x] Remove the dashboard hero CTA and ambient deep-work prompt
+- [x] Move focus entry into the dock as a ritual-style control
+- [x] Add a lightweight dock chooser for unpinned tasks with the full task sheet as fallback
+- [x] Verify shared tests after the dock-driven focus flow changes
+
+## Review
+
+- The old home shell split focus entry between a large center CTA and the dock, which made the product feel like two competing focus surfaces.
+- The dashboard is now calmer and more ambient, with task presence shown as soft chips instead of a central command button.
+- The dock now owns focus entry through a more playful ritual control, and when no task is pinned it opens a compact chooser instead of throwing the user straight into the full task sheet.
+- Verification:
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
