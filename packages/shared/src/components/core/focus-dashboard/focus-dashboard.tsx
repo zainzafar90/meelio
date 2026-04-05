@@ -6,14 +6,8 @@ import { useShallow } from "zustand/shallow";
 import { CalendarDays, CheckSquare2, Timer } from "lucide-react";
 
 import type { TimerState } from "../../../types/timer.types";
-import type { CalendarEvent } from "../../../types/calendar.types";
 import { formatTime } from "../../../utils/timer.utils";
-import {
-  getEventStartDate,
-  getMinutesUntilEvent,
-  isAllDayEvent,
-  isEventHappening,
-} from "../../../utils/calendar-date.utils";
+import { getMinutesUntilEvent } from "../../../utils/calendar-date.utils";
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
 import {
@@ -26,7 +20,6 @@ import { useAuthStore } from "../../../stores/auth.store";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
-import { cn } from "../../../lib/utils";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
 import {
@@ -280,26 +273,19 @@ const HomeModeShell = ({
         <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
           {isTaskBootstrapPending ? (
             <motion.div
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-white/12 bg-black/28 px-4 text-sm text-white/78 backdrop-blur-md"
-              animate={{ opacity: [0.55, 1, 0.55] }}
+              className="inline-flex h-8 items-center gap-2 rounded-full bg-white/10 px-4 text-sm text-white/60 backdrop-blur-md ring-1 ring-inset ring-white/10"
+              animate={{ opacity: [0.4, 0.8, 0.4] }}
               transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <span className="size-2 rounded-full bg-white/72" />
-              Loading focus ritual
+              Loading tasks…
             </motion.div>
           ) : focusTasks.length > 0 ? (
             focusTasks.map((task) => (
               <div
                 key={task.id}
-                className={cn(
-                  "inline-flex h-10 items-center gap-2 rounded-full border px-4 text-sm text-white/82 backdrop-blur-md",
-                  task.pinned
-                    ? "border-white/16 bg-white/14 shadow-[0_10px_30px_rgba(0,0,0,0.14)]"
-                    : "border-white/10 bg-black/24",
-                )}
+                className="inline-flex h-8 items-center rounded-full bg-white/[0.12] px-4 text-sm text-white/80 backdrop-blur-md ring-1 ring-inset ring-white/10"
               >
-                {task.pinned ? <span className="size-2 rounded-full bg-amber-300" /> : null}
-                <span className="max-w-[180px] truncate">{task.title}</span>
+                <span className="max-w-[200px] truncate">{task.title}</span>
               </div>
             ))
           ) : null}

@@ -14,7 +14,6 @@ import {
 } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
-import { NextPinnedTask } from "./core/timer/components/timer-next-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
 import { TimerSettingsDialog } from "./timer-settings.dialog";
 
@@ -122,7 +121,6 @@ const TimerView = ({
             <div className="text-5xl font-bold tracking-normal sm:text-7xl md:text-9xl">
               {formatTime(remaining)}
             </div>
-            <NextPinnedTask />
           </div>
 
           <div className="flex flex-col gap-4">

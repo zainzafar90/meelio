@@ -2,6 +2,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { useDockStore } from "../../stores/dock.store";
 import type { ComponentType } from "react";
 import { useShallow } from "zustand/shallow";
+import { motion } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +12,7 @@ import {
 import { isMacPlatform } from "../../utils/common.utils";
 
 const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
-  timer: "ring-red-500/70",
+  timer: "ring-red-400/60",
   soundscapes: "ring-emerald-400/70",
   breathepod: "ring-sky-400/70",
   tasks: "ring-indigo-400/70",
@@ -116,18 +117,30 @@ export function DockButton({ item, isDisabled, className }: DockButtonProps): Re
             className={cn(
               "cursor-pointer",
               "relative flex size-10 items-center justify-center rounded-xl shadow-lg",
-              isFocusRitual
-                ? "overflow-hidden bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),transparent_42%),linear-gradient(180deg,rgba(255,119,91,0.92),rgba(107,33,168,0.94))]"
-                : "bg-gradient-to-b from-zinc-800 to-zinc-900",
-              isFocusRitual && "before:absolute before:inset-[5px] before:rounded-[10px] before:border before:border-white/18 before:content-['']",
-              isFocusRitual && isActive && "animate-pulse",
+              "bg-gradient-to-b from-zinc-800 to-zinc-900",
               ringClassName,
               className
             )}
             onClick={handleClick}
             role="button"
           >
-            <IconComponent className={cn("size-6 text-white", isFocusRitual && "relative z-10 drop-shadow-[0_2px_10px_rgba(0,0,0,0.28)]")} />
+            {isFocusRitual && isActive ? (
+              <motion.span
+                animate={{
+                  filter: [
+                    "drop-shadow(0 0 2px rgba(255,255,255,0.2))",
+                    "drop-shadow(0 0 7px rgba(255,255,255,0.65))",
+                    "drop-shadow(0 0 2px rgba(255,255,255,0.2))",
+                  ],
+                }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10"
+              >
+                <IconComponent className="size-6 text-white" />
+              </motion.span>
+            ) : (
+              <IconComponent className="size-6 text-white" />
+            )}
             {item.requirePro && (
               <span
                 className={cn(
