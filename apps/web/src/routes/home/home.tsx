@@ -24,9 +24,10 @@ import { webTimerStore } from "@/stores/web.timer.store";
 import { useShallow } from "zustand/shallow";
 
 const Home = () => {
-  const { isTimerVisible } = useDockStore(
+  const { isTimerVisible, isBreathingVisible } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
+      isBreathingVisible: state.isBreathingVisible,
     })),
   );
   const { isRunning } = webTimerStore(
@@ -41,13 +42,11 @@ const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
-        <div
-          className={`hidden shrink-0 justify-center pb-4 transition-opacity [@media(min-height:580px)]:flex ${
-            isTimerVisible || isRunning ? "pointer-events-none opacity-0" : ""
-          }`}
-        >
-          <Quote />
-        </div>
+        {!(isTimerVisible || isRunning || isBreathingVisible) && (
+          <div className="hidden shrink-0 justify-center pb-4 [@media(min-height:580px)]:flex">
+            <Quote />
+          </div>
+        )}
       <BottomBar />
       </AppLayout>
     </>

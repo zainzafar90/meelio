@@ -203,7 +203,7 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
   const isTaskBootstrapPending =
     Boolean(user) && (!hasTaskStoreInitialized || isTaskStoreLoading);
 
-  const launchFocusSession = (focusTaskId?: string | null) => {
+  const launchFocusSession = (focusTaskId?: string | null, autoStart = false) => {
     if (!timerStore || !timerSnapshot) {
       return;
     }
@@ -236,7 +236,7 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
       minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
     });
 
-    if (!timerSnapshot.isRunning) {
+    if (autoStart && !timerSnapshot.isRunning) {
       timerSnapshot.start();
     }
   };
@@ -265,7 +265,7 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
 
   const handleChooseFocusTask = async (taskId: string) => {
     await togglePinTask(taskId);
-    launchFocusSession(taskId);
+    launchFocusSession(taskId, true);
   };
 
   const staticItems = BASE_STATIC_DOCK_ITEMS;
@@ -358,44 +358,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
     <>
       {user && <DockOnboarding />}
       <div className="relative z-50" ref={dockRef}>
-        <AnimatePresence>
-          {isFocusChooserOpen && (
-            <motion.div
-              ref={focusChooserRef}
-              initial={{ opacity: 0, y: 8, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.97 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className="absolute bottom-full left-1/2 z-50 mb-3 w-[300px] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[0.08] bg-zinc-950/85 shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-3xl"
-            >
-              <div className="px-4 pt-4 pb-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">What are you focusing on?</p>
-              </div>
-              <div className="p-2 space-y-0.5">
-                {focusCandidates.map((task) => (
-                  <button
-                    key={task.id}
-                    type="button"
-                    onClick={() => void handleChooseFocusTask(task.id)}
-                    className="group relative flex w-full items-center rounded-xl px-3 py-3 text-left transition-colors hover:bg-white/[0.06]"
-                  >
-                    <span className="absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-full bg-white/0 transition-all group-hover:bg-white/30" />
-                    <span className="truncate text-sm font-medium text-white/75 group-hover:text-white/95 transition-colors">{task.title}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="mx-3 mb-3 mt-1 border-t border-white/[0.06] pt-2">
-                <button
-                  type="button"
-                  onClick={() => { setIsFocusChooserOpen(false); setTasksVisible(true); }}
-                  className="flex w-full items-center justify-center rounded-xl py-2 text-[11px] text-white/30 transition-colors hover:text-white/60"
-                >
-                  View all tasks
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-3 pr-1">
@@ -410,6 +372,46 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
                       "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                   )}
                 >
+                  {item.id === "timer" && (
+                    <AnimatePresence>
+                      {isFocusChooserOpen && (
+                        <motion.div
+                          ref={focusChooserRef}
+                          initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                          transition={{ duration: 0.18, ease: "easeOut" }}
+                          className="absolute bottom-full left-1/2 z-50 mb-3 w-[300px] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[0.08] bg-black shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
+                        >
+                          <div className="px-4 pt-4 pb-1">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">What are you focusing on?</p>
+                          </div>
+                          <div className="p-2 space-y-0.5">
+                            {focusCandidates.map((task) => (
+                              <button
+                                key={task.id}
+                                type="button"
+                                onClick={() => void handleChooseFocusTask(task.id)}
+                                className="group relative flex w-full items-center rounded-xl px-3 py-3 text-left transition-colors hover:bg-white/[0.06]"
+                              >
+                                <span className="absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-full bg-white/0 transition-all group-hover:bg-white/30" />
+                                <span className="truncate text-sm font-medium text-white/75 group-hover:text-white/95 transition-colors">{task.title}</span>
+                              </button>
+                            ))}
+                          </div>
+                          <div className="mx-3 mb-3 mt-1 border-t border-white/[0.06] pt-2">
+                            <button
+                              type="button"
+                              onClick={() => { setIsFocusChooserOpen(false); setTasksVisible(true); }}
+                              className="flex w-full items-center justify-center rounded-xl py-2 text-[11px] text-white/30 transition-colors hover:text-white/60"
+                            >
+                              View all tasks
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
                   <DockButton item={item} />
                 </div>
               ))}

@@ -66,22 +66,22 @@ export const FocusDashboard = ({
   timerPanel,
 }: FocusDashboardProps) => {
   const userId = useAuthStore((state) => state.user?.id);
+  const { stage, isRunning, prevRemaining, endTimestamp, durations } =
+    timerStore(
+      useShallow((state) => ({
+        stage: state.stage,
+        isRunning: state.isRunning,
+        prevRemaining: state.prevRemaining,
+        endTimestamp: state.endTimestamp,
+        durations: state.durations,
+      })),
+    );
   const {
-    stage,
-    isRunning,
-    prevRemaining,
-    endTimestamp,
-    durations,
-  } = timerStore(
-    useShallow((state) => ({
-      stage: state.stage,
-      isRunning: state.isRunning,
-      prevRemaining: state.prevRemaining,
-      endTimestamp: state.endTimestamp,
-      durations: state.durations,
-    })),
-  );
-  const { tasks, initializeTaskStore, isTaskStoreLoading, hasTaskStoreInitialized } = useTaskStore(
+    tasks,
+    initializeTaskStore,
+    isTaskStoreLoading,
+    hasTaskStoreInitialized,
+  } = useTaskStore(
     useShallow((state) => ({
       tasks: state.tasks,
       initializeTaskStore: state.initializeStore,
@@ -227,8 +227,6 @@ export const FocusDashboard = ({
             <HomeModeShell
               calendarPillValue={getAgendaPillValue(nextEvent)}
               queuedTaskCount={taskPillSummary.queuedCount}
-              focusTasks={focusTasks}
-              isTaskBootstrapPending={isTaskBootstrapPending}
             />
           </motion.div>
         )}
@@ -240,13 +238,9 @@ export const FocusDashboard = ({
 const HomeModeShell = ({
   calendarPillValue,
   queuedTaskCount,
-  focusTasks,
-  isTaskBootstrapPending,
 }: {
   calendarPillValue: string;
   queuedTaskCount: number;
-  focusTasks: Array<{ id: string; title: string; pinned: boolean }>;
-  isTaskBootstrapPending: boolean;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
@@ -269,26 +263,6 @@ const HomeModeShell = ({
           <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
             <Greeting />
           </div>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-          {isTaskBootstrapPending ? (
-            <motion.div
-              className="inline-flex h-8 items-center gap-2 rounded-full bg-white/10 px-4 text-sm text-white/60 backdrop-blur-md ring-1 ring-inset ring-white/10"
-              animate={{ opacity: [0.4, 0.8, 0.4] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              Loading tasks…
-            </motion.div>
-          ) : focusTasks.length > 0 ? (
-            focusTasks.map((task) => (
-              <div
-                key={task.id}
-                className="inline-flex h-8 items-center rounded-full bg-white/[0.12] px-4 text-sm text-white/80 backdrop-blur-md ring-1 ring-inset ring-white/10"
-              >
-                <span className="max-w-[200px] truncate">{task.title}</span>
-              </div>
-            ))
-          ) : null}
         </div>
       </div>
     </div>
@@ -313,21 +287,28 @@ const FocusModeShell = ({
     <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.20),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.13),transparent_28%)]" />
     <div className="relative flex h-full w-full max-w-full flex-col">
       <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-        <AmbientPill
-          icon={<CalendarDays className="size-3.5" />}
-          label="Calendar"
-          value={calendarPillValue}
-        />
-        <AmbientPill
-          icon={<Timer className="size-3.5" />}
-          label="Focus"
-          value={currentTimerLabel}
-        />
-        <AmbientPill
-          icon={<CheckSquare2 className="size-3.5" />}
-          label="Today"
-          value={`${completedTaskCount} done`}
-        />
+        <div className="flex-1 flex justify-start">
+          <AmbientPill
+            icon={<CalendarDays className="size-3.5" />}
+            label="Calendar"
+            value={calendarPillValue}
+          />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <AmbientPill
+            icon={<Timer className="size-3.5" />}
+            label="Focus"
+            value={currentTimerLabel}
+          />
+        </div>
+
+        <div className="flex-1 flex justify-end">
+          <AmbientPill
+            icon={<CheckSquare2 className="size-3.5" />}
+            label="Today"
+            value={`${completedTaskCount} done`}
+          />
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
