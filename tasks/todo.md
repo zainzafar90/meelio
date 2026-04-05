@@ -99,3 +99,31 @@
 - Verification:
   - `pnpm --filter @repo/shared test -- src/components/core/task-list/components/task-list.helpers.test.ts`
   - `pnpm --filter @repo/shared test -- --run`
+
+## Startup Focus Hydration
+
+- [x] Trace why pinned tasks are missing from the dashboard on extension open
+- [x] Move task-store initialization out of the task sheet and into dashboard startup
+- [x] Verify shared tests after the startup hydration change
+
+## Review
+
+- The dashboard CTA was reading an empty task store on startup because tasks were only initialized when the task sheet opened.
+- Opening the sheet populated the store, which is why the pinned task only affected the CTA after that interaction.
+- The focus dashboard now bootstraps the task store as soon as the user is available, so pinned tasks can influence `Start Focusing` immediately on load.
+- Verification:
+  - `pnpm --filter @repo/shared test -- --run`
+
+## Startup CTA Loading State
+
+- [x] Identify the transient incorrect CTA shown during task hydration
+- [x] Add a pending state so startup shows a neutral animated button instead of the wrong action
+- [x] Verify shared tests after the CTA loading-state change
+
+## Review
+
+- After moving task initialization to dashboard startup, the UI still rendered one frame of the pre-hydration CTA before the task store finished loading.
+- The home shell now treats task hydration as a real pending state and shows a disabled animated `Loading focus...` CTA until tasks are ready.
+- The dashboard also avoids writing an empty daily plan back into the focus store during that pending window, which removes the visual flash instead of merely masking it.
+- Verification:
+  - `pnpm --filter @repo/shared test -- --run`

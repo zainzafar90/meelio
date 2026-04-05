@@ -22,6 +22,7 @@ import {
   updateDailyFocusPlan,
   useFocusDashboardStore,
 } from "../../../stores/focus-dashboard.store";
+import { useAuthStore } from "../../../stores/auth.store";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
@@ -70,13 +71,13 @@ export const FocusDashboard = ({
   timerStore,
   timerPanel,
 }: FocusDashboardProps) => {
+  const userId = useAuthStore((state) => state.user?.id);
   const {
     stage,
     isRunning,
     prevRemaining,
     endTimestamp,
     durations,
-    settings,
     start,
   } = timerStore(
     useShallow((state) => ({
@@ -89,7 +90,14 @@ export const FocusDashboard = ({
       start: state.start,
     })),
   );
-  const tasks = useTaskStore(useShallow((state) => state.tasks));
+  const { tasks, initializeTaskStore, isTaskStoreLoading, hasTaskStoreInitialized } = useTaskStore(
+    useShallow((state) => ({
+      tasks: state.tasks,
+      initializeTaskStore: state.initializeStore,
+      isTaskStoreLoading: state.isLoading,
+      hasTaskStoreInitialized: state.hasInitialized,
+    })),
+  );
   const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
   const playingSounds = useSoundscapesStore(
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
@@ -100,20 +108,20 @@ export const FocusDashboard = ({
     setTimerVisible,
     setGreetingsVisible,
     setTasksVisible,
-    setSoundscapesVisible,
   } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       setTimerVisible: state.setTimerVisible,
       setGreetingsVisible: state.setGreetingsVisible,
       setTasksVisible: state.setTasksVisible,
-      setSoundscapesVisible: state.setSoundscapesVisible,
     })),
   );
   const snapshot = useFocusDashboardStore(
     useShallow((state) => state.snapshot),
   );
   const reduceMotion = useReducedMotion();
+  const isTaskBootstrapPending =
+    Boolean(userId) && (!hasTaskStoreInitialized || isTaskStoreLoading);
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
   const taskPillSummary = useMemo(() => getTaskPillSummary(tasks), [tasks]);
@@ -134,8 +142,20 @@ export const FocusDashboard = ({
   }, []);
 
   useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    void initializeTaskStore();
+  }, [initializeTaskStore, userId]);
+
+  useEffect(() => {
+    if (isTaskBootstrapPending) {
+      return;
+    }
+
     updateDailyFocusPlan({ topTasks: focusTasks });
-  }, [focusTasks]);
+  }, [focusTasks, isTaskBootstrapPending]);
 
   useEffect(() => {
     syncFocusDashboardSignals({
@@ -162,8 +182,27 @@ export const FocusDashboard = ({
 
   const agendaSummary = useMemo(() => getAgendaSummary(nextEvent), [nextEvent]);
   const showTimerPanel = isTimerVisible || isRunning;
+  const primaryActionLabel = isTaskBootstrapPending
+    ? "Loading focus..."
+    : snapshot.primaryAction.kind === "review-plan"
+      ? "Open Tasks"
+      : snapshot.primaryAction.kind === "choose-focus-task"
+        ? "Choose Focus Task"
+        : snapshot.primaryAction.kind === "switch-focus-task"
+          ? "Switch Focus Task"
+          : "Start Focusing";
+  const primaryActionDescription = isTaskBootstrapPending
+    ? "Pulling in your pinned task and today's queue."
+    : snapshot.primaryAction.kind === "review-plan" ||
+        snapshot.primaryAction.kind === "choose-focus-task"
+      ? "Pick or pin a task to anchor the next focus block."
+      : snapshot.agendaWindowLabel;
 
   const handlePrimaryAction = () => {
+    if (isTaskBootstrapPending) {
+      return;
+    }
+
     if (
       snapshot.primaryAction.kind === "review-plan" ||
       snapshot.primaryAction.kind === "choose-focus-task"
@@ -176,10 +215,6 @@ export const FocusDashboard = ({
     setTasksVisible(false);
     setGreetingsVisible(false);
     setTimerVisible(true);
-
-    if (settings.soundscapes) {
-      setSoundscapesVisible(true);
-    }
 
     syncFocusDashboardSignals({
       timerRunning: isRunning,
@@ -263,21 +298,9 @@ export const FocusDashboard = ({
             className="flex min-h-0 flex-1"
           >
             <HomeModeShell
-              primaryActionLabel={
-                snapshot.primaryAction.kind === "review-plan"
-                  ? "Open Tasks"
-                  : snapshot.primaryAction.kind === "choose-focus-task"
-                    ? "Choose Focus Task"
-                  : snapshot.primaryAction.kind === "switch-focus-task"
-                    ? "Switch Focus Task"
-                  : "Start Focusing"
-              }
-              primaryActionDescription={
-                snapshot.primaryAction.kind === "review-plan" ||
-                  snapshot.primaryAction.kind === "choose-focus-task"
-                  ? "Pick or pin a task to anchor the next focus block."
-                  : snapshot.agendaWindowLabel
-              }
+              primaryActionLabel={primaryActionLabel}
+              primaryActionDescription={primaryActionDescription}
+              isPrimaryActionPending={isTaskBootstrapPending}
               onPrimaryAction={handlePrimaryAction}
               calendarPillValue={getAgendaPillValue(nextEvent)}
               queuedTaskCount={taskPillSummary.queuedCount}
@@ -292,12 +315,14 @@ export const FocusDashboard = ({
 const HomeModeShell = ({
   primaryActionLabel,
   primaryActionDescription,
+  isPrimaryActionPending,
   onPrimaryAction,
   calendarPillValue,
   queuedTaskCount,
 }: {
   primaryActionLabel: string;
   primaryActionDescription: string;
+  isPrimaryActionPending: boolean;
   onPrimaryAction: () => void;
   calendarPillValue: string;
   queuedTaskCount: number;
@@ -330,9 +355,18 @@ const HomeModeShell = ({
         <div className="space-y-3 pt-1">
           <button
             type="button"
+            disabled={isPrimaryActionPending}
             onClick={onPrimaryAction}
-            className="inline-flex h-12 items-center justify-center rounded-full bg-black/55 px-8 text-base font-medium text-white shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors hover:bg-black/68"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-black/55 px-8 text-base font-medium text-white shadow-[0_16px_40px_rgba(0,0,0,0.28)] backdrop-blur-md transition-colors hover:bg-black/68 disabled:cursor-default disabled:bg-black/42 disabled:text-white/82"
           >
+            {isPrimaryActionPending ? (
+              <motion.span
+                aria-hidden="true"
+                className="size-2 rounded-full bg-white/78"
+                animate={{ opacity: [0.35, 1, 0.35], scale: [0.9, 1.15, 0.9] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+              />
+            ) : null}
             {primaryActionLabel}
           </button>
         </div>

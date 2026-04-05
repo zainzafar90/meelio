@@ -27,6 +27,7 @@ interface TaskState {
   tasks: Task[];
   activeListId: string | null;
   isLoading: boolean;
+  hasInitialized: boolean;
   error: string | null;
 
   addTask: (task: {
@@ -91,6 +92,7 @@ export const useTaskStore = create<TaskState>()(
       tasks: [],
       activeListId: "all",
       isLoading: false,
+      hasInitialized: false,
       error: null,
 
       addTask: async (task) => {
@@ -284,10 +286,13 @@ export const useTaskStore = create<TaskState>()(
       set({ activeListId: listId });
     },
 
-    initializeStore: async () => {
+      initializeStore: async () => {
       const userId = useAuthStore.getState().user?.id;
 
-      if (!userId) return;
+      if (!userId) {
+        set({ hasInitialized: true });
+        return;
+      }
 
       if (isInitializing) {
         return;
@@ -304,7 +309,7 @@ export const useTaskStore = create<TaskState>()(
         console.error("Failed to initialize task store:", error);
         set({ error: error?.message || "Failed to initialize store" });
       } finally {
-        set({ isLoading: false });
+        set({ isLoading: false, hasInitialized: true });
         isInitializing = false;
       }
     },
