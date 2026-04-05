@@ -49,13 +49,28 @@ const Home = () => {
     initializeBookmarks();
   }, [checkPermissions, initializeStore]);
 
+  const { isTimerVisible } = useDockStore(
+    useShallow((state) => ({
+      isTimerVisible: state.isTimerVisible,
+    }))
+  );
+  const { isRunning } = extensionTimerStore(
+    useShallow((state) => ({
+      isRunning: state.isRunning,
+    }))
+  );
+
   return (
     <>
       <Background />
       <AppLayout>
         <TopBar />
         <Content />
-        <div className="hidden shrink-0 justify-center pb-5 [@media(min-height:580px)]:flex">
+        <div
+          className={`hidden shrink-0 justify-center pb-4 transition-opacity [@media(min-height:580px)]:flex ${
+            isTimerVisible || isRunning ? "pointer-events-none opacity-0" : ""
+          }`}
+        >
           <Quote />
         </div>
         <BottomBar />

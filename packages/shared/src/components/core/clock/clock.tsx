@@ -17,7 +17,7 @@ export const Clock = () => {
   useInterval(() => setTime(new Date()), 1000);
 
   return (
-    <h1 className="relative text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold flex tracking-tighter text-white">
+    <h1 className="relative text-shadow-lg text-5xl sm:text-7xl md:text-9xl font-semibold tracking-tighter text-white flex justify-center items-center">
       <div className="flex items-center justify-center">
         <ShadowOverlay />
         <NumberFlow

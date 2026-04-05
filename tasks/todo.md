@@ -25,6 +25,7 @@
 - [x] Unify home and focus shell typography/container treatment
 - [x] Rebalance timer surface to match the shell
 - [ ] Strengthen shell pill visibility in home and focus modes
+- [ ] Run browser-led polish pass across home and focus modes
 - [x] Verify Phase 4 behavior and boundaries
 
 ## Review
