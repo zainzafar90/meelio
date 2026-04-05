@@ -67,3 +67,35 @@
   - `pnpm --filter @repo/shared test -- --run`
   - `pnpm --filter web build`
   - `pnpm --filter extension build`
+
+## Pill Wiring Bug
+
+- [x] Confirm how top calendar and todo pills derive their data
+- [x] Add regression coverage for pill-facing task and calendar values
+- [x] Wire pill values to live calendar event summaries and task counts
+- [x] Verify targeted test suites for the affected focus-dashboard logic
+
+## Review
+
+- Top shell pills were using focus-dashboard snapshot fields that are intentionally narrow or generic.
+- The task pills were not based on the full task store, so completed and queued counts drifted from actual todos.
+- The calendar pill was showing an agenda status label instead of the actual event summary, which made it feel disconnected even when calendar data existed.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts`
+  - `pnpm --filter @repo/shared test -- --run`
+
+## Task List Focus Labeling
+
+- [x] Inspect the task list row action that users read as “start”
+- [x] Replace the icon-only focus affordance with explicit copy
+- [x] Hide the focus affordance for completed tasks
+- [x] Verify targeted shared tests for the task-list change
+
+## Review
+
+- The task list was using a bare star icon for `togglePinTask`, which forced users to guess that starring a task meant “set this as the current focus task.”
+- The row action now uses explicit copy: `Focus` for selectable tasks and `Focused` for the current one.
+- Completed tasks no longer advertise a focus action, which keeps the sheet aligned with the dashboard’s active-focus model.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/task-list/components/task-list.helpers.test.ts`
+  - `pnpm --filter @repo/shared test -- --run`

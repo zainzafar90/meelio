@@ -10,3 +10,4 @@
 - 2026-04-05: Do not keep “improving” responsiveness after the user says a recent responsive state was good. If the user liked the last responsive version, preserve that layout baseline and isolate later visual tweaks from width/height behavior.
 - 2026-04-05: Fix small-screen overlap at the component-content level first. Prefer hiding/compressing pill internals on narrow widths over changing the shell flex structure if the broader layout was already working.
 - 2026-04-05: For responsive pill behavior, follow the user's pattern: on very small widths keep `icon + value`, tighten the gap, and hide the label; on `sm+` restore `icon + label + value`. Do not solve pill overlap by rewriting parent flex/layout first.
+- 2026-04-05: If an action changes product state in a non-obvious way, do not ship it as an unlabeled icon-only control. Use plain language like `Focus` or `Focused` so the user does not have to infer semantics from a star or pin glyph.

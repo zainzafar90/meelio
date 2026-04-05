@@ -27,6 +27,10 @@ import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
+import {
+  getAgendaPillValue,
+  getTaskPillSummary,
+} from "./focus-dashboard.helpers";
 
 type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
@@ -112,6 +116,7 @@ export const FocusDashboard = ({
   const reduceMotion = useReducedMotion();
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
+  const taskPillSummary = useMemo(() => getTaskPillSummary(tasks), [tasks]);
   const timerRemaining = useMemo(() => {
     if (!isRunning && prevRemaining !== null) {
       return prevRemaining;
@@ -229,8 +234,8 @@ export const FocusDashboard = ({
               timerPanel={timerPanel}
               currentTimerLabel={snapshot.currentTimerLabel}
               activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
-              topTasksCompleted={snapshot.topTasksCompleted}
-              agendaLabel={agendaSummary.label}
+              completedTaskCount={taskPillSummary.completedCount}
+              calendarPillValue={getAgendaPillValue(nextEvent)}
             />
           </motion.div>
         ) : (
@@ -274,8 +279,8 @@ export const FocusDashboard = ({
                   : snapshot.agendaWindowLabel
               }
               onPrimaryAction={handlePrimaryAction}
-              agendaSummary={agendaSummary}
-              topTasksTotal={snapshot.topTasksTotal}
+              calendarPillValue={getAgendaPillValue(nextEvent)}
+              queuedTaskCount={taskPillSummary.queuedCount}
             />
           </motion.div>
         )}
@@ -288,26 +293,26 @@ const HomeModeShell = ({
   primaryActionLabel,
   primaryActionDescription,
   onPrimaryAction,
-  agendaSummary,
-  topTasksTotal,
+  calendarPillValue,
+  queuedTaskCount,
 }: {
   primaryActionLabel: string;
   primaryActionDescription: string;
   onPrimaryAction: () => void;
-  agendaSummary: ReturnType<typeof getAgendaSummary>;
-  topTasksTotal: number;
+  calendarPillValue: string;
+  queuedTaskCount: number;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
       <AmbientPill
         icon={<CalendarDays className="size-3.5" />}
         label="Calendar"
-        value={agendaSummary.label}
+        value={calendarPillValue}
       />
       <AmbientPill
         icon={<CheckSquare2 className="size-3.5" />}
         label="Tasks"
-        value={`${topTasksTotal} queued`}
+        value={`${queuedTaskCount} queued`}
       />
     </div>
 
@@ -340,14 +345,14 @@ const FocusModeShell = ({
   timerPanel,
   currentTimerLabel,
   activeFocusTaskLabel,
-  topTasksCompleted,
-  agendaLabel,
+  completedTaskCount,
+  calendarPillValue,
 }: {
   timerPanel: ReactNode;
   currentTimerLabel: string;
   activeFocusTaskLabel: string;
-  topTasksCompleted: number;
-  agendaLabel: string;
+  completedTaskCount: number;
+  calendarPillValue: string;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
     <div className="pointer-events-none absolute inset-0 bg-black/7 backdrop-blur-[8px]" />
@@ -357,7 +362,7 @@ const FocusModeShell = ({
         <AmbientPill
           icon={<CalendarDays className="size-3.5" />}
           label="Calendar"
-          value={agendaLabel}
+          value={calendarPillValue}
         />
         <AmbientPill
           icon={<Timer className="size-3.5" />}
@@ -367,7 +372,7 @@ const FocusModeShell = ({
         <AmbientPill
           icon={<CheckSquare2 className="size-3.5" />}
           label="Today"
-          value={`${topTasksCompleted} done`}
+          value={`${completedTaskCount} done`}
         />
       </div>
 
