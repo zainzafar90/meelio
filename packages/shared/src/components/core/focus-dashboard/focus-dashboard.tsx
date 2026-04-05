@@ -286,8 +286,8 @@ const HomeModeShell = ({
       </div>
     </div>
 
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-16 pt-16 text-center sm:pb-8 sm:pt-28">
-      <div className="max-w-4xl -translate-y-8 space-y-4 sm:-translate-y-10">
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-14 pt-14 text-center sm:pb-8 sm:pt-24">
+      <div className="max-w-4xl -translate-y-6 space-y-4 sm:-translate-y-8">
         <Clock />
         <div className="space-y-3">
           <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
@@ -328,22 +328,22 @@ const FocusModeShell = ({
     <div className="pointer-events-none absolute inset-0 bg-black/6 backdrop-blur-[6px]" />
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_20%),radial-gradient(circle_at_center,rgba(0,0,0,0.18),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%)] rounded-lg" />
     <div className="relative flex h-full w-full max-w-full flex-col">
-      <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-        <div className="flex-1 flex justify-start">
+      <div className="hidden items-center justify-between px-3 py-3 sm:px-4 [@media(min-height:580px)]:flex">
+        <div className="flex flex-1 justify-start">
           <AmbientPill
             icon={<CalendarDays className="size-3.5" />}
             label="Calendar"
             value={agendaLabel}
           />
         </div>
-        <div className="flex-1 flex justify-center">
+        <div className="flex flex-1 justify-center">
           <AmbientPill
             icon={<Timer className="size-3.5" />}
             label="Focus"
             value={currentTimerLabel}
           />
         </div>
-        <div className="flex-1 flex justify-end">
+        <div className="flex flex-1 justify-end">
           <AmbientPill
             icon={<CheckSquare2 className="size-3.5" />}
             label="Today"
@@ -352,12 +352,12 @@ const FocusModeShell = ({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
-        <div className="space-y-3 text-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-4 [@media(min-height:700px)]:gap-8 [@media(min-height:700px)]:pb-6">
+        <div className="space-y-2 text-center [@media(min-height:700px)]:space-y-3">
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
             Active Focus Task
           </p>
-          <h2 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
+          <h2 className="max-w-3xl text-balance text-[1.75rem] font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
             {activeFocusTaskLabel}
           </h2>
         </div>
@@ -390,12 +390,12 @@ const AmbientPill = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex h-7 items-center gap-1 rounded-full bg-black/12 px-3 text-sm text-white shadow-[0_8px_24px_rgba(0,0,0,0.08)] backdrop-blur-xl sm:h-9 sm:gap-1.5 sm:px-5 md:gap-3">
-    {icon && <span className="text-white/80">{icon}</span>}
-    <span className="hidden md:inline text-xs font-medium uppercase tracking-[0.28em] text-white/58">
+  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/14 px-3.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] backdrop-blur-2xl sm:h-10 sm:gap-2 sm:px-5 md:gap-3">
+    {icon && <span className="text-white/88">{icon}</span>}
+    <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
       {label}
     </span>
-    <span className="truncate max-w-[72px] sm:max-w-[120px] md:max-w-none text-xs sm:text-sm font-semibold text-white">
+    <span className="truncate max-w-[86px] text-xs font-semibold text-white sm:max-w-[132px] sm:text-sm md:max-w-none md:text-[15px]">
       {value}
     </span>
   </div>

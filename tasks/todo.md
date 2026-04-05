@@ -30,6 +30,11 @@
 - [x] Write Phase 5 spec and implementation plan
 - [x] Implement Phase 5 motion and mode transitions
 - [x] Verify Phase 5 behavior and boundaries
+- [x] Define Phase 6 scope: shell presence and responsive calibration
+- [x] Write Phase 6 spec and implementation plan
+- [ ] Implement Phase 6 shell presence and responsive calibration
+- [ ] Tighten Phase 6 responsive spacing for home, focus, quote, and dock
+- [ ] Verify Phase 6 behavior and boundaries
 - [x] Verify Phase 4 behavior and boundaries
 
 ## Review
