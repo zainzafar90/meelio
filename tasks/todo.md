@@ -32,9 +32,9 @@
 - [x] Verify Phase 5 behavior and boundaries
 - [x] Define Phase 6 scope: shell presence and responsive calibration
 - [x] Write Phase 6 spec and implementation plan
-- [ ] Implement Phase 6 shell presence and responsive calibration
-- [ ] Tighten Phase 6 responsive spacing for home, focus, quote, and dock
-- [ ] Verify Phase 6 behavior and boundaries
+- [x] Implement Phase 6 shell presence and responsive calibration
+- [x] Tighten Phase 6 responsive spacing for home, focus, quote, and dock
+- [x] Verify Phase 6 behavior and boundaries
 - [x] Verify Phase 4 behavior and boundaries
 
 ## Review
@@ -51,6 +51,7 @@
 - Phase 4 target is: replace the card-heavy home layout with a desktop-style ambient shell, a persistent dock, and a dedicated focus mode shell.
 - The latest Phase 4 pass repaired broken CTA wiring after a manual UI rewrite, simplified the ambient metadata treatment, and pushed the timer toward the same darker visual language as the shell.
 - Phase 5 target is: make home and focus feel like two states of one environment through restrained transitions instead of abrupt mode swaps.
+- Phase 6 target is: calibrate shell presence across wallpapers and screen sizes without reintroducing harsh chrome.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

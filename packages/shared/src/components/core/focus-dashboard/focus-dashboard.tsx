@@ -271,7 +271,7 @@ const HomeModeShell = ({
   topTasksTotal: number;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
-    <div className="absolute inset-x-0 top-0 z-10 hidden [@media(min-height:580px)]:flex items-start justify-between gap-3 px-4 py-3">
+    <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
       <AmbientPill
         icon={<CalendarDays className="size-3.5" />}
         label="Calendar"
@@ -323,8 +323,8 @@ const FocusModeShell = ({
   agendaLabel: string;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
-    <div className="pointer-events-none absolute inset-0 bg-black/6 backdrop-blur-[6px]" />
-    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_20%),radial-gradient(circle_at_center,rgba(0,0,0,0.18),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%)] rounded-lg" />
+    <div className="pointer-events-none absolute inset-0 bg-black/7 backdrop-blur-[8px]" />
+    <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.20),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.13),transparent_28%)]" />
     <div className="relative flex h-full w-full max-w-full flex-col">
       <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
         <AmbientPill
@@ -376,12 +376,12 @@ const AmbientPill = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/14 px-3.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] backdrop-blur-2xl sm:h-10 sm:gap-3 sm:px-5">
+  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/16 px-3.5 text-sm text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl sm:h-10 sm:gap-3 sm:px-5">
     {icon && <span className="text-white/88">{icon}</span>}
     <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
       {label}
     </span>
-    <span className="truncate max-w-[86px] text-xs font-semibold text-white sm:max-w-[132px] sm:text-sm">
+    <span className="truncate max-w-[86px] text-xs font-semibold text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.18)] sm:max-w-[132px] sm:text-sm">
       {value}
     </span>
   </div>
