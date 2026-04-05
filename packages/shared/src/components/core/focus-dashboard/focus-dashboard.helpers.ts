@@ -15,9 +15,9 @@ export const getTaskPillSummary = (tasks: FocusTaskLike[]) => {
   };
 };
 
-export const getAgendaPillValue = (event: CalendarEvent | null) => {
+export const getAgendaPillValue = (event: CalendarEvent | null): string | null => {
   if (!event) {
-    return "No upcoming event";
+    return null;
   }
 
   const summary = event.summary?.trim();

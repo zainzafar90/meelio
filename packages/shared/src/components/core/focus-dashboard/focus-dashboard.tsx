@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { CalendarDays, CheckSquare2, Timer } from "lucide-react";
+import { Brain, CalendarDays, CheckSquare2, Timer } from "lucide-react";
 
 import type { TimerState } from "../../../types/timer.types";
 import { formatTime } from "../../../utils/timer.utils";
@@ -94,9 +94,11 @@ export const FocusDashboard = ({
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible } = useDockStore(
+  const { isTimerVisible, setTimerVisible, toggleTasks } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
+      setTimerVisible: state.setTimerVisible,
+      toggleTasks: state.toggleTasks,
     })),
   );
   const snapshot = useFocusDashboardStore(
@@ -196,8 +198,10 @@ export const FocusDashboard = ({
               timerPanel={timerPanel}
               currentTimerLabel={snapshot.currentTimerLabel}
               activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
+              activeFocusTaskId={snapshot.activeFocusTaskId}
               completedTaskCount={taskPillSummary.completedCount}
               calendarPillValue={getAgendaPillValue(nextEvent)}
+              onSelectTask={toggleTasks}
             />
           </motion.div>
         ) : (
@@ -227,6 +231,7 @@ export const FocusDashboard = ({
             <HomeModeShell
               calendarPillValue={getAgendaPillValue(nextEvent)}
               queuedTaskCount={taskPillSummary.queuedCount}
+              onStartFocusing={() => setTimerVisible(true)}
             />
           </motion.div>
         )}
@@ -238,22 +243,34 @@ export const FocusDashboard = ({
 const HomeModeShell = ({
   calendarPillValue,
   queuedTaskCount,
+  onStartFocusing,
 }: {
-  calendarPillValue: string;
+  calendarPillValue: string | null;
   queuedTaskCount: number;
+  onStartFocusing: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
-      <AmbientPill
-        icon={<CalendarDays className="size-3.5" />}
-        label="Calendar"
-        value={calendarPillValue}
-      />
-      <AmbientPill
-        icon={<CheckSquare2 className="size-3.5" />}
-        label="Tasks"
-        value={`${queuedTaskCount} queued`}
-      />
+     
+      <div className="flex-1 flex justify-start">
+        <StartFocusPill onClick={onStartFocusing} />
+      </div>
+       <div className="flex-1 flex justify-center">
+        {calendarPillValue && (
+          <AmbientPill
+            icon={<CalendarDays className="size-3.5" />}
+            label="Calendar"
+            value={calendarPillValue}
+          />
+        )}
+      </div>
+      <div className="flex-1 flex justify-end">
+        <AmbientPill
+          icon={<CheckSquare2 className="size-3.5" />}
+          label="Tasks"
+          value={`${queuedTaskCount} queued`}
+        />
+      </div>
     </div>
 
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
@@ -273,35 +290,40 @@ const FocusModeShell = ({
   timerPanel,
   currentTimerLabel,
   activeFocusTaskLabel,
+  activeFocusTaskId,
   completedTaskCount,
   calendarPillValue,
+  onSelectTask,
 }: {
   timerPanel: ReactNode;
   currentTimerLabel: string;
   activeFocusTaskLabel: string;
+  activeFocusTaskId: string | null;
   completedTaskCount: number;
-  calendarPillValue: string;
+  calendarPillValue: string | null;
+  onSelectTask: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
     <div className="pointer-events-none absolute inset-0 bg-black/7 backdrop-blur-[8px]" />
     <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.20),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.13),transparent_28%)]" />
     <div className="relative flex h-full w-full max-w-full flex-col">
       <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-        <div className="flex-1 flex justify-start">
-          <AmbientPill
-            icon={<CalendarDays className="size-3.5" />}
-            label="Calendar"
-            value={calendarPillValue}
-          />
-        </div>
-        <div className="flex-1 flex justify-center">
+         <div className="flex-1 flex justify-start">
           <AmbientPill
             icon={<Timer className="size-3.5" />}
             label="Focus"
             value={currentTimerLabel}
           />
         </div>
-
+        <div className="flex-1 flex justify-center">
+          {calendarPillValue && (
+            <AmbientPill
+              icon={<CalendarDays className="size-3.5" />}
+              label="Calendar"
+              value={calendarPillValue}
+            />
+          )}
+        </div>
         <div className="flex-1 flex justify-end">
           <AmbientPill
             icon={<CheckSquare2 className="size-3.5" />}
@@ -312,7 +334,10 @@ const FocusModeShell = ({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
-        <div className="space-y-3 text-center">
+        <div
+          className="cursor-default space-y-3 text-center"
+          onClick={activeFocusTaskId ? undefined : onSelectTask}
+        >
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
             Active Focus Task
           </p>
@@ -352,4 +377,21 @@ const AmbientPill = ({
       {value}
     </span>
   </div>
+);
+
+const StartFocusPill = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/16 px-3.5 text-sm text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-colors hover:bg-white/24 sm:h-10 sm:gap-3 sm:px-5"
+  >
+    <span className="text-white/88">
+      <Brain className="size-3.5" />
+    </span>
+    <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
+      Focus
+    </span>
+    <span className="text-xs font-semibold text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.18)] sm:text-sm">
+      Start Focusing
+    </span>
+  </button>
 );

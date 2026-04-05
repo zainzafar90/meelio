@@ -4,7 +4,6 @@ import type { StoreApi, UseBoundStore } from "zustand";
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
 import { Brain, MoreHorizontal } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
@@ -12,12 +11,7 @@ import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useBookmarksStore } from "../../../stores/bookmarks.store";
-import { useFocusDashboardStore, syncFocusDashboardSignals } from "../../../stores/focus-dashboard.store";
-import { useTaskStore } from "../../../stores/task.store";
 import type { TimerState } from "../../../types/timer.types";
-import { formatTime } from "../../../utils/timer.utils";
-import { getMinutesUntilEvent } from "../../../utils/calendar-date.utils";
-import { useCalendarStore } from "../../../stores/calendar.store";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
@@ -70,42 +64,19 @@ function getVisibleItemCount(width: number, itemsLength: number): number {
   return 1;
 }
 
-function selectFocusCandidates(
-  tasks: Array<{
-    id: string;
-    title: string;
-    completed?: boolean;
-    pinned?: boolean;
-    deletedAt?: number | null;
-    updatedAt?: number;
-  }>,
-) {
-  return tasks
-    .filter((task) => !task.completed && !task.deletedAt)
-    .sort((left, right) => {
-      if (Boolean(left.pinned) !== Boolean(right.pinned)) {
-        return left.pinned ? -1 : 1;
-      }
-
-      return (right.updatedAt ?? 0) - (left.updatedAt ?? 0);
-    })
-    .slice(0, 3);
-}
-
 interface DockProps {
+  // timerStore kept for backward-compat with callers; no longer used internally
   timerStore?: TimerStoreHook;
 }
 
-export function Dock({ timerStore }: DockProps): JSX.Element {
+export function Dock(_props: DockProps): JSX.Element {
   useDockShortcuts();
 
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
   const [dropdownItems, setDropdownItems] = useState<DockItem[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isFocusChooserOpen, setIsFocusChooserOpen] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const focusChooserRef = useRef<HTMLDivElement>(null);
 
   const dockState = useDockStore(
     useShallow((state) => ({
@@ -128,8 +99,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
       toggleTabStash: state.toggleTabStash,
       toggleBookmarks: state.toggleBookmarks,
       setTimerVisible: state.setTimerVisible,
-      setGreetingsVisible: state.setGreetingsVisible,
-      setTasksVisible: state.setTasksVisible,
       dockIconsVisible: state.dockIconsVisible,
     }))
   );
@@ -154,8 +123,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
     toggleTabStash,
     toggleBookmarks,
     setTimerVisible,
-    setGreetingsVisible,
-    setTasksVisible,
     dockIconsVisible,
   } = dockState;
 
@@ -174,99 +141,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
   const user = useAuthStore(useShallow((state) => state.user));
   const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
   const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
-  const snapshot = useFocusDashboardStore(useShallow((state) => state.snapshot));
-  const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const {
-    tasks,
-    togglePinTask,
-    hasInitialized: hasTaskStoreInitialized,
-    isLoading: isTaskStoreLoading,
-  } = useTaskStore(
-    useShallow((state) => ({
-      tasks: state.tasks,
-      togglePinTask: state.togglePinTask,
-      hasInitialized: state.hasInitialized,
-      isLoading: state.isLoading,
-    })),
-  );
-  const timerSnapshot = timerStore?.(
-    useShallow((state) => ({
-      stage: state.stage,
-      isRunning: state.isRunning,
-      prevRemaining: state.prevRemaining,
-      endTimestamp: state.endTimestamp,
-      durations: state.durations,
-      start: state.start,
-    })),
-  );
-  const focusCandidates = useMemo(() => selectFocusCandidates(tasks), [tasks]);
-  const isTaskBootstrapPending =
-    Boolean(user) && (!hasTaskStoreInitialized || isTaskStoreLoading);
-
-  const launchFocusSession = (focusTaskId?: string | null, autoStart = false) => {
-    if (!timerStore || !timerSnapshot) {
-      return;
-    }
-
-    const timerRemaining = !timerSnapshot.isRunning && timerSnapshot.prevRemaining !== null
-      ? timerSnapshot.prevRemaining
-      : timerSnapshot.isRunning && timerSnapshot.endTimestamp
-        ? Math.max(0, Math.ceil((timerSnapshot.endTimestamp - Date.now()) / 1000))
-        : timerSnapshot.durations[timerSnapshot.stage];
-
-    setTasksVisible(false);
-    setGreetingsVisible(false);
-    setTimerVisible(true);
-    setIsFocusChooserOpen(false);
-
-    syncFocusDashboardSignals({
-      timerRunning: timerSnapshot.isRunning,
-      timerStage: timerSnapshot.stage,
-      timerLabel: timerSnapshot.isRunning
-        ? `${formatTime(timerRemaining)} remaining`
-        : "Ready to focus",
-      sessionFocusTaskId: focusTaskId ??
-        (snapshot.primaryAction.kind === "start-focus-session" ||
-        snapshot.primaryAction.kind === "switch-focus-task"
-          ? snapshot.activeFocusTaskId
-          : snapshot.sessionFocusTaskId),
-      blockerMode: "ready",
-      soundtrackMode: "available",
-      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
-      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
-    });
-
-    if (autoStart && !timerSnapshot.isRunning) {
-      timerSnapshot.start();
-    }
-  };
-
-  const handleFocusDockAction = async () => {
-    if (isTaskBootstrapPending || !timerStore || !timerSnapshot) {
-      return;
-    }
-
-    if (
-      snapshot.primaryAction.kind === "review-plan" ||
-      snapshot.primaryAction.kind === "choose-focus-task"
-    ) {
-      if (focusCandidates.length === 0) {
-        setTasksVisible(true);
-        setIsFocusChooserOpen(false);
-        return;
-      }
-
-      setIsFocusChooserOpen((open) => !open);
-      return;
-    }
-
-    launchFocusSession();
-  };
-
-  const handleChooseFocusTask = async (taskId: string) => {
-    await togglePinTask(taskId);
-    launchFocusSession(taskId, true);
-  };
 
   const staticItems = BASE_STATIC_DOCK_ITEMS;
 
@@ -278,8 +152,8 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
         name: "Focus",
         icon: Brain,
         activeIcon: Brain,
-        onClick: handleFocusDockAction,
-        isActive: isTimerVisible || isFocusChooserOpen,
+        onClick: () => setTimerVisible(!isTimerVisible),
+        isActive: isTimerVisible,
         visibilityKey: "timer" as const,
       },
       { id: "soundscapes", name: t("common.soundscapes"), icon: Icons.soundscapes, activeIcon: Icons.soundscapesActive, onClick: toggleSoundscapes, visibilityKey: "soundscapes" as const },
@@ -298,7 +172,8 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
   }, [
     t,
     resetDock,
-    handleFocusDockAction,
+    setTimerVisible,
+    isTimerVisible,
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
@@ -309,8 +184,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
     toggleBookmarks,
     dockIconsVisible,
     showBookmarksInDock,
-    isTimerVisible,
-    isFocusChooserOpen,
   ]);
 
   useEffect(() => {
@@ -340,20 +213,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        focusChooserRef.current &&
-        !focusChooserRef.current.contains(event.target as Node)
-      ) {
-        setIsFocusChooserOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <>
       {user && <DockOnboarding />}
@@ -372,46 +231,6 @@ export function Dock({ timerStore }: DockProps): JSX.Element {
                       "after:absolute after:inset-0 after:rounded-xl after:ring-2 after:ring-white/50 after:animate-pulse"
                   )}
                 >
-                  {item.id === "timer" && (
-                    <AnimatePresence>
-                      {isFocusChooserOpen && (
-                        <motion.div
-                          ref={focusChooserRef}
-                          initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                          transition={{ duration: 0.18, ease: "easeOut" }}
-                          className="absolute bottom-full left-1/2 z-50 mb-3 w-[300px] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/[0.08] bg-black shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-2xl"
-                        >
-                          <div className="px-4 pt-4 pb-1">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/30">What are you focusing on?</p>
-                          </div>
-                          <div className="p-2 space-y-0.5">
-                            {focusCandidates.map((task) => (
-                              <button
-                                key={task.id}
-                                type="button"
-                                onClick={() => void handleChooseFocusTask(task.id)}
-                                className="group relative flex w-full items-center rounded-xl px-3 py-3 text-left transition-colors hover:bg-white/[0.06]"
-                              >
-                                <span className="absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-full bg-white/0 transition-all group-hover:bg-white/30" />
-                                <span className="truncate text-sm font-medium text-white/75 group-hover:text-white/95 transition-colors">{task.title}</span>
-                              </button>
-                            ))}
-                          </div>
-                          <div className="mx-3 mb-3 mt-1 border-t border-white/[0.06] pt-2">
-                            <button
-                              type="button"
-                              onClick={() => { setIsFocusChooserOpen(false); setTasksVisible(true); }}
-                              className="flex w-full items-center justify-center rounded-xl py-2 text-[11px] text-white/30 transition-colors hover:text-white/60"
-                            >
-                              View all tasks
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  )}
                   <DockButton item={item} />
                 </div>
               ))}
