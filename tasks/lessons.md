@@ -6,3 +6,4 @@
 - 2026-04-05: Do not remove useful shell structure like ambient top pills unless the user asked for that simplification. Reduce their prominence first. Also never repeat the same semantic content in both pills and center copy.
 - 2026-04-05: Ambient pills on wallpaper-first shells should never use heavy dark outlines. Favor soft borders, subtle fills, and atmospheric contrast over explicit strokes.
 - 2026-04-05: When a wallpaper-first UI starts feeling "outlined everywhere", remove stroke-based separation across the whole shell family, not just one component. Use fill, blur, and shadow as the primary separators.
+- 2026-04-05: When cleaning up shell chrome, preserve intentional atmospheric blur. Remove harsh strokes first; do not flatten blur-backed focus surfaces unless the user asks for a flatter style.

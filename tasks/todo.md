@@ -26,6 +26,10 @@
 - [x] Rebalance timer surface to match the shell
 - [ ] Strengthen shell pill visibility in home and focus modes
 - [ ] Run browser-led polish pass across home and focus modes
+- [x] Define Phase 5 scope: motion and mode transitions
+- [x] Write Phase 5 spec and implementation plan
+- [x] Implement Phase 5 motion and mode transitions
+- [x] Verify Phase 5 behavior and boundaries
 - [x] Verify Phase 4 behavior and boundaries
 
 ## Review
@@ -41,6 +45,7 @@
 - Phase 3 now treats the pinned task as the active focus task, lets the CTA reference that task directly, and adds agenda-window guidance to the hero and agenda card.
 - Phase 4 target is: replace the card-heavy home layout with a desktop-style ambient shell, a persistent dock, and a dedicated focus mode shell.
 - The latest Phase 4 pass repaired broken CTA wiring after a manual UI rewrite, simplified the ambient metadata treatment, and pushed the timer toward the same darker visual language as the shell.
+- Phase 5 target is: make home and focus feel like two states of one environment through restrained transitions instead of abrupt mode swaps.
 - Verification completed for the affected packages and app surfaces:
   - `pnpm --filter @repo/contracts test -- --run`
   - `pnpm --filter @repo/core test -- --run`

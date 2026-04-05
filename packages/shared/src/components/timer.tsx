@@ -84,10 +84,11 @@ const TimerView = ({
 
   return (
     <div className="relative">
-      <div className="w-[22rem] max-w-full rounded-[30px] bg-black/28 text-white shadow-[0_20px_60px_rgba(0,0,0,0.22)] backdrop-blur-2xl sm:w-[440px] lg:w-[520px]">
+      <div className="relative w-[22rem] max-w-full overflow-hidden rounded-[30px] bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur-[28px] sm:w-[440px] lg:w-[520px]">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_28%,rgba(0,0,0,0.08))]" />
         <div className="space-y-5 p-4 [@media(min-height:580px)]:space-y-8 sm:p-7">
           <div className="w-full">
-            <div className="flex h-12 w-full rounded-full bg-white/8 p-1 text-white">
+            <div className="flex h-12 w-full rounded-full bg-white/12 p-1 text-white backdrop-blur-md">
               <button
                 onClick={() => skip(TimerStage.Focus)}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
@@ -124,7 +125,7 @@ const TimerView = ({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-black/16 text-white transition-colors hover:bg-black/24"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={reset}
                 title={t("timer.controls.reset")}
                 role="button"
@@ -134,7 +135,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-black/16 text-white transition-colors hover:bg-black/24"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={onStatsClick}
                 title={t("timer.controls.viewStats")}
                 role="button"
@@ -160,7 +161,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-black/16 text-white transition-colors hover:bg-black/24"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={() => skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}
                 title={t("timer.controls.skipToNextStage")}
                 role="button"
@@ -170,7 +171,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-black/16 text-white transition-colors hover:bg-black/24"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={onSettingsClick}
                 title={t("timer.controls.settings")}
                 role="button"
@@ -180,7 +181,7 @@ const TimerView = ({
               </button>
             </div>
 
-            <div className="h-1.5 rounded-full bg-white/12">
+            <div className="h-1.5 rounded-full bg-white/14">
               <div
                 className="h-full rounded-full bg-white transition-all"
                 style={{ width: `${(remaining / durations[stage]) * 100}%` }}

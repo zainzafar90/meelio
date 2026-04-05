@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { CalendarDays, CheckSquare2, Timer } from "lucide-react";
@@ -107,6 +108,7 @@ export const FocusDashboard = ({
   const snapshot = useFocusDashboardStore(
     useShallow((state) => state.snapshot),
   );
+  const reduceMotion = useReducedMotion();
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
   const timerRemaining = useMemo(() => {
@@ -176,31 +178,81 @@ export const FocusDashboard = ({
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
-      {showTimerPanel ? (
-        <FocusModeShell
-          timerPanel={timerPanel}
-          currentTimerLabel={snapshot.currentTimerLabel}
-          activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
-          topTasksCompleted={snapshot.topTasksCompleted}
-          agendaLabel={agendaSummary.label}
-        />
-      ) : (
-        <HomeModeShell
-          primaryActionLabel={
-            snapshot.primaryAction.kind === "review-plan"
-              ? "Open Tasks"
-              : "Start Focusing"
-          }
-          primaryActionDescription={
-            snapshot.primaryAction.kind === "review-plan"
-              ? "Pick or pin a task to anchor the next focus block."
-              : snapshot.agendaWindowLabel
-          }
-          onPrimaryAction={handlePrimaryAction}
-          agendaSummary={agendaSummary}
-          topTasksTotal={snapshot.topTasksTotal}
-        />
-      )}
+      <AnimatePresence mode="wait" initial={false}>
+        {showTimerPanel ? (
+          <motion.div
+            key="focus-mode"
+            initial={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 18, filter: "blur(10px)" }
+            }
+            animate={
+              reduceMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, filter: "blur(0px)" }
+            }
+            exit={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: -12, filter: "blur(8px)" }
+            }
+            transition={{
+              duration: reduceMotion ? 0.18 : 0.3,
+              ease: "easeOut",
+            }}
+            className="flex min-h-0 flex-1"
+          >
+            <FocusModeShell
+              timerPanel={timerPanel}
+              currentTimerLabel={snapshot.currentTimerLabel}
+              activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
+              topTasksCompleted={snapshot.topTasksCompleted}
+              agendaLabel={agendaSummary.label}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="home-mode"
+            initial={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 14, filter: "blur(10px)" }
+            }
+            animate={
+              reduceMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, filter: "blur(0px)" }
+            }
+            exit={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: -10, filter: "blur(8px)" }
+            }
+            transition={{
+              duration: reduceMotion ? 0.18 : 0.28,
+              ease: "easeOut",
+            }}
+            className="flex min-h-0 flex-1"
+          >
+            <HomeModeShell
+              primaryActionLabel={
+                snapshot.primaryAction.kind === "review-plan"
+                  ? "Open Tasks"
+                  : "Start Focusing"
+              }
+              primaryActionDescription={
+                snapshot.primaryAction.kind === "review-plan"
+                  ? "Pick or pin a task to anchor the next focus block."
+                  : snapshot.agendaWindowLabel
+              }
+              onPrimaryAction={handlePrimaryAction}
+              agendaSummary={agendaSummary}
+              topTasksTotal={snapshot.topTasksTotal}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -273,25 +325,31 @@ const FocusModeShell = ({
   agendaLabel: string;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
-    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,0,0,0.08),transparent_32%),linear-gradient(to_bottom,rgba(0,0,0,0.10),transparent_28%)]" />
+    <div className="pointer-events-none absolute inset-0 bg-black/6 backdrop-blur-[6px]" />
+    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_20%),radial-gradient(circle_at_center,rgba(0,0,0,0.18),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%)] rounded-lg" />
     <div className="relative flex h-full w-full max-w-full flex-col">
       <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-        {" "}
-        <AmbientPill
-          icon={<CalendarDays className="size-3.5" />}
-          label="Calendar"
-          value={agendaLabel}
-        />{" "}
-        <AmbientPill
-          icon={<Timer className="size-3.5" />}
-          label="Focus"
-          value={currentTimerLabel}
-        />
-        <AmbientPill
-          icon={<CheckSquare2 className="size-3.5" />}
-          label="Today"
-          value={`${topTasksCompleted} done`}
-        />
+        <div className="flex-1 flex justify-start">
+          <AmbientPill
+            icon={<CalendarDays className="size-3.5" />}
+            label="Calendar"
+            value={agendaLabel}
+          />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <AmbientPill
+            icon={<Timer className="size-3.5" />}
+            label="Focus"
+            value={currentTimerLabel}
+          />
+        </div>
+        <div className="flex-1 flex justify-end">
+          <AmbientPill
+            icon={<CheckSquare2 className="size-3.5" />}
+            label="Today"
+            value={`${topTasksCompleted} done`}
+          />
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
@@ -303,7 +361,14 @@ const FocusModeShell = ({
             {activeFocusTaskLabel}
           </h2>
         </div>
-        {timerPanel}
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.985 }}
+          transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
+        >
+          {timerPanel}
+        </motion.div>
       </div>
     </div>
   </div>
