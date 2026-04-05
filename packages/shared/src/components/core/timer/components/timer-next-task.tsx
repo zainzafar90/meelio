@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 export const NextPinnedTask = () => {
   const next = useTaskStore(useShallow((state) => state.getNextPinnedTask()));
 
-  if (!next) return <div className="h-5 w-full" />;
+  if (!next) return null;
 
   return (
     <AnimatePresence>

@@ -271,23 +271,21 @@ const HomeModeShell = ({
   topTasksTotal: number;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
-    <div className="absolute inset-x-0 top-0 z-10 hidden [@media(min-height:580px)]:block">
-      <div className="mx-auto flex w-full max-w-full items-center justify-between gap-3 px-4 py-3">
-        <AmbientPill
-          icon={<CalendarDays className="size-3.5" />}
-          label="Calendar"
-          value={agendaSummary.label}
-        />
-        <AmbientPill
-          icon={<CheckSquare2 className="size-3.5" />}
-          label="Tasks"
-          value={`${topTasksTotal} queued`}
-        />
-      </div>
+    <div className="absolute inset-x-0 top-0 z-10 hidden [@media(min-height:580px)]:flex items-start justify-between gap-3 px-4 py-3">
+      <AmbientPill
+        icon={<CalendarDays className="size-3.5" />}
+        label="Calendar"
+        value={agendaSummary.label}
+      />
+      <AmbientPill
+        icon={<CheckSquare2 className="size-3.5" />}
+        label="Tasks"
+        value={`${topTasksTotal} queued`}
+      />
     </div>
 
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-14 pt-14 text-center sm:pb-8 sm:pt-24">
-      <div className="max-w-4xl -translate-y-6 space-y-4 sm:-translate-y-8">
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
+      <div className="max-w-4xl space-y-4">
         <Clock />
         <div className="space-y-3">
           <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
@@ -328,36 +326,30 @@ const FocusModeShell = ({
     <div className="pointer-events-none absolute inset-0 bg-black/6 backdrop-blur-[6px]" />
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_20%),radial-gradient(circle_at_center,rgba(0,0,0,0.18),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.12),transparent_28%)] rounded-lg" />
     <div className="relative flex h-full w-full max-w-full flex-col">
-      <div className="hidden items-center justify-between px-3 py-3 sm:px-4 [@media(min-height:580px)]:flex">
-        <div className="flex flex-1 justify-start">
-          <AmbientPill
-            icon={<CalendarDays className="size-3.5" />}
-            label="Calendar"
-            value={agendaLabel}
-          />
-        </div>
-        <div className="flex flex-1 justify-center">
-          <AmbientPill
-            icon={<Timer className="size-3.5" />}
-            label="Focus"
-            value={currentTimerLabel}
-          />
-        </div>
-        <div className="flex flex-1 justify-end">
-          <AmbientPill
-            icon={<CheckSquare2 className="size-3.5" />}
-            label="Today"
-            value={`${topTasksCompleted} done`}
-          />
-        </div>
+      <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
+        <AmbientPill
+          icon={<CalendarDays className="size-3.5" />}
+          label="Calendar"
+          value={agendaLabel}
+        />
+        <AmbientPill
+          icon={<Timer className="size-3.5" />}
+          label="Focus"
+          value={currentTimerLabel}
+        />
+        <AmbientPill
+          icon={<CheckSquare2 className="size-3.5" />}
+          label="Today"
+          value={`${topTasksCompleted} done`}
+        />
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-4 [@media(min-height:700px)]:gap-8 [@media(min-height:700px)]:pb-6">
-        <div className="space-y-2 text-center [@media(min-height:700px)]:space-y-3">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
+        <div className="space-y-3 text-center">
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
             Active Focus Task
           </p>
-          <h2 className="max-w-3xl text-balance text-[1.75rem] font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
+          <h2 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
             {activeFocusTaskLabel}
           </h2>
         </div>
@@ -366,18 +358,12 @@ const FocusModeShell = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.985 }}
           transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
+          className="w-full"
         >
           {timerPanel}
         </motion.div>
       </div>
     </div>
-  </div>
-);
-
-const AmbientMeta = ({ icon, value }: { icon?: ReactNode; value: string }) => (
-  <div className="inline-flex items-center gap-2 text-sm font-medium text-white/78">
-    {icon && <span className="text-white/46">{icon}</span>}
-    <span>{value}</span>
   </div>
 );
 
@@ -390,12 +376,12 @@ const AmbientPill = ({
   label: string;
   value: string;
 }) => (
-  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/14 px-3.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] backdrop-blur-2xl sm:h-10 sm:gap-2 sm:px-5 md:gap-3">
+  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/14 px-3.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,0,0.10)] backdrop-blur-2xl sm:h-10 sm:gap-3 sm:px-5">
     {icon && <span className="text-white/88">{icon}</span>}
     <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
       {label}
     </span>
-    <span className="truncate max-w-[86px] text-xs font-semibold text-white sm:max-w-[132px] sm:text-sm md:max-w-none md:text-[15px]">
+    <span className="truncate max-w-[86px] text-xs font-semibold text-white sm:max-w-[132px] sm:text-sm">
       {value}
     </span>
   </div>

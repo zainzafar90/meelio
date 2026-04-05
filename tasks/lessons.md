@@ -7,3 +7,6 @@
 - 2026-04-05: Ambient pills on wallpaper-first shells should never use heavy dark outlines. Favor soft borders, subtle fills, and atmospheric contrast over explicit strokes.
 - 2026-04-05: When a wallpaper-first UI starts feeling "outlined everywhere", remove stroke-based separation across the whole shell family, not just one component. Use fill, blur, and shadow as the primary separators.
 - 2026-04-05: When cleaning up shell chrome, preserve intentional atmospheric blur. Remove harsh strokes first; do not flatten blur-backed focus surfaces unless the user asks for a flatter style.
+- 2026-04-05: Do not keep “improving” responsiveness after the user says a recent responsive state was good. If the user liked the last responsive version, preserve that layout baseline and isolate later visual tweaks from width/height behavior.
+- 2026-04-05: Fix small-screen overlap at the component-content level first. Prefer hiding/compressing pill internals on narrow widths over changing the shell flex structure if the broader layout was already working.
+- 2026-04-05: For responsive pill behavior, follow the user's pattern: on very small widths keep `icon + value`, tighten the gap, and hide the label; on `sm+` restore `icon + label + value`. Do not solve pill overlap by rewriting parent flex/layout first.

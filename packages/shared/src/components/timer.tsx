@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { toast } from "sonner";
+import { Brain, Coffee } from "lucide-react";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import { useTranslation } from "../i18n";
 import {
@@ -83,10 +84,10 @@ const TimerView = ({
   const { t } = useTranslation();
 
   return (
-    <div className="relative">
-      <div className="relative w-[22rem] max-w-full overflow-hidden rounded-[30px] bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur-[28px] sm:w-[440px] lg:w-[520px]">
+    <div className="relative w-full">
+      <div className="relative mx-auto w-[22rem] max-w-full overflow-hidden rounded-[30px] bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur-[28px] sm:w-[440px] lg:w-[520px]">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_28%,rgba(0,0,0,0.08))]" />
-        <div className="space-y-5 p-4 [@media(min-height:580px)]:space-y-8 sm:p-7">
+        <div className="space-y-3 p-4 [@media(min-height:580px)]:space-y-5 sm:space-y-8 sm:p-7">
           <div className="w-full">
             <div className="flex h-12 w-full rounded-full bg-white/12 p-1 text-white backdrop-blur-md">
               <button
@@ -98,7 +99,8 @@ const TimerView = ({
                 }`}
                 title={t("timer.controls.focusMode")}
               >
-                <span>{t("timer.controls.focusLabel")}</span>
+                <Brain className="size-4 sm:hidden" />
+                <span className="hidden sm:inline">{t("timer.controls.focusLabel")}</span>
               </button>
               <button
                 onClick={() => skip(TimerStage.Break)}
@@ -110,7 +112,8 @@ const TimerView = ({
                 } ${stage === TimerStage.Break ? "cursor-not-allowed" : ""}`}
                 title={t("timer.controls.breakMode")}
               >
-                <span>{t("timer.controls.breakLabel")}</span>
+                <Coffee className="size-4 sm:hidden" />
+                <span className="hidden sm:inline">{t("timer.controls.breakLabel")}</span>
               </button>
             </div>
           </div>
@@ -125,7 +128,7 @@ const TimerView = ({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
+                className="relative hidden sm:flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={reset}
                 title={t("timer.controls.reset")}
                 role="button"
@@ -135,7 +138,7 @@ const TimerView = ({
               </button>
 
               <button
-                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
+                className="relative hidden sm:flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={onStatsClick}
                 title={t("timer.controls.viewStats")}
                 role="button"
