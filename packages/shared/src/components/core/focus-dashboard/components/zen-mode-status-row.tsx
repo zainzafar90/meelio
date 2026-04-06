@@ -11,11 +11,11 @@ export interface ZenModeStatusItem {
 }
 
 const toneClasses: Record<ZenModeStatusTone, string> = {
-  ready: "border-white/12 bg-white/10 text-white/88",
-  active: "border-emerald-200/18 bg-emerald-300/14 text-white",
-  off: "border-white/10 bg-white/6 text-white/56",
-  warning: "border-amber-200/20 bg-amber-300/14 text-white",
-  unavailable: "border-white/10 bg-white/6 text-white/64",
+  ready: "bg-white/10 text-white/88",
+  active: "bg-emerald-300/14 text-white",
+  off: "bg-white/6 text-white/56",
+  warning: "bg-amber-300/14 text-white",
+  unavailable: "bg-white/6 text-white/64",
 };
 
 export const ZenModeStatusRow = ({
@@ -30,7 +30,7 @@ export const ZenModeStatusRow = ({
       <div
         key={`${item.label}-${item.value}`}
         className={cn(
-          "inline-flex min-w-[140px] max-w-full items-center gap-2 rounded-full border px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl",
+          "inline-flex min-w-[140px] max-w-full items-center gap-2 rounded-full px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl",
           toneClasses[item.tone]
         )}
       >
@@ -44,6 +44,49 @@ export const ZenModeStatusRow = ({
           </span>
         </span>
       </div>
+    ))}
+  </div>
+);
+
+const toneAccentClasses: Record<ZenModeStatusTone, string> = {
+  ready: "text-white/80",
+  active: "text-emerald-100",
+  off: "text-white/50",
+  warning: "text-amber-100",
+  unavailable: "text-white/60",
+};
+
+export const ZenModeStatusLine = ({
+  items,
+  className,
+}: {
+  items: ZenModeStatusItem[];
+  className?: string;
+}) => (
+  <div
+    className={cn(
+      "flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[11px] text-white/70 sm:text-xs",
+      className,
+    )}
+  >
+    {items.map((item, index) => (
+      <span
+        key={`${item.label}-${item.value}-line`}
+        className="inline-flex min-w-0 items-center gap-1.5"
+      >
+        {item.icon && (
+          <span className={cn("shrink-0", toneAccentClasses[item.tone])}>
+            {item.icon}
+          </span>
+        )}
+        <span className="uppercase tracking-[0.22em] text-white/42">
+          {item.label}
+        </span>
+        <span className={cn("truncate font-medium", toneAccentClasses[item.tone])}>
+          {item.value}
+        </span>
+        {index < items.length - 1 && <span className="ml-1 text-white/18">·</span>}
+      </span>
     ))}
   </div>
 );

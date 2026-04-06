@@ -236,3 +236,24 @@
   - `pnpm --filter @repo/shared test -- src/stores/zen-mode.store.test.ts --run`
   - `pnpm --filter extension build`
   - `git diff --check`
+
+## Zen Mode Minimal Shell Redesign
+
+- [x] Remove the duplicated Zen chrome from the home shell and restore a cleaner wallpaper-first hierarchy
+- [x] Move Zen entry out of the top-left and into a calmer dedicated launch surface
+- [x] Replace active Zen pill rows with a quieter single-line system summary
+- [x] Keep controls in one stable area with low-presence hover reveal behavior
+- [x] Make the dock recede during active Zen and return on hover without using hard borders
+- [x] Verify web and extension builds after the shell redesign
+
+## Review
+
+- Zen entry now lives in a dedicated bottom ritual rail on the home shell instead of competing with the ambient top metadata, which restores the wallpaper-first hierarchy.
+- Active Zen now keeps its session controls in that same bottom zone, so configure and end actions no longer jump to a different corner or compete with the task and timer.
+- The old five-pill Zen status row was replaced with a single text-first system summary, which preserves readiness visibility without adding bordered chrome.
+- The dock now recedes during active Zen and comes forward on hover or focus, giving the session a more immersive feel without hiding functionality.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/stores/zen-mode.store.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
