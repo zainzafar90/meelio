@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "Ready to focus",
+      "remaining": "{{time}} remaining"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} queued",
+      "doneCount": "{{count}} done"
+    },
+    "activeTask": {
+      "label": "Active Focus Task",
+      "empty": "Choose a task to anchor the next focus block"
+    },
+    "calendar": {
+      "noUpcomingEvent": "No upcoming event",
+      "allDayEvent": "All-day event",
+      "upcomingEvent": "Upcoming event",
+      "nextEventLabel": "Next: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "Start Focusing"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "Task List",

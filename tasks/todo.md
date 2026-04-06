@@ -150,17 +150,20 @@
 - [x] Diff `feat/focus-dashboard-phase-5` against the current branch to identify new or changed user-facing copy
 - [x] Add missing task-focus translation keys for every supported locale
 - [x] Update the onboarding timer copy in every non-English locale
+- [x] Add missing focus-dashboard shell translation keys for every supported locale
+- [x] Replace hardcoded focus-dashboard shell strings with locale lookups
 - [x] Verify locale keys exist and run targeted shared verification
 
 ## Review
 
-- Diffing `feat/focus-dashboard-phase-5` against the current branch surfaced two localization deltas worth translating:
-  - the updated onboarding timer copy in `onboarding.timer`
-  - the newer task-focus action copy used by the task list button and its tooltip/aria label
+- Diffing `feat/focus-dashboard-phase-5` against the current branch surfaced an additional localization delta in the new focus-dashboard shell after screenshot review.
 - Added `tasks.item.focus`, `tasks.item.focused`, `tasks.item.focusTitle`, and `tasks.item.focusedTitle` to every supported locale so the task-list focus action no longer falls back to English.
 - Updated every non-English locale’s onboarding timer copy to match the new English “Focus Timer” wording instead of the older Pomodoro framing.
+- Added a dedicated `focusDashboard` translation block to every supported locale for the new shell copy, including `Ready to focus`, `{{time}} remaining`, `Start Focusing`, active-task labeling, calendar fallbacks, and task-count pill values.
+- The focus-dashboard shell now renders translated strings at the component layer instead of relying on English text stored in the dashboard snapshot, which removes the screenshot-visible English copy from the pills and hero label.
+- `getAgendaPillValue` now accepts translated fallback labels and once again returns a no-event fallback, restoring the intended pill behavior and fixing the related helper regression test.
 - Verification:
   - `for f in packages/shared/src/i18n/locales/{en,de,es,fr,pt,ru,ja,zh,ar}/translation.json; do jq -e '.onboarding.timer.title and .onboarding.timer.description and .tasks.item.focus and .tasks.item.focused and .tasks.item.focusTitle and .tasks.item.focusedTitle' "$f" >/dev/null || exit 1; done && echo 'locale key verification passed'`
-  - `pnpm --filter @repo/shared test -- src/components/core/task-list/components/task-list.helpers.test.ts --run`
-  - `pnpm --filter @repo/shared test -- --run` currently fails in the existing unrelated test `src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts` because `getAgendaPillValue(null)` returns `null` while the test expects `"No upcoming event"`.
-  - `pnpm --filter @repo/shared exec tsc --noEmit` is currently blocked by the repo’s existing `tsconfig.json` setting: `TS5103 Invalid value for '--ignoreDeprecations'`.
+  - `for f in packages/shared/src/i18n/locales/{en,de,es,fr,pt,ru,ja,zh,ar}/translation.json; do jq -e '.focusDashboard.timer.ready and .focusDashboard.timer.remaining and .focusDashboard.tasks.queuedCount and .focusDashboard.tasks.doneCount and .focusDashboard.activeTask.label and .focusDashboard.activeTask.empty and .focusDashboard.calendar.noUpcomingEvent and .focusDashboard.calendar.allDayEvent and .focusDashboard.calendar.upcomingEvent and .focusDashboard.calendar.nextEventLabel and .focusDashboard.actions.startFocusing' "$f" >/dev/null || exit 1; done && echo 'focus dashboard locale key verification passed'`
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/components/core/task-list/components/task-list.helpers.test.ts src/i18n/localization-completeness.test.ts --run`
+  - `pnpm --filter @repo/shared test -- --run`

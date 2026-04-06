@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "Bereit zum Fokussieren",
+      "remaining": "{{time}} verbleibend"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} ausstehend",
+      "doneCount": "{{count}} erledigt"
+    },
+    "activeTask": {
+      "label": "Aktuelle Fokusaufgabe",
+      "empty": "Wähle eine Aufgabe, die deinen nächsten Fokusblock verankern soll"
+    },
+    "calendar": {
+      "noUpcomingEvent": "Kein anstehender Termin",
+      "allDayEvent": "Ganztägiger Termin",
+      "upcomingEvent": "Anstehender Termin",
+      "nextEventLabel": "Nächster Termin: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "Fokus starten"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "Aufgabenliste",

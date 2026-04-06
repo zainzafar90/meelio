@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "准备开始专注",
+      "remaining": "剩余 {{time}}"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} 项待办",
+      "doneCount": "已完成 {{count}} 项"
+    },
+    "activeTask": {
+      "label": "当前专注任务",
+      "empty": "选择一项任务作为下一段专注时段的锚点"
+    },
+    "calendar": {
+      "noUpcomingEvent": "暂无即将开始的事件",
+      "allDayEvent": "全天事件",
+      "upcomingEvent": "即将开始的事件",
+      "nextEventLabel": "接下来：{{summary}}"
+    },
+    "actions": {
+      "startFocusing": "开始专注"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "任务清单",

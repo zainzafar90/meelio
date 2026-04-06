@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { Brain, CalendarDays, CheckSquare2, Timer } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { TimerState } from "../../../types/timer.types";
 import { formatTime } from "../../../utils/timer.utils";
@@ -65,6 +66,7 @@ export const FocusDashboard = ({
   timerStore,
   timerPanel,
 }: FocusDashboardProps) => {
+  const { t, i18n } = useTranslation();
   const userId = useAuthStore((state) => state.user?.id);
   const { stage, isRunning, prevRemaining, endTimestamp, durations } =
     timerStore(
@@ -121,6 +123,66 @@ export const FocusDashboard = ({
 
     return durations[stage];
   }, [durations, endTimestamp, isRunning, prevRemaining, stage]);
+  const calendarPillValue = useMemo(
+    () =>
+      getAgendaPillValue(nextEvent, {
+        noUpcomingEvent: t("focusDashboard.calendar.noUpcomingEvent", {
+          defaultValue: "No upcoming event",
+        }),
+        allDayEvent: t("focusDashboard.calendar.allDayEvent", {
+          defaultValue: "All-day event",
+        }),
+        upcomingEvent: t("focusDashboard.calendar.upcomingEvent", {
+          defaultValue: "Upcoming event",
+        }),
+      }),
+    [i18n.resolvedLanguage, nextEvent, t],
+  );
+  const currentTimerLabel = isRunning
+    ? t("focusDashboard.timer.remaining", {
+        time: formatTime(timerRemaining),
+        defaultValue: "{{time}} remaining",
+      })
+    : t("focusDashboard.timer.ready", {
+        defaultValue: "Ready to focus",
+      });
+  const nextEventLabel = nextEvent?.summary
+    ? t("focusDashboard.calendar.nextEventLabel", {
+        summary: nextEvent.summary,
+        defaultValue: "Next: {{summary}}",
+      })
+    : "";
+  const queuedTaskCountLabel = t("focusDashboard.tasks.queuedCount", {
+    count: taskPillSummary.queuedCount,
+    defaultValue: "{{count}} queued",
+  });
+  const completedTaskCountLabel = t("focusDashboard.tasks.doneCount", {
+    count: taskPillSummary.completedCount,
+    defaultValue: "{{count}} done",
+  });
+  const activeFocusTaskLabel = snapshot.activeFocusTaskId
+    ? snapshot.activeFocusTaskLabel
+    : t("focusDashboard.activeTask.empty", {
+        defaultValue: "Choose a task to anchor the next focus block",
+      });
+  const focusPillLabel = t("timer.controls.focusLabel", {
+    defaultValue: "Focus",
+  });
+  const calendarPillLabel = t("common.calendar", {
+    defaultValue: "Calendar",
+  });
+  const tasksPillLabel = t("common.tasks", {
+    defaultValue: "Tasks",
+  });
+  const todayPillLabel = t("calendar.sheet.today", {
+    defaultValue: "Today",
+  });
+  const activeFocusTaskEyebrow = t("focusDashboard.activeTask.label", {
+    defaultValue: "Active Focus Task",
+  });
+  const startFocusingLabel = t("focusDashboard.actions.startFocusing", {
+    defaultValue: "Start Focusing",
+  });
 
   useEffect(() => {
     initializeFocusDashboardStore();
@@ -146,20 +208,19 @@ export const FocusDashboard = ({
     syncFocusDashboardSignals({
       timerRunning: isRunning,
       timerStage: stage,
-      timerLabel: isRunning
-        ? `${formatTime(timerRemaining)} remaining`
-        : "Ready to focus",
+      timerLabel: currentTimerLabel,
       sessionFocusTaskId: isRunning ? snapshot.sessionFocusTaskId : null,
       blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
       soundtrackMode: playingSounds > 0 ? "playing" : "available",
-      nextEventLabel: nextEvent?.summary ? `Next: ${nextEvent.summary}` : "",
+      nextEventLabel,
       minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
     });
   }, [
     blockedSites.length,
+    currentTimerLabel,
+    nextEventLabel,
     isRunning,
     nextEvent,
-    nextEvent?.summary,
     playingSounds,
     stage,
     timerRemaining,
@@ -196,11 +257,15 @@ export const FocusDashboard = ({
           >
             <FocusModeShell
               timerPanel={timerPanel}
-              currentTimerLabel={snapshot.currentTimerLabel}
-              activeFocusTaskLabel={snapshot.activeFocusTaskLabel}
+              currentTimerLabel={currentTimerLabel}
+              activeFocusTaskLabel={activeFocusTaskLabel}
               activeFocusTaskId={snapshot.activeFocusTaskId}
-              completedTaskCount={taskPillSummary.completedCount}
-              calendarPillValue={getAgendaPillValue(nextEvent)}
+              completedTaskCountLabel={completedTaskCountLabel}
+              calendarPillValue={calendarPillValue}
+              focusPillLabel={focusPillLabel}
+              calendarPillLabel={calendarPillLabel}
+              todayPillLabel={todayPillLabel}
+              activeFocusTaskEyebrow={activeFocusTaskEyebrow}
               onSelectTask={toggleTasks}
             />
           </motion.div>
@@ -229,8 +294,12 @@ export const FocusDashboard = ({
             className="flex min-h-0 flex-1"
           >
             <HomeModeShell
-              calendarPillValue={getAgendaPillValue(nextEvent)}
-              queuedTaskCount={taskPillSummary.queuedCount}
+              calendarPillValue={calendarPillValue}
+              queuedTaskCountLabel={queuedTaskCountLabel}
+              focusPillLabel={focusPillLabel}
+              calendarPillLabel={calendarPillLabel}
+              tasksPillLabel={tasksPillLabel}
+              startFocusingLabel={startFocusingLabel}
               onStartFocusing={() => setTimerVisible(true)}
             />
           </motion.div>
@@ -242,24 +311,35 @@ export const FocusDashboard = ({
 
 const HomeModeShell = ({
   calendarPillValue,
-  queuedTaskCount,
+  queuedTaskCountLabel,
+  focusPillLabel,
+  calendarPillLabel,
+  tasksPillLabel,
+  startFocusingLabel,
   onStartFocusing,
 }: {
   calendarPillValue: string | null;
-  queuedTaskCount: number;
+  queuedTaskCountLabel: string;
+  focusPillLabel: string;
+  calendarPillLabel: string;
+  tasksPillLabel: string;
+  startFocusingLabel: string;
   onStartFocusing: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
-     
       <div className="flex-1 flex justify-start">
-        <StartFocusPill onClick={onStartFocusing} />
+        <StartFocusPill
+          focusPillLabel={focusPillLabel}
+          startFocusingLabel={startFocusingLabel}
+          onClick={onStartFocusing}
+        />
       </div>
-       <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center">
         {calendarPillValue && (
           <AmbientPill
             icon={<CalendarDays className="size-3.5" />}
-            label="Calendar"
+            label={calendarPillLabel}
             value={calendarPillValue}
           />
         )}
@@ -267,8 +347,8 @@ const HomeModeShell = ({
       <div className="flex-1 flex justify-end">
         <AmbientPill
           icon={<CheckSquare2 className="size-3.5" />}
-          label="Tasks"
-          value={`${queuedTaskCount} queued`}
+          label={tasksPillLabel}
+          value={queuedTaskCountLabel}
         />
       </div>
     </div>
@@ -291,16 +371,24 @@ const FocusModeShell = ({
   currentTimerLabel,
   activeFocusTaskLabel,
   activeFocusTaskId,
-  completedTaskCount,
+  completedTaskCountLabel,
   calendarPillValue,
+  focusPillLabel,
+  calendarPillLabel,
+  todayPillLabel,
+  activeFocusTaskEyebrow,
   onSelectTask,
 }: {
   timerPanel: ReactNode;
   currentTimerLabel: string;
   activeFocusTaskLabel: string;
   activeFocusTaskId: string | null;
-  completedTaskCount: number;
+  completedTaskCountLabel: string;
   calendarPillValue: string | null;
+  focusPillLabel: string;
+  calendarPillLabel: string;
+  todayPillLabel: string;
+  activeFocusTaskEyebrow: string;
   onSelectTask: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
@@ -308,10 +396,10 @@ const FocusModeShell = ({
     <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.20),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.13),transparent_28%)]" />
     <div className="relative flex h-full w-full max-w-full flex-col">
       <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-         <div className="flex-1 flex justify-start">
+        <div className="flex-1 flex justify-start">
           <AmbientPill
             icon={<Timer className="size-3.5" />}
-            label="Focus"
+            label={focusPillLabel}
             value={currentTimerLabel}
           />
         </div>
@@ -319,7 +407,7 @@ const FocusModeShell = ({
           {calendarPillValue && (
             <AmbientPill
               icon={<CalendarDays className="size-3.5" />}
-              label="Calendar"
+              label={calendarPillLabel}
               value={calendarPillValue}
             />
           )}
@@ -327,8 +415,8 @@ const FocusModeShell = ({
         <div className="flex-1 flex justify-end">
           <AmbientPill
             icon={<CheckSquare2 className="size-3.5" />}
-            label="Today"
-            value={`${completedTaskCount} done`}
+            label={todayPillLabel}
+            value={completedTaskCountLabel}
           />
         </div>
       </div>
@@ -339,7 +427,7 @@ const FocusModeShell = ({
           onClick={activeFocusTaskId ? undefined : onSelectTask}
         >
           <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
-            Active Focus Task
+            {activeFocusTaskEyebrow}
           </p>
           <h2 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
             {activeFocusTaskLabel}
@@ -379,7 +467,15 @@ const AmbientPill = ({
   </div>
 );
 
-const StartFocusPill = ({ onClick }: { onClick: () => void }) => (
+const StartFocusPill = ({
+  focusPillLabel,
+  startFocusingLabel,
+  onClick,
+}: {
+  focusPillLabel: string;
+  startFocusingLabel: string;
+  onClick: () => void;
+}) => (
   <button
     onClick={onClick}
     className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/16 px-3.5 text-sm text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-colors hover:bg-white/24 sm:h-10 sm:gap-3 sm:px-5"
@@ -388,10 +484,10 @@ const StartFocusPill = ({ onClick }: { onClick: () => void }) => (
       <Brain className="size-3.5" />
     </span>
     <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
-      Focus
+      {focusPillLabel}
     </span>
     <span className="text-xs font-semibold text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.18)] sm:text-sm">
-      Start Focusing
+      {startFocusingLabel}
     </span>
   </button>
 );

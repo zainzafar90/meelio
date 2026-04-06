@@ -49,6 +49,13 @@ const requiredShape = {
     drawer: enTranslation["site-blocker"].drawer,
     blockedPage: enTranslation["site-blocker"].blockedPage,
   },
+  focusDashboard: {
+    timer: enTranslation.focusDashboard.timer,
+    tasks: enTranslation.focusDashboard.tasks,
+    activeTask: enTranslation.focusDashboard.activeTask,
+    calendar: enTranslation.focusDashboard.calendar,
+    actions: enTranslation.focusDashboard.actions,
+  },
 } satisfies TranslationTree;
 
 const locales = {

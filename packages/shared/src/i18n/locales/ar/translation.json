@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "جاهز للتركيز",
+      "remaining": "متبقي {{time}}"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} قيد الانتظار",
+      "doneCount": "{{count}} مكتملة"
+    },
+    "activeTask": {
+      "label": "مهمة التركيز الحالية",
+      "empty": "اختر مهمة لتكون محور جلسة التركيز التالية"
+    },
+    "calendar": {
+      "noUpcomingEvent": "لا توجد أحداث قادمة",
+      "allDayEvent": "حدث طوال اليوم",
+      "upcomingEvent": "حدث قادم",
+      "nextEventLabel": "التالي: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "ابدأ التركيز"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "قائمة المهام",

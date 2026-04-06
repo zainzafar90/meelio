@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "Pronto para focar",
+      "remaining": "{{time}} restantes"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} pendentes",
+      "doneCount": "{{count}} concluídas"
+    },
+    "activeTask": {
+      "label": "Tarefa de foco ativa",
+      "empty": "Escolha uma tarefa para ancorar seu próximo bloco de foco"
+    },
+    "calendar": {
+      "noUpcomingEvent": "Nenhum evento próximo",
+      "allDayEvent": "Evento de dia inteiro",
+      "upcomingEvent": "Próximo evento",
+      "nextEventLabel": "Próximo: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "Começar a focar"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "Lista de Tarefas",

@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "集中の準備完了",
+      "remaining": "残り{{time}}"
+    },
+    "tasks": {
+      "queuedCount": "{{count}}件待機中",
+      "doneCount": "{{count}}件完了"
+    },
+    "activeTask": {
+      "label": "現在の集中タスク",
+      "empty": "次の集中ブロックの軸にするタスクを選んでください"
+    },
+    "calendar": {
+      "noUpcomingEvent": "今後の予定はありません",
+      "allDayEvent": "終日の予定",
+      "upcomingEvent": "今後の予定",
+      "nextEventLabel": "次: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "集中を始める"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "タスクリスト",

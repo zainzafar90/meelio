@@ -168,6 +168,29 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "Готово к фокусу",
+      "remaining": "Осталось {{time}}"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} в очереди",
+      "doneCount": "{{count}} выполнено"
+    },
+    "activeTask": {
+      "label": "Текущая задача фокуса",
+      "empty": "Выберите задачу, которая станет опорой для следующего блока фокуса"
+    },
+    "calendar": {
+      "noUpcomingEvent": "Ближайших событий нет",
+      "allDayEvent": "Событие на весь день",
+      "upcomingEvent": "Предстоящее событие",
+      "nextEventLabel": "Следующее: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "Начать фокусироваться"
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "Список задач",
