@@ -189,6 +189,26 @@
     },
     "actions": {
       "startFocusing": "Começar a focar"
+    },
+    "zenMode": {
+      "readyLabel": "Modo Zen",
+      "activeLabel": "Zen ativo",
+      "readyHeadline": "Um toque inicia seu ritual de foco",
+      "readySubtitle": "Temporizador, tarefas, paisagens sonoras, bloqueador e abas seguem suas preferências salvas.",
+      "activeSubtitle": "Tudo o que você ativou está sustentando o foco.",
+      "start": "Entrar no Zen",
+      "starting": "Entrando no Zen...",
+      "end": "Encerrar Zen",
+      "ending": "Saindo do Zen...",
+      "configure": "Configurar",
+      "status": {
+        "ready": "Pronto",
+        "active": "Ativo",
+        "off": "Desativado",
+        "unavailable": "Somente extensão",
+        "permissionNeeded": "Permissão necessária",
+        "stashed": "Guardadas"
+      }
     }
   },
   "tasks": {
@@ -435,6 +455,31 @@
       "twelveHourClock": {
         "title": "Relógio de 24 Horas",
         "description": "Exibir horário no formato de 24 horas"
+      },
+      "zenMode": {
+        "title": "Modo Zen",
+        "description": "Escolha o que inicia automaticamente ao entrar no modo de foco.",
+        "platformNote": "O bloqueador de sites e o armazenamento de abas só funcionam na extensão do navegador.",
+        "timer": {
+          "title": "Iniciar temporizador",
+          "description": "Inicie o temporizador de foco assim que o Modo Zen começar."
+        },
+        "soundscapes": {
+          "title": "Reproduzir paisagens sonoras",
+          "description": "Inicie sua paisagem sonora de foco automaticamente."
+        },
+        "pinnedTaskSync": {
+          "title": "Sincronizar tarefa fixada",
+          "description": "Use a tarefa fixada atual como âncora da sessão Zen."
+        },
+        "siteBlocker": {
+          "title": "Ativar bloqueador de sites",
+          "description": "Coloque os sites bloqueados no modo somente foco durante o Modo Zen."
+        },
+        "tabStash": {
+          "title": "Guardar abas",
+          "description": "Guarde as abas abertas no início do Modo Zen."
+        }
       }
     },
     "appearance": {

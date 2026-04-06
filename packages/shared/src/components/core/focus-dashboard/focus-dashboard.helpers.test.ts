@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getAgendaPillValue,
   getTaskPillSummary,
+  getZenModeStatus,
 } from "./focus-dashboard.helpers";
 
 describe("focus dashboard pill helpers", () => {
@@ -31,5 +32,64 @@ describe("focus dashboard pill helpers", () => {
 
   it("falls back when no upcoming event exists", () => {
     expect(getAgendaPillValue(null)).toBe("No upcoming event");
+  });
+
+  it("maps Zen readiness into calm status copy", () => {
+    expect(
+      getZenModeStatus({
+        enabled: true,
+        availability: "ready",
+        readyValue: "Ready",
+        activeValue: "Running",
+        labels: {
+          off: "Off",
+          unavailable: "Extension only",
+          permissionNeeded: "Permission needed",
+          stashed: "Stashed",
+        },
+      }),
+    ).toEqual({
+      tone: "ready",
+      value: "Ready",
+    });
+  });
+
+  it("surfaces permission and stashed states explicitly", () => {
+    expect(
+      getZenModeStatus({
+        enabled: true,
+        availability: "permission-needed",
+        readyValue: "Ready",
+        activeValue: "Running",
+        labels: {
+          off: "Off",
+          unavailable: "Extension only",
+          permissionNeeded: "Permission needed",
+          stashed: "Stashed",
+        },
+      }),
+    ).toEqual({
+      tone: "warning",
+      value: "Permission needed",
+    });
+
+    expect(
+      getZenModeStatus({
+        enabled: true,
+        availability: "ready",
+        isStashed: true,
+        readyValue: "Ready",
+        activeValue: "Running",
+        labels: {
+          off: "Off",
+          unavailable: "Extension only",
+          permissionNeeded: "Permission needed",
+          stashed: "Stashed",
+        },
+      }),
+    ).toEqual({
+      tone: "active",
+      value: "Stashed",
+    });
   });
 });

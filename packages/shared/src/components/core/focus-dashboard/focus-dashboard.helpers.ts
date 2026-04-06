@@ -12,6 +12,20 @@ type AgendaPillLabels = {
   upcomingEvent: string;
 };
 
+export type ZenModeStatusTone =
+  | "ready"
+  | "active"
+  | "off"
+  | "warning"
+  | "unavailable";
+
+type ZenModeStatusLabels = {
+  off: string;
+  unavailable: string;
+  permissionNeeded: string;
+  stashed: string;
+};
+
 export const getTaskPillSummary = (tasks: FocusTaskLike[]) => {
   const visibleTasks = tasks.filter((task) => !task.deletedAt);
 
@@ -39,4 +53,65 @@ export const getAgendaPillValue = (
   }
 
   return isAllDayEvent(event) ? labels.allDayEvent : labels.upcomingEvent;
+};
+
+export const getZenModeStatus = ({
+  enabled,
+  availability = "ready",
+  isActive = false,
+  isStashed = false,
+  readyValue,
+  activeValue,
+  labels,
+}: {
+  enabled: boolean;
+  availability?: "ready" | "permission-needed" | "unavailable" | "error";
+  isActive?: boolean;
+  isStashed?: boolean;
+  readyValue: string;
+  activeValue: string;
+  labels: ZenModeStatusLabels;
+}): {
+  tone: ZenModeStatusTone;
+  value: string;
+} => {
+  if (!enabled) {
+    return {
+      tone: "off",
+      value: labels.off,
+    };
+  }
+
+  if (availability === "unavailable") {
+    return {
+      tone: "unavailable",
+      value: labels.unavailable,
+    };
+  }
+
+  if (availability === "permission-needed" || availability === "error") {
+    return {
+      tone: "warning",
+      value: labels.permissionNeeded,
+    };
+  }
+
+  if (isStashed) {
+    return {
+      tone: "active",
+      value: labels.stashed,
+    };
+  }
+
+  if (isActive) {
+    return {
+      tone: "active",
+      value: activeValue,
+    };
+  }
+
+  return {
+    tone: "ready",
+    value: readyValue,
+  };
 };

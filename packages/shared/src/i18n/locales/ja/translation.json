@@ -189,6 +189,26 @@
     },
     "actions": {
       "startFocusing": "集中を始める"
+    },
+    "zenMode": {
+      "readyLabel": "禅モード",
+      "activeLabel": "禅モード中",
+      "readyHeadline": "ワンタップで集中の儀式に入ります",
+      "readySubtitle": "タイマー、タスク、サウンドスケープ、ブロッカー、タブが保存した設定に従います。",
+      "activeSubtitle": "有効にしたものが今は集中を支えています。",
+      "start": "禅に入る",
+      "starting": "禅モードを開始中...",
+      "end": "禅を終了",
+      "ending": "禅モードを終了中...",
+      "configure": "設定",
+      "status": {
+        "ready": "準備完了",
+        "active": "アクティブ",
+        "off": "オフ",
+        "unavailable": "拡張機能のみ",
+        "permissionNeeded": "権限が必要",
+        "stashed": "退避済み"
+      }
     }
   },
   "tasks": {
@@ -435,6 +455,31 @@
       "twelveHourClock": {
         "title": "24時間表示",
         "description": "時刻を24時間形式で表示します"
+      },
+      "zenMode": {
+        "title": "禅モード",
+        "description": "集中モードに入ったとき自動で始める項目を選択します。",
+        "platformNote": "サイトブロッカーとタブ退避はブラウザー拡張機能でのみ動作します。",
+        "timer": {
+          "title": "タイマーを開始",
+          "description": "禅モードの開始と同時に集中タイマーを始めます。"
+        },
+        "soundscapes": {
+          "title": "サウンドスケープを再生",
+          "description": "集中用のサウンドスケープを自動で再生します。"
+        },
+        "pinnedTaskSync": {
+          "title": "固定タスクを同期",
+          "description": "現在固定しているタスクを禅セッションの軸にします。"
+        },
+        "siteBlocker": {
+          "title": "サイトブロッカーを有効化",
+          "description": "禅モード中はブロック対象サイトを集中専用モードにします。"
+        },
+        "tabStash": {
+          "title": "タブを退避",
+          "description": "禅モード開始時に開いているタブを退避します。"
+        }
       }
     },
     "appearance": {

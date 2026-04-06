@@ -12,6 +12,7 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
   const [isResetting, setIsResetting] = useState(false);
 
   const {
+    platform,
     mantraRotationEnabled,
     setMantraRotation,
     wallpaperRotationEnabled,
@@ -20,8 +21,11 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     setTwelveHourClock,
     confettiOnComplete,
     setConfettiOnComplete,
+    zenMode,
+    updateZenModeSettings,
   } = useAppStore(
     useShallow((state) => ({
+      platform: state.platform,
       mantraRotationEnabled: state.mantraRotationEnabled,
       setMantraRotation: state.setMantraRotation,
       wallpaperRotationEnabled: state.wallpaperRotationEnabled,
@@ -30,6 +34,8 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
       setTwelveHourClock: state.setTwelveHourClock,
       confettiOnComplete: state.confettiOnComplete ?? true,
       setConfettiOnComplete: state.setConfettiOnComplete,
+      zenMode: state.zenMode,
+      updateZenModeSettings: state.updateZenModeSettings,
     }))
   );
 
@@ -133,6 +139,63 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
         />
       </div>
 
+      <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="space-y-1">
+          <p className="text-sm font-medium">
+            {t("settings.general.zenMode.title")}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t("settings.general.zenMode.description")}
+          </p>
+          {platform === "web" && (
+            <p className="text-xs text-muted-foreground">
+              {t("settings.general.zenMode.platformNote")}
+            </p>
+          )}
+        </div>
+
+        <ZenModeToggleRow
+          title={t("settings.general.zenMode.timer.title")}
+          description={t("settings.general.zenMode.timer.description")}
+          checked={zenMode.timerEnabled}
+          onCheckedChange={(value) =>
+            updateZenModeSettings({ timerEnabled: value })
+          }
+        />
+        <ZenModeToggleRow
+          title={t("settings.general.zenMode.soundscapes.title")}
+          description={t("settings.general.zenMode.soundscapes.description")}
+          checked={zenMode.soundscapesEnabled}
+          onCheckedChange={(value) =>
+            updateZenModeSettings({ soundscapesEnabled: value })
+          }
+        />
+        <ZenModeToggleRow
+          title={t("settings.general.zenMode.pinnedTaskSync.title")}
+          description={t("settings.general.zenMode.pinnedTaskSync.description")}
+          checked={zenMode.pinnedTaskSyncEnabled}
+          onCheckedChange={(value) =>
+            updateZenModeSettings({ pinnedTaskSyncEnabled: value })
+          }
+        />
+        <ZenModeToggleRow
+          title={t("settings.general.zenMode.siteBlocker.title")}
+          description={t("settings.general.zenMode.siteBlocker.description")}
+          checked={zenMode.siteBlockerEnabled}
+          onCheckedChange={(value) =>
+            updateZenModeSettings({ siteBlockerEnabled: value })
+          }
+        />
+        <ZenModeToggleRow
+          title={t("settings.general.zenMode.tabStash.title")}
+          description={t("settings.general.zenMode.tabStash.description")}
+          checked={zenMode.tabStashEnabled}
+          onCheckedChange={(value) =>
+            updateZenModeSettings({ tabStashEnabled: value })
+          }
+        />
+      </div>
+
       <div className="flex items-center justify-between rounded-lg border p-4 transition-colors">
         <div className="flex items-center space-x-4">
           <div className="space-y-1">
@@ -156,3 +219,31 @@ export function GeneralSettings({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
+
+const ZenModeToggleRow = ({
+  title,
+  description,
+  checked,
+  onCheckedChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (value: boolean) => void;
+}) => (
+  <div
+    className="flex items-center justify-between rounded-lg border border-white/10 p-4 transition-colors hover:bg-muted/30 cursor-pointer"
+    onClick={() => onCheckedChange(!checked)}
+  >
+    <div className="space-y-1 pr-4">
+      <p className="text-sm font-medium">{title}</p>
+      <p className="text-sm text-muted-foreground">{description}</p>
+    </div>
+    <Switch
+      size="sm"
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      aria-label={title}
+    />
+  </div>
+);

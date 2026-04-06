@@ -3,12 +3,21 @@ import type { ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
-import { Brain, CalendarDays, CheckSquare2, Timer } from "lucide-react";
+import {
+  Brain,
+  CalendarDays,
+  CheckSquare2,
+  PanelsTopLeft,
+  Shield,
+  Timer,
+  Volume2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import type { TimerState } from "../../../types/timer.types";
 import { formatTime } from "../../../utils/timer.utils";
 import { getMinutesUntilEvent } from "../../../utils/calendar-date.utils";
+import { useAppStore } from "../../../stores/app.store";
 import { useCalendarStore } from "../../../stores/calendar.store";
 import { useDockStore } from "../../../stores/dock.store";
 import {
@@ -18,14 +27,22 @@ import {
   useFocusDashboardStore,
 } from "../../../stores/focus-dashboard.store";
 import { useAuthStore } from "../../../stores/auth.store";
+import { useSettingsStore } from "../../../stores/settings.store";
 import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
 import { useSoundscapesStore } from "../../../stores/soundscapes.store";
 import { useTaskStore } from "../../../stores/task.store";
+import { useZenModeStore } from "../../../stores/zen-mode.store";
 import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
+import { ZenModeConfigTrigger } from "./components/zen-mode-config-trigger";
+import {
+  ZenModeStatusRow,
+  type ZenModeStatusItem,
+} from "./components/zen-mode-status-row";
 import {
   getAgendaPillValue,
   getTaskPillSummary,
+  getZenModeStatus,
 } from "./focus-dashboard.helpers";
 
 type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
@@ -76,8 +93,16 @@ export const FocusDashboard = ({
         prevRemaining: state.prevRemaining,
         endTimestamp: state.endTimestamp,
         durations: state.durations,
+        start: state.start,
+        reset: state.reset,
       })),
     );
+  const { platform, zenMode } = useAppStore(
+    useShallow((state) => ({
+      platform: state.platform,
+      zenMode: state.zenMode,
+    })),
+  );
   const {
     tasks,
     initializeTaskStore,
@@ -91,15 +116,41 @@ export const FocusDashboard = ({
       hasTaskStoreInitialized: state.hasInitialized,
     })),
   );
+  const { openSettings, setTab } = useSettingsStore(
+    useShallow((state) => ({
+      openSettings: state.openSettings,
+      setTab: state.setTab,
+    })),
+  );
+  const {
+    phase: zenPhase,
+    browserCapabilities,
+    didStashTabs,
+    sessionTaskId: zenSessionTaskId,
+    refreshBrowserCapabilities,
+    startSession,
+    endSession,
+    syncSessionFocusState,
+  } = useZenModeStore(
+    useShallow((state) => ({
+      phase: state.phase,
+      browserCapabilities: state.browserCapabilities,
+      didStashTabs: state.didStashTabs,
+      sessionTaskId: state.sessionTaskId,
+      refreshBrowserCapabilities: state.refreshBrowserCapabilities,
+      startSession: state.startSession,
+      endSession: state.endSession,
+      syncSessionFocusState: state.syncSessionFocusState,
+    })),
+  );
   const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
   const playingSounds = useSoundscapesStore(
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible, setTimerVisible, toggleTasks } = useDockStore(
+  const { isTimerVisible, toggleTasks } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
-      setTimerVisible: state.setTimerVisible,
       toggleTasks: state.toggleTasks,
     })),
   );
@@ -111,6 +162,14 @@ export const FocusDashboard = ({
     Boolean(userId) && (!hasTaskStoreInitialized || isTaskStoreLoading);
 
   const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
+  const pinnedTask = useMemo(
+    () =>
+      tasks
+        .filter((task) => !task.completed && !task.deletedAt && task.pinned)
+        .sort((left, right) => (right.updatedAt ?? 0) - (left.updatedAt ?? 0))[0] ??
+      null,
+    [tasks],
+  );
   const taskPillSummary = useMemo(() => getTaskPillSummary(tasks), [tasks]);
   const timerRemaining = useMemo(() => {
     if (!isRunning && prevRemaining !== null) {
@@ -165,6 +224,24 @@ export const FocusDashboard = ({
     : t("focusDashboard.activeTask.empty", {
         defaultValue: "Choose a task to anchor the next focus block",
       });
+  const zenTask = useMemo(() => {
+    if (zenMode.pinnedTaskSyncEnabled) {
+      return pinnedTask;
+    }
+
+    if (!zenSessionTaskId) {
+      return null;
+    }
+
+    return (
+      tasks.find(
+        (task) =>
+          task.id === zenSessionTaskId && !task.completed && !task.deletedAt,
+      ) ?? null
+    );
+  }, [pinnedTask, tasks, zenMode.pinnedTaskSyncEnabled, zenSessionTaskId]);
+  const zenActiveTaskId = zenTask?.id ?? zenSessionTaskId;
+  const zenActiveTaskLabel = zenTask?.title ?? activeFocusTaskLabel;
   const focusPillLabel = t("timer.controls.focusLabel", {
     defaultValue: "Focus",
   });
@@ -180,9 +257,235 @@ export const FocusDashboard = ({
   const activeFocusTaskEyebrow = t("focusDashboard.activeTask.label", {
     defaultValue: "Active Focus Task",
   });
-  const startFocusingLabel = t("focusDashboard.actions.startFocusing", {
-    defaultValue: "Start Focusing",
+  const zenReadyLabel = t("focusDashboard.zenMode.readyLabel", {
+    defaultValue: "Zen Mode",
   });
+  const zenActiveLabel = t("focusDashboard.zenMode.activeLabel", {
+    defaultValue: "Zen active",
+  });
+  const zenReadyHeadline = t("focusDashboard.zenMode.readyHeadline", {
+    defaultValue: "One tap enters your focus ritual",
+  });
+  const zenReadySubtitle = t("focusDashboard.zenMode.readySubtitle", {
+    defaultValue:
+      "Timer, tasks, soundscapes, blocker, and tabs follow your saved defaults.",
+  });
+  const zenActiveSubtitle = t("focusDashboard.zenMode.activeSubtitle", {
+    defaultValue: "Everything you enabled is holding the line.",
+  });
+  const zenConfigureLabel = t("focusDashboard.zenMode.configure", {
+    defaultValue: "Configure",
+  });
+  const zenStartLabel =
+    zenPhase === "starting"
+      ? t("focusDashboard.zenMode.starting", {
+          defaultValue: "Entering Zen...",
+        })
+      : t("focusDashboard.zenMode.start", {
+          defaultValue: "Enter Zen",
+        });
+  const zenEndLabel =
+    zenPhase === "ending"
+      ? t("focusDashboard.zenMode.ending", {
+          defaultValue: "Leaving Zen...",
+        })
+      : t("focusDashboard.zenMode.end", {
+          defaultValue: "End Zen",
+        });
+  const zenStatusReadyLabel = t("focusDashboard.zenMode.status.ready", {
+    defaultValue: "Ready",
+  });
+  const zenStatusActiveLabel = t("focusDashboard.zenMode.status.active", {
+    defaultValue: "Active",
+  });
+  const zenStatusLabels = {
+    off: t("focusDashboard.zenMode.status.off", {
+      defaultValue: "Off",
+    }),
+    unavailable: t("focusDashboard.zenMode.status.unavailable", {
+      defaultValue: "Extension only",
+    }),
+    permissionNeeded: t("focusDashboard.zenMode.status.permissionNeeded", {
+      defaultValue: "Permission needed",
+    }),
+    stashed: t("focusDashboard.zenMode.status.stashed", {
+      defaultValue: "Stashed",
+    }),
+  };
+
+  const zenReadyItems = useMemo<ZenModeStatusItem[]>(
+    () => [
+      {
+        icon: <Timer className="size-3.5" />,
+        label: focusPillLabel,
+        ...getZenModeStatus({
+          enabled: zenMode.timerEnabled,
+          readyValue: zenStatusReadyLabel,
+          activeValue: currentTimerLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <CheckSquare2 className="size-3.5" />,
+        label: tasksPillLabel,
+        ...getZenModeStatus({
+          enabled: zenMode.pinnedTaskSyncEnabled,
+          readyValue: pinnedTask?.title ?? zenStatusReadyLabel,
+          activeValue: zenActiveTaskLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <Volume2 className="size-3.5" />,
+        label: t("common.soundscapes", {
+          defaultValue: "Soundscapes",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.soundscapesEnabled,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <Shield className="size-3.5" />,
+        label: t("common.site-blocker", {
+          defaultValue: "Site Blocker",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.siteBlockerEnabled,
+          availability: browserCapabilities.siteBlocker,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <PanelsTopLeft className="size-3.5" />,
+        label: t("common.tab-stash", {
+          defaultValue: "Tab Stash",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.tabStashEnabled,
+          availability: browserCapabilities.tabStash,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+    ],
+    [
+      browserCapabilities.siteBlocker,
+      browserCapabilities.tabStash,
+      currentTimerLabel,
+      focusPillLabel,
+      pinnedTask?.title,
+      tasksPillLabel,
+      t,
+      zenActiveTaskLabel,
+      zenMode.pinnedTaskSyncEnabled,
+      zenMode.siteBlockerEnabled,
+      zenMode.soundscapesEnabled,
+      zenMode.tabStashEnabled,
+      zenMode.timerEnabled,
+      zenStatusActiveLabel,
+      zenStatusLabels,
+      zenStatusReadyLabel,
+    ],
+  );
+
+  const zenActiveItems = useMemo<ZenModeStatusItem[]>(
+    () => [
+      {
+        icon: <Timer className="size-3.5" />,
+        label: focusPillLabel,
+        ...getZenModeStatus({
+          enabled: zenMode.timerEnabled,
+          isActive: zenPhase !== "inactive" && zenMode.timerEnabled,
+          readyValue: zenStatusReadyLabel,
+          activeValue: currentTimerLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <CheckSquare2 className="size-3.5" />,
+        label: tasksPillLabel,
+        ...getZenModeStatus({
+          enabled: zenMode.pinnedTaskSyncEnabled,
+          isActive: Boolean(zenActiveTaskId),
+          readyValue: pinnedTask?.title ?? zenStatusReadyLabel,
+          activeValue: zenActiveTaskLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <Volume2 className="size-3.5" />,
+        label: t("common.soundscapes", {
+          defaultValue: "Soundscapes",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.soundscapesEnabled,
+          isActive: playingSounds > 0,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <Shield className="size-3.5" />,
+        label: t("common.site-blocker", {
+          defaultValue: "Site Blocker",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.siteBlockerEnabled,
+          availability: browserCapabilities.siteBlocker,
+          isActive:
+            zenPhase !== "inactive" &&
+            zenMode.siteBlockerEnabled &&
+            browserCapabilities.siteBlocker === "ready",
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <PanelsTopLeft className="size-3.5" />,
+        label: t("common.tab-stash", {
+          defaultValue: "Tab Stash",
+        }),
+        ...getZenModeStatus({
+          enabled: zenMode.tabStashEnabled,
+          availability: browserCapabilities.tabStash,
+          isStashed: didStashTabs,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+    ],
+    [
+      browserCapabilities.siteBlocker,
+      browserCapabilities.tabStash,
+      currentTimerLabel,
+      didStashTabs,
+      focusPillLabel,
+      pinnedTask?.title,
+      playingSounds,
+      t,
+      tasksPillLabel,
+      zenActiveTaskId,
+      zenActiveTaskLabel,
+      zenMode.pinnedTaskSyncEnabled,
+      zenMode.siteBlockerEnabled,
+      zenMode.soundscapesEnabled,
+      zenMode.tabStashEnabled,
+      zenMode.timerEnabled,
+      zenPhase,
+      zenStatusActiveLabel,
+      zenStatusLabels,
+      zenStatusReadyLabel,
+    ],
+  );
 
   useEffect(() => {
     initializeFocusDashboardStore();
@@ -205,12 +508,33 @@ export const FocusDashboard = ({
   }, [focusTasks, isTaskBootstrapPending]);
 
   useEffect(() => {
+    void refreshBrowserCapabilities();
+  }, [
+    platform,
+    refreshBrowserCapabilities,
+    zenMode.siteBlockerEnabled,
+    zenMode.tabStashEnabled,
+  ]);
+
+  useEffect(() => {
     syncFocusDashboardSignals({
       timerRunning: isRunning,
       timerStage: stage,
       timerLabel: currentTimerLabel,
-      sessionFocusTaskId: isRunning ? snapshot.sessionFocusTaskId : null,
-      blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
+      sessionFocusTaskId:
+        zenPhase !== "inactive"
+          ? zenActiveTaskId ?? null
+          : isRunning
+            ? snapshot.sessionFocusTaskId
+            : null,
+      blockerMode:
+        zenPhase !== "inactive" &&
+        zenMode.siteBlockerEnabled &&
+        browserCapabilities.siteBlocker === "ready"
+          ? "active"
+          : blockedSites.length > 0 && isRunning
+            ? "active"
+            : "ready",
       soundtrackMode: playingSounds > 0 ? "playing" : "available",
       nextEventLabel,
       minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
@@ -222,11 +546,53 @@ export const FocusDashboard = ({
     isRunning,
     nextEvent,
     playingSounds,
+    zenActiveTaskId,
+    zenMode.siteBlockerEnabled,
+    browserCapabilities.siteBlocker,
+    zenPhase,
     stage,
     timerRemaining,
   ]);
 
-  const showTimerPanel = isTimerVisible || isRunning;
+  useEffect(() => {
+    void syncSessionFocusState({
+      isRunning,
+      stage,
+    });
+  }, [
+    browserCapabilities.siteBlocker,
+    isRunning,
+    stage,
+    syncSessionFocusState,
+    zenMode.siteBlockerEnabled,
+    zenPhase,
+  ]);
+
+  const handleConfigureZenMode = () => {
+    setTab("general");
+    openSettings();
+  };
+
+  const handleStartZenMode = () => {
+    void startSession({
+      isRunning,
+      stage,
+      start: timerStore.getState().start,
+      reset: timerStore.getState().reset,
+    });
+  };
+
+  const handleEndZenMode = () => {
+    void endSession({
+      isRunning,
+      stage,
+      start: timerStore.getState().start,
+      reset: timerStore.getState().reset,
+    });
+  };
+
+  const showTimerPanel = zenPhase !== "inactive" || isTimerVisible || isRunning;
+  const showZenModeShell = zenPhase !== "inactive";
 
   return (
     <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
@@ -255,19 +621,38 @@ export const FocusDashboard = ({
             }}
             className="flex min-h-0 flex-1"
           >
-            <FocusModeShell
-              timerPanel={timerPanel}
-              currentTimerLabel={currentTimerLabel}
-              activeFocusTaskLabel={activeFocusTaskLabel}
-              activeFocusTaskId={snapshot.activeFocusTaskId}
-              completedTaskCountLabel={completedTaskCountLabel}
-              calendarPillValue={calendarPillValue}
-              focusPillLabel={focusPillLabel}
-              calendarPillLabel={calendarPillLabel}
-              todayPillLabel={todayPillLabel}
-              activeFocusTaskEyebrow={activeFocusTaskEyebrow}
-              onSelectTask={toggleTasks}
-            />
+            {showZenModeShell ? (
+              <ZenModeShell
+                timerPanel={timerPanel}
+                timerEnabled={zenMode.timerEnabled}
+                currentTimerLabel={currentTimerLabel}
+                activeLabel={zenActiveLabel}
+                activeSubtitle={zenActiveSubtitle}
+                activeFocusTaskLabel={zenActiveTaskLabel}
+                activeFocusTaskId={zenActiveTaskId}
+                activeFocusTaskEyebrow={activeFocusTaskEyebrow}
+                statusItems={zenActiveItems}
+                endZenLabel={zenEndLabel}
+                configureLabel={zenConfigureLabel}
+                onEndZen={handleEndZenMode}
+                onConfigure={handleConfigureZenMode}
+                onSelectTask={toggleTasks}
+              />
+            ) : (
+              <FocusModeShell
+                timerPanel={timerPanel}
+                currentTimerLabel={currentTimerLabel}
+                activeFocusTaskLabel={activeFocusTaskLabel}
+                activeFocusTaskId={snapshot.activeFocusTaskId}
+                completedTaskCountLabel={completedTaskCountLabel}
+                calendarPillValue={calendarPillValue}
+                focusPillLabel={focusPillLabel}
+                calendarPillLabel={calendarPillLabel}
+                todayPillLabel={todayPillLabel}
+                activeFocusTaskEyebrow={activeFocusTaskEyebrow}
+                onSelectTask={toggleTasks}
+              />
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -296,11 +681,16 @@ export const FocusDashboard = ({
             <HomeModeShell
               calendarPillValue={calendarPillValue}
               queuedTaskCountLabel={queuedTaskCountLabel}
-              focusPillLabel={focusPillLabel}
+              focusPillLabel={zenReadyLabel}
               calendarPillLabel={calendarPillLabel}
               tasksPillLabel={tasksPillLabel}
-              startFocusingLabel={startFocusingLabel}
-              onStartFocusing={() => setTimerVisible(true)}
+              startFocusingLabel={zenStartLabel}
+              zenHeadline={zenReadyHeadline}
+              zenSubtitle={zenReadySubtitle}
+              zenStatusItems={zenReadyItems}
+              configureLabel={zenConfigureLabel}
+              onConfigure={handleConfigureZenMode}
+              onStartFocusing={handleStartZenMode}
             />
           </motion.div>
         )}
@@ -316,6 +706,11 @@ const HomeModeShell = ({
   calendarPillLabel,
   tasksPillLabel,
   startFocusingLabel,
+  zenHeadline,
+  zenSubtitle,
+  zenStatusItems,
+  configureLabel,
+  onConfigure,
   onStartFocusing,
 }: {
   calendarPillValue: string | null;
@@ -324,16 +719,22 @@ const HomeModeShell = ({
   calendarPillLabel: string;
   tasksPillLabel: string;
   startFocusingLabel: string;
+  zenHeadline: string;
+  zenSubtitle: string;
+  zenStatusItems: ZenModeStatusItem[];
+  configureLabel: string;
+  onConfigure: () => void;
   onStartFocusing: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 flex-col">
     <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
-      <div className="flex-1 flex justify-start">
+      <div className="flex-1 flex justify-start gap-2">
         <StartFocusPill
           focusPillLabel={focusPillLabel}
           startFocusingLabel={startFocusingLabel}
           onClick={onStartFocusing}
         />
+        <ZenModeConfigTrigger label={configureLabel} onClick={onConfigure} />
       </div>
       <div className="flex-1 flex justify-center">
         {calendarPillValue && (
@@ -354,12 +755,26 @@ const HomeModeShell = ({
     </div>
 
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-      <div className="max-w-4xl space-y-6">
+      <div className="max-w-5xl space-y-6">
         <Clock />
         <div className="space-y-2">
           <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
             <Greeting />
           </div>
+        </div>
+        <div className="mx-auto max-w-4xl space-y-4 rounded-[28px] border border-white/10 bg-white/8 px-5 py-5 shadow-[0_24px_70px_rgba(0,0,0,0.14)] backdrop-blur-2xl sm:px-7">
+          <div className="space-y-2">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-white/56">
+              {focusPillLabel}
+            </p>
+            <h2 className="text-balance text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              {zenHeadline}
+            </h2>
+            <p className="mx-auto max-w-2xl text-sm text-white/68 sm:text-base">
+              {zenSubtitle}
+            </p>
+          </div>
+          <ZenModeStatusRow items={zenStatusItems} />
         </div>
       </div>
     </div>
@@ -442,6 +857,93 @@ const FocusModeShell = ({
         >
           {timerPanel}
         </motion.div>
+      </div>
+    </div>
+  </div>
+);
+
+const ZenModeShell = ({
+  timerPanel,
+  timerEnabled,
+  currentTimerLabel,
+  activeLabel,
+  activeSubtitle,
+  activeFocusTaskLabel,
+  activeFocusTaskId,
+  activeFocusTaskEyebrow,
+  statusItems,
+  endZenLabel,
+  configureLabel,
+  onEndZen,
+  onConfigure,
+  onSelectTask,
+}: {
+  timerPanel: ReactNode;
+  timerEnabled: boolean;
+  currentTimerLabel: string;
+  activeLabel: string;
+  activeSubtitle: string;
+  activeFocusTaskLabel: string;
+  activeFocusTaskId: string | null | undefined;
+  activeFocusTaskEyebrow: string;
+  statusItems: ZenModeStatusItem[];
+  endZenLabel: string;
+  configureLabel: string;
+  onEndZen: () => void;
+  onConfigure: () => void;
+  onSelectTask: () => void;
+}) => (
+  <div className="relative flex min-h-0 flex-1 items-center justify-center">
+    <div className="pointer-events-none absolute inset-0 bg-black/9 backdrop-blur-[10px]" />
+    <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.22),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.16),transparent_28%)]" />
+    <div className="relative flex h-full w-full max-w-full flex-col">
+      <div className="hidden items-center justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
+        <div className="flex-1 flex justify-start">
+          <AmbientPill
+            icon={<Brain className="size-3.5" />}
+            label={activeLabel}
+            value={timerEnabled ? currentTimerLabel : activeSubtitle}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <ZenModeConfigTrigger label={configureLabel} onClick={onConfigure} />
+          <StartFocusPill
+            focusPillLabel={activeLabel}
+            startFocusingLabel={endZenLabel}
+            onClick={onEndZen}
+          />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-6 pt-4">
+        <div className="max-w-5xl space-y-5 text-center">
+          <div className="space-y-2">
+            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
+              {activeFocusTaskEyebrow}
+            </p>
+            <h2
+              className="cursor-default text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl"
+              onClick={activeFocusTaskId ? undefined : onSelectTask}
+            >
+              {activeFocusTaskLabel}
+            </h2>
+            <p className="mx-auto max-w-2xl text-sm text-white/68 sm:text-base">
+              {activeSubtitle}
+            </p>
+          </div>
+          <ZenModeStatusRow items={statusItems} />
+        </div>
+        {timerEnabled && (
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.985 }}
+            transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
+            className="w-full"
+          >
+            {timerPanel}
+          </motion.div>
+        )}
       </div>
     </div>
   </div>

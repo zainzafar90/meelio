@@ -17,6 +17,7 @@ import {
   TabStashSheet,
   TaskListSheet,
   useDockStore,
+  useZenModeStore,
 } from "@repo/shared";
 import { WebSiteBlockerSheet } from "@/components/web.site-blocker.sheet";
 import { WebTimer } from "@/components/web.timer";
@@ -28,6 +29,11 @@ const Home = () => {
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       isBreathingVisible: state.isBreathingVisible,
+    })),
+  );
+  const { zenPhase } = useZenModeStore(
+    useShallow((state) => ({
+      zenPhase: state.phase,
     })),
   );
   const { isRunning } = webTimerStore(
@@ -42,7 +48,7 @@ const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
-        {!(isTimerVisible || isRunning || isBreathingVisible) && (
+        {!(isTimerVisible || isRunning || isBreathingVisible || zenPhase !== "inactive") && (
           <div className="hidden shrink-0 justify-center pb-4 [@media(min-height:580px)]:flex">
             <Quote />
           </div>

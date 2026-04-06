@@ -189,6 +189,26 @@
     },
     "actions": {
       "startFocusing": "Fokus starten"
+    },
+    "zenMode": {
+      "readyLabel": "Zen-Modus",
+      "activeLabel": "Zen aktiv",
+      "readyHeadline": "Ein Tippen startet dein Fokusritual",
+      "readySubtitle": "Timer, Aufgaben, Soundscapes, Blocker und Tabs folgen deinen gespeicherten Standards.",
+      "activeSubtitle": "Alles, was du aktiviert hast, hält jetzt die Linie.",
+      "start": "Zen starten",
+      "starting": "Zen wird gestartet...",
+      "end": "Zen beenden",
+      "ending": "Zen wird beendet...",
+      "configure": "Konfigurieren",
+      "status": {
+        "ready": "Bereit",
+        "active": "Aktiv",
+        "off": "Aus",
+        "unavailable": "Nur Erweiterung",
+        "permissionNeeded": "Berechtigung nötig",
+        "stashed": "Verstaut"
+      }
     }
   },
   "tasks": {
@@ -435,6 +455,31 @@
       "twelveHourClock": {
         "title": "24-Stunden-Uhr",
         "description": "Zeit im 24-Stunden-Format anzeigen"
+      },
+      "zenMode": {
+        "title": "Zen-Modus",
+        "description": "Lege fest, was beim Start des Fokusmodus automatisch passiert.",
+        "platformNote": "Website-Blocker und Tab-Stash funktionieren nur in der Browser-Erweiterung.",
+        "timer": {
+          "title": "Timer starten",
+          "description": "Starte den Fokustimer automatisch, sobald der Zen-Modus beginnt."
+        },
+        "soundscapes": {
+          "title": "Soundscapes abspielen",
+          "description": "Starte deine Fokus-Soundscape automatisch."
+        },
+        "pinnedTaskSync": {
+          "title": "Angeheftete Aufgabe synchronisieren",
+          "description": "Verwende die aktuell angeheftete Aufgabe als Anker der Zen-Sitzung."
+        },
+        "siteBlocker": {
+          "title": "Website-Blocker aktivieren",
+          "description": "Schalte blockierte Seiten im Zen-Modus in den Nur-Fokus-Modus."
+        },
+        "tabStash": {
+          "title": "Tabs verstauen",
+          "description": "Verstaue offene Tabs beim Start des Zen-Modus."
+        }
       }
     },
     "appearance": {

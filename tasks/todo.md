@@ -167,3 +167,72 @@
   - `for f in packages/shared/src/i18n/locales/{en,de,es,fr,pt,ru,ja,zh,ar}/translation.json; do jq -e '.focusDashboard.timer.ready and .focusDashboard.timer.remaining and .focusDashboard.tasks.queuedCount and .focusDashboard.tasks.doneCount and .focusDashboard.activeTask.label and .focusDashboard.activeTask.empty and .focusDashboard.calendar.noUpcomingEvent and .focusDashboard.calendar.allDayEvent and .focusDashboard.calendar.upcomingEvent and .focusDashboard.calendar.nextEventLabel and .focusDashboard.actions.startFocusing' "$f" >/dev/null || exit 1; done && echo 'focus dashboard locale key verification passed'`
   - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/components/core/task-list/components/task-list.helpers.test.ts src/i18n/localization-completeness.test.ts --run`
   - `pnpm --filter @repo/shared test -- --run`
+
+## Zen Mode Focus Orchestration
+
+- [x] Explore the current focus-dashboard, timer, soundscapes, site-blocker, task, and dock integration points
+- [ ] Offer visual companion for shell and interaction design discussion
+- [x] Confirm the Zen Mode lifecycle assumption: explicit session enter/exit, not toggle on every timer stage change
+- [x] Lock the UX model for the primary control: one-tap enter, visible module readiness, and compact configuration access
+- [ ] Add persistent Zen Mode settings with defaults:
+  - [x] timer enabled by default
+  - [x] soundscapes enabled by default
+  - [x] pinned-task sync enabled by default
+  - [x] site blocker enabled by default
+  - [x] tab stash disabled by default
+- [x] Define the shared Zen Mode orchestration layer that snapshots pre-session state and restores it on exit
+- [ ] Extract extension-only actions behind callable services instead of UI-only hooks:
+  - [x] tab stashing
+  - [x] blocker focus activation sync
+- [x] Define dashboard UX states:
+  - [x] ready state with module readiness chips
+  - [x] active Zen Mode shell with 4-5 core interactions
+  - [x] degraded web behavior when extension-only capabilities are unavailable
+  - [x] permission-needed states for blocker/tab stash
+- [ ] Define start-session behavior:
+  - [x] ensure task store is initialized
+  - [x] use pinned task as session anchor when available
+  - [x] start timer
+  - [x] start or resume soundscape preset when enabled
+  - [x] activate blocker in focus mode when enabled
+  - [x] stash tabs when enabled and permissions allow
+- [ ] Define end-session behavior:
+  - [x] stop Zen Mode explicitly
+  - [x] restore prior soundscape playback state
+  - [x] restore prior dock/shell visibility state
+  - [x] release blocker back to the user’s non-session baseline
+  - [x] leave stashed tabs recoverable without destructive auto-restore
+- [x] Propose 2-3 orchestration and UX approaches with recommendation
+- [x] Present the Zen Mode design for approval
+- [x] Write the Zen Mode spec
+- [x] Review the written spec with the user
+- [x] Write the implementation plan
+
+## Review
+
+- Zen Mode now exists as an explicit shared session layer with persisted defaults, browser-capability awareness, and clean restoration of dock visibility, soundscapes, blocker state, and optional tab stashing.
+- The focus dashboard now has a real Zen ready state with module-readiness chips and compact configuration access, plus an active Zen shell centered on the current task, timer, module state, and explicit exit.
+- Tab stashing was extracted into a callable service so both the sheet and Zen Mode use the same behavior instead of duplicating tab logic inside a React hook.
+- The extension runtime now upgrades blocker enforcement into focus-only mode for the session, then restores the user’s previous blocker baseline on exit.
+- Locale coverage now includes the new Zen Mode settings and dashboard shell copy across every supported language.
+- Verification:
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `pnpm --filter extension test -- --run`
+  - `git diff --check`
+
+## Zen Mode Blocker Sync Correction
+
+- [x] Reproduce the current Zen blocker activation path against real focus state changes
+- [x] Bind Zen blocker activity to timer focus transitions instead of only session start/end
+- [x] Verify the extension blocker returns inactive outside focus while Zen remains enabled
+
+## Review
+
+- Zen blocker control is now explicitly synchronized from live timer state while Zen is active, instead of inferring “focus active” from session entry alone.
+- Entering Zen still moves the blocker into `focus-only` mode when that setting is enabled, but actual blocking now follows real focus state transitions, so breaks, pauses, and other out-of-focus states correctly deactivate enforcement without ending the Zen session.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/stores/zen-mode.store.test.ts --run`
+  - `pnpm --filter extension build`
+  - `git diff --check`

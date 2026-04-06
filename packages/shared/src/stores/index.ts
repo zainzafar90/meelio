@@ -14,6 +14,8 @@ export * from "./search.store";
 export * from "./settings.store";
 export * from "./site-blocker.store";
 export * from "./soundscapes.store";
+export * from "./tab-stash.store";
 export * from "./task.store";
+export * from "./zen-mode.store";
 
 export { createTimerStore } from "./timer.store";
