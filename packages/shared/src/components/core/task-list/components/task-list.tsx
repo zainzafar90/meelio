@@ -66,6 +66,12 @@ const TaskItem = ({ task }: { task: Task }) => {
   const [editValue, setEditValue] = useState(task.title);
   const inputRef = useRef<HTMLInputElement>(null);
   const focusActionCopy = getTaskFocusActionCopy(task);
+  const focusActionLabel = focusActionCopy
+    ? t(focusActionCopy.labelKey, { defaultValue: focusActionCopy.label })
+    : null;
+  const focusActionTitle = focusActionCopy
+    ? t(focusActionCopy.titleKey, { defaultValue: focusActionCopy.title })
+    : null;
 
   useEffect(() => {
     if (isEditing) {
@@ -143,8 +149,8 @@ const TaskItem = ({ task }: { task: Task }) => {
         {focusActionCopy ? (
           <button
             type="button"
-            title={focusActionCopy.title}
-            aria-label={focusActionCopy.title}
+            title={focusActionTitle ?? focusActionCopy.title}
+            aria-label={focusActionTitle ?? focusActionCopy.title}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
               task.pinned
@@ -159,11 +165,7 @@ const TaskItem = ({ task }: { task: Task }) => {
             <Icons.pin
               className={cn("h-3.5 w-3.5", task.pinned ? "fill-current" : "")}
             />
-            <span>
-              {task.pinned
-                ? t("tasks.item.focused", { defaultValue: focusActionCopy.label })
-                : t("tasks.item.focus", { defaultValue: focusActionCopy.label })}
-            </span>
+            <span>{focusActionLabel ?? focusActionCopy.label}</span>
           </button>
         ) : null}
         <button

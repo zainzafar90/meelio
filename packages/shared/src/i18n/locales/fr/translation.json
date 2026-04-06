@@ -89,8 +89,8 @@
       "description": "Faisons un rapide tour de votre dock de productivité."
     },
     "timer": {
-      "title": "Minuteur Pomodoro",
-      "description": "Restez concentré avec notre minuteur Pomodoro. Divisez votre travail en sessions de concentration."
+      "title": "Minuteur de concentration",
+      "description": "Définissez une session de concentration, choisissez une tâche et laissez le minuteur vous garder sur la bonne voie."
     },
     "soundscapes": {
       "title": "Ambiances sonores",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "Terminée",
-      "uncompleted": "Non terminée"
+      "uncompleted": "Non terminée",
+      "focus": "Focus",
+      "focused": "En focus",
+      "focusTitle": "Définissez ceci comme votre tâche de concentration actuelle.",
+      "focusedTitle": "Cette tâche est définie comme votre tâche de concentration actuelle."
     },
     "list": {
       "create": {

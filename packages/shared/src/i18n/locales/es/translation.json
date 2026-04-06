@@ -89,8 +89,8 @@
       "description": "Hagamos un recorrido rápido por tu panel de productividad."
     },
     "timer": {
-      "title": "Temporizador Pomodoro",
-      "description": "Mantén el enfoque con nuestro temporizador Pomodoro. Divide tu trabajo en sesiones concentradas."
+      "title": "Temporizador de enfoque",
+      "description": "Configura una sesión de enfoque, elige una tarea y deja que el temporizador te mantenga encaminado."
     },
     "soundscapes": {
       "title": "Paisajes Sonoros",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "Completada",
-      "uncompleted": "Sin completar"
+      "uncompleted": "Sin completar",
+      "focus": "Foco",
+      "focused": "En foco",
+      "focusTitle": "Establece esta como tu tarea de enfoque actual.",
+      "focusedTitle": "Esta tarea está establecida como tu tarea de enfoque actual."
     },
     "list": {
       "create": {

@@ -89,8 +89,8 @@
       "description": "生産性ドックの簡単なツアーを始めましょう。"
     },
     "timer": {
-      "title": "ポモドーロタイマー",
-      "description": "ポモドーロタイマーで集中力を維持しましょう。作業を集中セッションに分割します。"
+      "title": "集中タイマー",
+      "description": "集中セッションを設定し、タスクを選んで、タイマーで集中の流れを保ちましょう。"
     },
     "soundscapes": {
       "title": "サウンドスケープ",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "完了",
-      "uncompleted": "未完了"
+      "uncompleted": "未完了",
+      "focus": "集中",
+      "focused": "集中中",
+      "focusTitle": "このタスクを現在の集中タスクに設定します。",
+      "focusedTitle": "このタスクは現在の集中タスクに設定されています。"
     },
     "list": {
       "create": {

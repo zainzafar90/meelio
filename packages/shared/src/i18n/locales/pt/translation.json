@@ -89,8 +89,8 @@
       "description": "Vamos fazer um tour rápido pela sua barra de produtividade."
     },
     "timer": {
-      "title": "Timer Pomodoro",
-      "description": "Mantenha o foco com nosso timer Pomodoro. Divida seu trabalho em sessões focadas."
+      "title": "Timer de foco",
+      "description": "Defina uma sessão de foco, escolha uma tarefa e deixe o timer manter você no caminho certo."
     },
     "soundscapes": {
       "title": "Paisagens Sonoras",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "Concluída",
-      "uncompleted": "Não concluída"
+      "uncompleted": "Não concluída",
+      "focus": "Foco",
+      "focused": "Em foco",
+      "focusTitle": "Defina esta como sua tarefa de foco atual.",
+      "focusedTitle": "Esta tarefa está definida como sua tarefa de foco atual."
     },
     "list": {
       "create": {

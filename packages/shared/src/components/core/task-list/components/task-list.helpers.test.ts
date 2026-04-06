@@ -15,7 +15,9 @@ describe("task list focus action copy", () => {
         updatedAt: 0,
       }),
     ).toEqual({
+      labelKey: "tasks.item.focus",
       label: "Focus",
+      titleKey: "tasks.item.focusTitle",
       title: "Set this as your current focus task.",
     });
   });
@@ -32,7 +34,9 @@ describe("task list focus action copy", () => {
         updatedAt: 0,
       }),
     ).toEqual({
+      labelKey: "tasks.item.focused",
       label: "Focused",
+      titleKey: "tasks.item.focusedTitle",
       title: "This task is set as your current focus task.",
     });
   });

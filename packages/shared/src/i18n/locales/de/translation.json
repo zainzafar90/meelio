@@ -89,8 +89,8 @@
       "description": "Lass uns einen schnellen Rundgang durch deinen Produktivitätsdock machen."
     },
     "timer": {
-      "title": "Pomodoro Timer",
-      "description": "Bleib konzentriert mit unserem Pomodoro timer. Teile deine Arbeit in konzentrierte Sitzungen auf."
+      "title": "Fokus-Timer",
+      "description": "Lege eine Fokus-Session fest, wähle eine Aufgabe und lass dich vom Timer auf Kurs halten."
     },
     "soundscapes": {
       "title": "Soundscapes",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "Erledigt",
-      "uncompleted": "Nicht erledigt"
+      "uncompleted": "Nicht erledigt",
+      "focus": "Fokus",
+      "focused": "Im Fokus",
+      "focusTitle": "Lege dies als deine aktuelle Fokusaufgabe fest.",
+      "focusedTitle": "Diese Aufgabe ist als deine aktuelle Fokusaufgabe festgelegt."
     },
     "list": {
       "create": {

@@ -89,8 +89,8 @@
       "description": "让我们快速浏览一下您的效率工具栏。"
     },
     "timer": {
-      "title": "番茄工作法计时器",
-      "description": "使用番茄工作法计时器保持专注。将工作分解为专注时段。"
+      "title": "专注计时器",
+      "description": "设置一个专注时段，选择一项任务，让计时器帮你保持节奏。"
     },
     "soundscapes": {
       "title": "环境音效",
@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "已完成",
-      "uncompleted": "未完成"
+      "uncompleted": "未完成",
+      "focus": "专注",
+      "focused": "专注中",
+      "focusTitle": "将此任务设为当前专注任务。",
+      "focusedTitle": "此任务已设为当前专注任务。"
     },
     "list": {
       "create": {

@@ -180,7 +180,11 @@
     },
     "item": {
       "completed": "Completed",
-      "uncompleted": "Uncompleted"
+      "uncompleted": "Uncompleted",
+      "focus": "Focus",
+      "focused": "Focused",
+      "focusTitle": "Set this as your current focus task.",
+      "focusedTitle": "This task is set as your current focus task."
     },
     "list": {
       "create": {
