@@ -48,6 +48,33 @@ export const ZenModeStatusRow = ({
   </div>
 );
 
+export const ZenModeStatusSummary = ({
+  items,
+  className,
+}: {
+  items: ZenModeStatusItem[];
+  className?: string;
+}) => {
+  const activeItems = items.filter((item) => item.tone !== "off");
+  if (activeItems.length === 0) return null;
+
+  return (
+    <p
+      className={cn(
+        "text-center text-xs text-white/40 transition-opacity duration-300 hover:text-white/70",
+        className,
+      )}
+    >
+      {activeItems.map((item, index) => (
+        <span key={`${item.label}-${item.value}-summary`}>
+          {index > 0 && <span className="mx-1.5">&middot;</span>}
+          <span>{item.value}</span>
+        </span>
+      ))}
+    </p>
+  );
+};
+
 const toneAccentClasses: Record<ZenModeStatusTone, string> = {
   ready: "text-white/80",
   active: "text-emerald-100",

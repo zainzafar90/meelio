@@ -8,6 +8,7 @@ import {
   CalendarDays,
   CheckSquare2,
   PanelsTopLeft,
+  Settings2,
   Shield,
   Timer,
   Volume2,
@@ -37,6 +38,7 @@ import { Greeting } from "../greetings/greetings-mantras";
 import { ZenModeConfigTrigger } from "./components/zen-mode-config-trigger";
 import {
   ZenModeStatusLine,
+  ZenModeStatusSummary,
   type ZenModeStatusItem,
 } from "./components/zen-mode-status-row";
 import {
@@ -260,18 +262,12 @@ export const FocusDashboard = ({
   const zenReadyLabel = t("focusDashboard.zenMode.readyLabel", {
     defaultValue: "Zen Mode",
   });
-  const zenActiveLabel = t("focusDashboard.zenMode.activeLabel", {
-    defaultValue: "Zen active",
-  });
   const zenReadyHeadline = t("focusDashboard.zenMode.readyHeadline", {
     defaultValue: "One tap enters your focus ritual",
   });
   const zenReadySubtitle = t("focusDashboard.zenMode.readySubtitle", {
     defaultValue:
       "Timer, tasks, soundscapes, blocker, and tabs follow your saved defaults.",
-  });
-  const zenActiveSubtitle = t("focusDashboard.zenMode.activeSubtitle", {
-    defaultValue: "Everything you enabled is holding the line.",
   });
   const zenConfigureLabel = t("focusDashboard.zenMode.configure", {
     defaultValue: "Configure",
@@ -626,11 +622,8 @@ export const FocusDashboard = ({
                 timerPanel={timerPanel}
                 timerEnabled={zenMode.timerEnabled}
                 currentTimerLabel={currentTimerLabel}
-                activeLabel={zenActiveLabel}
-                activeSubtitle={zenActiveSubtitle}
                 activeFocusTaskLabel={zenActiveTaskLabel}
                 activeFocusTaskId={zenActiveTaskId}
-                activeFocusTaskEyebrow={activeFocusTaskEyebrow}
                 statusItems={zenActiveItems}
                 endZenLabel={zenEndLabel}
                 configureLabel={zenConfigureLabel}
@@ -856,11 +849,8 @@ const ZenModeShell = ({
   timerPanel,
   timerEnabled,
   currentTimerLabel,
-  activeLabel,
-  activeSubtitle,
   activeFocusTaskLabel,
   activeFocusTaskId,
-  activeFocusTaskEyebrow,
   statusItems,
   endZenLabel,
   configureLabel,
@@ -871,11 +861,8 @@ const ZenModeShell = ({
   timerPanel: ReactNode;
   timerEnabled: boolean;
   currentTimerLabel: string;
-  activeLabel: string;
-  activeSubtitle: string;
   activeFocusTaskLabel: string;
   activeFocusTaskId: string | null | undefined;
-  activeFocusTaskEyebrow: string;
   statusItems: ZenModeStatusItem[];
   endZenLabel: string;
   configureLabel: string;
@@ -884,25 +871,17 @@ const ZenModeShell = ({
   onSelectTask: () => void;
 }) => (
   <div className="relative flex min-h-0 flex-1 items-center justify-center">
-    <div className="pointer-events-none absolute inset-0 bg-black/9 backdrop-blur-[10px]" />
+    <div className="pointer-events-none absolute inset-0 bg-black/12 backdrop-blur-[10px]" />
     <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.22),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.16),transparent_28%)]" />
     <div className="relative flex h-full w-full max-w-full flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-28 pt-6 sm:pb-32">
-        <div className="max-w-5xl space-y-4 text-center">
-          <div className="space-y-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
-              {activeFocusTaskEyebrow}
-            </p>
-            <h2
-              className="cursor-default text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
-              onClick={activeFocusTaskId ? undefined : onSelectTask}
-            >
-              {activeFocusTaskLabel}
-            </h2>
-            <p className="mx-auto max-w-2xl text-sm text-white/62 sm:text-base">
-              {activeSubtitle}
-            </p>
-          </div>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pt-6">
+        <div className="max-w-5xl text-center">
+          <h2
+            className="cursor-default text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
+            onClick={activeFocusTaskId ? undefined : onSelectTask}
+          >
+            {activeFocusTaskLabel}
+          </h2>
         </div>
         {timerEnabled && (
           <motion.div
@@ -915,19 +894,28 @@ const ZenModeShell = ({
             {timerPanel}
           </motion.div>
         )}
+        <div className="flex flex-col items-center gap-3 pt-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onConfigure}
+              className="inline-flex size-9 items-center justify-center rounded-full text-white/50 transition-opacity duration-200 hover:text-white/90"
+              aria-label={configureLabel}
+            >
+              <Settings2 className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onEndZen}
+              className="inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium text-white/50 transition-opacity duration-200 hover:text-white/90"
+            >
+              <Brain className="size-3.5" />
+              <span>{endZenLabel}</span>
+            </button>
+          </div>
+          <ZenModeStatusSummary items={statusItems} />
+        </div>
       </div>
-
-      <ZenSessionRail
-        activeLabel={activeLabel}
-        currentTimerLabel={currentTimerLabel}
-        timerEnabled={timerEnabled}
-        fallbackValue={activeSubtitle}
-        statusItems={statusItems}
-        configureLabel={configureLabel}
-        endZenLabel={endZenLabel}
-        onConfigure={onConfigure}
-        onEndZen={onEndZen}
-      />
     </div>
   </div>
 );
@@ -975,50 +963,6 @@ const ZenLaunchRail = ({
   </div>
 );
 
-const ZenSessionRail = ({
-  activeLabel,
-  currentTimerLabel,
-  timerEnabled,
-  fallbackValue,
-  statusItems,
-  configureLabel,
-  endZenLabel,
-  onConfigure,
-  onEndZen,
-}: {
-  activeLabel: string;
-  currentTimerLabel: string;
-  timerEnabled: boolean;
-  fallbackValue: string;
-  statusItems: ZenModeStatusItem[];
-  configureLabel: string;
-  endZenLabel: string;
-  onConfigure: () => void;
-  onEndZen: () => void;
-}) => (
-  <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex justify-center px-4 sm:bottom-4">
-    <div className="pointer-events-auto w-full max-w-3xl rounded-[28px] bg-white/8 px-4 py-3 shadow-[0_24px_70px_rgba(0,0,0,0.16)] backdrop-blur-2xl transition-all duration-300 hover:bg-white/12 hover:opacity-100 focus-within:bg-white/12 focus-within:opacity-100 sm:px-5 sm:opacity-72">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 text-left">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/52">
-              {activeLabel}
-            </p>
-            <span className="text-sm font-medium text-white/80">
-              {timerEnabled ? currentTimerLabel : fallbackValue}
-            </span>
-          </div>
-          <ZenModeStatusLine items={statusItems} className="mt-2 justify-start" />
-        </div>
-        <div className="flex items-center gap-2 self-start sm:self-center">
-          <ZenModeConfigTrigger label={configureLabel} onClick={onConfigure} />
-          <ZenSecondaryAction label={endZenLabel} onClick={onEndZen} />
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
 const AmbientPill = ({
   icon,
   label,
@@ -1051,22 +995,6 @@ const ZenPrimaryAction = ({
     className="inline-flex h-9 items-center gap-2 rounded-full bg-white px-4 text-sm font-semibold text-zinc-950 shadow-[0_14px_40px_rgba(0,0,0,0.18)] transition-transform duration-200 hover:-translate-y-0.5 sm:h-10 sm:px-5"
   >
     <Brain className="size-3.5" />
-    <span>{label}</span>
-  </button>
-);
-
-const ZenSecondaryAction = ({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    className="inline-flex h-9 items-center gap-2 rounded-full bg-white/12 px-4 text-sm font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-all duration-200 hover:bg-white/18 sm:h-10 sm:px-5"
-  >
-    <Brain className="size-3.5 text-white/86" />
     <span>{label}</span>
   </button>
 );

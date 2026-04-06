@@ -222,20 +222,20 @@ export function Dock(_props: DockProps): JSX.Element {
       <div
         className={cn(
           "relative z-50 transition-all duration-500 ease-out",
-          isZenActive && "hover:translate-y-0 hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100"
+          isZenActive && "translate-y-[calc(100%+1rem)] opacity-0 hover:translate-y-0 hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100"
         )}
         ref={dockRef}
       >
         {isZenActive && (
-          <div className="pointer-events-none absolute inset-x-0 -top-3 flex justify-center">
-            <div className="h-1 w-14 rounded-full bg-white/18 shadow-[0_8px_24px_rgba(0,0,0,0.16)] backdrop-blur-xl transition-opacity duration-300" />
-          </div>
+          <div
+            className="absolute inset-x-0 -top-10 h-10"
+            aria-hidden="true"
+          />
         )}
         <div
           className={cn(
             "rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl transition-all duration-500 ease-out",
-            isZenActive &&
-              "translate-y-5 opacity-40 saturate-75 hover:translate-y-0 hover:opacity-100 hover:saturate-100 focus-within:translate-y-0 focus-within:opacity-100 focus-within:saturate-100"
+            isZenActive && "duration-700"
           )}
         >
           <div className="flex items-center gap-2">
