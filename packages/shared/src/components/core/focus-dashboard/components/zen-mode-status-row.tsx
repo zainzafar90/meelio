@@ -8,6 +8,7 @@ export interface ZenModeStatusItem {
   label: string;
   value: string;
   tone: ZenModeStatusTone;
+  onClick?: () => void;
 }
 
 const toneClasses: Record<ZenModeStatusTone, string> = {
@@ -66,9 +67,23 @@ export const ZenModeStatusSummary = ({
       )}
     >
       {activeItems.map((item, index) => (
-        <span key={`${item.label}-${item.value}-summary`}>
+        <span key={`${item.label}-summary`}>
           {index > 0 && <span className="mx-1.5">&middot;</span>}
-          <span>{item.value}</span>
+          {item.onClick ? (
+            <button
+              type="button"
+              onClick={item.onClick}
+              className="inline-flex items-center gap-1 transition-colors duration-150 hover:text-white/90"
+            >
+              {item.icon && <span className="shrink-0">{item.icon}</span>}
+              {item.label}
+            </button>
+          ) : (
+            <span className="inline-flex items-center gap-1">
+              {item.icon && <span className="shrink-0">{item.icon}</span>}
+              {item.label}
+            </span>
+          )}
         </span>
       ))}
     </p>

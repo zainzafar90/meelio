@@ -1,6 +1,7 @@
 import type { ActivationMode } from "@repo/contracts/site-blocker";
 import { TimerStage } from "@repo/contracts/timer";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { SoundState } from "../types/sound";
 import { useAppStore } from "./app.store";
@@ -123,7 +124,9 @@ export const createZenModeRuntime = (runtime: Partial<ZenModeRuntime>) => ({
   ...runtime,
 });
 
-export const useZenModeStore = create<ZenModeState>()((set, get) => ({
+export const useZenModeStore = create<ZenModeState>()(
+  persist(
+  (set, get) => ({
   phase: "inactive",
   browserCapabilities: defaultBrowserCapabilities(),
   didStashTabs: false,
@@ -224,18 +227,20 @@ export const useZenModeStore = create<ZenModeState>()((set, get) => ({
     }
   },
   endSession: async (timer) => {
-    const snapshot = get().snapshot;
-    if (!snapshot || get().phase === "inactive") {
+    if (get().phase === "inactive") {
       return;
     }
 
+    const snapshot = get().snapshot;
     set({ phase: "ending" });
 
     try {
       timer.reset();
-      await get().runtime.exitSiteBlockerSession(snapshot.siteBlocker);
-      useSoundscapesStore.getState().restoreSoundState(snapshot.soundState);
-      applyDockSnapshot(snapshot.dock);
+      if (snapshot) {
+        await get().runtime.exitSiteBlockerSession(snapshot.siteBlocker);
+        useSoundscapesStore.getState().restoreSoundState(snapshot.soundState);
+        applyDockSnapshot(snapshot.dock);
+      }
     } finally {
       set({
         phase: "inactive",
@@ -273,4 +278,16 @@ export const useZenModeStore = create<ZenModeState>()((set, get) => ({
       snapshot: null,
     });
   },
-}));
+}),
+    {
+      name: "meelio:local:zen-mode",
+      storage: createJSONStorage(() => localStorage),
+      version: 1,
+      partialize: (state) => ({
+        phase: state.phase,
+        sessionTaskId: state.sessionTaskId,
+        didStashTabs: state.didStashTabs,
+      }),
+    },
+  ),
+);

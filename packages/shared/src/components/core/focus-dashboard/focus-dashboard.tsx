@@ -149,10 +149,19 @@ export const FocusDashboard = ({
     useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
   );
   const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible, toggleTasks } = useDockStore(
+  const {
+    isTimerVisible,
+    toggleTasks,
+    toggleSoundscapes,
+    toggleSiteBlocker,
+    toggleTabStash,
+  } = useDockStore(
     useShallow((state) => ({
       isTimerVisible: state.isTimerVisible,
       toggleTasks: state.toggleTasks,
+      toggleSoundscapes: state.toggleSoundscapes,
+      toggleSiteBlocker: state.toggleSiteBlocker,
+      toggleTabStash: state.toggleTabStash,
     })),
   );
   const snapshot = useFocusDashboardStore(
@@ -482,6 +491,69 @@ export const FocusDashboard = ({
     ],
   );
 
+  const zenModuleSummaryItems = useMemo<ZenModeStatusItem[]>(
+    () => [
+      {
+        icon: <Volume2 className="size-3" />,
+        label: t("common.soundscapes", { defaultValue: "Soundscapes" }),
+        onClick: toggleSoundscapes,
+        ...getZenModeStatus({
+          enabled: zenMode.soundscapesEnabled,
+          isActive: playingSounds > 0,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <Shield className="size-3" />,
+        label: t("common.site-blocker", { defaultValue: "Site Blocker" }),
+        onClick: toggleSiteBlocker,
+        ...getZenModeStatus({
+          enabled: zenMode.siteBlockerEnabled,
+          availability: browserCapabilities.siteBlocker,
+          isActive:
+            zenPhase !== "inactive" &&
+            zenMode.siteBlockerEnabled &&
+            browserCapabilities.siteBlocker === "ready",
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+      {
+        icon: <PanelsTopLeft className="size-3" />,
+        label: t("common.tab-stash", { defaultValue: "Tab Stash" }),
+        onClick: toggleTabStash,
+        ...getZenModeStatus({
+          enabled: zenMode.tabStashEnabled,
+          availability: browserCapabilities.tabStash,
+          isStashed: didStashTabs,
+          readyValue: zenStatusReadyLabel,
+          activeValue: zenStatusActiveLabel,
+          labels: zenStatusLabels,
+        }),
+      },
+    ],
+    [
+      browserCapabilities.siteBlocker,
+      browserCapabilities.tabStash,
+      didStashTabs,
+      playingSounds,
+      t,
+      toggleSiteBlocker,
+      toggleSoundscapes,
+      toggleTabStash,
+      zenMode.siteBlockerEnabled,
+      zenMode.soundscapesEnabled,
+      zenMode.tabStashEnabled,
+      zenPhase,
+      zenStatusActiveLabel,
+      zenStatusLabels,
+      zenStatusReadyLabel,
+    ],
+  );
+
   useEffect(() => {
     initializeFocusDashboardStore();
   }, []);
@@ -620,10 +692,9 @@ export const FocusDashboard = ({
               <ZenModeShell
                 timerPanel={timerPanel}
                 timerEnabled={zenMode.timerEnabled}
-                currentTimerLabel={currentTimerLabel}
                 activeFocusTaskLabel={zenActiveTaskLabel}
                 activeFocusTaskId={zenActiveTaskId}
-                statusItems={zenActiveItems}
+                summaryItems={zenModuleSummaryItems}
                 endZenLabel={zenEndLabel}
                 configureLabel={zenConfigureLabel}
                 onEndZen={handleEndZenMode}
@@ -847,10 +918,9 @@ const FocusModeShell = ({
 const ZenModeShell = ({
   timerPanel,
   timerEnabled,
-  currentTimerLabel,
   activeFocusTaskLabel,
   activeFocusTaskId,
-  statusItems,
+  summaryItems,
   endZenLabel,
   configureLabel,
   onEndZen,
@@ -859,10 +929,9 @@ const ZenModeShell = ({
 }: {
   timerPanel: ReactNode;
   timerEnabled: boolean;
-  currentTimerLabel: string;
   activeFocusTaskLabel: string;
   activeFocusTaskId: string | null | undefined;
-  statusItems: ZenModeStatusItem[];
+  summaryItems: ZenModeStatusItem[];
   endZenLabel: string;
   configureLabel: string;
   onEndZen: () => void;
@@ -912,7 +981,7 @@ const ZenModeShell = ({
               <span>{endZenLabel}</span>
             </button>
           </div>
-          <ZenModeStatusSummary items={statusItems} />
+          <ZenModeStatusSummary items={summaryItems} />
         </div>
       </div>
     </div>
