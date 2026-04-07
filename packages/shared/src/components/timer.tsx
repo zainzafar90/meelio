@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Brain, Coffee } from "lucide-react";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import { useTranslation } from "../i18n";
+import { useZenModeStore } from "../stores/zen-mode.store";
 import {
   TimerStage,
   TimerEvent,
@@ -199,6 +200,80 @@ const TimerView = ({
   );
 };
 
+const ZenTimerView = ({
+  remaining,
+  running,
+  stage,
+  durations,
+  start,
+  pause,
+  skip,
+}: Pick<
+  TimerViewProps,
+  "remaining" | "running" | "stage" | "durations" | "start" | "pause" | "skip"
+>) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="relative mx-auto w-full max-w-lg">
+      <div className="flex flex-col items-center gap-6">
+        <div className="text-6xl font-bold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)] sm:text-8xl md:text-9xl">
+          {formatTime(remaining)}
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            className="inline-flex size-10 items-center justify-center rounded-full text-white/40 transition-opacity duration-200 hover:text-white/90"
+            onClick={() =>
+              skip(
+                stage === TimerStage.Focus
+                  ? TimerStage.Break
+                  : TimerStage.Focus,
+              )
+            }
+            title={t("timer.controls.skipToNextStage")}
+          >
+            <Icons.forward className="size-4" />
+          </button>
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium text-white/50 transition-opacity duration-200 hover:text-white/90"
+            onClick={() => (running ? pause() : start())}
+            title={
+              running
+                ? t("common.actions.pause")
+                : t("common.actions.start")
+            }
+          >
+            {running ? (
+              <Icons.pause className="size-4" />
+            ) : (
+              <Icons.play className="size-4" />
+            )}
+            <span className="uppercase text-xs tracking-wider">
+              {running
+                ? t("common.actions.pause")
+                : t("common.actions.start")}
+            </span>
+          </button>
+        </div>
+
+        <div className="mx-auto h-0.5 w-48 rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full bg-white/30 transition-all"
+            style={{
+              width: `${(remaining / durations[stage]) * 100}%`,
+            }}
+            role="progressbar"
+            aria-valuenow={(remaining / durations[stage]) * 100}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
 const useTimerState = (
@@ -333,21 +408,35 @@ export const Timer = ({ timerStore, runtime }: TimerProps) => {
     soundscapes,
     autoStartBreaks,
   } = useTimerState(timerStore, runtime);
+  const zenPhase = useZenModeStore(useShallow((state) => state.phase));
+  const isZenActive = zenPhase !== "inactive";
 
   return (
     <>
-      <TimerView
-        remaining={remaining}
-        running={store.isRunning}
-        stage={store.stage}
-        durations={store.durations}
-        start={store.start}
-        pause={store.pause}
-        reset={store.reset}
-        skip={store.skipToStage}
-        onStatsClick={statsModal.open}
-        onSettingsClick={settingsModal.open}
-      />
+      {isZenActive ? (
+        <ZenTimerView
+          remaining={remaining}
+          running={store.isRunning}
+          stage={store.stage}
+          durations={store.durations}
+          start={store.start}
+          pause={store.pause}
+          skip={store.skipToStage}
+        />
+      ) : (
+        <TimerView
+          remaining={remaining}
+          running={store.isRunning}
+          stage={store.stage}
+          durations={store.durations}
+          start={store.start}
+          pause={store.pause}
+          reset={store.reset}
+          skip={store.skipToStage}
+          onStatsClick={statsModal.open}
+          onSettingsClick={settingsModal.open}
+        />
+      )}
 
       <TimerStatsDialog
         isOpen={statsModal.isOpen}

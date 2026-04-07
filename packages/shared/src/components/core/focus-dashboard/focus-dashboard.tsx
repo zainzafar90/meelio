@@ -37,7 +37,6 @@ import { Clock } from "../clock";
 import { Greeting } from "../greetings/greetings-mantras";
 import { ZenModeConfigTrigger } from "./components/zen-mode-config-trigger";
 import {
-  ZenModeStatusLine,
   ZenModeStatusSummary,
   type ZenModeStatusItem,
 } from "./components/zen-mode-status-row";
@@ -958,7 +957,7 @@ const ZenLaunchRail = ({
           <ZenPrimaryAction label={startFocusingLabel} onClick={onStartFocusing} />
         </div>
       </div>
-      <ZenModeStatusLine items={zenStatusItems} className="mt-3 justify-start sm:mt-4" />
+      <ZenModeStatusSummary items={zenStatusItems} className="mt-3 text-left sm:mt-4" />
     </div>
   </div>
 );
