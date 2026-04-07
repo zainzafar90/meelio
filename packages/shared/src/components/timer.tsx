@@ -221,9 +221,9 @@ const ZenTimerView = ({
           {formatTime(remaining)}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 rounded-full bg-white/10 px-2 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
           <button
-            className="inline-flex size-10 items-center justify-center rounded-full text-white/40 transition-opacity duration-200 hover:text-white/90"
+            className="inline-flex size-10 items-center justify-center rounded-full bg-white/14 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/22"
             onClick={() =>
               skip(
                 stage === TimerStage.Focus
@@ -236,7 +236,7 @@ const ZenTimerView = ({
             <Icons.forward className="size-4" />
           </button>
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium text-white/50 transition-opacity duration-200 hover:text-white/90"
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-white/14 px-5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/22"
             onClick={() => (running ? pause() : start())}
             title={
               running
@@ -257,9 +257,9 @@ const ZenTimerView = ({
           </button>
         </div>
 
-        <div className="mx-auto h-0.5 w-48 rounded-full bg-white/10">
+        <div className="mx-auto h-1 w-48 rounded-full bg-white/14">
           <div
-            className="h-full rounded-full bg-white/30 transition-all"
+            className="h-full rounded-full bg-white/60 transition-all"
             style={{
               width: `${(remaining / durations[stage]) * 100}%`,
             }}

@@ -237,6 +237,14 @@
   - `pnpm --filter extension build`
   - `git diff --check`
 
+## Zen Controls Visibility Polish
+
+- [x] Inspect the active Zen shell controls ownership and current opacity behavior
+- [x] Confirm the preferred direction: keep frosted semi-white controls while moving fade behavior to the shared controls wrapper
+- [ ] Update the shared Zen controls cluster to reveal fully on extension focus, hover, or focus-within
+- [ ] Keep the button surfaces calm and translucent instead of bright white
+- [ ] Verify the affected shared surface and document the result
+
 ## Zen Mode Minimal Shell Redesign
 
 - [x] Remove the duplicated Zen chrome from the home shell and restore a cleaner wallpaper-first hierarchy
@@ -257,3 +265,84 @@
   - `pnpm --filter web build`
   - `pnpm --filter extension build`
   - `git diff --check`
+
+## Zen Session Controls Reveal Tuning
+
+- [x] Confirm where active Zen controls derive their visibility and surface styling
+- [x] Make the shared Zen controls cluster fully visible when the extension window is focused or the controls are hovered/focus-within
+- [x] Keep the Zen action buttons on a softer frosted white surface instead of relying on stronger button chrome
+- [x] Verify the affected shared focus-dashboard surface with targeted tests/build checks
+
+## Review
+
+- Active Zen controls no longer depend on a timer-based cursor fade to become fully visible in the extension. The shared controls cluster now reveals at full opacity whenever the extension window itself is focused, while web still keeps the quieter hover/focus-within reveal.
+- The `Zen Settings` and `End Zen` buttons now sit on a softer frosted treatment with backdrop blur and stable translucent white fills, instead of the heavier gradient chrome that made the control group feel louder.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to force active Zen in the built extension newtab and confirm the `End Zen` controls wrapper reports computed `opacity: 1` while focused, with a blurred translucent button surface
+
+## Zen Controls Blur Correction
+
+- [x] Remove black border/shadow treatment from the active Zen controls rail and buttons
+- [x] Keep the blur-backed surface mounted continuously instead of revealing it via overall opacity
+- [x] Verify the corrected Zen controls styles in fresh web and extension builds plus a focused runtime inspection
+
+## Review
+
+- The active Zen controls rail no longer uses any dark border or shadow treatment. The rail surface and both buttons now rely on translucent white fills plus persistent blur instead of outlined chrome.
+- The blur layer is now a separate always-mounted element inside the controls rail, so the reveal no longer depends on fading the blur surface itself in and out. Only the fill/text emphasis changes between calm and active states.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - controls surface `boxShadow: none`
+    - end button `borderTopWidth: 0px`
+    - end button `boxShadow: none`
+    - button `backdropFilter: blur(24px)`
+    - dedicated blur layer `backdropFilter: blur(40px)`
+
+## Zen Controls Dock Separation
+
+- [x] Move the active Zen controls into their own lane above the dock band
+- [x] Make both Zen actions use the requested white surface treatment
+- [x] Verify the updated layout and control styling in fresh builds
+
+## Zen Controls Quiet-State Calibration
+
+- [x] Confirm the focused-out state is still too visually active
+- [x] Reduce quiet-state control emphasis while preserving persistent blur
+- [x] Verify the focused-out style values after the calibration change
+
+## Zen Controls Mouse Activity Reveal
+
+- [x] Replace `windowFocused` as the main reveal trigger with short-lived mouse activity
+- [x] Keep hover and focus-within as direct reveal signals for the controls themselves
+- [x] Verify the quiet state stays recessed until mouse movement occurs, then reveals smoothly
+
+## Review
+
+- The active Zen controls no longer reveal just because the window is focused. They now stay recessed until there is real mouse movement, direct hover, or focus within the controls.
+- Mouse activity is handled as a short-lived pulse, so the controls brighten smoothly when the pointer moves and then settle back to the quiet state without relying on permanent window-focus presence.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - before mouse movement: row `opacity: 0.55`, button `backgroundColor: rgba(255, 255, 255, 0.54)`
+    - after mouse movement: row `opacity: 0.809962`, button `backgroundColor: rgba(255, 255, 255, 0.737)`
+
+## Review
+
+- The active Zen controls now sit in a higher lane above the dock band, so they no longer share the same bottom slot as the dock.
+- Both `Zen Settings` and `End Zen` now use the same white surface treatment, but the focused-out state is intentionally subdued by lowering content opacity and button fill instead of leaving both actions near full white.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - wrapper `bottom: 112px`
+    - focused-out row `opacity: 0.722864`
+    - both buttons `backgroundColor: rgba(255, 255, 255, 0.67)`

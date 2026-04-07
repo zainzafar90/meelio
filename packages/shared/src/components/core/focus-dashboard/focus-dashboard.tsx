@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { cn } from "../../../lib";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import {
@@ -398,99 +399,6 @@ export const FocusDashboard = ({
     ],
   );
 
-  const zenActiveItems = useMemo<ZenModeStatusItem[]>(
-    () => [
-      {
-        icon: <Timer className="size-3.5" />,
-        label: focusPillLabel,
-        ...getZenModeStatus({
-          enabled: zenMode.timerEnabled,
-          isActive: zenPhase !== "inactive" && zenMode.timerEnabled,
-          readyValue: zenStatusReadyLabel,
-          activeValue: currentTimerLabel,
-          labels: zenStatusLabels,
-        }),
-      },
-      {
-        icon: <CheckSquare2 className="size-3.5" />,
-        label: tasksPillLabel,
-        ...getZenModeStatus({
-          enabled: zenMode.pinnedTaskSyncEnabled,
-          isActive: Boolean(zenActiveTaskId),
-          readyValue: pinnedTask?.title ?? zenStatusReadyLabel,
-          activeValue: zenActiveTaskLabel,
-          labels: zenStatusLabels,
-        }),
-      },
-      {
-        icon: <Volume2 className="size-3.5" />,
-        label: t("common.soundscapes", {
-          defaultValue: "Soundscapes",
-        }),
-        ...getZenModeStatus({
-          enabled: zenMode.soundscapesEnabled,
-          isActive: playingSounds > 0,
-          readyValue: zenStatusReadyLabel,
-          activeValue: zenStatusActiveLabel,
-          labels: zenStatusLabels,
-        }),
-      },
-      {
-        icon: <Shield className="size-3.5" />,
-        label: t("common.site-blocker", {
-          defaultValue: "Site Blocker",
-        }),
-        ...getZenModeStatus({
-          enabled: zenMode.siteBlockerEnabled,
-          availability: browserCapabilities.siteBlocker,
-          isActive:
-            zenPhase !== "inactive" &&
-            zenMode.siteBlockerEnabled &&
-            browserCapabilities.siteBlocker === "ready",
-          readyValue: zenStatusReadyLabel,
-          activeValue: zenStatusActiveLabel,
-          labels: zenStatusLabels,
-        }),
-      },
-      {
-        icon: <PanelsTopLeft className="size-3.5" />,
-        label: t("common.tab-stash", {
-          defaultValue: "Tab Stash",
-        }),
-        ...getZenModeStatus({
-          enabled: zenMode.tabStashEnabled,
-          availability: browserCapabilities.tabStash,
-          isStashed: didStashTabs,
-          readyValue: zenStatusReadyLabel,
-          activeValue: zenStatusActiveLabel,
-          labels: zenStatusLabels,
-        }),
-      },
-    ],
-    [
-      browserCapabilities.siteBlocker,
-      browserCapabilities.tabStash,
-      currentTimerLabel,
-      didStashTabs,
-      focusPillLabel,
-      pinnedTask?.title,
-      playingSounds,
-      t,
-      tasksPillLabel,
-      zenActiveTaskId,
-      zenActiveTaskLabel,
-      zenMode.pinnedTaskSyncEnabled,
-      zenMode.siteBlockerEnabled,
-      zenMode.soundscapesEnabled,
-      zenMode.tabStashEnabled,
-      zenMode.timerEnabled,
-      zenPhase,
-      zenStatusActiveLabel,
-      zenStatusLabels,
-      zenStatusReadyLabel,
-    ],
-  );
-
   const zenModuleSummaryItems = useMemo<ZenModeStatusItem[]>(
     () => [
       {
@@ -658,6 +566,33 @@ export const FocusDashboard = ({
     });
   };
 
+  const [zenWindowFocused, setZenWindowFocused] = useState(() =>
+    typeof document === "undefined"
+      ? true
+      : document.visibilityState === "visible" && document.hasFocus(),
+  );
+
+  useEffect(() => {
+    if (zenPhase === "inactive") return;
+
+    const syncZenWindowFocus = () => {
+      setZenWindowFocused(
+        document.visibilityState === "visible" && document.hasFocus(),
+      );
+    };
+
+    syncZenWindowFocus();
+    window.addEventListener("focus", syncZenWindowFocus);
+    window.addEventListener("blur", syncZenWindowFocus);
+    document.addEventListener("visibilitychange", syncZenWindowFocus);
+
+    return () => {
+      window.removeEventListener("focus", syncZenWindowFocus);
+      window.removeEventListener("blur", syncZenWindowFocus);
+      document.removeEventListener("visibilitychange", syncZenWindowFocus);
+    };
+  }, [zenPhase]);
+
   const showTimerPanel = zenPhase !== "inactive" || isTimerVisible || isRunning;
   const showZenModeShell = zenPhase !== "inactive";
 
@@ -694,11 +629,6 @@ export const FocusDashboard = ({
                 timerEnabled={zenMode.timerEnabled}
                 activeFocusTaskLabel={zenActiveTaskLabel}
                 activeFocusTaskId={zenActiveTaskId}
-                summaryItems={zenModuleSummaryItems}
-                endZenLabel={zenEndLabel}
-                configureLabel={zenConfigureLabel}
-                onEndZen={handleEndZenMode}
-                onConfigure={handleConfigureZenMode}
                 onSelectTask={toggleTasks}
               />
             ) : (
@@ -758,6 +688,17 @@ export const FocusDashboard = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showZenModeShell && (
+        <ZenSessionControls
+          windowFocused={zenWindowFocused}
+          summaryItems={zenModuleSummaryItems}
+          endZenLabel={zenEndLabel}
+          configureLabel={zenConfigureLabel}
+          onEndZen={handleEndZenMode}
+          onConfigure={handleConfigureZenMode}
+        />
+      )}
     </div>
   );
 };
@@ -920,54 +861,139 @@ const ZenModeShell = ({
   timerEnabled,
   activeFocusTaskLabel,
   activeFocusTaskId,
-  summaryItems,
-  endZenLabel,
-  configureLabel,
-  onEndZen,
-  onConfigure,
   onSelectTask,
 }: {
   timerPanel: ReactNode;
   timerEnabled: boolean;
   activeFocusTaskLabel: string;
   activeFocusTaskId: string | null | undefined;
+  onSelectTask: () => void;
+}) => (
+  <div className="relative flex min-h-0 flex-1 items-center justify-center">
+    <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-20">
+      <div className="max-w-5xl text-center">
+        <h2
+          className="cursor-default text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
+          onClick={activeFocusTaskId ? undefined : onSelectTask}
+        >
+          {activeFocusTaskLabel}
+        </h2>
+      </div>
+      {timerEnabled && (
+        <motion.div
+          initial={{ opacity: 0, y: 16, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.985 }}
+          transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
+          className="w-full"
+        >
+          {timerPanel}
+        </motion.div>
+      )}
+    </div>
+  </div>
+);
+
+const ZenSessionControls = ({
+  windowFocused,
+  summaryItems,
+  endZenLabel,
+  configureLabel,
+  onEndZen,
+  onConfigure,
+}: {
+  windowFocused: boolean;
   summaryItems: ZenModeStatusItem[];
   endZenLabel: string;
   configureLabel: string;
   onEndZen: () => void;
   onConfigure: () => void;
-  onSelectTask: () => void;
-}) => (
-  <div className="relative flex min-h-0 flex-1 items-center justify-center">
-    <div className="pointer-events-none absolute inset-0 bg-black/12 backdrop-blur-[10px]" />
-    <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.22),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.16),transparent_28%)]" />
-    <div className="relative flex h-full w-full max-w-full flex-col">
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pt-6">
-        <div className="max-w-5xl text-center">
-          <h2
-            className="cursor-default text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
-            onClick={activeFocusTaskId ? undefined : onSelectTask}
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocusWithin, setIsFocusWithin] = useState(false);
+  const [isMouseActive, setIsMouseActive] = useState(false);
+  const mouseActiveTimeoutRef = useRef<ReturnType<typeof window.setTimeout>>(null);
+  const shouldReveal = isMouseActive || isHovered || isFocusWithin;
+
+  useEffect(() => {
+    if (windowFocused) {
+      return;
+    }
+
+    setIsHovered(false);
+    setIsFocusWithin(false);
+    setIsMouseActive(false);
+  }, [windowFocused]);
+
+  useEffect(() => {
+    const markMouseActive = () => {
+      setIsMouseActive(true);
+
+      if (mouseActiveTimeoutRef.current) {
+        window.clearTimeout(mouseActiveTimeoutRef.current);
+      }
+
+      mouseActiveTimeoutRef.current = window.setTimeout(() => {
+        setIsMouseActive(false);
+        mouseActiveTimeoutRef.current = null;
+      }, 3000);
+    };
+
+    window.addEventListener("mousemove", markMouseActive, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove", markMouseActive);
+      if (mouseActiveTimeoutRef.current) {
+        window.clearTimeout(mouseActiveTimeoutRef.current);
+        mouseActiveTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+
+  return (
+    <div className={cn("pointer-events-none absolute transition-opacity duration-1000 inset-x-0 bottom-24 z-20 flex justify-center px-4 sm:bottom-28", {
+        "opacity-100 ": shouldReveal,
+        "opacity-25": !shouldReveal,
+    })} >
+      <div
+        className="pointer-events-auto flex flex-col items-center gap-2"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocusCapture={() => setIsFocusWithin(true)}
+        onBlurCapture={(event) => {
+          const nextTarget = event.relatedTarget;
+          if (
+            nextTarget instanceof Node &&
+            event.currentTarget.contains(nextTarget)
+          ) {
+            return;
+          }
+          setIsFocusWithin(false);
+        }}
+      >
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-full transition-[background-color] duration-300 ease-out",
+            shouldReveal ? "bg-white/[0.08]" : "bg-white/[0.03]",
+          )}
+        >
+          <div className="pointer-events-none absolute inset-0 rounded-full bg-white/20" />
+          <div
+            className={cn(
+              "relative flex items-center gap-3 px-2 py-1.5 transition-opacity duration-300 ease-out",
+              shouldReveal ? "opacity-100" : "opacity-55",
+            )}
           >
-            {activeFocusTaskLabel}
-          </h2>
-        </div>
-        {timerEnabled && (
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.985 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.985 }}
-            transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
-            className="w-full"
-          >
-            {timerPanel}
-          </motion.div>
-        )}
-        <div className="flex flex-col items-center gap-3 pt-4">
-          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onConfigure}
-              className="inline-flex size-9 items-center justify-center rounded-full text-white/50 transition-opacity duration-200 hover:text-white/90"
+              className={cn(
+                "inline-flex size-10 items-center justify-center rounded-full backdrop-blur-xl transition-[background-color,color] duration-300 ease-out",
+                shouldReveal
+                  ? "bg-white/[0.88] text-zinc-950"
+                  : "bg-white/[0.54] text-zinc-950/70",
+              )}
               aria-label={configureLabel}
             >
               <Settings2 className="size-4" />
@@ -975,18 +1001,29 @@ const ZenModeShell = ({
             <button
               type="button"
               onClick={onEndZen}
-              className="inline-flex h-9 items-center gap-2 rounded-full px-4 text-sm font-medium text-white/50 transition-opacity duration-200 hover:text-white/90"
+              className={cn(
+                "inline-flex h-10 items-center gap-2 rounded-full px-5 text-sm font-medium backdrop-blur-xl transition-[background-color,color] duration-300 ease-out",
+                shouldReveal
+                  ? "bg-white/[0.88] text-zinc-950"
+                  : "bg-white/[0.54] text-zinc-950/70",
+              )}
             >
               <Brain className="size-3.5" />
               <span>{endZenLabel}</span>
             </button>
           </div>
-          <ZenModeStatusSummary items={summaryItems} />
         </div>
+        <ZenModeStatusSummary
+          items={summaryItems}
+          className={cn(
+            "transition-colors duration-300 ease-out",
+            shouldReveal ? "text-white/82" : "text-white/50",
+          )}
+        />
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ZenLaunchRail = ({
   focusPillLabel,

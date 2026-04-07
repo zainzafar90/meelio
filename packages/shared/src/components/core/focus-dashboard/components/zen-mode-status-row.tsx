@@ -62,7 +62,7 @@ export const ZenModeStatusSummary = ({
   return (
     <p
       className={cn(
-        "text-center text-xs text-white/40 transition-opacity duration-300 hover:text-white/70",
+        "text-center text-xs text-white/90 transition-opacity duration-300 hover:text-white",
         className,
       )}
     >
