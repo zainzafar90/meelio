@@ -218,9 +218,60 @@
 - Verification:
   - `pnpm --filter @repo/shared test -- --run`
   - `pnpm --filter web build`
+
+## Zen CTA Pill Refresh
+
+- [x] Inspect the current home-shell Zen CTA, top pill row, and recent related commits
+- [x] Offer visual companion for the Zen CTA/pill redesign discussion
+- [x] Confirm the desired interaction model for moving the primary Zen CTA into the top pill area
+- [x] Propose UI approaches for a top-pill CTA with popover or expanded action surface
+- [x] Present the recommended design and get approval before implementation
+- [x] Implement the approved Zen CTA/pill layout in the focus dashboard shell
+- [x] Verify the affected shared tests and app builds
+- [x] Document review notes and verification results
+
+## Review
+
+- The persistent bottom Zen launch rail was removed from the home shell so Zen entry now has one clear location instead of competing with the main content area.
+- The first top pill now reads like an action instead of a vague status by using the Zen entry copy in the trigger rather than a generic `Ready` value.
+- The popover no longer repeats `Ready` in the header or for every module. Included modules render as compact chips, while only non-ready exceptions stay in subdued secondary text.
+- `AmbientPill` still carries the interactive trigger styling through lightweight adornment and class overrides, but the body content is now materially quieter and more legible.
+- Added helper coverage for the Zen launch summary grouping so the popover does not regress back into per-item `Ready` repetition.
+- Follow-up polish softened pill contrast and shadow across the shell, restored icons inside the Zen summary chips/exceptions, and lightened the eyebrow/subtitle hierarchy so the panel stays minimal while scanning faster.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts --run`
+  - `pnpm --filter web build`
   - `pnpm --filter extension build`
-  - `pnpm --filter extension test -- --run`
+
+## Focus Dashboard Refactor
+
+- [x] Audit the current `focus-dashboard.tsx` responsibilities and related helpers/tests
+- [x] Run React Doctor against the workspace and capture dashboard-specific findings
+- [x] Present the refactor design direction for approval
+- [x] Write the approved implementation plan into this todo
+- [x] Extract dashboard state selection and derived labels into a focused view-model hook
+- [x] Keep `focus-dashboard.tsx` as the orchestration container for effects and mode switching only
+- [x] Split home, focus, and zen shells into dedicated component files
+- [x] Split shared dashboard primitives (`ambient-pill`, `zen-primary-action`, `zen-session-controls`) into dedicated component files
+- [x] Replace clickable non-semantic task headings with semantic button affordances where selection is actionable
+- [x] Preserve the current ambient visual language while simplifying render composition
+- [x] Verify targeted shared tests and re-run React Doctor for the affected area
+
+## Review
+
+- `packages/shared/src/components/core/focus-dashboard/focus-dashboard.tsx` is 1,105 lines and currently mixes store selection, runtime effects, state synchronization, motion orchestration, and all three dashboard shells in one file.
+- React Doctor flagged the file for giant-component architecture, a multi-`setState` effect in Zen controls, and non-semantic interactive wrappers in the focus/zen task headings.
+- The clean split is around four concerns: dashboard data/orchestration, home shell, focus shell(s), and small shared primitives like pills and Zen action rails.
+- Approved direction: keep the current wallpaper-first ambient shell, but refactor the implementation into a thin container plus smaller presentational units so the code reads by responsibility instead of by screen state.
+- The main `focus-dashboard.tsx` container is now down to 281 lines and the presentational shells/primitives live in focused component files under `components/`, while a dedicated `use-focus-dashboard-view-model` hook owns the derived dashboard state.
+- The selectable task headings in focus and Zen modes now use semantic buttons when they open task selection, which removes the original non-interactive click handling from this surface.
+- Added helper coverage for task prioritization and pinned-task selection so the extracted view-model logic keeps the same task ordering behavior.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/stores/focus-dashboard.store.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
   - `git diff --check`
+  - `npx -y react-doctor@latest packages/shared --verbose`
 
 ## Zen Mode Blocker Sync Correction
 

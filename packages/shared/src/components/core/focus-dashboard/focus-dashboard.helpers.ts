@@ -2,8 +2,12 @@ import type { CalendarEvent } from "../../../types/calendar.types";
 import { isAllDayEvent } from "../../../utils/calendar-date.utils";
 
 type FocusTaskLike = {
+  id: string;
+  title: string;
   completed?: boolean;
+  pinned?: boolean;
   deletedAt?: number | null;
+  updatedAt?: number;
 };
 
 type AgendaPillLabels = {
@@ -34,6 +38,30 @@ export const getTaskPillSummary = (tasks: FocusTaskLike[]) => {
     completedCount: visibleTasks.filter((task) => Boolean(task.completed)).length,
   };
 };
+
+export const selectFocusTasks = (tasks: FocusTaskLike[]) =>
+  tasks
+    .filter((task) => !task.completed && !task.deletedAt)
+    .sort((left, right) => {
+      if (Boolean(left.pinned) !== Boolean(right.pinned)) {
+        return left.pinned ? -1 : 1;
+      }
+
+      return (right.updatedAt ?? 0) - (left.updatedAt ?? 0);
+    })
+    .slice(0, 3)
+    .map((task) => ({
+      id: task.id,
+      title: task.title,
+      completed: false,
+      pinned: Boolean(task.pinned),
+    }));
+
+export const getPinnedTask = (tasks: FocusTaskLike[]) =>
+  tasks
+    .filter((task) => !task.completed && !task.deletedAt && task.pinned)
+    .sort((left, right) => (right.updatedAt ?? 0) - (left.updatedAt ?? 0))[0] ??
+  null;
 
 export const getAgendaPillValue = (
   event: CalendarEvent | null,

@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   getAgendaPillValue,
+  getPinnedTask,
   getTaskPillSummary,
   getZenModeStatus,
+  selectFocusTasks,
 } from "./focus-dashboard.helpers";
 
 describe("focus dashboard pill helpers", () => {
@@ -17,6 +19,92 @@ describe("focus dashboard pill helpers", () => {
 
     expect(summary.queuedCount).toBe(2);
     expect(summary.completedCount).toBe(1);
+  });
+
+  it("prioritizes pinned and recently updated focus tasks", () => {
+    expect(
+      selectFocusTasks([
+        {
+          id: "task-1",
+          title: "Older unpinned",
+          pinned: false,
+          completed: false,
+          updatedAt: 10,
+        },
+        {
+          id: "task-2",
+          title: "Pinned task",
+          pinned: true,
+          completed: false,
+          updatedAt: 5,
+        },
+        {
+          id: "task-3",
+          title: "Recent unpinned",
+          pinned: false,
+          completed: false,
+          updatedAt: 20,
+        },
+        {
+          id: "task-4",
+          title: "Completed task",
+          pinned: true,
+          completed: true,
+          updatedAt: 50,
+        },
+      ]),
+    ).toEqual([
+      {
+        id: "task-2",
+        title: "Pinned task",
+        completed: false,
+        pinned: true,
+      },
+      {
+        id: "task-3",
+        title: "Recent unpinned",
+        completed: false,
+        pinned: false,
+      },
+      {
+        id: "task-1",
+        title: "Older unpinned",
+        completed: false,
+        pinned: false,
+      },
+    ]);
+  });
+
+  it("returns the newest pinned incomplete task", () => {
+    expect(
+      getPinnedTask([
+        {
+          id: "task-1",
+          title: "Older pinned",
+          pinned: true,
+          completed: false,
+          updatedAt: 10,
+        },
+        {
+          id: "task-2",
+          title: "Newest pinned",
+          pinned: true,
+          completed: false,
+          updatedAt: 20,
+        },
+        {
+          id: "task-3",
+          title: "Deleted pinned",
+          pinned: true,
+          completed: false,
+          updatedAt: 30,
+          deletedAt: Date.now(),
+        },
+      ]),
+    ).toMatchObject({
+      id: "task-2",
+      title: "Newest pinned",
+    });
   });
 
   it("prefers the actual calendar event summary for the pill value", () => {
