@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "当前专注任务",
-      "empty": "选择一项任务作为下一段专注时段的锚点"
+      "emptyLabel": "尚未选择专注任务",
+      "empty": "选择一项任务开始"
     },
     "calendar": {
       "noUpcomingEvent": "暂无即将开始的事件",

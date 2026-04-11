@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "現在の集中タスク",
-      "empty": "次の集中ブロックの軸にするタスクを選んでください"
+      "emptyLabel": "集中タスクが選択されていません",
+      "empty": "開始するタスクを選んでください"
     },
     "calendar": {
       "noUpcomingEvent": "今後の予定はありません",

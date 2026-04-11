@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Active Focus Task",
-      "empty": "Choose a task to anchor the next focus block"
+      "emptyLabel": "No focus task selected",
+      "empty": "Choose a task to start"
     },
     "calendar": {
       "noUpcomingEvent": "No upcoming event",

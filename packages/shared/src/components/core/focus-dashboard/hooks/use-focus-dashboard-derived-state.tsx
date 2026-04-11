@@ -134,10 +134,11 @@ export const useFocusDashboardDerivedState = (
     count: taskPillSummary.completedCount,
     defaultValue: "{{count}} done",
   });
-  const activeFocusTaskLabel = state.snapshot.activeFocusTaskId
+  const hasSelectedFocusTask = Boolean(state.snapshot.activeFocusTaskId);
+  const activeFocusTaskLabel = hasSelectedFocusTask
     ? state.snapshot.activeFocusTaskLabel
     : t("focusDashboard.activeTask.empty", {
-        defaultValue: "Choose a task to anchor the next focus block",
+        defaultValue: "Choose a task to start",
       });
   const zenTask = useMemo(
     () =>
@@ -168,9 +169,13 @@ export const useFocusDashboardDerivedState = (
   const todayPillLabel = t("calendar.sheet.today", {
     defaultValue: "Today",
   });
-  const activeFocusTaskEyebrow = t("focusDashboard.activeTask.label", {
-    defaultValue: "Active Focus Task",
-  });
+  const activeFocusTaskEyebrow = hasSelectedFocusTask
+    ? t("focusDashboard.activeTask.label", {
+        defaultValue: "Active Focus Task",
+      })
+    : t("focusDashboard.activeTask.emptyLabel", {
+        defaultValue: "No focus task selected",
+      });
   const zenReadyLabel = t("focusDashboard.zenMode.readyLabel", {
     defaultValue: "Zen Mode",
   });
@@ -388,23 +393,33 @@ export const useFocusDashboardDerivedState = (
     },
     focusModeProps: {
       topPills: {
-        currentTimerLabel,
         completedTaskCountLabel,
         calendarPillValue,
-        focusPillLabel,
         calendarPillLabel,
         todayPillLabel,
+        zenLaunch: {
+          focusPillLabel: zenReadyLabel,
+          focusPillValue: zenStartLabel,
+          startFocusingLabel: zenStartLabel,
+          zenHeadline: zenReadyHeadline,
+          zenSubtitle: zenReadySubtitle,
+          zenStatusItems: zenReadyItems,
+          configureLabel: zenConfigureLabel,
+        },
       },
       taskHeading: {
         activeFocusTaskLabel,
         activeFocusTaskId: state.snapshot.activeFocusTaskId,
         activeFocusTaskEyebrow,
+        isEmptyState: !hasSelectedFocusTask,
       },
     },
     zenModeProps: {
       timerEnabled: state.zenMode.timerEnabled,
       activeFocusTaskLabel: zenActiveTaskLabel,
       activeFocusTaskId: zenActiveTaskId,
+      activeFocusTaskEyebrow,
+      isEmptyState: !zenActiveTaskId,
     },
     zenSessionControlsProps: {
       summaryItems: zenModuleSummaryItems,

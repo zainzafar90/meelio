@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Tarefa de foco ativa",
-      "empty": "Escolha uma tarefa para ancorar seu próximo bloco de foco"
+      "emptyLabel": "Nenhuma tarefa de foco selecionada",
+      "empty": "Escolha uma tarefa para começar"
     },
     "calendar": {
       "noUpcomingEvent": "Nenhum evento próximo",

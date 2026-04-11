@@ -219,6 +219,14 @@
   - `pnpm --filter @repo/shared test -- --run`
   - `pnpm --filter web build`
 
+## Focus Dashboard Translation Fix
+
+- [x] Inspect the recent focus-dashboard empty-state copy changes and impacted locale keys
+- [ ] Run localization completeness verification to confirm the current failure
+- [ ] Update every supported locale with the new focus-dashboard active-task keys and copy
+- [ ] Re-run localization and build verification
+- [ ] Document the translation fix results
+
 ## Zen CTA Pill Refresh
 
 - [x] Inspect the current home-shell Zen CTA, top pill row, and recent related commits

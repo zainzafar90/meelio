@@ -29,3 +29,7 @@
 - 2026-04-11: On Zen popover exception rows like `Tab Stash Off`, typography still counts toward the three-level system. Exceptions can be dimmer than active chips, but they cannot introduce a fourth label/value scale or overly letter-spaced style.
 - 2026-04-11: If Zen status items are meant to read as a pill set, active and inactive states must share the same container shape and spacing. Only tone should change; do not drop inactive items into a raw text row.
 - 2026-04-11: If the user asks for check/minus status pills, stop splitting Zen modules into included vs exception groups. Render all modules through one pill component and vary only the status icon and tone.
+- 2026-04-11: Empty focus-task guidance must not reuse the same headline treatment as a real selected task. Give empty state its own eyebrow/indicator and lower-emphasis title so placeholder guidance never looks like chosen content.
+- 2026-04-11: When fixing a focus-shell empty state, verify which shell is actually visible in the reported mode. Zen mode and non-Zen focus mode do not share the same heading surface.
+- 2026-04-11: For empty-state task headings, never use `inline-flex` on the eyebrow row if the title should stack below it. Also update the actual locale string, not just the fallback default, or the old copy will keep rendering.
+- 2026-04-11: Shared shell chrome should stay consistent across home and focus mode. If home has moved to a Zen entry pill, do not leave an older timer/focus pill in the same slot on focus mode.

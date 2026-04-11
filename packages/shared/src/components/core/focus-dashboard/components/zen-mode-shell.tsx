@@ -15,11 +15,17 @@ export const ZenModeShell = ({ viewModel, timerPanel, onSelectTask }: ZenModeShe
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-4 pb-20">
       <div className="max-w-5xl text-center">
         <FocusTaskHeading
+          eyebrow={viewModel.activeFocusTaskEyebrow}
           label={viewModel.activeFocusTaskLabel}
           isSelectable={!viewModel.activeFocusTaskId}
+          isEmptyState={viewModel.isEmptyState}
           onSelectTask={onSelectTask}
           containerClassName="w-full"
-          headingClassName="text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
+          headingClassName={
+            viewModel.isEmptyState
+              ? "text-balance text-2xl font-medium tracking-tight text-white/88 drop-shadow-[0_8px_22px_rgba(0,0,0,0.14)] sm:text-3xl lg:text-[2.55rem]"
+              : "text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl lg:text-5xl"
+          }
         />
       </div>
       {viewModel.timerEnabled ? (

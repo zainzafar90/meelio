@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Tarea de enfoque activa",
-      "empty": "Elige una tarea para anclar tu próximo bloque de enfoque"
+      "emptyLabel": "No hay una tarea de enfoque seleccionada",
+      "empty": "Elige una tarea para empezar"
     },
     "calendar": {
       "noUpcomingEvent": "No hay próximos eventos",

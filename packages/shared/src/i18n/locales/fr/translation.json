@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Tâche de concentration active",
-      "empty": "Choisissez une tâche pour ancrer votre prochain bloc de concentration"
+      "emptyLabel": "Aucune tâche de concentration sélectionnée",
+      "empty": "Choisissez une tâche pour commencer"
     },
     "calendar": {
       "noUpcomingEvent": "Aucun événement à venir",

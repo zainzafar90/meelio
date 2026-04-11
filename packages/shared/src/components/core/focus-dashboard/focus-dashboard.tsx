@@ -67,6 +67,8 @@ export const FocusDashboard = ({
                   viewModel={derived.focusModeProps}
                   timerPanel={timerPanel}
                   onSelectTask={state.toggleTasks}
+                  onConfigureZenMode={effects.handleConfigureZenMode}
+                  onStartZenMode={effects.handleStartZenMode}
                 />
               )}
             </m.div>

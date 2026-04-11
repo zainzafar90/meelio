@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Aktuelle Fokusaufgabe",
-      "empty": "Wähle eine Aufgabe, die deinen nächsten Fokusblock verankern soll"
+      "emptyLabel": "Keine Fokusaufgabe ausgewählt",
+      "empty": "Wähle eine Aufgabe zum Starten"
     },
     "calendar": {
       "noUpcomingEvent": "Kein anstehender Termin",

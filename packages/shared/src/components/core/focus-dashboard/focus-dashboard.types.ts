@@ -35,10 +35,22 @@ export interface FocusDashboardHomeModeProps {
   configureLabel: string;
 }
 
+export interface FocusDashboardZenLaunchProps {
+  focusPillLabel: string;
+  focusPillValue: string;
+  startFocusingLabel: string;
+  zenHeadline: string;
+  zenSubtitle: string;
+  zenStatusItems: ZenModeStatusItem[];
+  configureLabel: string;
+}
+
 export interface FocusDashboardZenModeProps {
   timerEnabled: boolean;
   activeFocusTaskLabel: string;
   activeFocusTaskId: string | null;
+  activeFocusTaskEyebrow: string;
+  isEmptyState: boolean;
 }
 
 export interface FocusDashboardZenSessionControlsProps {
