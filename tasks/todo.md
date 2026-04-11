@@ -222,10 +222,19 @@
 ## Focus Dashboard Translation Fix
 
 - [x] Inspect the recent focus-dashboard empty-state copy changes and impacted locale keys
-- [ ] Run localization completeness verification to confirm the current failure
-- [ ] Update every supported locale with the new focus-dashboard active-task keys and copy
-- [ ] Re-run localization and build verification
-- [ ] Document the translation fix results
+- [x] Run localization completeness verification to confirm the current failure
+- [x] Update every supported locale with the new focus-dashboard active-task keys and copy
+- [x] Re-run localization and build verification
+- [x] Document the translation fix results
+
+## Review
+
+- The recent empty-state copy change added `focusDashboard.activeTask.emptyLabel` only in English, so every non-English locale failed localization completeness and risked mixed fallback copy in focus and Zen mode.
+- Added `emptyLabel` to every supported non-English locale and shortened the `empty` copy in those same locale blocks so the focus-dashboard empty state now matches the new UX across languages.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/i18n/localization-completeness.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
 
 ## Zen CTA Pill Refresh
 
