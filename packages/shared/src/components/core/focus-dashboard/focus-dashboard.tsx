@@ -1,493 +1,121 @@
-import { useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import type { StoreApi, UseBoundStore } from "zustand";
-import { useShallow } from "zustand/shallow";
-import { Brain, CalendarDays, CheckSquare2, Timer } from "lucide-react";
-import { useTranslation } from "react-i18next";
-
-import type { TimerState } from "../../../types/timer.types";
-import { formatTime } from "../../../utils/timer.utils";
-import { getMinutesUntilEvent } from "../../../utils/calendar-date.utils";
-import { useCalendarStore } from "../../../stores/calendar.store";
-import { useDockStore } from "../../../stores/dock.store";
 import {
-  initializeFocusDashboardStore,
-  syncFocusDashboardSignals,
-  updateDailyFocusPlan,
-  useFocusDashboardStore,
-} from "../../../stores/focus-dashboard.store";
-import { useAuthStore } from "../../../stores/auth.store";
-import { useSiteBlockerStore } from "../../../stores/site-blocker.store";
-import { useSoundscapesStore } from "../../../stores/soundscapes.store";
-import { useTaskStore } from "../../../stores/task.store";
-import { Clock } from "../clock";
-import { Greeting } from "../greetings/greetings-mantras";
-import {
-  getAgendaPillValue,
-  getTaskPillSummary,
-} from "./focus-dashboard.helpers";
+  AnimatePresence,
+  LazyMotion,
+  domAnimation,
+  m,
+} from "framer-motion";
 
-type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
+import { FocusModeShell } from "./components/focus-mode-shell";
+import { HomeModeShell } from "./components/home-mode-shell";
+import { ZenModeShell } from "./components/zen-mode-shell";
+import { ZenSessionControls } from "./components/zen-session-controls";
+import { useFocusDashboardDerivedState } from "./hooks/use-focus-dashboard-derived-state";
+import { useFocusDashboardEffects } from "./hooks/use-focus-dashboard-effects";
+import { useFocusDashboardState } from "./hooks/use-focus-dashboard-state";
+import type { TimerStoreHook } from "./focus-dashboard.types";
 
 interface FocusDashboardProps {
   timerStore: TimerStoreHook;
   timerPanel: ReactNode;
 }
 
-const selectFocusTasks = (
-  tasks: Array<{
-    id: string;
-    title: string;
-    completed?: boolean;
-    pinned?: boolean;
-    deletedAt?: number | null;
-    updatedAt?: number;
-  }>,
-) =>
-  tasks
-    .filter((task) => !task.completed && !task.deletedAt)
-    .sort((left, right) => {
-      if (Boolean(left.pinned) !== Boolean(right.pinned)) {
-        return left.pinned ? -1 : 1;
-      }
-
-      return (right.updatedAt ?? 0) - (left.updatedAt ?? 0);
-    })
-    .slice(0, 3)
-    .map((task) => ({
-      id: task.id,
-      title: task.title,
-      completed: false,
-      pinned: Boolean(task.pinned),
-    }));
-
 export const FocusDashboard = ({
   timerStore,
   timerPanel,
 }: FocusDashboardProps) => {
-  const { t, i18n } = useTranslation();
-  const userId = useAuthStore((state) => state.user?.id);
-  const { stage, isRunning, prevRemaining, endTimestamp, durations } =
-    timerStore(
-      useShallow((state) => ({
-        stage: state.stage,
-        isRunning: state.isRunning,
-        prevRemaining: state.prevRemaining,
-        endTimestamp: state.endTimestamp,
-        durations: state.durations,
-      })),
-    );
-  const {
-    tasks,
-    initializeTaskStore,
-    isTaskStoreLoading,
-    hasTaskStoreInitialized,
-  } = useTaskStore(
-    useShallow((state) => ({
-      tasks: state.tasks,
-      initializeTaskStore: state.initializeStore,
-      isTaskStoreLoading: state.isLoading,
-      hasTaskStoreInitialized: state.hasInitialized,
-    })),
-  );
-  const blockedSites = useSiteBlockerStore(useShallow((state) => state.sites));
-  const playingSounds = useSoundscapesStore(
-    useShallow((state) => state.sounds.filter((sound) => sound.playing).length),
-  );
-  const nextEvent = useCalendarStore(useShallow((state) => state.nextEvent));
-  const { isTimerVisible, setTimerVisible, toggleTasks } = useDockStore(
-    useShallow((state) => ({
-      isTimerVisible: state.isTimerVisible,
-      setTimerVisible: state.setTimerVisible,
-      toggleTasks: state.toggleTasks,
-    })),
-  );
-  const snapshot = useFocusDashboardStore(
-    useShallow((state) => state.snapshot),
-  );
-  const reduceMotion = useReducedMotion();
-  const isTaskBootstrapPending =
-    Boolean(userId) && (!hasTaskStoreInitialized || isTaskStoreLoading);
-
-  const focusTasks = useMemo(() => selectFocusTasks(tasks), [tasks]);
-  const taskPillSummary = useMemo(() => getTaskPillSummary(tasks), [tasks]);
-  const timerRemaining = useMemo(() => {
-    if (!isRunning && prevRemaining !== null) {
-      return prevRemaining;
-    }
-
-    if (isRunning && endTimestamp) {
-      return Math.max(0, Math.ceil((endTimestamp - Date.now()) / 1000));
-    }
-
-    return durations[stage];
-  }, [durations, endTimestamp, isRunning, prevRemaining, stage]);
-  const calendarPillValue = useMemo(
-    () =>
-      getAgendaPillValue(nextEvent, {
-        noUpcomingEvent: t("focusDashboard.calendar.noUpcomingEvent", {
-          defaultValue: "No upcoming event",
-        }),
-        allDayEvent: t("focusDashboard.calendar.allDayEvent", {
-          defaultValue: "All-day event",
-        }),
-        upcomingEvent: t("focusDashboard.calendar.upcomingEvent", {
-          defaultValue: "Upcoming event",
-        }),
-      }),
-    [i18n.resolvedLanguage, nextEvent, t],
-  );
-  const currentTimerLabel = isRunning
-    ? t("focusDashboard.timer.remaining", {
-        time: formatTime(timerRemaining),
-        defaultValue: "{{time}} remaining",
-      })
-    : t("focusDashboard.timer.ready", {
-        defaultValue: "Ready to focus",
-      });
-  const nextEventLabel = nextEvent?.summary
-    ? t("focusDashboard.calendar.nextEventLabel", {
-        summary: nextEvent.summary,
-        defaultValue: "Next: {{summary}}",
-      })
-    : "";
-  const queuedTaskCountLabel = t("focusDashboard.tasks.queuedCount", {
-    count: taskPillSummary.queuedCount,
-    defaultValue: "{{count}} queued",
-  });
-  const completedTaskCountLabel = t("focusDashboard.tasks.doneCount", {
-    count: taskPillSummary.completedCount,
-    defaultValue: "{{count}} done",
-  });
-  const activeFocusTaskLabel = snapshot.activeFocusTaskId
-    ? snapshot.activeFocusTaskLabel
-    : t("focusDashboard.activeTask.empty", {
-        defaultValue: "Choose a task to anchor the next focus block",
-      });
-  const focusPillLabel = t("timer.controls.focusLabel", {
-    defaultValue: "Focus",
-  });
-  const calendarPillLabel = t("common.calendar", {
-    defaultValue: "Calendar",
-  });
-  const tasksPillLabel = t("common.tasks", {
-    defaultValue: "Tasks",
-  });
-  const todayPillLabel = t("calendar.sheet.today", {
-    defaultValue: "Today",
-  });
-  const activeFocusTaskEyebrow = t("focusDashboard.activeTask.label", {
-    defaultValue: "Active Focus Task",
-  });
-  const startFocusingLabel = t("focusDashboard.actions.startFocusing", {
-    defaultValue: "Start Focusing",
-  });
-
-  useEffect(() => {
-    initializeFocusDashboardStore();
-  }, []);
-
-  useEffect(() => {
-    if (!userId) {
-      return;
-    }
-
-    void initializeTaskStore();
-  }, [initializeTaskStore, userId]);
-
-  useEffect(() => {
-    if (isTaskBootstrapPending) {
-      return;
-    }
-
-    updateDailyFocusPlan({ topTasks: focusTasks });
-  }, [focusTasks, isTaskBootstrapPending]);
-
-  useEffect(() => {
-    syncFocusDashboardSignals({
-      timerRunning: isRunning,
-      timerStage: stage,
-      timerLabel: currentTimerLabel,
-      sessionFocusTaskId: isRunning ? snapshot.sessionFocusTaskId : null,
-      blockerMode: blockedSites.length > 0 && isRunning ? "active" : "ready",
-      soundtrackMode: playingSounds > 0 ? "playing" : "available",
-      nextEventLabel,
-      minutesUntilEvent: nextEvent ? getMinutesUntilEvent(nextEvent) : null,
-    });
-  }, [
-    blockedSites.length,
-    currentTimerLabel,
-    nextEventLabel,
-    isRunning,
-    nextEvent,
-    playingSounds,
-    stage,
-    timerRemaining,
-  ]);
-
-  const showTimerPanel = isTimerVisible || isRunning;
+  const state = useFocusDashboardState({ timerStore });
+  const derived = useFocusDashboardDerivedState(state);
+  const effects = useFocusDashboardEffects({ state, derived, timerStore });
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
-      <AnimatePresence mode="wait" initial={false}>
-        {showTimerPanel ? (
-          <motion.div
-            key="focus-mode"
-            initial={
-              reduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: 18, filter: "blur(10px)" }
-            }
-            animate={
-              reduceMotion
-                ? { opacity: 1 }
-                : { opacity: 1, y: 0, filter: "blur(0px)" }
-            }
-            exit={
-              reduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -12, filter: "blur(8px)" }
-            }
-            transition={{
-              duration: reduceMotion ? 0.18 : 0.3,
-              ease: "easeOut",
-            }}
-            className="flex min-h-0 flex-1"
-          >
-            <FocusModeShell
-              timerPanel={timerPanel}
-              currentTimerLabel={currentTimerLabel}
-              activeFocusTaskLabel={activeFocusTaskLabel}
-              activeFocusTaskId={snapshot.activeFocusTaskId}
-              completedTaskCountLabel={completedTaskCountLabel}
-              calendarPillValue={calendarPillValue}
-              focusPillLabel={focusPillLabel}
-              calendarPillLabel={calendarPillLabel}
-              todayPillLabel={todayPillLabel}
-              activeFocusTaskEyebrow={activeFocusTaskEyebrow}
-              onSelectTask={toggleTasks}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="home-mode"
-            initial={
-              reduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: 14, filter: "blur(10px)" }
-            }
-            animate={
-              reduceMotion
-                ? { opacity: 1 }
-                : { opacity: 1, y: 0, filter: "blur(0px)" }
-            }
-            exit={
-              reduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -10, filter: "blur(8px)" }
-            }
-            transition={{
-              duration: reduceMotion ? 0.18 : 0.28,
-              ease: "easeOut",
-            }}
-            className="flex min-h-0 flex-1"
-          >
-            <HomeModeShell
-              calendarPillValue={calendarPillValue}
-              queuedTaskCountLabel={queuedTaskCountLabel}
-              focusPillLabel={focusPillLabel}
-              calendarPillLabel={calendarPillLabel}
-              tasksPillLabel={tasksPillLabel}
-              startFocusingLabel={startFocusingLabel}
-              onStartFocusing={() => setTimerVisible(true)}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <LazyMotion features={domAnimation}>
+      <div className="flex h-full w-full flex-col overflow-hidden px-2 pb-2 pt-2 sm:px-4">
+        <AnimatePresence mode="wait" initial={false}>
+          {derived.showTimerPanel ? (
+            <m.div
+              key="focus-mode"
+              initial={
+                state.reduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 18, filter: "blur(10px)" }
+              }
+              animate={
+                state.reduceMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, y: 0, filter: "blur(0px)" }
+              }
+              exit={
+                state.reduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -12, filter: "blur(8px)" }
+              }
+              transition={{
+                duration: state.reduceMotion ? 0.18 : 0.3,
+                ease: "easeOut",
+              }}
+              className="flex min-h-0 flex-1"
+            >
+              {derived.showZenModeShell ? (
+                <ZenModeShell
+                  viewModel={derived.zenModeProps}
+                  timerPanel={timerPanel}
+                  onSelectTask={state.toggleTasks}
+                />
+              ) : (
+                <FocusModeShell
+                  viewModel={derived.focusModeProps}
+                  timerPanel={timerPanel}
+                  onSelectTask={state.toggleTasks}
+                  onConfigureZenMode={effects.handleConfigureZenMode}
+                  onStartZenMode={effects.handleStartZenMode}
+                />
+              )}
+            </m.div>
+          ) : (
+            <m.div
+              key="home-mode"
+              initial={
+                state.reduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 14, filter: "blur(10px)" }
+              }
+              animate={
+                state.reduceMotion
+                  ? { opacity: 1 }
+                  : { opacity: 1, y: 0, filter: "blur(0px)" }
+              }
+              exit={
+                state.reduceMotion
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: -10, filter: "blur(8px)" }
+              }
+              transition={{
+                duration: state.reduceMotion ? 0.18 : 0.28,
+                ease: "easeOut",
+              }}
+              className="flex min-h-0 flex-1"
+            >
+              <HomeModeShell
+                homeModeProps={derived.homeModeProps}
+                onConfigure={effects.handleConfigureZenMode}
+                onStartZenMode={effects.handleStartZenMode}
+              />
+            </m.div>
+          )}
+        </AnimatePresence>
+
+        {derived.showZenModeShell ? (
+          <ZenSessionControls
+            windowFocused={effects.zenWindowFocused}
+            summaryItems={derived.zenSessionControlsProps.summaryItems}
+            endZenLabel={derived.zenSessionControlsProps.endZenLabel}
+            configureLabel={derived.zenSessionControlsProps.configureLabel}
+            onEndZen={effects.handleEndZenMode}
+            onConfigure={effects.handleConfigureZenMode}
+          />
+        ) : null}
+      </div>
+    </LazyMotion>
   );
 };
-
-const HomeModeShell = ({
-  calendarPillValue,
-  queuedTaskCountLabel,
-  focusPillLabel,
-  calendarPillLabel,
-  tasksPillLabel,
-  startFocusingLabel,
-  onStartFocusing,
-}: {
-  calendarPillValue: string | null;
-  queuedTaskCountLabel: string;
-  focusPillLabel: string;
-  calendarPillLabel: string;
-  tasksPillLabel: string;
-  startFocusingLabel: string;
-  onStartFocusing: () => void;
-}) => (
-  <div className="relative flex min-h-0 flex-1 flex-col">
-    <div className="absolute inset-x-0 top-0 z-10 hidden items-start justify-between gap-3 px-4 py-3 [@media(min-height:580px)]:flex">
-      <div className="flex-1 flex justify-start">
-        <StartFocusPill
-          focusPillLabel={focusPillLabel}
-          startFocusingLabel={startFocusingLabel}
-          onClick={onStartFocusing}
-        />
-      </div>
-      <div className="flex-1 flex justify-center">
-        {calendarPillValue && (
-          <AmbientPill
-            icon={<CalendarDays className="size-3.5" />}
-            label={calendarPillLabel}
-            value={calendarPillValue}
-          />
-        )}
-      </div>
-      <div className="flex-1 flex justify-end">
-        <AmbientPill
-          icon={<CheckSquare2 className="size-3.5" />}
-          label={tasksPillLabel}
-          value={queuedTaskCountLabel}
-        />
-      </div>
-    </div>
-
-    <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 text-center">
-      <div className="max-w-4xl space-y-6">
-        <Clock />
-        <div className="space-y-2">
-          <div className="[&_h2]:mb-0 [&_h2]:mt-0 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight sm:[&_h2]:text-3xl md:[&_h2]:text-4xl">
-            <Greeting />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const FocusModeShell = ({
-  timerPanel,
-  currentTimerLabel,
-  activeFocusTaskLabel,
-  activeFocusTaskId,
-  completedTaskCountLabel,
-  calendarPillValue,
-  focusPillLabel,
-  calendarPillLabel,
-  todayPillLabel,
-  activeFocusTaskEyebrow,
-  onSelectTask,
-}: {
-  timerPanel: ReactNode;
-  currentTimerLabel: string;
-  activeFocusTaskLabel: string;
-  activeFocusTaskId: string | null;
-  completedTaskCountLabel: string;
-  calendarPillValue: string | null;
-  focusPillLabel: string;
-  calendarPillLabel: string;
-  todayPillLabel: string;
-  activeFocusTaskEyebrow: string;
-  onSelectTask: () => void;
-}) => (
-  <div className="relative flex min-h-0 flex-1 items-center justify-center">
-    <div className="pointer-events-none absolute inset-0 bg-black/7 backdrop-blur-[8px]" />
-    <div className="pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_18%),radial-gradient(circle_at_center,rgba(0,0,0,0.20),transparent_58%),linear-gradient(to_bottom,rgba(0,0,0,0.13),transparent_28%)]" />
-    <div className="relative flex h-full w-full max-w-full flex-col">
-      <div className="hidden items-center justify-between px-4 py-3 [@media(min-height:580px)]:flex">
-        <div className="flex-1 flex justify-start">
-          <AmbientPill
-            icon={<Timer className="size-3.5" />}
-            label={focusPillLabel}
-            value={currentTimerLabel}
-          />
-        </div>
-        <div className="flex-1 flex justify-center">
-          {calendarPillValue && (
-            <AmbientPill
-              icon={<CalendarDays className="size-3.5" />}
-              label={calendarPillLabel}
-              value={calendarPillValue}
-            />
-          )}
-        </div>
-        <div className="flex-1 flex justify-end">
-          <AmbientPill
-            icon={<CheckSquare2 className="size-3.5" />}
-            label={todayPillLabel}
-            value={completedTaskCountLabel}
-          />
-        </div>
-      </div>
-
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-8 px-4 pb-6">
-        <div
-          className="cursor-default space-y-3 text-center"
-          onClick={activeFocusTaskId ? undefined : onSelectTask}
-        >
-          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/62">
-            {activeFocusTaskEyebrow}
-          </p>
-          <h2 className="max-w-3xl text-balance text-3xl font-semibold tracking-tight text-white drop-shadow-[0_8px_22px_rgba(0,0,0,0.16)] sm:text-4xl">
-            {activeFocusTaskLabel}
-          </h2>
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 16, scale: 0.985 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.985 }}
-          transition={{ duration: 0.28, ease: "easeOut", delay: 0.04 }}
-          className="w-full"
-        >
-          {timerPanel}
-        </motion.div>
-      </div>
-    </div>
-  </div>
-);
-
-const AmbientPill = ({
-  icon,
-  label,
-  value,
-}: {
-  icon?: ReactNode;
-  label: string;
-  value: string;
-}) => (
-  <div className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/16 px-3.5 text-sm text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl sm:h-10 sm:gap-3 sm:px-5">
-    {icon && <span className="text-white/88">{icon}</span>}
-    <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
-      {label}
-    </span>
-    <span className="truncate max-w-[86px] text-xs font-semibold text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.18)] sm:max-w-[132px] sm:text-sm">
-      {value}
-    </span>
-  </div>
-);
-
-const StartFocusPill = ({
-  focusPillLabel,
-  startFocusingLabel,
-  onClick,
-}: {
-  focusPillLabel: string;
-  startFocusingLabel: string;
-  onClick: () => void;
-}) => (
-  <button
-    onClick={onClick}
-    className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white/16 px-3.5 text-sm text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)] backdrop-blur-2xl transition-colors hover:bg-white/24 sm:h-10 sm:gap-3 sm:px-5"
-  >
-    <span className="text-white/88">
-      <Brain className="size-3.5" />
-    </span>
-    <span className="hidden md:inline text-[11px] font-medium uppercase tracking-[0.28em] text-white/68">
-      {focusPillLabel}
-    </span>
-    <span className="text-xs font-semibold text-white [text-shadow:_0_1px_8px_rgba(0,0,0,0.18)] sm:text-sm">
-      {startFocusingLabel}
-    </span>
-  </button>
-);

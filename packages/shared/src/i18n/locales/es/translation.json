@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Tarea de enfoque activa",
-      "empty": "Elige una tarea para anclar tu próximo bloque de enfoque"
+      "emptyLabel": "No hay una tarea de enfoque seleccionada",
+      "empty": "Elige una tarea para empezar"
     },
     "calendar": {
       "noUpcomingEvent": "No hay próximos eventos",
@@ -189,6 +190,26 @@
     },
     "actions": {
       "startFocusing": "Empezar a enfocarte"
+    },
+    "zenMode": {
+      "readyLabel": "Modo Zen",
+      "activeLabel": "Zen activo",
+      "readyHeadline": "Un toque inicia tu ritual de enfoque",
+      "readySubtitle": "El temporizador, las tareas, los paisajes sonoros, el bloqueador y las pestañas siguen tus ajustes guardados.",
+      "activeSubtitle": "Todo lo que activaste está manteniendo el enfoque.",
+      "start": "Entrar en Zen",
+      "starting": "Entrando en Zen...",
+      "end": "Salir de Zen",
+      "ending": "Saliendo de Zen...",
+      "configure": "Configurar",
+      "status": {
+        "ready": "Listo",
+        "active": "Activo",
+        "off": "Desactivado",
+        "unavailable": "Solo extensión",
+        "permissionNeeded": "Permiso necesario",
+        "stashed": "Guardadas"
+      }
     }
   },
   "tasks": {
@@ -435,6 +456,31 @@
       "twelveHourClock": {
         "title": "Reloj de 24 Horas",
         "description": "Mostrar la hora en formato de 24 horas"
+      },
+      "zenMode": {
+        "title": "Modo Zen",
+        "description": "Elige qué se inicia automáticamente al entrar en el modo de enfoque.",
+        "platformNote": "El bloqueador de sitios y el guardado de pestañas solo funcionan en la extensión del navegador.",
+        "timer": {
+          "title": "Iniciar temporizador",
+          "description": "Inicia el temporizador de enfoque en cuanto empiece el Modo Zen."
+        },
+        "soundscapes": {
+          "title": "Reproducir paisajes sonoros",
+          "description": "Inicia automáticamente tu paisaje sonoro de enfoque."
+        },
+        "pinnedTaskSync": {
+          "title": "Sincronizar tarea fijada",
+          "description": "Usa la tarea fijada actual como ancla de la sesión Zen."
+        },
+        "siteBlocker": {
+          "title": "Activar bloqueador de sitios",
+          "description": "Activa los sitios bloqueados en modo solo enfoque durante el Modo Zen."
+        },
+        "tabStash": {
+          "title": "Guardar pestañas",
+          "description": "Guarda las pestañas abiertas al inicio del Modo Zen."
+        }
       }
     },
     "appearance": {

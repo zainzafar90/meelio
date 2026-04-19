@@ -11,6 +11,7 @@ import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useBookmarksStore } from "../../../stores/bookmarks.store";
+import { useZenModeStore } from "../../../stores/zen-mode.store";
 import type { TimerState } from "../../../types/timer.types";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
@@ -140,7 +141,9 @@ export function Dock(_props: DockProps): JSX.Element {
   const { t } = useTranslation();
   const user = useAuthStore(useShallow((state) => state.user));
   const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
+  const zenPhase = useZenModeStore(useShallow((state) => state.phase));
   const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
+  const isZenActive = zenPhase !== "inactive";
 
   const staticItems = BASE_STATIC_DOCK_ITEMS;
 
@@ -216,8 +219,25 @@ export function Dock(_props: DockProps): JSX.Element {
   return (
     <>
       {user && <DockOnboarding />}
-      <div className="relative z-50" ref={dockRef}>
-        <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
+      <div
+        className={cn(
+          "relative z-50 transition-all duration-500 ease-out",
+          isZenActive && "translate-y-[calc(100%+1rem)] opacity-0 hover:translate-y-0 hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100"
+        )}
+        ref={dockRef}
+      >
+        {isZenActive && (
+          <div
+            className="absolute inset-x-0 -top-10 h-10"
+            aria-hidden="true"
+          />
+        )}
+        <div
+          className={cn(
+            "rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl transition-all duration-500 ease-out",
+            isZenActive && "duration-700"
+          )}
+        >
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-3 pr-1">
               {visibleItems.map((item, index) => (

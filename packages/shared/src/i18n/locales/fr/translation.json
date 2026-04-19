@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "Tâche de concentration active",
-      "empty": "Choisissez une tâche pour ancrer votre prochain bloc de concentration"
+      "emptyLabel": "Aucune tâche de concentration sélectionnée",
+      "empty": "Choisissez une tâche pour commencer"
     },
     "calendar": {
       "noUpcomingEvent": "Aucun événement à venir",
@@ -189,6 +190,26 @@
     },
     "actions": {
       "startFocusing": "Se concentrer"
+    },
+    "zenMode": {
+      "readyLabel": "Mode Zen",
+      "activeLabel": "Zen actif",
+      "readyHeadline": "Un seul geste lance votre rituel de concentration",
+      "readySubtitle": "Le minuteur, les tâches, les ambiances, le bloqueur et les onglets suivent vos réglages enregistrés.",
+      "activeSubtitle": "Tout ce que vous avez activé tient la ligne.",
+      "start": "Entrer en mode Zen",
+      "starting": "Entrée en mode Zen...",
+      "end": "Quitter le mode Zen",
+      "ending": "Sortie du mode Zen...",
+      "configure": "Configurer",
+      "status": {
+        "ready": "Prêt",
+        "active": "Actif",
+        "off": "Désactivé",
+        "unavailable": "Extension seulement",
+        "permissionNeeded": "Autorisation requise",
+        "stashed": "Mis de côté"
+      }
     }
   },
   "tasks": {
@@ -435,6 +456,31 @@
       "twelveHourClock": {
         "title": "Horloge 24 heures",
         "description": "Afficher l'heure au format 24 heures"
+      },
+      "zenMode": {
+        "title": "Mode Zen",
+        "description": "Choisissez ce qui démarre automatiquement lorsque vous entrez en mode concentration.",
+        "platformNote": "Le bloqueur de sites et la mise de côté des onglets ne fonctionnent que dans l'extension du navigateur.",
+        "timer": {
+          "title": "Démarrer le minuteur",
+          "description": "Démarre le minuteur de concentration dès l'entrée en mode Zen."
+        },
+        "soundscapes": {
+          "title": "Lancer les ambiances sonores",
+          "description": "Lance automatiquement votre ambiance sonore de concentration."
+        },
+        "pinnedTaskSync": {
+          "title": "Synchroniser la tâche épinglée",
+          "description": "Utilise la tâche épinglée actuelle comme point d'ancrage de la session Zen."
+        },
+        "siteBlocker": {
+          "title": "Activer le bloqueur de sites",
+          "description": "Passe les sites bloqués en mode concentration uniquement pendant le mode Zen."
+        },
+        "tabStash": {
+          "title": "Mettre les onglets de côté",
+          "description": "Met de côté les onglets ouverts au démarrage du mode Zen."
+        }
       }
     },
     "appearance": {

@@ -55,6 +55,12 @@ const requiredShape = {
     activeTask: enTranslation.focusDashboard.activeTask,
     calendar: enTranslation.focusDashboard.calendar,
     actions: enTranslation.focusDashboard.actions,
+    zenMode: enTranslation.focusDashboard.zenMode,
+  },
+  settings: {
+    general: {
+      zenMode: enTranslation.settings.general.zenMode,
+    },
   },
 } satisfies TranslationTree;
 

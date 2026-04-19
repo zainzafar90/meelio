@@ -88,6 +88,7 @@ export * from "./core/site-blocker/data/site-list";
 
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";
+export * from "./core/tab-stash/services/tab-stash.service";
 
 // Bookmarks
 export * from "./core/bookmarks";

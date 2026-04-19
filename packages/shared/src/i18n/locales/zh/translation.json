@@ -179,7 +179,8 @@
     },
     "activeTask": {
       "label": "当前专注任务",
-      "empty": "选择一项任务作为下一段专注时段的锚点"
+      "emptyLabel": "尚未选择专注任务",
+      "empty": "选择一项任务开始"
     },
     "calendar": {
       "noUpcomingEvent": "暂无即将开始的事件",
@@ -189,6 +190,26 @@
     },
     "actions": {
       "startFocusing": "开始专注"
+    },
+    "zenMode": {
+      "readyLabel": "禅模式",
+      "activeLabel": "禅模式已开启",
+      "readyHeadline": "一键进入你的专注仪式",
+      "readySubtitle": "计时器、任务、声音景观、拦截器和标签页都会遵循你保存的默认设置。",
+      "activeSubtitle": "你启用的内容现在都在维持专注。",
+      "start": "进入禅模式",
+      "starting": "正在进入禅模式...",
+      "end": "结束禅模式",
+      "ending": "正在退出禅模式...",
+      "configure": "配置",
+      "status": {
+        "ready": "就绪",
+        "active": "活跃",
+        "off": "关闭",
+        "unavailable": "仅扩展可用",
+        "permissionNeeded": "需要权限",
+        "stashed": "已暂存"
+      }
     }
   },
   "tasks": {
@@ -435,6 +456,31 @@
       "twelveHourClock": {
         "title": "24 小时制时钟",
         "description": "以 24 小时格式显示时间"
+      },
+      "zenMode": {
+        "title": "禅模式",
+        "description": "选择进入专注模式时要自动启动的内容。",
+        "platformNote": "网站拦截和标签页暂存仅在浏览器扩展中可用。",
+        "timer": {
+          "title": "启动计时器",
+          "description": "进入禅模式后立即开始专注计时器。"
+        },
+        "soundscapes": {
+          "title": "播放声音景观",
+          "description": "自动开始你的专注声音景观。"
+        },
+        "pinnedTaskSync": {
+          "title": "同步置顶任务",
+          "description": "将当前置顶任务作为禅会话的锚点。"
+        },
+        "siteBlocker": {
+          "title": "启用网站拦截",
+          "description": "在禅模式期间将已拦截网站切换为仅专注模式。"
+        },
+        "tabStash": {
+          "title": "暂存标签页",
+          "description": "在禅模式开始时暂存已打开的标签页。"
+        }
       }
     },
     "appearance": {

@@ -167,3 +167,250 @@
   - `for f in packages/shared/src/i18n/locales/{en,de,es,fr,pt,ru,ja,zh,ar}/translation.json; do jq -e '.focusDashboard.timer.ready and .focusDashboard.timer.remaining and .focusDashboard.tasks.queuedCount and .focusDashboard.tasks.doneCount and .focusDashboard.activeTask.label and .focusDashboard.activeTask.empty and .focusDashboard.calendar.noUpcomingEvent and .focusDashboard.calendar.allDayEvent and .focusDashboard.calendar.upcomingEvent and .focusDashboard.calendar.nextEventLabel and .focusDashboard.actions.startFocusing' "$f" >/dev/null || exit 1; done && echo 'focus dashboard locale key verification passed'`
   - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/components/core/task-list/components/task-list.helpers.test.ts src/i18n/localization-completeness.test.ts --run`
   - `pnpm --filter @repo/shared test -- --run`
+
+## Zen Mode Focus Orchestration
+
+- [x] Explore the current focus-dashboard, timer, soundscapes, site-blocker, task, and dock integration points
+- [ ] Offer visual companion for shell and interaction design discussion
+- [x] Confirm the Zen Mode lifecycle assumption: explicit session enter/exit, not toggle on every timer stage change
+- [x] Lock the UX model for the primary control: one-tap enter, visible module readiness, and compact configuration access
+- [ ] Add persistent Zen Mode settings with defaults:
+  - [x] timer enabled by default
+  - [x] soundscapes enabled by default
+  - [x] pinned-task sync enabled by default
+  - [x] site blocker enabled by default
+  - [x] tab stash disabled by default
+- [x] Define the shared Zen Mode orchestration layer that snapshots pre-session state and restores it on exit
+- [ ] Extract extension-only actions behind callable services instead of UI-only hooks:
+  - [x] tab stashing
+  - [x] blocker focus activation sync
+- [x] Define dashboard UX states:
+  - [x] ready state with module readiness chips
+  - [x] active Zen Mode shell with 4-5 core interactions
+  - [x] degraded web behavior when extension-only capabilities are unavailable
+  - [x] permission-needed states for blocker/tab stash
+- [ ] Define start-session behavior:
+  - [x] ensure task store is initialized
+  - [x] use pinned task as session anchor when available
+  - [x] start timer
+  - [x] start or resume soundscape preset when enabled
+  - [x] activate blocker in focus mode when enabled
+  - [x] stash tabs when enabled and permissions allow
+- [ ] Define end-session behavior:
+  - [x] stop Zen Mode explicitly
+  - [x] restore prior soundscape playback state
+  - [x] restore prior dock/shell visibility state
+  - [x] release blocker back to the user’s non-session baseline
+  - [x] leave stashed tabs recoverable without destructive auto-restore
+- [x] Propose 2-3 orchestration and UX approaches with recommendation
+- [x] Present the Zen Mode design for approval
+- [x] Write the Zen Mode spec
+- [x] Review the written spec with the user
+- [x] Write the implementation plan
+
+## Review
+
+- Zen Mode now exists as an explicit shared session layer with persisted defaults, browser-capability awareness, and clean restoration of dock visibility, soundscapes, blocker state, and optional tab stashing.
+- The focus dashboard now has a real Zen ready state with module-readiness chips and compact configuration access, plus an active Zen shell centered on the current task, timer, module state, and explicit exit.
+- Tab stashing was extracted into a callable service so both the sheet and Zen Mode use the same behavior instead of duplicating tab logic inside a React hook.
+- The extension runtime now upgrades blocker enforcement into focus-only mode for the session, then restores the user’s previous blocker baseline on exit.
+- Locale coverage now includes the new Zen Mode settings and dashboard shell copy across every supported language.
+- Verification:
+  - `pnpm --filter @repo/shared test -- --run`
+  - `pnpm --filter web build`
+
+## Focus Dashboard Translation Fix
+
+- [x] Inspect the recent focus-dashboard empty-state copy changes and impacted locale keys
+- [x] Run localization completeness verification to confirm the current failure
+- [x] Update every supported locale with the new focus-dashboard active-task keys and copy
+- [x] Re-run localization and build verification
+- [x] Document the translation fix results
+
+## Review
+
+- The recent empty-state copy change added `focusDashboard.activeTask.emptyLabel` only in English, so every non-English locale failed localization completeness and risked mixed fallback copy in focus and Zen mode.
+- Added `emptyLabel` to every supported non-English locale and shortened the `empty` copy in those same locale blocks so the focus-dashboard empty state now matches the new UX across languages.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/i18n/localization-completeness.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+
+## Zen CTA Pill Refresh
+
+- [x] Inspect the current home-shell Zen CTA, top pill row, and recent related commits
+- [x] Offer visual companion for the Zen CTA/pill redesign discussion
+- [x] Confirm the desired interaction model for moving the primary Zen CTA into the top pill area
+- [x] Propose UI approaches for a top-pill CTA with popover or expanded action surface
+- [x] Present the recommended design and get approval before implementation
+- [x] Implement the approved Zen CTA/pill layout in the focus dashboard shell
+- [x] Verify the affected shared tests and app builds
+- [x] Document review notes and verification results
+
+## Review
+
+- The persistent bottom Zen launch rail was removed from the home shell so Zen entry now has one clear location instead of competing with the main content area.
+- The first top pill now reads like an action instead of a vague status by using the Zen entry copy in the trigger rather than a generic `Ready` value.
+- The popover no longer repeats `Ready` in the header or for every module. Included modules render as compact chips, while only non-ready exceptions stay in subdued secondary text.
+- `AmbientPill` still carries the interactive trigger styling through lightweight adornment and class overrides, but the body content is now materially quieter and more legible.
+- Added helper coverage for the Zen launch summary grouping so the popover does not regress back into per-item `Ready` repetition.
+- Follow-up polish softened pill contrast and shadow across the shell, restored icons inside the Zen summary chips/exceptions, and lightened the eyebrow/subtitle hierarchy so the panel stays minimal while scanning faster.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+
+## Focus Dashboard Refactor
+
+- [x] Audit the current `focus-dashboard.tsx` responsibilities and related helpers/tests
+- [x] Run React Doctor against the workspace and capture dashboard-specific findings
+- [x] Present the refactor design direction for approval
+- [x] Write the approved implementation plan into this todo
+- [x] Extract dashboard state selection and derived labels into a focused view-model hook
+- [x] Keep `focus-dashboard.tsx` as the orchestration container for effects and mode switching only
+- [x] Split home, focus, and zen shells into dedicated component files
+- [x] Split shared dashboard primitives (`ambient-pill`, `zen-primary-action`, `zen-session-controls`) into dedicated component files
+- [x] Replace clickable non-semantic task headings with semantic button affordances where selection is actionable
+- [x] Preserve the current ambient visual language while simplifying render composition
+- [x] Verify targeted shared tests and re-run React Doctor for the affected area
+
+## Review
+
+- `packages/shared/src/components/core/focus-dashboard/focus-dashboard.tsx` is 1,105 lines and currently mixes store selection, runtime effects, state synchronization, motion orchestration, and all three dashboard shells in one file.
+- React Doctor flagged the file for giant-component architecture, a multi-`setState` effect in Zen controls, and non-semantic interactive wrappers in the focus/zen task headings.
+- The clean split is around four concerns: dashboard data/orchestration, home shell, focus shell(s), and small shared primitives like pills and Zen action rails.
+- Approved direction: keep the current wallpaper-first ambient shell, but refactor the implementation into a thin container plus smaller presentational units so the code reads by responsibility instead of by screen state.
+- The main `focus-dashboard.tsx` container is now down to 281 lines and the presentational shells/primitives live in focused component files under `components/`, while a dedicated `use-focus-dashboard-view-model` hook owns the derived dashboard state.
+- The selectable task headings in focus and Zen modes now use semantic buttons when they open task selection, which removes the original non-interactive click handling from this surface.
+- Added helper coverage for task prioritization and pinned-task selection so the extracted view-model logic keeps the same task ordering behavior.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/stores/focus-dashboard.store.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `npx -y react-doctor@latest packages/shared --verbose`
+
+## Zen Mode Blocker Sync Correction
+
+- [x] Reproduce the current Zen blocker activation path against real focus state changes
+- [x] Bind Zen blocker activity to timer focus transitions instead of only session start/end
+- [x] Verify the extension blocker returns inactive outside focus while Zen remains enabled
+
+## Review
+
+- Zen blocker control is now explicitly synchronized from live timer state while Zen is active, instead of inferring “focus active” from session entry alone.
+- Entering Zen still moves the blocker into `focus-only` mode when that setting is enabled, but actual blocking now follows real focus state transitions, so breaks, pauses, and other out-of-focus states correctly deactivate enforcement without ending the Zen session.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/stores/zen-mode.store.test.ts --run`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+
+## Zen Controls Visibility Polish
+
+- [x] Inspect the active Zen shell controls ownership and current opacity behavior
+- [x] Confirm the preferred direction: keep frosted semi-white controls while moving fade behavior to the shared controls wrapper
+- [ ] Update the shared Zen controls cluster to reveal fully on extension focus, hover, or focus-within
+- [ ] Keep the button surfaces calm and translucent instead of bright white
+- [ ] Verify the affected shared surface and document the result
+
+## Zen Mode Minimal Shell Redesign
+
+- [x] Remove the duplicated Zen chrome from the home shell and restore a cleaner wallpaper-first hierarchy
+- [x] Move Zen entry out of the top-left and into a calmer dedicated launch surface
+- [x] Replace active Zen pill rows with a quieter single-line system summary
+- [x] Keep controls in one stable area with low-presence hover reveal behavior
+- [x] Make the dock recede during active Zen and return on hover without using hard borders
+- [x] Verify web and extension builds after the shell redesign
+
+## Review
+
+- Zen entry now lives in a dedicated bottom ritual rail on the home shell instead of competing with the ambient top metadata, which restores the wallpaper-first hierarchy.
+- Active Zen now keeps its session controls in that same bottom zone, so configure and end actions no longer jump to a different corner or compete with the task and timer.
+- The old five-pill Zen status row was replaced with a single text-first system summary, which preserves readiness visibility without adding bordered chrome.
+- The dock now recedes during active Zen and comes forward on hover or focus, giving the session a more immersive feel without hiding functionality.
+- Verification:
+  - `pnpm --filter @repo/shared test -- src/components/core/focus-dashboard/focus-dashboard.helpers.test.ts src/stores/zen-mode.store.test.ts --run`
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+
+## Zen Session Controls Reveal Tuning
+
+- [x] Confirm where active Zen controls derive their visibility and surface styling
+- [x] Make the shared Zen controls cluster fully visible when the extension window is focused or the controls are hovered/focus-within
+- [x] Keep the Zen action buttons on a softer frosted white surface instead of relying on stronger button chrome
+- [x] Verify the affected shared focus-dashboard surface with targeted tests/build checks
+
+## Review
+
+- Active Zen controls no longer depend on a timer-based cursor fade to become fully visible in the extension. The shared controls cluster now reveals at full opacity whenever the extension window itself is focused, while web still keeps the quieter hover/focus-within reveal.
+- The `Zen Settings` and `End Zen` buttons now sit on a softer frosted treatment with backdrop blur and stable translucent white fills, instead of the heavier gradient chrome that made the control group feel louder.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to force active Zen in the built extension newtab and confirm the `End Zen` controls wrapper reports computed `opacity: 1` while focused, with a blurred translucent button surface
+
+## Zen Controls Blur Correction
+
+- [x] Remove black border/shadow treatment from the active Zen controls rail and buttons
+- [x] Keep the blur-backed surface mounted continuously instead of revealing it via overall opacity
+- [x] Verify the corrected Zen controls styles in fresh web and extension builds plus a focused runtime inspection
+
+## Review
+
+- The active Zen controls rail no longer uses any dark border or shadow treatment. The rail surface and both buttons now rely on translucent white fills plus persistent blur instead of outlined chrome.
+- The blur layer is now a separate always-mounted element inside the controls rail, so the reveal no longer depends on fading the blur surface itself in and out. Only the fill/text emphasis changes between calm and active states.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - controls surface `boxShadow: none`
+    - end button `borderTopWidth: 0px`
+    - end button `boxShadow: none`
+    - button `backdropFilter: blur(24px)`
+    - dedicated blur layer `backdropFilter: blur(40px)`
+
+## Zen Controls Dock Separation
+
+- [x] Move the active Zen controls into their own lane above the dock band
+- [x] Make both Zen actions use the requested white surface treatment
+- [x] Verify the updated layout and control styling in fresh builds
+
+## Zen Controls Quiet-State Calibration
+
+- [x] Confirm the focused-out state is still too visually active
+- [x] Reduce quiet-state control emphasis while preserving persistent blur
+- [x] Verify the focused-out style values after the calibration change
+
+## Zen Controls Mouse Activity Reveal
+
+- [x] Replace `windowFocused` as the main reveal trigger with short-lived mouse activity
+- [x] Keep hover and focus-within as direct reveal signals for the controls themselves
+- [x] Verify the quiet state stays recessed until mouse movement occurs, then reveals smoothly
+
+## Review
+
+- The active Zen controls no longer reveal just because the window is focused. They now stay recessed until there is real mouse movement, direct hover, or focus within the controls.
+- Mouse activity is handled as a short-lived pulse, so the controls brighten smoothly when the pointer moves and then settle back to the quiet state without relying on permanent window-focus presence.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - before mouse movement: row `opacity: 0.55`, button `backgroundColor: rgba(255, 255, 255, 0.54)`
+    - after mouse movement: row `opacity: 0.809962`, button `backgroundColor: rgba(255, 255, 255, 0.737)`
+
+## Review
+
+- The active Zen controls now sit in a higher lane above the dock band, so they no longer share the same bottom slot as the dock.
+- Both `Zen Settings` and `End Zen` now use the same white surface treatment, but the focused-out state is intentionally subdued by lowering content opacity and button fill instead of leaving both actions near full white.
+- Verification:
+  - `pnpm --filter web build`
+  - `pnpm --filter extension build`
+  - `git diff --check`
+  - `node --input-type=module <<'EOF' ... EOF` to inspect the built extension newtab in active Zen and confirm:
+    - wrapper `bottom: 112px`
+    - focused-out row `opacity: 0.722864`
+    - both buttons `backgroundColor: rgba(255, 255, 255, 0.67)`

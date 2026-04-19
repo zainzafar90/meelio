@@ -24,9 +24,11 @@ import {
   useAppStore,
   useBookmarksStore,
   useDockStore,
+  useZenModeStore,
 } from "@repo/shared";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
+import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen-mode.runtime";
 import { extensionTimerStore } from "./stores/extension.timer.store";
 
 import "./style.css";
@@ -55,6 +57,11 @@ const Home = () => {
       isBreathingVisible: state.isBreathingVisible,
     }))
   );
+  const { zenPhase } = useZenModeStore(
+    useShallow((state) => ({
+      zenPhase: state.phase,
+    }))
+  );
   const { isRunning } = extensionTimerStore(
     useShallow((state) => ({
       isRunning: state.isRunning,
@@ -67,7 +74,7 @@ const Home = () => {
       <AppLayout>
         <TopBar />
         <Content />
-        {!(isTimerVisible || isRunning || isBreathingVisible) && (
+        {!(isTimerVisible || isRunning || isBreathingVisible || zenPhase !== "inactive") && (
           <div className="hidden shrink-0 justify-center pb-4 [@media(min-height:580px)]:flex">
             <Quote />
           </div>
@@ -135,6 +142,11 @@ const BottomBar = () => {
 
 export const NewTab = () => {
  useAppStore.getState().setPlatform("extension");
+
+  useEffect(() => {
+    useZenModeStore.getState().setRuntime(createExtensionZenModeRuntime());
+    void useZenModeStore.getState().refreshBrowserCapabilities();
+  }, []);
 
   return (
     <AppProvider>
