@@ -48,7 +48,19 @@ async function signInExtension() {
   if (!res.ok) throw new Error(`Couldn't mint token (${res.status}).`);
   const { token } = (await res.json()) as { token: string };
 
-  await chrome.runtime.sendMessage(extId, { type: "AUTH_TOKEN", token, nonce });
+  const ack = (await chrome.runtime.sendMessage(extId, {
+    type: "AUTH_TOKEN",
+    token,
+    nonce,
+  })) as { ok?: boolean; error?: string } | undefined;
+
+  if (!ack?.ok) {
+    throw new Error(
+      ack?.error === "nonce_mismatch"
+        ? "Sign-in nonce mismatch — please retry from the extension."
+        : "Extension rejected the sign-in.",
+    );
+  }
 }
 
 export default AuthExtension;
