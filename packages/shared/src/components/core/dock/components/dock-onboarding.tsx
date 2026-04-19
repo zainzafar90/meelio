@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Button } from "@repo/ui/components/ui/button";
+import { Brain } from "lucide-react";
 import { useOnboardingStore } from "../../../../stores/onboarding.store";
 import { useAuthStore } from "../../../../stores/auth.store";
 import { Icons } from "../../../../components/icons/icons";
@@ -25,9 +25,9 @@ export const ONBOARDING_STEPS = [
     id: "timer",
     titleKey: "onboarding.timer.title",
     descriptionKey: "onboarding.timer.description",
-    icon: Icons.pomodoroActive,
+    icon: Brain,
     gradient: "from-red-600/20 to-orange-500/20",
-    iconClass: "text-red-500",
+    iconClass: "text-white/70",
     action: "toggleTimer",
     position: 1, // Timer
   },
@@ -257,124 +257,80 @@ export const DockOnboarding = () => {
         data-testid="onboarding-modal"
       >
         <motion.div
-          className={cn(
-            "relative flex flex-col gap-4 w-[340px] rounded-xl border border-white/10",
-            "bg-gradient-to-br p-4 shadow-2xl backdrop-blur-xl",
-            "bg-zinc-900/90",
-            currentStepData.gradient
-          )}
-          initial={false}
-          animate={{
-            backgroundColor: ["rgba(24, 24, 27, 0.9)", "rgba(24, 24, 27, 0.9)"],
-          }}
-          transition={{ duration: 0.5 }}
+          className="relative flex flex-col gap-4 w-[340px] rounded-2xl border border-white/[0.08] bg-zinc-950/85 p-5 shadow-[0_24px_64px_rgba(0,0,0,0.6)] backdrop-blur-3xl"
         >
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2">
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2">
             <motion.div
-              className={cn(
-                "flex items-center justify-center size-24 rounded-full",
-                "bg-zinc-900/90 border border-white/10 shadow-2xl",
-                "backdrop-blur-xl"
-              )}
+              className="flex items-center justify-center size-20 rounded-full border border-white/10 bg-black/20 backdrop-blur-2xl"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.15 }}
             >
-              <IconComponent
-                className={cn("size-12", currentStepData.iconClass)}
-              />
+              <IconComponent className={cn("size-9", currentStepData.iconClass)} />
             </motion.div>
           </div>
 
-          <div className="space-y-4 pt-12">
+          <div className="space-y-2 pt-10">
             <motion.h3
               id="onboarding-title"
-              className="text-center text-xl font-medium text-white"
-              initial={{ opacity: 0, y: 10 }}
+              className="text-center text-lg font-semibold text-white"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.2 }}
               data-testid="onboarding-title"
             >
               {t(currentStepData.titleKey)}
             </motion.h3>
             <motion.p
               id="onboarding-description"
-              className="text-center text-sm text-white/70 line-clamp-2 h-10"
-              initial={{ opacity: 0, y: 10 }}
+              className="text-center text-sm text-white/50 leading-relaxed"
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.28 }}
               data-testid="onboarding-description"
             >
               {t(currentStepData.descriptionKey)}
             </motion.p>
           </div>
 
-          <div className="flex flex-col gap-4 mt-4">
-            <div className="flex justify-center gap-1">
-              {ONBOARDING_STEPS.map((step, index) => (
-                <motion.div
-                  key={step.id}
-                  className={cn(
-                    "h-1 rounded-full transition-all duration-300",
-                    index === currentStep ? "w-8 bg-white" : "w-4 bg-white/20"
-                  )}
-                  role="progressbar"
-                  aria-valuenow={index + 1}
-                  aria-valuemin={1}
-                  aria-valuemax={ONBOARDING_STEPS.length}
-                  aria-label={`Step ${index + 1} of ${ONBOARDING_STEPS.length}`}
-                  data-testid={`onboarding-step-${index}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 * index }}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between gap-2 mt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white/70 hover:text-white hover:bg-white/10"
-                onClick={handleSkip}
-                aria-label={t("common.actions.skip")}
-                data-testid="onboarding-skip"
-              >
-                {t("common.actions.skip")}
-              </Button>
-              <div className="flex items-center gap-2">
-                {currentStep > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handlePrevious}
-                    className="text-white/70 hover:text-white hover:bg-white/10"
-                    aria-label={t("common.actions.previous")}
-                    data-testid="onboarding-previous"
-                  >
-                    {t("common.actions.previous")}
-                  </Button>
+          <div className="flex justify-center gap-1 py-1">
+            {ONBOARDING_STEPS.map((step, index) => (
+              <div
+                key={step.id}
+                className={cn(
+                  "h-0.5 rounded-full transition-all duration-300",
+                  index === currentStep ? "w-6 bg-white/70" : "w-3 bg-white/15"
                 )}
-                <Button
-                  size="sm"
-                  onClick={handleNext}
-                  className="bg-white/80 hover:bg-white/90"
-                  aria-label={
-                    currentStep === ONBOARDING_STEPS.length - 1
-                      ? t("common.actions.finish")
-                      : t("common.actions.next")
-                  }
-                  data-testid={
-                    currentStep === ONBOARDING_STEPS.length - 1
-                      ? "onboarding-finish"
-                      : "onboarding-next"
-                  }
+                data-testid={`onboarding-step-${index}`}
+              />
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <button
+              onClick={handleSkip}
+              className="px-3 py-1.5 text-sm text-white/30 transition-colors hover:text-white/60"
+              data-testid="onboarding-skip"
+            >
+              {t("common.actions.skip")}
+            </button>
+            <div className="flex items-center gap-1">
+              {currentStep > 0 && (
+                <button
+                  onClick={handlePrevious}
+                  className="px-3 py-1.5 text-sm text-white/40 transition-colors hover:text-white/70"
+                  data-testid="onboarding-previous"
                 >
-                  {currentStep === ONBOARDING_STEPS.length - 1
-                    ? t("common.actions.finish")
-                    : t("common.actions.next")}
-                </Button>
-              </div>
+                  {t("common.actions.previous")}
+                </button>
+              )}
+              <button
+                onClick={handleNext}
+                className="rounded-xl bg-white/90 px-4 py-1.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-white"
+                data-testid={currentStep === ONBOARDING_STEPS.length - 1 ? "onboarding-finish" : "onboarding-next"}
+              >
+                {currentStep === ONBOARDING_STEPS.length - 1 ? t("common.actions.finish") : t("common.actions.next")}
+              </button>
             </div>
           </div>
         </motion.div>

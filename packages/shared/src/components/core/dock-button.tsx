@@ -2,6 +2,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { useDockStore } from "../../stores/dock.store";
 import type { ComponentType } from "react";
 import { useShallow } from "zustand/shallow";
+import { motion } from "framer-motion";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +12,7 @@ import {
 import { isMacPlatform } from "../../utils/common.utils";
 
 const FEATURE_RING_CLASS_BY_ID: Record<string, string> = {
-  timer: "ring-red-500/70",
+  timer: "ring-red-400/60",
   soundscapes: "ring-emerald-400/70",
   breathepod: "ring-sky-400/70",
   tasks: "ring-indigo-400/70",
@@ -98,6 +99,7 @@ export function DockButton({ item, isDisabled, className }: DockButtonProps): Re
   const ringClassName = shouldShowActiveRing
     ? `ring-2 ${FEATURE_RING_CLASS_BY_ID[item.id] ?? "ring-white/60"}`
     : "";
+  const isFocusRitual = item.id === "timer";
 
   const handleClick = () => {
     if (isDisabled) return;
@@ -122,7 +124,23 @@ export function DockButton({ item, isDisabled, className }: DockButtonProps): Re
             onClick={handleClick}
             role="button"
           >
-            <IconComponent className="size-6 text-white" />
+            {isFocusRitual && isActive ? (
+              <motion.span
+                animate={{
+                  filter: [
+                    "drop-shadow(0 0 2px rgba(255,255,255,0.2))",
+                    "drop-shadow(0 0 7px rgba(255,255,255,0.65))",
+                    "drop-shadow(0 0 2px rgba(255,255,255,0.2))",
+                  ],
+                }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10"
+              >
+                <IconComponent className="size-6 text-white" />
+              </motion.span>
+            ) : (
+              <IconComponent className="size-6 text-white" />
+            )}
             {item.requirePro && (
               <span
                 className={cn(

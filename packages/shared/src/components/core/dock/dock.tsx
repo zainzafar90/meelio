@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { StoreApi, UseBoundStore } from "zustand";
 
 import { SidebarTrigger } from "@repo/ui/components/ui/sidebar";
 import { cn } from "@repo/ui/lib/utils";
-import { MoreHorizontal } from "lucide-react";
+import { Brain, MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { Icons } from "../../../components/icons/icons";
@@ -10,6 +11,8 @@ import { Logo } from "../../../components/common/logo";
 import { useDockStore } from "../../../stores/dock.store";
 import { useAuthStore } from "../../../stores/auth.store";
 import { useBookmarksStore } from "../../../stores/bookmarks.store";
+import { useZenModeStore } from "../../../stores/zen-mode.store";
+import type { TimerState } from "../../../types/timer.types";
 import { useShallow } from "zustand/shallow";
 import { useDockShortcuts } from "../../../hooks/use-dock-shortcuts";
 
@@ -20,6 +23,7 @@ import { DockButton, DockItem } from "../dock-button";
 import { DockOnboarding, ONBOARDING_STEPS } from "./components/dock-onboarding";
 
 type DockIconComponent = React.ComponentType<{ className?: string }>;
+type TimerStoreHook = UseBoundStore<StoreApi<TimerState>>;
 
 const BASE_STATIC_DOCK_ITEMS: {
   id: string;
@@ -61,7 +65,12 @@ function getVisibleItemCount(width: number, itemsLength: number): number {
   return 1;
 }
 
-export function Dock(): JSX.Element {
+interface DockProps {
+  // timerStore kept for backward-compat with callers; no longer used internally
+  timerStore?: TimerStoreHook;
+}
+
+export function Dock(_props: DockProps): JSX.Element {
   useDockShortcuts();
 
   const [visibleItems, setVisibleItems] = useState<DockItem[]>([]);
@@ -82,7 +91,6 @@ export function Dock(): JSX.Element {
       isBookmarksVisible: state.isBookmarksVisible,
       currentOnboardingStep: state.currentOnboardingStep,
       resetDock: state.reset,
-      toggleTimer: state.toggleTimer,
       toggleSoundscapes: state.toggleSoundscapes,
       toggleBreathing: state.toggleBreathing,
       toggleTasks: state.toggleTasks,
@@ -91,6 +99,7 @@ export function Dock(): JSX.Element {
       toggleBackgrounds: state.toggleBackgrounds,
       toggleTabStash: state.toggleTabStash,
       toggleBookmarks: state.toggleBookmarks,
+      setTimerVisible: state.setTimerVisible,
       dockIconsVisible: state.dockIconsVisible,
     }))
   );
@@ -106,7 +115,6 @@ export function Dock(): JSX.Element {
     isBookmarksVisible,
     currentOnboardingStep,
     resetDock,
-    toggleTimer,
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
@@ -115,6 +123,7 @@ export function Dock(): JSX.Element {
     toggleBackgrounds,
     toggleTabStash,
     toggleBookmarks,
+    setTimerVisible,
     dockIconsVisible,
   } = dockState;
 
@@ -132,14 +141,24 @@ export function Dock(): JSX.Element {
   const { t } = useTranslation();
   const user = useAuthStore(useShallow((state) => state.user));
   const bookmarksDisplayMode = useBookmarksStore(useShallow((state) => state.displayMode));
+  const zenPhase = useZenModeStore(useShallow((state) => state.phase));
   const showBookmarksInDock = bookmarksDisplayMode === 'sheet' || bookmarksDisplayMode === 'both';
+  const isZenActive = zenPhase !== "inactive";
 
   const staticItems = BASE_STATIC_DOCK_ITEMS;
 
   const items = useMemo(() => {
     const allItems = [
       { id: "home", name: t("common.home"), icon: Logo, activeIcon: Logo, onClick: resetDock, visibilityKey: null },
-      { id: "timer", name: t("common.pomodoro"), icon: Icons.pomodoro, activeIcon: Icons.pomodoroActive, onClick: toggleTimer, visibilityKey: "timer" as const },
+      {
+        id: "timer",
+        name: "Focus",
+        icon: Brain,
+        activeIcon: Brain,
+        onClick: () => setTimerVisible(!isTimerVisible),
+        isActive: isTimerVisible,
+        visibilityKey: "timer" as const,
+      },
       { id: "soundscapes", name: t("common.soundscapes"), icon: Icons.soundscapes, activeIcon: Icons.soundscapesActive, onClick: toggleSoundscapes, visibilityKey: "soundscapes" as const },
       { id: "breathepod", name: t("common.breathing"), icon: Icons.breathing, activeIcon: Icons.breathingActive, onClick: toggleBreathing, visibilityKey: "breathing" as const },
       { id: "tasks", name: t("common.tasks"), icon: Icons.taskList, activeIcon: Icons.taskListActive, onClick: toggleTasks, visibilityKey: "tasks" as const },
@@ -156,7 +175,8 @@ export function Dock(): JSX.Element {
   }, [
     t,
     resetDock,
-    toggleTimer,
+    setTimerVisible,
+    isTimerVisible,
     toggleSoundscapes,
     toggleBreathing,
     toggleTasks,
@@ -199,8 +219,25 @@ export function Dock(): JSX.Element {
   return (
     <>
       {user && <DockOnboarding />}
-      <div className="relative z-50" ref={dockRef}>
-        <div className="rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl">
+      <div
+        className={cn(
+          "relative z-50 transition-all duration-500 ease-out",
+          isZenActive && "translate-y-[calc(100%+1rem)] opacity-0 hover:translate-y-0 hover:opacity-100 focus-within:translate-y-0 focus-within:opacity-100"
+        )}
+        ref={dockRef}
+      >
+        {isZenActive && (
+          <div
+            className="absolute inset-x-0 -top-10 h-10"
+            aria-hidden="true"
+          />
+        )}
+        <div
+          className={cn(
+            "rounded-2xl border border-white/10 bg-zinc-400/10 p-3 shadow-2xl backdrop-blur-xl transition-all duration-500 ease-out",
+            isZenActive && "duration-700"
+          )}
+        >
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-3 pr-1">
               {visibleItems.map((item, index) => (

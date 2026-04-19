@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useTranslation } from "@repo/shared/i18n";
@@ -13,11 +12,10 @@ import {
   BreathePod,
   CalendarDynamicIsland,
   CalendarSheet,
-  Clock,
   Dock,
-  Greeting,
-  NotesSheet,
+  FocusDashboard,
   Quote,
+  NotesSheet,
   SearchPopover,
   ShortcutsModal,
   SoundscapesSheet,
@@ -26,9 +24,12 @@ import {
   useAppStore,
   useBookmarksStore,
   useDockStore,
+  useZenModeStore,
 } from "@repo/shared";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
+import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen-mode.runtime";
+import { extensionTimerStore } from "./stores/extension.timer.store";
 
 import "./style.css";
 
@@ -50,12 +51,34 @@ const Home = () => {
     initializeBookmarks();
   }, [checkPermissions, initializeStore]);
 
+  const { isTimerVisible, isBreathingVisible } = useDockStore(
+    useShallow((state) => ({
+      isTimerVisible: state.isTimerVisible,
+      isBreathingVisible: state.isBreathingVisible,
+    }))
+  );
+  const { zenPhase } = useZenModeStore(
+    useShallow((state) => ({
+      zenPhase: state.phase,
+    }))
+  );
+  const { isRunning } = extensionTimerStore(
+    useShallow((state) => ({
+      isRunning: state.isRunning,
+    }))
+  );
+
   return (
     <>
       <Background />
       <AppLayout>
         <TopBar />
         <Content />
+        {!(isTimerVisible || isRunning || isBreathingVisible || zenPhase !== "inactive") && (
+          <div className="hidden shrink-0 justify-center pb-4 [@media(min-height:580px)]:flex">
+            <Quote />
+          </div>
+        )}
         <BottomBar />
       </AppLayout>
     </>
@@ -64,22 +87,23 @@ const Home = () => {
 
 const Content = () => {
   const { t } = useTranslation();
-  const { isBreathingVisible, isGreetingsVisible, isTimerVisible } = useDockStore(
+  const { isBreathingVisible } = useDockStore(
     useShallow((state) => ({
       isBreathingVisible: state.isBreathingVisible,
-      isGreetingsVisible: state.isGreetingsVisible,
-      isTimerVisible: state.isTimerVisible,
     }))
   );
 
-  const showGreetings = isGreetingsVisible || isTimerVisible;
-
   return (
     <main
-      className="flex flex-1 flex-col items-center justify-center"
+      className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden"
       aria-label={t("home.layout.main.aria")}
     >
-      {showGreetings && <GreetingsContent />}
+      {!isBreathingVisible && (
+        <FocusDashboard
+          timerStore={extensionTimerStore}
+          timerPanel={<ExtensionTimer />}
+        />
+      )}
       {isBreathingVisible && <BreathePod />}
       <SoundscapesSheet />
       <TaskListSheet />
@@ -91,38 +115,6 @@ const Content = () => {
       <CalendarSheet />
       <ShortcutsModal />
     </main>
-  );
-}
-
-const fadeSlideAnimation = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-};
-
-const GreetingsContent = () => {
-  const isTimerVisible = useDockStore(useShallow((state) => state.isTimerVisible));
-
-  return (
-    <motion.div>
-      <AnimatePresence mode="wait">
-        {isTimerVisible ? (
-          <motion.div key="timer" {...fadeSlideAnimation}>
-            <ExtensionTimer />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="clock"
-            className="flex flex-col items-center justify-center gap-8"
-            {...fadeSlideAnimation}
-          >
-            <Clock />
-            <Greeting />
-            <Quote />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
   );
 }
 
@@ -140,16 +132,21 @@ const BottomBar = () => {
   const { t } = useTranslation();
   return (
     <footer
-      className="flex items-center justify-center pb-2"
+      className="flex shrink-0 items-center justify-center pb-2"
       aria-label={t("home.layout.footer.aria")}
     >
-      <Dock />
+      <Dock timerStore={extensionTimerStore} />
     </footer>
   );
 }
 
 export const NewTab = () => {
  useAppStore.getState().setPlatform("extension");
+
+  useEffect(() => {
+    useZenModeStore.getState().setRuntime(createExtensionZenModeRuntime());
+    void useZenModeStore.getState().refreshBrowserCapabilities();
+  }, []);
 
   return (
     <AppProvider>

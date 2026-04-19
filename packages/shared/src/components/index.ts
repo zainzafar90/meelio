@@ -31,6 +31,8 @@ export * from "./core/dock/components/settings.dock";
 
 // Greeting
 export * from "./core/greetings/greetings-mantras";
+export * from "./core/focus-dashboard/focus-dashboard";
+export * from "./core/quick-capture/quick-capture-bar";
 
 // Quote
 export * from "./core/quote/quote";
@@ -86,6 +88,7 @@ export * from "./core/site-blocker/data/site-list";
 
 // Tab Stash
 export * from "./core/tab-stash/tab-stash.sheet";
+export * from "./core/tab-stash/services/tab-stash.service";
 
 // Bookmarks
 export * from "./core/bookmarks";

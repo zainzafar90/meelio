@@ -89,8 +89,8 @@
       "description": "Let's take a quick tour of your productivity dock."
     },
     "timer": {
-      "title": "Pomodoro Timer",
-      "description": "Stay focused with our Pomodoro timer. Break your work into focused sessions."
+      "title": "Focus Timer",
+      "description": "Set a focus session, pick a task, and let the timer keep you on track."
     },
     "soundscapes": {
       "title": "Soundscapes",
@@ -168,6 +168,50 @@
       }
     }
   },
+  "focusDashboard": {
+    "timer": {
+      "ready": "Ready to focus",
+      "remaining": "{{time}} remaining"
+    },
+    "tasks": {
+      "queuedCount": "{{count}} queued",
+      "doneCount": "{{count}} done"
+    },
+    "activeTask": {
+      "label": "Active Focus Task",
+      "emptyLabel": "No focus task selected",
+      "empty": "Choose a task to start"
+    },
+    "calendar": {
+      "noUpcomingEvent": "No upcoming event",
+      "allDayEvent": "All-day event",
+      "upcomingEvent": "Upcoming event",
+      "nextEventLabel": "Next: {{summary}}"
+    },
+    "actions": {
+      "startFocusing": "Start Focusing"
+    },
+    "zenMode": {
+      "readyLabel": "Zen Mode",
+      "activeLabel": "Zen active",
+      "readyHeadline": "One tap enters your focus ritual",
+      "readySubtitle": "Timer, tasks, soundscapes, blocker, and tabs follow your saved defaults.",
+      "activeSubtitle": "Everything you enabled is holding the line.",
+      "start": "Enter Zen",
+      "starting": "Entering Zen...",
+      "end": "End Zen",
+      "ending": "Leaving Zen...",
+      "configure": "Configure",
+      "status": {
+        "ready": "Ready",
+        "active": "Active",
+        "off": "Off",
+        "unavailable": "Extension only",
+        "permissionNeeded": "Permission needed",
+        "stashed": "Stashed"
+      }
+    }
+  },
   "tasks": {
     "sheet": {
       "title": "Task List",
@@ -180,7 +224,11 @@
     },
     "item": {
       "completed": "Completed",
-      "uncompleted": "Uncompleted"
+      "uncompleted": "Uncompleted",
+      "focus": "Focus",
+      "focused": "Focused",
+      "focusTitle": "Set this as your current focus task.",
+      "focusedTitle": "This task is set as your current focus task."
     },
     "list": {
       "create": {
@@ -408,6 +456,31 @@
       "twelveHourClock": {
         "title": "24-Hour Clock",
         "description": "Display time in 24-hour format"
+      },
+      "zenMode": {
+        "title": "Zen Mode",
+        "description": "Choose what starts automatically when you enter focus mode.",
+        "platformNote": "Site blocker and tab stash only run in the browser extension.",
+        "timer": {
+          "title": "Start timer",
+          "description": "Begin the focus timer as soon as Zen Mode starts."
+        },
+        "soundscapes": {
+          "title": "Play soundscapes",
+          "description": "Start your focus soundscape automatically."
+        },
+        "pinnedTaskSync": {
+          "title": "Sync pinned task",
+          "description": "Use the current pinned task as the Zen session anchor."
+        },
+        "siteBlocker": {
+          "title": "Enable site blocker",
+          "description": "Force blocked sites into focus-only mode during Zen Mode."
+        },
+        "tabStash": {
+          "title": "Stash tabs",
+          "description": "Stash open tabs at the start of Zen Mode."
+        }
       }
     },
     "appearance": {

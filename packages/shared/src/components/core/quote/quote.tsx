@@ -34,7 +34,7 @@ export const Quote = () => {
   return (
     <AnimatePresence mode="wait">
       <div
-        className="relative mx-auto max-w-xs rounded-lg border border-white/10 bg-gray-900/5 p-3 text-center backdrop-blur-lg sm:max-w-xs sm:px-4 md:max-w-md lg:max-w-lg"
+        className="mx-auto max-w-xl px-4 text-center"
         aria-label={t("home.quote.aria.quote")}
       >
         <motion.p
@@ -42,21 +42,20 @@ export const Quote = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.25 }}
-          className="text-shadow-lg md:text-md my-2 text-sm leading-relaxed lg:text-lg"
+          className="text-xs italic leading-relaxed text-white/88 text-balance sm:text-sm"
           key={currentQuote.quote}
         >
-          {currentQuote.quote}
+          <span className="box-decoration-clone rounded-md bg-black/18 px-2 py-0.5 shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-sm">
+            {currentQuote.quote}
+          </span>
         </motion.p>
         <span
-          className="text-xxs text-white/50 sm:text-xs md:text-sm"
+          className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] text-white/58 sm:text-xs"
           aria-label={t("home.quote.aria.author")}
         >
           — {currentQuote.author}
+          <QuoteIcon className="size-3 text-white/30" aria-hidden="true" />
         </span>
-        <QuoteIcon
-          className="absolute bottom-2 right-2 hidden size-6 text-white/20 sm:block"
-          aria-hidden="true"
-        />
       </div>
     </AnimatePresence>
   );

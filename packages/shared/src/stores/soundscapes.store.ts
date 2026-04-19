@@ -34,10 +34,12 @@ type State = {
   toggleShuffle: () => void;
   playSharedSound: (soundState: SoundState[]) => void;
   setSharedSoundState: (sharedSoundState: SoundState[]) => void;
+  captureSoundState: () => SoundState[];
+  restoreSoundState: (soundState: SoundState[]) => void;
   reset: () => void;
 };
 
-export const useSoundscapesStore = create<State>((set) => ({
+export const useSoundscapesStore = create<State>((set, get) => ({
   sounds: allSounds,
   globalVolume: 0.5,
   pausedSounds: [],
@@ -225,10 +227,39 @@ export const useSoundscapesStore = create<State>((set) => ({
       sounds: state.sounds.map((sound) => ({
         ...sound,
         playing: soundState.some((s) => s.id === sound.id),
+        volume:
+          soundState.find((sharedSound) => sharedSound.id === sound.id)?.volume ??
+          sound.volume,
       })),
     })),
 
   setSharedSoundState: (sharedSoundState) => set({ sharedSoundState }),
+
+  captureSoundState: () =>
+    get()
+      .sounds.filter((sound) => sound.playing)
+      .map((sound) => ({
+        id: sound.id,
+        volume: sound.volume,
+      })),
+
+  restoreSoundState: (soundState) =>
+    set((state) => ({
+      sounds: state.sounds.map((sound) => {
+        const restoredSound = soundState.find(
+          (candidate) => candidate.id === sound.id
+        );
+
+        return {
+          ...sound,
+          playing: Boolean(restoredSound),
+          volume: restoredSound?.volume ?? sound.volume,
+        };
+      }),
+      activeCategoryId: null,
+      pausedSounds: [],
+      isShuffling: false,
+    })),
 
   reset: () =>
     set({

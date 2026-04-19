@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from "react";
 import { Task } from "../../../../lib/db/models.dexie";
 import { cn } from "../../../../lib";
 import { Icons } from "../../../../components/icons";
+import { getTaskFocusActionCopy } from "./task-list.helpers";
 
 interface TaskListProps {
   tasks: Task[];
@@ -51,6 +52,7 @@ export function TaskList({
 }
 
 const TaskItem = ({ task }: { task: Task }) => {
+  const { t } = useTranslation();
   const { toggleTask, deleteTask, togglePinTask, editTask } = useTaskStore(
     useShallow((state) => ({
       toggleTask: state.toggleTask,
@@ -63,6 +65,13 @@ const TaskItem = ({ task }: { task: Task }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(task.title);
   const inputRef = useRef<HTMLInputElement>(null);
+  const focusActionCopy = getTaskFocusActionCopy(task);
+  const focusActionLabel = focusActionCopy
+    ? t(focusActionCopy.labelKey, { defaultValue: focusActionCopy.label })
+    : null;
+  const focusActionTitle = focusActionCopy
+    ? t(focusActionCopy.titleKey, { defaultValue: focusActionCopy.title })
+    : null;
 
   useEffect(() => {
     if (isEditing) {
@@ -137,20 +146,28 @@ const TaskItem = ({ task }: { task: Task }) => {
             {new Date(task.dueDate).toLocaleDateString()}
           </Badge>
         )}
-        <button
-          className="text-muted-foreground hover:text-yellow-500"
-          onClick={(e) => {
-            e.stopPropagation();
-            togglePinTask(task.id);
-          }}
-        >
-          <Icons.star
+        {focusActionCopy ? (
+          <button
+            type="button"
+            title={focusActionTitle ?? focusActionCopy.title}
+            aria-label={focusActionTitle ?? focusActionCopy.title}
             className={cn(
-              "h-4 w-4",
-              task.pinned ? "fill-yellow-400 text-yellow-400" : ""
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+              task.pinned
+                ? "border-yellow-500/50 bg-yellow-500/12 text-yellow-300 hover:bg-yellow-500/18"
+                : "border-border/70 text-muted-foreground hover:border-foreground/20 hover:text-foreground"
             )}
-          />
-        </button>
+            onClick={(e) => {
+              e.stopPropagation();
+              togglePinTask(task.id);
+            }}
+          >
+            <Icons.pin
+              className={cn("h-3.5 w-3.5", task.pinned ? "fill-current" : "")}
+            />
+            <span>{focusActionLabel ?? focusActionCopy.label}</span>
+          </button>
+        ) : null}
         <button
           className="invisible text-muted-foreground group-hover:visible"
           onClick={(e) => {

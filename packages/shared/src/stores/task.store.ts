@@ -27,6 +27,7 @@ interface TaskState {
   tasks: Task[];
   activeListId: string | null;
   isLoading: boolean;
+  hasInitialized: boolean;
   error: string | null;
 
   addTask: (task: {
@@ -35,7 +36,7 @@ interface TaskState {
     pinned?: boolean;
     categoryId?: string;
     providerId?: string;
-  }) => Promise<void>;
+  }) => Promise<Task | undefined>;
   toggleTask: (taskId: string) => Promise<void>;
   togglePinTask: (taskId: string) => Promise<void>;
   editTask: (taskId: string, title: string) => Promise<void>;
@@ -75,18 +76,30 @@ export const useTaskStore = create<TaskState>()(
       }));
     };
 
+    const getNextPromotableTask = (excludeId: string) =>
+      get()
+        .tasks
+        .filter(
+          (task) =>
+            task.id !== excludeId &&
+            !task.completed &&
+            !task.deletedAt
+        )
+        .sort((left, right) => (right.updatedAt ?? 0) - (left.updatedAt ?? 0))[0];
+
     return {
       lists: SYSTEM_LISTS,
       tasks: [],
       activeListId: "all",
       isLoading: false,
+      hasInitialized: false,
       error: null,
 
       addTask: async (task) => {
         const userId = getAuthUserId();
         if (!userId) {
           set({ error: "No user session found" });
-          return;
+          return undefined;
         }
 
         const activeListId = get().activeListId;
@@ -128,10 +141,14 @@ export const useTaskStore = create<TaskState>()(
             tasks: [...state.tasks, newTask],
             error: null,
           }));
+
+          return newTask;
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : "Failed to add task",
           });
+
+          return undefined;
         }
       },
 
@@ -139,20 +156,37 @@ export const useTaskStore = create<TaskState>()(
       const task = get().tasks.find((t) => t.id === taskId);
       if (!task) return;
 
-      const authState = useAuthStore.getState();
+      const nextPinnedTask =
+        task.pinned && !task.completed ? getNextPromotableTask(taskId) : undefined;
+      const toggledAt = Date.now();
       const updatedData = {
         completed: !task.completed,
-        updatedAt: Date.now(),
+        updatedAt: toggledAt,
         ...(task.pinned && !task.completed ? { pinned: false } : {}),
       };
 
       try {
         await db.tasks.update(taskId, updatedData);
 
+        if (nextPinnedTask) {
+          await db.tasks.update(nextPinnedTask.id, {
+            pinned: true,
+            updatedAt: toggledAt,
+          });
+        }
+
         set((state) => ({
-          tasks: state.tasks.map((t) =>
-            t.id === taskId ? { ...t, ...updatedData } : t
-          ),
+          tasks: state.tasks.map((t) => {
+            if (t.id === taskId) {
+              return { ...t, ...updatedData };
+            }
+
+            if (nextPinnedTask && t.id === nextPinnedTask.id) {
+              return { ...t, pinned: true, updatedAt: toggledAt };
+            }
+
+            return t;
+          }),
         }));
 
         if (updatedData.completed) {
@@ -252,10 +286,13 @@ export const useTaskStore = create<TaskState>()(
       set({ activeListId: listId });
     },
 
-    initializeStore: async () => {
+      initializeStore: async () => {
       const userId = useAuthStore.getState().user?.id;
 
-      if (!userId) return;
+      if (!userId) {
+        set({ hasInitialized: true });
+        return;
+      }
 
       if (isInitializing) {
         return;
@@ -272,7 +309,7 @@ export const useTaskStore = create<TaskState>()(
         console.error("Failed to initialize task store:", error);
         set({ error: error?.message || "Failed to initialize store" });
       } finally {
-        set({ isLoading: false });
+        set({ isLoading: false, hasInitialized: true });
         isInitializing = false;
       }
     },

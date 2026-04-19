@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import type { StoreApi, UseBoundStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { toast } from "sonner";
+import { Brain, Coffee } from "lucide-react";
 import { useDocumentTitle, useDisclosure } from "../hooks";
 import { useTranslation } from "../i18n";
+import { useZenModeStore } from "../stores/zen-mode.store";
 import {
   TimerStage,
   TimerEvent,
@@ -13,7 +15,6 @@ import {
 } from "../types/timer.types";
 import { formatTime } from "../utils/timer.utils";
 import { Icons } from "./icons";
-import { NextPinnedTask } from "./core/timer/components/timer-next-task";
 import { TimerStatsDialog } from "./core/timer/dialog/timer-stats.dialog";
 import { TimerSettingsDialog } from "./timer-settings.dialog";
 
@@ -83,64 +84,70 @@ const TimerView = ({
   const { t } = useTranslation();
 
   return (
-    <div className="relative">
-      <div className="max-w-full w-88 sm:w-[440px] lg:w-[540px] backdrop-blur-xl bg-white/5 rounded-3xl shadow-lg text-white">
-        <div className="p-4 sm:p-8 space-y-12">
+    <div className="relative w-full">
+      <div className="relative mx-auto w-[22rem] max-w-full overflow-hidden rounded-[30px] bg-white/10 text-white shadow-[0_24px_70px_rgba(0,0,0,0.20)] backdrop-blur-[28px] sm:w-[440px] lg:w-[520px]">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_28%,rgba(0,0,0,0.08))]" />
+        <div className="space-y-3 p-4 [@media(min-height:580px)]:space-y-5 sm:space-y-8 sm:p-7">
           <div className="w-full">
-            <div className="w-full h-12 rounded-full bg-gray-100/10 text-black p-1 flex">
+            <div className="flex h-12 w-full rounded-full bg-white/12 p-1 text-white backdrop-blur-md">
               <button
                 onClick={() => skip(TimerStage.Focus)}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                  stage === TimerStage.Focus ? "bg-white/50" : ""
+                className={`flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
+                  stage === TimerStage.Focus
+                    ? "bg-white text-zinc-950 shadow-lg"
+                    : "text-white/78 hover:bg-white/10"
                 }`}
                 title={t("timer.controls.focusMode")}
               >
-                <span>{t("timer.controls.focusLabel")}</span>
+                <Brain className="size-4 sm:hidden" />
+                <span className="hidden sm:inline">{t("timer.controls.focusLabel")}</span>
               </button>
               <button
                 onClick={() => skip(TimerStage.Break)}
                 disabled={stage === TimerStage.Break}
-                className={`flex-1 rounded-full flex items-center justify-center gap-2 transition-colors text-sm ${
-                  stage === TimerStage.Break ? "bg-white/50" : ""
-                } ${stage === TimerStage.Break ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium transition-colors ${
+                  stage === TimerStage.Break
+                    ? "bg-white text-zinc-950 shadow-lg"
+                    : "text-white/78 hover:bg-white/10"
+                } ${stage === TimerStage.Break ? "cursor-not-allowed" : ""}`}
                 title={t("timer.controls.breakMode")}
               >
-                <span>{t("timer.controls.breakLabel")}</span>
+                <Coffee className="size-4 sm:hidden" />
+                <span className="hidden sm:inline">{t("timer.controls.breakLabel")}</span>
               </button>
             </div>
           </div>
 
-          <div className="text-center space-y-4">
-            <div className="text-5xl sm:text-7xl md:text-9xl font-bold tracking-normal">
+          <div className="space-y-4 text-center">
+            <div className="text-5xl font-bold tracking-normal sm:text-7xl md:text-9xl">
               {formatTime(remaining)}
             </div>
-            <NextPinnedTask />
           </div>
 
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4">
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                className="relative hidden sm:flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={reset}
                 title={t("timer.controls.reset")}
                 role="button"
               >
-                <Icons.resetTimer className="size-4 text-white/90" />
+                <Icons.resetTimer className="size-4 text-white" />
                 <span className="sr-only">{t("timer.controls.resetLabel")}</span>
               </button>
 
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                className="relative hidden sm:flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={onStatsClick}
                 title={t("timer.controls.viewStats")}
                 role="button"
               >
-                <Icons.graph className="size-4 text-white/90" />
+                <Icons.graph className="size-4 text-white" />
                 <span className="sr-only">{t("timer.controls.statsLabel")}</span>
               </button>
 
               <button
-                className="cursor-pointer relative flex h-10 min-w-10 w-full items-center justify-center rounded-full shadow-lg bg-gradient-to-b from-zinc-800 to-zinc-900 text-white/90 backdrop-blur-sm"
+                className="relative flex h-10 min-w-10 w-full cursor-pointer items-center justify-center rounded-full bg-white text-zinc-950 shadow-xl transition-colors hover:bg-white/92"
                 onClick={() => running ? pause() : start()}
                 title={running ? t("common.actions.pause") : t("common.actions.start")}
                 role="button"
@@ -156,29 +163,29 @@ const TimerView = ({
               </button>
 
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={() => skip(stage === TimerStage.Focus ? TimerStage.Break : TimerStage.Focus)}
                 title={t("timer.controls.skipToNextStage")}
                 role="button"
               >
-                <Icons.forward className="size-4 text-white/90" />
+                <Icons.forward className="size-4 text-white" />
                 <span className="sr-only">{t("timer.controls.skipStage")}</span>
               </button>
 
               <button
-                className="cursor-pointer relative flex shrink-0 size-10 items-center justify-center rounded-full shadow-lg bg-gradient-to-b text-white/80 backdrop-blur-sm"
+                className="relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/14 text-white transition-colors backdrop-blur-sm hover:bg-white/20"
                 onClick={onSettingsClick}
                 title={t("timer.controls.settings")}
                 role="button"
               >
-                <Icons.settings className="size-4 text-white/90" />
+                <Icons.settings className="size-4 text-white" />
                 <span className="sr-only">{t("timer.controls.settings")}</span>
               </button>
             </div>
 
-            <div className="h-1.5 bg-gray-200/20 rounded-full">
+            <div className="h-1.5 rounded-full bg-white/14">
               <div
-                className="h-full bg-gray-100 rounded-full transition-all"
+                className="h-full rounded-full bg-white transition-all"
                 style={{ width: `${(remaining / durations[stage]) * 100}%` }}
                 role="progressbar"
                 aria-valuenow={(remaining / durations[stage]) * 100}
@@ -187,6 +194,80 @@ const TimerView = ({
               />
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ZenTimerView = ({
+  remaining,
+  running,
+  stage,
+  durations,
+  start,
+  pause,
+  skip,
+}: Pick<
+  TimerViewProps,
+  "remaining" | "running" | "stage" | "durations" | "start" | "pause" | "skip"
+>) => {
+  const { t } = useTranslation();
+
+  return (
+    <div className="relative mx-auto w-full max-w-lg">
+      <div className="flex flex-col items-center gap-6">
+        <div className="text-6xl font-bold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)] sm:text-8xl md:text-9xl">
+          {formatTime(remaining)}
+        </div>
+
+        <div className="flex items-center gap-3 rounded-full bg-white/10 px-2 py-1.5 shadow-[0_8px_32px_rgba(0,0,0,0.12)] backdrop-blur-2xl">
+          <button
+            className="inline-flex size-10 items-center justify-center rounded-full bg-white/14 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/22"
+            onClick={() =>
+              skip(
+                stage === TimerStage.Focus
+                  ? TimerStage.Break
+                  : TimerStage.Focus,
+              )
+            }
+            title={t("timer.controls.skipToNextStage")}
+          >
+            <Icons.forward className="size-4" />
+          </button>
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-white/14 px-5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition-colors duration-200 hover:bg-white/22"
+            onClick={() => (running ? pause() : start())}
+            title={
+              running
+                ? t("common.actions.pause")
+                : t("common.actions.start")
+            }
+          >
+            {running ? (
+              <Icons.pause className="size-4" />
+            ) : (
+              <Icons.play className="size-4" />
+            )}
+            <span className="uppercase text-xs tracking-wider">
+              {running
+                ? t("common.actions.pause")
+                : t("common.actions.start")}
+            </span>
+          </button>
+        </div>
+
+        <div className="mx-auto h-1 w-48 rounded-full bg-white/14">
+          <div
+            className="h-full rounded-full bg-white/60 transition-all"
+            style={{
+              width: `${(remaining / durations[stage]) * 100}%`,
+            }}
+            role="progressbar"
+            aria-valuenow={(remaining / durations[stage]) * 100}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          />
         </div>
       </div>
     </div>
@@ -327,21 +408,35 @@ export const Timer = ({ timerStore, runtime }: TimerProps) => {
     soundscapes,
     autoStartBreaks,
   } = useTimerState(timerStore, runtime);
+  const zenPhase = useZenModeStore(useShallow((state) => state.phase));
+  const isZenActive = zenPhase !== "inactive";
 
   return (
     <>
-      <TimerView
-        remaining={remaining}
-        running={store.isRunning}
-        stage={store.stage}
-        durations={store.durations}
-        start={store.start}
-        pause={store.pause}
-        reset={store.reset}
-        skip={store.skipToStage}
-        onStatsClick={statsModal.open}
-        onSettingsClick={settingsModal.open}
-      />
+      {isZenActive ? (
+        <ZenTimerView
+          remaining={remaining}
+          running={store.isRunning}
+          stage={store.stage}
+          durations={store.durations}
+          start={store.start}
+          pause={store.pause}
+          skip={store.skipToStage}
+        />
+      ) : (
+        <TimerView
+          remaining={remaining}
+          running={store.isRunning}
+          stage={store.stage}
+          durations={store.durations}
+          start={store.start}
+          pause={store.pause}
+          reset={store.reset}
+          skip={store.skipToStage}
+          onStatsClick={statsModal.open}
+          onSettingsClick={settingsModal.open}
+        />
+      )}
 
       <TimerStatsDialog
         isOpen={statsModal.isOpen}
