@@ -1,0 +1,17 @@
+name = "meelio"
+compatibility_date = "2026-01-27"
+assets = { directory = "./apps/web/dist" }
+
+# --- Dev environment (dev.meelio.io → api.dev.meelio.io) ---
+
+[env.dev]
+name = "meelio-dev"
+routes = [{ pattern = "dev.meelio.io", custom_domain = true }]
+assets = { directory = "./apps/web/dist" }
+
+# --- Production environment (app.meelio.io) ---
+
+[env.production]
+name = "meelio"
+routes = [{ pattern = "app.meelio.io", custom_domain = true }]
+assets = { directory = "./apps/web/dist" }

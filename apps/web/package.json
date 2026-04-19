@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite --port=4000",
     "build": "vite build",
+    "build:dev": "vite build --mode dev",
     "lint": "eslint . --max-warnings 0",
     "preview": "vite preview --host 0.0.0.0 --port=4000",
     "release": "standard-version",
@@ -18,6 +19,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
     "@number-flow/react": "^0.3.0",
+    "@repo/api-client": "workspace:*",
     "@repo/application": "workspace:*",
     "@repo/infrastructure": "workspace:*",
     "@repo/platform": "workspace:*",
@@ -62,6 +64,7 @@
     "@types/node": "^20.11.24",
     "@types/prettier": "^3.0.0",
     "@types/react": "^18.2.15",
+    "@types/chrome": "^0.0.270",
     "@types/react-dom": "^18.2.7",
     "@types/recharts": "^1.8.29",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
