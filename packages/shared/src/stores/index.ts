@@ -1,5 +1,6 @@
 export * from "./app.store";
 export * from "./auth.store";
+export * from "./auth-actions.store";
 export * from "./background.store";
 export * from "./bookmarks.store";
 export * from "./breathing.store";

@@ -22,11 +22,14 @@ import {
   TabStashSheet,
   TaskListSheet,
   useAppStore,
+  useAuthActionsStore,
   useBookmarksStore,
   useDockStore,
   useZenModeStore,
 } from "@repo/shared";
-import { AuthButton } from "./auth/auth-button";
+import { signOut as extensionSignOut } from "./auth/auth-client";
+import { bearerStore } from "./auth/bearer-store";
+import { startSignIn } from "./auth/extension-sign-in";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
 import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen-mode.runtime";
@@ -147,12 +150,33 @@ export const NewTab = () => {
   useEffect(() => {
     useZenModeStore.getState().setRuntime(createExtensionZenModeRuntime());
     void useZenModeStore.getState().refreshBrowserCapabilities();
+
+    const store = useAuthActionsStore.getState();
+    store.setActions({
+      signIn: startSignIn,
+      signOut: async () => {
+        await extensionSignOut();
+        useAuthActionsStore.getState().setIsSignedIn(false);
+      },
+    });
+
+    const refreshSignedIn = () => {
+      void bearerStore.getToken().then((t) => {
+        useAuthActionsStore.getState().setIsSignedIn(t !== null);
+      });
+    };
+    refreshSignedIn();
+
+    const onMessage = (msg: { type?: string }) => {
+      if (msg?.type === "MEELIO_AUTH_STATE_CHANGED") refreshSignedIn();
+    };
+    chrome.runtime.onMessage.addListener(onMessage);
+    return () => chrome.runtime.onMessage.removeListener(onMessage);
   }, []);
 
   return (
     <AppProvider>
       <Home />
-      <AuthButton />
     </AppProvider>
   );
 }
