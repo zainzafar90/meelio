@@ -26,6 +26,7 @@ import {
   useDockStore,
   useZenModeStore,
 } from "@repo/shared";
+import { AuthButton } from "./auth/auth-button";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
 import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen-mode.runtime";
@@ -151,6 +152,7 @@ export const NewTab = () => {
   return (
     <AppProvider>
       <Home />
+      <AuthButton />
     </AppProvider>
   );
 }
