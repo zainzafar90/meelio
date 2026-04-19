@@ -2,11 +2,6 @@ import { bearerStore } from "./bearer-store";
 
 const WEB_URL = import.meta.env.WXT_WEB_URL ?? "http://localhost:4000";
 
-/**
- * Open the web handoff page in a popup window so the page can call
- * window.close() once the bearer is sent. Pattern is "Option B" from
- * the v1 auth plan — keeps the user on the new tab the whole time.
- */
 export async function startHandoff(): Promise<void> {
   const nonce = generateNonce();
   await bearerStore.setPendingNonce(nonce);
@@ -31,13 +26,6 @@ export type ExternalMessageListener = (
   sendResponse: (response?: unknown) => void
 ) => boolean | undefined;
 
-/**
- * Register the externally-connectable listener on the background script.
- * Returns the listener so callers (mostly tests) can detach it.
- *
- * `onSuccess` runs after the token is persisted and the nonce is cleared —
- * useful for broadcasting MEELIO_AUTH_STATE_CHANGED to listening pages.
- */
 export function registerHandoffListener(
   onSuccess?: () => void
 ): ExternalMessageListener {
@@ -46,6 +34,8 @@ export function registerHandoffListener(
     void (async () => {
       const expected = await bearerStore.getPendingNonce();
       if (!expected || expected !== msg.nonce) {
+        // Do NOT clear the pending nonce on mismatch — a legitimate retry
+        // from the same handoff session must still be able to succeed.
         sendResponse({ ok: false, error: "nonce_mismatch" });
         return;
       }
@@ -58,23 +48,22 @@ export function registerHandoffListener(
       onSuccess?.();
       sendResponse({ ok: true });
 
-      // Close the popup window the page is in. window.close() from the page
-      // is unreliable for chrome.windows.create popups — Chromium often
-      // refuses. Closing from the extension side is the robust pattern.
-      const windowId = sender.tab?.windowId;
-      if (typeof windowId === "number") {
-        try {
-          await chrome.windows.remove(windowId);
-        } catch {
-          // Window already closed, or user closed it manually — ignore.
-        }
-      }
+      await closeSenderWindow(sender);
     })();
-    // signal async sendResponse so Chrome keeps the channel open
     return true;
   };
   chrome.runtime.onMessageExternal.addListener(listener);
   return listener;
+}
+
+async function closeSenderWindow(sender: chrome.runtime.MessageSender): Promise<void> {
+  const windowId = sender.tab?.windowId;
+  if (typeof windowId !== "number") return;
+  try {
+    await chrome.windows.remove(windowId);
+  } catch {
+    // Already closed by the user or by the page itself.
+  }
 }
 
 function generateNonce(): string {

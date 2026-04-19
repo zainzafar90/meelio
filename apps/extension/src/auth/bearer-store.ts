@@ -1,9 +1,3 @@
-/**
- * chrome.storage.local-backed accessor for the Better Auth bearer token and
- * the pending handoff nonce. Both values live outside the existing zustand
- * `useAuthStore` (which still creates a guest UUID user) so the two systems
- * can coexist while bearer auth rolls out.
- */
 const TOKEN_KEY = "meelio_auth_token";
 const NONCE_KEY = "meelio_pending_auth_nonce";
 

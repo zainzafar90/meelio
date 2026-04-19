@@ -4,8 +4,7 @@ export type WebAuthClientConfig = {
   baseURL: string;
 };
 
-// ReturnType alias declared first so the function can reference it.
-// Better Auth's inferred type is too deep to inline — this avoids TS2742.
+// Aliased to avoid TS2742 (Better Auth's inferred return type isn't portable).
 type _WebAuthClientReturn = ReturnType<typeof createAuthClient>;
 
 export function createWebAuthClient(config: WebAuthClientConfig): _WebAuthClientReturn {

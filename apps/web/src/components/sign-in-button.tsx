@@ -3,14 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { authClient } from "@/lib/auth-client";
 
-/**
- * Subtle floating sign-in affordance for the web app. Renders ONLY when:
- * - The user is confirmed signed-out (validated against /api/auth/get-session)
- * - The current route is NOT /sign-in or /auth/extension (those are dedicated
- *   auth pages — a button would be redundant there)
- *
- * Auth is opt-in: nothing on the web app is gated on this.
- */
+const isDedicatedAuthRoute = (pathname: string) =>
+  pathname === "/sign-in" || pathname.startsWith("/auth/");
+
 export const SignInButton = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,13 +22,8 @@ export const SignInButton = () => {
     };
   }, []);
 
-  // Render nothing while initial session check is in flight (no flash for signed-in users).
   if (isSignedIn !== false) return null;
-
-  // Don't render on dedicated auth pages.
-  if (location.pathname === "/sign-in" || location.pathname.startsWith("/auth/")) {
-    return null;
-  }
+  if (isDedicatedAuthRoute(location.pathname)) return null;
 
   return (
     <button

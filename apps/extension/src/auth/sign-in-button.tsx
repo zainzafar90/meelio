@@ -1,16 +1,9 @@
 import { startHandoff } from "./extension-handoff";
 import { useBearerAuth } from "./use-bearer-auth";
 
-/**
- * Subtle floating sign-in affordance. Renders ONLY when the user is
- * confirmed signed-out — never blocks the dashboard. Auth is opt-in:
- * the new-tab experience works fully without an account.
- */
 export const SignInButton = () => {
   const { hasToken } = useBearerAuth();
 
-  // While initial read is in flight, render nothing (no flash for signed-in users).
-  // Once confirmed signed-in, render nothing.
   if (hasToken !== false) return null;
 
   return (

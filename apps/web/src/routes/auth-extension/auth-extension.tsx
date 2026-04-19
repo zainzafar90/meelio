@@ -4,7 +4,7 @@ import { authClient } from "@/lib/auth-client";
 
 const STORAGE_KEY = "meelio:auth:ext-handoff";
 const TRIES_KEY = "meelio:auth:ext-handoff-tries";
-const MAX_TRIES = 2; // initial + one OAuth retry
+const MAX_TRIES = 2;
 const AUTO_CLOSE_DELAY_MS = 1500;
 
 type HandoffParams = { extId: string; nonce: string };
@@ -21,16 +21,14 @@ const AuthExtension = () => {
 
     async function run() {
       try {
-        // OAuth-denial loop guard — if Google sent us back with an error, surface it and stop
-        const url = new URL(window.location.href);
-        if (url.searchParams.get("error")) {
+        const oauthError = readOAuthError();
+        if (oauthError) {
           setStatus("error");
-          setError(`Sign-in declined: ${url.searchParams.get("error")}`);
+          setError(`Sign-in declined: ${oauthError}`);
           clearHandoffStash();
           return;
         }
 
-        // (a) Stash params (survives OAuth round trip)
         const params = readAndPersistParams();
         if (!params) {
           setStatus("error");
@@ -38,17 +36,15 @@ const AuthExtension = () => {
           return;
         }
 
-        // (b) Check session — if not signed in, redirect through OAuth back to here
         const session = await authClient.getSession();
         if (!session.data) {
-          const tries = Number(sessionStorage.getItem(TRIES_KEY) ?? "0");
-          if (tries >= MAX_TRIES) {
+          if (oauthRetryBudgetExhausted()) {
             setStatus("error");
             setError("Couldn't establish a session. Please try again from the extension.");
             clearHandoffStash();
             return;
           }
-          sessionStorage.setItem(TRIES_KEY, String(tries + 1));
+          incrementOAuthTries();
           await authClient.signIn.social({
             provider: "google",
             callbackURL: window.location.href,
@@ -57,54 +53,24 @@ const AuthExtension = () => {
         }
         setStatus("signed-in");
 
-        // (c) Mint bearer (cookie-authenticated POST)
-        const apiBase = (import.meta.env.VITE_API_URL ?? "http://localhost:8787") as string;
-        const res = await fetch(`${apiBase}/api/auth/token`, {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ purpose: "extension" }),
-        });
-        if (!res.ok) {
+        const token = await mintExtensionToken();
+        if (!token.ok) {
           setStatus("error");
-          setError(`Token mint failed: ${res.status}`);
-          return;
-        }
-        const { token } = (await res.json()) as { token: string };
-
-        // (d) Hand off to extension
-        const chromeApi = (globalThis as { chrome?: typeof chrome }).chrome;
-        if (!chromeApi?.runtime?.sendMessage) {
-          setStatus("error");
-          setError("chrome.runtime not available — open this from a Chromium browser");
+          setError(token.error);
           return;
         }
 
-        chromeApi.runtime.sendMessage(
-          params.extId,
-          { type: "AUTH_TOKEN", token, nonce: params.nonce },
-          () => {
-            const lastError = chromeApi.runtime.lastError;
-            if (lastError) {
-              const friendly = lastError.message?.includes("Receiving end does not exist")
-                ? "Couldn't reach the Meelio extension — make sure it's installed and enabled."
-                : (lastError.message ?? "sendMessage failed");
-              setStatus("error");
-              setError(friendly);
-              return;
-            }
+        sendTokenToExtension(params, token.value, {
+          onSuccess: () => {
             setStatus("minted");
             clearHandoffStash();
-            // Auto-close the popup window so the user returns to their extension new tab.
-            setTimeout(() => {
-              try {
-                window.close();
-              } catch {
-                // window.close() can fail in some contexts; UI fallback below tells user.
-              }
-            }, AUTO_CLOSE_DELAY_MS);
+            setTimeout(closeWindowSafely, AUTO_CLOSE_DELAY_MS);
           },
-        );
+          onError: (message) => {
+            setStatus("error");
+            setError(message);
+          },
+        });
       } catch (err) {
         setStatus("error");
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -132,6 +98,10 @@ const AuthExtension = () => {
   );
 };
 
+function readOAuthError(): string | null {
+  return new URL(window.location.href).searchParams.get("error");
+}
+
 function readAndPersistParams(): HandoffParams | null {
   const url = new URL(window.location.href);
   const extId = url.searchParams.get("ext_id");
@@ -146,6 +116,66 @@ function readAndPersistParams(): HandoffParams | null {
     return JSON.parse(stashed) as HandoffParams;
   } catch {
     return null;
+  }
+}
+
+function oauthRetryBudgetExhausted(): boolean {
+  return Number(sessionStorage.getItem(TRIES_KEY) ?? "0") >= MAX_TRIES;
+}
+
+function incrementOAuthTries(): void {
+  const current = Number(sessionStorage.getItem(TRIES_KEY) ?? "0");
+  sessionStorage.setItem(TRIES_KEY, String(current + 1));
+}
+
+type MintResult = { ok: true; value: string } | { ok: false; error: string };
+
+async function mintExtensionToken(): Promise<MintResult> {
+  const apiBase = (import.meta.env.VITE_API_URL ?? "http://localhost:8787") as string;
+  const res = await fetch(`${apiBase}/api/auth/token`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ purpose: "extension" }),
+  });
+  if (!res.ok) return { ok: false, error: `Token mint failed: ${res.status}` };
+  const { token } = (await res.json()) as { token: string };
+  return { ok: true, value: token };
+}
+
+function sendTokenToExtension(
+  params: HandoffParams,
+  token: string,
+  callbacks: { onSuccess: () => void; onError: (message: string) => void }
+): void {
+  const chromeApi = (globalThis as { chrome?: typeof chrome }).chrome;
+  if (!chromeApi?.runtime?.sendMessage) {
+    callbacks.onError("chrome.runtime not available — open this from a Chromium browser");
+    return;
+  }
+
+  chromeApi.runtime.sendMessage(
+    params.extId,
+    { type: "AUTH_TOKEN", token, nonce: params.nonce },
+    () => {
+      const lastError = chromeApi.runtime.lastError;
+      if (lastError) {
+        const friendly = lastError.message?.includes("Receiving end does not exist")
+          ? "Couldn't reach the Meelio extension — make sure it's installed and enabled."
+          : (lastError.message ?? "sendMessage failed");
+        callbacks.onError(friendly);
+        return;
+      }
+      callbacks.onSuccess();
+    },
+  );
+}
+
+function closeWindowSafely(): void {
+  try {
+    window.close();
+  } catch {
+    // Some browser contexts disallow window.close(); UI fallback covers this.
   }
 }
 
