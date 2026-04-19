@@ -33,22 +33,22 @@ globalThis.chrome = {
 };
 
 import { bearerStore } from "../../auth/bearer-store";
-import { registerHandoffListener } from "../../auth/extension-handoff";
+import { registerSignInListener } from "../../auth/extension-sign-in";
 
-describe("registerHandoffListener", () => {
+describe("registerSignInListener", () => {
   beforeEach(() => {
     storage.clear();
     externalListeners.length = 0;
   });
 
   it("registers itself on chrome.runtime.onMessageExternal", () => {
-    registerHandoffListener();
+    registerSignInListener();
     expect(externalListeners).toHaveLength(1);
   });
 
-  it("rejects when nonce doesn't match the stored pending nonce", async () => {
-    await bearerStore.setPendingNonce("real-nonce");
-    const listener = registerHandoffListener();
+  it("rejects when nonce doesn't match the stored sign-in nonce", async () => {
+    await bearerStore.setSignInNonce("real-nonce");
+    const listener = registerSignInListener();
 
     const sendResponse = vi.fn();
     listener(
@@ -64,13 +64,13 @@ describe("registerHandoffListener", () => {
       error: "nonce_mismatch",
     });
     expect(await bearerStore.getToken()).toBeNull();
-    // Pending nonce must NOT be cleared — a nonce-mismatch is suspicious and
+    // Sign-in nonce must NOT be cleared — a nonce-mismatch is suspicious and
     // we want subsequent legitimate retries to still work.
-    expect(await bearerStore.getPendingNonce()).toBe("real-nonce");
+    expect(await bearerStore.getSignInNonce()).toBe("real-nonce");
   });
 
-  it("rejects when no pending nonce is stored", async () => {
-    const listener = registerHandoffListener();
+  it("rejects when no sign-in nonce is stored", async () => {
+    const listener = registerSignInListener();
 
     const sendResponse = vi.fn();
     listener(
@@ -88,8 +88,8 @@ describe("registerHandoffListener", () => {
   });
 
   it("accepts when nonce matches and stores the token", async () => {
-    await bearerStore.setPendingNonce("good-nonce");
-    const listener = registerHandoffListener();
+    await bearerStore.setSignInNonce("good-nonce");
+    const listener = registerSignInListener();
 
     const sendResponse = vi.fn();
     listener(
@@ -101,11 +101,11 @@ describe("registerHandoffListener", () => {
 
     expect(sendResponse).toHaveBeenCalledWith({ ok: true });
     expect(await bearerStore.getToken()).toBe("t-xyz");
-    expect(await bearerStore.getPendingNonce()).toBeNull();
+    expect(await bearerStore.getSignInNonce()).toBeNull();
   });
 
   it("ignores non-AUTH_TOKEN messages", () => {
-    const listener = registerHandoffListener();
+    const listener = registerSignInListener();
     const sendResponse = vi.fn();
     const result = listener(
       { type: "SOMETHING_ELSE" },
@@ -116,10 +116,10 @@ describe("registerHandoffListener", () => {
     expect(sendResponse).not.toHaveBeenCalled();
   });
 
-  it("invokes onSuccess after persisting a valid handoff", async () => {
-    await bearerStore.setPendingNonce("ok-nonce");
+  it("invokes onSuccess after persisting a valid sign-in", async () => {
+    await bearerStore.setSignInNonce("ok-nonce");
     const onSuccess = vi.fn();
-    const listener = registerHandoffListener(onSuccess);
+    const listener = registerSignInListener(onSuccess);
 
     listener(
       { type: "AUTH_TOKEN", token: "tok", nonce: "ok-nonce" },

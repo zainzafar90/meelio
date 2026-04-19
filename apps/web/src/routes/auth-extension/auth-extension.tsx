@@ -8,7 +8,7 @@ const AuthExtension = () => {
   const [message, setMessage] = useState("Connecting…");
 
   useEffect(() => {
-    handoff()
+    signInExtension()
       .then(() => {
         setMessage("Signed in. Closing…");
         setTimeout(() => window.close(), 1000);
@@ -25,7 +25,7 @@ const AuthExtension = () => {
   );
 };
 
-async function handoff() {
+async function signInExtension() {
   const url = new URL(window.location.href);
   const extId = url.searchParams.get("ext_id");
   const nonce = url.searchParams.get("nonce");

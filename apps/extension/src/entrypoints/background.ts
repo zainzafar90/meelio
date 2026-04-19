@@ -40,7 +40,7 @@ import {
 } from "../features/site-blocker/services/blocker-state";
 import { normalizeSiteHost } from "../utils/site-blocker.utils";
 import { hasBlockerAccessPermission } from "../utils/extension-permissions";
-import { registerHandoffListener } from "../auth/extension-handoff";
+import { registerSignInListener } from "../auth/extension-sign-in";
 
 interface TimerControllerState {
   stage: TimerStage;
@@ -572,7 +572,7 @@ const handleExtensionCommand = async (
 export default defineBackground(() => {
   void refreshBlockerState();
 
-  registerHandoffListener(() => {
+  registerSignInListener(() => {
     chrome.runtime.sendMessage({ type: "MEELIO_AUTH_STATE_CHANGED" }).catch(() => undefined);
   });
 

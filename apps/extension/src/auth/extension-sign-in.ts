@@ -2,9 +2,9 @@ import { bearerStore } from "./bearer-store";
 
 const WEB_URL = (import.meta.env.WXT_WEB_URL as string | undefined) ?? "http://localhost:4000";
 
-export async function startHandoff() {
+export async function startSignIn() {
   const nonce = randomHex(16);
-  await bearerStore.setPendingNonce(nonce);
+  await bearerStore.setSignInNonce(nonce);
 
   const url = new URL(`${WEB_URL}/auth/extension`);
   url.searchParams.set("ext_id", chrome.runtime.id);
@@ -18,7 +18,7 @@ export async function startHandoff() {
   });
 }
 
-export function registerHandoffListener(onSuccess?: () => void) {
+export function registerSignInListener(onSuccess?: () => void) {
   const listener = (
     msg: { type?: unknown; token?: unknown; nonce?: unknown },
     sender: chrome.runtime.MessageSender,
@@ -43,12 +43,12 @@ async function handleAuthToken(
 ) {
   if (typeof msg.token !== "string" || typeof msg.nonce !== "string") return false;
 
-  const expected = await bearerStore.getPendingNonce();
-  // Don't clear pending nonce on mismatch — legitimate retries from the same handoff session must still succeed.
+  const expected = await bearerStore.getSignInNonce();
+  // Don't clear the sign-in nonce on mismatch — legitimate retries from the same sign-in attempt must still succeed.
   if (expected !== msg.nonce) return false;
 
   await bearerStore.setToken(msg.token);
-  await bearerStore.clearPendingNonce();
+  await bearerStore.clearSignInNonce();
 
   if (sender.tab?.windowId) {
     chrome.windows.remove(sender.tab.windowId).catch(() => undefined);

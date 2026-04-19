@@ -1,5 +1,5 @@
 const TOKEN_KEY = "meelio:auth:bearer-token";
-const NONCE_KEY = "meelio:auth:handoff-nonce";
+const NONCE_KEY = "meelio:auth:sign-in-nonce";
 
 export const bearerStore = {
   async getToken(): Promise<string | null> {
@@ -12,14 +12,14 @@ export const bearerStore = {
   async clearToken(): Promise<void> {
     await chrome.storage.local.remove(TOKEN_KEY);
   },
-  async getPendingNonce(): Promise<string | null> {
+  async getSignInNonce(): Promise<string | null> {
     const result = await chrome.storage.local.get(NONCE_KEY);
     return (result[NONCE_KEY] as string | undefined) ?? null;
   },
-  async setPendingNonce(nonce: string): Promise<void> {
+  async setSignInNonce(nonce: string): Promise<void> {
     await chrome.storage.local.set({ [NONCE_KEY]: nonce });
   },
-  async clearPendingNonce(): Promise<void> {
+  async clearSignInNonce(): Promise<void> {
     await chrome.storage.local.remove(NONCE_KEY);
   },
 };

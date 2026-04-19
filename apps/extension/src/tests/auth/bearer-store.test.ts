@@ -38,10 +38,10 @@ describe("bearerStore", () => {
     expect(await bearerStore.getToken()).toBeNull();
   });
 
-  it("stores and retrieves a pending nonce, then clears it", async () => {
-    await bearerStore.setPendingNonce("nonce-123");
-    expect(await bearerStore.getPendingNonce()).toBe("nonce-123");
-    await bearerStore.clearPendingNonce();
-    expect(await bearerStore.getPendingNonce()).toBeNull();
+  it("stores and retrieves the sign-in nonce, then clears it", async () => {
+    await bearerStore.setSignInNonce("nonce-123");
+    expect(await bearerStore.getSignInNonce()).toBe("nonce-123");
+    await bearerStore.clearSignInNonce();
+    expect(await bearerStore.getSignInNonce()).toBeNull();
   });
 });
