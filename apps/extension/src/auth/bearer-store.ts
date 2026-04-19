@@ -1,5 +1,5 @@
-const TOKEN_KEY = "meelio_auth_token";
-const NONCE_KEY = "meelio_pending_auth_nonce";
+const TOKEN_KEY = "meelio:auth:bearer-token";
+const NONCE_KEY = "meelio:auth:handoff-nonce";
 
 export const bearerStore = {
   async getToken(): Promise<string | null> {

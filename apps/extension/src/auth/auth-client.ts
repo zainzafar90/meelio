@@ -10,7 +10,7 @@ export const authClient = createBearerAuthClient({
   setToken: (token) => bearerStore.setToken(token),
 });
 
-export async function signOutAndClear(): Promise<void> {
+export async function signOut(): Promise<void> {
   try {
     await authClient.signOut();
   } finally {
