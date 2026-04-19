@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
-const STORAGE_KEY = "meelio:ext-handoff";
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8787";
 const AUTO_CLOSE_DELAY_MS = 1000;
 
@@ -63,39 +62,21 @@ async function runHandoff(): Promise<boolean> {
 
   const session = await authClient.getSession();
   if (!session.data) {
-    persistParams(params);
     await authClient.signIn.social({ provider: "google", callbackURL: window.location.href });
     return false;
   }
 
   const token = await mintExtensionToken();
   await sendTokenToExtension(params, token);
-  clearPersistedParams();
   return true;
 }
 
 // ── Pure ──────────────────────────────────────────────────────────────────────
 
 function readParams(url: URL): Params | null {
-  const fromUrl = paramsFromUrl(url);
-  if (fromUrl) return fromUrl;
-  return paramsFromSessionStorage();
-}
-
-function paramsFromUrl(url: URL): Params | null {
   const extId = url.searchParams.get("ext_id");
   const nonce = url.searchParams.get("nonce");
   return extId && nonce ? { extId, nonce } : null;
-}
-
-function paramsFromSessionStorage(): Params | null {
-  const raw = sessionStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as Params;
-  } catch {
-    return null;
-  }
 }
 
 function friendlyChromeError(message: string | undefined): string {
@@ -106,14 +87,6 @@ function friendlyChromeError(message: string | undefined): string {
 }
 
 // ── Side effects ──────────────────────────────────────────────────────────────
-
-function persistParams(params: Params): void {
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(params));
-}
-
-function clearPersistedParams(): void {
-  sessionStorage.removeItem(STORAGE_KEY);
-}
 
 async function mintExtensionToken(): Promise<string> {
   const res = await fetch(`${API_URL}/api/auth/token`, {
