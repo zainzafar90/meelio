@@ -6,7 +6,10 @@
   "scripts": {
     "build": "turbo run build",
     "build:web": "turbo run build --filter=web --filter=!extension",
+    "build:web:dev": "pnpm --filter web build:dev",
     "build:extension": "turbo run build --filter=extension",
+    "deploy:web:dev": "pnpm build:web:dev && pnpm wrangler deploy --env dev",
+    "deploy:web:prod": "pnpm build:web && pnpm wrangler deploy --env production",
     "package": "turbo run package --filter=extension",
     "preview": "turbo run preview --filter=web",
     "clean": "turbo run clean",
@@ -32,7 +35,8 @@
   },
   "devDependencies": {
     "prettier": "^3.2.5",
-    "turbo": "^2.4.2"
+    "turbo": "^2.4.2",
+    "wrangler": "^4.83.0"
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "0.24.0"

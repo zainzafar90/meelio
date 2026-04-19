@@ -55,5 +55,12 @@ export default defineConfig({
         matches: ["<all_urls>"],
       },
     ],
+    externally_connectable: {
+      matches: [
+        "https://app.meelio.io/*",
+        "https://dev.meelio.io/*",
+        "http://localhost:4000/*",
+      ],
+    },
   },
 });
