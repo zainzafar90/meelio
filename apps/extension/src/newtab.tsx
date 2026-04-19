@@ -26,7 +26,6 @@ import {
   useDockStore,
   useZenModeStore,
 } from "@repo/shared";
-import { SignInButton } from "./auth/sign-in-button";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
 import { ExtensionTimer } from "./components/extension.timer";
 import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen-mode.runtime";
@@ -149,14 +148,9 @@ export const NewTab = () => {
     void useZenModeStore.getState().refreshBrowserCapabilities();
   }, []);
 
-  // Auth is opt-in. The dashboard ALWAYS renders — never blocked on sign-in.
-  // SignInButton renders a subtle floating affordance when signed-out, and
-  // nothing when signed-in. Background validation in useBearerAuth clears
-  // stale bearers without disrupting the UI.
   return (
     <AppProvider>
       <Home />
-      <SignInButton />
     </AppProvider>
   );
 }

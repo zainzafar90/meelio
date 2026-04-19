@@ -40,7 +40,6 @@ import {
 } from "../features/site-blocker/services/blocker-state";
 import { normalizeSiteHost } from "../utils/site-blocker.utils";
 import { hasBlockerAccessPermission } from "../utils/extension-permissions";
-import { broadcastRuntimeMessage } from "../auth/chrome-api";
 import { registerHandoffListener } from "../auth/extension-handoff";
 
 interface TimerControllerState {
@@ -574,7 +573,7 @@ export default defineBackground(() => {
   void refreshBlockerState();
 
   registerHandoffListener(() => {
-    void broadcastRuntimeMessage({ type: "MEELIO_AUTH_STATE_CHANGED" });
+    chrome.runtime.sendMessage({ type: "MEELIO_AUTH_STATE_CHANGED" }).catch(() => undefined);
   });
 
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
