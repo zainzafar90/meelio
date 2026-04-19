@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { authClient } from "@/lib/auth-client";
-
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8787";
+import { apiUrl, authClient } from "@/auth";
 
 const AuthExtension = () => {
   const [message, setMessage] = useState("Connecting…");
@@ -39,7 +37,7 @@ async function signInExtension() {
     });
   }
 
-  const res = await fetch(`${API_URL}/api/auth/token`, {
+  const res = await fetch(`${apiUrl}/api/auth/token`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },

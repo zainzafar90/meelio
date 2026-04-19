@@ -1,12 +1,10 @@
 import { bearerStore } from "./bearer-store";
 
-const WEB_URL = (import.meta.env.WXT_WEB_URL as string | undefined) ?? "http://localhost:4000";
-
-export async function startSignIn() {
+export async function startSignIn(webUrl: string) {
   const nonce = randomHex(16);
   await bearerStore.setSignInNonce(nonce);
 
-  const url = new URL(`${WEB_URL}/auth/extension`);
+  const url = new URL(`${webUrl}/auth/extension`);
   url.searchParams.set("ext_id", chrome.runtime.id);
   url.searchParams.set("nonce", nonce);
 

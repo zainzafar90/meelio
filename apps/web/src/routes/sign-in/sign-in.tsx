@@ -1,4 +1,4 @@
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/auth";
 
 const SignIn = () => {
   const handleSignIn = async () => {

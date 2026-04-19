@@ -2,18 +2,22 @@ import { createBearerAuthClient } from "@repo/api-client/auth-bearer";
 
 import { bearerStore } from "./bearer-store";
 
-const API_URL = (import.meta.env.WXT_API_URL as string | undefined) ?? "http://localhost:8787";
+export function createAuth(baseURL: string) {
+  const client = createBearerAuthClient({
+    baseURL,
+    getToken: () => bearerStore.getToken(),
+    setToken: (token) => bearerStore.setToken(token),
+  });
 
-export const authClient = createBearerAuthClient({
-  baseURL: API_URL,
-  getToken: () => bearerStore.getToken(),
-  setToken: (token) => bearerStore.setToken(token),
-});
+  const signOut = async (): Promise<void> => {
+    try {
+      await client.signOut();
+    } finally {
+      await bearerStore.clearToken();
+    }
+  };
 
-export async function signOut(): Promise<void> {
-  try {
-    await authClient.signOut();
-  } finally {
-    await bearerStore.clearToken();
-  }
+  return { client, signOut };
 }
+
+export type Auth = ReturnType<typeof createAuth>;

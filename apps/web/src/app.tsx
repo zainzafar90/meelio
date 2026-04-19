@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { AppProvider, useAppStore, useAuthActionsStore } from "@repo/shared";
 
 import { Router } from "@/routes/router";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/auth";
 
 export const App = () => {
   useAppStore.getState().setPlatform("web");

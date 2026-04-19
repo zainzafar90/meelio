@@ -27,7 +27,7 @@ import {
   useDockStore,
   useZenModeStore,
 } from "@repo/shared";
-import { signOut as extensionSignOut } from "./auth/auth-client";
+import { createAuth } from "./auth/auth-client";
 import { bearerStore } from "./auth/bearer-store";
 import { startSignIn } from "./auth/extension-sign-in";
 import { ExtensionSiteBlockerSheet } from "./components/extension.site-blocker.sheet";
@@ -36,6 +36,13 @@ import { createExtensionZenModeRuntime } from "./features/zen-mode/extension-zen
 import { extensionTimerStore } from "./stores/extension.timer.store";
 
 import "./style.css";
+
+const API_URL = import.meta.env.WXT_API_URL;
+const WEB_URL = import.meta.env.WXT_WEB_URL;
+if (!API_URL) throw new Error("WXT_API_URL is required (see apps/extension/.env.development)");
+if (!WEB_URL) throw new Error("WXT_WEB_URL is required (see apps/extension/.env.development)");
+
+const { signOut: extensionSignOut } = createAuth(API_URL);
 
 const Home = () => {
   const { checkPermissions, initializeStore } = useBookmarksStore(
@@ -153,7 +160,7 @@ export const NewTab = () => {
 
     const store = useAuthActionsStore.getState();
     store.setActions({
-      signIn: startSignIn,
+      signIn: () => startSignIn(WEB_URL),
       signOut: async () => {
         await extensionSignOut();
         useAuthActionsStore.getState().setIsSignedIn(false);
